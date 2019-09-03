@@ -9,6 +9,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -20,6 +21,8 @@ import (
 	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -32,7 +35,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type SessionKeyRequest struct {
 	// Join Server issued identifier for the session keys.
@@ -58,7 +61,7 @@ func (m *SessionKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_SessionKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +111,7 @@ func (m *NwkSKeysResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_NwkSKeysResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -168,7 +171,7 @@ func (m *AppSKeyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return xxx_messageInfo_AppSKeyResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -217,7 +220,7 @@ func (m *CryptoServicePayloadRequest) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_CryptoServicePayloadRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -283,7 +286,7 @@ func (m *CryptoServicePayloadResponse) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_CryptoServicePayloadResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -330,7 +333,7 @@ func (m *JoinAcceptMICRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_JoinAcceptMICRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -381,7 +384,7 @@ func (m *DeriveSessionKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_DeriveSessionKeysRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -442,7 +445,7 @@ func (m *GetRootKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_GetRootKeysRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -504,7 +507,7 @@ func (m *ProvisionEndDevicesRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_ProvisionEndDevicesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -586,97 +589,13 @@ func (m *ProvisionEndDevicesRequest) GetFromData() *ProvisionEndDevicesRequest_I
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ProvisionEndDevicesRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ProvisionEndDevicesRequest_OneofMarshaler, _ProvisionEndDevicesRequest_OneofUnmarshaler, _ProvisionEndDevicesRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ProvisionEndDevicesRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ProvisionEndDevicesRequest_List)(nil),
 		(*ProvisionEndDevicesRequest_Range)(nil),
 		(*ProvisionEndDevicesRequest_FromData)(nil),
 	}
-}
-
-func _ProvisionEndDevicesRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ProvisionEndDevicesRequest)
-	// end_devices
-	switch x := m.EndDevices.(type) {
-	case *ProvisionEndDevicesRequest_List:
-		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.List); err != nil {
-			return err
-		}
-	case *ProvisionEndDevicesRequest_Range:
-		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Range); err != nil {
-			return err
-		}
-	case *ProvisionEndDevicesRequest_FromData:
-		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.FromData); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("ProvisionEndDevicesRequest.EndDevices has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ProvisionEndDevicesRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ProvisionEndDevicesRequest)
-	switch tag {
-	case 4: // end_devices.list
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ProvisionEndDevicesRequest_IdentifiersList)
-		err := b.DecodeMessage(msg)
-		m.EndDevices = &ProvisionEndDevicesRequest_List{msg}
-		return true, err
-	case 5: // end_devices.range
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ProvisionEndDevicesRequest_IdentifiersRange)
-		err := b.DecodeMessage(msg)
-		m.EndDevices = &ProvisionEndDevicesRequest_Range{msg}
-		return true, err
-	case 6: // end_devices.from_data
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ProvisionEndDevicesRequest_IdentifiersFromData)
-		err := b.DecodeMessage(msg)
-		m.EndDevices = &ProvisionEndDevicesRequest_FromData{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ProvisionEndDevicesRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ProvisionEndDevicesRequest)
-	// end_devices
-	switch x := m.EndDevices.(type) {
-	case *ProvisionEndDevicesRequest_List:
-		s := proto.Size(x.List)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ProvisionEndDevicesRequest_Range:
-		s := proto.Size(x.Range)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ProvisionEndDevicesRequest_FromData:
-		s := proto.Size(x.FromData)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ProvisionEndDevicesRequest_IdentifiersList struct {
@@ -701,7 +620,7 @@ func (m *ProvisionEndDevicesRequest_IdentifiersList) XXX_Marshal(b []byte, deter
 		return xxx_messageInfo_ProvisionEndDevicesRequest_IdentifiersList.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -750,7 +669,7 @@ func (m *ProvisionEndDevicesRequest_IdentifiersRange) XXX_Marshal(b []byte, dete
 		return xxx_messageInfo_ProvisionEndDevicesRequest_IdentifiersRange.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -790,7 +709,7 @@ func (m *ProvisionEndDevicesRequest_IdentifiersFromData) XXX_Marshal(b []byte, d
 		return xxx_messageInfo_ProvisionEndDevicesRequest_IdentifiersFromData.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -829,7 +748,7 @@ func (m *JoinEUIPrefix) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return xxx_messageInfo_JoinEUIPrefix.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -874,7 +793,7 @@ func (m *JoinEUIPrefixes) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return xxx_messageInfo_JoinEUIPrefixes.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1612,6 +1531,17 @@ type NsJsServer interface {
 	GetNwkSKeys(context.Context, *SessionKeyRequest) (*NwkSKeysResponse, error)
 }
 
+// UnimplementedNsJsServer can be embedded to have forward compatible implementations.
+type UnimplementedNsJsServer struct {
+}
+
+func (*UnimplementedNsJsServer) HandleJoin(ctx context.Context, req *JoinRequest) (*JoinResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HandleJoin not implemented")
+}
+func (*UnimplementedNsJsServer) GetNwkSKeys(ctx context.Context, req *SessionKeyRequest) (*NwkSKeysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNwkSKeys not implemented")
+}
+
 func RegisterNsJsServer(s *grpc.Server, srv NsJsServer) {
 	s.RegisterService(&_NsJs_serviceDesc, srv)
 }
@@ -1696,6 +1626,14 @@ func (c *asJsClient) GetAppSKey(ctx context.Context, in *SessionKeyRequest, opts
 // AsJsServer is the server API for AsJs service.
 type AsJsServer interface {
 	GetAppSKey(context.Context, *SessionKeyRequest) (*AppSKeyResponse, error)
+}
+
+// UnimplementedAsJsServer can be embedded to have forward compatible implementations.
+type UnimplementedAsJsServer struct {
+}
+
+func (*UnimplementedAsJsServer) GetAppSKey(ctx context.Context, req *SessionKeyRequest) (*AppSKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAppSKey not implemented")
 }
 
 func RegisterAsJsServer(s *grpc.Server, srv AsJsServer) {
@@ -1817,6 +1755,29 @@ type NetworkCryptoServiceServer interface {
 	DeriveNwkSKeys(context.Context, *DeriveSessionKeysRequest) (*NwkSKeysResponse, error)
 	// Get the NwkKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.
 	GetNwkKey(context.Context, *GetRootKeysRequest) (*KeyEnvelope, error)
+}
+
+// UnimplementedNetworkCryptoServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedNetworkCryptoServiceServer struct {
+}
+
+func (*UnimplementedNetworkCryptoServiceServer) JoinRequestMIC(ctx context.Context, req *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method JoinRequestMIC not implemented")
+}
+func (*UnimplementedNetworkCryptoServiceServer) JoinAcceptMIC(ctx context.Context, req *JoinAcceptMICRequest) (*CryptoServicePayloadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method JoinAcceptMIC not implemented")
+}
+func (*UnimplementedNetworkCryptoServiceServer) EncryptJoinAccept(ctx context.Context, req *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EncryptJoinAccept not implemented")
+}
+func (*UnimplementedNetworkCryptoServiceServer) EncryptRejoinAccept(ctx context.Context, req *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EncryptRejoinAccept not implemented")
+}
+func (*UnimplementedNetworkCryptoServiceServer) DeriveNwkSKeys(ctx context.Context, req *DeriveSessionKeysRequest) (*NwkSKeysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeriveNwkSKeys not implemented")
+}
+func (*UnimplementedNetworkCryptoServiceServer) GetNwkKey(ctx context.Context, req *GetRootKeysRequest) (*KeyEnvelope, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNwkKey not implemented")
 }
 
 func RegisterNetworkCryptoServiceServer(s *grpc.Server, srv NetworkCryptoServiceServer) {
@@ -2006,6 +1967,17 @@ type ApplicationCryptoServiceServer interface {
 	GetAppKey(context.Context, *GetRootKeysRequest) (*KeyEnvelope, error)
 }
 
+// UnimplementedApplicationCryptoServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedApplicationCryptoServiceServer struct {
+}
+
+func (*UnimplementedApplicationCryptoServiceServer) DeriveAppSKey(ctx context.Context, req *DeriveSessionKeysRequest) (*AppSKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeriveAppSKey not implemented")
+}
+func (*UnimplementedApplicationCryptoServiceServer) GetAppKey(ctx context.Context, req *GetRootKeysRequest) (*KeyEnvelope, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAppKey not implemented")
+}
+
 func RegisterApplicationCryptoServiceServer(s *grpc.Server, srv ApplicationCryptoServiceServer) {
 	s.RegisterService(&_ApplicationCryptoService_serviceDesc, srv)
 }
@@ -2163,6 +2135,23 @@ type JsEndDeviceRegistryServer interface {
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }
 
+// UnimplementedJsEndDeviceRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedJsEndDeviceRegistryServer struct {
+}
+
+func (*UnimplementedJsEndDeviceRegistryServer) Get(ctx context.Context, req *GetEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedJsEndDeviceRegistryServer) Set(ctx context.Context, req *SetEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
+}
+func (*UnimplementedJsEndDeviceRegistryServer) Provision(req *ProvisionEndDevicesRequest, srv JsEndDeviceRegistry_ProvisionServer) error {
+	return status.Errorf(codes.Unimplemented, "method Provision not implemented")
+}
+func (*UnimplementedJsEndDeviceRegistryServer) Delete(ctx context.Context, req *EndDeviceIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+
 func RegisterJsEndDeviceRegistryServer(s *grpc.Server, srv JsEndDeviceRegistryServer) {
 	s.RegisterService(&_JsEndDeviceRegistry_serviceDesc, srv)
 }
@@ -2298,6 +2287,14 @@ type JsServer interface {
 	GetJoinEUIPrefixes(context.Context, *types.Empty) (*JoinEUIPrefixes, error)
 }
 
+// UnimplementedJsServer can be embedded to have forward compatible implementations.
+type UnimplementedJsServer struct {
+}
+
+func (*UnimplementedJsServer) GetJoinEUIPrefixes(ctx context.Context, req *types.Empty) (*JoinEUIPrefixes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetJoinEUIPrefixes not implemented")
+}
+
 func RegisterJsServer(s *grpc.Server, srv JsServer) {
 	s.RegisterService(&_Js_serviceDesc, srv)
 }
@@ -2336,7 +2333,7 @@ var _Js_serviceDesc = grpc.ServiceDesc{
 func (m *SessionKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2344,39 +2341,49 @@ func (m *SessionKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SessionKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SessionKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionKeyID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.SessionKeyID)))
-		i += copy(dAtA[i:], m.SessionKeyID)
+	{
+		size := m.JoinEUI.Size()
+		i -= size
+		if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.DevEUI.Size()))
-	n1, err := m.DevEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
+	i--
 	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinEUI.Size()))
-	n2, err := m.JoinEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size := m.DevEUI.Size()
+		i -= size
+		if _, err := m.DevEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	i += n2
-	return i, nil
+	i--
+	dAtA[i] = 0x12
+	if len(m.SessionKeyID) > 0 {
+		i -= len(m.SessionKeyID)
+		copy(dAtA[i:], m.SessionKeyID)
+		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.SessionKeyID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *NwkSKeysResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2384,41 +2391,52 @@ func (m *NwkSKeysResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *NwkSKeysResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *NwkSKeysResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.FNwkSIntKey.Size()))
-	n3, err := m.FNwkSIntKey.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.NwkSEncKey.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	i += n3
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.SNwkSIntKey.Size()))
-	n4, err := m.SNwkSIntKey.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n4
+	i--
 	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.NwkSEncKey.Size()))
-	n5, err := m.NwkSEncKey.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.SNwkSIntKey.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	i += n5
-	return i, nil
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.FNwkSIntKey.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *AppSKeyResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2426,25 +2444,32 @@ func (m *AppSKeyResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *AppSKeyResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AppSKeyResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.AppSKey.Size()))
-	n6, err := m.AppSKey.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.AppSKey.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	i += n6
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *CryptoServicePayloadRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2452,52 +2477,63 @@ func (m *CryptoServicePayloadRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CryptoServicePayloadRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CryptoServicePayloadRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n7, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n7
-	if m.LoRaWANVersion != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.LoRaWANVersion))
-	}
-	if len(m.Payload) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.Payload)))
-		i += copy(dAtA[i:], m.Payload)
+	if m.ProvisioningData != nil {
+		{
+			size, err := m.ProvisioningData.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
 	}
 	if len(m.ProvisionerID) > 0 {
-		dAtA[i] = 0x22
-		i++
+		i -= len(m.ProvisionerID)
+		copy(dAtA[i:], m.ProvisionerID)
 		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.ProvisionerID)))
-		i += copy(dAtA[i:], m.ProvisionerID)
+		i--
+		dAtA[i] = 0x22
 	}
-	if m.ProvisioningData != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.ProvisioningData.Size()))
-		n8, err := m.ProvisioningData.MarshalTo(dAtA[i:])
+	if len(m.Payload) > 0 {
+		i -= len(m.Payload)
+		copy(dAtA[i:], m.Payload)
+		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.Payload)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.LoRaWANVersion != 0 {
+		i = encodeVarintJoinserver(dAtA, i, uint64(m.LoRaWANVersion))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n8
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *CryptoServicePayloadResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2505,23 +2541,29 @@ func (m *CryptoServicePayloadResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CryptoServicePayloadResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CryptoServicePayloadResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Payload) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.Payload)
+		copy(dAtA[i:], m.Payload)
 		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.Payload)))
-		i += copy(dAtA[i:], m.Payload)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *JoinAcceptMICRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2529,38 +2571,47 @@ func (m *JoinAcceptMICRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *JoinAcceptMICRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinAcceptMICRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.CryptoServicePayloadRequest.Size()))
-	n9, err := m.CryptoServicePayloadRequest.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size := m.DevNonce.Size()
+		i -= size
+		if _, err := m.DevNonce.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	i += n9
-	if m.JoinRequestType != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinRequestType))
-	}
+	i--
 	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.DevNonce.Size()))
-	n10, err := m.DevNonce.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.JoinRequestType != 0 {
+		i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinRequestType))
+		i--
+		dAtA[i] = 0x10
 	}
-	i += n10
-	return i, nil
+	{
+		size, err := m.CryptoServicePayloadRequest.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *DeriveSessionKeysRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2568,70 +2619,86 @@ func (m *DeriveSessionKeysRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *DeriveSessionKeysRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DeriveSessionKeysRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n11, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n11
-	if m.LoRaWANVersion != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.LoRaWANVersion))
-	}
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinNonce.Size()))
-	n12, err := m.JoinNonce.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n12
-	dAtA[i] = 0x22
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.DevNonce.Size()))
-	n13, err := m.DevNonce.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n13
-	dAtA[i] = 0x2a
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.NetID.Size()))
-	n14, err := m.NetID.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n14
-	if len(m.ProvisionerID) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.ProvisionerID)))
-		i += copy(dAtA[i:], m.ProvisionerID)
-	}
 	if m.ProvisioningData != nil {
+		{
+			size, err := m.ProvisioningData.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.ProvisioningData.Size()))
-		n15, err := m.ProvisioningData.MarshalTo(dAtA[i:])
+	}
+	if len(m.ProvisionerID) > 0 {
+		i -= len(m.ProvisionerID)
+		copy(dAtA[i:], m.ProvisionerID)
+		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.ProvisionerID)))
+		i--
+		dAtA[i] = 0x32
+	}
+	{
+		size := m.NetID.Size()
+		i -= size
+		if _, err := m.NetID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x2a
+	{
+		size := m.DevNonce.Size()
+		i -= size
+		if _, err := m.DevNonce.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	{
+		size := m.JoinNonce.Size()
+		i -= size
+		if _, err := m.JoinNonce.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	if m.LoRaWANVersion != 0 {
+		i = encodeVarintJoinserver(dAtA, i, uint64(m.LoRaWANVersion))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n15
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetRootKeysRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2639,41 +2706,51 @@ func (m *GetRootKeysRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetRootKeysRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetRootKeysRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n16, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n16
-	if len(m.ProvisionerID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.ProvisionerID)))
-		i += copy(dAtA[i:], m.ProvisionerID)
-	}
 	if m.ProvisioningData != nil {
+		{
+			size, err := m.ProvisioningData.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.ProvisioningData.Size()))
-		n17, err := m.ProvisioningData.MarshalTo(dAtA[i:])
+	}
+	if len(m.ProvisionerID) > 0 {
+		i -= len(m.ProvisionerID)
+		copy(dAtA[i:], m.ProvisionerID)
+		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.ProvisionerID)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n17
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ProvisionEndDevicesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2681,86 +2758,115 @@ func (m *ProvisionEndDevicesRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ProvisionEndDevicesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProvisionEndDevicesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n18, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n18
-	if len(m.ProvisionerID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.ProvisionerID)))
-		i += copy(dAtA[i:], m.ProvisionerID)
+	if m.EndDevices != nil {
+		{
+			size := m.EndDevices.Size()
+			i -= size
+			if _, err := m.EndDevices.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
 	}
 	if len(m.ProvisioningData) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.ProvisioningData)
+		copy(dAtA[i:], m.ProvisioningData)
 		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.ProvisioningData)))
-		i += copy(dAtA[i:], m.ProvisioningData)
+		i--
+		dAtA[i] = 0x1a
 	}
-	if m.EndDevices != nil {
-		nn19, err := m.EndDevices.MarshalTo(dAtA[i:])
+	if len(m.ProvisionerID) > 0 {
+		i -= len(m.ProvisionerID)
+		copy(dAtA[i:], m.ProvisionerID)
+		i = encodeVarintJoinserver(dAtA, i, uint64(len(m.ProvisionerID)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += nn19
+		i -= size
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ProvisionEndDevicesRequest_List) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ProvisionEndDevicesRequest_List) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.List != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.List.Size()))
-		n20, err := m.List.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.List.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
 		}
-		i += n20
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ProvisionEndDevicesRequest_Range) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ProvisionEndDevicesRequest_Range) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Range != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.Range.Size()))
-		n21, err := m.Range.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Range.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
 		}
-		i += n21
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ProvisionEndDevicesRequest_FromData) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ProvisionEndDevicesRequest_FromData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.FromData != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.FromData.Size()))
-		n22, err := m.FromData.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.FromData.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
 		}
-		i += n22
+		i--
+		dAtA[i] = 0x32
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ProvisionEndDevicesRequest_IdentifiersList) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2768,39 +2874,48 @@ func (m *ProvisionEndDevicesRequest_IdentifiersList) Marshal() (dAtA []byte, err
 }
 
 func (m *ProvisionEndDevicesRequest_IdentifiersList) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProvisionEndDevicesRequest_IdentifiersList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.JoinEUI != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinEUI.Size()))
-		n23, err := m.JoinEUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n23
-	}
 	if len(m.EndDeviceIDs) > 0 {
-		for _, msg := range m.EndDeviceIDs {
+		for iNdEx := len(m.EndDeviceIDs) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.EndDeviceIDs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintJoinserver(dAtA, i, uint64(size))
+			}
+			i--
 			dAtA[i] = 0x12
-			i++
-			i = encodeVarintJoinserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
+		}
+	}
+	if m.JoinEUI != nil {
+		{
+			size := m.JoinEUI.Size()
+			i -= size
+			if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
 				return 0, err
 			}
-			i += n
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ProvisionEndDevicesRequest_IdentifiersRange) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2808,35 +2923,44 @@ func (m *ProvisionEndDevicesRequest_IdentifiersRange) Marshal() (dAtA []byte, er
 }
 
 func (m *ProvisionEndDevicesRequest_IdentifiersRange) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProvisionEndDevicesRequest_IdentifiersRange) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.JoinEUI != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinEUI.Size()))
-		n24, err := m.JoinEUI.MarshalTo(dAtA[i:])
-		if err != nil {
+	{
+		size := m.StartDevEUI.Size()
+		i -= size
+		if _, err := m.StartDevEUI.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
-		i += n24
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
 	}
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.StartDevEUI.Size()))
-	n25, err := m.StartDevEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.JoinEUI != nil {
+		{
+			size := m.JoinEUI.Size()
+			i -= size
+			if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
 	}
-	i += n25
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ProvisionEndDevicesRequest_IdentifiersFromData) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2844,27 +2968,34 @@ func (m *ProvisionEndDevicesRequest_IdentifiersFromData) Marshal() (dAtA []byte,
 }
 
 func (m *ProvisionEndDevicesRequest_IdentifiersFromData) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProvisionEndDevicesRequest_IdentifiersFromData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.JoinEUI != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinEUI.Size()))
-		n26, err := m.JoinEUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.JoinEUI.Size()
+			i -= size
+			if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintJoinserver(dAtA, i, uint64(size))
 		}
-		i += n26
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *JoinEUIPrefix) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2872,30 +3003,37 @@ func (m *JoinEUIPrefix) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *JoinEUIPrefix) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinEUIPrefix) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintJoinserver(dAtA, i, uint64(m.JoinEUI.Size()))
-	n27, err := m.JoinEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n27
 	if m.Length != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintJoinserver(dAtA, i, uint64(m.Length))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	{
+		size := m.JoinEUI.Size()
+		i -= size
+		if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintJoinserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *JoinEUIPrefixes) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2903,33 +3041,42 @@ func (m *JoinEUIPrefixes) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *JoinEUIPrefixes) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinEUIPrefixes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Prefixes) > 0 {
-		for _, msg := range m.Prefixes {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintJoinserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Prefixes) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Prefixes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintJoinserver(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintJoinserver(dAtA []byte, offset int, v uint64) int {
+	offset -= sovJoinserver(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedSessionKeyRequest(r randyJoinserver, easy bool) *SessionKeyRequest {
 	this := &SessionKeyRequest{}
@@ -2980,7 +3127,7 @@ func NewPopulatedCryptoServicePayloadRequest(r randyJoinserver, easy bool) *Cryp
 		this.Payload[i] = byte(r.Intn(256))
 	}
 	this.ProvisionerID = randStringJoinserver(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ProvisioningData = types.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -3024,7 +3171,7 @@ func NewPopulatedDeriveSessionKeysRequest(r randyJoinserver, easy bool) *DeriveS
 	v16 := go_thethings_network_lorawan_stack_pkg_types.NewPopulatedNetID(r)
 	this.NetID = *v16
 	this.ProvisionerID = randStringJoinserver(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ProvisioningData = types.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -3037,7 +3184,7 @@ func NewPopulatedGetRootKeysRequest(r randyJoinserver, easy bool) *GetRootKeysRe
 	v17 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v17
 	this.ProvisionerID = randStringJoinserver(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ProvisioningData = types.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -3087,7 +3234,7 @@ func NewPopulatedProvisionEndDevicesRequest_FromData(r randyJoinserver, easy boo
 func NewPopulatedProvisionEndDevicesRequest_IdentifiersList(r randyJoinserver, easy bool) *ProvisionEndDevicesRequest_IdentifiersList {
 	this := &ProvisionEndDevicesRequest_IdentifiersList{}
 	this.JoinEUI = go_thethings_network_lorawan_stack_pkg_types.NewPopulatedEUI64(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v20 := r.Intn(5)
 		this.EndDeviceIDs = make([]EndDeviceIdentifiers, v20)
 		for i := 0; i < v20; i++ {
@@ -3130,7 +3277,7 @@ func NewPopulatedJoinEUIPrefix(r randyJoinserver, easy bool) *JoinEUIPrefix {
 
 func NewPopulatedJoinEUIPrefixes(r randyJoinserver, easy bool) *JoinEUIPrefixes {
 	this := &JoinEUIPrefixes{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v24 := r.Intn(5)
 		this.Prefixes = make([]JoinEUIPrefix, v24)
 		for i := 0; i < v24; i++ {
@@ -3495,14 +3642,7 @@ func (m *JoinEUIPrefixes) Size() (n int) {
 }
 
 func sovJoinserver(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozJoinserver(x uint64) (n int) {
 	return sovJoinserver((x << 1) ^ uint64((int64(x) >> 63)))
@@ -3524,9 +3664,9 @@ func (this *NwkSKeysResponse) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&NwkSKeysResponse{`,
-		`FNwkSIntKey:` + strings.Replace(strings.Replace(this.FNwkSIntKey.String(), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
-		`SNwkSIntKey:` + strings.Replace(strings.Replace(this.SNwkSIntKey.String(), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
-		`NwkSEncKey:` + strings.Replace(strings.Replace(this.NwkSEncKey.String(), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
+		`FNwkSIntKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FNwkSIntKey), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
+		`SNwkSIntKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.SNwkSIntKey), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
+		`NwkSEncKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.NwkSEncKey), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3536,7 +3676,7 @@ func (this *AppSKeyResponse) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&AppSKeyResponse{`,
-		`AppSKey:` + strings.Replace(strings.Replace(this.AppSKey.String(), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
+		`AppSKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.AppSKey), "KeyEnvelope", "KeyEnvelope", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3546,7 +3686,7 @@ func (this *CryptoServicePayloadRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&CryptoServicePayloadRequest{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
 		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
 		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
 		`ProvisionerID:` + fmt.Sprintf("%v", this.ProvisionerID) + `,`,
@@ -3582,7 +3722,7 @@ func (this *DeriveSessionKeysRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&DeriveSessionKeysRequest{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
 		`LoRaWANVersion:` + fmt.Sprintf("%v", this.LoRaWANVersion) + `,`,
 		`JoinNonce:` + fmt.Sprintf("%v", this.JoinNonce) + `,`,
 		`DevNonce:` + fmt.Sprintf("%v", this.DevNonce) + `,`,
@@ -3598,7 +3738,7 @@ func (this *GetRootKeysRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetRootKeysRequest{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
 		`ProvisionerID:` + fmt.Sprintf("%v", this.ProvisionerID) + `,`,
 		`ProvisioningData:` + strings.Replace(fmt.Sprintf("%v", this.ProvisioningData), "Struct", "types.Struct", 1) + `,`,
 		`}`,
@@ -3610,7 +3750,7 @@ func (this *ProvisionEndDevicesRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ProvisionEndDevicesRequest{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`ProvisionerID:` + fmt.Sprintf("%v", this.ProvisionerID) + `,`,
 		`ProvisioningData:` + fmt.Sprintf("%v", this.ProvisioningData) + `,`,
 		`EndDevices:` + fmt.Sprintf("%v", this.EndDevices) + `,`,
@@ -3652,9 +3792,14 @@ func (this *ProvisionEndDevicesRequest_IdentifiersList) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForEndDeviceIDs := "[]EndDeviceIdentifiers{"
+	for _, f := range this.EndDeviceIDs {
+		repeatedStringForEndDeviceIDs += fmt.Sprintf("%v", f) + ","
+	}
+	repeatedStringForEndDeviceIDs += "}"
 	s := strings.Join([]string{`&ProvisionEndDevicesRequest_IdentifiersList{`,
 		`JoinEUI:` + fmt.Sprintf("%v", this.JoinEUI) + `,`,
-		`EndDeviceIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIDs), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIDs:` + repeatedStringForEndDeviceIDs + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3695,8 +3840,13 @@ func (this *JoinEUIPrefixes) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForPrefixes := "[]JoinEUIPrefix{"
+	for _, f := range this.Prefixes {
+		repeatedStringForPrefixes += strings.Replace(strings.Replace(f.String(), "JoinEUIPrefix", "JoinEUIPrefix", 1), `&`, ``, 1) + ","
+	}
+	repeatedStringForPrefixes += "}"
 	s := strings.Join([]string{`&JoinEUIPrefixes{`,
-		`Prefixes:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Prefixes), "JoinEUIPrefix", "JoinEUIPrefix", 1), `&`, ``, 1) + `,`,
+		`Prefixes:` + repeatedStringForPrefixes + `,`,
 		`}`,
 	}, "")
 	return s

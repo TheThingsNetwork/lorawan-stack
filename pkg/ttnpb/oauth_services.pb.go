@@ -14,6 +14,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 func init() {
 	proto.RegisterFile("lorawan-stack/api/oauth_services.proto", fileDescriptor_10930ff381158870)
@@ -140,6 +142,23 @@ type OAuthAuthorizationRegistryServer interface {
 	ListTokens(context.Context, *ListOAuthAccessTokensRequest) (*OAuthAccessTokens, error)
 	Delete(context.Context, *OAuthClientAuthorizationIdentifiers) (*types.Empty, error)
 	DeleteToken(context.Context, *OAuthAccessTokenIdentifiers) (*types.Empty, error)
+}
+
+// UnimplementedOAuthAuthorizationRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedOAuthAuthorizationRegistryServer struct {
+}
+
+func (*UnimplementedOAuthAuthorizationRegistryServer) List(ctx context.Context, req *ListOAuthClientAuthorizationsRequest) (*OAuthClientAuthorizations, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedOAuthAuthorizationRegistryServer) ListTokens(ctx context.Context, req *ListOAuthAccessTokensRequest) (*OAuthAccessTokens, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTokens not implemented")
+}
+func (*UnimplementedOAuthAuthorizationRegistryServer) Delete(ctx context.Context, req *OAuthClientAuthorizationIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedOAuthAuthorizationRegistryServer) DeleteToken(ctx context.Context, req *OAuthAccessTokenIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteToken not implemented")
 }
 
 func RegisterOAuthAuthorizationRegistryServer(s *grpc.Server, srv OAuthAuthorizationRegistryServer) {

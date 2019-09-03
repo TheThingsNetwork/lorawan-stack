@@ -9,6 +9,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -20,6 +21,8 @@ import (
 	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -32,7 +35,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ClaimEndDeviceRequest struct {
 	// Types that are valid to be assigned to SourceDevice:
@@ -78,7 +81,7 @@ func (m *ClaimEndDeviceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_ClaimEndDeviceRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -191,74 +194,12 @@ func (m *ClaimEndDeviceRequest) GetInvalidateAuthenticationCode() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ClaimEndDeviceRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ClaimEndDeviceRequest_OneofMarshaler, _ClaimEndDeviceRequest_OneofUnmarshaler, _ClaimEndDeviceRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ClaimEndDeviceRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_)(nil),
 		(*ClaimEndDeviceRequest_QRCode)(nil),
 	}
-}
-
-func _ClaimEndDeviceRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ClaimEndDeviceRequest)
-	// source_device
-	switch x := m.SourceDevice.(type) {
-	case *ClaimEndDeviceRequest_AuthenticatedIdentifiers_:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.AuthenticatedIdentifiers); err != nil {
-			return err
-		}
-	case *ClaimEndDeviceRequest_QRCode:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		_ = b.EncodeRawBytes(x.QRCode)
-	case nil:
-	default:
-		return fmt.Errorf("ClaimEndDeviceRequest.SourceDevice has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ClaimEndDeviceRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ClaimEndDeviceRequest)
-	switch tag {
-	case 1: // source_device.authenticated_identifiers
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ClaimEndDeviceRequest_AuthenticatedIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.SourceDevice = &ClaimEndDeviceRequest_AuthenticatedIdentifiers_{msg}
-		return true, err
-	case 2: // source_device.qr_code
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.SourceDevice = &ClaimEndDeviceRequest_QRCode{x}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ClaimEndDeviceRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ClaimEndDeviceRequest)
-	// source_device
-	switch x := m.SourceDevice.(type) {
-	case *ClaimEndDeviceRequest_AuthenticatedIdentifiers_:
-		s := proto.Size(x.AuthenticatedIdentifiers)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ClaimEndDeviceRequest_QRCode:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(len(x.QRCode)))
-		n += len(x.QRCode)
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ClaimEndDeviceRequest_AuthenticatedIdentifiers struct {
@@ -284,7 +225,7 @@ func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) XXX_Marshal(b []byte, d
 		return xxx_messageInfo_ClaimEndDeviceRequest_AuthenticatedIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -330,7 +271,7 @@ func (m *AuthorizeApplicationRequest) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_AuthorizeApplicationRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -681,6 +622,20 @@ type EndDeviceClaimingServerServer interface {
 	UnauthorizeApplication(context.Context, *ApplicationIdentifiers) (*types.Empty, error)
 }
 
+// UnimplementedEndDeviceClaimingServerServer can be embedded to have forward compatible implementations.
+type UnimplementedEndDeviceClaimingServerServer struct {
+}
+
+func (*UnimplementedEndDeviceClaimingServerServer) Claim(ctx context.Context, req *ClaimEndDeviceRequest) (*EndDeviceIdentifiers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Claim not implemented")
+}
+func (*UnimplementedEndDeviceClaimingServerServer) AuthorizeApplication(ctx context.Context, req *AuthorizeApplicationRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthorizeApplication not implemented")
+}
+func (*UnimplementedEndDeviceClaimingServerServer) UnauthorizeApplication(ctx context.Context, req *ApplicationIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnauthorizeApplication not implemented")
+}
+
 func RegisterEndDeviceClaimingServerServer(s *grpc.Server, srv EndDeviceClaimingServerServer) {
 	s.RegisterService(&_EndDeviceClaimingServer_serviceDesc, srv)
 }
@@ -763,7 +718,7 @@ var _EndDeviceClaimingServer_serviceDesc = grpc.ServiceDesc{
 func (m *ClaimEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -771,112 +726,140 @@ func (m *ClaimEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ClaimEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimEndDeviceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.SourceDevice != nil {
-		nn1, err := m.SourceDevice.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.TargetNetID != nil {
+		{
+			size := m.TargetNetID.Size()
+			i -= size
+			if _, err := m.TargetNetID.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
 		}
-		i += nn1
+		i--
+		dAtA[i] = 0x6a
 	}
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(m.TargetApplicationIDs.Size()))
-	n2, err := m.TargetApplicationIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if len(m.TargetApplicationServerID) > 0 {
+		i -= len(m.TargetApplicationServerID)
+		copy(dAtA[i:], m.TargetApplicationServerID)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerID)))
+		i--
+		dAtA[i] = 0x5a
 	}
-	i += n2
-	if len(m.TargetDeviceID) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetDeviceID)))
-		i += copy(dAtA[i:], m.TargetDeviceID)
+	if len(m.TargetApplicationServerKEKLabel) > 0 {
+		i -= len(m.TargetApplicationServerKEKLabel)
+		copy(dAtA[i:], m.TargetApplicationServerKEKLabel)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerKEKLabel)))
+		i--
+		dAtA[i] = 0x52
+	}
+	if len(m.TargetApplicationServerAddress) > 0 {
+		i -= len(m.TargetApplicationServerAddress)
+		copy(dAtA[i:], m.TargetApplicationServerAddress)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerAddress)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if len(m.TargetNetworkServerKEKLabel) > 0 {
+		i -= len(m.TargetNetworkServerKEKLabel)
+		copy(dAtA[i:], m.TargetNetworkServerKEKLabel)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetNetworkServerKEKLabel)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.TargetNetworkServerAddress) > 0 {
+		i -= len(m.TargetNetworkServerAddress)
+		copy(dAtA[i:], m.TargetNetworkServerAddress)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetNetworkServerAddress)))
+		i--
+		dAtA[i] = 0x3a
 	}
 	if m.InvalidateAuthenticationCode {
-		dAtA[i] = 0x28
-		i++
+		i--
 		if m.InvalidateAuthenticationCode {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x28
 	}
-	if len(m.TargetNetworkServerAddress) > 0 {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetNetworkServerAddress)))
-		i += copy(dAtA[i:], m.TargetNetworkServerAddress)
+	if len(m.TargetDeviceID) > 0 {
+		i -= len(m.TargetDeviceID)
+		copy(dAtA[i:], m.TargetDeviceID)
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetDeviceID)))
+		i--
+		dAtA[i] = 0x22
 	}
-	if len(m.TargetNetworkServerKEKLabel) > 0 {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetNetworkServerKEKLabel)))
-		i += copy(dAtA[i:], m.TargetNetworkServerKEKLabel)
-	}
-	if len(m.TargetApplicationServerAddress) > 0 {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerAddress)))
-		i += copy(dAtA[i:], m.TargetApplicationServerAddress)
-	}
-	if len(m.TargetApplicationServerKEKLabel) > 0 {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerKEKLabel)))
-		i += copy(dAtA[i:], m.TargetApplicationServerKEKLabel)
-	}
-	if len(m.TargetApplicationServerID) > 0 {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.TargetApplicationServerID)))
-		i += copy(dAtA[i:], m.TargetApplicationServerID)
-	}
-	if m.TargetNetID != nil {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(m.TargetNetID.Size()))
-		n3, err := m.TargetNetID.MarshalTo(dAtA[i:])
+	{
+		size, err := m.TargetApplicationIDs.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n3
+		i -= size
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0x1a
+	if m.SourceDevice != nil {
+		{
+			size := m.SourceDevice.Size()
+			i -= size
+			if _, err := m.SourceDevice.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.AuthenticatedIdentifiers != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(m.AuthenticatedIdentifiers.Size()))
-		n4, err := m.AuthenticatedIdentifiers.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.AuthenticatedIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
 		}
-		i += n4
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ClaimEndDeviceRequest_QRCode) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ClaimEndDeviceRequest_QRCode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.QRCode != nil {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.QRCode)
+		copy(dAtA[i:], m.QRCode)
 		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.QRCode)))
-		i += copy(dAtA[i:], m.QRCode)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -884,39 +867,49 @@ func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) Marshal() (dAtA []byte,
 }
 
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(m.JoinEUI.Size()))
-	n5, err := m.JoinEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(m.DevEUI.Size()))
-	n6, err := m.DevEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n6
 	if len(m.AuthenticationCode) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.AuthenticationCode)
+		copy(dAtA[i:], m.AuthenticationCode)
 		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.AuthenticationCode)))
-		i += copy(dAtA[i:], m.AuthenticationCode)
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	{
+		size := m.DevEUI.Size()
+		i -= size
+		if _, err := m.DevEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size := m.JoinEUI.Size()
+		i -= size
+		if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *AuthorizeApplicationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -924,35 +917,45 @@ func (m *AuthorizeApplicationRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *AuthorizeApplicationRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AuthorizeApplicationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n7, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n7
 	if len(m.APIKey) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.APIKey)
+		copy(dAtA[i:], m.APIKey)
 		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(len(m.APIKey)))
-		i += copy(dAtA[i:], m.APIKey)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintDeviceclaimingserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintDeviceclaimingserver(dAtA []byte, offset int, v uint64) int {
+	offset -= sovDeviceclaimingserver(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedClaimEndDeviceRequest(r randyDeviceclaimingserver, easy bool) *ClaimEndDeviceRequest {
 	this := &ClaimEndDeviceRequest{}
@@ -1192,14 +1195,7 @@ func (m *AuthorizeApplicationRequest) Size() (n int) {
 }
 
 func sovDeviceclaimingserver(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozDeviceclaimingserver(x uint64) (n int) {
 	return sovDeviceclaimingserver((x << 1) ^ uint64((int64(x) >> 63)))
@@ -1210,7 +1206,7 @@ func (this *ClaimEndDeviceRequest) String() string {
 	}
 	s := strings.Join([]string{`&ClaimEndDeviceRequest{`,
 		`SourceDevice:` + fmt.Sprintf("%v", this.SourceDevice) + `,`,
-		`TargetApplicationIDs:` + strings.Replace(strings.Replace(this.TargetApplicationIDs.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`TargetApplicationIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.TargetApplicationIDs), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`TargetDeviceID:` + fmt.Sprintf("%v", this.TargetDeviceID) + `,`,
 		`InvalidateAuthenticationCode:` + fmt.Sprintf("%v", this.InvalidateAuthenticationCode) + `,`,
 		`TargetNetworkServerAddress:` + fmt.Sprintf("%v", this.TargetNetworkServerAddress) + `,`,
@@ -1260,7 +1256,7 @@ func (this *AuthorizeApplicationRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&AuthorizeApplicationRequest{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`APIKey:` + fmt.Sprintf("%v", this.APIKey) + `,`,
 		`}`,
 	}, "")

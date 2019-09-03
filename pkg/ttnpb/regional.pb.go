@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -31,7 +32,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ConcentratorConfig struct {
 	Channels             []*ConcentratorConfig_Channel           `protobuf:"bytes,1,rep,name=channels,proto3" json:"channels,omitempty"`
@@ -58,7 +59,7 @@ func (m *ConcentratorConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_ConcentratorConfig.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -147,7 +148,7 @@ func (m *ConcentratorConfig_Channel) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_ConcentratorConfig_Channel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -206,7 +207,7 @@ func (m *ConcentratorConfig_LoRaStandardChannel) XXX_Marshal(b []byte, determini
 		return xxx_messageInfo_ConcentratorConfig_LoRaStandardChannel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -274,7 +275,7 @@ func (m *ConcentratorConfig_FSKChannel) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_ConcentratorConfig_FSKChannel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -330,7 +331,7 @@ func (m *ConcentratorConfig_LBTConfiguration) XXX_Marshal(b []byte, deterministi
 		return xxx_messageInfo_ConcentratorConfig_LBTConfiguration.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -610,7 +611,7 @@ func (this *ConcentratorConfig_LBTConfiguration) Equal(that interface{}) bool {
 func (m *ConcentratorConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -618,86 +619,103 @@ func (m *ConcentratorConfig) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ConcentratorConfig) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ConcentratorConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Channels) > 0 {
-		for _, msg := range m.Channels {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintRegional(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if m.LoRaStandardChannel != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.LoRaStandardChannel.Size()))
-		n1, err := m.LoRaStandardChannel.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	if m.FSKChannel != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.FSKChannel.Size()))
-		n2, err := m.FSKChannel.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
-	if m.LBT != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.LBT.Size()))
-		n3, err := m.LBT.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	if m.PingSlot != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.PingSlot.Size()))
-		n4, err := m.PingSlot.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
+	if m.ClockSource != 0 {
+		i = encodeVarintRegional(dAtA, i, uint64(m.ClockSource))
+		i--
+		dAtA[i] = 0x38
 	}
 	if len(m.Radios) > 0 {
-		for _, msg := range m.Radios {
+		for iNdEx := len(m.Radios) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Radios[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintRegional(dAtA, i, uint64(size))
+			}
+			i--
 			dAtA[i] = 0x32
-			i++
-			i = encodeVarintRegional(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+		}
+	}
+	if m.PingSlot != nil {
+		{
+			size, err := m.PingSlot.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintRegional(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.LBT != nil {
+		{
+			size, err := m.LBT.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintRegional(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.FSKChannel != nil {
+		{
+			size, err := m.FSKChannel.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintRegional(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.LoRaStandardChannel != nil {
+		{
+			size, err := m.LoRaStandardChannel.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintRegional(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Channels) > 0 {
+		for iNdEx := len(m.Channels) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Channels[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintRegional(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	if m.ClockSource != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.ClockSource))
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ConcentratorConfig_Channel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -705,27 +723,32 @@ func (m *ConcentratorConfig_Channel) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ConcentratorConfig_Channel) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ConcentratorConfig_Channel) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Frequency != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintRegional(dAtA, i, m.Frequency)
-	}
 	if m.Radio != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintRegional(dAtA, i, uint64(m.Radio))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Frequency != 0 {
+		i = encodeVarintRegional(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ConcentratorConfig_LoRaStandardChannel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -733,37 +756,42 @@ func (m *ConcentratorConfig_LoRaStandardChannel) Marshal() (dAtA []byte, err err
 }
 
 func (m *ConcentratorConfig_LoRaStandardChannel) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ConcentratorConfig_LoRaStandardChannel) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Frequency != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintRegional(dAtA, i, m.Frequency)
-	}
-	if m.Radio != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.Radio))
+	if m.SpreadingFactor != 0 {
+		i = encodeVarintRegional(dAtA, i, uint64(m.SpreadingFactor))
+		i--
+		dAtA[i] = 0x20
 	}
 	if m.Bandwidth != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintRegional(dAtA, i, uint64(m.Bandwidth))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.SpreadingFactor != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintRegional(dAtA, i, uint64(m.SpreadingFactor))
+	if m.Radio != 0 {
+		i = encodeVarintRegional(dAtA, i, uint64(m.Radio))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Frequency != 0 {
+		i = encodeVarintRegional(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ConcentratorConfig_FSKChannel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -771,27 +799,32 @@ func (m *ConcentratorConfig_FSKChannel) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ConcentratorConfig_FSKChannel) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ConcentratorConfig_FSKChannel) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Frequency != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintRegional(dAtA, i, m.Frequency)
-	}
 	if m.Radio != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintRegional(dAtA, i, uint64(m.Radio))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Frequency != 0 {
+		i = encodeVarintRegional(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ConcentratorConfig_LBTConfiguration) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -799,64 +832,71 @@ func (m *ConcentratorConfig_LBTConfiguration) Marshal() (dAtA []byte, err error)
 }
 
 func (m *ConcentratorConfig_LBTConfiguration) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ConcentratorConfig_LBTConfiguration) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.RSSITarget != 0 {
-		dAtA[i] = 0xd
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSITarget)))
-		i += 4
+	n5, err5 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ScanTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.ScanTime):])
+	if err5 != nil {
+		return 0, err5
 	}
-	if m.RSSIOffset != 0 {
-		dAtA[i] = 0x15
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIOffset)))
-		i += 4
-	}
+	i -= n5
+	i = encodeVarintRegional(dAtA, i, uint64(n5))
+	i--
 	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintRegional(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ScanTime)))
-	n5, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ScanTime, dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.RSSIOffset != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIOffset)))
+		i--
+		dAtA[i] = 0x15
 	}
-	i += n5
-	return i, nil
+	if m.RSSITarget != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSITarget)))
+		i--
+		dAtA[i] = 0xd
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintRegional(dAtA []byte, offset int, v uint64) int {
+	offset -= sovRegional(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedConcentratorConfig(r randyRegional, easy bool) *ConcentratorConfig {
 	this := &ConcentratorConfig{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(5)
 		this.Channels = make([]*ConcentratorConfig_Channel, v1)
 		for i := 0; i < v1; i++ {
 			this.Channels[i] = NewPopulatedConcentratorConfig_Channel(r, easy)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LoRaStandardChannel = NewPopulatedConcentratorConfig_LoRaStandardChannel(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.FSKChannel = NewPopulatedConcentratorConfig_FSKChannel(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LBT = NewPopulatedConcentratorConfig_LBTConfiguration(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.PingSlot = NewPopulatedConcentratorConfig_Channel(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v2 := r.Intn(5)
 		this.Radios = make([]*GatewayRadio, v2)
 		for i := 0; i < v2; i++ {
@@ -1096,14 +1136,7 @@ func (m *ConcentratorConfig_LBTConfiguration) Size() (n int) {
 }
 
 func sovRegional(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozRegional(x uint64) (n int) {
 	return sovRegional((x << 1) ^ uint64((int64(x) >> 63)))
@@ -1112,13 +1145,23 @@ func (this *ConcentratorConfig) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForChannels := "[]*ConcentratorConfig_Channel{"
+	for _, f := range this.Channels {
+		repeatedStringForChannels += strings.Replace(fmt.Sprintf("%v", f), "ConcentratorConfig_Channel", "ConcentratorConfig_Channel", 1) + ","
+	}
+	repeatedStringForChannels += "}"
+	repeatedStringForRadios := "[]*GatewayRadio{"
+	for _, f := range this.Radios {
+		repeatedStringForRadios += strings.Replace(fmt.Sprintf("%v", f), "GatewayRadio", "GatewayRadio", 1) + ","
+	}
+	repeatedStringForRadios += "}"
 	s := strings.Join([]string{`&ConcentratorConfig{`,
-		`Channels:` + strings.Replace(fmt.Sprintf("%v", this.Channels), "ConcentratorConfig_Channel", "ConcentratorConfig_Channel", 1) + `,`,
+		`Channels:` + repeatedStringForChannels + `,`,
 		`LoRaStandardChannel:` + strings.Replace(fmt.Sprintf("%v", this.LoRaStandardChannel), "ConcentratorConfig_LoRaStandardChannel", "ConcentratorConfig_LoRaStandardChannel", 1) + `,`,
 		`FSKChannel:` + strings.Replace(fmt.Sprintf("%v", this.FSKChannel), "ConcentratorConfig_FSKChannel", "ConcentratorConfig_FSKChannel", 1) + `,`,
 		`LBT:` + strings.Replace(fmt.Sprintf("%v", this.LBT), "ConcentratorConfig_LBTConfiguration", "ConcentratorConfig_LBTConfiguration", 1) + `,`,
 		`PingSlot:` + strings.Replace(fmt.Sprintf("%v", this.PingSlot), "ConcentratorConfig_Channel", "ConcentratorConfig_Channel", 1) + `,`,
-		`Radios:` + strings.Replace(fmt.Sprintf("%v", this.Radios), "GatewayRadio", "GatewayRadio", 1) + `,`,
+		`Radios:` + repeatedStringForRadios + `,`,
 		`ClockSource:` + fmt.Sprintf("%v", this.ClockSource) + `,`,
 		`}`,
 	}, "")
@@ -1166,7 +1209,7 @@ func (this *ConcentratorConfig_LBTConfiguration) String() string {
 	s := strings.Join([]string{`&ConcentratorConfig_LBTConfiguration{`,
 		`RSSITarget:` + fmt.Sprintf("%v", this.RSSITarget) + `,`,
 		`RSSIOffset:` + fmt.Sprintf("%v", this.RSSIOffset) + `,`,
-		`ScanTime:` + strings.Replace(strings.Replace(this.ScanTime.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
+		`ScanTime:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ScanTime), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

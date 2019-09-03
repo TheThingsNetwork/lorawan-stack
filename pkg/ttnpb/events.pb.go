@@ -9,6 +9,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -22,6 +23,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -35,7 +38,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Event struct {
 	Name           string               `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -64,7 +67,7 @@ func (m *Event) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Event.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -166,7 +169,7 @@ func (m *StreamEventsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_StreamEventsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -432,6 +435,14 @@ type EventsServer interface {
 	Stream(*StreamEventsRequest, Events_StreamServer) error
 }
 
+// UnimplementedEventsServer can be embedded to have forward compatible implementations.
+type UnimplementedEventsServer struct {
+}
+
+func (*UnimplementedEventsServer) Stream(req *StreamEventsRequest, srv Events_StreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method Stream not implemented")
+}
+
 func RegisterEventsServer(s *grpc.Server, srv EventsServer) {
 	s.RegisterService(&_Events_serviceDesc, srv)
 }
@@ -474,7 +485,7 @@ var _Events_serviceDesc = grpc.ServiceDesc{
 func (m *Event) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -482,107 +493,112 @@ func (m *Event) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Event) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Event) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEvents(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
-	n1, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	if len(m.Identifiers) > 0 {
-		for _, msg := range m.Identifiers {
-			dAtA[i] = 0x1a
-			i++
-			i = encodeVarintEvents(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.Visibility != nil {
+		{
+			size, err := m.Visibility.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintEvents(dAtA, i, uint64(size))
 		}
-	}
-	if m.Data != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.Data.Size()))
-		n2, err := m.Data.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
-	if len(m.CorrelationIDs) > 0 {
-		for _, s := range m.CorrelationIDs {
-			dAtA[i] = 0x2a
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
-		}
-	}
-	if len(m.Origin) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Origin)))
-		i += copy(dAtA[i:], m.Origin)
+		i--
+		dAtA[i] = 0x42
 	}
 	if len(m.Context) > 0 {
 		for k := range m.Context {
-			dAtA[i] = 0x3a
-			i++
 			v := m.Context[k]
-			byteSize := 0
+			baseI := i
 			if len(v) > 0 {
-				byteSize = 1 + len(v) + sovEvents(uint64(len(v)))
-			}
-			mapSize := 1 + len(k) + sovEvents(uint64(len(k))) + byteSize
-			i = encodeVarintEvents(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintEvents(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			if len(v) > 0 {
-				dAtA[i] = 0x12
-				i++
+				i -= len(v)
+				copy(dAtA[i:], v)
 				i = encodeVarintEvents(dAtA, i, uint64(len(v)))
-				i += copy(dAtA[i:], v)
+				i--
+				dAtA[i] = 0x12
 			}
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintEvents(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintEvents(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x3a
 		}
 	}
-	if m.Visibility != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(m.Visibility.Size()))
-		n3, err := m.Visibility.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
+	if len(m.Origin) > 0 {
+		i -= len(m.Origin)
+		copy(dAtA[i:], m.Origin)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Origin)))
+		i--
+		dAtA[i] = 0x32
 	}
-	return i, nil
+	if len(m.CorrelationIDs) > 0 {
+		for iNdEx := len(m.CorrelationIDs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CorrelationIDs[iNdEx])
+			copy(dAtA[i:], m.CorrelationIDs[iNdEx])
+			i = encodeVarintEvents(dAtA, i, uint64(len(m.CorrelationIDs[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if m.Data != nil {
+		{
+			size, err := m.Data.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvents(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Identifiers) > 0 {
+		for iNdEx := len(m.Identifiers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Identifiers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEvents(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Time):])
+	if err3 != nil {
+		return 0, err3
+	}
+	i -= n3
+	i = encodeVarintEvents(dAtA, i, uint64(n3))
+	i--
+	dAtA[i] = 0x12
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintEvents(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *StreamEventsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -590,62 +606,71 @@ func (m *StreamEventsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *StreamEventsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *StreamEventsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Identifiers) > 0 {
-		for _, msg := range m.Identifiers {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintEvents(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
+	if m.After != nil {
+		n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.After, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.After):])
+		if err4 != nil {
+			return 0, err4
 		}
+		i -= n4
+		i = encodeVarintEvents(dAtA, i, uint64(n4))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.Tail != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintEvents(dAtA, i, uint64(m.Tail))
+		i--
+		dAtA[i] = 0x10
 	}
-	if m.After != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintEvents(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.After)))
-		n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.After, dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.Identifiers) > 0 {
+		for iNdEx := len(m.Identifiers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Identifiers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEvents(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
 		}
-		i += n4
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintEvents(dAtA []byte, offset int, v uint64) int {
+	offset -= sovEvents(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedEvent(r randyEvents, easy bool) *Event {
 	this := &Event{}
 	this.Name = randStringEvents(r)
 	v1 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.Time = *v1
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v2 := r.Intn(5)
 		this.Identifiers = make([]*EntityIdentifiers, v2)
 		for i := 0; i < v2; i++ {
 			this.Identifiers[i] = NewPopulatedEntityIdentifiers(r, easy)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Data = types.NewPopulatedAny(r, easy)
 	}
 	v3 := r.Intn(10)
@@ -654,7 +679,7 @@ func NewPopulatedEvent(r randyEvents, easy bool) *Event {
 		this.CorrelationIDs[i] = randStringEvents(r)
 	}
 	this.Origin = randStringEvents(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Context = make(map[string][]byte)
 		for i := 0; i < v4; i++ {
@@ -666,7 +691,7 @@ func NewPopulatedEvent(r randyEvents, easy bool) *Event {
 			}
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Visibility = NewPopulatedRights(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -676,7 +701,7 @@ func NewPopulatedEvent(r randyEvents, easy bool) *Event {
 
 func NewPopulatedStreamEventsRequest(r randyEvents, easy bool) *StreamEventsRequest {
 	this := &StreamEventsRequest{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v7 := r.Intn(5)
 		this.Identifiers = make([]*EntityIdentifiers, v7)
 		for i := 0; i < v7; i++ {
@@ -684,7 +709,7 @@ func NewPopulatedStreamEventsRequest(r randyEvents, easy bool) *StreamEventsRequ
 		}
 	}
 	this.Tail = r.Uint32()
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.After = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -838,14 +863,7 @@ func (m *StreamEventsRequest) Size() (n int) {
 }
 
 func sovEvents(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozEvents(x uint64) (n int) {
 	return sovEvents((x << 1) ^ uint64((int64(x) >> 63)))
@@ -854,6 +872,11 @@ func (this *Event) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForIdentifiers := "[]*EntityIdentifiers{"
+	for _, f := range this.Identifiers {
+		repeatedStringForIdentifiers += strings.Replace(fmt.Sprintf("%v", f), "EntityIdentifiers", "EntityIdentifiers", 1) + ","
+	}
+	repeatedStringForIdentifiers += "}"
 	keysForContext := make([]string, 0, len(this.Context))
 	for k := range this.Context {
 		keysForContext = append(keysForContext, k)
@@ -866,8 +889,8 @@ func (this *Event) String() string {
 	mapStringForContext += "}"
 	s := strings.Join([]string{`&Event{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`Time:` + strings.Replace(strings.Replace(this.Time.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`Identifiers:` + strings.Replace(fmt.Sprintf("%v", this.Identifiers), "EntityIdentifiers", "EntityIdentifiers", 1) + `,`,
+		`Time:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`Identifiers:` + repeatedStringForIdentifiers + `,`,
 		`Data:` + strings.Replace(fmt.Sprintf("%v", this.Data), "Any", "types.Any", 1) + `,`,
 		`CorrelationIDs:` + fmt.Sprintf("%v", this.CorrelationIDs) + `,`,
 		`Origin:` + fmt.Sprintf("%v", this.Origin) + `,`,
@@ -881,8 +904,13 @@ func (this *StreamEventsRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForIdentifiers := "[]*EntityIdentifiers{"
+	for _, f := range this.Identifiers {
+		repeatedStringForIdentifiers += strings.Replace(fmt.Sprintf("%v", f), "EntityIdentifiers", "EntityIdentifiers", 1) + ","
+	}
+	repeatedStringForIdentifiers += "}"
 	s := strings.Join([]string{`&StreamEventsRequest{`,
-		`Identifiers:` + strings.Replace(fmt.Sprintf("%v", this.Identifiers), "EntityIdentifiers", "EntityIdentifiers", 1) + `,`,
+		`Identifiers:` + repeatedStringForIdentifiers + `,`,
 		`Tail:` + fmt.Sprintf("%v", this.Tail) + `,`,
 		`After:` + strings.Replace(fmt.Sprintf("%v", this.After), "Timestamp", "types.Timestamp", 1) + `,`,
 		`}`,

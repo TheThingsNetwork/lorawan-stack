@@ -38,6 +38,43 @@ func request_EntityAccess_AuthInfo_0(ctx context.Context, marshaler runtime.Mars
 
 }
 
+func local_request_EntityAccess_AuthInfo_0(ctx context.Context, marshaler runtime.Marshaler, server EntityAccessServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq types.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.AuthInfo(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+// RegisterEntityAccessHandlerServer registers the http handlers for service EntityAccess to "mux".
+// UnaryRPC     :call EntityAccessServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+func RegisterEntityAccessHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EntityAccessServer) error {
+
+	mux.Handle("GET", pattern_EntityAccess_AuthInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_EntityAccess_AuthInfo_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EntityAccess_AuthInfo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
 // RegisterEntityAccessHandlerFromEndpoint is same as RegisterEntityAccessHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEntityAccessHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {

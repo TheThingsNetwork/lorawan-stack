@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -32,7 +33,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // User is the message that defines an user on the network.
 type User struct {
@@ -79,7 +80,7 @@ func (m *User) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_User.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -240,7 +241,7 @@ func (m *Picture) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Picture.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -296,7 +297,7 @@ func (m *Picture_Embedded) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_Picture_Embedded.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -348,7 +349,7 @@ func (m *Users) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Users.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -394,7 +395,7 @@ func (m *GetUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return xxx_messageInfo_GetUserRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -440,7 +441,7 @@ func (m *CreateUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_CreateUserRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -486,7 +487,7 @@ func (m *UpdateUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_UpdateUserRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -531,7 +532,7 @@ func (m *CreateTemporaryPasswordRequest) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_CreateTemporaryPasswordRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -573,7 +574,7 @@ func (m *UpdateUserPasswordRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_UpdateUserPasswordRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -636,7 +637,7 @@ func (m *ListUserAPIKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_ListUserAPIKeysRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -690,7 +691,7 @@ func (m *GetUserAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_GetUserAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -737,7 +738,7 @@ func (m *CreateUserAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_CreateUserAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -790,7 +791,7 @@ func (m *UpdateUserAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_UpdateUserAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -834,7 +835,7 @@ func (m *Invitation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Invitation.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -924,7 +925,7 @@ func (m *ListInvitationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_ListInvitationsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -976,7 +977,7 @@ func (m *Invitations) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_Invitations.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1021,7 +1022,7 @@ func (m *SendInvitationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_SendInvitationRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1066,7 +1067,7 @@ func (m *DeleteInvitationRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_DeleteInvitationRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1112,7 +1113,7 @@ func (m *UserSessionIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_UserSessionIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1161,7 +1162,7 @@ func (m *UserSession) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_UserSession.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1227,7 +1228,7 @@ func (m *UserSessions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_UserSessions.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1279,7 +1280,7 @@ func (m *ListUserSessionsRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_ListUserSessionsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2211,7 +2212,7 @@ func (this *ListUserSessionsRequest) Equal(that interface{}) bool {
 func (m *User) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2219,181 +2220,199 @@ func (m *User) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *User) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *User) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n1, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n3
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
-			dAtA[i] = 0x32
-			i++
-			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovUser(uint64(len(k))) + 1 + len(v) + sovUser(uint64(len(v)))
-			i = encodeVarintUser(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintUser(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintUser(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if len(m.ContactInfo) > 0 {
-		for _, msg := range m.ContactInfo {
-			dAtA[i] = 0x3a
-			i++
-			i = encodeVarintUser(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.ProfilePicture != nil {
+		{
+			size, err := m.ProfilePicture.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintUser(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x92
 	}
-	if len(m.PrimaryEmailAddress) > 0 {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.PrimaryEmailAddress)))
-		i += copy(dAtA[i:], m.PrimaryEmailAddress)
-	}
-	if m.PrimaryEmailAddressValidatedAt != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.PrimaryEmailAddressValidatedAt)))
-		n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.PrimaryEmailAddressValidatedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.TemporaryPasswordExpiresAt != nil {
+		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.TemporaryPasswordExpiresAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.TemporaryPasswordExpiresAt):])
+		if err2 != nil {
+			return 0, err2
 		}
-		i += n4
+		i -= n2
+		i = encodeVarintUser(dAtA, i, uint64(n2))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
 	}
-	if len(m.Password) > 0 {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Password)))
-		i += copy(dAtA[i:], m.Password)
-	}
-	if m.PasswordUpdatedAt != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.PasswordUpdatedAt)))
-		n5, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.PasswordUpdatedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.TemporaryPasswordCreatedAt != nil {
+		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.TemporaryPasswordCreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.TemporaryPasswordCreatedAt):])
+		if err3 != nil {
+			return 0, err3
 		}
-		i += n5
+		i -= n3
+		i = encodeVarintUser(dAtA, i, uint64(n3))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
 	}
-	if m.RequirePasswordUpdate {
-		dAtA[i] = 0x60
-		i++
-		if m.RequirePasswordUpdate {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.State != 0 {
-		dAtA[i] = 0x68
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(m.State))
+	if len(m.TemporaryPassword) > 0 {
+		i -= len(m.TemporaryPassword)
+		copy(dAtA[i:], m.TemporaryPassword)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.TemporaryPassword)))
+		i--
+		dAtA[i] = 0x7a
 	}
 	if m.Admin {
-		dAtA[i] = 0x70
-		i++
+		i--
 		if m.Admin {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x70
 	}
-	if len(m.TemporaryPassword) > 0 {
-		dAtA[i] = 0x7a
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.TemporaryPassword)))
-		i += copy(dAtA[i:], m.TemporaryPassword)
+	if m.State != 0 {
+		i = encodeVarintUser(dAtA, i, uint64(m.State))
+		i--
+		dAtA[i] = 0x68
 	}
-	if m.TemporaryPasswordCreatedAt != nil {
-		dAtA[i] = 0x82
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.TemporaryPasswordCreatedAt)))
-		n6, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.TemporaryPasswordCreatedAt, dAtA[i:])
+	if m.RequirePasswordUpdate {
+		i--
+		if m.RequirePasswordUpdate {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x60
+	}
+	if m.PasswordUpdatedAt != nil {
+		n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.PasswordUpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.PasswordUpdatedAt):])
+		if err4 != nil {
+			return 0, err4
+		}
+		i -= n4
+		i = encodeVarintUser(dAtA, i, uint64(n4))
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.Password) > 0 {
+		i -= len(m.Password)
+		copy(dAtA[i:], m.Password)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.Password)))
+		i--
+		dAtA[i] = 0x52
+	}
+	if m.PrimaryEmailAddressValidatedAt != nil {
+		n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.PrimaryEmailAddressValidatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.PrimaryEmailAddressValidatedAt):])
+		if err5 != nil {
+			return 0, err5
+		}
+		i -= n5
+		i = encodeVarintUser(dAtA, i, uint64(n5))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if len(m.PrimaryEmailAddress) > 0 {
+		i -= len(m.PrimaryEmailAddress)
+		copy(dAtA[i:], m.PrimaryEmailAddress)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.PrimaryEmailAddress)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.ContactInfo) > 0 {
+		for iNdEx := len(m.ContactInfo) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ContactInfo[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintUser(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if len(m.Attributes) > 0 {
+		for k := range m.Attributes {
+			v := m.Attributes[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintUser(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintUser(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintUser(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x22
+	}
+	n6, err6 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err6 != nil {
+		return 0, err6
+	}
+	i -= n6
+	i = encodeVarintUser(dAtA, i, uint64(n6))
+	i--
+	dAtA[i] = 0x1a
+	n7, err7 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err7 != nil {
+		return 0, err7
+	}
+	i -= n7
+	i = encodeVarintUser(dAtA, i, uint64(n7))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n6
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	if m.TemporaryPasswordExpiresAt != nil {
-		dAtA[i] = 0x8a
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.TemporaryPasswordExpiresAt)))
-		n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.TemporaryPasswordExpiresAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	if m.ProfilePicture != nil {
-		dAtA[i] = 0x92
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(m.ProfilePicture.Size()))
-		n8, err := m.ProfilePicture.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n8
-	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Picture) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2401,43 +2420,51 @@ func (m *Picture) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Picture) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Picture) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Embedded != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(m.Embedded.Size()))
-		n9, err := m.Embedded.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n9
-	}
 	if len(m.Sizes) > 0 {
 		for k := range m.Sizes {
-			dAtA[i] = 0x12
-			i++
 			v := m.Sizes[k]
-			mapSize := 1 + sovUser(uint64(k)) + 1 + len(v) + sovUser(uint64(len(v)))
-			i = encodeVarintUser(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0x8
-			i++
-			i = encodeVarintUser(dAtA, i, uint64(k))
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintUser(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i = encodeVarintUser(dAtA, i, uint64(k))
+			i--
+			dAtA[i] = 0x8
+			i = encodeVarintUser(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x12
 		}
 	}
-	return i, nil
+	if m.Embedded != nil {
+		{
+			size, err := m.Embedded.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintUser(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Picture_Embedded) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2445,29 +2472,36 @@ func (m *Picture_Embedded) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Picture_Embedded) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Picture_Embedded) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.MimeType) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.MimeType)))
-		i += copy(dAtA[i:], m.MimeType)
-	}
 	if len(m.Data) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.Data)
+		copy(dAtA[i:], m.Data)
 		i = encodeVarintUser(dAtA, i, uint64(len(m.Data)))
-		i += copy(dAtA[i:], m.Data)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.MimeType) > 0 {
+		i -= len(m.MimeType)
+		copy(dAtA[i:], m.MimeType)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.MimeType)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Users) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2475,29 +2509,36 @@ func (m *Users) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Users) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Users) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Users) > 0 {
-		for _, msg := range m.Users {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintUser(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Users) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Users[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintUser(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GetUserRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2505,33 +2546,42 @@ func (m *GetUserRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetUserRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetUserRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n10, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	i += n10
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.FieldMask.Size()))
-	n11, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	i += n11
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateUserRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2539,31 +2589,39 @@ func (m *CreateUserRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateUserRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateUserRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.User.Size()))
-	n12, err := m.User.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n12
 	if len(m.InvitationToken) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.InvitationToken)
+		copy(dAtA[i:], m.InvitationToken)
 		i = encodeVarintUser(dAtA, i, uint64(len(m.InvitationToken)))
-		i += copy(dAtA[i:], m.InvitationToken)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.User.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateUserRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2571,33 +2629,42 @@ func (m *UpdateUserRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateUserRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateUserRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.User.Size()))
-	n13, err := m.User.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	i += n13
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.FieldMask.Size()))
-	n14, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.User.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	i += n14
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateTemporaryPasswordRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2605,25 +2672,32 @@ func (m *CreateTemporaryPasswordRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateTemporaryPasswordRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateTemporaryPasswordRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n15, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	i += n15
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateUserPasswordRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2631,47 +2705,56 @@ func (m *UpdateUserPasswordRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateUserPasswordRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateUserPasswordRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n16, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n16
-	if len(m.New) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.New)))
-		i += copy(dAtA[i:], m.New)
-	}
-	if len(m.Old) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Old)))
-		i += copy(dAtA[i:], m.Old)
-	}
 	if m.RevokeAllAccess {
-		dAtA[i] = 0x20
-		i++
+		i--
 		if m.RevokeAllAccess {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x20
 	}
-	return i, nil
+	if len(m.Old) > 0 {
+		i -= len(m.Old)
+		copy(dAtA[i:], m.Old)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.Old)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.New) > 0 {
+		i -= len(m.New)
+		copy(dAtA[i:], m.New)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.New)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListUserAPIKeysRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2679,35 +2762,42 @@ func (m *ListUserAPIKeysRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListUserAPIKeysRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListUserAPIKeysRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n17, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n17
-	if m.Limit != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(m.Limit))
-	}
 	if m.Page != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintUser(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Limit != 0 {
+		i = encodeVarintUser(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetUserAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2715,31 +2805,39 @@ func (m *GetUserAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetUserAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetUserAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n18, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n18
 	if len(m.KeyID) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.KeyID)
+		copy(dAtA[i:], m.KeyID)
 		i = encodeVarintUser(dAtA, i, uint64(len(m.KeyID)))
-		i += copy(dAtA[i:], m.KeyID)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateUserAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2747,48 +2845,57 @@ func (m *CreateUserAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateUserAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateUserAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n19, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n19
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
 	if len(m.Rights) > 0 {
-		dAtA21 := make([]byte, len(m.Rights)*10)
-		var j20 int
+		dAtA20 := make([]byte, len(m.Rights)*10)
+		var j19 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA21[j20] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA20[j19] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j20++
+				j19++
 			}
-			dAtA21[j20] = uint8(num)
-			j20++
+			dAtA20[j19] = uint8(num)
+			j19++
 		}
+		i -= j19
+		copy(dAtA[i:], dAtA20[:j19])
+		i = encodeVarintUser(dAtA, i, uint64(j19))
+		i--
 		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(j20))
-		i += copy(dAtA[i:], dAtA21[:j20])
 	}
-	return i, nil
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateUserAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2796,33 +2903,42 @@ func (m *UpdateUserAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateUserAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateUserAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n22, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.APIKey.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	i += n22
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.APIKey.Size()))
-	n23, err := m.APIKey.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	i += n23
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Invitation) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2830,73 +2946,82 @@ func (m *Invitation) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Invitation) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Invitation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Email) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Email)))
-		i += copy(dAtA[i:], m.Email)
-	}
-	if len(m.Token) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Token)))
-		i += copy(dAtA[i:], m.Token)
-	}
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)))
-	n24, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n24
-	dAtA[i] = 0x22
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n25, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n25
-	dAtA[i] = 0x2a
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n26, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n26
-	if m.AcceptedAt != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.AcceptedAt)))
-		n27, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.AcceptedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n27
-	}
 	if m.AcceptedBy != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(m.AcceptedBy.Size()))
-		n28, err := m.AcceptedBy.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.AcceptedBy.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintUser(dAtA, i, uint64(size))
 		}
-		i += n28
+		i--
+		dAtA[i] = 0x3a
 	}
-	return i, nil
+	if m.AcceptedAt != nil {
+		n25, err25 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.AcceptedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.AcceptedAt):])
+		if err25 != nil {
+			return 0, err25
+		}
+		i -= n25
+		i = encodeVarintUser(dAtA, i, uint64(n25))
+		i--
+		dAtA[i] = 0x32
+	}
+	n26, err26 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err26 != nil {
+		return 0, err26
+	}
+	i -= n26
+	i = encodeVarintUser(dAtA, i, uint64(n26))
+	i--
+	dAtA[i] = 0x2a
+	n27, err27 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err27 != nil {
+		return 0, err27
+	}
+	i -= n27
+	i = encodeVarintUser(dAtA, i, uint64(n27))
+	i--
+	dAtA[i] = 0x22
+	n28, err28 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt):])
+	if err28 != nil {
+		return 0, err28
+	}
+	i -= n28
+	i = encodeVarintUser(dAtA, i, uint64(n28))
+	i--
+	dAtA[i] = 0x1a
+	if len(m.Token) > 0 {
+		i -= len(m.Token)
+		copy(dAtA[i:], m.Token)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.Token)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Email) > 0 {
+		i -= len(m.Email)
+		copy(dAtA[i:], m.Email)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.Email)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListInvitationsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2904,27 +3029,32 @@ func (m *ListInvitationsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListInvitationsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListInvitationsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Limit != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(m.Limit))
-	}
 	if m.Page != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintUser(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Limit != 0 {
+		i = encodeVarintUser(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Invitations) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2932,29 +3062,36 @@ func (m *Invitations) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Invitations) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Invitations) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Invitations) > 0 {
-		for _, msg := range m.Invitations {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintUser(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Invitations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Invitations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintUser(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *SendInvitationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2962,23 +3099,29 @@ func (m *SendInvitationRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SendInvitationRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SendInvitationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Email) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.Email)
+		copy(dAtA[i:], m.Email)
 		i = encodeVarintUser(dAtA, i, uint64(len(m.Email)))
-		i += copy(dAtA[i:], m.Email)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *DeleteInvitationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2986,23 +3129,29 @@ func (m *DeleteInvitationRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *DeleteInvitationRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DeleteInvitationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Email) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.Email)
+		copy(dAtA[i:], m.Email)
 		i = encodeVarintUser(dAtA, i, uint64(len(m.Email)))
-		i += copy(dAtA[i:], m.Email)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *UserSessionIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3010,31 +3159,39 @@ func (m *UserSessionIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UserSessionIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UserSessionIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n29, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n29
 	if len(m.SessionID) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.SessionID)
+		copy(dAtA[i:], m.SessionID)
 		i = encodeVarintUser(dAtA, i, uint64(len(m.SessionID)))
-		i += copy(dAtA[i:], m.SessionID)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UserSession) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3042,57 +3199,65 @@ func (m *UserSession) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UserSession) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UserSession) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n30, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n30
-	if len(m.SessionID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.SessionID)))
-		i += copy(dAtA[i:], m.SessionID)
-	}
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n31, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n31
-	dAtA[i] = 0x22
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n32, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n32
 	if m.ExpiresAt != nil {
+		n30, err30 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ExpiresAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ExpiresAt):])
+		if err30 != nil {
+			return 0, err30
+		}
+		i -= n30
+		i = encodeVarintUser(dAtA, i, uint64(n30))
+		i--
 		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.ExpiresAt)))
-		n33, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ExpiresAt, dAtA[i:])
+	}
+	n31, err31 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err31 != nil {
+		return 0, err31
+	}
+	i -= n31
+	i = encodeVarintUser(dAtA, i, uint64(n31))
+	i--
+	dAtA[i] = 0x22
+	n32, err32 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err32 != nil {
+		return 0, err32
+	}
+	i -= n32
+	i = encodeVarintUser(dAtA, i, uint64(n32))
+	i--
+	dAtA[i] = 0x1a
+	if len(m.SessionID) > 0 {
+		i -= len(m.SessionID)
+		copy(dAtA[i:], m.SessionID)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.SessionID)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n33
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UserSessions) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3100,29 +3265,36 @@ func (m *UserSessions) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UserSessions) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UserSessions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Sessions) > 0 {
-		for _, msg := range m.Sessions {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintUser(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Sessions) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Sessions[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintUser(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ListUserSessionsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3130,45 +3302,55 @@ func (m *ListUserSessionsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListUserSessionsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListUserSessionsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintUser(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n34, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n34
-	if len(m.Order) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(len(m.Order)))
-		i += copy(dAtA[i:], m.Order)
+	if m.Page != 0 {
+		i = encodeVarintUser(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x20
 	}
 	if m.Limit != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintUser(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.Page != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintUser(dAtA, i, uint64(m.Page))
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintUser(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintUser(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintUser(dAtA []byte, offset int, v uint64) int {
+	offset -= sovUser(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedUser(r randyUser, easy bool) *User {
 	this := &User{}
@@ -3180,14 +3362,14 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 	this.UpdatedAt = *v3
 	this.Name = randStringUser(r)
 	this.Description = randStringUser(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
 		for i := 0; i < v4; i++ {
 			this.Attributes[randStringUser(r)] = randStringUser(r)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v5 := r.Intn(5)
 		this.ContactInfo = make([]*ContactInfo, v5)
 		for i := 0; i < v5; i++ {
@@ -3195,24 +3377,24 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 		}
 	}
 	this.PrimaryEmailAddress = randStringUser(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.PrimaryEmailAddressValidatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	this.Password = randStringUser(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.PasswordUpdatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	this.RequirePasswordUpdate = bool(r.Intn(2) == 0)
 	this.State = State([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
 	this.Admin = bool(r.Intn(2) == 0)
 	this.TemporaryPassword = randStringUser(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.TemporaryPasswordCreatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.TemporaryPasswordExpiresAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ProfilePicture = NewPopulatedPicture(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -3222,10 +3404,10 @@ func NewPopulatedUser(r randyUser, easy bool) *User {
 
 func NewPopulatedPicture(r randyUser, easy bool) *Picture {
 	this := &Picture{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Embedded = NewPopulatedPicture_Embedded(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v6 := r.Intn(10)
 		this.Sizes = make(map[uint32]string)
 		for i := 0; i < v6; i++ {
@@ -3252,7 +3434,7 @@ func NewPopulatedPicture_Embedded(r randyUser, easy bool) *Picture_Embedded {
 
 func NewPopulatedUsers(r randyUser, easy bool) *Users {
 	this := &Users{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v8 := r.Intn(5)
 		this.Users = make([]*User, v8)
 		for i := 0; i < v8; i++ {
@@ -3374,10 +3556,10 @@ func NewPopulatedInvitation(r randyUser, easy bool) *Invitation {
 	this.CreatedAt = *v23
 	v24 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v24
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.AcceptedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.AcceptedBy = NewPopulatedUserIdentifiers(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -3396,7 +3578,7 @@ func NewPopulatedListInvitationsRequest(r randyUser, easy bool) *ListInvitations
 
 func NewPopulatedInvitations(r randyUser, easy bool) *Invitations {
 	this := &Invitations{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v25 := r.Intn(5)
 		this.Invitations = make([]*Invitation, v25)
 		for i := 0; i < v25; i++ {
@@ -3443,7 +3625,7 @@ func NewPopulatedUserSession(r randyUser, easy bool) *UserSession {
 	this.CreatedAt = *v28
 	v29 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v29
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ExpiresAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -3453,7 +3635,7 @@ func NewPopulatedUserSession(r randyUser, easy bool) *UserSession {
 
 func NewPopulatedUserSessions(r randyUser, easy bool) *UserSessions {
 	this := &UserSessions{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v30 := r.Intn(5)
 		this.Sessions = make([]*UserSession, v30)
 		for i := 0; i < v30; i++ {
@@ -3983,14 +4165,7 @@ func (m *ListUserSessionsRequest) Size() (n int) {
 }
 
 func sovUser(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozUser(x uint64) (n int) {
 	return sovUser((x << 1) ^ uint64((int64(x) >> 63)))
@@ -3999,6 +4174,11 @@ func (this *User) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForContactInfo := "[]*ContactInfo{"
+	for _, f := range this.ContactInfo {
+		repeatedStringForContactInfo += strings.Replace(fmt.Sprintf("%v", f), "ContactInfo", "ContactInfo", 1) + ","
+	}
+	repeatedStringForContactInfo += "}"
 	keysForAttributes := make([]string, 0, len(this.Attributes))
 	for k := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
@@ -4010,13 +4190,13 @@ func (this *User) String() string {
 	}
 	mapStringForAttributes += "}"
 	s := strings.Join([]string{`&User{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
 		`Attributes:` + mapStringForAttributes + `,`,
-		`ContactInfo:` + strings.Replace(fmt.Sprintf("%v", this.ContactInfo), "ContactInfo", "ContactInfo", 1) + `,`,
+		`ContactInfo:` + repeatedStringForContactInfo + `,`,
 		`PrimaryEmailAddress:` + fmt.Sprintf("%v", this.PrimaryEmailAddress) + `,`,
 		`PrimaryEmailAddressValidatedAt:` + strings.Replace(fmt.Sprintf("%v", this.PrimaryEmailAddressValidatedAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`Password:` + fmt.Sprintf("%v", this.Password) + `,`,
@@ -4027,7 +4207,7 @@ func (this *User) String() string {
 		`TemporaryPassword:` + fmt.Sprintf("%v", this.TemporaryPassword) + `,`,
 		`TemporaryPasswordCreatedAt:` + strings.Replace(fmt.Sprintf("%v", this.TemporaryPasswordCreatedAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`TemporaryPasswordExpiresAt:` + strings.Replace(fmt.Sprintf("%v", this.TemporaryPasswordExpiresAt), "Timestamp", "types.Timestamp", 1) + `,`,
-		`ProfilePicture:` + strings.Replace(fmt.Sprintf("%v", this.ProfilePicture), "Picture", "Picture", 1) + `,`,
+		`ProfilePicture:` + strings.Replace(this.ProfilePicture.String(), "Picture", "Picture", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4068,8 +4248,13 @@ func (this *Users) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForUsers := "[]*User{"
+	for _, f := range this.Users {
+		repeatedStringForUsers += strings.Replace(f.String(), "User", "User", 1) + ","
+	}
+	repeatedStringForUsers += "}"
 	s := strings.Join([]string{`&Users{`,
-		`Users:` + strings.Replace(fmt.Sprintf("%v", this.Users), "User", "User", 1) + `,`,
+		`Users:` + repeatedStringForUsers + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4079,8 +4264,8 @@ func (this *GetUserRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetUserRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4102,7 +4287,7 @@ func (this *UpdateUserRequest) String() string {
 	}
 	s := strings.Join([]string{`&UpdateUserRequest{`,
 		`User:` + strings.Replace(strings.Replace(this.User.String(), "User", "User", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4112,7 +4297,7 @@ func (this *CreateTemporaryPasswordRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&CreateTemporaryPasswordRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4122,7 +4307,7 @@ func (this *UpdateUserPasswordRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&UpdateUserPasswordRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`New:` + fmt.Sprintf("%v", this.New) + `,`,
 		`Old:` + fmt.Sprintf("%v", this.Old) + `,`,
 		`RevokeAllAccess:` + fmt.Sprintf("%v", this.RevokeAllAccess) + `,`,
@@ -4135,7 +4320,7 @@ func (this *ListUserAPIKeysRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListUserAPIKeysRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
@@ -4147,7 +4332,7 @@ func (this *GetUserAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetUserAPIKeyRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`KeyID:` + fmt.Sprintf("%v", this.KeyID) + `,`,
 		`}`,
 	}, "")
@@ -4158,7 +4343,7 @@ func (this *CreateUserAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&CreateUserAPIKeyRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`}`,
@@ -4170,8 +4355,8 @@ func (this *UpdateUserAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&UpdateUserAPIKeyRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`APIKey:` + strings.Replace(strings.Replace(this.APIKey.String(), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`APIKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKey), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4183,9 +4368,9 @@ func (this *Invitation) String() string {
 	s := strings.Join([]string{`&Invitation{`,
 		`Email:` + fmt.Sprintf("%v", this.Email) + `,`,
 		`Token:` + fmt.Sprintf("%v", this.Token) + `,`,
-		`ExpiresAt:` + strings.Replace(strings.Replace(this.ExpiresAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`ExpiresAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ExpiresAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`AcceptedAt:` + strings.Replace(fmt.Sprintf("%v", this.AcceptedAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`AcceptedBy:` + strings.Replace(fmt.Sprintf("%v", this.AcceptedBy), "UserIdentifiers", "UserIdentifiers", 1) + `,`,
 		`}`,
@@ -4207,8 +4392,13 @@ func (this *Invitations) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForInvitations := "[]*Invitation{"
+	for _, f := range this.Invitations {
+		repeatedStringForInvitations += strings.Replace(f.String(), "Invitation", "Invitation", 1) + ","
+	}
+	repeatedStringForInvitations += "}"
 	s := strings.Join([]string{`&Invitations{`,
-		`Invitations:` + strings.Replace(fmt.Sprintf("%v", this.Invitations), "Invitation", "Invitation", 1) + `,`,
+		`Invitations:` + repeatedStringForInvitations + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4238,7 +4428,7 @@ func (this *UserSessionIdentifiers) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&UserSessionIdentifiers{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`SessionID:` + fmt.Sprintf("%v", this.SessionID) + `,`,
 		`}`,
 	}, "")
@@ -4249,10 +4439,10 @@ func (this *UserSession) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&UserSession{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`SessionID:` + fmt.Sprintf("%v", this.SessionID) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`ExpiresAt:` + strings.Replace(fmt.Sprintf("%v", this.ExpiresAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`}`,
 	}, "")
@@ -4262,8 +4452,13 @@ func (this *UserSessions) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForSessions := "[]*UserSession{"
+	for _, f := range this.Sessions {
+		repeatedStringForSessions += strings.Replace(f.String(), "UserSession", "UserSession", 1) + ","
+	}
+	repeatedStringForSessions += "}"
 	s := strings.Join([]string{`&UserSessions{`,
-		`Sessions:` + strings.Replace(fmt.Sprintf("%v", this.Sessions), "UserSession", "UserSession", 1) + `,`,
+		`Sessions:` + repeatedStringForSessions + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4273,7 +4468,7 @@ func (this *ListUserSessionsRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListUserSessionsRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,

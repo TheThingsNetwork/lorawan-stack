@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -18,6 +19,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -30,7 +33,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type AuthInfoResponse struct {
 	// Types that are valid to be assigned to AccessMethod:
@@ -56,7 +59,7 @@ func (m *AuthInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_AuthInfoResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -127,78 +130,12 @@ func (m *AuthInfoResponse) GetIsAdmin() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*AuthInfoResponse) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _AuthInfoResponse_OneofMarshaler, _AuthInfoResponse_OneofUnmarshaler, _AuthInfoResponse_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*AuthInfoResponse) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*AuthInfoResponse_APIKey)(nil),
 		(*AuthInfoResponse_OAuthAccessToken)(nil),
 	}
-}
-
-func _AuthInfoResponse_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*AuthInfoResponse)
-	// access_method
-	switch x := m.AccessMethod.(type) {
-	case *AuthInfoResponse_APIKey:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.APIKey); err != nil {
-			return err
-		}
-	case *AuthInfoResponse_OAuthAccessToken:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.OAuthAccessToken); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("AuthInfoResponse.AccessMethod has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _AuthInfoResponse_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*AuthInfoResponse)
-	switch tag {
-	case 1: // access_method.api_key
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(AuthInfoResponse_APIKeyAccess)
-		err := b.DecodeMessage(msg)
-		m.AccessMethod = &AuthInfoResponse_APIKey{msg}
-		return true, err
-	case 2: // access_method.oauth_access_token
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(OAuthAccessToken)
-		err := b.DecodeMessage(msg)
-		m.AccessMethod = &AuthInfoResponse_OAuthAccessToken{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _AuthInfoResponse_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*AuthInfoResponse)
-	// access_method
-	switch x := m.AccessMethod.(type) {
-	case *AuthInfoResponse_APIKey:
-		s := proto.Size(x.APIKey)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *AuthInfoResponse_OAuthAccessToken:
-		s := proto.Size(x.OAuthAccessToken)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type AuthInfoResponse_APIKeyAccess struct {
@@ -221,7 +158,7 @@ func (m *AuthInfoResponse_APIKeyAccess) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_AuthInfoResponse_APIKeyAccess.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -457,6 +394,14 @@ type EntityAccessServer interface {
 	AuthInfo(context.Context, *types.Empty) (*AuthInfoResponse, error)
 }
 
+// UnimplementedEntityAccessServer can be embedded to have forward compatible implementations.
+type UnimplementedEntityAccessServer struct {
+}
+
+func (*UnimplementedEntityAccessServer) AuthInfo(ctx context.Context, req *types.Empty) (*AuthInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthInfo not implemented")
+}
+
 func RegisterEntityAccessServer(s *grpc.Server, srv EntityAccessServer) {
 	s.RegisterService(&_EntityAccess_serviceDesc, srv)
 }
@@ -495,7 +440,7 @@ var _EntityAccess_serviceDesc = grpc.ServiceDesc{
 func (m *AuthInfoResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -503,72 +448,93 @@ func (m *AuthInfoResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *AuthInfoResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AuthInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.AccessMethod != nil {
-		nn1, err := m.AccessMethod.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn1
-	}
-	if m.UniversalRights != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(m.UniversalRights.Size()))
-		n2, err := m.UniversalRights.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
 	if m.IsAdmin {
-		dAtA[i] = 0x20
-		i++
+		i--
 		if m.IsAdmin {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x20
 	}
-	return i, nil
+	if m.UniversalRights != nil {
+		{
+			size, err := m.UniversalRights.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentityserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.AccessMethod != nil {
+		{
+			size := m.AccessMethod.Size()
+			i -= size
+			if _, err := m.AccessMethod.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *AuthInfoResponse_APIKey) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *AuthInfoResponse_APIKey) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.APIKey != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(m.APIKey.Size()))
-		n3, err := m.APIKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.APIKey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentityserver(dAtA, i, uint64(size))
 		}
-		i += n3
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *AuthInfoResponse_OAuthAccessToken) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *AuthInfoResponse_OAuthAccessToken) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.OAuthAccessToken != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentityserver(dAtA, i, uint64(m.OAuthAccessToken.Size()))
-		n4, err := m.OAuthAccessToken.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.OAuthAccessToken.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentityserver(dAtA, i, uint64(size))
 		}
-		i += n4
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *AuthInfoResponse_APIKeyAccess) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -576,37 +542,48 @@ func (m *AuthInfoResponse_APIKeyAccess) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *AuthInfoResponse_APIKeyAccess) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AuthInfoResponse_APIKeyAccess) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.APIKey.Size()))
-	n5, err := m.APIKey.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.EntityIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintIdentityserver(dAtA, i, uint64(size))
 	}
-	i += n5
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintIdentityserver(dAtA, i, uint64(m.EntityIDs.Size()))
-	n6, err := m.EntityIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.APIKey.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintIdentityserver(dAtA, i, uint64(size))
 	}
-	i += n6
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintIdentityserver(dAtA []byte, offset int, v uint64) int {
+	offset -= sovIdentityserver(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedAuthInfoResponse(r randyIdentityserver, easy bool) *AuthInfoResponse {
 	this := &AuthInfoResponse{}
@@ -617,7 +594,7 @@ func NewPopulatedAuthInfoResponse(r randyIdentityserver, easy bool) *AuthInfoRes
 	case 2:
 		this.AccessMethod = NewPopulatedAuthInfoResponse_OAuthAccessToken(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.UniversalRights = NewPopulatedRights(r, easy)
 	}
 	this.IsAdmin = bool(r.Intn(2) == 0)
@@ -776,14 +753,7 @@ func (m *AuthInfoResponse_APIKeyAccess) Size() (n int) {
 }
 
 func sovIdentityserver(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozIdentityserver(x uint64) (n int) {
 	return sovIdentityserver((x << 1) ^ uint64((int64(x) >> 63)))
@@ -825,8 +795,8 @@ func (this *AuthInfoResponse_APIKeyAccess) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&AuthInfoResponse_APIKeyAccess{`,
-		`APIKey:` + strings.Replace(strings.Replace(this.APIKey.String(), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
-		`EntityIDs:` + strings.Replace(strings.Replace(this.EntityIDs.String(), "EntityIdentifiers", "EntityIdentifiers", 1), `&`, ``, 1) + `,`,
+		`APIKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKey), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
+		`EntityIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EntityIDs), "EntityIdentifiers", "EntityIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

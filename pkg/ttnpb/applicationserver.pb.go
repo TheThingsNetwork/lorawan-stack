@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -20,6 +21,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -33,7 +36,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ApplicationLink struct {
 	// The address of the external Network Server where to link to.
@@ -60,7 +63,7 @@ func (m *ApplicationLink) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return xxx_messageInfo_ApplicationLink.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -120,7 +123,7 @@ func (m *GetApplicationLinkRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_GetApplicationLinkRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -167,7 +170,7 @@ func (m *SetApplicationLinkRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_SetApplicationLinkRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -223,7 +226,7 @@ func (m *ApplicationLinkStats) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_ApplicationLinkStats.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -607,6 +610,23 @@ type AsServer interface {
 	GetLinkStats(context.Context, *ApplicationIdentifiers) (*ApplicationLinkStats, error)
 }
 
+// UnimplementedAsServer can be embedded to have forward compatible implementations.
+type UnimplementedAsServer struct {
+}
+
+func (*UnimplementedAsServer) GetLink(ctx context.Context, req *GetApplicationLinkRequest) (*ApplicationLink, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLink not implemented")
+}
+func (*UnimplementedAsServer) SetLink(ctx context.Context, req *SetApplicationLinkRequest) (*ApplicationLink, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetLink not implemented")
+}
+func (*UnimplementedAsServer) DeleteLink(ctx context.Context, req *ApplicationIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLink not implemented")
+}
+func (*UnimplementedAsServer) GetLinkStats(ctx context.Context, req *ApplicationIdentifiers) (*ApplicationLinkStats, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLinkStats not implemented")
+}
+
 func RegisterAsServer(s *grpc.Server, srv AsServer) {
 	s.RegisterService(&_As_serviceDesc, srv)
 }
@@ -793,6 +813,23 @@ type AppAsServer interface {
 	DownlinkQueueList(context.Context, *EndDeviceIdentifiers) (*ApplicationDownlinks, error)
 }
 
+// UnimplementedAppAsServer can be embedded to have forward compatible implementations.
+type UnimplementedAppAsServer struct {
+}
+
+func (*UnimplementedAppAsServer) Subscribe(req *ApplicationIdentifiers, srv AppAs_SubscribeServer) error {
+	return status.Errorf(codes.Unimplemented, "method Subscribe not implemented")
+}
+func (*UnimplementedAppAsServer) DownlinkQueuePush(ctx context.Context, req *DownlinkQueueRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownlinkQueuePush not implemented")
+}
+func (*UnimplementedAppAsServer) DownlinkQueueReplace(ctx context.Context, req *DownlinkQueueRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownlinkQueueReplace not implemented")
+}
+func (*UnimplementedAppAsServer) DownlinkQueueList(ctx context.Context, req *EndDeviceIdentifiers) (*ApplicationDownlinks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownlinkQueueList not implemented")
+}
+
 func RegisterAppAsServer(s *grpc.Server, srv AppAsServer) {
 	s.RegisterService(&_AppAs_serviceDesc, srv)
 }
@@ -960,6 +997,20 @@ type AsEndDeviceRegistryServer interface {
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }
 
+// UnimplementedAsEndDeviceRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedAsEndDeviceRegistryServer struct {
+}
+
+func (*UnimplementedAsEndDeviceRegistryServer) Get(ctx context.Context, req *GetEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedAsEndDeviceRegistryServer) Set(ctx context.Context, req *SetEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
+}
+func (*UnimplementedAsEndDeviceRegistryServer) Delete(ctx context.Context, req *EndDeviceIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+
 func RegisterAsEndDeviceRegistryServer(s *grpc.Server, srv AsEndDeviceRegistryServer) {
 	s.RegisterService(&_AsEndDeviceRegistry_serviceDesc, srv)
 }
@@ -1042,7 +1093,7 @@ var _AsEndDeviceRegistry_serviceDesc = grpc.ServiceDesc{
 func (m *ApplicationLink) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1050,39 +1101,48 @@ func (m *ApplicationLink) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationLink) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationLink) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.NetworkServerAddress) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintApplicationserver(dAtA, i, uint64(len(m.NetworkServerAddress)))
-		i += copy(dAtA[i:], m.NetworkServerAddress)
+	if m.DefaultFormatters != nil {
+		{
+			size, err := m.DefaultFormatters.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
 	}
 	if len(m.APIKey) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.APIKey)
+		copy(dAtA[i:], m.APIKey)
 		i = encodeVarintApplicationserver(dAtA, i, uint64(len(m.APIKey)))
-		i += copy(dAtA[i:], m.APIKey)
+		i--
+		dAtA[i] = 0x12
 	}
-	if m.DefaultFormatters != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintApplicationserver(dAtA, i, uint64(m.DefaultFormatters.Size()))
-		n1, err := m.DefaultFormatters.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
+	if len(m.NetworkServerAddress) > 0 {
+		i -= len(m.NetworkServerAddress)
+		copy(dAtA[i:], m.NetworkServerAddress)
+		i = encodeVarintApplicationserver(dAtA, i, uint64(len(m.NetworkServerAddress)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GetApplicationLinkRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1090,33 +1150,42 @@ func (m *GetApplicationLinkRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetApplicationLinkRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetApplicationLinkRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n2, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserver(dAtA, i, uint64(size))
 	}
-	i += n2
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserver(dAtA, i, uint64(m.FieldMask.Size()))
-	n3, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserver(dAtA, i, uint64(size))
 	}
-	i += n3
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *SetApplicationLinkRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1124,41 +1193,52 @@ func (m *SetApplicationLinkRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SetApplicationLinkRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SetApplicationLinkRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserver(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n4, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserver(dAtA, i, uint64(size))
 	}
-	i += n4
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserver(dAtA, i, uint64(m.ApplicationLink.Size()))
-	n5, err := m.ApplicationLink.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
+	i--
 	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintApplicationserver(dAtA, i, uint64(m.FieldMask.Size()))
-	n6, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationLink.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserver(dAtA, i, uint64(size))
 	}
-	i += n6
-	return i, nil
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserver(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationLinkStats) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1166,73 +1246,81 @@ func (m *ApplicationLinkStats) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationLinkStats) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationLinkStats) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.LinkedAt != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintApplicationserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LinkedAt)))
-		n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LinkedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	if len(m.NetworkServerAddress) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintApplicationserver(dAtA, i, uint64(len(m.NetworkServerAddress)))
-		i += copy(dAtA[i:], m.NetworkServerAddress)
-	}
-	if m.LastUpReceivedAt != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintApplicationserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastUpReceivedAt)))
-		n8, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastUpReceivedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n8
-	}
-	if m.UpCount != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintApplicationserver(dAtA, i, m.UpCount)
+	if m.DownlinkCount != 0 {
+		i = encodeVarintApplicationserver(dAtA, i, m.DownlinkCount)
+		i--
+		dAtA[i] = 0x30
 	}
 	if m.LastDownlinkForwardedAt != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintApplicationserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkForwardedAt)))
-		n9, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDownlinkForwardedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
+		n7, err7 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDownlinkForwardedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkForwardedAt):])
+		if err7 != nil {
+			return 0, err7
 		}
-		i += n9
+		i -= n7
+		i = encodeVarintApplicationserver(dAtA, i, uint64(n7))
+		i--
+		dAtA[i] = 0x2a
 	}
-	if m.DownlinkCount != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintApplicationserver(dAtA, i, m.DownlinkCount)
+	if m.UpCount != 0 {
+		i = encodeVarintApplicationserver(dAtA, i, m.UpCount)
+		i--
+		dAtA[i] = 0x20
 	}
-	return i, nil
+	if m.LastUpReceivedAt != nil {
+		n8, err8 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastUpReceivedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastUpReceivedAt):])
+		if err8 != nil {
+			return 0, err8
+		}
+		i -= n8
+		i = encodeVarintApplicationserver(dAtA, i, uint64(n8))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.NetworkServerAddress) > 0 {
+		i -= len(m.NetworkServerAddress)
+		copy(dAtA[i:], m.NetworkServerAddress)
+		i = encodeVarintApplicationserver(dAtA, i, uint64(len(m.NetworkServerAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.LinkedAt != nil {
+		n9, err9 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LinkedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LinkedAt):])
+		if err9 != nil {
+			return 0, err9
+		}
+		i -= n9
+		i = encodeVarintApplicationserver(dAtA, i, uint64(n9))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintApplicationserver(dAtA []byte, offset int, v uint64) int {
+	offset -= sovApplicationserver(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedApplicationLink(r randyApplicationserver, easy bool) *ApplicationLink {
 	this := &ApplicationLink{}
 	this.NetworkServerAddress = randStringApplicationserver(r)
 	this.APIKey = randStringApplicationserver(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DefaultFormatters = NewPopulatedMessagePayloadFormatters(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -1266,15 +1354,15 @@ func NewPopulatedSetApplicationLinkRequest(r randyApplicationserver, easy bool) 
 
 func NewPopulatedApplicationLinkStats(r randyApplicationserver, easy bool) *ApplicationLinkStats {
 	this := &ApplicationLinkStats{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LinkedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	this.NetworkServerAddress = randStringApplicationserver(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LastUpReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	this.UpCount = uint64(r.Uint32())
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LastDownlinkForwardedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	this.DownlinkCount = uint64(r.Uint32())
@@ -1436,14 +1524,7 @@ func (m *ApplicationLinkStats) Size() (n int) {
 }
 
 func sovApplicationserver(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplicationserver(x uint64) (n int) {
 	return sovApplicationserver((x << 1) ^ uint64((int64(x) >> 63)))
@@ -1465,8 +1546,8 @@ func (this *GetApplicationLinkRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetApplicationLinkRequest{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1476,9 +1557,9 @@ func (this *SetApplicationLinkRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&SetApplicationLinkRequest{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`ApplicationLink:` + strings.Replace(strings.Replace(this.ApplicationLink.String(), "ApplicationLink", "ApplicationLink", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -17,6 +18,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -29,7 +32,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ListFrequencyPlansRequest struct {
 	// Optional base frequency in MHz for hardware support (433, 470, 868 or 915)
@@ -51,7 +54,7 @@ func (m *ListFrequencyPlansRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_ListFrequencyPlansRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +104,7 @@ func (m *FrequencyPlanDescription) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_FrequencyPlanDescription.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -167,7 +170,7 @@ func (m *ListFrequencyPlansResponse) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_ListFrequencyPlansResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -370,6 +373,14 @@ type ConfigurationServer interface {
 	ListFrequencyPlans(context.Context, *ListFrequencyPlansRequest) (*ListFrequencyPlansResponse, error)
 }
 
+// UnimplementedConfigurationServer can be embedded to have forward compatible implementations.
+type UnimplementedConfigurationServer struct {
+}
+
+func (*UnimplementedConfigurationServer) ListFrequencyPlans(ctx context.Context, req *ListFrequencyPlansRequest) (*ListFrequencyPlansResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFrequencyPlans not implemented")
+}
+
 func RegisterConfigurationServer(s *grpc.Server, srv ConfigurationServer) {
 	s.RegisterService(&_Configuration_serviceDesc, srv)
 }
@@ -408,7 +419,7 @@ var _Configuration_serviceDesc = grpc.ServiceDesc{
 func (m *ListFrequencyPlansRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -416,22 +427,27 @@ func (m *ListFrequencyPlansRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListFrequencyPlansRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListFrequencyPlansRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.BaseFrequency != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintConfigurationServices(dAtA, i, uint64(m.BaseFrequency))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *FrequencyPlanDescription) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -439,40 +455,48 @@ func (m *FrequencyPlanDescription) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *FrequencyPlanDescription) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FrequencyPlanDescription) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintConfigurationServices(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
-	}
-	if len(m.BaseID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintConfigurationServices(dAtA, i, uint64(len(m.BaseID)))
-		i += copy(dAtA[i:], m.BaseID)
+	if m.BaseFrequency != 0 {
+		i = encodeVarintConfigurationServices(dAtA, i, uint64(m.BaseFrequency))
+		i--
+		dAtA[i] = 0x20
 	}
 	if len(m.Name) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
 		i = encodeVarintConfigurationServices(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
+		i--
+		dAtA[i] = 0x1a
 	}
-	if m.BaseFrequency != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintConfigurationServices(dAtA, i, uint64(m.BaseFrequency))
+	if len(m.BaseID) > 0 {
+		i -= len(m.BaseID)
+		copy(dAtA[i:], m.BaseID)
+		i = encodeVarintConfigurationServices(dAtA, i, uint64(len(m.BaseID)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.ID) > 0 {
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
+		i = encodeVarintConfigurationServices(dAtA, i, uint64(len(m.ID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListFrequencyPlansResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -480,33 +504,42 @@ func (m *ListFrequencyPlansResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListFrequencyPlansResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListFrequencyPlansResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.FrequencyPlans) > 0 {
-		for _, msg := range m.FrequencyPlans {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintConfigurationServices(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.FrequencyPlans) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.FrequencyPlans[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintConfigurationServices(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintConfigurationServices(dAtA []byte, offset int, v uint64) int {
+	offset -= sovConfigurationServices(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedListFrequencyPlansRequest(r randyConfigurationServices, easy bool) *ListFrequencyPlansRequest {
 	this := &ListFrequencyPlansRequest{}
@@ -529,7 +562,7 @@ func NewPopulatedFrequencyPlanDescription(r randyConfigurationServices, easy boo
 
 func NewPopulatedListFrequencyPlansResponse(r randyConfigurationServices, easy bool) *ListFrequencyPlansResponse {
 	this := &ListFrequencyPlansResponse{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(5)
 		this.FrequencyPlans = make([]*FrequencyPlanDescription, v1)
 		for i := 0; i < v1; i++ {
@@ -665,14 +698,7 @@ func (m *ListFrequencyPlansResponse) Size() (n int) {
 }
 
 func sovConfigurationServices(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozConfigurationServices(x uint64) (n int) {
 	return sovConfigurationServices((x << 1) ^ uint64((int64(x) >> 63)))
@@ -704,8 +730,13 @@ func (this *ListFrequencyPlansResponse) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForFrequencyPlans := "[]*FrequencyPlanDescription{"
+	for _, f := range this.FrequencyPlans {
+		repeatedStringForFrequencyPlans += strings.Replace(f.String(), "FrequencyPlanDescription", "FrequencyPlanDescription", 1) + ","
+	}
+	repeatedStringForFrequencyPlans += "}"
 	s := strings.Join([]string{`&ListFrequencyPlansResponse{`,
-		`FrequencyPlans:` + strings.Replace(fmt.Sprintf("%v", this.FrequencyPlans), "FrequencyPlanDescription", "FrequencyPlanDescription", 1) + `,`,
+		`FrequencyPlans:` + repeatedStringForFrequencyPlans + `,`,
 		`}`,
 	}, "")
 	return s

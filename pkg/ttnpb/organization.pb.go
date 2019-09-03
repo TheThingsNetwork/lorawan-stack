@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -31,7 +32,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Organization struct {
 	OrganizationIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
@@ -58,7 +59,7 @@ func (m *Organization) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_Organization.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -138,7 +139,7 @@ func (m *Organizations) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return xxx_messageInfo_Organizations.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +185,7 @@ func (m *GetOrganizationRequest) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_GetOrganizationRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -239,7 +240,7 @@ func (m *ListOrganizationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_ListOrganizationsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -316,7 +317,7 @@ func (m *CreateOrganizationRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_CreateOrganizationRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -362,7 +363,7 @@ func (m *UpdateOrganizationRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_UpdateOrganizationRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -411,7 +412,7 @@ func (m *ListOrganizationAPIKeysRequest) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_ListOrganizationAPIKeysRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -465,7 +466,7 @@ func (m *GetOrganizationAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_GetOrganizationAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -512,7 +513,7 @@ func (m *CreateOrganizationAPIKeyRequest) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_CreateOrganizationAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -565,7 +566,7 @@ func (m *UpdateOrganizationAPIKeyRequest) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_UpdateOrganizationAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -607,7 +608,7 @@ func (m *ListOrganizationCollaboratorsRequest) XXX_Marshal(b []byte, determinist
 		return xxx_messageInfo_ListOrganizationCollaboratorsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -662,7 +663,7 @@ func (m *GetOrganizationCollaboratorRequest) XXX_Marshal(b []byte, deterministic
 		return xxx_messageInfo_GetOrganizationCollaboratorRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -701,7 +702,7 @@ func (m *SetOrganizationCollaboratorRequest) XXX_Marshal(b []byte, deterministic
 		return xxx_messageInfo_SetOrganizationCollaboratorRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1240,7 +1241,7 @@ func (this *SetOrganizationCollaboratorRequest) Equal(that interface{}) bool {
 func (m *Organization) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1248,82 +1249,95 @@ func (m *Organization) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Organization) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Organization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n1, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n3
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
+	if len(m.ContactInfo) > 0 {
+		for iNdEx := len(m.ContactInfo) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ContactInfo[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintOrganization(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
 	}
 	if len(m.Attributes) > 0 {
 		for k := range m.Attributes {
-			dAtA[i] = 0x32
-			i++
 			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovOrganization(uint64(len(k))) + 1 + len(v) + sovOrganization(uint64(len(v)))
-			i = encodeVarintOrganization(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintOrganization(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintOrganization(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintOrganization(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintOrganization(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x32
 		}
 	}
-	if len(m.ContactInfo) > 0 {
-		for _, msg := range m.ContactInfo {
-			dAtA[i] = 0x3a
-			i++
-			i = encodeVarintOrganization(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x22
+	}
+	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintOrganization(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x1a
+	n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err2 != nil {
+		return 0, err2
+	}
+	i -= n2
+	i = encodeVarintOrganization(dAtA, i, uint64(n2))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Organizations) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1331,29 +1345,36 @@ func (m *Organizations) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Organizations) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Organizations) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Organizations) > 0 {
-		for _, msg := range m.Organizations {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintOrganization(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Organizations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Organizations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintOrganization(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GetOrganizationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1361,33 +1382,42 @@ func (m *GetOrganizationRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetOrganizationRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetOrganizationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n4, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n4
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.FieldMask.Size()))
-	n5, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n5
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListOrganizationsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1395,51 +1425,61 @@ func (m *ListOrganizationsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListOrganizationsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListOrganizationsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Collaborator != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(m.Collaborator.Size()))
-		n6, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if m.Page != 0 {
+		i = encodeVarintOrganization(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.Limit != 0 {
+		i = encodeVarintOrganization(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n6
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.FieldMask.Size()))
-	n7, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.Collaborator != nil {
+		{
+			size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintOrganization(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
 	}
-	i += n7
-	if len(m.Order) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Order)))
-		i += copy(dAtA[i:], m.Order)
-	}
-	if m.Limit != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(m.Limit))
-	}
-	if m.Page != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(m.Page))
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateOrganizationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1447,33 +1487,42 @@ func (m *CreateOrganizationRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateOrganizationRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateOrganizationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.Organization.Size()))
-	n8, err := m.Organization.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n8
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.Collaborator.Size()))
-	n9, err := m.Collaborator.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Organization.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n9
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateOrganizationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1481,33 +1530,42 @@ func (m *UpdateOrganizationRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateOrganizationRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateOrganizationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.Organization.Size()))
-	n10, err := m.Organization.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n10
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.FieldMask.Size()))
-	n11, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Organization.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n11
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListOrganizationAPIKeysRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1515,35 +1573,42 @@ func (m *ListOrganizationAPIKeysRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListOrganizationAPIKeysRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListOrganizationAPIKeysRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n12, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n12
-	if m.Limit != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(m.Limit))
-	}
 	if m.Page != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintOrganization(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Limit != 0 {
+		i = encodeVarintOrganization(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1551,31 +1616,39 @@ func (m *GetOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetOrganizationAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n13, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n13
 	if len(m.KeyID) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.KeyID)
+		copy(dAtA[i:], m.KeyID)
 		i = encodeVarintOrganization(dAtA, i, uint64(len(m.KeyID)))
-		i += copy(dAtA[i:], m.KeyID)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1583,48 +1656,57 @@ func (m *CreateOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateOrganizationAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n14, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n14
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
 	if len(m.Rights) > 0 {
-		dAtA16 := make([]byte, len(m.Rights)*10)
-		var j15 int
+		dAtA15 := make([]byte, len(m.Rights)*10)
+		var j14 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA16[j15] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA15[j14] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j15++
+				j14++
 			}
-			dAtA16[j15] = uint8(num)
-			j15++
+			dAtA15[j14] = uint8(num)
+			j14++
 		}
+		i -= j14
+		copy(dAtA[i:], dAtA15[:j14])
+		i = encodeVarintOrganization(dAtA, i, uint64(j14))
+		i--
 		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(j15))
-		i += copy(dAtA[i:], dAtA16[:j15])
 	}
-	return i, nil
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintOrganization(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1632,33 +1714,42 @@ func (m *UpdateOrganizationAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateOrganizationAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateOrganizationAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n17, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.APIKey.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n17
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.APIKey.Size()))
-	n18, err := m.APIKey.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n18
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListOrganizationCollaboratorsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1666,35 +1757,42 @@ func (m *ListOrganizationCollaboratorsRequest) Marshal() (dAtA []byte, err error
 }
 
 func (m *ListOrganizationCollaboratorsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListOrganizationCollaboratorsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n19, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n19
-	if m.Limit != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintOrganization(dAtA, i, uint64(m.Limit))
-	}
 	if m.Page != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintOrganization(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Limit != 0 {
+		i = encodeVarintOrganization(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetOrganizationCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1702,33 +1800,42 @@ func (m *GetOrganizationCollaboratorRequest) Marshal() (dAtA []byte, err error) 
 }
 
 func (m *GetOrganizationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetOrganizationCollaboratorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n20, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.OrganizationOrUserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n20
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationOrUserIdentifiers.Size()))
-	n21, err := m.OrganizationOrUserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n21
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *SetOrganizationCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1736,37 +1843,48 @@ func (m *SetOrganizationCollaboratorRequest) Marshal() (dAtA []byte, err error) 
 }
 
 func (m *SetOrganizationCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SetOrganizationCollaboratorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.OrganizationIdentifiers.Size()))
-	n22, err := m.OrganizationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n22
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOrganization(dAtA, i, uint64(m.Collaborator.Size()))
-	n23, err := m.Collaborator.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.OrganizationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOrganization(dAtA, i, uint64(size))
 	}
-	i += n23
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintOrganization(dAtA []byte, offset int, v uint64) int {
+	offset -= sovOrganization(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedOrganization(r randyOrganization, easy bool) *Organization {
 	this := &Organization{}
@@ -1778,14 +1896,14 @@ func NewPopulatedOrganization(r randyOrganization, easy bool) *Organization {
 	this.UpdatedAt = *v3
 	this.Name = randStringOrganization(r)
 	this.Description = randStringOrganization(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
 		for i := 0; i < v4; i++ {
 			this.Attributes[randStringOrganization(r)] = randStringOrganization(r)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v5 := r.Intn(5)
 		this.ContactInfo = make([]*ContactInfo, v5)
 		for i := 0; i < v5; i++ {
@@ -1799,7 +1917,7 @@ func NewPopulatedOrganization(r randyOrganization, easy bool) *Organization {
 
 func NewPopulatedOrganizations(r randyOrganization, easy bool) *Organizations {
 	this := &Organizations{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v6 := r.Intn(5)
 		this.Organizations = make([]*Organization, v6)
 		for i := 0; i < v6; i++ {
@@ -1824,7 +1942,7 @@ func NewPopulatedGetOrganizationRequest(r randyOrganization, easy bool) *GetOrga
 
 func NewPopulatedListOrganizationsRequest(r randyOrganization, easy bool) *ListOrganizationsRequest {
 	this := &ListOrganizationsRequest{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Collaborator = NewPopulatedOrganizationOrUserIdentifiers(r, easy)
 	}
 	v9 := types.NewPopulatedFieldMask(r, easy)
@@ -2238,14 +2356,7 @@ func (m *SetOrganizationCollaboratorRequest) Size() (n int) {
 }
 
 func sovOrganization(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozOrganization(x uint64) (n int) {
 	return sovOrganization((x << 1) ^ uint64((int64(x) >> 63)))
@@ -2254,6 +2365,11 @@ func (this *Organization) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForContactInfo := "[]*ContactInfo{"
+	for _, f := range this.ContactInfo {
+		repeatedStringForContactInfo += strings.Replace(fmt.Sprintf("%v", f), "ContactInfo", "ContactInfo", 1) + ","
+	}
+	repeatedStringForContactInfo += "}"
 	keysForAttributes := make([]string, 0, len(this.Attributes))
 	for k := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
@@ -2265,13 +2381,13 @@ func (this *Organization) String() string {
 	}
 	mapStringForAttributes += "}"
 	s := strings.Join([]string{`&Organization{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
 		`Attributes:` + mapStringForAttributes + `,`,
-		`ContactInfo:` + strings.Replace(fmt.Sprintf("%v", this.ContactInfo), "ContactInfo", "ContactInfo", 1) + `,`,
+		`ContactInfo:` + repeatedStringForContactInfo + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2280,8 +2396,13 @@ func (this *Organizations) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForOrganizations := "[]*Organization{"
+	for _, f := range this.Organizations {
+		repeatedStringForOrganizations += strings.Replace(f.String(), "Organization", "Organization", 1) + ","
+	}
+	repeatedStringForOrganizations += "}"
 	s := strings.Join([]string{`&Organizations{`,
-		`Organizations:` + strings.Replace(fmt.Sprintf("%v", this.Organizations), "Organization", "Organization", 1) + `,`,
+		`Organizations:` + repeatedStringForOrganizations + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2291,8 +2412,8 @@ func (this *GetOrganizationRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetOrganizationRequest{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2303,7 +2424,7 @@ func (this *ListOrganizationsRequest) String() string {
 	}
 	s := strings.Join([]string{`&ListOrganizationsRequest{`,
 		`Collaborator:` + strings.Replace(fmt.Sprintf("%v", this.Collaborator), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
@@ -2317,7 +2438,7 @@ func (this *CreateOrganizationRequest) String() string {
 	}
 	s := strings.Join([]string{`&CreateOrganizationRequest{`,
 		`Organization:` + strings.Replace(strings.Replace(this.Organization.String(), "Organization", "Organization", 1), `&`, ``, 1) + `,`,
-		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborator), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2328,7 +2449,7 @@ func (this *UpdateOrganizationRequest) String() string {
 	}
 	s := strings.Join([]string{`&UpdateOrganizationRequest{`,
 		`Organization:` + strings.Replace(strings.Replace(this.Organization.String(), "Organization", "Organization", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2338,7 +2459,7 @@ func (this *ListOrganizationAPIKeysRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListOrganizationAPIKeysRequest{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
@@ -2350,7 +2471,7 @@ func (this *GetOrganizationAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetOrganizationAPIKeyRequest{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`KeyID:` + fmt.Sprintf("%v", this.KeyID) + `,`,
 		`}`,
 	}, "")
@@ -2361,7 +2482,7 @@ func (this *CreateOrganizationAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&CreateOrganizationAPIKeyRequest{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`}`,
@@ -2373,8 +2494,8 @@ func (this *UpdateOrganizationAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&UpdateOrganizationAPIKeyRequest{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`APIKey:` + strings.Replace(strings.Replace(this.APIKey.String(), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`APIKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKey), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2384,7 +2505,7 @@ func (this *ListOrganizationCollaboratorsRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListOrganizationCollaboratorsRequest{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
@@ -2396,8 +2517,8 @@ func (this *GetOrganizationCollaboratorRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetOrganizationCollaboratorRequest{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationOrUserIdentifiers.String(), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationOrUserIdentifiers), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2407,8 +2528,8 @@ func (this *SetOrganizationCollaboratorRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&SetOrganizationCollaboratorRequest{`,
-		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationIdentifiers.String(), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`OrganizationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationIdentifiers), "OrganizationIdentifiers", "OrganizationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborator), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

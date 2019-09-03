@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -16,6 +17,8 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	golang_proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -28,7 +31,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ProcessUplinkMessageRequest struct {
 	EndDeviceIdentifiers `protobuf:"bytes,1,opt,name=ids,proto3,embedded=ids" json:"ids"`
@@ -52,7 +55,7 @@ func (m *ProcessUplinkMessageRequest) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_ProcessUplinkMessageRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -114,7 +117,7 @@ func (m *ProcessDownlinkMessageRequest) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_ProcessDownlinkMessageRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -312,6 +315,14 @@ type UplinkMessageProcessorServer interface {
 	Process(context.Context, *ProcessUplinkMessageRequest) (*ApplicationUplink, error)
 }
 
+// UnimplementedUplinkMessageProcessorServer can be embedded to have forward compatible implementations.
+type UnimplementedUplinkMessageProcessorServer struct {
+}
+
+func (*UnimplementedUplinkMessageProcessorServer) Process(ctx context.Context, req *ProcessUplinkMessageRequest) (*ApplicationUplink, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Process not implemented")
+}
+
 func RegisterUplinkMessageProcessorServer(s *grpc.Server, srv UplinkMessageProcessorServer) {
 	s.RegisterService(&_UplinkMessageProcessor_serviceDesc, srv)
 }
@@ -376,6 +387,14 @@ type DownlinkMessageProcessorServer interface {
 	Process(context.Context, *ProcessDownlinkMessageRequest) (*ApplicationDownlink, error)
 }
 
+// UnimplementedDownlinkMessageProcessorServer can be embedded to have forward compatible implementations.
+type UnimplementedDownlinkMessageProcessorServer struct {
+}
+
+func (*UnimplementedDownlinkMessageProcessorServer) Process(ctx context.Context, req *ProcessDownlinkMessageRequest) (*ApplicationDownlink, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Process not implemented")
+}
+
 func RegisterDownlinkMessageProcessorServer(s *grpc.Server, srv DownlinkMessageProcessorServer) {
 	s.RegisterService(&_DownlinkMessageProcessor_serviceDesc, srv)
 }
@@ -414,7 +433,7 @@ var _DownlinkMessageProcessor_serviceDesc = grpc.ServiceDesc{
 func (m *ProcessUplinkMessageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -422,47 +441,59 @@ func (m *ProcessUplinkMessageRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ProcessUplinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProcessUplinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n1, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceVersionIDs.Size()))
-	n2, err := m.EndDeviceVersionIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.Message.Size()))
-	n3, err := m.Message.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n3
 	if len(m.Parameter) > 0 {
-		dAtA[i] = 0x22
-		i++
+		i -= len(m.Parameter)
+		copy(dAtA[i:], m.Parameter)
 		i = encodeVarintMessageServices(dAtA, i, uint64(len(m.Parameter)))
-		i += copy(dAtA[i:], m.Parameter)
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	{
+		size, err := m.Message.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size, err := m.EndDeviceVersionIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ProcessDownlinkMessageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -470,51 +501,65 @@ func (m *ProcessDownlinkMessageRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ProcessDownlinkMessageRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProcessDownlinkMessageRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n4, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n4
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.EndDeviceVersionIDs.Size()))
-	n5, err := m.EndDeviceVersionIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintMessageServices(dAtA, i, uint64(m.Message.Size()))
-	n6, err := m.Message.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n6
 	if len(m.Parameter) > 0 {
-		dAtA[i] = 0x22
-		i++
+		i -= len(m.Parameter)
+		copy(dAtA[i:], m.Parameter)
 		i = encodeVarintMessageServices(dAtA, i, uint64(len(m.Parameter)))
-		i += copy(dAtA[i:], m.Parameter)
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	{
+		size, err := m.Message.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size, err := m.EndDeviceVersionIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessageServices(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintMessageServices(dAtA []byte, offset int, v uint64) int {
+	offset -= sovMessageServices(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedProcessUplinkMessageRequest(r randyMessageServices, easy bool) *ProcessUplinkMessageRequest {
 	this := &ProcessUplinkMessageRequest{}
@@ -655,14 +700,7 @@ func (m *ProcessDownlinkMessageRequest) Size() (n int) {
 }
 
 func sovMessageServices(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozMessageServices(x uint64) (n int) {
 	return sovMessageServices((x << 1) ^ uint64((int64(x) >> 63)))
@@ -672,9 +710,9 @@ func (this *ProcessUplinkMessageRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ProcessUplinkMessageRequest{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
-		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(this.EndDeviceVersionIDs.String(), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Message:` + strings.Replace(strings.Replace(this.Message.String(), "ApplicationUplink", "ApplicationUplink", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceVersionIDs), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Message:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Message), "ApplicationUplink", "ApplicationUplink", 1), `&`, ``, 1) + `,`,
 		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
 		`}`,
 	}, "")
@@ -685,9 +723,9 @@ func (this *ProcessDownlinkMessageRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ProcessDownlinkMessageRequest{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
-		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(this.EndDeviceVersionIDs.String(), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Message:` + strings.Replace(strings.Replace(this.Message.String(), "ApplicationDownlink", "ApplicationDownlink", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`EndDeviceVersionIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceVersionIDs), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Message:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Message), "ApplicationDownlink", "ApplicationDownlink", 1), `&`, ``, 1) + `,`,
 		`Parameter:` + fmt.Sprintf("%v", this.Parameter) + `,`,
 		`}`,
 	}, "")

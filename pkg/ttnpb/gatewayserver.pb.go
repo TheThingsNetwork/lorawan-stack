@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -20,6 +21,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -33,7 +36,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
 type GatewayUp struct {
@@ -58,7 +61,7 @@ func (m *GatewayUp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_GatewayUp.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +122,7 @@ func (m *GatewayDown) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_GatewayDown.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -164,7 +167,7 @@ func (m *ScheduleDownlinkResponse) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_ScheduleDownlinkResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -209,7 +212,7 @@ func (m *ScheduleDownlinkErrorDetails) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_ScheduleDownlinkErrorDetails.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -493,6 +496,17 @@ type GtwGsServer interface {
 	GetConcentratorConfig(context.Context, *types.Empty) (*ConcentratorConfig, error)
 }
 
+// UnimplementedGtwGsServer can be embedded to have forward compatible implementations.
+type UnimplementedGtwGsServer struct {
+}
+
+func (*UnimplementedGtwGsServer) LinkGateway(srv GtwGs_LinkGatewayServer) error {
+	return status.Errorf(codes.Unimplemented, "method LinkGateway not implemented")
+}
+func (*UnimplementedGtwGsServer) GetConcentratorConfig(ctx context.Context, req *types.Empty) (*ConcentratorConfig, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConcentratorConfig not implemented")
+}
+
 func RegisterGtwGsServer(s *grpc.Server, srv GtwGsServer) {
 	s.RegisterService(&_GtwGs_serviceDesc, srv)
 }
@@ -596,6 +610,14 @@ type NsGsServer interface {
 	ScheduleDownlink(context.Context, *DownlinkMessage) (*ScheduleDownlinkResponse, error)
 }
 
+// UnimplementedNsGsServer can be embedded to have forward compatible implementations.
+type UnimplementedNsGsServer struct {
+}
+
+func (*UnimplementedNsGsServer) ScheduleDownlink(ctx context.Context, req *DownlinkMessage) (*ScheduleDownlinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ScheduleDownlink not implemented")
+}
+
 func RegisterNsGsServer(s *grpc.Server, srv NsGsServer) {
 	s.RegisterService(&_NsGs_serviceDesc, srv)
 }
@@ -664,6 +686,14 @@ type GsServer interface {
 	GetGatewayConnectionStats(context.Context, *GatewayIdentifiers) (*GatewayConnectionStats, error)
 }
 
+// UnimplementedGsServer can be embedded to have forward compatible implementations.
+type UnimplementedGsServer struct {
+}
+
+func (*UnimplementedGsServer) GetGatewayConnectionStats(ctx context.Context, req *GatewayIdentifiers) (*GatewayConnectionStats, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGatewayConnectionStats not implemented")
+}
+
 func RegisterGsServer(s *grpc.Server, srv GsServer) {
 	s.RegisterService(&_Gs_serviceDesc, srv)
 }
@@ -702,7 +732,7 @@ var _Gs_serviceDesc = grpc.ServiceDesc{
 func (m *GatewayUp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -710,49 +740,60 @@ func (m *GatewayUp) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayUp) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayUp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.UplinkMessages) > 0 {
-		for _, msg := range m.UplinkMessages {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintGatewayserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.TxAcknowledgment != nil {
+		{
+			size, err := m.TxAcknowledgment.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintGatewayserver(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.GatewayStatus != nil {
+		{
+			size, err := m.GatewayStatus.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGatewayserver(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x12
-		i++
-		i = encodeVarintGatewayserver(dAtA, i, uint64(m.GatewayStatus.Size()))
-		n1, err := m.GatewayStatus.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
 	}
-	if m.TxAcknowledgment != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintGatewayserver(dAtA, i, uint64(m.TxAcknowledgment.Size()))
-		n2, err := m.TxAcknowledgment.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.UplinkMessages) > 0 {
+		for iNdEx := len(m.UplinkMessages) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.UplinkMessages[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGatewayserver(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
 		}
-		i += n2
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayDown) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -760,27 +801,34 @@ func (m *GatewayDown) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayDown) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayDown) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.DownlinkMessage != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintGatewayserver(dAtA, i, uint64(m.DownlinkMessage.Size()))
-		n3, err := m.DownlinkMessage.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DownlinkMessage.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGatewayserver(dAtA, i, uint64(size))
 		}
-		i += n3
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ScheduleDownlinkResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -788,25 +836,30 @@ func (m *ScheduleDownlinkResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ScheduleDownlinkResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ScheduleDownlinkResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGatewayserver(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.Delay)))
-	n4, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Delay, dAtA[i:])
-	if err != nil {
-		return 0, err
+	n4, err4 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Delay, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.Delay):])
+	if err4 != nil {
+		return 0, err4
 	}
-	i += n4
-	return i, nil
+	i -= n4
+	i = encodeVarintGatewayserver(dAtA, i, uint64(n4))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ScheduleDownlinkErrorDetails) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -814,47 +867,56 @@ func (m *ScheduleDownlinkErrorDetails) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ScheduleDownlinkErrorDetails) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ScheduleDownlinkErrorDetails) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.PathErrors) > 0 {
-		for _, msg := range m.PathErrors {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintGatewayserver(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.PathErrors) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.PathErrors[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGatewayserver(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintGatewayserver(dAtA []byte, offset int, v uint64) int {
+	offset -= sovGatewayserver(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedGatewayUp(r randyGatewayserver, easy bool) *GatewayUp {
 	this := &GatewayUp{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(5)
 		this.UplinkMessages = make([]*UplinkMessage, v1)
 		for i := 0; i < v1; i++ {
 			this.UplinkMessages[i] = NewPopulatedUplinkMessage(r, easy)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.GatewayStatus = NewPopulatedGatewayStatus(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.TxAcknowledgment = NewPopulatedTxAcknowledgment(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -864,7 +926,7 @@ func NewPopulatedGatewayUp(r randyGatewayserver, easy bool) *GatewayUp {
 
 func NewPopulatedGatewayDown(r randyGatewayserver, easy bool) *GatewayDown {
 	this := &GatewayDown{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkMessage = NewPopulatedDownlinkMessage(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -883,7 +945,7 @@ func NewPopulatedScheduleDownlinkResponse(r randyGatewayserver, easy bool) *Sche
 
 func NewPopulatedScheduleDownlinkErrorDetails(r randyGatewayserver, easy bool) *ScheduleDownlinkErrorDetails {
 	this := &ScheduleDownlinkErrorDetails{}
-	if r.Intn(10) == 0 {
+	if r.Intn(5) == 0 {
 		v3 := r.Intn(5)
 		this.PathErrors = make([]*ErrorDetails, v3)
 		for i := 0; i < v3; i++ {
@@ -1030,14 +1092,7 @@ func (m *ScheduleDownlinkErrorDetails) Size() (n int) {
 }
 
 func sovGatewayserver(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozGatewayserver(x uint64) (n int) {
 	return sovGatewayserver((x << 1) ^ uint64((int64(x) >> 63)))
@@ -1046,8 +1101,13 @@ func (this *GatewayUp) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForUplinkMessages := "[]*UplinkMessage{"
+	for _, f := range this.UplinkMessages {
+		repeatedStringForUplinkMessages += strings.Replace(fmt.Sprintf("%v", f), "UplinkMessage", "UplinkMessage", 1) + ","
+	}
+	repeatedStringForUplinkMessages += "}"
 	s := strings.Join([]string{`&GatewayUp{`,
-		`UplinkMessages:` + strings.Replace(fmt.Sprintf("%v", this.UplinkMessages), "UplinkMessage", "UplinkMessage", 1) + `,`,
+		`UplinkMessages:` + repeatedStringForUplinkMessages + `,`,
 		`GatewayStatus:` + strings.Replace(fmt.Sprintf("%v", this.GatewayStatus), "GatewayStatus", "GatewayStatus", 1) + `,`,
 		`TxAcknowledgment:` + strings.Replace(fmt.Sprintf("%v", this.TxAcknowledgment), "TxAcknowledgment", "TxAcknowledgment", 1) + `,`,
 		`}`,
@@ -1069,7 +1129,7 @@ func (this *ScheduleDownlinkResponse) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ScheduleDownlinkResponse{`,
-		`Delay:` + strings.Replace(strings.Replace(this.Delay.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
+		`Delay:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Delay), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1078,8 +1138,13 @@ func (this *ScheduleDownlinkErrorDetails) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForPathErrors := "[]*ErrorDetails{"
+	for _, f := range this.PathErrors {
+		repeatedStringForPathErrors += strings.Replace(fmt.Sprintf("%v", f), "ErrorDetails", "ErrorDetails", 1) + ","
+	}
+	repeatedStringForPathErrors += "}"
 	s := strings.Join([]string{`&ScheduleDownlinkErrorDetails{`,
-		`PathErrors:` + strings.Replace(fmt.Sprintf("%v", this.PathErrors), "ErrorDetails", "ErrorDetails", 1) + `,`,
+		`PathErrors:` + repeatedStringForPathErrors + `,`,
 		`}`,
 	}, "")
 	return s

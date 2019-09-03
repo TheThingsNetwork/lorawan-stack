@@ -14,6 +14,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 func init() {
 	proto.RegisterFile("lorawan-stack/api/application_services.proto", fileDescriptor_f6c42f4fe8e3c902)
@@ -186,6 +188,26 @@ type ApplicationRegistryServer interface {
 	List(context.Context, *ListApplicationsRequest) (*Applications, error)
 	Update(context.Context, *UpdateApplicationRequest) (*Application, error)
 	Delete(context.Context, *ApplicationIdentifiers) (*types.Empty, error)
+}
+
+// UnimplementedApplicationRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedApplicationRegistryServer struct {
+}
+
+func (*UnimplementedApplicationRegistryServer) Create(ctx context.Context, req *CreateApplicationRequest) (*Application, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedApplicationRegistryServer) Get(ctx context.Context, req *GetApplicationRequest) (*Application, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedApplicationRegistryServer) List(ctx context.Context, req *ListApplicationsRequest) (*Applications, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedApplicationRegistryServer) Update(ctx context.Context, req *UpdateApplicationRequest) (*Application, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedApplicationRegistryServer) Delete(ctx context.Context, req *ApplicationIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 
 func RegisterApplicationRegistryServer(s *grpc.Server, srv ApplicationRegistryServer) {
@@ -429,6 +451,35 @@ type ApplicationAccessServer interface {
 	// Setting a collaborator without rights, removes them.
 	SetCollaborator(context.Context, *SetApplicationCollaboratorRequest) (*types.Empty, error)
 	ListCollaborators(context.Context, *ListApplicationCollaboratorsRequest) (*Collaborators, error)
+}
+
+// UnimplementedApplicationAccessServer can be embedded to have forward compatible implementations.
+type UnimplementedApplicationAccessServer struct {
+}
+
+func (*UnimplementedApplicationAccessServer) ListRights(ctx context.Context, req *ApplicationIdentifiers) (*Rights, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRights not implemented")
+}
+func (*UnimplementedApplicationAccessServer) CreateAPIKey(ctx context.Context, req *CreateApplicationAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAPIKey not implemented")
+}
+func (*UnimplementedApplicationAccessServer) ListAPIKeys(ctx context.Context, req *ListApplicationAPIKeysRequest) (*APIKeys, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAPIKeys not implemented")
+}
+func (*UnimplementedApplicationAccessServer) GetAPIKey(ctx context.Context, req *GetApplicationAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAPIKey not implemented")
+}
+func (*UnimplementedApplicationAccessServer) UpdateAPIKey(ctx context.Context, req *UpdateApplicationAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAPIKey not implemented")
+}
+func (*UnimplementedApplicationAccessServer) GetCollaborator(ctx context.Context, req *GetApplicationCollaboratorRequest) (*GetCollaboratorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCollaborator not implemented")
+}
+func (*UnimplementedApplicationAccessServer) SetCollaborator(ctx context.Context, req *SetApplicationCollaboratorRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCollaborator not implemented")
+}
+func (*UnimplementedApplicationAccessServer) ListCollaborators(ctx context.Context, req *ListApplicationCollaboratorsRequest) (*Collaborators, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCollaborators not implemented")
 }
 
 func RegisterApplicationAccessServer(s *grpc.Server, srv ApplicationAccessServer) {

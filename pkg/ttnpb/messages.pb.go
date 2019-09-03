@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strconv "strconv"
 	strings "strings"
@@ -33,7 +34,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type PayloadFormatter int32
 
@@ -142,7 +143,7 @@ func (m *UplinkMessage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return xxx_messageInfo_UplinkMessage.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -237,7 +238,7 @@ func (m *DownlinkMessage) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return xxx_messageInfo_DownlinkMessage.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -322,78 +323,12 @@ func (m *DownlinkMessage) GetCorrelationIDs() []string {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*DownlinkMessage) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _DownlinkMessage_OneofMarshaler, _DownlinkMessage_OneofUnmarshaler, _DownlinkMessage_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*DownlinkMessage) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*DownlinkMessage_Request)(nil),
 		(*DownlinkMessage_Scheduled)(nil),
 	}
-}
-
-func _DownlinkMessage_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*DownlinkMessage)
-	// settings
-	switch x := m.Settings.(type) {
-	case *DownlinkMessage_Request:
-		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Request); err != nil {
-			return err
-		}
-	case *DownlinkMessage_Scheduled:
-		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Scheduled); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("DownlinkMessage.Settings has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _DownlinkMessage_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*DownlinkMessage)
-	switch tag {
-	case 4: // settings.request
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TxRequest)
-		err := b.DecodeMessage(msg)
-		m.Settings = &DownlinkMessage_Request{msg}
-		return true, err
-	case 5: // settings.scheduled
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(TxSettings)
-		err := b.DecodeMessage(msg)
-		m.Settings = &DownlinkMessage_Scheduled{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _DownlinkMessage_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*DownlinkMessage)
-	// settings
-	switch x := m.Settings.(type) {
-	case *DownlinkMessage_Request:
-		s := proto.Size(x.Request)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *DownlinkMessage_Scheduled:
-		s := proto.Size(x.Scheduled)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type TxAcknowledgment struct {
@@ -416,7 +351,7 @@ func (m *TxAcknowledgment) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_TxAcknowledgment.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -475,7 +410,7 @@ func (m *ApplicationUplink) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_ApplicationUplink.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -564,7 +499,7 @@ func (m *ApplicationLocation) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_ApplicationLocation.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -624,7 +559,7 @@ func (m *ApplicationJoinAccept) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_ApplicationJoinAccept.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -703,7 +638,7 @@ func (m *ApplicationDownlink) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_ApplicationDownlink.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -813,7 +748,7 @@ func (m *ApplicationDownlink_ClassBC) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_ApplicationDownlink_ClassBC.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -865,7 +800,7 @@ func (m *ApplicationDownlinks) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_ApplicationDownlinks.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -911,7 +846,7 @@ func (m *ApplicationDownlinkFailed) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_ApplicationDownlinkFailed.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -957,7 +892,7 @@ func (m *ApplicationInvalidatedDownlinks) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_ApplicationInvalidatedDownlinks.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1022,7 +957,7 @@ func (m *ApplicationUp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return xxx_messageInfo_ApplicationUp.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1170,9 +1105,9 @@ func (m *ApplicationUp) GetLocationSolved() *ApplicationLocation {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ApplicationUp) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ApplicationUp_OneofMarshaler, _ApplicationUp_OneofUnmarshaler, _ApplicationUp_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ApplicationUp) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ApplicationUp_UplinkMessage)(nil),
 		(*ApplicationUp_JoinAccept)(nil),
 		(*ApplicationUp_DownlinkAck)(nil),
@@ -1183,198 +1118,6 @@ func (*ApplicationUp) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer)
 		(*ApplicationUp_DownlinkQueueInvalidated)(nil),
 		(*ApplicationUp_LocationSolved)(nil),
 	}
-}
-
-func _ApplicationUp_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ApplicationUp)
-	// up
-	switch x := m.Up.(type) {
-	case *ApplicationUp_UplinkMessage:
-		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.UplinkMessage); err != nil {
-			return err
-		}
-	case *ApplicationUp_JoinAccept:
-		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.JoinAccept); err != nil {
-			return err
-		}
-	case *ApplicationUp_DownlinkAck:
-		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DownlinkAck); err != nil {
-			return err
-		}
-	case *ApplicationUp_DownlinkNack:
-		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DownlinkNack); err != nil {
-			return err
-		}
-	case *ApplicationUp_DownlinkSent:
-		_ = b.EncodeVarint(7<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DownlinkSent); err != nil {
-			return err
-		}
-	case *ApplicationUp_DownlinkFailed:
-		_ = b.EncodeVarint(8<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DownlinkFailed); err != nil {
-			return err
-		}
-	case *ApplicationUp_DownlinkQueued:
-		_ = b.EncodeVarint(9<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DownlinkQueued); err != nil {
-			return err
-		}
-	case *ApplicationUp_DownlinkQueueInvalidated:
-		_ = b.EncodeVarint(10<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DownlinkQueueInvalidated); err != nil {
-			return err
-		}
-	case *ApplicationUp_LocationSolved:
-		_ = b.EncodeVarint(11<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.LocationSolved); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("ApplicationUp.Up has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ApplicationUp_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ApplicationUp)
-	switch tag {
-	case 3: // up.uplink_message
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationUplink)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_UplinkMessage{msg}
-		return true, err
-	case 4: // up.join_accept
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationJoinAccept)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_JoinAccept{msg}
-		return true, err
-	case 5: // up.downlink_ack
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationDownlink)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_DownlinkAck{msg}
-		return true, err
-	case 6: // up.downlink_nack
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationDownlink)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_DownlinkNack{msg}
-		return true, err
-	case 7: // up.downlink_sent
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationDownlink)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_DownlinkSent{msg}
-		return true, err
-	case 8: // up.downlink_failed
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationDownlinkFailed)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_DownlinkFailed{msg}
-		return true, err
-	case 9: // up.downlink_queued
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationDownlink)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_DownlinkQueued{msg}
-		return true, err
-	case 10: // up.downlink_queue_invalidated
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationInvalidatedDownlinks)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_DownlinkQueueInvalidated{msg}
-		return true, err
-	case 11: // up.location_solved
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationLocation)
-		err := b.DecodeMessage(msg)
-		m.Up = &ApplicationUp_LocationSolved{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ApplicationUp_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ApplicationUp)
-	// up
-	switch x := m.Up.(type) {
-	case *ApplicationUp_UplinkMessage:
-		s := proto.Size(x.UplinkMessage)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationUp_JoinAccept:
-		s := proto.Size(x.JoinAccept)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationUp_DownlinkAck:
-		s := proto.Size(x.DownlinkAck)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationUp_DownlinkNack:
-		s := proto.Size(x.DownlinkNack)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationUp_DownlinkSent:
-		s := proto.Size(x.DownlinkSent)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationUp_DownlinkFailed:
-		s := proto.Size(x.DownlinkFailed)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationUp_DownlinkQueued:
-		s := proto.Size(x.DownlinkQueued)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationUp_DownlinkQueueInvalidated:
-		s := proto.Size(x.DownlinkQueueInvalidated)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationUp_LocationSolved:
-		s := proto.Size(x.LocationSolved)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type MessagePayloadFormatters struct {
@@ -1403,7 +1146,7 @@ func (m *MessagePayloadFormatters) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_MessagePayloadFormatters.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1470,7 +1213,7 @@ func (m *DownlinkQueueRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_DownlinkQueueRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2492,7 +2235,7 @@ func (this *DownlinkQueueRequest) Equal(that interface{}) bool {
 func (m *UplinkMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2500,81 +2243,87 @@ func (m *UplinkMessage) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UplinkMessage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.RawPayload) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.RawPayload)))
-		i += copy(dAtA[i:], m.RawPayload)
+	if m.DeviceChannelIndex != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.DeviceChannelIndex))
+		i--
+		dAtA[i] = 0x48
 	}
-	if m.Payload != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Payload.Size()))
-		n1, err := m.Payload.MarshalTo(dAtA[i:])
+	if len(m.CorrelationIDs) > 0 {
+		for iNdEx := len(m.CorrelationIDs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CorrelationIDs[iNdEx])
+			copy(dAtA[i:], m.CorrelationIDs[iNdEx])
+			i = encodeVarintMessages(dAtA, i, uint64(len(m.CorrelationIDs[iNdEx])))
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ReceivedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.ReceivedAt):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintMessages(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x32
+	if len(m.RxMetadata) > 0 {
+		for iNdEx := len(m.RxMetadata) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RxMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMessages(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	{
+		size, err := m.Settings.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n1
+		i -= size
+		i = encodeVarintMessages(dAtA, i, uint64(size))
 	}
+	i--
 	dAtA[i] = 0x22
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(m.Settings.Size()))
-	n2, err := m.Settings.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	if len(m.RxMetadata) > 0 {
-		for _, msg := range m.RxMetadata {
-			dAtA[i] = 0x2a
-			i++
-			i = encodeVarintMessages(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.Payload != nil {
+		{
+			size, err := m.Payload.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x12
 	}
-	dAtA[i] = 0x32
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ReceivedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ReceivedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
+	if len(m.RawPayload) > 0 {
+		i -= len(m.RawPayload)
+		copy(dAtA[i:], m.RawPayload)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.RawPayload)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i += n3
-	if len(m.CorrelationIDs) > 0 {
-		for _, s := range m.CorrelationIDs {
-			dAtA[i] = 0x3a
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
-		}
-	}
-	if m.DeviceChannelIndex != 0 {
-		dAtA[i] = 0x48
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DeviceChannelIndex))
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *DownlinkMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2582,93 +2331,111 @@ func (m *DownlinkMessage) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *DownlinkMessage) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DownlinkMessage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.RawPayload) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.RawPayload)))
-		i += copy(dAtA[i:], m.RawPayload)
-	}
-	if m.Payload != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Payload.Size()))
-		n4, err := m.Payload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.CorrelationIDs) > 0 {
+		for iNdEx := len(m.CorrelationIDs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CorrelationIDs[iNdEx])
+			copy(dAtA[i:], m.CorrelationIDs[iNdEx])
+			i = encodeVarintMessages(dAtA, i, uint64(len(m.CorrelationIDs[iNdEx])))
+			i--
+			dAtA[i] = 0x32
 		}
-		i += n4
-	}
-	if m.EndDeviceIDs != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.EndDeviceIDs.Size()))
-		n5, err := m.EndDeviceIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
 	}
 	if m.Settings != nil {
-		nn6, err := m.Settings.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn6
-	}
-	if len(m.CorrelationIDs) > 0 {
-		for _, s := range m.CorrelationIDs {
-			dAtA[i] = 0x32
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
+		{
+			size := m.Settings.Size()
+			i -= size
+			if _, err := m.Settings.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
 			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
 		}
 	}
-	return i, nil
+	if m.EndDeviceIDs != nil {
+		{
+			size, err := m.EndDeviceIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Payload != nil {
+		{
+			size, err := m.Payload.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.RawPayload) > 0 {
+		i -= len(m.RawPayload)
+		copy(dAtA[i:], m.RawPayload)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.RawPayload)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *DownlinkMessage_Request) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *DownlinkMessage_Request) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Request != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Request.Size()))
-		n7, err := m.Request.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Request.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n7
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *DownlinkMessage_Scheduled) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *DownlinkMessage_Scheduled) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Scheduled != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Scheduled.Size()))
-		n8, err := m.Scheduled.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Scheduled.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n8
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *TxAcknowledgment) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2676,37 +2443,36 @@ func (m *TxAcknowledgment) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *TxAcknowledgment) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TxAcknowledgment) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.Result != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.Result))
+		i--
+		dAtA[i] = 0x10
+	}
 	if len(m.CorrelationIDs) > 0 {
-		for _, s := range m.CorrelationIDs {
+		for iNdEx := len(m.CorrelationIDs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CorrelationIDs[iNdEx])
+			copy(dAtA[i:], m.CorrelationIDs[iNdEx])
+			i = encodeVarintMessages(dAtA, i, uint64(len(m.CorrelationIDs[iNdEx])))
+			i--
 			dAtA[i] = 0xa
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
 		}
 	}
-	if m.Result != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Result))
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationUplink) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2714,69 +2480,82 @@ func (m *ApplicationUplink) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationUplink) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationUplink) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionKeyID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.SessionKeyID)))
-		i += copy(dAtA[i:], m.SessionKeyID)
-	}
-	if m.FPort != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.FPort))
-	}
-	if m.FCnt != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.FCnt))
-	}
-	if len(m.FRMPayload) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.FRMPayload)))
-		i += copy(dAtA[i:], m.FRMPayload)
-	}
-	if m.DecodedPayload != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DecodedPayload.Size()))
-		n9, err := m.DecodedPayload.MarshalTo(dAtA[i:])
+	{
+		size, err := m.Settings.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n9
+		i -= size
+		i = encodeVarintMessages(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x3a
 	if len(m.RxMetadata) > 0 {
-		for _, msg := range m.RxMetadata {
+		for iNdEx := len(m.RxMetadata) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RxMetadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMessages(dAtA, i, uint64(size))
+			}
+			i--
 			dAtA[i] = 0x32
-			i++
-			i = encodeVarintMessages(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+		}
+	}
+	if m.DecodedPayload != nil {
+		{
+			size, err := m.DecodedPayload.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x2a
 	}
-	dAtA[i] = 0x3a
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(m.Settings.Size()))
-	n10, err := m.Settings.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if len(m.FRMPayload) > 0 {
+		i -= len(m.FRMPayload)
+		copy(dAtA[i:], m.FRMPayload)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.FRMPayload)))
+		i--
+		dAtA[i] = 0x22
 	}
-	i += n10
-	return i, nil
+	if m.FCnt != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.FCnt))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.FPort != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.FPort))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.SessionKeyID) > 0 {
+		i -= len(m.SessionKeyID)
+		copy(dAtA[i:], m.SessionKeyID)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.SessionKeyID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationLocation) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2784,48 +2563,58 @@ func (m *ApplicationLocation) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationLocation) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationLocation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Service) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.Service)))
-		i += copy(dAtA[i:], m.Service)
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(m.Location.Size()))
-	n11, err := m.Location.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n11
 	if len(m.Attributes) > 0 {
 		for k := range m.Attributes {
-			dAtA[i] = 0x1a
-			i++
 			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovMessages(uint64(len(k))) + 1 + len(v) + sovMessages(uint64(len(v)))
-			i = encodeVarintMessages(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintMessages(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintMessages(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintMessages(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintMessages(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x1a
 		}
 	}
-	return i, nil
+	{
+		size, err := m.Location.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Service) > 0 {
+		i -= len(m.Service)
+		copy(dAtA[i:], m.Service)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.Service)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationJoinAccept) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2833,55 +2622,65 @@ func (m *ApplicationJoinAccept) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationJoinAccept) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationJoinAccept) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionKeyID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.SessionKeyID)))
-		i += copy(dAtA[i:], m.SessionKeyID)
-	}
-	if m.AppSKey != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.AppSKey.Size()))
-		n12, err := m.AppSKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n12
-	}
-	if len(m.InvalidatedDownlinks) > 0 {
-		for _, msg := range m.InvalidatedDownlinks {
-			dAtA[i] = 0x1a
-			i++
-			i = encodeVarintMessages(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
 	if m.PendingSession {
-		dAtA[i] = 0x20
-		i++
+		i--
 		if m.PendingSession {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x20
 	}
-	return i, nil
+	if len(m.InvalidatedDownlinks) > 0 {
+		for iNdEx := len(m.InvalidatedDownlinks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.InvalidatedDownlinks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMessages(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if m.AppSKey != nil {
+		{
+			size, err := m.AppSKey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.SessionKeyID) > 0 {
+		i -= len(m.SessionKeyID)
+		copy(dAtA[i:], m.SessionKeyID)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.SessionKeyID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationDownlink) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2889,89 +2688,94 @@ func (m *ApplicationDownlink) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationDownlink) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationDownlink) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionKeyID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.SessionKeyID)))
-		i += copy(dAtA[i:], m.SessionKeyID)
-	}
-	if m.FPort != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.FPort))
-	}
-	if m.FCnt != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.FCnt))
-	}
-	if len(m.FRMPayload) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.FRMPayload)))
-		i += copy(dAtA[i:], m.FRMPayload)
-	}
-	if m.DecodedPayload != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DecodedPayload.Size()))
-		n13, err := m.DecodedPayload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.CorrelationIDs) > 0 {
+		for iNdEx := len(m.CorrelationIDs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CorrelationIDs[iNdEx])
+			copy(dAtA[i:], m.CorrelationIDs[iNdEx])
+			i = encodeVarintMessages(dAtA, i, uint64(len(m.CorrelationIDs[iNdEx])))
+			i--
+			dAtA[i] = 0x4a
 		}
-		i += n13
+	}
+	if m.Priority != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.Priority))
+		i--
+		dAtA[i] = 0x40
+	}
+	if m.ClassBC != nil {
+		{
+			size, err := m.ClassBC.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
 	}
 	if m.Confirmed {
-		dAtA[i] = 0x30
-		i++
+		i--
 		if m.Confirmed {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x30
 	}
-	if m.ClassBC != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.ClassBC.Size()))
-		n14, err := m.ClassBC.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n14
-	}
-	if m.Priority != 0 {
-		dAtA[i] = 0x40
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.Priority))
-	}
-	if len(m.CorrelationIDs) > 0 {
-		for _, s := range m.CorrelationIDs {
-			dAtA[i] = 0x4a
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
+	if m.DecodedPayload != nil {
+		{
+			size, err := m.DecodedPayload.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
 			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	if len(m.FRMPayload) > 0 {
+		i -= len(m.FRMPayload)
+		copy(dAtA[i:], m.FRMPayload)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.FRMPayload)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.FCnt != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.FCnt))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.FPort != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.FPort))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.SessionKeyID) > 0 {
+		i -= len(m.SessionKeyID)
+		copy(dAtA[i:], m.SessionKeyID)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.SessionKeyID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationDownlink_ClassBC) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2979,39 +2783,46 @@ func (m *ApplicationDownlink_ClassBC) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationDownlink_ClassBC) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationDownlink_ClassBC) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Gateways) > 0 {
-		for _, msg := range m.Gateways {
-			dAtA[i] = 0x3a
-			i++
-			i = encodeVarintMessages(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
 	if m.AbsoluteTime != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.AbsoluteTime)))
-		n15, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.AbsoluteTime, dAtA[i:])
-		if err != nil {
-			return 0, err
+		n14, err14 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.AbsoluteTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.AbsoluteTime):])
+		if err14 != nil {
+			return 0, err14
 		}
-		i += n15
+		i -= n14
+		i = encodeVarintMessages(dAtA, i, uint64(n14))
+		i--
+		dAtA[i] = 0x42
 	}
-	return i, nil
+	if len(m.Gateways) > 0 {
+		for iNdEx := len(m.Gateways) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Gateways[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMessages(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationDownlinks) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3019,29 +2830,36 @@ func (m *ApplicationDownlinks) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationDownlinks) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationDownlinks) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Downlinks) > 0 {
-		for _, msg := range m.Downlinks {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintMessages(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Downlinks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Downlinks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMessages(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationDownlinkFailed) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3049,33 +2867,42 @@ func (m *ApplicationDownlinkFailed) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationDownlinkFailed) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationDownlinkFailed) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(m.ApplicationDownlink.Size()))
-	n16, err := m.ApplicationDownlink.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Error.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessages(dAtA, i, uint64(size))
 	}
-	i += n16
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(m.Error.Size()))
-	n17, err := m.Error.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationDownlink.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessages(dAtA, i, uint64(size))
 	}
-	i += n17
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationInvalidatedDownlinks) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3083,34 +2910,41 @@ func (m *ApplicationInvalidatedDownlinks) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationInvalidatedDownlinks) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationInvalidatedDownlinks) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.LastFCntDown != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.LastFCntDown))
+		i--
+		dAtA[i] = 0x10
+	}
 	if len(m.Downlinks) > 0 {
-		for _, msg := range m.Downlinks {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintMessages(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Downlinks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Downlinks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMessages(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	if m.LastFCntDown != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.LastFCntDown))
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationUp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3118,183 +2952,240 @@ func (m *ApplicationUp) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationUp) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationUp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n18, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n18
-	if len(m.CorrelationIDs) > 0 {
-		for _, s := range m.CorrelationIDs {
-			dAtA[i] = 0x12
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
+	if m.ReceivedAt != nil {
+		n17, err17 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ReceivedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ReceivedAt):])
+		if err17 != nil {
+			return 0, err17
 		}
+		i -= n17
+		i = encodeVarintMessages(dAtA, i, uint64(n17))
+		i--
+		dAtA[i] = 0x62
 	}
 	if m.Up != nil {
-		nn19, err := m.Up.MarshalTo(dAtA[i:])
+		{
+			size := m.Up.Size()
+			i -= size
+			if _, err := m.Up.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if len(m.CorrelationIDs) > 0 {
+		for iNdEx := len(m.CorrelationIDs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CorrelationIDs[iNdEx])
+			copy(dAtA[i:], m.CorrelationIDs[iNdEx])
+			i = encodeVarintMessages(dAtA, i, uint64(len(m.CorrelationIDs[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += nn19
+		i -= size
+		i = encodeVarintMessages(dAtA, i, uint64(size))
 	}
-	if m.ReceivedAt != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.ReceivedAt)))
-		n20, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ReceivedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n20
-	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationUp_UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_UplinkMessage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.UplinkMessage != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.UplinkMessage.Size()))
-		n21, err := m.UplinkMessage.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.UplinkMessage.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n21
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_JoinAccept) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_JoinAccept) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.JoinAccept != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.JoinAccept.Size()))
-		n22, err := m.JoinAccept.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.JoinAccept.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n22
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkAck) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_DownlinkAck) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DownlinkAck != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkAck.Size()))
-		n23, err := m.DownlinkAck.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DownlinkAck.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n23
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkNack) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_DownlinkNack) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DownlinkNack != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkNack.Size()))
-		n24, err := m.DownlinkNack.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DownlinkNack.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n24
+		i--
+		dAtA[i] = 0x32
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkSent) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_DownlinkSent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DownlinkSent != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkSent.Size()))
-		n25, err := m.DownlinkSent.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DownlinkSent.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n25
+		i--
+		dAtA[i] = 0x3a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkFailed) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_DownlinkFailed) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DownlinkFailed != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkFailed.Size()))
-		n26, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DownlinkFailed.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n26
+		i--
+		dAtA[i] = 0x42
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkQueued) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_DownlinkQueued) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DownlinkQueued != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkQueued.Size()))
-		n27, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DownlinkQueued.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n27
+		i--
+		dAtA[i] = 0x4a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkQueueInvalidated) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_DownlinkQueueInvalidated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DownlinkQueueInvalidated != nil {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.DownlinkQueueInvalidated.Size()))
-		n28, err := m.DownlinkQueueInvalidated.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DownlinkQueueInvalidated.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n28
+		i--
+		dAtA[i] = 0x52
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_LocationSolved) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationUp_LocationSolved) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.LocationSolved != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.LocationSolved.Size()))
-		n29, err := m.LocationSolved.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.LocationSolved.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMessages(dAtA, i, uint64(size))
 		}
-		i += n29
+		i--
+		dAtA[i] = 0x5a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MessagePayloadFormatters) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3302,39 +3193,46 @@ func (m *MessagePayloadFormatters) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MessagePayloadFormatters) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MessagePayloadFormatters) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.UpFormatter != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(m.UpFormatter))
-	}
-	if len(m.UpFormatterParameter) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.UpFormatterParameter)))
-		i += copy(dAtA[i:], m.UpFormatterParameter)
+	if len(m.DownFormatterParameter) > 0 {
+		i -= len(m.DownFormatterParameter)
+		copy(dAtA[i:], m.DownFormatterParameter)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.DownFormatterParameter)))
+		i--
+		dAtA[i] = 0x22
 	}
 	if m.DownFormatter != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintMessages(dAtA, i, uint64(m.DownFormatter))
+		i--
+		dAtA[i] = 0x18
 	}
-	if len(m.DownFormatterParameter) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintMessages(dAtA, i, uint64(len(m.DownFormatterParameter)))
-		i += copy(dAtA[i:], m.DownFormatterParameter)
+	if len(m.UpFormatterParameter) > 0 {
+		i -= len(m.UpFormatterParameter)
+		copy(dAtA[i:], m.UpFormatterParameter)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.UpFormatterParameter)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if m.UpFormatter != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.UpFormatter))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *DownlinkQueueRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3342,41 +3240,52 @@ func (m *DownlinkQueueRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *DownlinkQueueRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DownlinkQueueRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintMessages(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n30, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n30
 	if len(m.Downlinks) > 0 {
-		for _, msg := range m.Downlinks {
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintMessages(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Downlinks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Downlinks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintMessages(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0x12
 		}
 	}
-	return i, nil
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintMessages(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintMessages(dAtA []byte, offset int, v uint64) int {
+	offset -= sovMessages(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedTxAcknowledgment(r randyMessages, easy bool) *TxAcknowledgment {
 	this := &TxAcknowledgment{}
@@ -3405,10 +3314,10 @@ func NewPopulatedApplicationUplink(r randyMessages, easy bool) *ApplicationUplin
 	for i := 0; i < v3; i++ {
 		this.FRMPayload[i] = byte(r.Intn(256))
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DecodedPayload = types.NewPopulatedStruct(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v4 := r.Intn(5)
 		this.RxMetadata = make([]*RxMetadata, v4)
 		for i := 0; i < v4; i++ {
@@ -3427,7 +3336,7 @@ func NewPopulatedApplicationLocation(r randyMessages, easy bool) *ApplicationLoc
 	this.Service = randStringMessages(r)
 	v6 := NewPopulatedLocation(r, easy)
 	this.Location = *v6
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v7 := r.Intn(10)
 		this.Attributes = make(map[string]string)
 		for i := 0; i < v7; i++ {
@@ -3446,10 +3355,10 @@ func NewPopulatedApplicationJoinAccept(r randyMessages, easy bool) *ApplicationJ
 	for i := 0; i < v8; i++ {
 		this.SessionKeyID[i] = byte(r.Intn(256))
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.AppSKey = NewPopulatedKeyEnvelope(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v9 := r.Intn(5)
 		this.InvalidatedDownlinks = make([]*ApplicationDownlink, v9)
 		for i := 0; i < v9; i++ {
@@ -3464,14 +3373,14 @@ func NewPopulatedApplicationJoinAccept(r randyMessages, easy bool) *ApplicationJ
 
 func NewPopulatedApplicationDownlink_ClassBC(r randyMessages, easy bool) *ApplicationDownlink_ClassBC {
 	this := &ApplicationDownlink_ClassBC{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v10 := r.Intn(5)
 		this.Gateways = make([]*GatewayAntennaIdentifiers, v10)
 		for i := 0; i < v10; i++ {
 			this.Gateways[i] = NewPopulatedGatewayAntennaIdentifiers(r, easy)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.AbsoluteTime = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -3481,7 +3390,7 @@ func NewPopulatedApplicationDownlink_ClassBC(r randyMessages, easy bool) *Applic
 
 func NewPopulatedApplicationDownlinks(r randyMessages, easy bool) *ApplicationDownlinks {
 	this := &ApplicationDownlinks{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v11 := r.Intn(5)
 		this.Downlinks = make([]*ApplicationDownlink, v11)
 		for i := 0; i < v11; i++ {
@@ -3506,7 +3415,7 @@ func NewPopulatedApplicationDownlinkFailed(r randyMessages, easy bool) *Applicat
 
 func NewPopulatedApplicationInvalidatedDownlinks(r randyMessages, easy bool) *ApplicationInvalidatedDownlinks {
 	this := &ApplicationInvalidatedDownlinks{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v14 := r.Intn(5)
 		this.Downlinks = make([]*ApplicationDownlink, v14)
 		for i := 0; i < v14; i++ {
@@ -3549,7 +3458,7 @@ func NewPopulatedApplicationUp(r randyMessages, easy bool) *ApplicationUp {
 	case 11:
 		this.Up = NewPopulatedApplicationUp_LocationSolved(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -3617,7 +3526,7 @@ func NewPopulatedDownlinkQueueRequest(r randyMessages, easy bool) *DownlinkQueue
 	this := &DownlinkQueueRequest{}
 	v17 := NewPopulatedEndDeviceIdentifiers(r, easy)
 	this.EndDeviceIdentifiers = *v17
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v18 := r.Intn(5)
 		this.Downlinks = make([]*ApplicationDownlink, v18)
 		for i := 0; i < v18; i++ {
@@ -4174,14 +4083,7 @@ func (m *DownlinkQueueRequest) Size() (n int) {
 }
 
 func sovMessages(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozMessages(x uint64) (n int) {
 	return sovMessages((x << 1) ^ uint64((int64(x) >> 63)))
@@ -4190,12 +4092,17 @@ func (this *UplinkMessage) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForRxMetadata := "[]*RxMetadata{"
+	for _, f := range this.RxMetadata {
+		repeatedStringForRxMetadata += strings.Replace(fmt.Sprintf("%v", f), "RxMetadata", "RxMetadata", 1) + ","
+	}
+	repeatedStringForRxMetadata += "}"
 	s := strings.Join([]string{`&UplinkMessage{`,
 		`RawPayload:` + fmt.Sprintf("%v", this.RawPayload) + `,`,
 		`Payload:` + strings.Replace(fmt.Sprintf("%v", this.Payload), "Message", "Message", 1) + `,`,
-		`Settings:` + strings.Replace(strings.Replace(this.Settings.String(), "TxSettings", "TxSettings", 1), `&`, ``, 1) + `,`,
-		`RxMetadata:` + strings.Replace(fmt.Sprintf("%v", this.RxMetadata), "RxMetadata", "RxMetadata", 1) + `,`,
-		`ReceivedAt:` + strings.Replace(strings.Replace(this.ReceivedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`Settings:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Settings), "TxSettings", "TxSettings", 1), `&`, ``, 1) + `,`,
+		`RxMetadata:` + repeatedStringForRxMetadata + `,`,
+		`ReceivedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ReceivedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`CorrelationIDs:` + fmt.Sprintf("%v", this.CorrelationIDs) + `,`,
 		`DeviceChannelIndex:` + fmt.Sprintf("%v", this.DeviceChannelIndex) + `,`,
 		`}`,
@@ -4251,14 +4158,19 @@ func (this *ApplicationUplink) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForRxMetadata := "[]*RxMetadata{"
+	for _, f := range this.RxMetadata {
+		repeatedStringForRxMetadata += strings.Replace(fmt.Sprintf("%v", f), "RxMetadata", "RxMetadata", 1) + ","
+	}
+	repeatedStringForRxMetadata += "}"
 	s := strings.Join([]string{`&ApplicationUplink{`,
 		`SessionKeyID:` + fmt.Sprintf("%v", this.SessionKeyID) + `,`,
 		`FPort:` + fmt.Sprintf("%v", this.FPort) + `,`,
 		`FCnt:` + fmt.Sprintf("%v", this.FCnt) + `,`,
 		`FRMPayload:` + fmt.Sprintf("%v", this.FRMPayload) + `,`,
 		`DecodedPayload:` + strings.Replace(fmt.Sprintf("%v", this.DecodedPayload), "Struct", "types.Struct", 1) + `,`,
-		`RxMetadata:` + strings.Replace(fmt.Sprintf("%v", this.RxMetadata), "RxMetadata", "RxMetadata", 1) + `,`,
-		`Settings:` + strings.Replace(strings.Replace(this.Settings.String(), "TxSettings", "TxSettings", 1), `&`, ``, 1) + `,`,
+		`RxMetadata:` + repeatedStringForRxMetadata + `,`,
+		`Settings:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Settings), "TxSettings", "TxSettings", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4279,7 +4191,7 @@ func (this *ApplicationLocation) String() string {
 	mapStringForAttributes += "}"
 	s := strings.Join([]string{`&ApplicationLocation{`,
 		`Service:` + fmt.Sprintf("%v", this.Service) + `,`,
-		`Location:` + strings.Replace(strings.Replace(this.Location.String(), "Location", "Location", 1), `&`, ``, 1) + `,`,
+		`Location:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1), `&`, ``, 1) + `,`,
 		`Attributes:` + mapStringForAttributes + `,`,
 		`}`,
 	}, "")
@@ -4289,10 +4201,15 @@ func (this *ApplicationJoinAccept) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForInvalidatedDownlinks := "[]*ApplicationDownlink{"
+	for _, f := range this.InvalidatedDownlinks {
+		repeatedStringForInvalidatedDownlinks += strings.Replace(f.String(), "ApplicationDownlink", "ApplicationDownlink", 1) + ","
+	}
+	repeatedStringForInvalidatedDownlinks += "}"
 	s := strings.Join([]string{`&ApplicationJoinAccept{`,
 		`SessionKeyID:` + fmt.Sprintf("%v", this.SessionKeyID) + `,`,
 		`AppSKey:` + strings.Replace(fmt.Sprintf("%v", this.AppSKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
-		`InvalidatedDownlinks:` + strings.Replace(fmt.Sprintf("%v", this.InvalidatedDownlinks), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
+		`InvalidatedDownlinks:` + repeatedStringForInvalidatedDownlinks + `,`,
 		`PendingSession:` + fmt.Sprintf("%v", this.PendingSession) + `,`,
 		`}`,
 	}, "")
@@ -4320,8 +4237,13 @@ func (this *ApplicationDownlink_ClassBC) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForGateways := "[]*GatewayAntennaIdentifiers{"
+	for _, f := range this.Gateways {
+		repeatedStringForGateways += strings.Replace(fmt.Sprintf("%v", f), "GatewayAntennaIdentifiers", "GatewayAntennaIdentifiers", 1) + ","
+	}
+	repeatedStringForGateways += "}"
 	s := strings.Join([]string{`&ApplicationDownlink_ClassBC{`,
-		`Gateways:` + strings.Replace(fmt.Sprintf("%v", this.Gateways), "GatewayAntennaIdentifiers", "GatewayAntennaIdentifiers", 1) + `,`,
+		`Gateways:` + repeatedStringForGateways + `,`,
 		`AbsoluteTime:` + strings.Replace(fmt.Sprintf("%v", this.AbsoluteTime), "Timestamp", "types.Timestamp", 1) + `,`,
 		`}`,
 	}, "")
@@ -4331,8 +4253,13 @@ func (this *ApplicationDownlinks) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForDownlinks := "[]*ApplicationDownlink{"
+	for _, f := range this.Downlinks {
+		repeatedStringForDownlinks += strings.Replace(f.String(), "ApplicationDownlink", "ApplicationDownlink", 1) + ","
+	}
+	repeatedStringForDownlinks += "}"
 	s := strings.Join([]string{`&ApplicationDownlinks{`,
-		`Downlinks:` + strings.Replace(fmt.Sprintf("%v", this.Downlinks), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
+		`Downlinks:` + repeatedStringForDownlinks + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4343,7 +4270,7 @@ func (this *ApplicationDownlinkFailed) String() string {
 	}
 	s := strings.Join([]string{`&ApplicationDownlinkFailed{`,
 		`ApplicationDownlink:` + strings.Replace(strings.Replace(this.ApplicationDownlink.String(), "ApplicationDownlink", "ApplicationDownlink", 1), `&`, ``, 1) + `,`,
-		`Error:` + strings.Replace(strings.Replace(this.Error.String(), "ErrorDetails", "ErrorDetails", 1), `&`, ``, 1) + `,`,
+		`Error:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Error), "ErrorDetails", "ErrorDetails", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -4352,8 +4279,13 @@ func (this *ApplicationInvalidatedDownlinks) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForDownlinks := "[]*ApplicationDownlink{"
+	for _, f := range this.Downlinks {
+		repeatedStringForDownlinks += strings.Replace(f.String(), "ApplicationDownlink", "ApplicationDownlink", 1) + ","
+	}
+	repeatedStringForDownlinks += "}"
 	s := strings.Join([]string{`&ApplicationInvalidatedDownlinks{`,
-		`Downlinks:` + strings.Replace(fmt.Sprintf("%v", this.Downlinks), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
+		`Downlinks:` + repeatedStringForDownlinks + `,`,
 		`LastFCntDown:` + fmt.Sprintf("%v", this.LastFCntDown) + `,`,
 		`}`,
 	}, "")
@@ -4364,7 +4296,7 @@ func (this *ApplicationUp) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ApplicationUp{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
 		`CorrelationIDs:` + fmt.Sprintf("%v", this.CorrelationIDs) + `,`,
 		`Up:` + fmt.Sprintf("%v", this.Up) + `,`,
 		`ReceivedAt:` + strings.Replace(fmt.Sprintf("%v", this.ReceivedAt), "Timestamp", "types.Timestamp", 1) + `,`,
@@ -4479,9 +4411,14 @@ func (this *DownlinkQueueRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForDownlinks := "[]*ApplicationDownlink{"
+	for _, f := range this.Downlinks {
+		repeatedStringForDownlinks += strings.Replace(f.String(), "ApplicationDownlink", "ApplicationDownlink", 1) + ","
+	}
+	repeatedStringForDownlinks += "}"
 	s := strings.Join([]string{`&DownlinkQueueRequest{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Downlinks:` + strings.Replace(fmt.Sprintf("%v", this.Downlinks), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Downlinks:` + repeatedStringForDownlinks + `,`,
 		`}`,
 	}, "")
 	return s

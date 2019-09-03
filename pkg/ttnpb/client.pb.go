@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strconv "strconv"
 	strings "strings"
@@ -32,7 +33,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // The OAuth2 flows an OAuth client can use to get an access token.
 type GrantType int32
@@ -110,7 +111,7 @@ func (m *Client) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Client.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -239,7 +240,7 @@ func (m *Clients) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Clients.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -285,7 +286,7 @@ func (m *GetClientRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_GetClientRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -338,7 +339,7 @@ func (m *ListClientsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_ListClientsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -413,7 +414,7 @@ func (m *CreateClientRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_CreateClientRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -459,7 +460,7 @@ func (m *UpdateClientRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_UpdateClientRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -508,7 +509,7 @@ func (m *ListClientCollaboratorsRequest) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_ListClientCollaboratorsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -561,7 +562,7 @@ func (m *GetClientCollaboratorRequest) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_GetClientCollaboratorRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -600,7 +601,7 @@ func (m *SetClientCollaboratorRequest) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_SetClientCollaboratorRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1063,7 +1064,7 @@ func (this *SetClientCollaboratorRequest) Equal(that interface{}) bool {
 func (m *Client) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1071,162 +1072,172 @@ func (m *Client) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Client) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Client) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.ClientIdentifiers.Size()))
-	n1, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n3
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
-			dAtA[i] = 0x32
-			i++
-			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovClient(uint64(len(k))) + 1 + len(v) + sovClient(uint64(len(v)))
-			i = encodeVarintClient(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintClient(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintClient(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if len(m.ContactInfo) > 0 {
-		for _, msg := range m.ContactInfo {
-			dAtA[i] = 0x3a
-			i++
-			i = encodeVarintClient(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+	if len(m.Rights) > 0 {
+		dAtA2 := make([]byte, len(m.Rights)*10)
+		var j1 int
+		for _, num := range m.Rights {
+			for num >= 1<<7 {
+				dAtA2[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
 			}
-			i += n
+			dAtA2[j1] = uint8(num)
+			j1++
 		}
+		i -= j1
+		copy(dAtA[i:], dAtA2[:j1])
+		i = encodeVarintClient(dAtA, i, uint64(j1))
+		i--
+		dAtA[i] = 0x72
 	}
-	if len(m.Secret) > 0 {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(len(m.Secret)))
-		i += copy(dAtA[i:], m.Secret)
-	}
-	if len(m.RedirectURIs) > 0 {
-		for _, s := range m.RedirectURIs {
-			dAtA[i] = 0x4a
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
+	if len(m.Grants) > 0 {
+		dAtA4 := make([]byte, len(m.Grants)*10)
+		var j3 int
+		for _, num := range m.Grants {
+			for num >= 1<<7 {
+				dAtA4[j3] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j3++
 			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
+			dAtA4[j3] = uint8(num)
+			j3++
 		}
-	}
-	if m.State != 0 {
-		dAtA[i] = 0x50
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(m.State))
-	}
-	if m.SkipAuthorization {
-		dAtA[i] = 0x58
-		i++
-		if m.SkipAuthorization {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
+		i -= j3
+		copy(dAtA[i:], dAtA4[:j3])
+		i = encodeVarintClient(dAtA, i, uint64(j3))
+		i--
+		dAtA[i] = 0x6a
 	}
 	if m.Endorsed {
-		dAtA[i] = 0x60
-		i++
+		i--
 		if m.Endorsed {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x60
 	}
-	if len(m.Grants) > 0 {
-		dAtA5 := make([]byte, len(m.Grants)*10)
-		var j4 int
-		for _, num := range m.Grants {
-			for num >= 1<<7 {
-				dAtA5[j4] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j4++
-			}
-			dAtA5[j4] = uint8(num)
-			j4++
+	if m.SkipAuthorization {
+		i--
+		if m.SkipAuthorization {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
 		}
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(j4))
-		i += copy(dAtA[i:], dAtA5[:j4])
+		i--
+		dAtA[i] = 0x58
 	}
-	if len(m.Rights) > 0 {
-		dAtA7 := make([]byte, len(m.Rights)*10)
-		var j6 int
-		for _, num := range m.Rights {
-			for num >= 1<<7 {
-				dAtA7[j6] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j6++
-			}
-			dAtA7[j6] = uint8(num)
-			j6++
+	if m.State != 0 {
+		i = encodeVarintClient(dAtA, i, uint64(m.State))
+		i--
+		dAtA[i] = 0x50
+	}
+	if len(m.RedirectURIs) > 0 {
+		for iNdEx := len(m.RedirectURIs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.RedirectURIs[iNdEx])
+			copy(dAtA[i:], m.RedirectURIs[iNdEx])
+			i = encodeVarintClient(dAtA, i, uint64(len(m.RedirectURIs[iNdEx])))
+			i--
+			dAtA[i] = 0x4a
 		}
-		dAtA[i] = 0x72
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(j6))
-		i += copy(dAtA[i:], dAtA7[:j6])
 	}
-	return i, nil
+	if len(m.Secret) > 0 {
+		i -= len(m.Secret)
+		copy(dAtA[i:], m.Secret)
+		i = encodeVarintClient(dAtA, i, uint64(len(m.Secret)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.ContactInfo) > 0 {
+		for iNdEx := len(m.ContactInfo) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ContactInfo[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintClient(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if len(m.Attributes) > 0 {
+		for k := range m.Attributes {
+			v := m.Attributes[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintClient(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintClient(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintClient(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintClient(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintClient(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x22
+	}
+	n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err5 != nil {
+		return 0, err5
+	}
+	i -= n5
+	i = encodeVarintClient(dAtA, i, uint64(n5))
+	i--
+	dAtA[i] = 0x1a
+	n6, err6 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err6 != nil {
+		return 0, err6
+	}
+	i -= n6
+	i = encodeVarintClient(dAtA, i, uint64(n6))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ClientIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Clients) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1234,29 +1245,36 @@ func (m *Clients) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Clients) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Clients) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Clients) > 0 {
-		for _, msg := range m.Clients {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintClient(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Clients) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Clients[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintClient(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GetClientRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1264,33 +1282,42 @@ func (m *GetClientRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetClientRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetClientRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.ClientIdentifiers.Size()))
-	n8, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n8
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.FieldMask.Size()))
-	n9, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ClientIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n9
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListClientsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1298,51 +1325,61 @@ func (m *ListClientsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListClientsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListClientsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Collaborator != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(m.Collaborator.Size()))
-		n10, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if m.Page != 0 {
+		i = encodeVarintClient(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.Limit != 0 {
+		i = encodeVarintClient(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintClient(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n10
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.FieldMask.Size()))
-	n11, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.Collaborator != nil {
+		{
+			size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintClient(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
 	}
-	i += n11
-	if len(m.Order) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(len(m.Order)))
-		i += copy(dAtA[i:], m.Order)
-	}
-	if m.Limit != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(m.Limit))
-	}
-	if m.Page != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(m.Page))
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateClientRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1350,33 +1387,42 @@ func (m *CreateClientRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateClientRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateClientRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.Client.Size()))
-	n12, err := m.Client.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n12
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.Collaborator.Size()))
-	n13, err := m.Collaborator.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Client.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n13
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateClientRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1384,33 +1430,42 @@ func (m *UpdateClientRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateClientRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateClientRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.Client.Size()))
-	n14, err := m.Client.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n14
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.FieldMask.Size()))
-	n15, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Client.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n15
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListClientCollaboratorsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1418,35 +1473,42 @@ func (m *ListClientCollaboratorsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListClientCollaboratorsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListClientCollaboratorsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.ClientIdentifiers.Size()))
-	n16, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n16
-	if m.Limit != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintClient(dAtA, i, uint64(m.Limit))
-	}
 	if m.Page != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintClient(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Limit != 0 {
+		i = encodeVarintClient(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.ClientIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1454,33 +1516,42 @@ func (m *GetClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetClientCollaboratorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.ClientIdentifiers.Size()))
-	n17, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.OrganizationOrUserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n17
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.OrganizationOrUserIdentifiers.Size()))
-	n18, err := m.OrganizationOrUserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ClientIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n18
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *SetClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1488,37 +1559,48 @@ func (m *SetClientCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SetClientCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SetClientCollaboratorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.ClientIdentifiers.Size()))
-	n19, err := m.ClientIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n19
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintClient(dAtA, i, uint64(m.Collaborator.Size()))
-	n20, err := m.Collaborator.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ClientIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintClient(dAtA, i, uint64(size))
 	}
-	i += n20
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintClient(dAtA []byte, offset int, v uint64) int {
+	offset -= sovClient(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedClient(r randyClient, easy bool) *Client {
 	this := &Client{}
@@ -1530,14 +1612,14 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 	this.UpdatedAt = *v3
 	this.Name = randStringClient(r)
 	this.Description = randStringClient(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.Attributes = make(map[string]string)
 		for i := 0; i < v4; i++ {
 			this.Attributes[randStringClient(r)] = randStringClient(r)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v5 := r.Intn(5)
 		this.ContactInfo = make([]*ContactInfo, v5)
 		for i := 0; i < v5; i++ {
@@ -1570,7 +1652,7 @@ func NewPopulatedClient(r randyClient, easy bool) *Client {
 
 func NewPopulatedClients(r randyClient, easy bool) *Clients {
 	this := &Clients{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v9 := r.Intn(5)
 		this.Clients = make([]*Client, v9)
 		for i := 0; i < v9; i++ {
@@ -1595,7 +1677,7 @@ func NewPopulatedGetClientRequest(r randyClient, easy bool) *GetClientRequest {
 
 func NewPopulatedListClientsRequest(r randyClient, easy bool) *ListClientsRequest {
 	this := &ListClientsRequest{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Collaborator = NewPopulatedOrganizationOrUserIdentifiers(r, easy)
 	}
 	v12 := types.NewPopulatedFieldMask(r, easy)
@@ -1928,14 +2010,7 @@ func (m *SetClientCollaboratorRequest) Size() (n int) {
 }
 
 func sovClient(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozClient(x uint64) (n int) {
 	return sovClient((x << 1) ^ uint64((int64(x) >> 63)))
@@ -1944,6 +2019,11 @@ func (this *Client) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForContactInfo := "[]*ContactInfo{"
+	for _, f := range this.ContactInfo {
+		repeatedStringForContactInfo += strings.Replace(fmt.Sprintf("%v", f), "ContactInfo", "ContactInfo", 1) + ","
+	}
+	repeatedStringForContactInfo += "}"
 	keysForAttributes := make([]string, 0, len(this.Attributes))
 	for k := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
@@ -1955,13 +2035,13 @@ func (this *Client) String() string {
 	}
 	mapStringForAttributes += "}"
 	s := strings.Join([]string{`&Client{`,
-		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIdentifiers), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
 		`Attributes:` + mapStringForAttributes + `,`,
-		`ContactInfo:` + strings.Replace(fmt.Sprintf("%v", this.ContactInfo), "ContactInfo", "ContactInfo", 1) + `,`,
+		`ContactInfo:` + repeatedStringForContactInfo + `,`,
 		`Secret:` + fmt.Sprintf("%v", this.Secret) + `,`,
 		`RedirectURIs:` + fmt.Sprintf("%v", this.RedirectURIs) + `,`,
 		`State:` + fmt.Sprintf("%v", this.State) + `,`,
@@ -1977,8 +2057,13 @@ func (this *Clients) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForClients := "[]*Client{"
+	for _, f := range this.Clients {
+		repeatedStringForClients += strings.Replace(f.String(), "Client", "Client", 1) + ","
+	}
+	repeatedStringForClients += "}"
 	s := strings.Join([]string{`&Clients{`,
-		`Clients:` + strings.Replace(fmt.Sprintf("%v", this.Clients), "Client", "Client", 1) + `,`,
+		`Clients:` + repeatedStringForClients + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1988,8 +2073,8 @@ func (this *GetClientRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetClientRequest{`,
-		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIdentifiers), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2000,7 +2085,7 @@ func (this *ListClientsRequest) String() string {
 	}
 	s := strings.Join([]string{`&ListClientsRequest{`,
 		`Collaborator:` + strings.Replace(fmt.Sprintf("%v", this.Collaborator), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
@@ -2014,7 +2099,7 @@ func (this *CreateClientRequest) String() string {
 	}
 	s := strings.Join([]string{`&CreateClientRequest{`,
 		`Client:` + strings.Replace(strings.Replace(this.Client.String(), "Client", "Client", 1), `&`, ``, 1) + `,`,
-		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborator), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2025,7 +2110,7 @@ func (this *UpdateClientRequest) String() string {
 	}
 	s := strings.Join([]string{`&UpdateClientRequest{`,
 		`Client:` + strings.Replace(strings.Replace(this.Client.String(), "Client", "Client", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2035,7 +2120,7 @@ func (this *ListClientCollaboratorsRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListClientCollaboratorsRequest{`,
-		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIdentifiers), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
@@ -2047,8 +2132,8 @@ func (this *GetClientCollaboratorRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetClientCollaboratorRequest{`,
-		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
-		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationOrUserIdentifiers.String(), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIdentifiers), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationOrUserIdentifiers), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2058,8 +2143,8 @@ func (this *SetClientCollaboratorRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&SetClientCollaboratorRequest{`,
-		`ClientIdentifiers:` + strings.Replace(strings.Replace(this.ClientIdentifiers.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`ClientIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIdentifiers), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborator), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

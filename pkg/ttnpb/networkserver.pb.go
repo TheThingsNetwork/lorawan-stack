@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -18,6 +19,8 @@ import (
 	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -30,7 +33,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type GenerateDevAddrResponse struct {
 	DevAddr              *go_thethings_network_lorawan_stack_pkg_types.DevAddr `protobuf:"bytes,1,opt,name=dev_addr,json=devAddr,proto3,customtype=go.thethings.network/lorawan-stack/pkg/types.DevAddr" json:"dev_addr,omitempty"`
@@ -51,7 +54,7 @@ func (m *GenerateDevAddrResponse) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_GenerateDevAddrResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -197,6 +200,14 @@ type GsNsServer interface {
 	HandleUplink(context.Context, *UplinkMessage) (*types.Empty, error)
 }
 
+// UnimplementedGsNsServer can be embedded to have forward compatible implementations.
+type UnimplementedGsNsServer struct {
+}
+
+func (*UnimplementedGsNsServer) HandleUplink(ctx context.Context, req *UplinkMessage) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HandleUplink not implemented")
+}
+
 func RegisterGsNsServer(s *grpc.Server, srv GsNsServer) {
 	s.RegisterService(&_GsNs_serviceDesc, srv)
 }
@@ -314,6 +325,23 @@ type AsNsServer interface {
 	DownlinkQueueReplace(context.Context, *DownlinkQueueRequest) (*types.Empty, error)
 	DownlinkQueuePush(context.Context, *DownlinkQueueRequest) (*types.Empty, error)
 	DownlinkQueueList(context.Context, *EndDeviceIdentifiers) (*ApplicationDownlinks, error)
+}
+
+// UnimplementedAsNsServer can be embedded to have forward compatible implementations.
+type UnimplementedAsNsServer struct {
+}
+
+func (*UnimplementedAsNsServer) LinkApplication(srv AsNs_LinkApplicationServer) error {
+	return status.Errorf(codes.Unimplemented, "method LinkApplication not implemented")
+}
+func (*UnimplementedAsNsServer) DownlinkQueueReplace(ctx context.Context, req *DownlinkQueueRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownlinkQueueReplace not implemented")
+}
+func (*UnimplementedAsNsServer) DownlinkQueuePush(ctx context.Context, req *DownlinkQueueRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownlinkQueuePush not implemented")
+}
+func (*UnimplementedAsNsServer) DownlinkQueueList(ctx context.Context, req *EndDeviceIdentifiers) (*ApplicationDownlinks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownlinkQueueList not implemented")
 }
 
 func RegisterAsNsServer(s *grpc.Server, srv AsNsServer) {
@@ -489,6 +517,20 @@ type NsEndDeviceRegistryServer interface {
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
 }
 
+// UnimplementedNsEndDeviceRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedNsEndDeviceRegistryServer struct {
+}
+
+func (*UnimplementedNsEndDeviceRegistryServer) Get(ctx context.Context, req *GetEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedNsEndDeviceRegistryServer) Set(ctx context.Context, req *SetEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
+}
+func (*UnimplementedNsEndDeviceRegistryServer) Delete(ctx context.Context, req *EndDeviceIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+
 func RegisterNsEndDeviceRegistryServer(s *grpc.Server, srv NsEndDeviceRegistryServer) {
 	s.RegisterService(&_NsEndDeviceRegistry_serviceDesc, srv)
 }
@@ -599,6 +641,14 @@ type NsServer interface {
 	GenerateDevAddr(context.Context, *types.Empty) (*GenerateDevAddrResponse, error)
 }
 
+// UnimplementedNsServer can be embedded to have forward compatible implementations.
+type UnimplementedNsServer struct {
+}
+
+func (*UnimplementedNsServer) GenerateDevAddr(ctx context.Context, req *types.Empty) (*GenerateDevAddrResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateDevAddr not implemented")
+}
+
 func RegisterNsServer(s *grpc.Server, srv NsServer) {
 	s.RegisterService(&_Ns_serviceDesc, srv)
 }
@@ -637,7 +687,7 @@ var _Ns_serviceDesc = grpc.ServiceDesc{
 func (m *GenerateDevAddrResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -645,31 +695,40 @@ func (m *GenerateDevAddrResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GenerateDevAddrResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GenerateDevAddrResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.DevAddr != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintNetworkserver(dAtA, i, uint64(m.DevAddr.Size()))
-		n1, err := m.DevAddr.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.DevAddr.Size()
+			i -= size
+			if _, err := m.DevAddr.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintNetworkserver(dAtA, i, uint64(size))
 		}
-		i += n1
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintNetworkserver(dAtA []byte, offset int, v uint64) int {
+	offset -= sovNetworkserver(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedGenerateDevAddrResponse(r randyNetworkserver, easy bool) *GenerateDevAddrResponse {
 	this := &GenerateDevAddrResponse{}
@@ -765,14 +824,7 @@ func (m *GenerateDevAddrResponse) Size() (n int) {
 }
 
 func sovNetworkserver(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozNetworkserver(x uint64) (n int) {
 	return sovNetworkserver((x << 1) ^ uint64((int64(x) >> 63)))

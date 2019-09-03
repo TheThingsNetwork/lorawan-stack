@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strconv "strconv"
 	strings "strings"
@@ -27,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Right is the enum that defines all the different rights to do something in the network.
 type Right int32
@@ -295,7 +296,7 @@ func (m *Rights) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Rights.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -349,7 +350,7 @@ func (m *APIKey) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_APIKey.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -415,7 +416,7 @@ func (m *APIKeys) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_APIKeys.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -461,7 +462,7 @@ func (m *Collaborator) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_Collaborator.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -507,7 +508,7 @@ func (m *GetCollaboratorResponse) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_GetCollaboratorResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -552,7 +553,7 @@ func (m *Collaborators) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return xxx_messageInfo_Collaborators.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -878,7 +879,7 @@ func (this *Collaborators) Equal(that interface{}) bool {
 func (m *Rights) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -886,7 +887,12 @@ func (m *Rights) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Rights) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Rights) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
@@ -902,18 +908,19 @@ func (m *Rights) MarshalTo(dAtA []byte) (int, error) {
 			dAtA2[j1] = uint8(num)
 			j1++
 		}
-		dAtA[i] = 0xa
-		i++
+		i -= j1
+		copy(dAtA[i:], dAtA2[:j1])
 		i = encodeVarintRights(dAtA, i, uint64(j1))
-		i += copy(dAtA[i:], dAtA2[:j1])
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *APIKey) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -921,28 +928,15 @@ func (m *APIKey) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *APIKey) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *APIKey) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintRights(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
-	}
-	if len(m.Key) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintRights(dAtA, i, uint64(len(m.Key)))
-		i += copy(dAtA[i:], m.Key)
-	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintRights(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
 	if len(m.Rights) > 0 {
 		dAtA4 := make([]byte, len(m.Rights)*10)
 		var j3 int
@@ -955,18 +949,40 @@ func (m *APIKey) MarshalTo(dAtA []byte) (int, error) {
 			dAtA4[j3] = uint8(num)
 			j3++
 		}
-		dAtA[i] = 0x22
-		i++
+		i -= j3
+		copy(dAtA[i:], dAtA4[:j3])
 		i = encodeVarintRights(dAtA, i, uint64(j3))
-		i += copy(dAtA[i:], dAtA4[:j3])
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintRights(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintRights(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.ID) > 0 {
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
+		i = encodeVarintRights(dAtA, i, uint64(len(m.ID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *APIKeys) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -974,29 +990,36 @@ func (m *APIKeys) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *APIKeys) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *APIKeys) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.APIKeys) > 0 {
-		for _, msg := range m.APIKeys {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintRights(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.APIKeys) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.APIKeys[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintRights(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *Collaborator) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1004,42 +1027,50 @@ func (m *Collaborator) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Collaborator) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Collaborator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintRights(dAtA, i, uint64(m.OrganizationOrUserIdentifiers.Size()))
-	n5, err := m.OrganizationOrUserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
 	if len(m.Rights) > 0 {
-		dAtA7 := make([]byte, len(m.Rights)*10)
-		var j6 int
+		dAtA6 := make([]byte, len(m.Rights)*10)
+		var j5 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA7[j6] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA6[j5] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j6++
+				j5++
 			}
-			dAtA7[j6] = uint8(num)
-			j6++
+			dAtA6[j5] = uint8(num)
+			j5++
 		}
+		i -= j5
+		copy(dAtA[i:], dAtA6[:j5])
+		i = encodeVarintRights(dAtA, i, uint64(j5))
+		i--
 		dAtA[i] = 0x12
-		i++
-		i = encodeVarintRights(dAtA, i, uint64(j6))
-		i += copy(dAtA[i:], dAtA7[:j6])
 	}
-	return i, nil
+	{
+		size, err := m.OrganizationOrUserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintRights(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetCollaboratorResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1047,42 +1078,50 @@ func (m *GetCollaboratorResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetCollaboratorResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetCollaboratorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintRights(dAtA, i, uint64(m.OrganizationOrUserIdentifiers.Size()))
-	n8, err := m.OrganizationOrUserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n8
 	if len(m.Rights) > 0 {
-		dAtA10 := make([]byte, len(m.Rights)*10)
-		var j9 int
+		dAtA9 := make([]byte, len(m.Rights)*10)
+		var j8 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA10[j9] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA9[j8] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j9++
+				j8++
 			}
-			dAtA10[j9] = uint8(num)
-			j9++
+			dAtA9[j8] = uint8(num)
+			j8++
 		}
+		i -= j8
+		copy(dAtA[i:], dAtA9[:j8])
+		i = encodeVarintRights(dAtA, i, uint64(j8))
+		i--
 		dAtA[i] = 0x12
-		i++
-		i = encodeVarintRights(dAtA, i, uint64(j9))
-		i += copy(dAtA[i:], dAtA10[:j9])
 	}
-	return i, nil
+	{
+		size, err := m.OrganizationOrUserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintRights(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Collaborators) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1090,33 +1129,42 @@ func (m *Collaborators) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Collaborators) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Collaborators) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Collaborators) > 0 {
-		for _, msg := range m.Collaborators {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintRights(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Collaborators) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Collaborators[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintRights(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintRights(dAtA []byte, offset int, v uint64) int {
+	offset -= sovRights(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedRights(r randyRights, easy bool) *Rights {
 	this := &Rights{}
@@ -1147,7 +1195,7 @@ func NewPopulatedAPIKey(r randyRights, easy bool) *APIKey {
 
 func NewPopulatedAPIKeys(r randyRights, easy bool) *APIKeys {
 	this := &APIKeys{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v3 := r.Intn(5)
 		this.APIKeys = make([]*APIKey, v3)
 		for i := 0; i < v3; i++ {
@@ -1189,7 +1237,7 @@ func NewPopulatedGetCollaboratorResponse(r randyRights, easy bool) *GetCollabora
 
 func NewPopulatedCollaborators(r randyRights, easy bool) *Collaborators {
 	this := &Collaborators{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v8 := r.Intn(5)
 		this.Collaborators = make([]*Collaborator, v8)
 		for i := 0; i < v8; i++ {
@@ -1384,14 +1432,7 @@ func (m *Collaborators) Size() (n int) {
 }
 
 func sovRights(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozRights(x uint64) (n int) {
 	return sovRights((x << 1) ^ uint64((int64(x) >> 63)))
@@ -1423,8 +1464,13 @@ func (this *APIKeys) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForAPIKeys := "[]*APIKey{"
+	for _, f := range this.APIKeys {
+		repeatedStringForAPIKeys += strings.Replace(f.String(), "APIKey", "APIKey", 1) + ","
+	}
+	repeatedStringForAPIKeys += "}"
 	s := strings.Join([]string{`&APIKeys{`,
-		`APIKeys:` + strings.Replace(fmt.Sprintf("%v", this.APIKeys), "APIKey", "APIKey", 1) + `,`,
+		`APIKeys:` + repeatedStringForAPIKeys + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1434,7 +1480,7 @@ func (this *Collaborator) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&Collaborator{`,
-		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationOrUserIdentifiers.String(), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationOrUserIdentifiers), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`}`,
 	}, "")
@@ -1445,7 +1491,7 @@ func (this *GetCollaboratorResponse) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetCollaboratorResponse{`,
-		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationOrUserIdentifiers.String(), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationOrUserIdentifiers), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`}`,
 	}, "")
@@ -1455,8 +1501,13 @@ func (this *Collaborators) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForCollaborators := "[]*Collaborator{"
+	for _, f := range this.Collaborators {
+		repeatedStringForCollaborators += strings.Replace(f.String(), "Collaborator", "Collaborator", 1) + ","
+	}
+	repeatedStringForCollaborators += "}"
 	s := strings.Join([]string{`&Collaborators{`,
-		`Collaborators:` + strings.Replace(fmt.Sprintf("%v", this.Collaborators), "Collaborator", "Collaborator", 1) + `,`,
+		`Collaborators:` + repeatedStringForCollaborators + `,`,
 		`}`,
 	}, "")
 	return s

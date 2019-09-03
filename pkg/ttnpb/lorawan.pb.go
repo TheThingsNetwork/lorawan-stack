@@ -9,6 +9,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strconv "strconv"
 	strings "strings"
@@ -34,7 +35,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type MType int32
 
@@ -1025,7 +1026,7 @@ func (m *Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Message.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1111,116 +1112,14 @@ func (m *Message) GetRejoinRequestPayload() *RejoinRequestPayload {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Message) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Message_OneofMarshaler, _Message_OneofUnmarshaler, _Message_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Message) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Message_MACPayload)(nil),
 		(*Message_JoinRequestPayload)(nil),
 		(*Message_JoinAcceptPayload)(nil),
 		(*Message_RejoinRequestPayload)(nil),
 	}
-}
-
-func _Message_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Message)
-	// Payload
-	switch x := m.Payload.(type) {
-	case *Message_MACPayload:
-		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.MACPayload); err != nil {
-			return err
-		}
-	case *Message_JoinRequestPayload:
-		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.JoinRequestPayload); err != nil {
-			return err
-		}
-	case *Message_JoinAcceptPayload:
-		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.JoinAcceptPayload); err != nil {
-			return err
-		}
-	case *Message_RejoinRequestPayload:
-		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.RejoinRequestPayload); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Message.Payload has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Message_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Message)
-	switch tag {
-	case 3: // Payload.mac_payload
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACPayload)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Message_MACPayload{msg}
-		return true, err
-	case 4: // Payload.join_request_payload
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(JoinRequestPayload)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Message_JoinRequestPayload{msg}
-		return true, err
-	case 5: // Payload.join_accept_payload
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(JoinAcceptPayload)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Message_JoinAcceptPayload{msg}
-		return true, err
-	case 6: // Payload.rejoin_request_payload
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(RejoinRequestPayload)
-		err := b.DecodeMessage(msg)
-		m.Payload = &Message_RejoinRequestPayload{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Message_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Message)
-	// Payload
-	switch x := m.Payload.(type) {
-	case *Message_MACPayload:
-		s := proto.Size(x.MACPayload)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Message_JoinRequestPayload:
-		s := proto.Size(x.JoinRequestPayload)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Message_JoinAcceptPayload:
-		s := proto.Size(x.JoinAcceptPayload)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Message_RejoinRequestPayload:
-		s := proto.Size(x.RejoinRequestPayload)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type MHDR struct {
@@ -1243,7 +1142,7 @@ func (m *MHDR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_MHDR.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1298,7 +1197,7 @@ func (m *MACPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_MACPayload.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1360,7 +1259,7 @@ func (m *FHDR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_FHDR.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1416,7 +1315,7 @@ func (m *FCtrl) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_FCtrl.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1491,7 +1390,7 @@ func (m *JoinRequestPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_JoinRequestPayload.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1533,7 +1432,7 @@ func (m *RejoinRequestPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_RejoinRequestPayload.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1591,7 +1490,7 @@ func (m *JoinAcceptPayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_JoinAcceptPayload.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1653,7 +1552,7 @@ func (m *DLSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_DLSettings.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1720,7 +1619,7 @@ func (m *CFList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_CFList.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1781,7 +1680,7 @@ func (m *LoRaDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_LoRaDataRate.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1834,7 +1733,7 @@ func (m *FSKDataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_FSKDataRate.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1882,7 +1781,7 @@ func (m *DataRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_DataRate.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1939,78 +1838,12 @@ func (m *DataRate) GetFSK() *FSKDataRate {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*DataRate) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _DataRate_OneofMarshaler, _DataRate_OneofUnmarshaler, _DataRate_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*DataRate) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*DataRate_LoRa)(nil),
 		(*DataRate_FSK)(nil),
 	}
-}
-
-func _DataRate_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*DataRate)
-	// modulation
-	switch x := m.Modulation.(type) {
-	case *DataRate_LoRa:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.LoRa); err != nil {
-			return err
-		}
-	case *DataRate_FSK:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.FSK); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("DataRate.Modulation has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _DataRate_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*DataRate)
-	switch tag {
-	case 1: // modulation.lora
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(LoRaDataRate)
-		err := b.DecodeMessage(msg)
-		m.Modulation = &DataRate_LoRa{msg}
-		return true, err
-	case 2: // modulation.fsk
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(FSKDataRate)
-		err := b.DecodeMessage(msg)
-		m.Modulation = &DataRate_FSK{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _DataRate_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*DataRate)
-	// modulation
-	switch x := m.Modulation.(type) {
-	case *DataRate_LoRa:
-		s := proto.Size(x.LoRa)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *DataRate_FSK:
-		s := proto.Size(x.FSK)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // TxSettings contains the settings for a transmission.
@@ -2052,7 +1885,7 @@ func (m *TxSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_TxSettings.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2152,7 +1985,7 @@ func (m *TxSettings_Downlink) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_TxSettings_Downlink.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2212,7 +2045,7 @@ func (m *GatewayAntennaIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_GatewayAntennaIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2258,7 +2091,7 @@ func (m *UplinkToken) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_UplinkToken.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2309,7 +2142,7 @@ func (m *DownlinkPath) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_DownlinkPath.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2366,74 +2199,12 @@ func (m *DownlinkPath) GetFixed() *GatewayAntennaIdentifiers {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*DownlinkPath) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _DownlinkPath_OneofMarshaler, _DownlinkPath_OneofUnmarshaler, _DownlinkPath_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*DownlinkPath) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*DownlinkPath_UplinkToken)(nil),
 		(*DownlinkPath_Fixed)(nil),
 	}
-}
-
-func _DownlinkPath_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*DownlinkPath)
-	// path
-	switch x := m.Path.(type) {
-	case *DownlinkPath_UplinkToken:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		_ = b.EncodeRawBytes(x.UplinkToken)
-	case *DownlinkPath_Fixed:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Fixed); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("DownlinkPath.Path has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _DownlinkPath_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*DownlinkPath)
-	switch tag {
-	case 1: // path.uplink_token
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.Path = &DownlinkPath_UplinkToken{x}
-		return true, err
-	case 2: // path.fixed
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(GatewayAntennaIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Path = &DownlinkPath_Fixed{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _DownlinkPath_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*DownlinkPath)
-	// path
-	switch x := m.Path.(type) {
-	case *DownlinkPath_UplinkToken:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(len(x.UplinkToken)))
-		n += len(x.UplinkToken)
-	case *DownlinkPath_Fixed:
-		s := proto.Size(x.Fixed)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // TxRequest is a request for transmission.
@@ -2486,7 +2257,7 @@ func (m *TxRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_TxRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2627,7 +2398,7 @@ func (m *MACCommand) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_MACCommand.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3010,9 +2781,9 @@ func (m *MACCommand) GetDeviceModeConf() *MACCommand_DeviceModeConf {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*MACCommand) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _MACCommand_OneofMarshaler, _MACCommand_OneofUnmarshaler, _MACCommand_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*MACCommand) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*MACCommand_RawPayload)(nil),
 		(*MACCommand_ResetInd_)(nil),
 		(*MACCommand_ResetConf_)(nil),
@@ -3047,590 +2818,6 @@ func (*MACCommand) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) er
 	}
 }
 
-func _MACCommand_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*MACCommand)
-	// payload
-	switch x := m.Payload.(type) {
-	case *MACCommand_RawPayload:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		_ = b.EncodeRawBytes(x.RawPayload)
-	case *MACCommand_ResetInd_:
-		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ResetInd); err != nil {
-			return err
-		}
-	case *MACCommand_ResetConf_:
-		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ResetConf); err != nil {
-			return err
-		}
-	case *MACCommand_LinkCheckAns_:
-		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.LinkCheckAns); err != nil {
-			return err
-		}
-	case *MACCommand_LinkADRReq_:
-		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.LinkADRReq); err != nil {
-			return err
-		}
-	case *MACCommand_LinkADRAns_:
-		_ = b.EncodeVarint(7<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.LinkADRAns); err != nil {
-			return err
-		}
-	case *MACCommand_DutyCycleReq_:
-		_ = b.EncodeVarint(8<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DutyCycleReq); err != nil {
-			return err
-		}
-	case *MACCommand_RxParamSetupReq_:
-		_ = b.EncodeVarint(9<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.RxParamSetupReq); err != nil {
-			return err
-		}
-	case *MACCommand_RxParamSetupAns_:
-		_ = b.EncodeVarint(10<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.RxParamSetupAns); err != nil {
-			return err
-		}
-	case *MACCommand_DevStatusAns_:
-		_ = b.EncodeVarint(11<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DevStatusAns); err != nil {
-			return err
-		}
-	case *MACCommand_NewChannelReq_:
-		_ = b.EncodeVarint(12<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.NewChannelReq); err != nil {
-			return err
-		}
-	case *MACCommand_NewChannelAns_:
-		_ = b.EncodeVarint(13<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.NewChannelAns); err != nil {
-			return err
-		}
-	case *MACCommand_DLChannelReq_:
-		_ = b.EncodeVarint(14<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DLChannelReq); err != nil {
-			return err
-		}
-	case *MACCommand_DLChannelAns_:
-		_ = b.EncodeVarint(15<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DLChannelAns); err != nil {
-			return err
-		}
-	case *MACCommand_RxTimingSetupReq_:
-		_ = b.EncodeVarint(16<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.RxTimingSetupReq); err != nil {
-			return err
-		}
-	case *MACCommand_TxParamSetupReq_:
-		_ = b.EncodeVarint(17<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.TxParamSetupReq); err != nil {
-			return err
-		}
-	case *MACCommand_RekeyInd_:
-		_ = b.EncodeVarint(18<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.RekeyInd); err != nil {
-			return err
-		}
-	case *MACCommand_RekeyConf_:
-		_ = b.EncodeVarint(19<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.RekeyConf); err != nil {
-			return err
-		}
-	case *MACCommand_ADRParamSetupReq_:
-		_ = b.EncodeVarint(20<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ADRParamSetupReq); err != nil {
-			return err
-		}
-	case *MACCommand_DeviceTimeAns_:
-		_ = b.EncodeVarint(21<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DeviceTimeAns); err != nil {
-			return err
-		}
-	case *MACCommand_ForceRejoinReq_:
-		_ = b.EncodeVarint(22<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ForceRejoinReq); err != nil {
-			return err
-		}
-	case *MACCommand_RejoinParamSetupReq_:
-		_ = b.EncodeVarint(23<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.RejoinParamSetupReq); err != nil {
-			return err
-		}
-	case *MACCommand_RejoinParamSetupAns_:
-		_ = b.EncodeVarint(24<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.RejoinParamSetupAns); err != nil {
-			return err
-		}
-	case *MACCommand_PingSlotInfoReq_:
-		_ = b.EncodeVarint(25<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.PingSlotInfoReq); err != nil {
-			return err
-		}
-	case *MACCommand_PingSlotChannelReq_:
-		_ = b.EncodeVarint(26<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.PingSlotChannelReq); err != nil {
-			return err
-		}
-	case *MACCommand_PingSlotChannelAns_:
-		_ = b.EncodeVarint(27<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.PingSlotChannelAns); err != nil {
-			return err
-		}
-	case *MACCommand_BeaconTimingAns_:
-		_ = b.EncodeVarint(28<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.BeaconTimingAns); err != nil {
-			return err
-		}
-	case *MACCommand_BeaconFreqReq_:
-		_ = b.EncodeVarint(29<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.BeaconFreqReq); err != nil {
-			return err
-		}
-	case *MACCommand_BeaconFreqAns_:
-		_ = b.EncodeVarint(30<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.BeaconFreqAns); err != nil {
-			return err
-		}
-	case *MACCommand_DeviceModeInd_:
-		_ = b.EncodeVarint(31<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DeviceModeInd); err != nil {
-			return err
-		}
-	case *MACCommand_DeviceModeConf_:
-		_ = b.EncodeVarint(32<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DeviceModeConf); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("MACCommand.Payload has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _MACCommand_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*MACCommand)
-	switch tag {
-	case 2: // payload.raw_payload
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.Payload = &MACCommand_RawPayload{x}
-		return true, err
-	case 3: // payload.reset_ind
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_ResetInd)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_ResetInd_{msg}
-		return true, err
-	case 4: // payload.reset_conf
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_ResetConf)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_ResetConf_{msg}
-		return true, err
-	case 5: // payload.link_check_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_LinkCheckAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_LinkCheckAns_{msg}
-		return true, err
-	case 6: // payload.link_adr_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_LinkADRReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_LinkADRReq_{msg}
-		return true, err
-	case 7: // payload.link_adr_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_LinkADRAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_LinkADRAns_{msg}
-		return true, err
-	case 8: // payload.duty_cycle_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_DutyCycleReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_DutyCycleReq_{msg}
-		return true, err
-	case 9: // payload.rx_param_setup_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_RxParamSetupReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_RxParamSetupReq_{msg}
-		return true, err
-	case 10: // payload.rx_param_setup_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_RxParamSetupAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_RxParamSetupAns_{msg}
-		return true, err
-	case 11: // payload.dev_status_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_DevStatusAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_DevStatusAns_{msg}
-		return true, err
-	case 12: // payload.new_channel_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_NewChannelReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_NewChannelReq_{msg}
-		return true, err
-	case 13: // payload.new_channel_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_NewChannelAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_NewChannelAns_{msg}
-		return true, err
-	case 14: // payload.dl_channel_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_DLChannelReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_DLChannelReq_{msg}
-		return true, err
-	case 15: // payload.dl_channel_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_DLChannelAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_DLChannelAns_{msg}
-		return true, err
-	case 16: // payload.rx_timing_setup_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_RxTimingSetupReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_RxTimingSetupReq_{msg}
-		return true, err
-	case 17: // payload.tx_param_setup_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_TxParamSetupReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_TxParamSetupReq_{msg}
-		return true, err
-	case 18: // payload.rekey_ind
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_RekeyInd)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_RekeyInd_{msg}
-		return true, err
-	case 19: // payload.rekey_conf
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_RekeyConf)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_RekeyConf_{msg}
-		return true, err
-	case 20: // payload.adr_param_setup_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_ADRParamSetupReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_ADRParamSetupReq_{msg}
-		return true, err
-	case 21: // payload.device_time_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_DeviceTimeAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_DeviceTimeAns_{msg}
-		return true, err
-	case 22: // payload.force_rejoin_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_ForceRejoinReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_ForceRejoinReq_{msg}
-		return true, err
-	case 23: // payload.rejoin_param_setup_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_RejoinParamSetupReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_RejoinParamSetupReq_{msg}
-		return true, err
-	case 24: // payload.rejoin_param_setup_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_RejoinParamSetupAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_RejoinParamSetupAns_{msg}
-		return true, err
-	case 25: // payload.ping_slot_info_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_PingSlotInfoReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_PingSlotInfoReq_{msg}
-		return true, err
-	case 26: // payload.ping_slot_channel_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_PingSlotChannelReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_PingSlotChannelReq_{msg}
-		return true, err
-	case 27: // payload.ping_slot_channel_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_PingSlotChannelAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_PingSlotChannelAns_{msg}
-		return true, err
-	case 28: // payload.beacon_timing_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_BeaconTimingAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_BeaconTimingAns_{msg}
-		return true, err
-	case 29: // payload.beacon_freq_req
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_BeaconFreqReq)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_BeaconFreqReq_{msg}
-		return true, err
-	case 30: // payload.beacon_freq_ans
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_BeaconFreqAns)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_BeaconFreqAns_{msg}
-		return true, err
-	case 31: // payload.device_mode_ind
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_DeviceModeInd)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_DeviceModeInd_{msg}
-		return true, err
-	case 32: // payload.device_mode_conf
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(MACCommand_DeviceModeConf)
-		err := b.DecodeMessage(msg)
-		m.Payload = &MACCommand_DeviceModeConf_{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _MACCommand_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*MACCommand)
-	// payload
-	switch x := m.Payload.(type) {
-	case *MACCommand_RawPayload:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(len(x.RawPayload)))
-		n += len(x.RawPayload)
-	case *MACCommand_ResetInd_:
-		s := proto.Size(x.ResetInd)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_ResetConf_:
-		s := proto.Size(x.ResetConf)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_LinkCheckAns_:
-		s := proto.Size(x.LinkCheckAns)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_LinkADRReq_:
-		s := proto.Size(x.LinkADRReq)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_LinkADRAns_:
-		s := proto.Size(x.LinkADRAns)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_DutyCycleReq_:
-		s := proto.Size(x.DutyCycleReq)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_RxParamSetupReq_:
-		s := proto.Size(x.RxParamSetupReq)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_RxParamSetupAns_:
-		s := proto.Size(x.RxParamSetupAns)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_DevStatusAns_:
-		s := proto.Size(x.DevStatusAns)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_NewChannelReq_:
-		s := proto.Size(x.NewChannelReq)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_NewChannelAns_:
-		s := proto.Size(x.NewChannelAns)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_DLChannelReq_:
-		s := proto.Size(x.DLChannelReq)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_DLChannelAns_:
-		s := proto.Size(x.DLChannelAns)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_RxTimingSetupReq_:
-		s := proto.Size(x.RxTimingSetupReq)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_TxParamSetupReq_:
-		s := proto.Size(x.TxParamSetupReq)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_RekeyInd_:
-		s := proto.Size(x.RekeyInd)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_RekeyConf_:
-		s := proto.Size(x.RekeyConf)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_ADRParamSetupReq_:
-		s := proto.Size(x.ADRParamSetupReq)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_DeviceTimeAns_:
-		s := proto.Size(x.DeviceTimeAns)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_ForceRejoinReq_:
-		s := proto.Size(x.ForceRejoinReq)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_RejoinParamSetupReq_:
-		s := proto.Size(x.RejoinParamSetupReq)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_RejoinParamSetupAns_:
-		s := proto.Size(x.RejoinParamSetupAns)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_PingSlotInfoReq_:
-		s := proto.Size(x.PingSlotInfoReq)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_PingSlotChannelReq_:
-		s := proto.Size(x.PingSlotChannelReq)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_PingSlotChannelAns_:
-		s := proto.Size(x.PingSlotChannelAns)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_BeaconTimingAns_:
-		s := proto.Size(x.BeaconTimingAns)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_BeaconFreqReq_:
-		s := proto.Size(x.BeaconFreqReq)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_BeaconFreqAns_:
-		s := proto.Size(x.BeaconFreqAns)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_DeviceModeInd_:
-		s := proto.Size(x.DeviceModeInd)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *MACCommand_DeviceModeConf_:
-		s := proto.Size(x.DeviceModeConf)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
-}
-
 type MACCommand_ResetInd struct {
 	MinorVersion         Minor    `protobuf:"varint,1,opt,name=minor_version,json=minorVersion,proto3,enum=ttn.lorawan.v3.Minor" json:"minor_version,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -3650,7 +2837,7 @@ func (m *MACCommand_ResetInd) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_MACCommand_ResetInd.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3695,7 +2882,7 @@ func (m *MACCommand_ResetConf) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_MACCommand_ResetConf.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3742,7 +2929,7 @@ func (m *MACCommand_LinkCheckAns) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_MACCommand_LinkCheckAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3798,7 +2985,7 @@ func (m *MACCommand_LinkADRReq) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_MACCommand_LinkADRReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3873,7 +3060,7 @@ func (m *MACCommand_LinkADRAns) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_MACCommand_LinkADRAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3932,7 +3119,7 @@ func (m *MACCommand_DutyCycleReq) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_MACCommand_DutyCycleReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3979,7 +3166,7 @@ func (m *MACCommand_RxParamSetupReq) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_MACCommand_RxParamSetupReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4040,7 +3227,7 @@ func (m *MACCommand_RxParamSetupAns) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_MACCommand_RxParamSetupAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4105,7 +3292,7 @@ func (m *MACCommand_DevStatusAns) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_MACCommand_DevStatusAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4160,7 +3347,7 @@ func (m *MACCommand_NewChannelReq) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_MACCommand_NewChannelReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4227,7 +3414,7 @@ func (m *MACCommand_NewChannelAns) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_MACCommand_NewChannelAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4280,7 +3467,7 @@ func (m *MACCommand_DLChannelReq) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_MACCommand_DLChannelReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4333,7 +3520,7 @@ func (m *MACCommand_DLChannelAns) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_MACCommand_DLChannelAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4385,7 +3572,7 @@ func (m *MACCommand_RxTimingSetupReq) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_MACCommand_RxTimingSetupReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4434,7 +3621,7 @@ func (m *MACCommand_TxParamSetupReq) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_MACCommand_TxParamSetupReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4493,7 +3680,7 @@ func (m *MACCommand_RekeyInd) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_MACCommand_RekeyInd.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4538,7 +3725,7 @@ func (m *MACCommand_RekeyConf) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_MACCommand_RekeyConf.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4586,7 +3773,7 @@ func (m *MACCommand_ADRParamSetupReq) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_MACCommand_ADRParamSetupReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4638,7 +3825,7 @@ func (m *MACCommand_DeviceTimeAns) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_MACCommand_DeviceTimeAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4687,7 +3874,7 @@ func (m *MACCommand_ForceRejoinReq) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_MACCommand_ForceRejoinReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4756,7 +3943,7 @@ func (m *MACCommand_RejoinParamSetupReq) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_MACCommand_RejoinParamSetupReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4808,7 +3995,7 @@ func (m *MACCommand_RejoinParamSetupAns) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_MACCommand_RejoinParamSetupAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4853,7 +4040,7 @@ func (m *MACCommand_PingSlotInfoReq) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_MACCommand_PingSlotInfoReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4899,7 +4086,7 @@ func (m *MACCommand_PingSlotChannelReq) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_MACCommand_PingSlotChannelReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4952,7 +4139,7 @@ func (m *MACCommand_PingSlotChannelAns) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_MACCommand_PingSlotChannelAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -5005,7 +4192,7 @@ func (m *MACCommand_BeaconTimingAns) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_MACCommand_BeaconTimingAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -5057,7 +4244,7 @@ func (m *MACCommand_BeaconFreqReq) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_MACCommand_BeaconFreqReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -5102,7 +4289,7 @@ func (m *MACCommand_BeaconFreqAns) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_MACCommand_BeaconFreqAns.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -5147,7 +4334,7 @@ func (m *MACCommand_DeviceModeInd) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_MACCommand_DeviceModeInd.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -5192,7 +4379,7 @@ func (m *MACCommand_DeviceModeConf) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_MACCommand_DeviceModeConf.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -8248,7 +7435,7 @@ func (this *MACCommand_DeviceModeConf) Equal(that interface{}) bool {
 func (m *Message) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8256,94 +7443,128 @@ func (m *Message) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Message) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Message) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.MHDR.Size()))
-	n1, err := m.MHDR.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	if len(m.MIC) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(len(m.MIC)))
-		i += copy(dAtA[i:], m.MIC)
-	}
 	if m.Payload != nil {
-		nn2, err := m.Payload.MarshalTo(dAtA[i:])
+		{
+			size := m.Payload.Size()
+			i -= size
+			if _, err := m.Payload.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if len(m.MIC) > 0 {
+		i -= len(m.MIC)
+		copy(dAtA[i:], m.MIC)
+		i = encodeVarintLorawan(dAtA, i, uint64(len(m.MIC)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.MHDR.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += nn2
+		i -= size
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Message_MACPayload) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Message_MACPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.MACPayload != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.MACPayload.Size()))
-		n3, err := m.MACPayload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.MACPayload.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n3
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *Message_JoinRequestPayload) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Message_JoinRequestPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.JoinRequestPayload != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.JoinRequestPayload.Size()))
-		n4, err := m.JoinRequestPayload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.JoinRequestPayload.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n4
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *Message_JoinAcceptPayload) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Message_JoinAcceptPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.JoinAcceptPayload != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.JoinAcceptPayload.Size()))
-		n5, err := m.JoinAcceptPayload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.JoinAcceptPayload.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n5
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *Message_RejoinRequestPayload) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *Message_RejoinRequestPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RejoinRequestPayload != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RejoinRequestPayload.Size()))
-		n6, err := m.RejoinRequestPayload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.RejoinRequestPayload.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n6
+		i--
+		dAtA[i] = 0x32
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MHDR) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8351,27 +7572,32 @@ func (m *MHDR) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MHDR) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MHDR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.MType != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.MType))
-	}
 	if m.Major != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.Major))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.MType != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.MType))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACPayload) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8379,46 +7605,56 @@ func (m *MACPayload) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACPayload) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.FHDR.Size()))
-	n7, err := m.FHDR.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n7
-	if m.FPort != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.FPort))
+	if m.DecodedPayload != nil {
+		{
+			size, err := m.DecodedPayload.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
 	}
 	if len(m.FRMPayload) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.FRMPayload)
+		copy(dAtA[i:], m.FRMPayload)
 		i = encodeVarintLorawan(dAtA, i, uint64(len(m.FRMPayload)))
-		i += copy(dAtA[i:], m.FRMPayload)
+		i--
+		dAtA[i] = 0x1a
 	}
-	if m.DecodedPayload != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DecodedPayload.Size()))
-		n8, err := m.DecodedPayload.MarshalTo(dAtA[i:])
+	if m.FPort != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.FPort))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.FHDR.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n8
+		i -= size
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *FHDR) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8426,44 +7662,54 @@ func (m *FHDR) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *FHDR) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FHDR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.DevAddr.Size()))
-	n9, err := m.DevAddr.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n9
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.FCtrl.Size()))
-	n10, err := m.FCtrl.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n10
-	if m.FCnt != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.FCnt))
-	}
 	if len(m.FOpts) > 0 {
-		dAtA[i] = 0x22
-		i++
+		i -= len(m.FOpts)
+		copy(dAtA[i:], m.FOpts)
 		i = encodeVarintLorawan(dAtA, i, uint64(len(m.FOpts)))
-		i += copy(dAtA[i:], m.FOpts)
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	if m.FCnt != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.FCnt))
+		i--
+		dAtA[i] = 0x18
+	}
+	{
+		size, err := m.FCtrl.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size := m.DevAddr.Size()
+		i -= size
+		if _, err := m.DevAddr.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *FCtrl) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8471,67 +7717,72 @@ func (m *FCtrl) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *FCtrl) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FCtrl) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ADR {
-		dAtA[i] = 0x8
-		i++
-		if m.ADR {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.ADRAckReq {
-		dAtA[i] = 0x10
-		i++
-		if m.ADRAckReq {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.Ack {
-		dAtA[i] = 0x18
-		i++
-		if m.Ack {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.FPending {
-		dAtA[i] = 0x20
-		i++
-		if m.FPending {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
 	if m.ClassB {
-		dAtA[i] = 0x28
-		i++
+		i--
 		if m.ClassB {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x28
 	}
-	return i, nil
+	if m.FPending {
+		i--
+		if m.FPending {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Ack {
+		i--
+		if m.Ack {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.ADRAckReq {
+		i--
+		if m.ADRAckReq {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.ADR {
+		i--
+		if m.ADR {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *JoinRequestPayload) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8539,41 +7790,52 @@ func (m *JoinRequestPayload) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *JoinRequestPayload) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinRequestPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.JoinEUI.Size()))
-	n11, err := m.JoinEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size := m.DevNonce.Size()
+		i -= size
+		if _, err := m.DevNonce.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
 	}
-	i += n11
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.DevEUI.Size()))
-	n12, err := m.DevEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n12
+	i--
 	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.DevNonce.Size()))
-	n13, err := m.DevNonce.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size := m.DevEUI.Size()
+		i -= size
+		if _, err := m.DevEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
 	}
-	i += n13
-	return i, nil
+	i--
+	dAtA[i] = 0x12
+	{
+		size := m.JoinEUI.Size()
+		i -= size
+		if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *RejoinRequestPayload) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8581,51 +7843,62 @@ func (m *RejoinRequestPayload) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *RejoinRequestPayload) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RejoinRequestPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.RejoinType != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RejoinType))
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.NetID.Size()))
-	n14, err := m.NetID.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n14
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.JoinEUI.Size()))
-	n15, err := m.JoinEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n15
-	dAtA[i] = 0x22
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.DevEUI.Size()))
-	n16, err := m.DevEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n16
 	if m.RejoinCnt != 0 {
-		dAtA[i] = 0x28
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.RejoinCnt))
+		i--
+		dAtA[i] = 0x28
 	}
-	return i, nil
+	{
+		size := m.DevEUI.Size()
+		i -= size
+		if _, err := m.DevEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	{
+		size := m.JoinEUI.Size()
+		i -= size
+		if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size := m.NetID.Size()
+		i -= size
+		if _, err := m.NetID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if m.RejoinType != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.RejoinType))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *JoinAcceptPayload) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8633,70 +7906,86 @@ func (m *JoinAcceptPayload) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *JoinAcceptPayload) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinAcceptPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Encrypted) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(len(m.Encrypted)))
-		i += copy(dAtA[i:], m.Encrypted)
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.JoinNonce.Size()))
-	n17, err := m.JoinNonce.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n17
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.NetID.Size()))
-	n18, err := m.NetID.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n18
-	dAtA[i] = 0x22
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.DevAddr.Size()))
-	n19, err := m.DevAddr.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n19
-	dAtA[i] = 0x2a
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.DLSettings.Size()))
-	n20, err := m.DLSettings.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n20
-	if m.RxDelay != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RxDelay))
-	}
 	if m.CFList != nil {
+		{
+			size, err := m.CFList.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.CFList.Size()))
-		n21, err := m.CFList.MarshalTo(dAtA[i:])
+	}
+	if m.RxDelay != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.RxDelay))
+		i--
+		dAtA[i] = 0x30
+	}
+	{
+		size, err := m.DLSettings.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n21
+		i -= size
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0x2a
+	{
+		size := m.DevAddr.Size()
+		i -= size
+		if _, err := m.DevAddr.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	{
+		size := m.NetID.Size()
+		i -= size
+		if _, err := m.NetID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size := m.JoinNonce.Size()
+		i -= size
+		if _, err := m.JoinNonce.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Encrypted) > 0 {
+		i -= len(m.Encrypted)
+		copy(dAtA[i:], m.Encrypted)
+		i = encodeVarintLorawan(dAtA, i, uint64(len(m.Encrypted)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *DLSettings) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8704,37 +7993,42 @@ func (m *DLSettings) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *DLSettings) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DLSettings) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Rx1DROffset != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx1DROffset))
-	}
-	if m.Rx2DR != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx2DR))
-	}
 	if m.OptNeg {
-		dAtA[i] = 0x18
-		i++
+		i--
 		if m.OptNeg {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Rx2DR != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx2DR))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Rx1DROffset != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx1DROffset))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *CFList) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8742,52 +8036,58 @@ func (m *CFList) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CFList) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CFList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Type != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Type))
-	}
-	if len(m.Freq) > 0 {
-		dAtA23 := make([]byte, len(m.Freq)*10)
-		var j22 int
-		for _, num := range m.Freq {
-			for num >= 1<<7 {
-				dAtA23[j22] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j22++
-			}
-			dAtA23[j22] = uint8(num)
-			j22++
-		}
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(j22))
-		i += copy(dAtA[i:], dAtA23[:j22])
-	}
 	if len(m.ChMasks) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(len(m.ChMasks)))
-		for _, b := range m.ChMasks {
-			if b {
+		for iNdEx := len(m.ChMasks) - 1; iNdEx >= 0; iNdEx-- {
+			i--
+			if m.ChMasks[iNdEx] {
 				dAtA[i] = 1
 			} else {
 				dAtA[i] = 0
 			}
-			i++
 		}
+		i = encodeVarintLorawan(dAtA, i, uint64(len(m.ChMasks)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	if len(m.Freq) > 0 {
+		dAtA12 := make([]byte, len(m.Freq)*10)
+		var j11 int
+		for _, num := range m.Freq {
+			for num >= 1<<7 {
+				dAtA12[j11] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j11++
+			}
+			dAtA12[j11] = uint8(num)
+			j11++
+		}
+		i -= j11
+		copy(dAtA[i:], dAtA12[:j11])
+		i = encodeVarintLorawan(dAtA, i, uint64(j11))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Type != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Type))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *LoRaDataRate) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8795,27 +8095,32 @@ func (m *LoRaDataRate) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *LoRaDataRate) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *LoRaDataRate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Bandwidth != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Bandwidth))
-	}
 	if m.SpreadingFactor != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.SpreadingFactor))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Bandwidth != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Bandwidth))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *FSKDataRate) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8823,22 +8128,27 @@ func (m *FSKDataRate) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *FSKDataRate) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FSKDataRate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.BitRate != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.BitRate))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *DataRate) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8846,52 +8156,71 @@ func (m *DataRate) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *DataRate) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DataRate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Modulation != nil {
-		nn24, err := m.Modulation.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Modulation.Size()
+			i -= size
+			if _, err := m.Modulation.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn24
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *DataRate_LoRa) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *DataRate_LoRa) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.LoRa != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.LoRa.Size()))
-		n25, err := m.LoRa.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.LoRa.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n25
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *DataRate_FSK) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *DataRate_FSK) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.FSK != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.FSK.Size()))
-		n26, err := m.FSK.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.FSK.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n26
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *TxSettings) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8899,76 +8228,86 @@ func (m *TxSettings) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *TxSettings) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TxSettings) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.DataRate.Size()))
-	n27, err := m.DataRate.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.Downlink != nil {
+		{
+			size, err := m.Downlink.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
 	}
-	i += n27
-	if m.DataRateIndex != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DataRateIndex))
+	if m.Time != nil {
+		n16, err16 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time):])
+		if err16 != nil {
+			return 0, err16
+		}
+		i -= n16
+		i = encodeVarintLorawan(dAtA, i, uint64(n16))
+		i--
+		dAtA[i] = 0x3a
 	}
-	if len(m.CodingRate) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(len(m.CodingRate)))
-		i += copy(dAtA[i:], m.CodingRate)
-	}
-	if m.Frequency != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+	if m.Timestamp != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Timestamp))
+		i--
+		dAtA[i] = 0x30
 	}
 	if m.EnableCRC {
-		dAtA[i] = 0x28
-		i++
+		i--
 		if m.EnableCRC {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x28
 	}
-	if m.Timestamp != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Timestamp))
+	if m.Frequency != 0 {
+		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x20
 	}
-	if m.Time != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)))
-		n28, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i:])
+	if len(m.CodingRate) > 0 {
+		i -= len(m.CodingRate)
+		copy(dAtA[i:], m.CodingRate)
+		i = encodeVarintLorawan(dAtA, i, uint64(len(m.CodingRate)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.DataRateIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.DataRateIndex))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.DataRate.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n28
+		i -= size
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
 	}
-	if m.Downlink != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Downlink.Size()))
-		n29, err := m.Downlink.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n29
-	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *TxSettings_Downlink) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -8976,38 +8315,43 @@ func (m *TxSettings_Downlink) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *TxSettings_Downlink) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TxSettings_Downlink) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.AntennaIndex != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.AntennaIndex))
-	}
-	if m.TxPower != 0 {
-		dAtA[i] = 0x15
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.TxPower)))
-		i += 4
-	}
 	if m.InvertPolarization {
-		dAtA[i] = 0x18
-		i++
+		i--
 		if m.InvertPolarization {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.TxPower != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.TxPower)))
+		i--
+		dAtA[i] = 0x15
+	}
+	if m.AntennaIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.AntennaIndex))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayAntennaIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9015,30 +8359,37 @@ func (m *GatewayAntennaIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayAntennaIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayAntennaIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n30, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n30
 	if m.AntennaIndex != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.AntennaIndex))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UplinkToken) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9046,30 +8397,37 @@ func (m *UplinkToken) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UplinkToken) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UplinkToken) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(m.GatewayAntennaIdentifiers.Size()))
-	n31, err := m.GatewayAntennaIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n31
 	if m.Timestamp != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.Timestamp))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	{
+		size, err := m.GatewayAntennaIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintLorawan(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *DownlinkPath) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9077,48 +8435,66 @@ func (m *DownlinkPath) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *DownlinkPath) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DownlinkPath) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Path != nil {
-		nn32, err := m.Path.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Path.Size()
+			i -= size
+			if _, err := m.Path.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn32
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *DownlinkPath_UplinkToken) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *DownlinkPath_UplinkToken) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.UplinkToken != nil {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.UplinkToken)
+		copy(dAtA[i:], m.UplinkToken)
 		i = encodeVarintLorawan(dAtA, i, uint64(len(m.UplinkToken)))
-		i += copy(dAtA[i:], m.UplinkToken)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *DownlinkPath_Fixed) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *DownlinkPath_Fixed) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Fixed != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Fixed.Size()))
-		n33, err := m.Fixed.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Fixed.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n33
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *TxRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9126,86 +8502,95 @@ func (m *TxRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *TxRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TxRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Class != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Class))
-	}
-	if len(m.DownlinkPaths) > 0 {
-		for _, msg := range m.DownlinkPaths {
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintLorawan(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.Advanced != nil {
+		{
+			size, err := m.Advanced.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-	}
-	if m.Rx1Delay != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx1Delay))
-	}
-	if m.Rx1DataRateIndex != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx1DataRateIndex))
-	}
-	if m.Rx1Frequency != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintLorawan(dAtA, i, m.Rx1Frequency)
-	}
-	if m.Rx2DataRateIndex != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx2DataRateIndex))
-	}
-	if m.Rx2Frequency != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintLorawan(dAtA, i, m.Rx2Frequency)
-	}
-	if m.Priority != 0 {
-		dAtA[i] = 0x40
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Priority))
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0x9a
 	}
 	if m.AbsoluteTime != nil {
+		n22, err22 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.AbsoluteTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.AbsoluteTime):])
+		if err22 != nil {
+			return 0, err22
+		}
+		i -= n22
+		i = encodeVarintLorawan(dAtA, i, uint64(n22))
+		i--
 		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.AbsoluteTime)))
-		n34, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.AbsoluteTime, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n34
 	}
-	if m.Advanced != nil {
-		dAtA[i] = 0x9a
-		i++
-		dAtA[i] = 0x6
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Advanced.Size()))
-		n35, err := m.Advanced.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n35
+	if m.Priority != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Priority))
+		i--
+		dAtA[i] = 0x40
 	}
-	return i, nil
+	if m.Rx2Frequency != 0 {
+		i = encodeVarintLorawan(dAtA, i, m.Rx2Frequency)
+		i--
+		dAtA[i] = 0x38
+	}
+	if m.Rx2DataRateIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx2DataRateIndex))
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.Rx1Frequency != 0 {
+		i = encodeVarintLorawan(dAtA, i, m.Rx1Frequency)
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.Rx1DataRateIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx1DataRateIndex))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Rx1Delay != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx1Delay))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.DownlinkPaths) > 0 {
+		for iNdEx := len(m.DownlinkPaths) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.DownlinkPaths[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintLorawan(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if m.Class != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Class))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9213,493 +8598,685 @@ func (m *MACCommand) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.CID != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.CID))
-	}
 	if m.Payload != nil {
-		nn36, err := m.Payload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Payload.Size()
+			i -= size
+			if _, err := m.Payload.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn36
 	}
-	return i, nil
+	if m.CID != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.CID))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_RawPayload) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_RawPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RawPayload != nil {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.RawPayload)
+		copy(dAtA[i:], m.RawPayload)
 		i = encodeVarintLorawan(dAtA, i, uint64(len(m.RawPayload)))
-		i += copy(dAtA[i:], m.RawPayload)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_ResetInd_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_ResetInd_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ResetInd != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ResetInd.Size()))
-		n37, err := m.ResetInd.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ResetInd.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n37
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_ResetConf_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_ResetConf_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ResetConf != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ResetConf.Size()))
-		n38, err := m.ResetConf.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ResetConf.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n38
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_LinkCheckAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_LinkCheckAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.LinkCheckAns != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.LinkCheckAns.Size()))
-		n39, err := m.LinkCheckAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.LinkCheckAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n39
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_LinkADRReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_LinkADRReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.LinkADRReq != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.LinkADRReq.Size()))
-		n40, err := m.LinkADRReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.LinkADRReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n40
+		i--
+		dAtA[i] = 0x32
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_LinkADRAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_LinkADRAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.LinkADRAns != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.LinkADRAns.Size()))
-		n41, err := m.LinkADRAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.LinkADRAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n41
+		i--
+		dAtA[i] = 0x3a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_DutyCycleReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_DutyCycleReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DutyCycleReq != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DutyCycleReq.Size()))
-		n42, err := m.DutyCycleReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DutyCycleReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n42
+		i--
+		dAtA[i] = 0x42
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_RxParamSetupReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_RxParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RxParamSetupReq != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RxParamSetupReq.Size()))
-		n43, err := m.RxParamSetupReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.RxParamSetupReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n43
+		i--
+		dAtA[i] = 0x4a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_RxParamSetupAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_RxParamSetupAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RxParamSetupAns != nil {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RxParamSetupAns.Size()))
-		n44, err := m.RxParamSetupAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.RxParamSetupAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n44
+		i--
+		dAtA[i] = 0x52
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_DevStatusAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_DevStatusAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DevStatusAns != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DevStatusAns.Size()))
-		n45, err := m.DevStatusAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DevStatusAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n45
+		i--
+		dAtA[i] = 0x5a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_NewChannelReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_NewChannelReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.NewChannelReq != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.NewChannelReq.Size()))
-		n46, err := m.NewChannelReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.NewChannelReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n46
+		i--
+		dAtA[i] = 0x62
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_NewChannelAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_NewChannelAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.NewChannelAns != nil {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.NewChannelAns.Size()))
-		n47, err := m.NewChannelAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.NewChannelAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n47
+		i--
+		dAtA[i] = 0x6a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_DLChannelReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_DLChannelReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DLChannelReq != nil {
-		dAtA[i] = 0x72
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DLChannelReq.Size()))
-		n48, err := m.DLChannelReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DLChannelReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n48
+		i--
+		dAtA[i] = 0x72
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_DLChannelAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_DLChannelAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DLChannelAns != nil {
-		dAtA[i] = 0x7a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DLChannelAns.Size()))
-		n49, err := m.DLChannelAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DLChannelAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n49
+		i--
+		dAtA[i] = 0x7a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_RxTimingSetupReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_RxTimingSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RxTimingSetupReq != nil {
-		dAtA[i] = 0x82
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RxTimingSetupReq.Size()))
-		n50, err := m.RxTimingSetupReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.RxTimingSetupReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n50
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_TxParamSetupReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_TxParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.TxParamSetupReq != nil {
-		dAtA[i] = 0x8a
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.TxParamSetupReq.Size()))
-		n51, err := m.TxParamSetupReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.TxParamSetupReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n51
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_RekeyInd_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_RekeyInd_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RekeyInd != nil {
-		dAtA[i] = 0x92
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RekeyInd.Size()))
-		n52, err := m.RekeyInd.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.RekeyInd.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n52
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x92
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_RekeyConf_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_RekeyConf_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RekeyConf != nil {
-		dAtA[i] = 0x9a
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RekeyConf.Size()))
-		n53, err := m.RekeyConf.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.RekeyConf.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n53
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x9a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_ADRParamSetupReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_ADRParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ADRParamSetupReq != nil {
-		dAtA[i] = 0xa2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ADRParamSetupReq.Size()))
-		n54, err := m.ADRParamSetupReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ADRParamSetupReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n54
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa2
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_DeviceTimeAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_DeviceTimeAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DeviceTimeAns != nil {
-		dAtA[i] = 0xaa
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DeviceTimeAns.Size()))
-		n55, err := m.DeviceTimeAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DeviceTimeAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n55
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xaa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_ForceRejoinReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_ForceRejoinReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ForceRejoinReq != nil {
-		dAtA[i] = 0xb2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ForceRejoinReq.Size()))
-		n56, err := m.ForceRejoinReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ForceRejoinReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n56
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb2
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_RejoinParamSetupReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_RejoinParamSetupReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RejoinParamSetupReq != nil {
-		dAtA[i] = 0xba
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RejoinParamSetupReq.Size()))
-		n57, err := m.RejoinParamSetupReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.RejoinParamSetupReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n57
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xba
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_RejoinParamSetupAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_RejoinParamSetupAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.RejoinParamSetupAns != nil {
-		dAtA[i] = 0xc2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RejoinParamSetupAns.Size()))
-		n58, err := m.RejoinParamSetupAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.RejoinParamSetupAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n58
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xc2
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_PingSlotInfoReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_PingSlotInfoReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.PingSlotInfoReq != nil {
-		dAtA[i] = 0xca
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.PingSlotInfoReq.Size()))
-		n59, err := m.PingSlotInfoReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.PingSlotInfoReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n59
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xca
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_PingSlotChannelReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_PingSlotChannelReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.PingSlotChannelReq != nil {
-		dAtA[i] = 0xd2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.PingSlotChannelReq.Size()))
-		n60, err := m.PingSlotChannelReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.PingSlotChannelReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n60
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xd2
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_PingSlotChannelAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_PingSlotChannelAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.PingSlotChannelAns != nil {
-		dAtA[i] = 0xda
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.PingSlotChannelAns.Size()))
-		n61, err := m.PingSlotChannelAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.PingSlotChannelAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n61
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xda
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_BeaconTimingAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_BeaconTimingAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.BeaconTimingAns != nil {
-		dAtA[i] = 0xe2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.BeaconTimingAns.Size()))
-		n62, err := m.BeaconTimingAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.BeaconTimingAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n62
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xe2
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_BeaconFreqReq_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_BeaconFreqReq_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.BeaconFreqReq != nil {
-		dAtA[i] = 0xea
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.BeaconFreqReq.Size()))
-		n63, err := m.BeaconFreqReq.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.BeaconFreqReq.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n63
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xea
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_BeaconFreqAns_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_BeaconFreqAns_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.BeaconFreqAns != nil {
-		dAtA[i] = 0xf2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.BeaconFreqAns.Size()))
-		n64, err := m.BeaconFreqAns.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.BeaconFreqAns.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n64
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf2
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_DeviceModeInd_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_DeviceModeInd_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DeviceModeInd != nil {
-		dAtA[i] = 0xfa
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DeviceModeInd.Size()))
-		n65, err := m.DeviceModeInd.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DeviceModeInd.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n65
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xfa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_DeviceModeConf_) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *MACCommand_DeviceModeConf_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DeviceModeConf != nil {
-		dAtA[i] = 0x82
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DeviceModeConf.Size()))
-		n66, err := m.DeviceModeConf.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DeviceModeConf.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintLorawan(dAtA, i, uint64(size))
 		}
-		i += n66
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0x82
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *MACCommand_ResetInd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9707,22 +9284,27 @@ func (m *MACCommand_ResetInd) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_ResetInd) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_ResetInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.MinorVersion != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.MinorVersion))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_ResetConf) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9730,22 +9312,27 @@ func (m *MACCommand_ResetConf) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_ResetConf) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_ResetConf) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.MinorVersion != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.MinorVersion))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_LinkCheckAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9753,27 +9340,32 @@ func (m *MACCommand_LinkCheckAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_LinkCheckAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_LinkCheckAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Margin != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Margin))
-	}
 	if m.GatewayCount != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.GatewayCount))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Margin != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Margin))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_LinkADRReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9781,50 +9373,55 @@ func (m *MACCommand_LinkADRReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_LinkADRReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_LinkADRReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.DataRateIndex != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DataRateIndex))
+	if m.NbTrans != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.NbTrans))
+		i--
+		dAtA[i] = 0x30
 	}
-	if m.TxPowerIndex != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.TxPowerIndex))
+	if m.ChannelMaskControl != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.ChannelMaskControl))
+		i--
+		dAtA[i] = 0x28
 	}
 	if len(m.ChannelMask) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(len(m.ChannelMask)))
-		for _, b := range m.ChannelMask {
-			if b {
+		for iNdEx := len(m.ChannelMask) - 1; iNdEx >= 0; iNdEx-- {
+			i--
+			if m.ChannelMask[iNdEx] {
 				dAtA[i] = 1
 			} else {
 				dAtA[i] = 0
 			}
-			i++
 		}
+		i = encodeVarintLorawan(dAtA, i, uint64(len(m.ChannelMask)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	if m.ChannelMaskControl != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ChannelMaskControl))
+	if m.TxPowerIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.TxPowerIndex))
+		i--
+		dAtA[i] = 0x10
 	}
-	if m.NbTrans != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.NbTrans))
+	if m.DataRateIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.DataRateIndex))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_LinkADRAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9832,47 +9429,52 @@ func (m *MACCommand_LinkADRAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_LinkADRAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_LinkADRAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ChannelMaskAck {
-		dAtA[i] = 0x8
-		i++
-		if m.ChannelMaskAck {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.DataRateIndexAck {
-		dAtA[i] = 0x10
-		i++
-		if m.DataRateIndexAck {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
 	if m.TxPowerIndexAck {
-		dAtA[i] = 0x18
-		i++
+		i--
 		if m.TxPowerIndexAck {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.DataRateIndexAck {
+		i--
+		if m.DataRateIndexAck {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.ChannelMaskAck {
+		i--
+		if m.ChannelMaskAck {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_DutyCycleReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9880,22 +9482,27 @@ func (m *MACCommand_DutyCycleReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_DutyCycleReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_DutyCycleReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.MaxDutyCycle != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxDutyCycle))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_RxParamSetupReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9903,32 +9510,37 @@ func (m *MACCommand_RxParamSetupReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_RxParamSetupReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_RxParamSetupReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Rx2DataRateIndex != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx2DataRateIndex))
+	if m.Rx2Frequency != 0 {
+		i = encodeVarintLorawan(dAtA, i, m.Rx2Frequency)
+		i--
+		dAtA[i] = 0x18
 	}
 	if m.Rx1DataRateOffset != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx1DataRateOffset))
+		i--
+		dAtA[i] = 0x10
 	}
-	if m.Rx2Frequency != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintLorawan(dAtA, i, m.Rx2Frequency)
+	if m.Rx2DataRateIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Rx2DataRateIndex))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_RxParamSetupAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9936,47 +9548,52 @@ func (m *MACCommand_RxParamSetupAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_RxParamSetupAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_RxParamSetupAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Rx2DataRateIndexAck {
-		dAtA[i] = 0x8
-		i++
-		if m.Rx2DataRateIndexAck {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.Rx1DataRateOffsetAck {
-		dAtA[i] = 0x10
-		i++
-		if m.Rx1DataRateOffsetAck {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
 	if m.Rx2FrequencyAck {
-		dAtA[i] = 0x18
-		i++
+		i--
 		if m.Rx2FrequencyAck {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Rx1DataRateOffsetAck {
+		i--
+		if m.Rx1DataRateOffsetAck {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Rx2DataRateIndexAck {
+		i--
+		if m.Rx2DataRateIndexAck {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_DevStatusAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -9984,27 +9601,32 @@ func (m *MACCommand_DevStatusAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_DevStatusAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_DevStatusAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Battery != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Battery))
-	}
 	if m.Margin != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.Margin))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Battery != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Battery))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_NewChannelReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10012,37 +9634,42 @@ func (m *MACCommand_NewChannelReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_NewChannelReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_NewChannelReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ChannelIndex != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ChannelIndex))
-	}
-	if m.Frequency != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+	if m.MaxDataRateIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxDataRateIndex))
+		i--
+		dAtA[i] = 0x20
 	}
 	if m.MinDataRateIndex != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.MinDataRateIndex))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.MaxDataRateIndex != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxDataRateIndex))
+	if m.Frequency != 0 {
+		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.ChannelIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.ChannelIndex))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_NewChannelAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10050,37 +9677,42 @@ func (m *MACCommand_NewChannelAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_NewChannelAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_NewChannelAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.FrequencyAck {
-		dAtA[i] = 0x8
-		i++
-		if m.FrequencyAck {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
 	if m.DataRateAck {
-		dAtA[i] = 0x10
-		i++
+		i--
 		if m.DataRateAck {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.FrequencyAck {
+		i--
+		if m.FrequencyAck {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_DLChannelReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10088,27 +9720,32 @@ func (m *MACCommand_DLChannelReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_DLChannelReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_DLChannelReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ChannelIndex != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ChannelIndex))
-	}
 	if m.Frequency != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.ChannelIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.ChannelIndex))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_DLChannelAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10116,37 +9753,42 @@ func (m *MACCommand_DLChannelAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_DLChannelAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_DLChannelAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ChannelIndexAck {
-		dAtA[i] = 0x8
-		i++
-		if m.ChannelIndexAck {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
 	if m.FrequencyAck {
-		dAtA[i] = 0x10
-		i++
+		i--
 		if m.FrequencyAck {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.ChannelIndexAck {
+		i--
+		if m.ChannelIndexAck {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_RxTimingSetupReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10154,22 +9796,27 @@ func (m *MACCommand_RxTimingSetupReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_RxTimingSetupReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_RxTimingSetupReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Delay != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.Delay))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_TxParamSetupReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10177,42 +9824,47 @@ func (m *MACCommand_TxParamSetupReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_TxParamSetupReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_TxParamSetupReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.MaxEIRPIndex != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxEIRPIndex))
-	}
-	if m.UplinkDwellTime {
-		dAtA[i] = 0x10
-		i++
-		if m.UplinkDwellTime {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
 	if m.DownlinkDwellTime {
-		dAtA[i] = 0x18
-		i++
+		i--
 		if m.DownlinkDwellTime {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.UplinkDwellTime {
+		i--
+		if m.UplinkDwellTime {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.MaxEIRPIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxEIRPIndex))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_RekeyInd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10220,22 +9872,27 @@ func (m *MACCommand_RekeyInd) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_RekeyInd) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_RekeyInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.MinorVersion != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.MinorVersion))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_RekeyConf) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10243,22 +9900,27 @@ func (m *MACCommand_RekeyConf) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_RekeyConf) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_RekeyConf) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.MinorVersion != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.MinorVersion))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_ADRParamSetupReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10266,27 +9928,32 @@ func (m *MACCommand_ADRParamSetupReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_ADRParamSetupReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_ADRParamSetupReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ADRAckLimitExponent != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.ADRAckLimitExponent))
-	}
 	if m.ADRAckDelayExponent != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.ADRAckDelayExponent))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.ADRAckLimitExponent != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.ADRAckLimitExponent))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_DeviceTimeAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10294,25 +9961,30 @@ func (m *MACCommand_DeviceTimeAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_DeviceTimeAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_DeviceTimeAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0x3a
-	i++
-	i = encodeVarintLorawan(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
-	n67, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
-	if err != nil {
-		return 0, err
+	n53, err53 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Time):])
+	if err53 != nil {
+		return 0, err53
 	}
-	i += n67
-	return i, nil
+	i -= n53
+	i = encodeVarintLorawan(dAtA, i, uint64(n53))
+	i--
+	dAtA[i] = 0x3a
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_ForceRejoinReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10320,37 +9992,42 @@ func (m *MACCommand_ForceRejoinReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_ForceRejoinReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_ForceRejoinReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.RejoinType != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.RejoinType))
-	}
-	if m.DataRateIndex != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.DataRateIndex))
+	if m.PeriodExponent != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.PeriodExponent))
+		i--
+		dAtA[i] = 0x20
 	}
 	if m.MaxRetries != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxRetries))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.PeriodExponent != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.PeriodExponent))
+	if m.DataRateIndex != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.DataRateIndex))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.RejoinType != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.RejoinType))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_RejoinParamSetupReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10358,27 +10035,32 @@ func (m *MACCommand_RejoinParamSetupReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_RejoinParamSetupReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_RejoinParamSetupReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.MaxCountExponent != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxCountExponent))
-	}
 	if m.MaxTimeExponent != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxTimeExponent))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.MaxCountExponent != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.MaxCountExponent))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_RejoinParamSetupAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10386,27 +10068,32 @@ func (m *MACCommand_RejoinParamSetupAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_RejoinParamSetupAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_RejoinParamSetupAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.MaxTimeExponentAck {
-		dAtA[i] = 0x8
-		i++
+		i--
 		if m.MaxTimeExponentAck {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_PingSlotInfoReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10414,22 +10101,27 @@ func (m *MACCommand_PingSlotInfoReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_PingSlotInfoReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_PingSlotInfoReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Period != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.Period))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_PingSlotChannelReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10437,27 +10129,32 @@ func (m *MACCommand_PingSlotChannelReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_PingSlotChannelReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_PingSlotChannelReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Frequency != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, m.Frequency)
-	}
 	if m.DataRateIndex != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.DataRateIndex))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Frequency != 0 {
+		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_PingSlotChannelAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10465,37 +10162,42 @@ func (m *MACCommand_PingSlotChannelAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_PingSlotChannelAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_PingSlotChannelAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.FrequencyAck {
-		dAtA[i] = 0x8
-		i++
-		if m.FrequencyAck {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
 	if m.DataRateIndexAck {
-		dAtA[i] = 0x10
-		i++
+		i--
 		if m.DataRateIndexAck {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.FrequencyAck {
+		i--
+		if m.FrequencyAck {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_BeaconTimingAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10503,27 +10205,32 @@ func (m *MACCommand_BeaconTimingAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_BeaconTimingAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_BeaconTimingAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Delay != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintLorawan(dAtA, i, uint64(m.Delay))
-	}
 	if m.ChannelIndex != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.ChannelIndex))
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.Delay != 0 {
+		i = encodeVarintLorawan(dAtA, i, uint64(m.Delay))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_BeaconFreqReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10531,22 +10238,27 @@ func (m *MACCommand_BeaconFreqReq) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_BeaconFreqReq) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_BeaconFreqReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Frequency != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_BeaconFreqAns) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10554,27 +10266,32 @@ func (m *MACCommand_BeaconFreqAns) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_BeaconFreqAns) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_BeaconFreqAns) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.FrequencyAck {
-		dAtA[i] = 0x8
-		i++
+		i--
 		if m.FrequencyAck {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_DeviceModeInd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10582,22 +10299,27 @@ func (m *MACCommand_DeviceModeInd) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_DeviceModeInd) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_DeviceModeInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Class != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.Class))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACCommand_DeviceModeConf) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -10605,26 +10327,33 @@ func (m *MACCommand_DeviceModeConf) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACCommand_DeviceModeConf) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACCommand_DeviceModeConf) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Class != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintLorawan(dAtA, i, uint64(m.Class))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintLorawan(dAtA []byte, offset int, v uint64) int {
+	offset -= sovLorawan(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedMHDR(r randyLorawan, easy bool) *MHDR {
 	this := &MHDR{}
@@ -12283,14 +12012,7 @@ func (m *MACCommand_DeviceModeConf) Size() (n int) {
 }
 
 func sovLorawan(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozLorawan(x uint64) (n int) {
 	return sovLorawan((x << 1) ^ uint64((int64(x) >> 63)))
@@ -12435,7 +12157,7 @@ func (this *JoinAcceptPayload) String() string {
 		`DevAddr:` + fmt.Sprintf("%v", this.DevAddr) + `,`,
 		`DLSettings:` + strings.Replace(strings.Replace(this.DLSettings.String(), "DLSettings", "DLSettings", 1), `&`, ``, 1) + `,`,
 		`RxDelay:` + fmt.Sprintf("%v", this.RxDelay) + `,`,
-		`CFList:` + strings.Replace(fmt.Sprintf("%v", this.CFList), "CFList", "CFList", 1) + `,`,
+		`CFList:` + strings.Replace(this.CFList.String(), "CFList", "CFList", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -12549,7 +12271,7 @@ func (this *GatewayAntennaIdentifiers) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GatewayAntennaIdentifiers{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
 		`}`,
 	}, "")
@@ -12600,9 +12322,14 @@ func (this *TxRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForDownlinkPaths := "[]*DownlinkPath{"
+	for _, f := range this.DownlinkPaths {
+		repeatedStringForDownlinkPaths += strings.Replace(f.String(), "DownlinkPath", "DownlinkPath", 1) + ","
+	}
+	repeatedStringForDownlinkPaths += "}"
 	s := strings.Join([]string{`&TxRequest{`,
 		`Class:` + fmt.Sprintf("%v", this.Class) + `,`,
-		`DownlinkPaths:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkPaths), "DownlinkPath", "DownlinkPath", 1) + `,`,
+		`DownlinkPaths:` + repeatedStringForDownlinkPaths + `,`,
 		`Rx1Delay:` + fmt.Sprintf("%v", this.Rx1Delay) + `,`,
 		`Rx1DataRateIndex:` + fmt.Sprintf("%v", this.Rx1DataRateIndex) + `,`,
 		`Rx1Frequency:` + fmt.Sprintf("%v", this.Rx1Frequency) + `,`,
@@ -13142,7 +12869,7 @@ func (this *MACCommand_DeviceTimeAns) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&MACCommand_DeviceTimeAns{`,
-		`Time:` + strings.Replace(strings.Replace(this.Time.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`Time:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -30,7 +31,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type OAuthClientAuthorizationIdentifiers struct {
 	UserIDs              UserIdentifiers   `protobuf:"bytes,1,opt,name=user_ids,json=userIds,proto3" json:"user_ids"`
@@ -52,7 +53,7 @@ func (m *OAuthClientAuthorizationIdentifiers) XXX_Marshal(b []byte, deterministi
 		return xxx_messageInfo_OAuthClientAuthorizationIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +109,7 @@ func (m *OAuthClientAuthorization) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_OAuthClientAuthorization.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -181,7 +182,7 @@ func (m *OAuthClientAuthorizations) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_OAuthClientAuthorizations.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -233,7 +234,7 @@ func (m *ListOAuthClientAuthorizationsRequest) XXX_Marshal(b []byte, determinist
 		return xxx_messageInfo_ListOAuthClientAuthorizationsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -299,7 +300,7 @@ func (m *OAuthAuthorizationCode) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_OAuthAuthorizationCode.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -395,7 +396,7 @@ func (m *OAuthAccessTokenIdentifiers) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_OAuthAccessTokenIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -461,7 +462,7 @@ func (m *OAuthAccessToken) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_OAuthAccessToken.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -555,7 +556,7 @@ func (m *OAuthAccessTokens) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_OAuthAccessTokens.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -608,7 +609,7 @@ func (m *ListOAuthAccessTokensRequest) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_ListOAuthAccessTokensRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1075,7 +1076,7 @@ func (this *ListOAuthAccessTokensRequest) Equal(that interface{}) bool {
 func (m *OAuthClientAuthorizationIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1083,33 +1084,42 @@ func (m *OAuthClientAuthorizationIdentifiers) Marshal() (dAtA []byte, err error)
 }
 
 func (m *OAuthClientAuthorizationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OAuthClientAuthorizationIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n1, err := m.UserIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ClientIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
 	}
-	i += n1
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n2, err := m.ClientIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.UserIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
 	}
-	i += n2
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *OAuthClientAuthorization) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1117,26 +1127,31 @@ func (m *OAuthClientAuthorization) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *OAuthClientAuthorization) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OAuthClientAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n3, err := m.UserIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err3 != nil {
+		return 0, err3
 	}
-	i += n3
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n4, err := m.ClientIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	i -= n3
+	i = encodeVarintOauth(dAtA, i, uint64(n3))
+	i--
+	dAtA[i] = 0x2a
+	n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err4 != nil {
+		return 0, err4
 	}
-	i += n4
+	i -= n4
+	i = encodeVarintOauth(dAtA, i, uint64(n4))
+	i--
+	dAtA[i] = 0x22
 	if len(m.Rights) > 0 {
 		dAtA6 := make([]byte, len(m.Rights)*10)
 		var j5 int
@@ -1149,34 +1164,39 @@ func (m *OAuthClientAuthorization) MarshalTo(dAtA []byte) (int, error) {
 			dAtA6[j5] = uint8(num)
 			j5++
 		}
-		dAtA[i] = 0x1a
-		i++
+		i -= j5
+		copy(dAtA[i:], dAtA6[:j5])
 		i = encodeVarintOauth(dAtA, i, uint64(j5))
-		i += copy(dAtA[i:], dAtA6[:j5])
+		i--
+		dAtA[i] = 0x1a
 	}
-	dAtA[i] = 0x22
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ClientIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
 	}
-	i += n7
-	dAtA[i] = 0x2a
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n8, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.UserIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
 	}
-	i += n8
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *OAuthClientAuthorizations) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1184,29 +1204,36 @@ func (m *OAuthClientAuthorizations) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *OAuthClientAuthorizations) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OAuthClientAuthorizations) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Authorizations) > 0 {
-		for _, msg := range m.Authorizations {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintOauth(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Authorizations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Authorizations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintOauth(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ListOAuthClientAuthorizationsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1214,41 +1241,49 @@ func (m *ListOAuthClientAuthorizationsRequest) Marshal() (dAtA []byte, err error
 }
 
 func (m *ListOAuthClientAuthorizationsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListOAuthClientAuthorizationsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIdentifiers.Size()))
-	n9, err := m.UserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n9
-	if len(m.Order) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(len(m.Order)))
-		i += copy(dAtA[i:], m.Order)
+	if m.Page != 0 {
+		i = encodeVarintOauth(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x20
 	}
 	if m.Limit != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintOauth(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.Page != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(m.Page))
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.UserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *OAuthAuthorizationCode) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1256,26 +1291,52 @@ func (m *OAuthAuthorizationCode) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *OAuthAuthorizationCode) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OAuthAuthorizationCode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n10, err := m.UserIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	n10, err10 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt):])
+	if err10 != nil {
+		return 0, err10
 	}
-	i += n10
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n11, err := m.ClientIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	i -= n10
+	i = encodeVarintOauth(dAtA, i, uint64(n10))
+	i--
+	dAtA[i] = 0x42
+	n11, err11 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err11 != nil {
+		return 0, err11
 	}
-	i += n11
+	i -= n11
+	i = encodeVarintOauth(dAtA, i, uint64(n11))
+	i--
+	dAtA[i] = 0x3a
+	if len(m.State) > 0 {
+		i -= len(m.State)
+		copy(dAtA[i:], m.State)
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.State)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.RedirectURI) > 0 {
+		i -= len(m.RedirectURI)
+		copy(dAtA[i:], m.RedirectURI)
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.RedirectURI)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Code) > 0 {
+		i -= len(m.Code)
+		copy(dAtA[i:], m.Code)
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.Code)))
+		i--
+		dAtA[i] = 0x22
+	}
 	if len(m.Rights) > 0 {
 		dAtA13 := make([]byte, len(m.Rights)*10)
 		var j12 int
@@ -1288,52 +1349,39 @@ func (m *OAuthAuthorizationCode) MarshalTo(dAtA []byte) (int, error) {
 			dAtA13[j12] = uint8(num)
 			j12++
 		}
-		dAtA[i] = 0x1a
-		i++
+		i -= j12
+		copy(dAtA[i:], dAtA13[:j12])
 		i = encodeVarintOauth(dAtA, i, uint64(j12))
-		i += copy(dAtA[i:], dAtA13[:j12])
+		i--
+		dAtA[i] = 0x1a
 	}
-	if len(m.Code) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(len(m.Code)))
-		i += copy(dAtA[i:], m.Code)
+	{
+		size, err := m.ClientIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
 	}
-	if len(m.RedirectURI) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(len(m.RedirectURI)))
-		i += copy(dAtA[i:], m.RedirectURI)
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.UserIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
 	}
-	if len(m.State) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(len(m.State)))
-		i += copy(dAtA[i:], m.State)
-	}
-	dAtA[i] = 0x3a
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n14, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n14
-	dAtA[i] = 0x42
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)))
-	n15, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n15
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *OAuthAccessTokenIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1341,39 +1389,49 @@ func (m *OAuthAccessTokenIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *OAuthAccessTokenIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OAuthAccessTokenIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n16, err := m.UserIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n16
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n17, err := m.ClientIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n17
 	if len(m.ID) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
 		i = encodeVarintOauth(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	{
+		size, err := m.ClientIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.UserIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *OAuthAccessToken) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1381,44 +1439,31 @@ func (m *OAuthAccessToken) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *OAuthAccessToken) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OAuthAccessToken) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n18, err := m.UserIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	n18, err18 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt):])
+	if err18 != nil {
+		return 0, err18
 	}
-	i += n18
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n19, err := m.ClientIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	i -= n18
+	i = encodeVarintOauth(dAtA, i, uint64(n18))
+	i--
+	dAtA[i] = 0x42
+	n19, err19 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err19 != nil {
+		return 0, err19
 	}
-	i += n19
-	if len(m.ID) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
-	}
-	if len(m.AccessToken) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(len(m.AccessToken)))
-		i += copy(dAtA[i:], m.AccessToken)
-	}
-	if len(m.RefreshToken) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(len(m.RefreshToken)))
-		i += copy(dAtA[i:], m.RefreshToken)
-	}
+	i -= n19
+	i = encodeVarintOauth(dAtA, i, uint64(n19))
+	i--
+	dAtA[i] = 0x3a
 	if len(m.Rights) > 0 {
 		dAtA21 := make([]byte, len(m.Rights)*10)
 		var j20 int
@@ -1431,34 +1476,60 @@ func (m *OAuthAccessToken) MarshalTo(dAtA []byte) (int, error) {
 			dAtA21[j20] = uint8(num)
 			j20++
 		}
-		dAtA[i] = 0x32
-		i++
+		i -= j20
+		copy(dAtA[i:], dAtA21[:j20])
 		i = encodeVarintOauth(dAtA, i, uint64(j20))
-		i += copy(dAtA[i:], dAtA21[:j20])
+		i--
+		dAtA[i] = 0x32
 	}
-	dAtA[i] = 0x3a
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n22, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
+	if len(m.RefreshToken) > 0 {
+		i -= len(m.RefreshToken)
+		copy(dAtA[i:], m.RefreshToken)
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.RefreshToken)))
+		i--
+		dAtA[i] = 0x2a
 	}
-	i += n22
-	dAtA[i] = 0x42
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExpiresAt)))
-	n23, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i:])
-	if err != nil {
-		return 0, err
+	if len(m.AccessToken) > 0 {
+		i -= len(m.AccessToken)
+		copy(dAtA[i:], m.AccessToken)
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.AccessToken)))
+		i--
+		dAtA[i] = 0x22
 	}
-	i += n23
-	return i, nil
+	if len(m.ID) > 0 {
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.ID)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size, err := m.ClientIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.UserIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *OAuthAccessTokens) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1466,29 +1537,36 @@ func (m *OAuthAccessTokens) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *OAuthAccessTokens) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OAuthAccessTokens) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Tokens) > 0 {
-		for _, msg := range m.Tokens {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintOauth(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Tokens) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Tokens[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintOauth(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ListOAuthAccessTokensRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1496,53 +1574,65 @@ func (m *ListOAuthAccessTokensRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListOAuthAccessTokensRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListOAuthAccessTokensRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.UserIDs.Size()))
-	n24, err := m.UserIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n24
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintOauth(dAtA, i, uint64(m.ClientIDs.Size()))
-	n25, err := m.ClientIDs.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n25
-	if len(m.Order) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(len(m.Order)))
-		i += copy(dAtA[i:], m.Order)
+	if m.Page != 0 {
+		i = encodeVarintOauth(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x28
 	}
 	if m.Limit != 0 {
-		dAtA[i] = 0x20
-		i++
 		i = encodeVarintOauth(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x20
 	}
-	if m.Page != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintOauth(dAtA, i, uint64(m.Page))
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintOauth(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	{
+		size, err := m.ClientIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.UserIDs.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintOauth(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintOauth(dAtA []byte, offset int, v uint64) int {
+	offset -= sovOauth(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedOAuthClientAuthorizationIdentifiers(r randyOauth, easy bool) *OAuthClientAuthorizationIdentifiers {
 	this := &OAuthClientAuthorizationIdentifiers{}
@@ -1577,7 +1667,7 @@ func NewPopulatedOAuthClientAuthorization(r randyOauth, easy bool) *OAuthClientA
 
 func NewPopulatedOAuthClientAuthorizations(r randyOauth, easy bool) *OAuthClientAuthorizations {
 	this := &OAuthClientAuthorizations{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v8 := r.Intn(5)
 		this.Authorizations = make([]*OAuthClientAuthorization, v8)
 		for i := 0; i < v8; i++ {
@@ -1661,7 +1751,7 @@ func NewPopulatedOAuthAccessToken(r randyOauth, easy bool) *OAuthAccessToken {
 
 func NewPopulatedOAuthAccessTokens(r randyOauth, easy bool) *OAuthAccessTokens {
 	this := &OAuthAccessTokens{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v22 := r.Intn(5)
 		this.Tokens = make([]*OAuthAccessToken, v22)
 		for i := 0; i < v22; i++ {
@@ -1960,14 +2050,7 @@ func (m *ListOAuthAccessTokensRequest) Size() (n int) {
 }
 
 func sovOauth(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozOauth(x uint64) (n int) {
 	return sovOauth((x << 1) ^ uint64((int64(x) >> 63)))
@@ -1977,8 +2060,8 @@ func (this *OAuthClientAuthorizationIdentifiers) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OAuthClientAuthorizationIdentifiers{`,
-		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIDs), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIDs), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1988,11 +2071,11 @@ func (this *OAuthClientAuthorization) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OAuthClientAuthorization{`,
-		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIDs), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIDs), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2001,8 +2084,13 @@ func (this *OAuthClientAuthorizations) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForAuthorizations := "[]*OAuthClientAuthorization{"
+	for _, f := range this.Authorizations {
+		repeatedStringForAuthorizations += strings.Replace(f.String(), "OAuthClientAuthorization", "OAuthClientAuthorization", 1) + ","
+	}
+	repeatedStringForAuthorizations += "}"
 	s := strings.Join([]string{`&OAuthClientAuthorizations{`,
-		`Authorizations:` + strings.Replace(fmt.Sprintf("%v", this.Authorizations), "OAuthClientAuthorization", "OAuthClientAuthorization", 1) + `,`,
+		`Authorizations:` + repeatedStringForAuthorizations + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2012,7 +2100,7 @@ func (this *ListOAuthClientAuthorizationsRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListOAuthClientAuthorizationsRequest{`,
-		`UserIdentifiers:` + strings.Replace(strings.Replace(this.UserIdentifiers.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIdentifiers), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
@@ -2025,14 +2113,14 @@ func (this *OAuthAuthorizationCode) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OAuthAuthorizationCode{`,
-		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIDs), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIDs), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`Code:` + fmt.Sprintf("%v", this.Code) + `,`,
 		`RedirectURI:` + fmt.Sprintf("%v", this.RedirectURI) + `,`,
 		`State:` + fmt.Sprintf("%v", this.State) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`ExpiresAt:` + strings.Replace(strings.Replace(this.ExpiresAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`ExpiresAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ExpiresAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2042,8 +2130,8 @@ func (this *OAuthAccessTokenIdentifiers) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OAuthAccessTokenIdentifiers{`,
-		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIDs), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIDs), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`}`,
 	}, "")
@@ -2054,14 +2142,14 @@ func (this *OAuthAccessToken) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&OAuthAccessToken{`,
-		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIDs), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIDs), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`AccessToken:` + fmt.Sprintf("%v", this.AccessToken) + `,`,
 		`RefreshToken:` + fmt.Sprintf("%v", this.RefreshToken) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`ExpiresAt:` + strings.Replace(strings.Replace(this.ExpiresAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`ExpiresAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ExpiresAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2070,8 +2158,13 @@ func (this *OAuthAccessTokens) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForTokens := "[]*OAuthAccessToken{"
+	for _, f := range this.Tokens {
+		repeatedStringForTokens += strings.Replace(f.String(), "OAuthAccessToken", "OAuthAccessToken", 1) + ","
+	}
+	repeatedStringForTokens += "}"
 	s := strings.Join([]string{`&OAuthAccessTokens{`,
-		`Tokens:` + strings.Replace(fmt.Sprintf("%v", this.Tokens), "OAuthAccessToken", "OAuthAccessToken", 1) + `,`,
+		`Tokens:` + repeatedStringForTokens + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2081,8 +2174,8 @@ func (this *ListOAuthAccessTokensRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListOAuthAccessTokensRequest{`,
-		`UserIDs:` + strings.Replace(strings.Replace(this.UserIDs.String(), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
-		`ClientIDs:` + strings.Replace(strings.Replace(this.ClientIDs.String(), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
+		`UserIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UserIDs), "UserIdentifiers", "UserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ClientIDs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ClientIDs), "ClientIdentifiers", "ClientIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,

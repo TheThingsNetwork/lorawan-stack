@@ -14,6 +14,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 func init() {
 	proto.RegisterFile("lorawan-stack/api/client_services.proto", fileDescriptor_80815ba053239a77)
@@ -176,6 +178,26 @@ type ClientRegistryServer interface {
 	List(context.Context, *ListClientsRequest) (*Clients, error)
 	Update(context.Context, *UpdateClientRequest) (*Client, error)
 	Delete(context.Context, *ClientIdentifiers) (*types.Empty, error)
+}
+
+// UnimplementedClientRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedClientRegistryServer struct {
+}
+
+func (*UnimplementedClientRegistryServer) Create(ctx context.Context, req *CreateClientRequest) (*Client, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedClientRegistryServer) Get(ctx context.Context, req *GetClientRequest) (*Client, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedClientRegistryServer) List(ctx context.Context, req *ListClientsRequest) (*Clients, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedClientRegistryServer) Update(ctx context.Context, req *UpdateClientRequest) (*Client, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedClientRegistryServer) Delete(ctx context.Context, req *ClientIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 
 func RegisterClientRegistryServer(s *grpc.Server, srv ClientRegistryServer) {
@@ -369,6 +391,23 @@ type ClientAccessServer interface {
 	// Setting a collaborator without rights, removes them.
 	SetCollaborator(context.Context, *SetClientCollaboratorRequest) (*types.Empty, error)
 	ListCollaborators(context.Context, *ListClientCollaboratorsRequest) (*Collaborators, error)
+}
+
+// UnimplementedClientAccessServer can be embedded to have forward compatible implementations.
+type UnimplementedClientAccessServer struct {
+}
+
+func (*UnimplementedClientAccessServer) ListRights(ctx context.Context, req *ClientIdentifiers) (*Rights, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRights not implemented")
+}
+func (*UnimplementedClientAccessServer) GetCollaborator(ctx context.Context, req *GetClientCollaboratorRequest) (*GetCollaboratorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCollaborator not implemented")
+}
+func (*UnimplementedClientAccessServer) SetCollaborator(ctx context.Context, req *SetClientCollaboratorRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCollaborator not implemented")
+}
+func (*UnimplementedClientAccessServer) ListCollaborators(ctx context.Context, req *ListClientCollaboratorsRequest) (*Collaborators, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCollaborators not implemented")
 }
 
 func RegisterClientAccessServer(s *grpc.Server, srv ClientAccessServer) {

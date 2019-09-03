@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -33,7 +34,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type GatewayBrand struct {
 	ID   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -58,7 +59,7 @@ func (m *GatewayBrand) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_GatewayBrand.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +127,7 @@ func (m *GatewayModel) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_GatewayModel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -189,7 +190,7 @@ func (m *GatewayVersionIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_GatewayVersionIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -259,7 +260,7 @@ func (m *GatewayRadio) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_GatewayRadio.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -334,7 +335,7 @@ func (m *GatewayRadio_TxConfiguration) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_GatewayRadio_TxConfiguration.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -399,7 +400,7 @@ func (m *GatewayVersion) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return xxx_messageInfo_GatewayVersion.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -489,7 +490,7 @@ func (m *Gateway) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Gateway.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -639,7 +640,7 @@ func (m *Gateways) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Gateways.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -685,7 +686,7 @@ func (m *GetGatewayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_GetGatewayRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -730,7 +731,7 @@ func (m *GetGatewayIdentifiersForEUIRequest) XXX_Marshal(b []byte, deterministic
 		return xxx_messageInfo_GetGatewayIdentifiersForEUIRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -776,7 +777,7 @@ func (m *ListGatewaysRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_ListGatewaysRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -851,7 +852,7 @@ func (m *CreateGatewayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_CreateGatewayRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -897,7 +898,7 @@ func (m *UpdateGatewayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_UpdateGatewayRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -946,7 +947,7 @@ func (m *ListGatewayAPIKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_ListGatewayAPIKeysRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1000,7 +1001,7 @@ func (m *GetGatewayAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_GetGatewayAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1047,7 +1048,7 @@ func (m *CreateGatewayAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_CreateGatewayAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1100,7 +1101,7 @@ func (m *UpdateGatewayAPIKeyRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_UpdateGatewayAPIKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1142,7 +1143,7 @@ func (m *ListGatewayCollaboratorsRequest) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_ListGatewayCollaboratorsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1195,7 +1196,7 @@ func (m *GetGatewayCollaboratorRequest) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_GetGatewayCollaboratorRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1234,7 +1235,7 @@ func (m *SetGatewayCollaboratorRequest) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_SetGatewayCollaboratorRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1284,7 +1285,7 @@ func (m *GatewayAntenna) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return xxx_messageInfo_GatewayAntenna.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1371,7 +1372,7 @@ func (m *GatewayStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return xxx_messageInfo_GatewayStatus.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1467,7 +1468,7 @@ func (m *GatewayConnectionStats) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_GatewayConnectionStats.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1571,7 +1572,7 @@ func (m *GatewayConnectionStats_RoundTripTimes) XXX_Marshal(b []byte, determinis
 		return xxx_messageInfo_GatewayConnectionStats_RoundTripTimes.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2709,7 +2710,7 @@ func (this *GatewayConnectionStats_RoundTripTimes) Equal(that interface{}) bool 
 func (m *GatewayBrand) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2717,50 +2718,52 @@ func (m *GatewayBrand) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayBrand) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayBrand) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
-	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.URL) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.URL)))
-		i += copy(dAtA[i:], m.URL)
-	}
 	if len(m.Logos) > 0 {
-		for _, s := range m.Logos {
+		for iNdEx := len(m.Logos) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Logos[iNdEx])
+			copy(dAtA[i:], m.Logos[iNdEx])
+			i = encodeVarintGateway(dAtA, i, uint64(len(m.Logos[iNdEx])))
+			i--
 			dAtA[i] = 0x22
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
 		}
 	}
-	return i, nil
+	if len(m.URL) > 0 {
+		i -= len(m.URL)
+		copy(dAtA[i:], m.URL)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.URL)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.ID) > 0 {
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.ID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayModel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2768,35 +2771,43 @@ func (m *GatewayModel) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayModel) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayModel) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.BrandID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.BrandID)))
-		i += copy(dAtA[i:], m.BrandID)
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if len(m.ID) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
 		i = encodeVarintGateway(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
+		i--
+		dAtA[i] = 0x12
 	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
+	if len(m.BrandID) > 0 {
+		i -= len(m.BrandID)
+		copy(dAtA[i:], m.BrandID)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.BrandID)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayVersionIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2804,41 +2815,50 @@ func (m *GatewayVersionIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayVersionIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayVersionIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.BrandID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.BrandID)))
-		i += copy(dAtA[i:], m.BrandID)
-	}
-	if len(m.ModelID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.ModelID)))
-		i += copy(dAtA[i:], m.ModelID)
+	if len(m.FirmwareVersion) > 0 {
+		i -= len(m.FirmwareVersion)
+		copy(dAtA[i:], m.FirmwareVersion)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.FirmwareVersion)))
+		i--
+		dAtA[i] = 0x22
 	}
 	if len(m.HardwareVersion) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.HardwareVersion)
+		copy(dAtA[i:], m.HardwareVersion)
 		i = encodeVarintGateway(dAtA, i, uint64(len(m.HardwareVersion)))
-		i += copy(dAtA[i:], m.HardwareVersion)
+		i--
+		dAtA[i] = 0x1a
 	}
-	if len(m.FirmwareVersion) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.FirmwareVersion)))
-		i += copy(dAtA[i:], m.FirmwareVersion)
+	if len(m.ModelID) > 0 {
+		i -= len(m.ModelID)
+		copy(dAtA[i:], m.ModelID)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.ModelID)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.BrandID) > 0 {
+		i -= len(m.BrandID)
+		copy(dAtA[i:], m.BrandID)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.BrandID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayRadio) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2846,54 +2866,62 @@ func (m *GatewayRadio) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayRadio) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayRadio) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.TxConfiguration != nil {
+		{
+			size, err := m.TxConfiguration.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGateway(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.RSSIOffset != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIOffset)))
+		i--
+		dAtA[i] = 0x25
+	}
+	if m.Frequency != 0 {
+		i = encodeVarintGateway(dAtA, i, m.Frequency)
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.ChipType) > 0 {
+		i -= len(m.ChipType)
+		copy(dAtA[i:], m.ChipType)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.ChipType)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.Enable {
-		dAtA[i] = 0x8
-		i++
+		i--
 		if m.Enable {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x8
 	}
-	if len(m.ChipType) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.ChipType)))
-		i += copy(dAtA[i:], m.ChipType)
-	}
-	if m.Frequency != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintGateway(dAtA, i, m.Frequency)
-	}
-	if m.RSSIOffset != 0 {
-		dAtA[i] = 0x25
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIOffset)))
-		i += 4
-	}
-	if m.TxConfiguration != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.TxConfiguration.Size()))
-		n1, err := m.TxConfiguration.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayRadio_TxConfiguration) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2901,32 +2929,37 @@ func (m *GatewayRadio_TxConfiguration) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayRadio_TxConfiguration) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayRadio_TxConfiguration) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.MinFrequency != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintGateway(dAtA, i, m.MinFrequency)
+	if m.NotchFrequency != 0 {
+		i = encodeVarintGateway(dAtA, i, m.NotchFrequency)
+		i--
+		dAtA[i] = 0x18
 	}
 	if m.MaxFrequency != 0 {
-		dAtA[i] = 0x10
-		i++
 		i = encodeVarintGateway(dAtA, i, m.MaxFrequency)
+		i--
+		dAtA[i] = 0x10
 	}
-	if m.NotchFrequency != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintGateway(dAtA, i, m.NotchFrequency)
+	if m.MinFrequency != 0 {
+		i = encodeVarintGateway(dAtA, i, m.MinFrequency)
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayVersion) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2934,57 +2967,60 @@ func (m *GatewayVersion) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayVersion) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayVersion) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayVersionIdentifiers.Size()))
-	n2, err := m.GatewayVersionIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	if len(m.Photos) > 0 {
-		for _, s := range m.Photos {
-			dAtA[i] = 0x12
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
-		}
+	if m.ClockSource != 0 {
+		i = encodeVarintGateway(dAtA, i, uint64(m.ClockSource))
+		i--
+		dAtA[i] = 0x38
 	}
 	if len(m.Radios) > 0 {
-		for _, msg := range m.Radios {
-			dAtA[i] = 0x1a
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Radios) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Radios[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGateway(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0x1a
 		}
 	}
-	if m.ClockSource != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.ClockSource))
+	if len(m.Photos) > 0 {
+		for iNdEx := len(m.Photos) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Photos[iNdEx])
+			copy(dAtA[i:], m.Photos[iNdEx])
+			i = encodeVarintGateway(dAtA, i, uint64(len(m.Photos[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
 	}
-	return i, nil
+	{
+		size, err := m.GatewayVersionIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Gateway) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2992,181 +3028,201 @@ func (m *Gateway) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Gateway) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Gateway) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n3, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n3
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n4
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n5, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n5
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
-			dAtA[i] = 0x32
-			i++
-			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovGateway(uint64(len(k))) + 1 + len(v) + sovGateway(uint64(len(v)))
-			i = encodeVarintGateway(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if len(m.ContactInfo) > 0 {
-		for _, msg := range m.ContactInfo {
-			dAtA[i] = 0x3a
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	dAtA[i] = 0x42
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayVersionIdentifiers.Size()))
-	n6, err := m.GatewayVersionIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n6
-	if len(m.GatewayServerAddress) > 0 {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.GatewayServerAddress)))
-		i += copy(dAtA[i:], m.GatewayServerAddress)
-	}
-	if m.AutoUpdate {
-		dAtA[i] = 0x50
-		i++
-		if m.AutoUpdate {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if len(m.UpdateChannel) > 0 {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.UpdateChannel)))
-		i += copy(dAtA[i:], m.UpdateChannel)
-	}
-	if len(m.FrequencyPlanID) > 0 {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.FrequencyPlanID)))
-		i += copy(dAtA[i:], m.FrequencyPlanID)
-	}
-	if len(m.Antennas) > 0 {
-		for _, msg := range m.Antennas {
-			dAtA[i] = 0x6a
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if m.StatusPublic {
-		dAtA[i] = 0x70
-		i++
-		if m.StatusPublic {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.LocationPublic {
-		dAtA[i] = 0x78
-		i++
-		if m.LocationPublic {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.ScheduleDownlinkLate {
-		dAtA[i] = 0x80
-		i++
+	if m.DownlinkPathConstraint != 0 {
+		i = encodeVarintGateway(dAtA, i, uint64(m.DownlinkPathConstraint))
+		i--
 		dAtA[i] = 0x1
-		i++
-		if m.ScheduleDownlinkLate {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
+		i--
+		dAtA[i] = 0x90
 	}
 	if m.EnforceDutyCycle {
-		dAtA[i] = 0x88
-		i++
-		dAtA[i] = 0x1
-		i++
+		i--
 		if m.EnforceDutyCycle {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
-	}
-	if m.DownlinkPathConstraint != 0 {
-		dAtA[i] = 0x90
-		i++
+		i--
 		dAtA[i] = 0x1
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.DownlinkPathConstraint))
+		i--
+		dAtA[i] = 0x88
 	}
-	return i, nil
+	if m.ScheduleDownlinkLate {
+		i--
+		if m.ScheduleDownlinkLate {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x80
+	}
+	if m.LocationPublic {
+		i--
+		if m.LocationPublic {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x78
+	}
+	if m.StatusPublic {
+		i--
+		if m.StatusPublic {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x70
+	}
+	if len(m.Antennas) > 0 {
+		for iNdEx := len(m.Antennas) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Antennas[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGateway(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x6a
+		}
+	}
+	if len(m.FrequencyPlanID) > 0 {
+		i -= len(m.FrequencyPlanID)
+		copy(dAtA[i:], m.FrequencyPlanID)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.FrequencyPlanID)))
+		i--
+		dAtA[i] = 0x62
+	}
+	if len(m.UpdateChannel) > 0 {
+		i -= len(m.UpdateChannel)
+		copy(dAtA[i:], m.UpdateChannel)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.UpdateChannel)))
+		i--
+		dAtA[i] = 0x5a
+	}
+	if m.AutoUpdate {
+		i--
+		if m.AutoUpdate {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x50
+	}
+	if len(m.GatewayServerAddress) > 0 {
+		i -= len(m.GatewayServerAddress)
+		copy(dAtA[i:], m.GatewayServerAddress)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.GatewayServerAddress)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	{
+		size, err := m.GatewayVersionIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x42
+	if len(m.ContactInfo) > 0 {
+		for iNdEx := len(m.ContactInfo) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ContactInfo[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGateway(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if len(m.Attributes) > 0 {
+		for k := range m.Attributes {
+			v := m.Attributes[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintGateway(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGateway(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGateway(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x22
+	}
+	n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err4 != nil {
+		return 0, err4
+	}
+	i -= n4
+	i = encodeVarintGateway(dAtA, i, uint64(n4))
+	i--
+	dAtA[i] = 0x1a
+	n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err5 != nil {
+		return 0, err5
+	}
+	i -= n5
+	i = encodeVarintGateway(dAtA, i, uint64(n5))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Gateways) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3174,29 +3230,36 @@ func (m *Gateways) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Gateways) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Gateways) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Gateways) > 0 {
-		for _, msg := range m.Gateways {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Gateways) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Gateways[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGateway(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GetGatewayRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3204,33 +3267,42 @@ func (m *GetGatewayRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetGatewayRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n7, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n7
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.FieldMask.Size()))
-	n8, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n8
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetGatewayIdentifiersForEUIRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3238,25 +3310,32 @@ func (m *GetGatewayIdentifiersForEUIRequest) Marshal() (dAtA []byte, err error) 
 }
 
 func (m *GetGatewayIdentifiersForEUIRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetGatewayIdentifiersForEUIRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.EUI.Size()))
-	n9, err := m.EUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size := m.EUI.Size()
+		i -= size
+		if _, err := m.EUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n9
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListGatewaysRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3264,51 +3343,61 @@ func (m *ListGatewaysRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListGatewaysRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListGatewaysRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Collaborator != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.Collaborator.Size()))
-		n10, err := m.Collaborator.MarshalTo(dAtA[i:])
+	if m.Page != 0 {
+		i = encodeVarintGateway(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.Limit != 0 {
+		i = encodeVarintGateway(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n10
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.FieldMask.Size()))
-	n11, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.Collaborator != nil {
+		{
+			size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGateway(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
 	}
-	i += n11
-	if len(m.Order) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.Order)))
-		i += copy(dAtA[i:], m.Order)
-	}
-	if m.Limit != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.Limit))
-	}
-	if m.Page != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.Page))
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateGatewayRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3316,33 +3405,42 @@ func (m *CreateGatewayRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateGatewayRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.Gateway.Size()))
-	n12, err := m.Gateway.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n12
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.Collaborator.Size()))
-	n13, err := m.Collaborator.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Gateway.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n13
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateGatewayRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3350,33 +3448,42 @@ func (m *UpdateGatewayRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateGatewayRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateGatewayRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.Gateway.Size()))
-	n14, err := m.Gateway.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n14
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.FieldMask.Size()))
-	n15, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Gateway.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n15
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListGatewayAPIKeysRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3384,35 +3491,42 @@ func (m *ListGatewayAPIKeysRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListGatewayAPIKeysRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListGatewayAPIKeysRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n16, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n16
-	if m.Limit != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.Limit))
-	}
 	if m.Page != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintGateway(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Limit != 0 {
+		i = encodeVarintGateway(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3420,31 +3534,39 @@ func (m *GetGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetGatewayAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n17, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n17
 	if len(m.KeyID) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.KeyID)
+		copy(dAtA[i:], m.KeyID)
 		i = encodeVarintGateway(dAtA, i, uint64(len(m.KeyID)))
-		i += copy(dAtA[i:], m.KeyID)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3452,48 +3574,57 @@ func (m *CreateGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateGatewayAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n18, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n18
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
 	if len(m.Rights) > 0 {
-		dAtA20 := make([]byte, len(m.Rights)*10)
-		var j19 int
+		dAtA18 := make([]byte, len(m.Rights)*10)
+		var j17 int
 		for _, num := range m.Rights {
 			for num >= 1<<7 {
-				dAtA20[j19] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA18[j17] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j19++
+				j17++
 			}
-			dAtA20[j19] = uint8(num)
-			j19++
+			dAtA18[j17] = uint8(num)
+			j17++
 		}
+		i -= j17
+		copy(dAtA[i:], dAtA18[:j17])
+		i = encodeVarintGateway(dAtA, i, uint64(j17))
+		i--
 		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(j19))
-		i += copy(dAtA[i:], dAtA20[:j19])
 	}
-	return i, nil
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3501,33 +3632,42 @@ func (m *UpdateGatewayAPIKeyRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateGatewayAPIKeyRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateGatewayAPIKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n21, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.APIKey.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n21
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.APIKey.Size()))
-	n22, err := m.APIKey.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n22
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListGatewayCollaboratorsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3535,35 +3675,42 @@ func (m *ListGatewayCollaboratorsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListGatewayCollaboratorsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListGatewayCollaboratorsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n23, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n23
-	if m.Limit != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.Limit))
-	}
 	if m.Page != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintGateway(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Limit != 0 {
+		i = encodeVarintGateway(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetGatewayCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3571,33 +3718,42 @@ func (m *GetGatewayCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetGatewayCollaboratorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n24, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.OrganizationOrUserIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n24
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.OrganizationOrUserIdentifiers.Size()))
-	n25, err := m.OrganizationOrUserIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n25
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *SetGatewayCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3605,33 +3761,42 @@ func (m *SetGatewayCollaboratorRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SetGatewayCollaboratorRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SetGatewayCollaboratorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n26, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Collaborator.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n26
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.Collaborator.Size()))
-	n27, err := m.Collaborator.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
 	}
-	i += n27
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayAntenna) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3639,48 +3804,57 @@ func (m *GatewayAntenna) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayAntenna) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayAntenna) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Gain != 0 {
-		dAtA[i] = 0xd
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.Gain)))
-		i += 4
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(m.Location.Size()))
-	n28, err := m.Location.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n28
 	if len(m.Attributes) > 0 {
 		for k := range m.Attributes {
-			dAtA[i] = 0x1a
-			i++
 			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovGateway(uint64(len(k))) + 1 + len(v) + sovGateway(uint64(len(v)))
-			i = encodeVarintGateway(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintGateway(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGateway(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGateway(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x1a
 		}
 	}
-	return i, nil
+	{
+		size, err := m.Location.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGateway(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if m.Gain != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.Gain)))
+		i--
+		dAtA[i] = 0xd
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3688,106 +3862,112 @@ func (m *GatewayStatus) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayStatus) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.Time)))
-	n29, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n29
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.BootTime)))
-	n30, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.BootTime, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n30
-	if len(m.Versions) > 0 {
-		for k := range m.Versions {
-			dAtA[i] = 0x1a
-			i++
-			v := m.Versions[k]
-			mapSize := 1 + len(k) + sovGateway(uint64(len(k))) + 1 + len(v) + sovGateway(uint64(len(v)))
-			i = encodeVarintGateway(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if len(m.AntennaLocations) > 0 {
-		for _, msg := range m.AntennaLocations {
-			dAtA[i] = 0x22
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.Advanced != nil {
+		{
+			size, err := m.Advanced.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintGateway(dAtA, i, uint64(size))
 		}
-	}
-	if len(m.IP) > 0 {
-		for _, s := range m.IP {
-			dAtA[i] = 0x2a
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
-		}
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0x9a
 	}
 	if len(m.Metrics) > 0 {
 		for k := range m.Metrics {
-			dAtA[i] = 0x32
-			i++
 			v := m.Metrics[k]
-			mapSize := 1 + len(k) + sovGateway(uint64(len(k))) + 1 + 4
-			i = encodeVarintGateway(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintGateway(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x15
-			i++
+			baseI := i
+			i -= 4
 			encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(v)))
-			i += 4
+			i--
+			dAtA[i] = 0x15
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGateway(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGateway(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x32
 		}
 	}
-	if m.Advanced != nil {
-		dAtA[i] = 0x9a
-		i++
-		dAtA[i] = 0x6
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.Advanced.Size()))
-		n31, err := m.Advanced.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.IP) > 0 {
+		for iNdEx := len(m.IP) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.IP[iNdEx])
+			copy(dAtA[i:], m.IP[iNdEx])
+			i = encodeVarintGateway(dAtA, i, uint64(len(m.IP[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
 		}
-		i += n31
 	}
-	return i, nil
+	if len(m.AntennaLocations) > 0 {
+		for iNdEx := len(m.AntennaLocations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.AntennaLocations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGateway(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.Versions) > 0 {
+		for k := range m.Versions {
+			v := m.Versions[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintGateway(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGateway(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGateway(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	n29, err29 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.BootTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.BootTime):])
+	if err29 != nil {
+		return 0, err29
+	}
+	i -= n29
+	i = encodeVarintGateway(dAtA, i, uint64(n29))
+	i--
+	dAtA[i] = 0x12
+	n30, err30 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Time, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Time):])
+	if err30 != nil {
+		return 0, err30
+	}
+	i -= n30
+	i = encodeVarintGateway(dAtA, i, uint64(n30))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayConnectionStats) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3795,93 +3975,103 @@ func (m *GatewayConnectionStats) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayConnectionStats) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayConnectionStats) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ConnectedAt != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.ConnectedAt)))
-		n32, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ConnectedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.RoundTripTimes != nil {
+		{
+			size, err := m.RoundTripTimes.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGateway(dAtA, i, uint64(size))
 		}
-		i += n32
-	}
-	if len(m.Protocol) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(len(m.Protocol)))
-		i += copy(dAtA[i:], m.Protocol)
-	}
-	if m.LastStatusReceivedAt != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceivedAt)))
-		n33, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastStatusReceivedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n33
-	}
-	if m.LastStatus != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.LastStatus.Size()))
-		n34, err := m.LastStatus.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n34
-	}
-	if m.LastUplinkReceivedAt != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastUplinkReceivedAt)))
-		n35, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastUplinkReceivedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n35
-	}
-	if m.UplinkCount != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintGateway(dAtA, i, m.UplinkCount)
-	}
-	if m.LastDownlinkReceivedAt != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkReceivedAt)))
-		n36, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDownlinkReceivedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n36
+		i--
+		dAtA[i] = 0x4a
 	}
 	if m.DownlinkCount != 0 {
-		dAtA[i] = 0x40
-		i++
 		i = encodeVarintGateway(dAtA, i, m.DownlinkCount)
+		i--
+		dAtA[i] = 0x40
 	}
-	if m.RoundTripTimes != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintGateway(dAtA, i, uint64(m.RoundTripTimes.Size()))
-		n37, err := m.RoundTripTimes.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.LastDownlinkReceivedAt != nil {
+		n32, err32 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDownlinkReceivedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDownlinkReceivedAt):])
+		if err32 != nil {
+			return 0, err32
 		}
-		i += n37
+		i -= n32
+		i = encodeVarintGateway(dAtA, i, uint64(n32))
+		i--
+		dAtA[i] = 0x3a
 	}
-	return i, nil
+	if m.UplinkCount != 0 {
+		i = encodeVarintGateway(dAtA, i, m.UplinkCount)
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.LastUplinkReceivedAt != nil {
+		n33, err33 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastUplinkReceivedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastUplinkReceivedAt):])
+		if err33 != nil {
+			return 0, err33
+		}
+		i -= n33
+		i = encodeVarintGateway(dAtA, i, uint64(n33))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.LastStatus != nil {
+		{
+			size, err := m.LastStatus.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGateway(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.LastStatusReceivedAt != nil {
+		n35, err35 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastStatusReceivedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastStatusReceivedAt):])
+		if err35 != nil {
+			return 0, err35
+		}
+		i -= n35
+		i = encodeVarintGateway(dAtA, i, uint64(n35))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Protocol) > 0 {
+		i -= len(m.Protocol)
+		copy(dAtA[i:], m.Protocol)
+		i = encodeVarintGateway(dAtA, i, uint64(len(m.Protocol)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.ConnectedAt != nil {
+		n36, err36 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ConnectedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ConnectedAt):])
+		if err36 != nil {
+			return 0, err36
+		}
+		i -= n36
+		i = encodeVarintGateway(dAtA, i, uint64(n36))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayConnectionStats_RoundTripTimes) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -3889,50 +4079,57 @@ func (m *GatewayConnectionStats_RoundTripTimes) Marshal() (dAtA []byte, err erro
 }
 
 func (m *GatewayConnectionStats_RoundTripTimes) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayConnectionStats_RoundTripTimes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.Min)))
-	n38, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Min, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n38
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.Max)))
-	n39, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Max, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n39
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintGateway(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.Median)))
-	n40, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Median, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n40
 	if m.Count != 0 {
-		dAtA[i] = 0x20
-		i++
 		i = encodeVarintGateway(dAtA, i, uint64(m.Count))
+		i--
+		dAtA[i] = 0x20
 	}
-	return i, nil
+	n37, err37 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Median, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.Median):])
+	if err37 != nil {
+		return 0, err37
+	}
+	i -= n37
+	i = encodeVarintGateway(dAtA, i, uint64(n37))
+	i--
+	dAtA[i] = 0x1a
+	n38, err38 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Max, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.Max):])
+	if err38 != nil {
+		return 0, err38
+	}
+	i -= n38
+	i = encodeVarintGateway(dAtA, i, uint64(n38))
+	i--
+	dAtA[i] = 0x12
+	n39, err39 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Min, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.Min):])
+	if err39 != nil {
+		return 0, err39
+	}
+	i -= n39
+	i = encodeVarintGateway(dAtA, i, uint64(n39))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintGateway(dAtA []byte, offset int, v uint64) int {
+	offset -= sovGateway(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedGatewayBrand(r randyGateway, easy bool) *GatewayBrand {
 	this := &GatewayBrand{}
@@ -3979,7 +4176,7 @@ func NewPopulatedGatewayRadio(r randyGateway, easy bool) *GatewayRadio {
 	if r.Intn(2) == 0 {
 		this.RSSIOffset *= -1
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.TxConfiguration = NewPopulatedGatewayRadio_TxConfiguration(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4007,14 +4204,14 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 	this.UpdatedAt = *v4
 	this.Name = randStringGateway(r)
 	this.Description = randStringGateway(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v5 := r.Intn(10)
 		this.Attributes = make(map[string]string)
 		for i := 0; i < v5; i++ {
 			this.Attributes[randStringGateway(r)] = randStringGateway(r)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v6 := r.Intn(5)
 		this.ContactInfo = make([]*ContactInfo, v6)
 		for i := 0; i < v6; i++ {
@@ -4027,7 +4224,7 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 	this.AutoUpdate = bool(r.Intn(2) == 0)
 	this.UpdateChannel = randStringGateway(r)
 	this.FrequencyPlanID = randStringGateway(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v8 := r.Intn(5)
 		this.Antennas = make([]GatewayAntenna, v8)
 		for i := 0; i < v8; i++ {
@@ -4047,7 +4244,7 @@ func NewPopulatedGateway(r randyGateway, easy bool) *Gateway {
 
 func NewPopulatedGateways(r randyGateway, easy bool) *Gateways {
 	this := &Gateways{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v10 := r.Intn(5)
 		this.Gateways = make([]*Gateway, v10)
 		for i := 0; i < v10; i++ {
@@ -4081,7 +4278,7 @@ func NewPopulatedGetGatewayIdentifiersForEUIRequest(r randyGateway, easy bool) *
 
 func NewPopulatedListGatewaysRequest(r randyGateway, easy bool) *ListGatewaysRequest {
 	this := &ListGatewaysRequest{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Collaborator = NewPopulatedOrganizationOrUserIdentifiers(r, easy)
 	}
 	v14 := types.NewPopulatedFieldMask(r, easy)
@@ -4204,7 +4401,7 @@ func NewPopulatedGatewayAntenna(r randyGateway, easy bool) *GatewayAntenna {
 	}
 	v30 := NewPopulatedLocation(r, easy)
 	this.Location = *v30
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v31 := r.Intn(10)
 		this.Attributes = make(map[string]string)
 		for i := 0; i < v31; i++ {
@@ -4222,14 +4419,14 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 	this.Time = *v32
 	v33 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.BootTime = *v33
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v34 := r.Intn(10)
 		this.Versions = make(map[string]string)
 		for i := 0; i < v34; i++ {
 			this.Versions[randStringGateway(r)] = randStringGateway(r)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v35 := r.Intn(5)
 		this.AntennaLocations = make([]*Location, v35)
 		for i := 0; i < v35; i++ {
@@ -4241,7 +4438,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 	for i := 0; i < v36; i++ {
 		this.IP[i] = randStringGateway(r)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v37 := r.Intn(10)
 		this.Metrics = make(map[string]float32)
 		for i := 0; i < v37; i++ {
@@ -4252,7 +4449,7 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 			}
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Advanced = types.NewPopulatedStruct(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4262,25 +4459,25 @@ func NewPopulatedGatewayStatus(r randyGateway, easy bool) *GatewayStatus {
 
 func NewPopulatedGatewayConnectionStats(r randyGateway, easy bool) *GatewayConnectionStats {
 	this := &GatewayConnectionStats{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ConnectedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	this.Protocol = randStringGateway(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LastStatusReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LastStatus = NewPopulatedGatewayStatus(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LastUplinkReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	this.UplinkCount = uint64(r.Uint32())
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LastDownlinkReceivedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	this.DownlinkCount = uint64(r.Uint32())
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.RoundTripTimes = NewPopulatedGatewayConnectionStats_RoundTripTimes(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -4921,14 +5118,7 @@ func (m *GatewayConnectionStats_RoundTripTimes) Size() (n int) {
 }
 
 func sovGateway(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozGateway(x uint64) (n int) {
 	return sovGateway((x << 1) ^ uint64((int64(x) >> 63)))
@@ -5001,10 +5191,15 @@ func (this *GatewayVersion) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForRadios := "[]*GatewayRadio{"
+	for _, f := range this.Radios {
+		repeatedStringForRadios += strings.Replace(f.String(), "GatewayRadio", "GatewayRadio", 1) + ","
+	}
+	repeatedStringForRadios += "}"
 	s := strings.Join([]string{`&GatewayVersion{`,
 		`GatewayVersionIdentifiers:` + strings.Replace(strings.Replace(this.GatewayVersionIdentifiers.String(), "GatewayVersionIdentifiers", "GatewayVersionIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Photos:` + fmt.Sprintf("%v", this.Photos) + `,`,
-		`Radios:` + strings.Replace(fmt.Sprintf("%v", this.Radios), "GatewayRadio", "GatewayRadio", 1) + `,`,
+		`Radios:` + repeatedStringForRadios + `,`,
 		`ClockSource:` + fmt.Sprintf("%v", this.ClockSource) + `,`,
 		`}`,
 	}, "")
@@ -5014,6 +5209,16 @@ func (this *Gateway) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForContactInfo := "[]*ContactInfo{"
+	for _, f := range this.ContactInfo {
+		repeatedStringForContactInfo += strings.Replace(fmt.Sprintf("%v", f), "ContactInfo", "ContactInfo", 1) + ","
+	}
+	repeatedStringForContactInfo += "}"
+	repeatedStringForAntennas := "[]GatewayAntenna{"
+	for _, f := range this.Antennas {
+		repeatedStringForAntennas += strings.Replace(strings.Replace(f.String(), "GatewayAntenna", "GatewayAntenna", 1), `&`, ``, 1) + ","
+	}
+	repeatedStringForAntennas += "}"
 	keysForAttributes := make([]string, 0, len(this.Attributes))
 	for k := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
@@ -5025,19 +5230,19 @@ func (this *Gateway) String() string {
 	}
 	mapStringForAttributes += "}"
 	s := strings.Join([]string{`&Gateway{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
 		`Attributes:` + mapStringForAttributes + `,`,
-		`ContactInfo:` + strings.Replace(fmt.Sprintf("%v", this.ContactInfo), "ContactInfo", "ContactInfo", 1) + `,`,
+		`ContactInfo:` + repeatedStringForContactInfo + `,`,
 		`GatewayVersionIdentifiers:` + strings.Replace(strings.Replace(this.GatewayVersionIdentifiers.String(), "GatewayVersionIdentifiers", "GatewayVersionIdentifiers", 1), `&`, ``, 1) + `,`,
 		`GatewayServerAddress:` + fmt.Sprintf("%v", this.GatewayServerAddress) + `,`,
 		`AutoUpdate:` + fmt.Sprintf("%v", this.AutoUpdate) + `,`,
 		`UpdateChannel:` + fmt.Sprintf("%v", this.UpdateChannel) + `,`,
 		`FrequencyPlanID:` + fmt.Sprintf("%v", this.FrequencyPlanID) + `,`,
-		`Antennas:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Antennas), "GatewayAntenna", "GatewayAntenna", 1), `&`, ``, 1) + `,`,
+		`Antennas:` + repeatedStringForAntennas + `,`,
 		`StatusPublic:` + fmt.Sprintf("%v", this.StatusPublic) + `,`,
 		`LocationPublic:` + fmt.Sprintf("%v", this.LocationPublic) + `,`,
 		`ScheduleDownlinkLate:` + fmt.Sprintf("%v", this.ScheduleDownlinkLate) + `,`,
@@ -5051,8 +5256,13 @@ func (this *Gateways) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForGateways := "[]*Gateway{"
+	for _, f := range this.Gateways {
+		repeatedStringForGateways += strings.Replace(f.String(), "Gateway", "Gateway", 1) + ","
+	}
+	repeatedStringForGateways += "}"
 	s := strings.Join([]string{`&Gateways{`,
-		`Gateways:` + strings.Replace(fmt.Sprintf("%v", this.Gateways), "Gateway", "Gateway", 1) + `,`,
+		`Gateways:` + repeatedStringForGateways + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5062,8 +5272,8 @@ func (this *GetGatewayRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetGatewayRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5084,7 +5294,7 @@ func (this *ListGatewaysRequest) String() string {
 	}
 	s := strings.Join([]string{`&ListGatewaysRequest{`,
 		`Collaborator:` + strings.Replace(fmt.Sprintf("%v", this.Collaborator), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
@@ -5098,7 +5308,7 @@ func (this *CreateGatewayRequest) String() string {
 	}
 	s := strings.Join([]string{`&CreateGatewayRequest{`,
 		`Gateway:` + strings.Replace(strings.Replace(this.Gateway.String(), "Gateway", "Gateway", 1), `&`, ``, 1) + `,`,
-		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborator), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5109,7 +5319,7 @@ func (this *UpdateGatewayRequest) String() string {
 	}
 	s := strings.Join([]string{`&UpdateGatewayRequest{`,
 		`Gateway:` + strings.Replace(strings.Replace(this.Gateway.String(), "Gateway", "Gateway", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5119,7 +5329,7 @@ func (this *ListGatewayAPIKeysRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListGatewayAPIKeysRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
@@ -5131,7 +5341,7 @@ func (this *GetGatewayAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetGatewayAPIKeyRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`KeyID:` + fmt.Sprintf("%v", this.KeyID) + `,`,
 		`}`,
 	}, "")
@@ -5142,7 +5352,7 @@ func (this *CreateGatewayAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&CreateGatewayAPIKeyRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Rights:` + fmt.Sprintf("%v", this.Rights) + `,`,
 		`}`,
@@ -5154,8 +5364,8 @@ func (this *UpdateGatewayAPIKeyRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&UpdateGatewayAPIKeyRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
-		`APIKey:` + strings.Replace(strings.Replace(this.APIKey.String(), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`APIKey:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.APIKey), "APIKey", "APIKey", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5165,7 +5375,7 @@ func (this *ListGatewayCollaboratorsRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListGatewayCollaboratorsRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
 		`}`,
@@ -5177,8 +5387,8 @@ func (this *GetGatewayCollaboratorRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetGatewayCollaboratorRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
-		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(this.OrganizationOrUserIdentifiers.String(), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`OrganizationOrUserIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.OrganizationOrUserIdentifiers), "OrganizationOrUserIdentifiers", "OrganizationOrUserIdentifiers", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5188,8 +5398,8 @@ func (this *SetGatewayCollaboratorRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&SetGatewayCollaboratorRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
-		`Collaborator:` + strings.Replace(strings.Replace(this.Collaborator.String(), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`Collaborator:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Collaborator), "Collaborator", "Collaborator", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5210,7 +5420,7 @@ func (this *GatewayAntenna) String() string {
 	mapStringForAttributes += "}"
 	s := strings.Join([]string{`&GatewayAntenna{`,
 		`Gain:` + fmt.Sprintf("%v", this.Gain) + `,`,
-		`Location:` + strings.Replace(strings.Replace(this.Location.String(), "Location", "Location", 1), `&`, ``, 1) + `,`,
+		`Location:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1), `&`, ``, 1) + `,`,
 		`Attributes:` + mapStringForAttributes + `,`,
 		`}`,
 	}, "")
@@ -5220,6 +5430,11 @@ func (this *GatewayStatus) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForAntennaLocations := "[]*Location{"
+	for _, f := range this.AntennaLocations {
+		repeatedStringForAntennaLocations += strings.Replace(fmt.Sprintf("%v", f), "Location", "Location", 1) + ","
+	}
+	repeatedStringForAntennaLocations += "}"
 	keysForVersions := make([]string, 0, len(this.Versions))
 	for k := range this.Versions {
 		keysForVersions = append(keysForVersions, k)
@@ -5241,10 +5456,10 @@ func (this *GatewayStatus) String() string {
 	}
 	mapStringForMetrics += "}"
 	s := strings.Join([]string{`&GatewayStatus{`,
-		`Time:` + strings.Replace(strings.Replace(this.Time.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`BootTime:` + strings.Replace(strings.Replace(this.BootTime.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`Time:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`BootTime:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.BootTime), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`Versions:` + mapStringForVersions + `,`,
-		`AntennaLocations:` + strings.Replace(fmt.Sprintf("%v", this.AntennaLocations), "Location", "Location", 1) + `,`,
+		`AntennaLocations:` + repeatedStringForAntennaLocations + `,`,
 		`IP:` + fmt.Sprintf("%v", this.IP) + `,`,
 		`Metrics:` + mapStringForMetrics + `,`,
 		`Advanced:` + strings.Replace(fmt.Sprintf("%v", this.Advanced), "Struct", "types.Struct", 1) + `,`,
@@ -5260,7 +5475,7 @@ func (this *GatewayConnectionStats) String() string {
 		`ConnectedAt:` + strings.Replace(fmt.Sprintf("%v", this.ConnectedAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`Protocol:` + fmt.Sprintf("%v", this.Protocol) + `,`,
 		`LastStatusReceivedAt:` + strings.Replace(fmt.Sprintf("%v", this.LastStatusReceivedAt), "Timestamp", "types.Timestamp", 1) + `,`,
-		`LastStatus:` + strings.Replace(fmt.Sprintf("%v", this.LastStatus), "GatewayStatus", "GatewayStatus", 1) + `,`,
+		`LastStatus:` + strings.Replace(this.LastStatus.String(), "GatewayStatus", "GatewayStatus", 1) + `,`,
 		`LastUplinkReceivedAt:` + strings.Replace(fmt.Sprintf("%v", this.LastUplinkReceivedAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`UplinkCount:` + fmt.Sprintf("%v", this.UplinkCount) + `,`,
 		`LastDownlinkReceivedAt:` + strings.Replace(fmt.Sprintf("%v", this.LastDownlinkReceivedAt), "Timestamp", "types.Timestamp", 1) + `,`,
@@ -5275,9 +5490,9 @@ func (this *GatewayConnectionStats_RoundTripTimes) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GatewayConnectionStats_RoundTripTimes{`,
-		`Min:` + strings.Replace(strings.Replace(this.Min.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
-		`Max:` + strings.Replace(strings.Replace(this.Max.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
-		`Median:` + strings.Replace(strings.Replace(this.Median.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
+		`Min:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Min), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
+		`Max:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Max), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
+		`Median:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Median), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
 		`Count:` + fmt.Sprintf("%v", this.Count) + `,`,
 		`}`,
 	}, "")

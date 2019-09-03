@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -32,7 +33,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type JoinRequest struct {
 	RawPayload         []byte                                               `protobuf:"bytes,1,opt,name=raw_payload,json=rawPayload,proto3" json:"raw_payload,omitempty"`
@@ -62,7 +63,7 @@ func (m *JoinRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_JoinRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -152,7 +153,7 @@ func (m *JoinResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_JoinResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -352,7 +353,7 @@ func (this *JoinResponse) Equal(that interface{}) bool {
 func (m *JoinRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -360,92 +361,102 @@ func (m *JoinRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *JoinRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.RawPayload) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintJoin(dAtA, i, uint64(len(m.RawPayload)))
-		i += copy(dAtA[i:], m.RawPayload)
-	}
-	if m.Payload != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintJoin(dAtA, i, uint64(m.Payload.Size()))
-		n1, err := m.Payload.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.CorrelationIDs) > 0 {
+		for iNdEx := len(m.CorrelationIDs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CorrelationIDs[iNdEx])
+			copy(dAtA[i:], m.CorrelationIDs[iNdEx])
+			i = encodeVarintJoin(dAtA, i, uint64(len(m.CorrelationIDs[iNdEx])))
+			i--
+			dAtA[i] = 0x52
 		}
-		i += n1
-	}
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintJoin(dAtA, i, uint64(m.DevAddr.Size()))
-	n2, err := m.DevAddr.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	if m.SelectedMACVersion != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintJoin(dAtA, i, uint64(m.SelectedMACVersion))
-	}
-	dAtA[i] = 0x2a
-	i++
-	i = encodeVarintJoin(dAtA, i, uint64(m.NetID.Size()))
-	n3, err := m.NetID.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n3
-	dAtA[i] = 0x32
-	i++
-	i = encodeVarintJoin(dAtA, i, uint64(m.DownlinkSettings.Size()))
-	n4, err := m.DownlinkSettings.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n4
-	if m.RxDelay != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintJoin(dAtA, i, uint64(m.RxDelay))
 	}
 	if m.CFList != nil {
+		{
+			size, err := m.CFList.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintJoin(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x42
-		i++
-		i = encodeVarintJoin(dAtA, i, uint64(m.CFList.Size()))
-		n5, err := m.CFList.MarshalTo(dAtA[i:])
+	}
+	if m.RxDelay != 0 {
+		i = encodeVarintJoin(dAtA, i, uint64(m.RxDelay))
+		i--
+		dAtA[i] = 0x38
+	}
+	{
+		size, err := m.DownlinkSettings.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n5
+		i -= size
+		i = encodeVarintJoin(dAtA, i, uint64(size))
 	}
-	if len(m.CorrelationIDs) > 0 {
-		for _, s := range m.CorrelationIDs {
-			dAtA[i] = 0x52
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
+	i--
+	dAtA[i] = 0x32
+	{
+		size := m.NetID.Size()
+		i -= size
+		if _, err := m.NetID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
 		}
+		i = encodeVarintJoin(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0x2a
+	if m.SelectedMACVersion != 0 {
+		i = encodeVarintJoin(dAtA, i, uint64(m.SelectedMACVersion))
+		i--
+		dAtA[i] = 0x20
+	}
+	{
+		size := m.DevAddr.Size()
+		i -= size
+		if _, err := m.DevAddr.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintJoin(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	if m.Payload != nil {
+		{
+			size, err := m.Payload.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintJoin(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.RawPayload) > 0 {
+		i -= len(m.RawPayload)
+		copy(dAtA[i:], m.RawPayload)
+		i = encodeVarintJoin(dAtA, i, uint64(len(m.RawPayload)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *JoinResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -453,58 +464,62 @@ func (m *JoinResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *JoinResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.RawPayload) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintJoin(dAtA, i, uint64(len(m.RawPayload)))
-		i += copy(dAtA[i:], m.RawPayload)
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintJoin(dAtA, i, uint64(m.SessionKeys.Size()))
-	n6, err := m.SessionKeys.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n6
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintJoin(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.Lifetime)))
-	n7, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Lifetime, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n7
 	if len(m.CorrelationIDs) > 0 {
-		for _, s := range m.CorrelationIDs {
+		for iNdEx := len(m.CorrelationIDs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CorrelationIDs[iNdEx])
+			copy(dAtA[i:], m.CorrelationIDs[iNdEx])
+			i = encodeVarintJoin(dAtA, i, uint64(len(m.CorrelationIDs[iNdEx])))
+			i--
 			dAtA[i] = 0x22
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
 		}
 	}
-	return i, nil
+	n4, err4 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Lifetime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.Lifetime):])
+	if err4 != nil {
+		return 0, err4
+	}
+	i -= n4
+	i = encodeVarintJoin(dAtA, i, uint64(n4))
+	i--
+	dAtA[i] = 0x1a
+	{
+		size, err := m.SessionKeys.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintJoin(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.RawPayload) > 0 {
+		i -= len(m.RawPayload)
+		copy(dAtA[i:], m.RawPayload)
+		i = encodeVarintJoin(dAtA, i, uint64(len(m.RawPayload)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintJoin(dAtA []byte, offset int, v uint64) int {
+	offset -= sovJoin(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedJoinResponse(r randyJoin, easy bool) *JoinResponse {
 	this := &JoinResponse{}
@@ -662,14 +677,7 @@ func (m *JoinResponse) Size() (n int) {
 }
 
 func sovJoin(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozJoin(x uint64) (n int) {
 	return sovJoin((x << 1) ^ uint64((int64(x) >> 63)))
@@ -684,7 +692,7 @@ func (this *JoinRequest) String() string {
 		`DevAddr:` + fmt.Sprintf("%v", this.DevAddr) + `,`,
 		`SelectedMACVersion:` + fmt.Sprintf("%v", this.SelectedMACVersion) + `,`,
 		`NetID:` + fmt.Sprintf("%v", this.NetID) + `,`,
-		`DownlinkSettings:` + strings.Replace(strings.Replace(this.DownlinkSettings.String(), "DLSettings", "DLSettings", 1), `&`, ``, 1) + `,`,
+		`DownlinkSettings:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.DownlinkSettings), "DLSettings", "DLSettings", 1), `&`, ``, 1) + `,`,
 		`RxDelay:` + fmt.Sprintf("%v", this.RxDelay) + `,`,
 		`CFList:` + strings.Replace(fmt.Sprintf("%v", this.CFList), "CFList", "CFList", 1) + `,`,
 		`CorrelationIDs:` + fmt.Sprintf("%v", this.CorrelationIDs) + `,`,
@@ -698,8 +706,8 @@ func (this *JoinResponse) String() string {
 	}
 	s := strings.Join([]string{`&JoinResponse{`,
 		`RawPayload:` + fmt.Sprintf("%v", this.RawPayload) + `,`,
-		`SessionKeys:` + strings.Replace(strings.Replace(this.SessionKeys.String(), "SessionKeys", "SessionKeys", 1), `&`, ``, 1) + `,`,
-		`Lifetime:` + strings.Replace(strings.Replace(this.Lifetime.String(), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
+		`SessionKeys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.SessionKeys), "SessionKeys", "SessionKeys", 1), `&`, ``, 1) + `,`,
+		`Lifetime:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Lifetime), "Duration", "types.Duration", 1), `&`, ``, 1) + `,`,
 		`CorrelationIDs:` + fmt.Sprintf("%v", this.CorrelationIDs) + `,`,
 		`}`,
 	}, "")

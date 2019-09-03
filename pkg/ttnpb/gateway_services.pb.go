@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -17,6 +18,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -29,7 +32,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type PullGatewayConfigurationRequest struct {
 	GatewayIdentifiers   `protobuf:"bytes,1,opt,name=gateway_ids,json=gatewayIds,proto3,embedded=gateway_ids" json:"gateway_ids"`
@@ -51,7 +54,7 @@ func (m *PullGatewayConfigurationRequest) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_PullGatewayConfigurationRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -287,6 +290,29 @@ type GatewayRegistryServer interface {
 	List(context.Context, *ListGatewaysRequest) (*Gateways, error)
 	Update(context.Context, *UpdateGatewayRequest) (*Gateway, error)
 	Delete(context.Context, *GatewayIdentifiers) (*types.Empty, error)
+}
+
+// UnimplementedGatewayRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedGatewayRegistryServer struct {
+}
+
+func (*UnimplementedGatewayRegistryServer) Create(ctx context.Context, req *CreateGatewayRequest) (*Gateway, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedGatewayRegistryServer) Get(ctx context.Context, req *GetGatewayRequest) (*Gateway, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedGatewayRegistryServer) GetIdentifiersForEUI(ctx context.Context, req *GetGatewayIdentifiersForEUIRequest) (*GatewayIdentifiers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIdentifiersForEUI not implemented")
+}
+func (*UnimplementedGatewayRegistryServer) List(ctx context.Context, req *ListGatewaysRequest) (*Gateways, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedGatewayRegistryServer) Update(ctx context.Context, req *UpdateGatewayRequest) (*Gateway, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedGatewayRegistryServer) Delete(ctx context.Context, req *GatewayIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 
 func RegisterGatewayRegistryServer(s *grpc.Server, srv GatewayRegistryServer) {
@@ -554,6 +580,35 @@ type GatewayAccessServer interface {
 	ListCollaborators(context.Context, *ListGatewayCollaboratorsRequest) (*Collaborators, error)
 }
 
+// UnimplementedGatewayAccessServer can be embedded to have forward compatible implementations.
+type UnimplementedGatewayAccessServer struct {
+}
+
+func (*UnimplementedGatewayAccessServer) ListRights(ctx context.Context, req *GatewayIdentifiers) (*Rights, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRights not implemented")
+}
+func (*UnimplementedGatewayAccessServer) CreateAPIKey(ctx context.Context, req *CreateGatewayAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAPIKey not implemented")
+}
+func (*UnimplementedGatewayAccessServer) ListAPIKeys(ctx context.Context, req *ListGatewayAPIKeysRequest) (*APIKeys, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAPIKeys not implemented")
+}
+func (*UnimplementedGatewayAccessServer) GetAPIKey(ctx context.Context, req *GetGatewayAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAPIKey not implemented")
+}
+func (*UnimplementedGatewayAccessServer) UpdateAPIKey(ctx context.Context, req *UpdateGatewayAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAPIKey not implemented")
+}
+func (*UnimplementedGatewayAccessServer) GetCollaborator(ctx context.Context, req *GetGatewayCollaboratorRequest) (*GetCollaboratorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCollaborator not implemented")
+}
+func (*UnimplementedGatewayAccessServer) SetCollaborator(ctx context.Context, req *SetGatewayCollaboratorRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCollaborator not implemented")
+}
+func (*UnimplementedGatewayAccessServer) ListCollaborators(ctx context.Context, req *ListGatewayCollaboratorsRequest) (*Collaborators, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCollaborators not implemented")
+}
+
 func RegisterGatewayAccessServer(s *grpc.Server, srv GatewayAccessServer) {
 	s.RegisterService(&_GatewayAccess_serviceDesc, srv)
 }
@@ -795,6 +850,14 @@ type GatewayConfiguratorServer interface {
 	PullConfiguration(*PullGatewayConfigurationRequest, GatewayConfigurator_PullConfigurationServer) error
 }
 
+// UnimplementedGatewayConfiguratorServer can be embedded to have forward compatible implementations.
+type UnimplementedGatewayConfiguratorServer struct {
+}
+
+func (*UnimplementedGatewayConfiguratorServer) PullConfiguration(req *PullGatewayConfigurationRequest, srv GatewayConfigurator_PullConfigurationServer) error {
+	return status.Errorf(codes.Unimplemented, "method PullConfiguration not implemented")
+}
+
 func RegisterGatewayConfiguratorServer(s *grpc.Server, srv GatewayConfiguratorServer) {
 	s.RegisterService(&_GatewayConfigurator_serviceDesc, srv)
 }
@@ -837,7 +900,7 @@ var _GatewayConfigurator_serviceDesc = grpc.ServiceDesc{
 func (m *PullGatewayConfigurationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -845,37 +908,48 @@ func (m *PullGatewayConfigurationRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *PullGatewayConfigurationRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PullGatewayConfigurationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintGatewayServices(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n1, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGatewayServices(dAtA, i, uint64(size))
 	}
-	i += n1
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintGatewayServices(dAtA, i, uint64(m.FieldMask.Size()))
-	n2, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGatewayServices(dAtA, i, uint64(size))
 	}
-	i += n2
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintGatewayServices(dAtA []byte, offset int, v uint64) int {
+	offset -= sovGatewayServices(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedPullGatewayConfigurationRequest(r randyGatewayServices, easy bool) *PullGatewayConfigurationRequest {
 	this := &PullGatewayConfigurationRequest{}
@@ -974,14 +1048,7 @@ func (m *PullGatewayConfigurationRequest) Size() (n int) {
 }
 
 func sovGatewayServices(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozGatewayServices(x uint64) (n int) {
 	return sovGatewayServices((x << 1) ^ uint64((int64(x) >> 63)))
@@ -991,8 +1058,8 @@ func (this *PullGatewayConfigurationRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&PullGatewayConfigurationRequest{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
