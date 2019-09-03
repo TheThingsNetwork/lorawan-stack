@@ -137,4 +137,9 @@ PropTypes.organization = PropTypes.shape({
   updated_at: PropTypes.string,
 })
 
+PropTypes.match = PropTypes.shape({
+  path: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+})
+
 export default PropTypes
