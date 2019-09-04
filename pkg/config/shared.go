@@ -101,6 +101,7 @@ type HTTPStaticConfig struct {
 type HTTP struct {
 	Listen          string           `name:"listen" description:"Address for the HTTP server to listen on"`
 	ListenTLS       string           `name:"listen-tls" description:"Address for the HTTPS server to listen on"`
+	RedirectToHost  string           `name:"redirect-to-host" description:"Redirect all requests to one host"`
 	RedirectToHTTPS bool             `name:"redirect-to-tls" description:"Redirect HTTP requests to HTTPS"`
 	Static          HTTPStaticConfig `name:"static"`
 	Cookie          Cookie           `name:"cookie"`

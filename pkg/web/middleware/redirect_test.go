@@ -24,6 +24,63 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestRedirectToHost(t *testing.T) {
+	a := assertions.New(t)
+	e := echo.New()
+
+	redirectHandler := RedirectToHost("example.com")(handler)
+
+	{
+		req := httptest.NewRequest("GET", "https://example.com/", nil)
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		err := redirectHandler(c)
+
+		a.So(err, should.BeNil)
+		a.So(rec.Code, should.Equal, http.StatusOK)
+	}
+
+	{
+		req := httptest.NewRequest("GET", "http://internal.cluster/", nil)
+		req.Header.Set("X-Forwarded-Proto", "https")
+		req.Header.Set("X-Forwarded-Host", "example.com")
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		err := redirectHandler(c)
+
+		a.So(err, should.BeNil)
+		a.So(rec.Code, should.Equal, http.StatusOK)
+	}
+
+	{
+		req := httptest.NewRequest("GET", "http://otherexample.com/", nil)
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		err := redirectHandler(c)
+
+		a.So(err, should.BeNil)
+		a.So(rec.Code, should.Equal, http.StatusFound)
+		a.So(rec.Header().Get("Location"), should.Equal, "http://example.com/")
+	}
+
+	{
+		req := httptest.NewRequest("GET", "http://example.com/", nil)
+		req.Header.Set("X-Forwarded-Host", "otherexample.com")
+		req.Header.Set("X-Forwarded-Proto", "https")
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		err := redirectHandler(c)
+
+		a.So(err, should.BeNil)
+		a.So(rec.Code, should.Equal, http.StatusFound)
+		a.So(rec.Header().Get("Location"), should.Equal, "https://example.com/")
+	}
+}
+
 func TestRedirectToHTTPS(t *testing.T) {
 	a := assertions.New(t)
 	e := echo.New()
@@ -94,5 +151,4 @@ func TestRedirectToHTTPS(t *testing.T) {
 		a.So(rec.Code, should.Equal, http.StatusPermanentRedirect)
 		a.So(rec.Header().Get("Location"), should.Equal, "https://example.com:8885/")
 	}
-
 }

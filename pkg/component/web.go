@@ -41,6 +41,9 @@ func (c *Component) initWeb() error {
 		web.WithCookieKeys(c.config.HTTP.Cookie.HashKey, c.config.HTTP.Cookie.BlockKey),
 		web.WithStatic(c.config.HTTP.Static.Mount, c.config.HTTP.Static.SearchPath...),
 	}
+	if c.config.HTTP.RedirectToHost != "" {
+		webOptions = append(webOptions, web.WithRedirectToHost(c.config.HTTP.RedirectToHost))
+	}
 	if c.config.HTTP.RedirectToHTTPS {
 		httpAddr, err := net.ResolveTCPAddr("tcp", c.config.HTTP.Listen)
 		if err != nil {
