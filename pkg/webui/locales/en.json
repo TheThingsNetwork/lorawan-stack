@@ -353,6 +353,8 @@
   "oauth.views.code.index.code": "Your Authorization Code",
   "oauth.views.create-account.index.createAccount": "Create a new {siteName} Account",
   "oauth.views.create-account.index.register": "Register",
+  "oauth.views.create-account.index.registrationApproved": "You have successfully registered and can login now",
+  "oauth.views.create-account.index.registrationPending": "You have successfully sent the registration request. Please wait until an admin approves it.",
   "oauth.views.forgot-password.index.loginPage": "Login Page",
   "oauth.views.forgot-password.index.forgotPassword": "Forgot Password",
   "oauth.views.forgot-password.index.passwordRequested": "You will receive an email with reset instructions shortly.",
