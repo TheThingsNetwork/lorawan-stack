@@ -91,13 +91,24 @@ func (oc *OAuthClient) configFromContext(ctx context.Context) *Config {
 
 func (oc *OAuthClient) oauth(c echo.Context) *oauth2.Config {
 	config := oc.configFromContext(c.Request().Context())
+
+	authorizeURL := config.AuthorizeURL
+	redirectURL := fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(oc.config.RootURL, "/"))
+	if oauthRootURL, err := url.Parse(oc.config.RootURL); err == nil {
+		rootURL := (&url.URL{Scheme: oauthRootURL.Scheme, Host: oauthRootURL.Host}).String()
+		if strings.HasPrefix(authorizeURL, rootURL) {
+			authorizeURL = strings.TrimPrefix(authorizeURL, rootURL)
+			redirectURL = strings.TrimPrefix(redirectURL, rootURL)
+		}
+	}
+
 	return &oauth2.Config{
 		ClientID:     config.ClientID,
 		ClientSecret: config.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(oc.config.RootURL, "/")),
+		RedirectURL:  redirectURL,
 		Endpoint: oauth2.Endpoint{
 			TokenURL:  config.TokenURL,
-			AuthURL:   config.AuthorizeURL,
+			AuthURL:   authorizeURL,
 			AuthStyle: oauth2.AuthStyleInParams,
 		},
 	}

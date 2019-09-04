@@ -128,7 +128,9 @@ var (
 					Redis:     config.Redis,
 					Namespace: []string{"is", "cache"},
 				}))
-				rootRedirect = web.Redirect("/", http.StatusFound, config.IS.OAuth.UI.CanonicalURL)
+				if oauthMount := config.IS.OAuth.UI.MountPath(); oauthMount != "/" {
+					rootRedirect = web.Redirect("/", http.StatusFound, oauthMount)
+				}
 			}
 
 			if start.GatewayServer || startDefault {
@@ -212,7 +214,9 @@ var (
 					return shared.ErrInitializeConsole.WithCause(err)
 				}
 				_ = console
-				rootRedirect = web.Redirect("/", http.StatusFound, config.Console.UI.CanonicalURL)
+				if consoleMount := config.Console.UI.MountPath(); consoleMount != "/" {
+					rootRedirect = web.Redirect("/", http.StatusFound, consoleMount)
+				}
 			}
 
 			if start.GatewayConfigurationServer {
