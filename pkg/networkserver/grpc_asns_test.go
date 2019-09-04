@@ -147,7 +147,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
 							},
@@ -188,7 +188,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -247,7 +247,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -322,7 +322,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -413,7 +413,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -510,7 +510,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -581,7 +581,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -664,7 +664,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -812,7 +812,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
 							},
@@ -853,7 +853,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -913,7 +913,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -988,7 +988,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -1083,7 +1083,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -1188,7 +1188,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -1272,7 +1272,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -1352,7 +1352,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -1488,7 +1488,7 @@ func TestDownlinkQueueList(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
 							},
@@ -1519,7 +1519,7 @@ func TestDownlinkQueueList(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
@@ -1555,7 +1555,7 @@ func TestDownlinkQueueList(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_LINK,
 							},
