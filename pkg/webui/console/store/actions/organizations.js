@@ -13,7 +13,12 @@
 // limitations under the License.
 
 import { createRequestActions } from './lib'
-import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
+import {
+  createPaginationRequestActions,
+  createPaginationBaseActionType,
+  createPaginationDeleteBaseActionType,
+  createPaginationDeleteActions,
+} from './pagination'
 import {
   startEventsStream,
   createStartEventsStreamActionType,
@@ -54,6 +59,26 @@ export const [
     failure: createOrganizationFailure,
   },
 ] = createRequestActions(CREATE_ORG_BASE)
+
+export const UPDATE_ORG_BASE = 'UPDATE_ORGANIZATION'
+export const [
+  { request: UPDATE_ORG, success: UPDATE_ORG_SUCCESS, failure: UPDATE_ORG_FAILURE },
+  {
+    request: updateOrganization,
+    success: updateOrganizationSuccess,
+    failure: updateOrganizationFailure,
+  },
+] = createRequestActions(UPDATE_ORG_BASE, (id, patch) => ({ id, patch }))
+
+export const DELETE_ORG_BASE = createPaginationDeleteBaseActionType(SHARED_NAME)
+export const [
+  { request: DELETE_ORG, success: DELETE_ORG_SUCCESS, failure: DELETE_ORG_FAILURE },
+  {
+    request: deleteOrganization,
+    success: deleteOrganizationSuccess,
+    failure: deleteORganizationFailure,
+  },
+] = createPaginationDeleteActions(SHARED_NAME, id => ({ id }))
 
 export const START_ORG_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_ORG_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
