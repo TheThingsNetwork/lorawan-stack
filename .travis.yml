@@ -5,7 +5,7 @@ os: linux
 git:
   depth: false
 language: go
-go: 1.12.x
+go: 1.13.x
 go_import_path: go.thethings.network/lorawan-stack
 env:
   global:
