@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_ORGS_LIST_BASE } from '../actions/organizations'
+import { GET_ORGS_LIST_BASE, GET_ORG_BASE } from '../actions/organizations'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
 } from './pagination'
+import {
+  createEventsSelector,
+  createEventsErrorSelector,
+  createEventsStatusSelector,
+} from './events'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
@@ -26,6 +31,12 @@ const ENTITY = 'organizations'
 export const selectOrganizationStore = state => state.organizations
 export const selectOrganizationEntitiesStore = state => selectOrganizationStore(state).entities
 export const selectOrganizationById = (state, id) => selectOrganizationEntitiesStore(state)[id]
+export const selectSelectedOrganizationId = state =>
+  selectOrganizationStore(state).selectedOrganization
+export const selectSelectedOrganization = state =>
+  selectOrganizationById(state, selectSelectedOrganizationId(state))
+export const selectOrganizationFetching = createFetchingSelector(GET_ORG_BASE)
+export const selectOrganizationError = createErrorSelector(GET_ORG_BASE)
 
 // Organizations
 const selectOrgsIds = createPaginationIdsSelectorByEntity(ENTITY)
@@ -38,3 +49,8 @@ export const selectOrganizations = state =>
 export const selectOrganizationsTotalCount = state => selectOrgsTotalCount(state)
 export const selectOrganizationsFetching = state => selectOrgsFetching(state)
 export const selectOrganizationsError = state => selectOrgsError(state)
+
+// Events
+export const selectOrganizationEvents = createEventsSelector(ENTITY)
+export const selectOrganizationEventsError = createEventsErrorSelector(ENTITY)
+export const selectOrganizationEventsStatus = createEventsStatusSelector(ENTITY)

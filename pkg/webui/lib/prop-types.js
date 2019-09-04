@@ -127,4 +127,19 @@ PropTypes.device = PropTypes.shape({
   }).isRequired,
 })
 
+PropTypes.organization = PropTypes.shape({
+  ids: PropTypes.shape({
+    organization_id: PropTypes.string.isRequired,
+  }),
+  name: PropTypes.string,
+  description: PropTypes.string,
+  created_at: PropTypes.string,
+  updated_at: PropTypes.string,
+})
+
+PropTypes.match = PropTypes.shape({
+  path: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+})
+
 export default PropTypes

@@ -49,7 +49,21 @@ export const getApiKeyId = function(key = {}) {
   return key.id
 }
 
-const idSelectors = [getApplicationId, getCollaboratorId, getApiKeyId, getGatewayId, getDeviceId]
+export const getOrganizationId = function(organization = {}) {
+  return (
+    getByPath(organization, 'ids.organization_id') ||
+    getByPath(organization, 'organization_ids.organization_id')
+  )
+}
+
+const idSelectors = [
+  getApplicationId,
+  getCollaboratorId,
+  getApiKeyId,
+  getGatewayId,
+  getDeviceId,
+  getOrganizationId,
+]
 
 export const getEntityId = function(entity) {
   let id
@@ -64,8 +78,4 @@ export const getEntityId = function(entity) {
 
 export const getWebhookId = function(webhook = {}) {
   return getByPath(webhook, 'ids.webhook_id')
-}
-
-export const getOrganizationId = function(organization = {}) {
-  return getByPath(organization, 'ids.organization_id')
 }

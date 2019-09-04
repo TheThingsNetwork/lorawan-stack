@@ -79,6 +79,7 @@ export default history =>
       applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
       devices: createNamedEventsReducer(DEVICE_SHARED_NAME),
       gateways: createNamedEventsReducer(GATEWAY_SHARED_NAME),
+      organizations: createNamedEventsReducer(ORGANIZATION_SHARED_NAME),
     }),
     ui: combineReducers({
       fetching,

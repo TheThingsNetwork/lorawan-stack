@@ -12,25 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import Overview from './organization-overview'
+import connect from './connect'
 
-import { createOrganization } from '../../store/actions/organizations'
-import { attachPromise } from '../../store/actions/lib'
+const ConnectedOrganizationOverview = connect(Overview)
 
-const mapDispatchToProps = dispatch => ({
-  ...bindActionCreators(
-    {
-      createOrganization: attachPromise(createOrganization),
-    },
-    dispatch,
-  ),
-  createOrganizationSuccess: id => dispatch(push(`/organizations/${id}`)),
-})
-
-export default Add =>
-  connect(
-    null,
-    mapDispatchToProps,
-  )(Add)
+export { ConnectedOrganizationOverview as default, Overview }

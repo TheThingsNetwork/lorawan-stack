@@ -183,4 +183,8 @@ export default {
     list: ttnClient.Organizations.getAll.bind(ttnClient.Organizations),
     create: ttnClient.Organizations.create.bind(ttnClient.Organizations),
   },
+  organization: {
+    get: ttnClient.Organizations.getById.bind(ttnClient.Organizations),
+    eventsSubscribe: ttnClient.Organizations.openStream.bind(ttnClient.Organizations),
+  },
 }

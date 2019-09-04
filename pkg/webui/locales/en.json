@@ -148,6 +148,7 @@
   "console.views.login.index.welcome": "Welcome to {stackConsole}",
   "console.views.login.index.login": "You need to be logged in to use this site",
   "console.views.login.index.loginWithStackAccount": "Login with your The Things Stack Account",
+  "console.views.organization-data.organization-data.orgData": "Organization Data",
   "console.views.overview.index.createApplication": "Create an application",
   "console.views.overview.index.createGateway": "Register a gateway",
   "console.views.overview.index.gotoApplications": "Go to applications",

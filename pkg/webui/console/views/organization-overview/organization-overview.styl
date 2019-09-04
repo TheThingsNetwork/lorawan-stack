@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+.title
+  margin-bottom: $ls.m
 
-import { createOrganization } from '../../store/actions/organizations'
-import { attachPromise } from '../../store/actions/lib'
+  h2
+    entity-title()
+    margin-bottom: 0
 
-const mapDispatchToProps = dispatch => ({
-  ...bindActionCreators(
-    {
-      createOrganization: attachPromise(createOrganization),
-    },
-    dispatch,
-  ),
-  createOrganizationSuccess: id => dispatch(push(`/organizations/${id}`)),
-})
+  .description
+    display: block
+    margin-top: ($cs.xs * -1)
+    margin-bottom: $ls.s
 
-export default Add =>
-  connect(
-    null,
-    mapDispatchToProps,
-  )(Add)
+.latest-events
+  margin-top: $ls.m

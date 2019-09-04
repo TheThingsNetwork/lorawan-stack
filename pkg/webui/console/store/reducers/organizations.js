@@ -13,7 +13,12 @@
 // limitations under the License.
 
 import { getOrganizationId } from '../../../lib/selectors/id'
-import { GET_ORGS_LIST_SUCCESS, CREATE_ORG_SUCCESS } from '../actions/organizations'
+import {
+  GET_ORGS_LIST_SUCCESS,
+  CREATE_ORG_SUCCESS,
+  GET_ORG,
+  GET_ORG_SUCCESS,
+} from '../actions/organizations'
 
 const organization = function(state = {}, organization) {
   return {
@@ -24,10 +29,16 @@ const organization = function(state = {}, organization) {
 
 const defaultState = {
   entities: {},
+  selectedOrganization: null,
 }
 
 const organizations = function(state = defaultState, { type, payload }) {
   switch (type) {
+    case GET_ORG:
+      return {
+        ...state,
+        selectedOrganization: payload.id,
+      }
     case GET_ORGS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
         function(acc, org) {
@@ -44,11 +55,15 @@ const organizations = function(state = defaultState, { type, payload }) {
         entities,
       }
     case CREATE_ORG_SUCCESS:
+    case GET_ORG_SUCCESS:
       const id = getOrganizationId(payload)
 
       return {
         ...state,
-        [id]: organization(state[id], payload),
+        entities: {
+          ...state.entities,
+          [id]: organization(state.entities[id], payload),
+        },
       }
     default:
       return state

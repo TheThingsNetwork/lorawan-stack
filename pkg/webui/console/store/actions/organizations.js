@@ -14,6 +14,18 @@
 
 import { createRequestActions } from './lib'
 import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
+import {
+  startEventsStream,
+  createStartEventsStreamActionType,
+  startEventsStreamSuccess,
+  createStartEventsStreamSuccessActionType,
+  startEventsStreamFailure,
+  createStartEventsStreamFailureActionType,
+  stopEventsStream,
+  createStopEventsStreamActionType,
+  clearEvents,
+  createClearEventsActionType,
+} from './events'
 
 export const SHARED_NAME = 'ORGANIZATION'
 
@@ -27,6 +39,12 @@ export const [
   },
 ] = createPaginationRequestActions(SHARED_NAME)
 
+export const GET_ORG_BASE = 'GET_ORGANIZATION'
+export const [
+  { request: GET_ORG, success: GET_ORG_SUCCESS, failure: GET_ORG_FAILURE },
+  { request: getOrganization, success: getOrganizationSuccess, failure: getOrganizationFailure },
+] = createRequestActions(GET_ORG_BASE, id => ({ id }), (id, selector) => ({ selector }))
+
 export const CREATE_ORG_BASE = 'CREATE_ORGANIZATION'
 export const [
   { request: CREATE_ORG, success: CREATE_ORG_SUCCESS, failure: CREATE_ORG_FAILURE },
@@ -36,3 +54,15 @@ export const [
     failure: createOrganizationFailure,
   },
 ] = createRequestActions(CREATE_ORG_BASE)
+
+export const START_ORG_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
+export const START_ORG_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
+export const START_ORG_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
+export const STOP_ORG_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
+export const CLEAR_ORG_EVENTS = createClearEventsActionType(SHARED_NAME)
+
+export const startOrganizationEventsStream = startEventsStream(SHARED_NAME)
+export const startOrganizationEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
+export const startOrganizationEventsStreamFailure = startEventsStreamFailure(SHARED_NAME)
+export const stopOrganizationEventsStream = stopEventsStream(SHARED_NAME)
+export const clearOrganizationEventsStream = clearEvents(SHARED_NAME)

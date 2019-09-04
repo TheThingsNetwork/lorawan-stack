@@ -17,6 +17,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import OrganizationsList from '../organizations-list'
 import OrganizationAdd from '../organization-add'
+import Organization from '../organization'
 
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -32,6 +33,7 @@ class Organizations extends React.Component {
       <Switch>
         <Route exact path={`${path}`} component={OrganizationsList} />
         <Route exact path={`${path}/add`} component={OrganizationAdd} />
+        <Route path={`${path}/:orgId`} component={Organization} />
       </Switch>
     )
   }

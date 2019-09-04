@@ -12,25 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 
-import { createOrganization } from '../../store/actions/organizations'
-import { attachPromise } from '../../store/actions/lib'
+import { clearOrganizationEventsStream } from '../../store/actions/organizations'
 
-const mapDispatchToProps = dispatch => ({
-  ...bindActionCreators(
-    {
-      createOrganization: attachPromise(createOrganization),
-    },
-    dispatch,
-  ),
-  createOrganizationSuccess: id => dispatch(push(`/organizations/${id}`)),
+import {
+  selectOrganizationEvents,
+  selectOrganizationEventsStatus,
+  selectOrganizationEventsError,
+} from '../../store/selectors/organizations'
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  onClear: () => dispatch(clearOrganizationEventsStream(ownProps.orgId)),
 })
 
-export default Add =>
+const mergeProps = (_, propsFromDispatch, ownProps) => ({
+  ...propsFromDispatch,
+  ...ownProps,
+  eventsSelector: selectOrganizationEvents,
+  statusSelector: selectOrganizationEventsStatus,
+  errorSelector: selectOrganizationEventsError,
+})
+
+export default Events =>
   connect(
     null,
     mapDispatchToProps,
-  )(Add)
+    mergeProps,
+  )(Events)
