@@ -1,4 +1,4 @@
-go 1.12
+go 1.13
 
 module go.thethings.network/lorawan-stack
 
@@ -25,6 +25,9 @@ replace github.com/go-redis/redis => github.com/go-redis/redis v0.0.0-2019050308
 
 // github.com/goreleaser/goreleaser uses invalid syntax for dependency version
 replace github.com/go-macaron/cors => github.com/go-macaron/cors v0.0.0-20190418220122-6fd6a9bfe14e
+
+// goreleaser depends on version of github.com/Azure/go-autorest, which has broken module management. See https://github.com/Azure/go-autorest/issues/414.
+replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v11.1.2+incompatible
 
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
@@ -79,8 +82,6 @@ require (
 	github.com/mdempsky/unconvert v0.0.0-20190325185700-2f5dc3378ed3
 	github.com/mgechev/revive v0.0.0-20190813230524-a08e03e0bd25
 	github.com/mitchellh/mapstructure v1.1.2
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.0.2
 	github.com/nats-io/nats.go v1.8.1
@@ -114,6 +115,8 @@ require (
 	google.golang.org/api v0.8.0
 	google.golang.org/genproto v0.0.0-20190801165951-fa694d86fc64
 	google.golang.org/grpc v1.23.0
+	// Do not upgrade go-sqlmock beyond v1.3.0 until https://github.com/heptiolabs/healthcheck/issues/23 is resolved
+	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1
