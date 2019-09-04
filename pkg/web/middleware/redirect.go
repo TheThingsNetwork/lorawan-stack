@@ -22,6 +22,42 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
+// RedirectToHost redirects to the target host if not already used.
+// The port of the request is preserved.
+func RedirectToHost(target string) echo.MiddlewareFunc {
+	targetHost, _, err := net.SplitHostPort(target)
+	if err != nil {
+		targetHost = target
+	}
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			requestHost := c.Request().Host
+			if forwardedHost := c.Request().Header.Get("X-Forwarded-Host"); forwardedHost != "" {
+				requestHost = forwardedHost
+			}
+			host, port, err := net.SplitHostPort(requestHost)
+			if err != nil {
+				host = requestHost
+			}
+			if host != targetHost {
+				url := *c.Request().URL
+				url.Scheme = "http"
+				if forwardedProto := c.Request().Header.Get("X-Forwarded-Proto"); forwardedProto != "" {
+					url.Scheme = forwardedProto
+				} else if c.IsTLS() {
+					url.Scheme = "https"
+				}
+				url.Host = targetHost
+				if port != "" {
+					url.Host = net.JoinHostPort(targetHost, port)
+				}
+				return c.Redirect(http.StatusFound, url.String())
+			}
+			return next(c)
+		}
+	}
+}
+
 // RedirectToHTTPS redirects requests from HTTP to HTTPS.
 func RedirectToHTTPS(fromToPorts map[int]int) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
