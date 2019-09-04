@@ -69,7 +69,7 @@ const validationSchema = Yup.object({
           }),
       }),
     mac_settings: Yup.object().when('activation_mode', {
-      is: isOTAA,
+      is: isABP,
       then: schema =>
         schema.shape({
           resets_f_cnt: Yup.boolean(),
