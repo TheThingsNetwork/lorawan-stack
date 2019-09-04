@@ -15,6 +15,7 @@
 package ttnmage
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"runtime"
@@ -33,6 +34,38 @@ func (Dev) Certificates() error {
 		}
 	}
 	return execGo("run", path.Join(runtime.GOROOT(), "src", "crypto", "tls", "generate_cert.go"), "-ca", "-host", "localhost,*.localhost")
+}
+
+// Misspell fixes common spelling mistakes in files.
+func (Dev) Misspell() error {
+	if mg.Verbose() {
+		fmt.Printf("Fixing common spelling mistakes in files\n")
+	}
+	return execGo("run", "github.com/client9/misspell/cmd/misspell", "-w", "-i", "mosquitto",
+		".editorconfig",
+		".gitignore",
+		".goreleaser.yml",
+		".mage",
+		".make",
+		".revive.toml",
+		".travis.yml",
+		"api",
+		"cmd",
+		"config",
+		"CONTRIBUTING.md",
+		"DEVELOPMENT.md",
+		"doc",
+		"docker-compose.yml",
+		"Dockerfile",
+		"lorawan-stack.go",
+		"magefile.go",
+		"Makefile",
+		"pkg",
+		"README.md",
+		"sdk",
+		"SECURITY.md",
+		"tools.go",
+	)
 }
 
 func init() {
