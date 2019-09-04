@@ -26,6 +26,7 @@ import PropTypes from '../../../lib/prop-types'
 
 import OrganizationOverview from '../organization-overview'
 import OrganizationData from '../organization-data'
+import OrganizationGeneralSettings from '../organization-general-settings'
 
 @withEnv
 @withSideNavigation(function(props) {
@@ -43,6 +44,11 @@ import OrganizationData from '../organization-data'
         title: sharedMessages.data,
         path: `${matchedUrl}/data`,
         icon: 'data',
+      },
+      {
+        title: sharedMessages.generalSettings,
+        path: `${matchedUrl}/general-settings`,
+        icon: 'general_settings',
       },
     ],
   }
@@ -75,6 +81,7 @@ class Organization extends React.Component {
         <Switch>
           <Route exact path={`${match.path}`} component={OrganizationOverview} />
           <Route path={`${match.path}/data`} component={OrganizationData} />
+          <Route path={`${match.path}/general-settings`} component={OrganizationGeneralSettings} />
         </Switch>
       </BreadcrumbView>
     )
