@@ -9,6 +9,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strconv "strconv"
 	strings "strings"
@@ -23,6 +24,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -36,7 +39,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ApplicationPubSub_MQTTProvider_QoS int32
 
@@ -82,7 +85,7 @@ func (m *ApplicationPubSubIdentifiers) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_ApplicationPubSubIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -152,7 +155,7 @@ func (m *ApplicationPubSub) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_ApplicationPubSub.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -307,78 +310,12 @@ func (m *ApplicationPubSub) GetLocationSolved() *ApplicationPubSub_Message {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ApplicationPubSub) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ApplicationPubSub_OneofMarshaler, _ApplicationPubSub_OneofUnmarshaler, _ApplicationPubSub_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ApplicationPubSub) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ApplicationPubSub_NATS)(nil),
 		(*ApplicationPubSub_MQTT)(nil),
 	}
-}
-
-func _ApplicationPubSub_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ApplicationPubSub)
-	// provider
-	switch x := m.Provider.(type) {
-	case *ApplicationPubSub_NATS:
-		_ = b.EncodeVarint(17<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.NATS); err != nil {
-			return err
-		}
-	case *ApplicationPubSub_MQTT:
-		_ = b.EncodeVarint(25<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.MQTT); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("ApplicationPubSub.Provider has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ApplicationPubSub_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ApplicationPubSub)
-	switch tag {
-	case 17: // provider.nats
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationPubSub_NATSProvider)
-		err := b.DecodeMessage(msg)
-		m.Provider = &ApplicationPubSub_NATS{msg}
-		return true, err
-	case 25: // provider.mqtt
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationPubSub_MQTTProvider)
-		err := b.DecodeMessage(msg)
-		m.Provider = &ApplicationPubSub_MQTT{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ApplicationPubSub_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ApplicationPubSub)
-	// provider
-	switch x := m.Provider.(type) {
-	case *ApplicationPubSub_NATS:
-		s := proto.Size(x.NATS)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *ApplicationPubSub_MQTT:
-		s := proto.Size(x.MQTT)
-		n += 2 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // The NATS provider settings.
@@ -402,7 +339,7 @@ func (m *ApplicationPubSub_NATSProvider) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_ApplicationPubSub_NATSProvider.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -460,7 +397,7 @@ func (m *ApplicationPubSub_MQTTProvider) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_ApplicationPubSub_MQTTProvider.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -569,7 +506,7 @@ func (m *ApplicationPubSub_Message) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_ApplicationPubSub_Message.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -614,7 +551,7 @@ func (m *ApplicationPubSubs) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_ApplicationPubSubs.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -660,7 +597,7 @@ func (m *ApplicationPubSubFormats) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_ApplicationPubSubFormats.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -706,7 +643,7 @@ func (m *GetApplicationPubSubRequest) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_GetApplicationPubSubRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -752,7 +689,7 @@ func (m *ListApplicationPubSubsRequest) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_ListApplicationPubSubsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -798,7 +735,7 @@ func (m *SetApplicationPubSubRequest) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_SetApplicationPubSubRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1441,6 +1378,26 @@ type ApplicationPubSubRegistryServer interface {
 	Delete(context.Context, *ApplicationPubSubIdentifiers) (*types.Empty, error)
 }
 
+// UnimplementedApplicationPubSubRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedApplicationPubSubRegistryServer struct {
+}
+
+func (*UnimplementedApplicationPubSubRegistryServer) GetFormats(ctx context.Context, req *types.Empty) (*ApplicationPubSubFormats, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFormats not implemented")
+}
+func (*UnimplementedApplicationPubSubRegistryServer) Get(ctx context.Context, req *GetApplicationPubSubRequest) (*ApplicationPubSub, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedApplicationPubSubRegistryServer) List(ctx context.Context, req *ListApplicationPubSubsRequest) (*ApplicationPubSubs, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedApplicationPubSubRegistryServer) Set(ctx context.Context, req *SetApplicationPubSubRequest) (*ApplicationPubSub, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
+}
+func (*UnimplementedApplicationPubSubRegistryServer) Delete(ctx context.Context, req *ApplicationPubSubIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+
 func RegisterApplicationPubSubRegistryServer(s *grpc.Server, srv ApplicationPubSubRegistryServer) {
 	s.RegisterService(&_ApplicationPubSubRegistry_serviceDesc, srv)
 }
@@ -1567,7 +1524,7 @@ var _ApplicationPubSubRegistry_serviceDesc = grpc.ServiceDesc{
 func (m *ApplicationPubSubIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1575,31 +1532,39 @@ func (m *ApplicationPubSubIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationPubSubIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPubSubIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n1, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
 	if len(m.PubSubID) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.PubSubID)
+		copy(dAtA[i:], m.PubSubID)
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.PubSubID)))
-		i += copy(dAtA[i:], m.PubSubID)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationPubSub) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1607,194 +1572,237 @@ func (m *ApplicationPubSub) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationPubSub) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPubSub) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.ApplicationPubSubIdentifiers.Size()))
-	n2, err := m.ApplicationPubSubIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n3
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n4
-	if len(m.Format) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.Format)))
-		i += copy(dAtA[i:], m.Format)
-	}
-	if len(m.BaseTopic) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.BaseTopic)))
-		i += copy(dAtA[i:], m.BaseTopic)
-	}
-	if m.DownlinkPush != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkPush.Size()))
-		n5, err := m.DownlinkPush.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.Provider != nil {
+		{
+			size := m.Provider.Size()
+			i -= size
+			if _, err := m.Provider.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += n5
-	}
-	if m.DownlinkReplace != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkReplace.Size()))
-		n6, err := m.DownlinkReplace.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n6
-	}
-	if m.UplinkMessage != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.UplinkMessage.Size()))
-		n7, err := m.UplinkMessage.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	if m.JoinAccept != nil {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.JoinAccept.Size()))
-		n8, err := m.JoinAccept.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n8
-	}
-	if m.DownlinkAck != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkAck.Size()))
-		n9, err := m.DownlinkAck.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n9
-	}
-	if m.DownlinkNack != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkNack.Size()))
-		n10, err := m.DownlinkNack.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n10
-	}
-	if m.DownlinkSent != nil {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkSent.Size()))
-		n11, err := m.DownlinkSent.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n11
-	}
-	if m.DownlinkFailed != nil {
-		dAtA[i] = 0x72
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkFailed.Size()))
-		n12, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n12
-	}
-	if m.DownlinkQueued != nil {
-		dAtA[i] = 0x7a
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.DownlinkQueued.Size()))
-		n13, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n13
 	}
 	if m.LocationSolved != nil {
-		dAtA[i] = 0x82
-		i++
+		{
+			size, err := m.LocationSolved.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x1
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.LocationSolved.Size()))
-		n14, err := m.LocationSolved.MarshalTo(dAtA[i:])
+		i--
+		dAtA[i] = 0x82
+	}
+	if m.DownlinkQueued != nil {
+		{
+			size, err := m.DownlinkQueued.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x7a
+	}
+	if m.DownlinkFailed != nil {
+		{
+			size, err := m.DownlinkFailed.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x72
+	}
+	if m.DownlinkSent != nil {
+		{
+			size, err := m.DownlinkSent.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x6a
+	}
+	if m.DownlinkNack != nil {
+		{
+			size, err := m.DownlinkNack.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x62
+	}
+	if m.DownlinkAck != nil {
+		{
+			size, err := m.DownlinkAck.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x5a
+	}
+	if m.JoinAccept != nil {
+		{
+			size, err := m.JoinAccept.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x52
+	}
+	if m.UplinkMessage != nil {
+		{
+			size, err := m.UplinkMessage.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.DownlinkReplace != nil {
+		{
+			size, err := m.DownlinkReplace.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.DownlinkPush != nil {
+		{
+			size, err := m.DownlinkPush.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.BaseTopic) > 0 {
+		i -= len(m.BaseTopic)
+		copy(dAtA[i:], m.BaseTopic)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.BaseTopic)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.Format) > 0 {
+		i -= len(m.Format)
+		copy(dAtA[i:], m.Format)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.Format)))
+		i--
+		dAtA[i] = 0x22
+	}
+	n12, err12 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err12 != nil {
+		return 0, err12
+	}
+	i -= n12
+	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(n12))
+	i--
+	dAtA[i] = 0x1a
+	n13, err13 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err13 != nil {
+		return 0, err13
+	}
+	i -= n13
+	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(n13))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ApplicationPubSubIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n14
+		i -= size
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 	}
-	if m.Provider != nil {
-		nn15, err := m.Provider.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn15
-	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationPubSub_NATS) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationPubSub_NATS) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.NATS != nil {
-		dAtA[i] = 0x8a
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.NATS.Size()))
-		n16, err := m.NATS.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.NATS.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 		}
-		i += n16
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationPubSub_MQTT) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *ApplicationPubSub_MQTT) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.MQTT != nil {
-		dAtA[i] = 0xca
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.MQTT.Size()))
-		n17, err := m.MQTT.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.MQTT.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 		}
-		i += n17
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xca
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ApplicationPubSub_NATSProvider) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1802,23 +1810,29 @@ func (m *ApplicationPubSub_NATSProvider) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationPubSub_NATSProvider) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPubSub_NATSProvider) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.ServerURL) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.ServerURL)
+		copy(dAtA[i:], m.ServerURL)
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.ServerURL)))
-		i += copy(dAtA[i:], m.ServerURL)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationPubSub_MQTTProvider) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1826,79 +1840,91 @@ func (m *ApplicationPubSub_MQTTProvider) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationPubSub_MQTTProvider) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPubSub_MQTTProvider) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ServerURL) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.ServerURL)))
-		i += copy(dAtA[i:], m.ServerURL)
+	if len(m.TLSClientKey) > 0 {
+		i -= len(m.TLSClientKey)
+		copy(dAtA[i:], m.TLSClientKey)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.TLSClientKey)))
+		i--
+		dAtA[i] = 0x52
 	}
-	if len(m.ClientID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.ClientID)))
-		i += copy(dAtA[i:], m.ClientID)
+	if len(m.TLSClientCert) > 0 {
+		i -= len(m.TLSClientCert)
+		copy(dAtA[i:], m.TLSClientCert)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.TLSClientCert)))
+		i--
+		dAtA[i] = 0x4a
 	}
-	if len(m.Username) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.Username)))
-		i += copy(dAtA[i:], m.Username)
-	}
-	if len(m.Password) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.Password)))
-		i += copy(dAtA[i:], m.Password)
-	}
-	if m.SubscribeQoS != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.SubscribeQoS))
-	}
-	if m.PublishQoS != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.PublishQoS))
+	if len(m.TLSCA) > 0 {
+		i -= len(m.TLSCA)
+		copy(dAtA[i:], m.TLSCA)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.TLSCA)))
+		i--
+		dAtA[i] = 0x42
 	}
 	if m.UseTLS {
-		dAtA[i] = 0x38
-		i++
+		i--
 		if m.UseTLS {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x38
 	}
-	if len(m.TLSCA) > 0 {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.TLSCA)))
-		i += copy(dAtA[i:], m.TLSCA)
+	if m.PublishQoS != 0 {
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.PublishQoS))
+		i--
+		dAtA[i] = 0x30
 	}
-	if len(m.TLSClientCert) > 0 {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.TLSClientCert)))
-		i += copy(dAtA[i:], m.TLSClientCert)
+	if m.SubscribeQoS != 0 {
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.SubscribeQoS))
+		i--
+		dAtA[i] = 0x28
 	}
-	if len(m.TLSClientKey) > 0 {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.TLSClientKey)))
-		i += copy(dAtA[i:], m.TLSClientKey)
+	if len(m.Password) > 0 {
+		i -= len(m.Password)
+		copy(dAtA[i:], m.Password)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.Password)))
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	if len(m.Username) > 0 {
+		i -= len(m.Username)
+		copy(dAtA[i:], m.Username)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.Username)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ClientID) > 0 {
+		i -= len(m.ClientID)
+		copy(dAtA[i:], m.ClientID)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.ClientID)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.ServerURL) > 0 {
+		i -= len(m.ServerURL)
+		copy(dAtA[i:], m.ServerURL)
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.ServerURL)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationPubSub_Message) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1906,23 +1932,29 @@ func (m *ApplicationPubSub_Message) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationPubSub_Message) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPubSub_Message) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Topic) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.Topic)
+		copy(dAtA[i:], m.Topic)
 		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(m.Topic)))
-		i += copy(dAtA[i:], m.Topic)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationPubSubs) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1930,29 +1962,36 @@ func (m *ApplicationPubSubs) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationPubSubs) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPubSubs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Pubsubs) > 0 {
-		for _, msg := range m.Pubsubs {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Pubsubs) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Pubsubs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationPubSubFormats) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1960,34 +1999,41 @@ func (m *ApplicationPubSubFormats) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationPubSubFormats) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationPubSubFormats) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Formats) > 0 {
 		for k := range m.Formats {
-			dAtA[i] = 0xa
-			i++
 			v := m.Formats[k]
-			mapSize := 1 + len(k) + sovApplicationserverPubsub(uint64(len(k))) + 1 + len(v) + sovApplicationserverPubsub(uint64(len(v)))
-			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GetApplicationPubSubRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1995,33 +2041,42 @@ func (m *GetApplicationPubSubRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetApplicationPubSubRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetApplicationPubSubRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.ApplicationPubSubIdentifiers.Size()))
-	n18, err := m.ApplicationPubSubIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 	}
-	i += n18
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.FieldMask.Size()))
-	n19, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationPubSubIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 	}
-	i += n19
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListApplicationPubSubsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2029,33 +2084,42 @@ func (m *ListApplicationPubSubsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListApplicationPubSubsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListApplicationPubSubsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n20, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 	}
-	i += n20
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.FieldMask.Size()))
-	n21, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 	}
-	i += n21
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *SetApplicationPubSubRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2063,37 +2127,48 @@ func (m *SetApplicationPubSubRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SetApplicationPubSubRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SetApplicationPubSubRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.ApplicationPubSub.Size()))
-	n22, err := m.ApplicationPubSub.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 	}
-	i += n22
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(m.FieldMask.Size()))
-	n23, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationPubSub.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverPubsub(dAtA, i, uint64(size))
 	}
-	i += n23
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintApplicationserverPubsub(dAtA []byte, offset int, v uint64) int {
+	offset -= sovApplicationserverPubsub(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedApplicationPubSubIdentifiers(r randyApplicationserverPubsub, easy bool) *ApplicationPubSubIdentifiers {
 	this := &ApplicationPubSubIdentifiers{}
@@ -2115,34 +2190,34 @@ func NewPopulatedApplicationPubSub(r randyApplicationserverPubsub, easy bool) *A
 	this.UpdatedAt = *v4
 	this.Format = randStringApplicationserverPubsub(r)
 	this.BaseTopic = randStringApplicationserverPubsub(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkPush = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkReplace = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.UplinkMessage = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.JoinAccept = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkAck = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkNack = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkSent = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkFailed = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkQueued = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LocationSolved = NewPopulatedApplicationPubSub_Message(r, easy)
 	}
 	oneofNumber_Provider := []int32{17, 25}[r.Intn(2)]
@@ -2214,7 +2289,7 @@ func NewPopulatedApplicationPubSub_Message(r randyApplicationserverPubsub, easy 
 
 func NewPopulatedApplicationPubSubs(r randyApplicationserverPubsub, easy bool) *ApplicationPubSubs {
 	this := &ApplicationPubSubs{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v8 := r.Intn(5)
 		this.Pubsubs = make([]*ApplicationPubSub, v8)
 		for i := 0; i < v8; i++ {
@@ -2228,7 +2303,7 @@ func NewPopulatedApplicationPubSubs(r randyApplicationserverPubsub, easy bool) *
 
 func NewPopulatedApplicationPubSubFormats(r randyApplicationserverPubsub, easy bool) *ApplicationPubSubFormats {
 	this := &ApplicationPubSubFormats{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v9 := r.Intn(10)
 		this.Formats = make(map[string]string)
 		for i := 0; i < v9; i++ {
@@ -2594,14 +2669,7 @@ func (m *SetApplicationPubSubRequest) Size() (n int) {
 }
 
 func sovApplicationserverPubsub(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplicationserverPubsub(x uint64) (n int) {
 	return sovApplicationserverPubsub((x << 1) ^ uint64((int64(x) >> 63)))
@@ -2611,7 +2679,7 @@ func (this *ApplicationPubSubIdentifiers) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ApplicationPubSubIdentifiers{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`PubSubID:` + fmt.Sprintf("%v", this.PubSubID) + `,`,
 		`}`,
 	}, "")
@@ -2623,8 +2691,8 @@ func (this *ApplicationPubSub) String() string {
 	}
 	s := strings.Join([]string{`&ApplicationPubSub{`,
 		`ApplicationPubSubIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationPubSubIdentifiers.String(), "ApplicationPubSubIdentifiers", "ApplicationPubSubIdentifiers", 1), `&`, ``, 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`Format:` + fmt.Sprintf("%v", this.Format) + `,`,
 		`BaseTopic:` + fmt.Sprintf("%v", this.BaseTopic) + `,`,
 		`DownlinkPush:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkPush), "ApplicationPubSub_Message", "ApplicationPubSub_Message", 1) + `,`,
@@ -2705,8 +2773,13 @@ func (this *ApplicationPubSubs) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForPubsubs := "[]*ApplicationPubSub{"
+	for _, f := range this.Pubsubs {
+		repeatedStringForPubsubs += strings.Replace(f.String(), "ApplicationPubSub", "ApplicationPubSub", 1) + ","
+	}
+	repeatedStringForPubsubs += "}"
 	s := strings.Join([]string{`&ApplicationPubSubs{`,
-		`Pubsubs:` + strings.Replace(fmt.Sprintf("%v", this.Pubsubs), "ApplicationPubSub", "ApplicationPubSub", 1) + `,`,
+		`Pubsubs:` + repeatedStringForPubsubs + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2737,7 +2810,7 @@ func (this *GetApplicationPubSubRequest) String() string {
 	}
 	s := strings.Join([]string{`&GetApplicationPubSubRequest{`,
 		`ApplicationPubSubIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationPubSubIdentifiers.String(), "ApplicationPubSubIdentifiers", "ApplicationPubSubIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2747,8 +2820,8 @@ func (this *ListApplicationPubSubsRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListApplicationPubSubsRequest{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2759,7 +2832,7 @@ func (this *SetApplicationPubSubRequest) String() string {
 	}
 	s := strings.Join([]string{`&SetApplicationPubSubRequest{`,
 		`ApplicationPubSub:` + strings.Replace(strings.Replace(this.ApplicationPubSub.String(), "ApplicationPubSub", "ApplicationPubSub", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

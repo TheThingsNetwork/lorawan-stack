@@ -66,6 +66,65 @@ func request_Gs_GetGatewayConnectionStats_0(ctx context.Context, marshaler runti
 
 }
 
+func local_request_Gs_GetGatewayConnectionStats_0(ctx context.Context, marshaler runtime.Marshaler, server GsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GatewayIdentifiers
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["gateway_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
+	}
+
+	protoReq.GatewayID, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Gs_GetGatewayConnectionStats_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.GetGatewayConnectionStats(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+// RegisterGsHandlerServer registers the http handlers for service Gs to "mux".
+// UnaryRPC     :call GsServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+func RegisterGsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server GsServer) error {
+
+	mux.Handle("GET", pattern_Gs_GetGatewayConnectionStats_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Gs_GetGatewayConnectionStats_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Gs_GetGatewayConnectionStats_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
 // RegisterGsHandlerFromEndpoint is same as RegisterGsHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterGsHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {

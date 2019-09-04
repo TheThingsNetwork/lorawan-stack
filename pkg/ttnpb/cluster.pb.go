@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -27,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // PeerInfo
 type PeerInfo struct {
@@ -56,7 +57,7 @@ func (m *PeerInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_PeerInfo.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -194,7 +195,7 @@ func (this *PeerInfo) Equal(that interface{}) bool {
 func (m *PeerInfo) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -202,24 +203,33 @@ func (m *PeerInfo) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *PeerInfo) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PeerInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.GRPCPort != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintCluster(dAtA, i, uint64(m.GRPCPort))
-	}
-	if m.TLS {
-		dAtA[i] = 0x10
-		i++
-		if m.TLS {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
+	if len(m.Tags) > 0 {
+		for k := range m.Tags {
+			v := m.Tags[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintCluster(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintCluster(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintCluster(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x22
 		}
-		i++
 	}
 	if len(m.Roles) > 0 {
 		dAtA2 := make([]byte, len(m.Roles)*10)
@@ -233,39 +243,40 @@ func (m *PeerInfo) MarshalTo(dAtA []byte) (int, error) {
 			dAtA2[j1] = uint8(num)
 			j1++
 		}
-		dAtA[i] = 0x1a
-		i++
+		i -= j1
+		copy(dAtA[i:], dAtA2[:j1])
 		i = encodeVarintCluster(dAtA, i, uint64(j1))
-		i += copy(dAtA[i:], dAtA2[:j1])
+		i--
+		dAtA[i] = 0x1a
 	}
-	if len(m.Tags) > 0 {
-		for k := range m.Tags {
-			dAtA[i] = 0x22
-			i++
-			v := m.Tags[k]
-			mapSize := 1 + len(k) + sovCluster(uint64(len(k))) + 1 + len(v) + sovCluster(uint64(len(v)))
-			i = encodeVarintCluster(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintCluster(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintCluster(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+	if m.TLS {
+		i--
+		if m.TLS {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
 		}
+		i--
+		dAtA[i] = 0x10
 	}
-	return i, nil
+	if m.GRPCPort != 0 {
+		i = encodeVarintCluster(dAtA, i, uint64(m.GRPCPort))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintCluster(dAtA []byte, offset int, v uint64) int {
+	offset -= sovCluster(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedPeerInfo(r randyCluster, easy bool) *PeerInfo {
 	this := &PeerInfo{}
@@ -276,7 +287,7 @@ func NewPopulatedPeerInfo(r randyCluster, easy bool) *PeerInfo {
 	for i := 0; i < v1; i++ {
 		this.Roles[i] = ClusterRole([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}[r.Intn(10)])
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v2 := r.Intn(10)
 		this.Tags = make(map[string]string)
 		for i := 0; i < v2; i++ {
@@ -391,14 +402,7 @@ func (m *PeerInfo) Size() (n int) {
 }
 
 func sovCluster(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozCluster(x uint64) (n int) {
 	return sovCluster((x << 1) ^ uint64((int64(x) >> 63)))

@@ -14,6 +14,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 func init() {
 	proto.RegisterFile("lorawan-stack/api/end_device_services.proto", fileDescriptor_36b7c5a531ab03ac)
@@ -179,6 +181,29 @@ type EndDeviceRegistryServer interface {
 	List(context.Context, *ListEndDevicesRequest) (*EndDevices, error)
 	Update(context.Context, *UpdateEndDeviceRequest) (*EndDevice, error)
 	Delete(context.Context, *EndDeviceIdentifiers) (*types.Empty, error)
+}
+
+// UnimplementedEndDeviceRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedEndDeviceRegistryServer struct {
+}
+
+func (*UnimplementedEndDeviceRegistryServer) Create(ctx context.Context, req *CreateEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedEndDeviceRegistryServer) Get(ctx context.Context, req *GetEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedEndDeviceRegistryServer) GetIdentifiersForEUIs(ctx context.Context, req *GetEndDeviceIdentifiersForEUIsRequest) (*EndDeviceIdentifiers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIdentifiersForEUIs not implemented")
+}
+func (*UnimplementedEndDeviceRegistryServer) List(ctx context.Context, req *ListEndDevicesRequest) (*EndDevices, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedEndDeviceRegistryServer) Update(ctx context.Context, req *UpdateEndDeviceRequest) (*EndDevice, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedEndDeviceRegistryServer) Delete(ctx context.Context, req *EndDeviceIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 
 func RegisterEndDeviceRegistryServer(s *grpc.Server, srv EndDeviceRegistryServer) {
@@ -391,6 +416,17 @@ type EndDeviceTemplateConverterServer interface {
 	ListFormats(context.Context, *types.Empty) (*EndDeviceTemplateFormats, error)
 	// Converts the binary data to a stream of end device templates.
 	Convert(*ConvertEndDeviceTemplateRequest, EndDeviceTemplateConverter_ConvertServer) error
+}
+
+// UnimplementedEndDeviceTemplateConverterServer can be embedded to have forward compatible implementations.
+type UnimplementedEndDeviceTemplateConverterServer struct {
+}
+
+func (*UnimplementedEndDeviceTemplateConverterServer) ListFormats(ctx context.Context, req *types.Empty) (*EndDeviceTemplateFormats, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFormats not implemented")
+}
+func (*UnimplementedEndDeviceTemplateConverterServer) Convert(req *ConvertEndDeviceTemplateRequest, srv EndDeviceTemplateConverter_ConvertServer) error {
+	return status.Errorf(codes.Unimplemented, "method Convert not implemented")
 }
 
 func RegisterEndDeviceTemplateConverterServer(s *grpc.Server, srv EndDeviceTemplateConverterServer) {

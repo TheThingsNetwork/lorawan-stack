@@ -14,6 +14,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 func init() {
 	proto.RegisterFile("lorawan-stack/api/user_services.proto", fileDescriptor_82df9ba9356987c4)
@@ -196,6 +198,29 @@ type UserRegistryServer interface {
 	CreateTemporaryPassword(context.Context, *CreateTemporaryPasswordRequest) (*types.Empty, error)
 	UpdatePassword(context.Context, *UpdateUserPasswordRequest) (*types.Empty, error)
 	Delete(context.Context, *UserIdentifiers) (*types.Empty, error)
+}
+
+// UnimplementedUserRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedUserRegistryServer struct {
+}
+
+func (*UnimplementedUserRegistryServer) Create(ctx context.Context, req *CreateUserRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedUserRegistryServer) Get(ctx context.Context, req *GetUserRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedUserRegistryServer) Update(ctx context.Context, req *UpdateUserRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedUserRegistryServer) CreateTemporaryPassword(ctx context.Context, req *CreateTemporaryPasswordRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTemporaryPassword not implemented")
+}
+func (*UnimplementedUserRegistryServer) UpdatePassword(ctx context.Context, req *UpdateUserPasswordRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePassword not implemented")
+}
+func (*UnimplementedUserRegistryServer) Delete(ctx context.Context, req *UserIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 
 func RegisterUserRegistryServer(s *grpc.Server, srv UserRegistryServer) {
@@ -422,6 +447,26 @@ type UserAccessServer interface {
 	UpdateAPIKey(context.Context, *UpdateUserAPIKeyRequest) (*APIKey, error)
 }
 
+// UnimplementedUserAccessServer can be embedded to have forward compatible implementations.
+type UnimplementedUserAccessServer struct {
+}
+
+func (*UnimplementedUserAccessServer) ListRights(ctx context.Context, req *UserIdentifiers) (*Rights, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRights not implemented")
+}
+func (*UnimplementedUserAccessServer) CreateAPIKey(ctx context.Context, req *CreateUserAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAPIKey not implemented")
+}
+func (*UnimplementedUserAccessServer) ListAPIKeys(ctx context.Context, req *ListUserAPIKeysRequest) (*APIKeys, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAPIKeys not implemented")
+}
+func (*UnimplementedUserAccessServer) GetAPIKey(ctx context.Context, req *GetUserAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAPIKey not implemented")
+}
+func (*UnimplementedUserAccessServer) UpdateAPIKey(ctx context.Context, req *UpdateUserAPIKeyRequest) (*APIKey, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAPIKey not implemented")
+}
+
 func RegisterUserAccessServer(s *grpc.Server, srv UserAccessServer) {
 	s.RegisterService(&_UserAccess_serviceDesc, srv)
 }
@@ -596,6 +641,20 @@ type UserInvitationRegistryServer interface {
 	Delete(context.Context, *DeleteInvitationRequest) (*types.Empty, error)
 }
 
+// UnimplementedUserInvitationRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedUserInvitationRegistryServer struct {
+}
+
+func (*UnimplementedUserInvitationRegistryServer) Send(ctx context.Context, req *SendInvitationRequest) (*Invitation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Send not implemented")
+}
+func (*UnimplementedUserInvitationRegistryServer) List(ctx context.Context, req *ListInvitationsRequest) (*Invitations, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedUserInvitationRegistryServer) Delete(ctx context.Context, req *DeleteInvitationRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+
 func RegisterUserInvitationRegistryServer(s *grpc.Server, srv UserInvitationRegistryServer) {
 	s.RegisterService(&_UserInvitationRegistry_serviceDesc, srv)
 }
@@ -713,6 +772,17 @@ func (c *userSessionRegistryClient) Delete(ctx context.Context, in *UserSessionI
 type UserSessionRegistryServer interface {
 	List(context.Context, *ListUserSessionsRequest) (*UserSessions, error)
 	Delete(context.Context, *UserSessionIdentifiers) (*types.Empty, error)
+}
+
+// UnimplementedUserSessionRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedUserSessionRegistryServer struct {
+}
+
+func (*UnimplementedUserSessionRegistryServer) List(ctx context.Context, req *ListUserSessionsRequest) (*UserSessions, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedUserSessionRegistryServer) Delete(ctx context.Context, req *UserSessionIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 
 func RegisterUserSessionRegistryServer(s *grpc.Server, srv UserSessionRegistryServer) {

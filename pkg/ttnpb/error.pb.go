@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -26,7 +27,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Error details that are communicated over gRPC (and HTTP) APIs.
 // The messages (for translation) are stored as "error:<namespace>:<name>".
@@ -67,7 +68,7 @@ func (m *ErrorDetails) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_ErrorDetails.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -239,7 +240,7 @@ func (this *ErrorDetails) Equal(that interface{}) bool {
 func (m *ErrorDetails) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -247,97 +248,114 @@ func (m *ErrorDetails) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ErrorDetails) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ErrorDetails) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Namespace) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintError(dAtA, i, uint64(len(m.Namespace)))
-		i += copy(dAtA[i:], m.Namespace)
-	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintError(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.MessageFormat) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintError(dAtA, i, uint64(len(m.MessageFormat)))
-		i += copy(dAtA[i:], m.MessageFormat)
-	}
-	if m.Attributes != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintError(dAtA, i, uint64(m.Attributes.Size()))
-		n1, err := m.Attributes.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.Details) > 0 {
+		for iNdEx := len(m.Details) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Details[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintError(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x42
 		}
-		i += n1
-	}
-	if len(m.CorrelationID) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintError(dAtA, i, uint64(len(m.CorrelationID)))
-		i += copy(dAtA[i:], m.CorrelationID)
-	}
-	if m.Cause != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintError(dAtA, i, uint64(m.Cause.Size()))
-		n2, err := m.Cause.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
 	}
 	if m.Code != 0 {
-		dAtA[i] = 0x38
-		i++
 		i = encodeVarintError(dAtA, i, uint64(m.Code))
+		i--
+		dAtA[i] = 0x38
 	}
-	if len(m.Details) > 0 {
-		for _, msg := range m.Details {
-			dAtA[i] = 0x42
-			i++
-			i = encodeVarintError(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.Cause != nil {
+		{
+			size, err := m.Cause.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintError(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x32
 	}
-	return i, nil
+	if len(m.CorrelationID) > 0 {
+		i -= len(m.CorrelationID)
+		copy(dAtA[i:], m.CorrelationID)
+		i = encodeVarintError(dAtA, i, uint64(len(m.CorrelationID)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Attributes != nil {
+		{
+			size, err := m.Attributes.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintError(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.MessageFormat) > 0 {
+		i -= len(m.MessageFormat)
+		copy(dAtA[i:], m.MessageFormat)
+		i = encodeVarintError(dAtA, i, uint64(len(m.MessageFormat)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintError(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Namespace) > 0 {
+		i -= len(m.Namespace)
+		copy(dAtA[i:], m.Namespace)
+		i = encodeVarintError(dAtA, i, uint64(len(m.Namespace)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintError(dAtA []byte, offset int, v uint64) int {
+	offset -= sovError(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedErrorDetails(r randyError, easy bool) *ErrorDetails {
 	this := &ErrorDetails{}
 	this.Namespace = randStringError(r)
 	this.Name = randStringError(r)
 	this.MessageFormat = randStringError(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Attributes = types.NewPopulatedStruct(r, easy)
 	}
 	this.CorrelationID = randStringError(r)
-	if r.Intn(10) == 0 {
+	if r.Intn(5) == 0 {
 		this.Cause = NewPopulatedErrorDetails(r, easy)
 	}
 	this.Code = r.Uint32()
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(5)
 		this.Details = make([]*types.Any, v1)
 		for i := 0; i < v1; i++ {
@@ -464,14 +482,7 @@ func (m *ErrorDetails) Size() (n int) {
 }
 
 func sovError(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozError(x uint64) (n int) {
 	return sovError((x << 1) ^ uint64((int64(x) >> 63)))
@@ -480,15 +491,20 @@ func (this *ErrorDetails) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForDetails := "[]*Any{"
+	for _, f := range this.Details {
+		repeatedStringForDetails += strings.Replace(fmt.Sprintf("%v", f), "Any", "types.Any", 1) + ","
+	}
+	repeatedStringForDetails += "}"
 	s := strings.Join([]string{`&ErrorDetails{`,
 		`Namespace:` + fmt.Sprintf("%v", this.Namespace) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`MessageFormat:` + fmt.Sprintf("%v", this.MessageFormat) + `,`,
 		`Attributes:` + strings.Replace(fmt.Sprintf("%v", this.Attributes), "Struct", "types.Struct", 1) + `,`,
 		`CorrelationID:` + fmt.Sprintf("%v", this.CorrelationID) + `,`,
-		`Cause:` + strings.Replace(fmt.Sprintf("%v", this.Cause), "ErrorDetails", "ErrorDetails", 1) + `,`,
+		`Cause:` + strings.Replace(this.Cause.String(), "ErrorDetails", "ErrorDetails", 1) + `,`,
 		`Code:` + fmt.Sprintf("%v", this.Code) + `,`,
-		`Details:` + strings.Replace(fmt.Sprintf("%v", this.Details), "Any", "types.Any", 1) + `,`,
+		`Details:` + repeatedStringForDetails + `,`,
 		`}`,
 	}, "")
 	return s

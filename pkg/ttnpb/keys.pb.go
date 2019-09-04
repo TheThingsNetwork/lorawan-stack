@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -28,7 +29,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type KeyEnvelope struct {
 	// The unencrypted AES key.
@@ -53,7 +54,7 @@ func (m *KeyEnvelope) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_KeyEnvelope.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +113,7 @@ func (m *RootKeys) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_RootKeys.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -187,7 +188,7 @@ func (m *SessionKeys) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_SessionKeys.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -400,7 +401,7 @@ func (this *SessionKeys) Equal(that interface{}) bool {
 func (m *KeyEnvelope) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -408,39 +409,48 @@ func (m *KeyEnvelope) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *KeyEnvelope) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *KeyEnvelope) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Key != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(m.Key.Size()))
-		n1, err := m.Key.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
+	if len(m.EncryptedKey) > 0 {
+		i -= len(m.EncryptedKey)
+		copy(dAtA[i:], m.EncryptedKey)
+		i = encodeVarintKeys(dAtA, i, uint64(len(m.EncryptedKey)))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if len(m.KEKLabel) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.KEKLabel)
+		copy(dAtA[i:], m.KEKLabel)
 		i = encodeVarintKeys(dAtA, i, uint64(len(m.KEKLabel)))
-		i += copy(dAtA[i:], m.KEKLabel)
+		i--
+		dAtA[i] = 0x12
 	}
-	if len(m.EncryptedKey) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(len(m.EncryptedKey)))
-		i += copy(dAtA[i:], m.EncryptedKey)
+	if m.Key != nil {
+		{
+			size := m.Key.Size()
+			i -= size
+			if _, err := m.Key.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintKeys(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *RootKeys) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -448,43 +458,53 @@ func (m *RootKeys) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *RootKeys) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RootKeys) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.RootKeyID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(len(m.RootKeyID)))
-		i += copy(dAtA[i:], m.RootKeyID)
+	if m.NwkKey != nil {
+		{
+			size, err := m.NwkKey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintKeys(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.AppKey != nil {
+		{
+			size, err := m.AppKey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintKeys(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x12
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(m.AppKey.Size()))
-		n2, err := m.AppKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
 	}
-	if m.NwkKey != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(m.NwkKey.Size()))
-		n3, err := m.NwkKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
+	if len(m.RootKeyID) > 0 {
+		i -= len(m.RootKeyID)
+		copy(dAtA[i:], m.RootKeyID)
+		i = encodeVarintKeys(dAtA, i, uint64(len(m.RootKeyID)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *SessionKeys) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -492,67 +512,83 @@ func (m *SessionKeys) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SessionKeys) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SessionKeys) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionKeyID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(len(m.SessionKeyID)))
-		i += copy(dAtA[i:], m.SessionKeyID)
-	}
-	if m.FNwkSIntKey != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(m.FNwkSIntKey.Size()))
-		n4, err := m.FNwkSIntKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.AppSKey != nil {
+		{
+			size, err := m.AppSKey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintKeys(dAtA, i, uint64(size))
 		}
-		i += n4
-	}
-	if m.SNwkSIntKey != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(m.SNwkSIntKey.Size()))
-		n5, err := m.SNwkSIntKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
+		i--
+		dAtA[i] = 0x2a
 	}
 	if m.NwkSEncKey != nil {
+		{
+			size, err := m.NwkSEncKey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintKeys(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x22
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(m.NwkSEncKey.Size()))
-		n6, err := m.NwkSEncKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n6
 	}
-	if m.AppSKey != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintKeys(dAtA, i, uint64(m.AppSKey.Size()))
-		n7, err := m.AppSKey.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.SNwkSIntKey != nil {
+		{
+			size, err := m.SNwkSIntKey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintKeys(dAtA, i, uint64(size))
 		}
-		i += n7
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	if m.FNwkSIntKey != nil {
+		{
+			size, err := m.FNwkSIntKey.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintKeys(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.SessionKeyID) > 0 {
+		i -= len(m.SessionKeyID)
+		copy(dAtA[i:], m.SessionKeyID)
+		i = encodeVarintKeys(dAtA, i, uint64(len(m.SessionKeyID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintKeys(dAtA []byte, offset int, v uint64) int {
+	offset -= sovKeys(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedKeyEnvelope(r randyKeys, easy bool) *KeyEnvelope {
 	this := &KeyEnvelope{}
@@ -571,10 +607,10 @@ func NewPopulatedKeyEnvelope(r randyKeys, easy bool) *KeyEnvelope {
 func NewPopulatedRootKeys(r randyKeys, easy bool) *RootKeys {
 	this := &RootKeys{}
 	this.RootKeyID = randStringKeys(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.AppKey = NewPopulatedKeyEnvelope(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.NwkKey = NewPopulatedKeyEnvelope(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -726,14 +762,7 @@ func (m *SessionKeys) Size() (n int) {
 }
 
 func sovKeys(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozKeys(x uint64) (n int) {
 	return sovKeys((x << 1) ^ uint64((int64(x) >> 63)))
@@ -756,8 +785,8 @@ func (this *RootKeys) String() string {
 	}
 	s := strings.Join([]string{`&RootKeys{`,
 		`RootKeyID:` + fmt.Sprintf("%v", this.RootKeyID) + `,`,
-		`AppKey:` + strings.Replace(fmt.Sprintf("%v", this.AppKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
-		`NwkKey:` + strings.Replace(fmt.Sprintf("%v", this.NwkKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`AppKey:` + strings.Replace(this.AppKey.String(), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`NwkKey:` + strings.Replace(this.NwkKey.String(), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -768,10 +797,10 @@ func (this *SessionKeys) String() string {
 	}
 	s := strings.Join([]string{`&SessionKeys{`,
 		`SessionKeyID:` + fmt.Sprintf("%v", this.SessionKeyID) + `,`,
-		`FNwkSIntKey:` + strings.Replace(fmt.Sprintf("%v", this.FNwkSIntKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
-		`SNwkSIntKey:` + strings.Replace(fmt.Sprintf("%v", this.SNwkSIntKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
-		`NwkSEncKey:` + strings.Replace(fmt.Sprintf("%v", this.NwkSEncKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
-		`AppSKey:` + strings.Replace(fmt.Sprintf("%v", this.AppSKey), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`FNwkSIntKey:` + strings.Replace(this.FNwkSIntKey.String(), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`SNwkSIntKey:` + strings.Replace(this.SNwkSIntKey.String(), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`NwkSEncKey:` + strings.Replace(this.NwkSEncKey.String(), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
+		`AppSKey:` + strings.Replace(this.AppSKey.String(), "KeyEnvelope", "KeyEnvelope", 1) + `,`,
 		`}`,
 	}, "")
 	return s

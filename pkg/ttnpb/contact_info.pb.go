@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strconv "strconv"
 	strings "strings"
@@ -20,6 +21,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -33,7 +36,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ContactType int32
 
@@ -109,7 +112,7 @@ func (m *ContactInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_ContactInfo.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -187,7 +190,7 @@ func (m *ContactInfoValidation) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_ContactInfoValidation.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -477,6 +480,17 @@ type ContactInfoRegistryServer interface {
 	Validate(context.Context, *ContactInfoValidation) (*types.Empty, error)
 }
 
+// UnimplementedContactInfoRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedContactInfoRegistryServer struct {
+}
+
+func (*UnimplementedContactInfoRegistryServer) RequestValidation(ctx context.Context, req *EntityIdentifiers) (*ContactInfoValidation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestValidation not implemented")
+}
+func (*UnimplementedContactInfoRegistryServer) Validate(ctx context.Context, req *ContactInfoValidation) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Validate not implemented")
+}
+
 func RegisterContactInfoRegistryServer(s *grpc.Server, srv ContactInfoRegistryServer) {
 	s.RegisterService(&_ContactInfoRegistry_serviceDesc, srv)
 }
@@ -537,7 +551,7 @@ var _ContactInfoRegistry_serviceDesc = grpc.ServiceDesc{
 func (m *ContactInfo) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -545,53 +559,59 @@ func (m *ContactInfo) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ContactInfo) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ContactInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ContactType != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(m.ContactType))
-	}
-	if m.ContactMethod != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(m.ContactMethod))
-	}
-	if len(m.Value) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(len(m.Value)))
-		i += copy(dAtA[i:], m.Value)
+	if m.ValidatedAt != nil {
+		n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ValidatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ValidatedAt):])
+		if err1 != nil {
+			return 0, err1
+		}
+		i -= n1
+		i = encodeVarintContactInfo(dAtA, i, uint64(n1))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if m.Public {
-		dAtA[i] = 0x20
-		i++
+		i--
 		if m.Public {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x20
 	}
-	if m.ValidatedAt != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.ValidatedAt)))
-		n1, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ValidatedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintContactInfo(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	if m.ContactMethod != 0 {
+		i = encodeVarintContactInfo(dAtA, i, uint64(m.ContactMethod))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.ContactType != 0 {
+		i = encodeVarintContactInfo(dAtA, i, uint64(m.ContactType))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ContactInfoValidation) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -599,75 +619,88 @@ func (m *ContactInfoValidation) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ContactInfoValidation) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ContactInfoValidation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
-	}
-	if len(m.Token) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(len(m.Token)))
-		i += copy(dAtA[i:], m.Token)
-	}
-	if m.Entity != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(m.Entity.Size()))
-		n2, err := m.Entity.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.ExpiresAt != nil {
+		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ExpiresAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ExpiresAt):])
+		if err2 != nil {
+			return 0, err2
 		}
-		i += n2
+		i -= n2
+		i = encodeVarintContactInfo(dAtA, i, uint64(n2))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.CreatedAt != nil {
+		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.CreatedAt):])
+		if err3 != nil {
+			return 0, err3
+		}
+		i -= n3
+		i = encodeVarintContactInfo(dAtA, i, uint64(n3))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if len(m.ContactInfo) > 0 {
-		for _, msg := range m.ContactInfo {
+		for iNdEx := len(m.ContactInfo) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ContactInfo[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintContactInfo(dAtA, i, uint64(size))
+			}
+			i--
 			dAtA[i] = 0x22
-			i++
-			i = encodeVarintContactInfo(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+		}
+	}
+	if m.Entity != nil {
+		{
+			size, err := m.Entity.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintContactInfo(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x1a
 	}
-	if m.CreatedAt != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.CreatedAt)))
-		n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.CreatedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
+	if len(m.Token) > 0 {
+		i -= len(m.Token)
+		copy(dAtA[i:], m.Token)
+		i = encodeVarintContactInfo(dAtA, i, uint64(len(m.Token)))
+		i--
+		dAtA[i] = 0x12
 	}
-	if m.ExpiresAt != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintContactInfo(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.ExpiresAt)))
-		n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ExpiresAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
+	if len(m.ID) > 0 {
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
+		i = encodeVarintContactInfo(dAtA, i, uint64(len(m.ID)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintContactInfo(dAtA []byte, offset int, v uint64) int {
+	offset -= sovContactInfo(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedContactInfo(r randyContactInfo, easy bool) *ContactInfo {
 	this := &ContactInfo{}
@@ -675,7 +708,7 @@ func NewPopulatedContactInfo(r randyContactInfo, easy bool) *ContactInfo {
 	this.ContactMethod = ContactMethod([]int32{0, 1, 2}[r.Intn(3)])
 	this.Value = randStringContactInfo(r)
 	this.Public = bool(r.Intn(2) == 0)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ValidatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -687,20 +720,20 @@ func NewPopulatedContactInfoValidation(r randyContactInfo, easy bool) *ContactIn
 	this := &ContactInfoValidation{}
 	this.ID = randStringContactInfo(r)
 	this.Token = randStringContactInfo(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Entity = NewPopulatedEntityIdentifiers(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(5)
 		this.ContactInfo = make([]*ContactInfo, v1)
 		for i := 0; i < v1; i++ {
 			this.ContactInfo[i] = NewPopulatedContactInfo(r, easy)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.CreatedAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ExpiresAt = github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -842,14 +875,7 @@ func (m *ContactInfoValidation) Size() (n int) {
 }
 
 func sovContactInfo(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozContactInfo(x uint64) (n int) {
 	return sovContactInfo((x << 1) ^ uint64((int64(x) >> 63)))
@@ -872,11 +898,16 @@ func (this *ContactInfoValidation) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForContactInfo := "[]*ContactInfo{"
+	for _, f := range this.ContactInfo {
+		repeatedStringForContactInfo += strings.Replace(f.String(), "ContactInfo", "ContactInfo", 1) + ","
+	}
+	repeatedStringForContactInfo += "}"
 	s := strings.Join([]string{`&ContactInfoValidation{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Token:` + fmt.Sprintf("%v", this.Token) + `,`,
 		`Entity:` + strings.Replace(fmt.Sprintf("%v", this.Entity), "EntityIdentifiers", "EntityIdentifiers", 1) + `,`,
-		`ContactInfo:` + strings.Replace(fmt.Sprintf("%v", this.ContactInfo), "ContactInfo", "ContactInfo", 1) + `,`,
+		`ContactInfo:` + repeatedStringForContactInfo + `,`,
 		`CreatedAt:` + strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`ExpiresAt:` + strings.Replace(fmt.Sprintf("%v", this.ExpiresAt), "Timestamp", "types.Timestamp", 1) + `,`,
 		`}`,

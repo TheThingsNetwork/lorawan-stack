@@ -9,6 +9,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strconv "strconv"
 	strings "strings"
@@ -36,7 +37,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Power state of the device.
 type PowerState int32
@@ -95,7 +96,7 @@ func (m *Session) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Session.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -209,7 +210,7 @@ func (m *MACParameters) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return xxx_messageInfo_MACParameters.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -389,7 +390,7 @@ func (m *MACParameters_Channel) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_MACParameters_Channel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -466,7 +467,7 @@ func (m *EndDeviceBrand) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return xxx_messageInfo_EndDeviceBrand.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -534,7 +535,7 @@ func (m *EndDeviceModel) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return xxx_messageInfo_EndDeviceModel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -597,7 +598,7 @@ func (m *EndDeviceVersionIdentifiers) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_EndDeviceVersionIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -689,7 +690,7 @@ func (m *EndDeviceVersion) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_EndDeviceVersion.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -873,7 +874,7 @@ func (m *MACSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return xxx_messageInfo_MACSettings.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1058,7 +1059,7 @@ func (m *MACSettings_DataRateIndexValue) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_MACSettings_DataRateIndexValue.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1103,7 +1104,7 @@ func (m *MACSettings_PingSlotPeriodValue) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_MACSettings_PingSlotPeriodValue.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1148,7 +1149,7 @@ func (m *MACSettings_AggregatedDutyCycleValue) XXX_Marshal(b []byte, determinist
 		return xxx_messageInfo_MACSettings_AggregatedDutyCycleValue.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1193,7 +1194,7 @@ func (m *MACSettings_RxDelayValue) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_MACSettings_RxDelayValue.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1275,7 +1276,7 @@ func (m *MACState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_MACState.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1409,7 +1410,7 @@ func (m *MACState_JoinAccept) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_MACState_JoinAccept.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1471,7 +1472,7 @@ func (m *EndDeviceAuthenticationCode) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_EndDeviceAuthenticationCode.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1674,7 +1675,7 @@ func (m *EndDevice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_EndDevice.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2041,7 +2042,7 @@ func (m *EndDevices) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_EndDevices.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2086,7 +2087,7 @@ func (m *CreateEndDeviceRequest) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_CreateEndDeviceRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2125,7 +2126,7 @@ func (m *UpdateEndDeviceRequest) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_UpdateEndDeviceRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2171,7 +2172,7 @@ func (m *GetEndDeviceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_GetEndDeviceRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2217,7 +2218,7 @@ func (m *GetEndDeviceIdentifiersForEUIsRequest) XXX_Marshal(b []byte, determinis
 		return xxx_messageInfo_GetEndDeviceIdentifiersForEUIsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2263,7 +2264,7 @@ func (m *ListEndDevicesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_ListEndDevicesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2330,7 +2331,7 @@ func (m *SetEndDeviceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_SetEndDeviceRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2384,7 +2385,7 @@ func (m *EndDeviceTemplate) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_EndDeviceTemplate.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2444,7 +2445,7 @@ func (m *EndDeviceTemplateFormat) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_EndDeviceTemplateFormat.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2496,7 +2497,7 @@ func (m *EndDeviceTemplateFormats) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_EndDeviceTemplateFormats.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2544,7 +2545,7 @@ func (m *ConvertEndDeviceTemplateRequest) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_ConvertEndDeviceTemplateRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -4136,7 +4137,7 @@ func (this *ConvertEndDeviceTemplateRequest) Equal(that interface{}) bool {
 func (m *Session) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4144,61 +4145,70 @@ func (m *Session) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Session) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Session) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.DevAddr.Size()))
-	n1, err := m.DevAddr.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.StartedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.StartedAt):])
+	if err1 != nil {
+		return 0, err1
 	}
-	i += n1
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.SessionKeys.Size()))
-	n2, err := m.SessionKeys.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	if m.LastFCntUp != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastFCntUp))
-	}
-	if m.LastNFCntDown != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastNFCntDown))
+	i -= n1
+	i = encodeVarintEndDevice(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x42
+	if m.LastConfFCntDown != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastConfFCntDown))
+		i--
+		dAtA[i] = 0x38
 	}
 	if m.LastAFCntDown != 0 {
-		dAtA[i] = 0x30
-		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastAFCntDown))
+		i--
+		dAtA[i] = 0x30
 	}
-	if m.LastConfFCntDown != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastConfFCntDown))
+	if m.LastNFCntDown != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastNFCntDown))
+		i--
+		dAtA[i] = 0x28
 	}
-	dAtA[i] = 0x42
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.StartedAt)))
-	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.StartedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.LastFCntUp != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastFCntUp))
+		i--
+		dAtA[i] = 0x20
 	}
-	i += n3
-	return i, nil
+	{
+		size, err := m.SessionKeys.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size := m.DevAddr.Size()
+		i -= size
+		if _, err := m.DevAddr.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	return len(dAtA) - i, nil
 }
 
 func (m *MACParameters) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4206,142 +4216,153 @@ func (m *MACParameters) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACParameters) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACParameters) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.MaxEIRP != 0 {
-		dAtA[i] = 0xd
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.MaxEIRP)))
-		i += 4
-	}
-	if m.ADRDataRateIndex != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRDataRateIndex))
-	}
-	if m.ADRTxPowerIndex != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRTxPowerIndex))
-	}
-	if m.ADRNbTrans != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRNbTrans))
-	}
-	if m.ADRAckLimit != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRAckLimit))
-	}
-	if m.ADRAckDelay != 0 {
-		dAtA[i] = 0x40
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRAckDelay))
-	}
-	if m.Rx1Delay != 0 {
-		dAtA[i] = 0x48
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1Delay))
-	}
-	if m.Rx1DataRateOffset != 0 {
-		dAtA[i] = 0x50
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1DataRateOffset))
-	}
-	if m.Rx2DataRateIndex != 0 {
-		dAtA[i] = 0x58
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2DataRateIndex))
-	}
-	if m.Rx2Frequency != 0 {
-		dAtA[i] = 0x60
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.Rx2Frequency)
-	}
-	if m.MaxDutyCycle != 0 {
-		dAtA[i] = 0x68
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDutyCycle))
-	}
-	if m.RejoinTimePeriodicity != 0 {
-		dAtA[i] = 0x70
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.RejoinTimePeriodicity))
-	}
-	if m.RejoinCountPeriodicity != 0 {
-		dAtA[i] = 0x78
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.RejoinCountPeriodicity))
-	}
-	if m.PingSlotFrequency != 0 {
-		dAtA[i] = 0x80
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.PingSlotFrequency)
-	}
-	if m.PingSlotDataRateIndex != 0 {
-		dAtA[i] = 0x88
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotDataRateIndex))
-	}
-	if m.BeaconFrequency != 0 {
-		dAtA[i] = 0x90
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.BeaconFrequency)
-	}
-	if len(m.Channels) > 0 {
-		for _, msg := range m.Channels {
-			dAtA[i] = 0x9a
-			i++
-			dAtA[i] = 0x1
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.DownlinkDwellTime != nil {
+		{
+			size, err := m.DownlinkDwellTime.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xaa
 	}
 	if m.UplinkDwellTime != nil {
+		{
+			size, err := m.UplinkDwellTime.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
 		dAtA[i] = 0xa2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.UplinkDwellTime.Size()))
-		n4, err := m.UplinkDwellTime.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
 	}
-	if m.DownlinkDwellTime != nil {
-		dAtA[i] = 0xaa
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DownlinkDwellTime.Size()))
-		n5, err := m.DownlinkDwellTime.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.Channels) > 0 {
+		for iNdEx := len(m.Channels) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Channels[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEndDevice(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x9a
 		}
-		i += n5
 	}
-	return i, nil
+	if m.BeaconFrequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.BeaconFrequency)
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x90
+	}
+	if m.PingSlotDataRateIndex != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotDataRateIndex))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x88
+	}
+	if m.PingSlotFrequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.PingSlotFrequency)
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x80
+	}
+	if m.RejoinCountPeriodicity != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.RejoinCountPeriodicity))
+		i--
+		dAtA[i] = 0x78
+	}
+	if m.RejoinTimePeriodicity != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.RejoinTimePeriodicity))
+		i--
+		dAtA[i] = 0x70
+	}
+	if m.MaxDutyCycle != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDutyCycle))
+		i--
+		dAtA[i] = 0x68
+	}
+	if m.Rx2Frequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.Rx2Frequency)
+		i--
+		dAtA[i] = 0x60
+	}
+	if m.Rx2DataRateIndex != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2DataRateIndex))
+		i--
+		dAtA[i] = 0x58
+	}
+	if m.Rx1DataRateOffset != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1DataRateOffset))
+		i--
+		dAtA[i] = 0x50
+	}
+	if m.Rx1Delay != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1Delay))
+		i--
+		dAtA[i] = 0x48
+	}
+	if m.ADRAckDelay != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRAckDelay))
+		i--
+		dAtA[i] = 0x40
+	}
+	if m.ADRAckLimit != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRAckLimit))
+		i--
+		dAtA[i] = 0x38
+	}
+	if m.ADRNbTrans != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRNbTrans))
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.ADRTxPowerIndex != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRTxPowerIndex))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.ADRDataRateIndex != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRDataRateIndex))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.MaxEIRP != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.MaxEIRP)))
+		i--
+		dAtA[i] = 0xd
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACParameters_Channel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4349,47 +4370,52 @@ func (m *MACParameters_Channel) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACParameters_Channel) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACParameters_Channel) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.UplinkFrequency != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.UplinkFrequency)
-	}
-	if m.DownlinkFrequency != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.DownlinkFrequency)
-	}
-	if m.MinDataRateIndex != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MinDataRateIndex))
-	}
-	if m.MaxDataRateIndex != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDataRateIndex))
-	}
 	if m.EnableUplink {
-		dAtA[i] = 0x28
-		i++
+		i--
 		if m.EnableUplink {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x28
 	}
-	return i, nil
+	if m.MaxDataRateIndex != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDataRateIndex))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.MinDataRateIndex != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.MinDataRateIndex))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.DownlinkFrequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.DownlinkFrequency)
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.UplinkFrequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.UplinkFrequency)
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceBrand) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4397,50 +4423,52 @@ func (m *EndDeviceBrand) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceBrand) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceBrand) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
-	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.URL) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.URL)))
-		i += copy(dAtA[i:], m.URL)
-	}
 	if len(m.Logos) > 0 {
-		for _, s := range m.Logos {
+		for iNdEx := len(m.Logos) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Logos[iNdEx])
+			copy(dAtA[i:], m.Logos[iNdEx])
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Logos[iNdEx])))
+			i--
 			dAtA[i] = 0x22
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
 		}
 	}
-	return i, nil
+	if len(m.URL) > 0 {
+		i -= len(m.URL)
+		copy(dAtA[i:], m.URL)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.URL)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.ID) > 0 {
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceModel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4448,35 +4476,43 @@ func (m *EndDeviceModel) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceModel) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceModel) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.BrandID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.BrandID)))
-		i += copy(dAtA[i:], m.BrandID)
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if len(m.ID) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
+		i--
+		dAtA[i] = 0x12
 	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
+	if len(m.BrandID) > 0 {
+		i -= len(m.BrandID)
+		copy(dAtA[i:], m.BrandID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.BrandID)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceVersionIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4484,41 +4520,50 @@ func (m *EndDeviceVersionIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceVersionIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceVersionIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.BrandID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.BrandID)))
-		i += copy(dAtA[i:], m.BrandID)
-	}
-	if len(m.ModelID) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ModelID)))
-		i += copy(dAtA[i:], m.ModelID)
+	if len(m.FirmwareVersion) > 0 {
+		i -= len(m.FirmwareVersion)
+		copy(dAtA[i:], m.FirmwareVersion)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FirmwareVersion)))
+		i--
+		dAtA[i] = 0x22
 	}
 	if len(m.HardwareVersion) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.HardwareVersion)
+		copy(dAtA[i:], m.HardwareVersion)
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.HardwareVersion)))
-		i += copy(dAtA[i:], m.HardwareVersion)
+		i--
+		dAtA[i] = 0x1a
 	}
-	if len(m.FirmwareVersion) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FirmwareVersion)))
-		i += copy(dAtA[i:], m.FirmwareVersion)
+	if len(m.ModelID) > 0 {
+		i -= len(m.ModelID)
+		copy(dAtA[i:], m.ModelID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ModelID)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.BrandID) > 0 {
+		i -= len(m.BrandID)
+		copy(dAtA[i:], m.BrandID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.BrandID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceVersion) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4526,124 +4571,130 @@ func (m *EndDeviceVersion) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceVersion) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceVersion) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDeviceVersionIdentifiers.Size()))
-	n6, err := m.EndDeviceVersionIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n6
-	if m.LoRaWANVersion != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
-	}
-	if m.LoRaWANPHYVersion != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANPHYVersion))
-	}
-	if len(m.FrequencyPlanID) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FrequencyPlanID)))
-		i += copy(dAtA[i:], m.FrequencyPlanID)
-	}
-	if len(m.Photos) > 0 {
-		for _, s := range m.Photos {
-			dAtA[i] = 0x2a
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
-		}
-	}
-	if m.SupportsClassB {
-		dAtA[i] = 0x30
-		i++
-		if m.SupportsClassB {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.SupportsClassC {
-		dAtA[i] = 0x38
-		i++
-		if m.SupportsClassC {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.DefaultMACSettings != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultMACSettings.Size()))
-		n7, err := m.DefaultMACSettings.MarshalTo(dAtA[i:])
+	{
+		size, err := m.DefaultFormatters.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n7
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	if m.MinFrequency != 0 {
-		dAtA[i] = 0x48
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
-	}
-	if m.MaxFrequency != 0 {
-		dAtA[i] = 0x50
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
-	}
-	if m.SupportsJoin {
-		dAtA[i] = 0x58
-		i++
-		if m.SupportsJoin {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
+	i--
+	dAtA[i] = 0x6a
 	if m.ResetsJoinNonces {
-		dAtA[i] = 0x60
-		i++
+		i--
 		if m.ResetsJoinNonces {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x60
 	}
-	dAtA[i] = 0x6a
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.DefaultFormatters.Size()))
-	n8, err := m.DefaultFormatters.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.SupportsJoin {
+		i--
+		if m.SupportsJoin {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x58
 	}
-	i += n8
-	return i, nil
+	if m.MaxFrequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
+		i--
+		dAtA[i] = 0x50
+	}
+	if m.MinFrequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
+		i--
+		dAtA[i] = 0x48
+	}
+	if m.DefaultMACSettings != nil {
+		{
+			size, err := m.DefaultMACSettings.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.SupportsClassC {
+		i--
+		if m.SupportsClassC {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x38
+	}
+	if m.SupportsClassB {
+		i--
+		if m.SupportsClassB {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
+	}
+	if len(m.Photos) > 0 {
+		for iNdEx := len(m.Photos) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Photos[iNdEx])
+			copy(dAtA[i:], m.Photos[iNdEx])
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Photos[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if len(m.FrequencyPlanID) > 0 {
+		i -= len(m.FrequencyPlanID)
+		copy(dAtA[i:], m.FrequencyPlanID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FrequencyPlanID)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.LoRaWANPHYVersion != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANPHYVersion))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.LoRaWANVersion != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.EndDeviceVersionIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *MACSettings) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4651,246 +4702,286 @@ func (m *MACSettings) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACSettings) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACSettings) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ClassBTimeout != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.ClassBTimeout)))
-		n9, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.ClassBTimeout, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n9
-	}
-	if m.PingSlotPeriodicity != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotPeriodicity.Size()))
-		n10, err := m.PingSlotPeriodicity.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n10
-	}
-	if m.PingSlotDataRateIndex != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotDataRateIndex.Size()))
-		n11, err := m.PingSlotDataRateIndex.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n11
-	}
-	if m.PingSlotFrequency != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotFrequency.Size()))
-		n12, err := m.PingSlotFrequency.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n12
-	}
-	if m.ClassCTimeout != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.ClassCTimeout)))
-		n13, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.ClassCTimeout, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n13
-	}
-	if m.Rx1Delay != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1Delay.Size()))
-		n14, err := m.Rx1Delay.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n14
-	}
-	if m.Rx1DataRateOffset != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx1DataRateOffset.Size()))
-		n15, err := m.Rx1DataRateOffset.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n15
-	}
-	if m.Rx2DataRateIndex != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2DataRateIndex.Size()))
-		n16, err := m.Rx2DataRateIndex.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n16
-	}
-	if m.Rx2Frequency != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Rx2Frequency.Size()))
-		n17, err := m.Rx2Frequency.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n17
-	}
-	if len(m.FactoryPresetFrequencies) > 0 {
-		dAtA19 := make([]byte, len(m.FactoryPresetFrequencies)*10)
-		var j18 int
-		for _, num := range m.FactoryPresetFrequencies {
-			for num >= 1<<7 {
-				dAtA19[j18] = uint8(num&0x7f | 0x80)
-				num >>= 7
-				j18++
+	if m.DesiredRx2Frequency != nil {
+		{
+			size, err := m.DesiredRx2Frequency.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
 			}
-			dAtA19[j18] = uint8(num)
-			j18++
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
 		}
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(j18))
-		i += copy(dAtA[i:], dAtA19[:j18])
-	}
-	if m.MaxDutyCycle != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MaxDutyCycle.Size()))
-		n20, err := m.MaxDutyCycle.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n20
-	}
-	if m.Supports32BitFCnt != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Supports32BitFCnt.Size()))
-		n21, err := m.Supports32BitFCnt.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n21
-	}
-	if m.UseADR != nil {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.UseADR.Size()))
-		n22, err := m.UseADR.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n22
-	}
-	if m.ADRMargin != nil {
-		dAtA[i] = 0x72
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ADRMargin.Size()))
-		n23, err := m.ADRMargin.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n23
-	}
-	if m.ResetsFCnt != nil {
-		dAtA[i] = 0x7a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ResetsFCnt.Size()))
-		n24, err := m.ResetsFCnt.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n24
-	}
-	if m.StatusTimePeriodicity != nil {
-		dAtA[i] = 0x82
-		i++
+		i--
 		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.StatusTimePeriodicity)))
-		n25, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.StatusTimePeriodicity, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n25
-	}
-	if m.StatusCountPeriodicity != nil {
-		dAtA[i] = 0x8a
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.StatusCountPeriodicity.Size()))
-		n26, err := m.StatusCountPeriodicity.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n26
-	}
-	if m.DesiredRx1Delay != nil {
-		dAtA[i] = 0x92
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredRx1Delay.Size()))
-		n27, err := m.DesiredRx1Delay.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n27
-	}
-	if m.DesiredRx1DataRateOffset != nil {
-		dAtA[i] = 0x9a
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredRx1DataRateOffset.Size()))
-		n28, err := m.DesiredRx1DataRateOffset.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n28
+		i--
+		dAtA[i] = 0xaa
 	}
 	if m.DesiredRx2DataRateIndex != nil {
+		{
+			size, err := m.DesiredRx2DataRateIndex.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
 		dAtA[i] = 0xa2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredRx2DataRateIndex.Size()))
-		n29, err := m.DesiredRx2DataRateIndex.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n29
 	}
-	if m.DesiredRx2Frequency != nil {
-		dAtA[i] = 0xaa
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredRx2Frequency.Size()))
-		n30, err := m.DesiredRx2Frequency.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.DesiredRx1DataRateOffset != nil {
+		{
+			size, err := m.DesiredRx1DataRateOffset.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
 		}
-		i += n30
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x9a
 	}
-	return i, nil
+	if m.DesiredRx1Delay != nil {
+		{
+			size, err := m.DesiredRx1Delay.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x92
+	}
+	if m.StatusCountPeriodicity != nil {
+		{
+			size, err := m.StatusCountPeriodicity.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
+	}
+	if m.StatusTimePeriodicity != nil {
+		n13, err13 := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.StatusTimePeriodicity, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(*m.StatusTimePeriodicity):])
+		if err13 != nil {
+			return 0, err13
+		}
+		i -= n13
+		i = encodeVarintEndDevice(dAtA, i, uint64(n13))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
+	}
+	if m.ResetsFCnt != nil {
+		{
+			size, err := m.ResetsFCnt.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x7a
+	}
+	if m.ADRMargin != nil {
+		{
+			size, err := m.ADRMargin.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x72
+	}
+	if m.UseADR != nil {
+		{
+			size, err := m.UseADR.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x6a
+	}
+	if m.Supports32BitFCnt != nil {
+		{
+			size, err := m.Supports32BitFCnt.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x62
+	}
+	if m.MaxDutyCycle != nil {
+		{
+			size, err := m.MaxDutyCycle.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.FactoryPresetFrequencies) > 0 {
+		dAtA20 := make([]byte, len(m.FactoryPresetFrequencies)*10)
+		var j19 int
+		for _, num := range m.FactoryPresetFrequencies {
+			for num >= 1<<7 {
+				dAtA20[j19] = uint8(num&0x7f | 0x80)
+				num >>= 7
+				j19++
+			}
+			dAtA20[j19] = uint8(num)
+			j19++
+		}
+		i -= j19
+		copy(dAtA[i:], dAtA20[:j19])
+		i = encodeVarintEndDevice(dAtA, i, uint64(j19))
+		i--
+		dAtA[i] = 0x52
+	}
+	if m.Rx2Frequency != nil {
+		{
+			size, err := m.Rx2Frequency.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.Rx2DataRateIndex != nil {
+		{
+			size, err := m.Rx2DataRateIndex.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.Rx1DataRateOffset != nil {
+		{
+			size, err := m.Rx1DataRateOffset.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	if m.Rx1Delay != nil {
+		{
+			size, err := m.Rx1Delay.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.ClassCTimeout != nil {
+		n25, err25 := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.ClassCTimeout, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(*m.ClassCTimeout):])
+		if err25 != nil {
+			return 0, err25
+		}
+		i -= n25
+		i = encodeVarintEndDevice(dAtA, i, uint64(n25))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.PingSlotFrequency != nil {
+		{
+			size, err := m.PingSlotFrequency.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.PingSlotDataRateIndex != nil {
+		{
+			size, err := m.PingSlotDataRateIndex.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.PingSlotPeriodicity != nil {
+		{
+			size, err := m.PingSlotPeriodicity.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.ClassBTimeout != nil {
+		n29, err29 := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.ClassBTimeout, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(*m.ClassBTimeout):])
+		if err29 != nil {
+			return 0, err29
+		}
+		i -= n29
+		i = encodeVarintEndDevice(dAtA, i, uint64(n29))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *MACSettings_DataRateIndexValue) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4898,22 +4989,27 @@ func (m *MACSettings_DataRateIndexValue) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACSettings_DataRateIndexValue) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACSettings_DataRateIndexValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Value != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.Value))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACSettings_PingSlotPeriodValue) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4921,22 +5017,27 @@ func (m *MACSettings_PingSlotPeriodValue) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACSettings_PingSlotPeriodValue) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACSettings_PingSlotPeriodValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Value != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.Value))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACSettings_AggregatedDutyCycleValue) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4944,22 +5045,27 @@ func (m *MACSettings_AggregatedDutyCycleValue) Marshal() (dAtA []byte, err error
 }
 
 func (m *MACSettings_AggregatedDutyCycleValue) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACSettings_AggregatedDutyCycleValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Value != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.Value))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACSettings_RxDelayValue) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4967,22 +5073,27 @@ func (m *MACSettings_RxDelayValue) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACSettings_RxDelayValue) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACSettings_RxDelayValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Value != 0 {
-		dAtA[i] = 0x8
-		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.Value))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *MACState) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4990,127 +5101,146 @@ func (m *MACState) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACState) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.CurrentParameters.Size()))
-	n31, err := m.CurrentParameters.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n31
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.DesiredParameters.Size()))
-	n32, err := m.DesiredParameters.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n32
-	if m.DeviceClass != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DeviceClass))
-	}
-	if m.LoRaWANVersion != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
-	}
-	if m.LastConfirmedDownlinkAt != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastConfirmedDownlinkAt)))
-		n33, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastConfirmedDownlinkAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n33
-	}
-	if m.LastDevStatusFCntUp != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastDevStatusFCntUp))
-	}
-	if m.PingSlotPeriodicity != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotPeriodicity))
-	}
-	if m.PendingApplicationDownlink != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PendingApplicationDownlink.Size()))
-		n34, err := m.PendingApplicationDownlink.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n34
-	}
-	if len(m.QueuedResponses) > 0 {
-		for _, msg := range m.QueuedResponses {
-			dAtA[i] = 0x4a
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.PendingRequests) > 0 {
-		for _, msg := range m.PendingRequests {
-			dAtA[i] = 0x52
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if m.QueuedJoinAccept != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.QueuedJoinAccept.Size()))
-		n35, err := m.QueuedJoinAccept.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n35
-	}
-	if m.PendingJoinRequest != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PendingJoinRequest.Size()))
-		n36, err := m.PendingJoinRequest.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n36
-	}
 	if m.RxWindowsAvailable {
-		dAtA[i] = 0x68
-		i++
+		i--
 		if m.RxWindowsAvailable {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x68
 	}
-	return i, nil
+	if m.PendingJoinRequest != nil {
+		{
+			size, err := m.PendingJoinRequest.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x62
+	}
+	if m.QueuedJoinAccept != nil {
+		{
+			size, err := m.QueuedJoinAccept.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.PendingRequests) > 0 {
+		for iNdEx := len(m.PendingRequests) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.PendingRequests[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEndDevice(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x52
+		}
+	}
+	if len(m.QueuedResponses) > 0 {
+		for iNdEx := len(m.QueuedResponses) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.QueuedResponses[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEndDevice(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x4a
+		}
+	}
+	if m.PendingApplicationDownlink != nil {
+		{
+			size, err := m.PendingApplicationDownlink.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.PingSlotPeriodicity != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PingSlotPeriodicity))
+		i--
+		dAtA[i] = 0x38
+	}
+	if m.LastDevStatusFCntUp != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastDevStatusFCntUp))
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.LastConfirmedDownlinkAt != nil {
+		n33, err33 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastConfirmedDownlinkAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastConfirmedDownlinkAt):])
+		if err33 != nil {
+			return 0, err33
+		}
+		i -= n33
+		i = encodeVarintEndDevice(dAtA, i, uint64(n33))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.LoRaWANVersion != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.DeviceClass != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DeviceClass))
+		i--
+		dAtA[i] = 0x18
+	}
+	{
+		size, err := m.DesiredParameters.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.CurrentParameters.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *MACState_JoinAccept) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5118,39 +5248,49 @@ func (m *MACState_JoinAccept) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *MACState_JoinAccept) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MACState_JoinAccept) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Payload) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Payload)))
-		i += copy(dAtA[i:], m.Payload)
+	{
+		size, err := m.Keys.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.Request.Size()))
-	n37, err := m.Request.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n37
+	i--
 	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.Keys.Size()))
-	n38, err := m.Keys.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.Request.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n38
-	return i, nil
+	i--
+	dAtA[i] = 0x12
+	if len(m.Payload) > 0 {
+		i -= len(m.Payload)
+		copy(dAtA[i:], m.Payload)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Payload)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceAuthenticationCode) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5158,43 +5298,49 @@ func (m *EndDeviceAuthenticationCode) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceAuthenticationCode) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceAuthenticationCode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Value) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Value)))
-		i += copy(dAtA[i:], m.Value)
+	if m.ValidTo != nil {
+		n38, err38 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ValidTo, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ValidTo):])
+		if err38 != nil {
+			return 0, err38
+		}
+		i -= n38
+		i = encodeVarintEndDevice(dAtA, i, uint64(n38))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.ValidFrom != nil {
+		n39, err39 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ValidFrom, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ValidFrom):])
+		if err39 != nil {
+			return 0, err39
+		}
+		i -= n39
+		i = encodeVarintEndDevice(dAtA, i, uint64(n39))
+		i--
 		dAtA[i] = 0x12
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.ValidFrom)))
-		n39, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ValidFrom, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n39
 	}
-	if m.ValidTo != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.ValidTo)))
-		n40, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ValidTo, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n40
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDevice) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5202,515 +5348,566 @@ func (m *EndDevice) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDevice) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDevice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n41, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n41
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n42, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n42
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n43, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n43
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.Attributes) > 0 {
-		for k := range m.Attributes {
-			dAtA[i] = 0x32
-			i++
-			v := m.Attributes[k]
-			mapSize := 1 + len(k) + sovEndDevice(uint64(len(k))) + 1 + len(v) + sovEndDevice(uint64(len(v)))
-			i = encodeVarintEndDevice(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if m.VersionIDs != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.VersionIDs.Size()))
-		n44, err := m.VersionIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n44
-	}
-	if len(m.ServiceProfileID) > 0 {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ServiceProfileID)))
-		i += copy(dAtA[i:], m.ServiceProfileID)
-	}
-	if len(m.NetworkServerAddress) > 0 {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.NetworkServerAddress)))
-		i += copy(dAtA[i:], m.NetworkServerAddress)
-	}
-	if len(m.ApplicationServerAddress) > 0 {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ApplicationServerAddress)))
-		i += copy(dAtA[i:], m.ApplicationServerAddress)
-	}
-	if len(m.JoinServerAddress) > 0 {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.JoinServerAddress)))
-		i += copy(dAtA[i:], m.JoinServerAddress)
-	}
-	if len(m.Locations) > 0 {
-		for k := range m.Locations {
-			dAtA[i] = 0x62
-			i++
-			v := m.Locations[k]
-			msgSize := 0
-			if v != nil {
-				msgSize = v.Size()
-				msgSize += 1 + sovEndDevice(uint64(msgSize))
-			}
-			mapSize := 1 + len(k) + sovEndDevice(uint64(len(k))) + msgSize
-			i = encodeVarintEndDevice(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			if v != nil {
-				dAtA[i] = 0x12
-				i++
-				i = encodeVarintEndDevice(dAtA, i, uint64(v.Size()))
-				n45, err := v.MarshalTo(dAtA[i:])
-				if err != nil {
-					return 0, err
-				}
-				i += n45
-			}
-		}
-	}
-	if m.SupportsClassB {
-		dAtA[i] = 0x68
-		i++
-		if m.SupportsClassB {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.SupportsClassC {
-		dAtA[i] = 0x70
-		i++
-		if m.SupportsClassC {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.LoRaWANVersion != 0 {
-		dAtA[i] = 0x78
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
-	}
-	if m.LoRaWANPHYVersion != 0 {
-		dAtA[i] = 0x80
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANPHYVersion))
-	}
-	if len(m.FrequencyPlanID) > 0 {
+	if len(m.ApplicationServerID) > 0 {
+		i -= len(m.ApplicationServerID)
+		copy(dAtA[i:], m.ApplicationServerID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ApplicationServerID)))
+		i--
+		dAtA[i] = 0x3
+		i--
 		dAtA[i] = 0x8a
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FrequencyPlanID)))
-		i += copy(dAtA[i:], m.FrequencyPlanID)
 	}
-	if m.MinFrequency != 0 {
-		dAtA[i] = 0x90
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
+	if len(m.ApplicationServerKEKLabel) > 0 {
+		i -= len(m.ApplicationServerKEKLabel)
+		copy(dAtA[i:], m.ApplicationServerKEKLabel)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ApplicationServerKEKLabel)))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x82
 	}
-	if m.MaxFrequency != 0 {
-		dAtA[i] = 0x98
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
-	}
-	if m.SupportsJoin {
-		dAtA[i] = 0xa0
-		i++
-		dAtA[i] = 0x1
-		i++
-		if m.SupportsJoin {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.ResetsJoinNonces {
-		dAtA[i] = 0xa8
-		i++
-		dAtA[i] = 0x1
-		i++
-		if m.ResetsJoinNonces {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.RootKeys != nil {
-		dAtA[i] = 0xb2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.RootKeys.Size()))
-		n46, err := m.RootKeys.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n46
-	}
-	if m.NetID != nil {
-		dAtA[i] = 0xba
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.NetID.Size()))
-		n47, err := m.NetID.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n47
-	}
-	if m.MACSettings != nil {
-		dAtA[i] = 0xc2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACSettings.Size()))
-		n48, err := m.MACSettings.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n48
-	}
-	if m.MACState != nil {
-		dAtA[i] = 0xca
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.MACState.Size()))
-		n49, err := m.MACState.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n49
-	}
-	if m.Session != nil {
-		dAtA[i] = 0xd2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Session.Size()))
-		n50, err := m.Session.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n50
-	}
-	if m.PendingSession != nil {
-		dAtA[i] = 0xda
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PendingSession.Size()))
-		n51, err := m.PendingSession.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n51
-	}
-	if m.LastDevNonce != 0 {
-		dAtA[i] = 0xe0
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastDevNonce))
-	}
-	if len(m.UsedDevNonces) > 0 {
-		dAtA53 := make([]byte, len(m.UsedDevNonces)*10)
-		var j52 int
-		for _, num := range m.UsedDevNonces {
-			for num >= 1<<7 {
-				dAtA53[j52] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j52++
-			}
-			dAtA53[j52] = uint8(num)
-			j52++
-		}
-		dAtA[i] = 0xea
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(j52))
-		i += copy(dAtA[i:], dAtA53[:j52])
-	}
-	if m.LastJoinNonce != 0 {
-		dAtA[i] = 0xf0
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastJoinNonce))
-	}
-	if m.LastRJCount0 != 0 {
-		dAtA[i] = 0xf8
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastRJCount0))
-	}
-	if m.LastRJCount1 != 0 {
-		dAtA[i] = 0x80
-		i++
+	if len(m.NetworkServerKEKLabel) > 0 {
+		i -= len(m.NetworkServerKEKLabel)
+		copy(dAtA[i:], m.NetworkServerKEKLabel)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.NetworkServerKEKLabel)))
+		i--
 		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastRJCount1))
+		i--
+		dAtA[i] = 0xfa
 	}
-	if m.LastDevStatusReceivedAt != nil {
-		dAtA[i] = 0x8a
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDevStatusReceivedAt)))
-		n54, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDevStatusReceivedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n54
-	}
-	if m.PowerState != 0 {
-		dAtA[i] = 0x90
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PowerState))
-	}
-	if m.BatteryPercentage != nil {
-		dAtA[i] = 0x9a
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.BatteryPercentage.Size()))
-		n55, err := m.BatteryPercentage.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n55
-	}
-	if m.DownlinkMargin != 0 {
-		dAtA[i] = 0xa0
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.DownlinkMargin))
-	}
-	if len(m.RecentADRUplinks) > 0 {
-		for _, msg := range m.RecentADRUplinks {
-			dAtA[i] = 0xaa
-			i++
-			dAtA[i] = 0x2
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.ClaimAuthenticationCode != nil {
+		{
+			size, err := m.ClaimAuthenticationCode.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
 		}
-	}
-	if len(m.RecentUplinks) > 0 {
-		for _, msg := range m.RecentUplinks {
-			dAtA[i] = 0xb2
-			i++
-			dAtA[i] = 0x2
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.RecentDownlinks) > 0 {
-		for _, msg := range m.RecentDownlinks {
-			dAtA[i] = 0xba
-			i++
-			dAtA[i] = 0x2
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.QueuedApplicationDownlinks) > 0 {
-		for _, msg := range m.QueuedApplicationDownlinks {
-			dAtA[i] = 0xc2
-			i++
-			dAtA[i] = 0x2
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if m.Formatters != nil {
-		dAtA[i] = 0xca
-		i++
+		i--
 		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Formatters.Size()))
-		n56, err := m.Formatters.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n56
-	}
-	if len(m.ProvisionerID) > 0 {
-		dAtA[i] = 0xd2
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ProvisionerID)))
-		i += copy(dAtA[i:], m.ProvisionerID)
-	}
-	if m.ProvisioningData != nil {
-		dAtA[i] = 0xda
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ProvisioningData.Size()))
-		n57, err := m.ProvisioningData.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n57
-	}
-	if m.PendingMACState != nil {
-		dAtA[i] = 0xe2
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.PendingMACState.Size()))
-		n58, err := m.PendingMACState.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n58
+		i--
+		dAtA[i] = 0xf2
 	}
 	if m.Multicast {
-		dAtA[i] = 0xe8
-		i++
-		dAtA[i] = 0x2
-		i++
+		i--
 		if m.Multicast {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
-	}
-	if m.ClaimAuthenticationCode != nil {
-		dAtA[i] = 0xf2
-		i++
+		i--
 		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.ClaimAuthenticationCode.Size()))
-		n59, err := m.ClaimAuthenticationCode.MarshalTo(dAtA[i:])
+		i--
+		dAtA[i] = 0xe8
+	}
+	if m.PendingMACState != nil {
+		{
+			size, err := m.PendingMACState.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xe2
+	}
+	if m.ProvisioningData != nil {
+		{
+			size, err := m.ProvisioningData.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xda
+	}
+	if len(m.ProvisionerID) > 0 {
+		i -= len(m.ProvisionerID)
+		copy(dAtA[i:], m.ProvisionerID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ProvisionerID)))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xd2
+	}
+	if m.Formatters != nil {
+		{
+			size, err := m.Formatters.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xca
+	}
+	if len(m.QueuedApplicationDownlinks) > 0 {
+		for iNdEx := len(m.QueuedApplicationDownlinks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.QueuedApplicationDownlinks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEndDevice(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x2
+			i--
+			dAtA[i] = 0xc2
+		}
+	}
+	if len(m.RecentDownlinks) > 0 {
+		for iNdEx := len(m.RecentDownlinks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RecentDownlinks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEndDevice(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x2
+			i--
+			dAtA[i] = 0xba
+		}
+	}
+	if len(m.RecentUplinks) > 0 {
+		for iNdEx := len(m.RecentUplinks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RecentUplinks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEndDevice(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x2
+			i--
+			dAtA[i] = 0xb2
+		}
+	}
+	if len(m.RecentADRUplinks) > 0 {
+		for iNdEx := len(m.RecentADRUplinks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RecentADRUplinks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEndDevice(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x2
+			i--
+			dAtA[i] = 0xaa
+		}
+	}
+	if m.DownlinkMargin != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.DownlinkMargin))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xa0
+	}
+	if m.BatteryPercentage != nil {
+		{
+			size, err := m.BatteryPercentage.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0x9a
+	}
+	if m.PowerState != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.PowerState))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0x90
+	}
+	if m.LastDevStatusReceivedAt != nil {
+		n45, err45 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.LastDevStatusReceivedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.LastDevStatusReceivedAt):])
+		if err45 != nil {
+			return 0, err45
+		}
+		i -= n45
+		i = encodeVarintEndDevice(dAtA, i, uint64(n45))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0x8a
+	}
+	if m.LastRJCount1 != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastRJCount1))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0x80
+	}
+	if m.LastRJCount0 != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastRJCount0))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf8
+	}
+	if m.LastJoinNonce != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastJoinNonce))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf0
+	}
+	if len(m.UsedDevNonces) > 0 {
+		dAtA47 := make([]byte, len(m.UsedDevNonces)*10)
+		var j46 int
+		for _, num := range m.UsedDevNonces {
+			for num >= 1<<7 {
+				dAtA47[j46] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j46++
+			}
+			dAtA47[j46] = uint8(num)
+			j46++
+		}
+		i -= j46
+		copy(dAtA[i:], dAtA47[:j46])
+		i = encodeVarintEndDevice(dAtA, i, uint64(j46))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xea
+	}
+	if m.LastDevNonce != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LastDevNonce))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xe0
+	}
+	if m.PendingSession != nil {
+		{
+			size, err := m.PendingSession.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xda
+	}
+	if m.Session != nil {
+		{
+			size, err := m.Session.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xd2
+	}
+	if m.MACState != nil {
+		{
+			size, err := m.MACState.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xca
+	}
+	if m.MACSettings != nil {
+		{
+			size, err := m.MACSettings.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xc2
+	}
+	if m.NetID != nil {
+		{
+			size := m.NetID.Size()
+			i -= size
+			if _, err := m.NetID.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xba
+	}
+	if m.RootKeys != nil {
+		{
+			size, err := m.RootKeys.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb2
+	}
+	if m.ResetsJoinNonces {
+		i--
+		if m.ResetsJoinNonces {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa8
+	}
+	if m.SupportsJoin {
+		i--
+		if m.SupportsJoin {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
+	if m.MaxFrequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.MaxFrequency)
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x98
+	}
+	if m.MinFrequency != 0 {
+		i = encodeVarintEndDevice(dAtA, i, m.MinFrequency)
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x90
+	}
+	if len(m.FrequencyPlanID) > 0 {
+		i -= len(m.FrequencyPlanID)
+		copy(dAtA[i:], m.FrequencyPlanID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FrequencyPlanID)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
+	}
+	if m.LoRaWANPHYVersion != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANPHYVersion))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x80
+	}
+	if m.LoRaWANVersion != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.LoRaWANVersion))
+		i--
+		dAtA[i] = 0x78
+	}
+	if m.SupportsClassC {
+		i--
+		if m.SupportsClassC {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x70
+	}
+	if m.SupportsClassB {
+		i--
+		if m.SupportsClassB {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x68
+	}
+	if len(m.Locations) > 0 {
+		for k := range m.Locations {
+			v := m.Locations[k]
+			baseI := i
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintEndDevice(dAtA, i, uint64(size))
+				}
+				i--
+				dAtA[i] = 0x12
+			}
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintEndDevice(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x62
+		}
+	}
+	if len(m.JoinServerAddress) > 0 {
+		i -= len(m.JoinServerAddress)
+		copy(dAtA[i:], m.JoinServerAddress)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.JoinServerAddress)))
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.ApplicationServerAddress) > 0 {
+		i -= len(m.ApplicationServerAddress)
+		copy(dAtA[i:], m.ApplicationServerAddress)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ApplicationServerAddress)))
+		i--
+		dAtA[i] = 0x52
+	}
+	if len(m.NetworkServerAddress) > 0 {
+		i -= len(m.NetworkServerAddress)
+		copy(dAtA[i:], m.NetworkServerAddress)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.NetworkServerAddress)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if len(m.ServiceProfileID) > 0 {
+		i -= len(m.ServiceProfileID)
+		copy(dAtA[i:], m.ServiceProfileID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ServiceProfileID)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.VersionIDs != nil {
+		{
+			size, err := m.VersionIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEndDevice(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.Attributes) > 0 {
+		for k := range m.Attributes {
+			v := m.Attributes[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintEndDevice(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x22
+	}
+	n55, err55 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err55 != nil {
+		return 0, err55
+	}
+	i -= n55
+	i = encodeVarintEndDevice(dAtA, i, uint64(n55))
+	i--
+	dAtA[i] = 0x1a
+	n56, err56 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err56 != nil {
+		return 0, err56
+	}
+	i -= n56
+	i = encodeVarintEndDevice(dAtA, i, uint64(n56))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n59
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	if len(m.NetworkServerKEKLabel) > 0 {
-		dAtA[i] = 0xfa
-		i++
-		dAtA[i] = 0x2
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.NetworkServerKEKLabel)))
-		i += copy(dAtA[i:], m.NetworkServerKEKLabel)
-	}
-	if len(m.ApplicationServerKEKLabel) > 0 {
-		dAtA[i] = 0x82
-		i++
-		dAtA[i] = 0x3
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ApplicationServerKEKLabel)))
-		i += copy(dAtA[i:], m.ApplicationServerKEKLabel)
-	}
-	if len(m.ApplicationServerID) > 0 {
-		dAtA[i] = 0x8a
-		i++
-		dAtA[i] = 0x3
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.ApplicationServerID)))
-		i += copy(dAtA[i:], m.ApplicationServerID)
-	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDevices) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5718,29 +5915,36 @@ func (m *EndDevices) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDevices) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDevices) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.EndDevices) > 0 {
-		for _, msg := range m.EndDevices {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.EndDevices) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.EndDevices[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintEndDevice(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *CreateEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5748,25 +5952,32 @@ func (m *CreateEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CreateEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CreateEndDeviceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDevice.Size()))
-	n60, err := m.EndDevice.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.EndDevice.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n60
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *UpdateEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5774,33 +5985,42 @@ func (m *UpdateEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UpdateEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpdateEndDeviceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDevice.Size()))
-	n61, err := m.EndDevice.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n61
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n62, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.EndDevice.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n62
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5808,33 +6028,42 @@ func (m *GetEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetEndDeviceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDeviceIdentifiers.Size()))
-	n63, err := m.EndDeviceIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n63
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n64, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.EndDeviceIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n64
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetEndDeviceIdentifiersForEUIsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5842,33 +6071,42 @@ func (m *GetEndDeviceIdentifiersForEUIsRequest) Marshal() (dAtA []byte, err erro
 }
 
 func (m *GetEndDeviceIdentifiersForEUIsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetEndDeviceIdentifiersForEUIsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.JoinEUI.Size()))
-	n65, err := m.JoinEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size := m.DevEUI.Size()
+		i -= size
+		if _, err := m.DevEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n65
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.DevEUI.Size()))
-	n66, err := m.DevEUI.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size := m.JoinEUI.Size()
+		i -= size
+		if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n66
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListEndDevicesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5876,49 +6114,59 @@ func (m *ListEndDevicesRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListEndDevicesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListEndDevicesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n67, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n67
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n68, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n68
-	if len(m.Order) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Order)))
-		i += copy(dAtA[i:], m.Order)
+	if m.Page != 0 {
+		i = encodeVarintEndDevice(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x28
 	}
 	if m.Limit != 0 {
-		dAtA[i] = 0x20
-		i++
 		i = encodeVarintEndDevice(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x20
 	}
-	if m.Page != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(m.Page))
+	if len(m.Order) > 0 {
+		i -= len(m.Order)
+		copy(dAtA[i:], m.Order)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Order)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *SetEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5926,33 +6174,42 @@ func (m *SetEndDeviceRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SetEndDeviceRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SetEndDeviceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDevice.Size()))
-	n69, err := m.EndDevice.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n69
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n70, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.EndDevice.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
 	}
-	i += n70
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceTemplate) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5960,39 +6217,49 @@ func (m *EndDeviceTemplate) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceTemplate) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceTemplate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.EndDevice.Size()))
-	n71, err := m.EndDevice.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n71
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintEndDevice(dAtA, i, uint64(m.FieldMask.Size()))
-	n72, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n72
 	if len(m.MappingKey) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.MappingKey)
+		copy(dAtA[i:], m.MappingKey)
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.MappingKey)))
-		i += copy(dAtA[i:], m.MappingKey)
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.EndDevice.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEndDevice(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceTemplateFormat) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -6000,29 +6267,36 @@ func (m *EndDeviceTemplateFormat) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceTemplateFormat) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceTemplateFormat) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
 	if len(m.Description) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceTemplateFormats) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -6030,45 +6304,48 @@ func (m *EndDeviceTemplateFormats) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceTemplateFormats) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceTemplateFormats) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Formats) > 0 {
 		for k := range m.Formats {
-			dAtA[i] = 0xa
-			i++
 			v := m.Formats[k]
-			msgSize := 0
+			baseI := i
 			if v != nil {
-				msgSize = v.Size()
-				msgSize += 1 + sovEndDevice(uint64(msgSize))
-			}
-			mapSize := 1 + len(k) + sovEndDevice(uint64(len(k))) + msgSize
-			i = encodeVarintEndDevice(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintEndDevice(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			if v != nil {
-				dAtA[i] = 0x12
-				i++
-				i = encodeVarintEndDevice(dAtA, i, uint64(v.Size()))
-				n73, err := v.MarshalTo(dAtA[i:])
-				if err != nil {
-					return 0, err
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintEndDevice(dAtA, i, uint64(size))
 				}
-				i += n73
+				i--
+				dAtA[i] = 0x12
 			}
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintEndDevice(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintEndDevice(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ConvertEndDeviceTemplateRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -6076,33 +6353,42 @@ func (m *ConvertEndDeviceTemplateRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ConvertEndDeviceTemplateRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ConvertEndDeviceTemplateRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.FormatID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FormatID)))
-		i += copy(dAtA[i:], m.FormatID)
-	}
 	if len(m.Data) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.Data)
+		copy(dAtA[i:], m.Data)
 		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.Data)))
-		i += copy(dAtA[i:], m.Data)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.FormatID) > 0 {
+		i -= len(m.FormatID)
+		copy(dAtA[i:], m.FormatID)
+		i = encodeVarintEndDevice(dAtA, i, uint64(len(m.FormatID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintEndDevice(dAtA []byte, offset int, v uint64) int {
+	offset -= sovEndDevice(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedSession(r randyEndDevice, easy bool) *Session {
 	this := &Session{}
@@ -6159,31 +6445,31 @@ func NewPopulatedEndDeviceVersionIdentifiers(r randyEndDevice, easy bool) *EndDe
 
 func NewPopulatedMACSettings(r randyEndDevice, easy bool) *MACSettings {
 	this := &MACSettings{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ClassBTimeout = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.PingSlotPeriodicity = NewPopulatedMACSettings_PingSlotPeriodValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.PingSlotDataRateIndex = NewPopulatedMACSettings_DataRateIndexValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.PingSlotFrequency = types.NewPopulatedUInt64Value(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ClassCTimeout = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Rx1Delay = NewPopulatedMACSettings_RxDelayValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Rx1DataRateOffset = types.NewPopulatedUInt32Value(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Rx2DataRateIndex = NewPopulatedMACSettings_DataRateIndexValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Rx2Frequency = types.NewPopulatedUInt64Value(r, easy)
 	}
 	v5 := r.Intn(10)
@@ -6191,37 +6477,37 @@ func NewPopulatedMACSettings(r randyEndDevice, easy bool) *MACSettings {
 	for i := 0; i < v5; i++ {
 		this.FactoryPresetFrequencies[i] = uint64(r.Uint32())
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.MaxDutyCycle = NewPopulatedMACSettings_AggregatedDutyCycleValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.Supports32BitFCnt = types.NewPopulatedBoolValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.UseADR = types.NewPopulatedBoolValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ADRMargin = types.NewPopulatedFloatValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ResetsFCnt = types.NewPopulatedBoolValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.StatusTimePeriodicity = github_com_gogo_protobuf_types.NewPopulatedStdDuration(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.StatusCountPeriodicity = types.NewPopulatedUInt32Value(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DesiredRx1Delay = NewPopulatedMACSettings_RxDelayValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DesiredRx1DataRateOffset = types.NewPopulatedUInt32Value(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DesiredRx2DataRateIndex = NewPopulatedMACSettings_DataRateIndexValue(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DesiredRx2Frequency = types.NewPopulatedUInt64Value(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -6279,7 +6565,7 @@ func NewPopulatedMACState_JoinAccept(r randyEndDevice, easy bool) *MACState_Join
 
 func NewPopulatedEndDevices(r randyEndDevice, easy bool) *EndDevices {
 	this := &EndDevices{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v9 := r.Intn(5)
 		this.EndDevices = make([]*EndDevice, v9)
 		for i := 0; i < v9; i++ {
@@ -6381,7 +6667,7 @@ func NewPopulatedEndDeviceTemplateFormat(r randyEndDevice, easy bool) *EndDevice
 
 func NewPopulatedEndDeviceTemplateFormats(r randyEndDevice, easy bool) *EndDeviceTemplateFormats {
 	this := &EndDeviceTemplateFormats{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v23 := r.Intn(10)
 		this.Formats = make(map[string]*EndDeviceTemplateFormat)
 		for i := 0; i < v23; i++ {
@@ -7345,14 +7631,7 @@ func (m *ConvertEndDeviceTemplateRequest) Size() (n int) {
 }
 
 func sovEndDevice(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozEndDevice(x uint64) (n int) {
 	return sovEndDevice((x << 1) ^ uint64((int64(x) >> 63)))
@@ -7363,12 +7642,12 @@ func (this *Session) String() string {
 	}
 	s := strings.Join([]string{`&Session{`,
 		`DevAddr:` + fmt.Sprintf("%v", this.DevAddr) + `,`,
-		`SessionKeys:` + strings.Replace(strings.Replace(this.SessionKeys.String(), "SessionKeys", "SessionKeys", 1), `&`, ``, 1) + `,`,
+		`SessionKeys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.SessionKeys), "SessionKeys", "SessionKeys", 1), `&`, ``, 1) + `,`,
 		`LastFCntUp:` + fmt.Sprintf("%v", this.LastFCntUp) + `,`,
 		`LastNFCntDown:` + fmt.Sprintf("%v", this.LastNFCntDown) + `,`,
 		`LastAFCntDown:` + fmt.Sprintf("%v", this.LastAFCntDown) + `,`,
 		`LastConfFCntDown:` + fmt.Sprintf("%v", this.LastConfFCntDown) + `,`,
-		`StartedAt:` + strings.Replace(strings.Replace(this.StartedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`StartedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.StartedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7377,6 +7656,11 @@ func (this *MACParameters) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForChannels := "[]*MACParameters_Channel{"
+	for _, f := range this.Channels {
+		repeatedStringForChannels += strings.Replace(fmt.Sprintf("%v", f), "MACParameters_Channel", "MACParameters_Channel", 1) + ","
+	}
+	repeatedStringForChannels += "}"
 	s := strings.Join([]string{`&MACParameters{`,
 		`MaxEIRP:` + fmt.Sprintf("%v", this.MaxEIRP) + `,`,
 		`ADRDataRateIndex:` + fmt.Sprintf("%v", this.ADRDataRateIndex) + `,`,
@@ -7394,7 +7678,7 @@ func (this *MACParameters) String() string {
 		`PingSlotFrequency:` + fmt.Sprintf("%v", this.PingSlotFrequency) + `,`,
 		`PingSlotDataRateIndex:` + fmt.Sprintf("%v", this.PingSlotDataRateIndex) + `,`,
 		`BeaconFrequency:` + fmt.Sprintf("%v", this.BeaconFrequency) + `,`,
-		`Channels:` + strings.Replace(fmt.Sprintf("%v", this.Channels), "MACParameters_Channel", "MACParameters_Channel", 1) + `,`,
+		`Channels:` + repeatedStringForChannels + `,`,
 		`UplinkDwellTime:` + strings.Replace(fmt.Sprintf("%v", this.UplinkDwellTime), "BoolValue", "types.BoolValue", 1) + `,`,
 		`DownlinkDwellTime:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkDwellTime), "BoolValue", "types.BoolValue", 1) + `,`,
 		`}`,
@@ -7465,12 +7749,12 @@ func (this *EndDeviceVersion) String() string {
 		`Photos:` + fmt.Sprintf("%v", this.Photos) + `,`,
 		`SupportsClassB:` + fmt.Sprintf("%v", this.SupportsClassB) + `,`,
 		`SupportsClassC:` + fmt.Sprintf("%v", this.SupportsClassC) + `,`,
-		`DefaultMACSettings:` + strings.Replace(fmt.Sprintf("%v", this.DefaultMACSettings), "MACSettings", "MACSettings", 1) + `,`,
+		`DefaultMACSettings:` + strings.Replace(this.DefaultMACSettings.String(), "MACSettings", "MACSettings", 1) + `,`,
 		`MinFrequency:` + fmt.Sprintf("%v", this.MinFrequency) + `,`,
 		`MaxFrequency:` + fmt.Sprintf("%v", this.MaxFrequency) + `,`,
 		`SupportsJoin:` + fmt.Sprintf("%v", this.SupportsJoin) + `,`,
 		`ResetsJoinNonces:` + fmt.Sprintf("%v", this.ResetsJoinNonces) + `,`,
-		`DefaultFormatters:` + strings.Replace(strings.Replace(this.DefaultFormatters.String(), "MessagePayloadFormatters", "MessagePayloadFormatters", 1), `&`, ``, 1) + `,`,
+		`DefaultFormatters:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.DefaultFormatters), "MessagePayloadFormatters", "MessagePayloadFormatters", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7549,6 +7833,16 @@ func (this *MACState) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForQueuedResponses := "[]*MACCommand{"
+	for _, f := range this.QueuedResponses {
+		repeatedStringForQueuedResponses += strings.Replace(fmt.Sprintf("%v", f), "MACCommand", "MACCommand", 1) + ","
+	}
+	repeatedStringForQueuedResponses += "}"
+	repeatedStringForPendingRequests := "[]*MACCommand{"
+	for _, f := range this.PendingRequests {
+		repeatedStringForPendingRequests += strings.Replace(fmt.Sprintf("%v", f), "MACCommand", "MACCommand", 1) + ","
+	}
+	repeatedStringForPendingRequests += "}"
 	s := strings.Join([]string{`&MACState{`,
 		`CurrentParameters:` + strings.Replace(strings.Replace(this.CurrentParameters.String(), "MACParameters", "MACParameters", 1), `&`, ``, 1) + `,`,
 		`DesiredParameters:` + strings.Replace(strings.Replace(this.DesiredParameters.String(), "MACParameters", "MACParameters", 1), `&`, ``, 1) + `,`,
@@ -7558,8 +7852,8 @@ func (this *MACState) String() string {
 		`LastDevStatusFCntUp:` + fmt.Sprintf("%v", this.LastDevStatusFCntUp) + `,`,
 		`PingSlotPeriodicity:` + fmt.Sprintf("%v", this.PingSlotPeriodicity) + `,`,
 		`PendingApplicationDownlink:` + strings.Replace(fmt.Sprintf("%v", this.PendingApplicationDownlink), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
-		`QueuedResponses:` + strings.Replace(fmt.Sprintf("%v", this.QueuedResponses), "MACCommand", "MACCommand", 1) + `,`,
-		`PendingRequests:` + strings.Replace(fmt.Sprintf("%v", this.PendingRequests), "MACCommand", "MACCommand", 1) + `,`,
+		`QueuedResponses:` + repeatedStringForQueuedResponses + `,`,
+		`PendingRequests:` + repeatedStringForPendingRequests + `,`,
 		`QueuedJoinAccept:` + strings.Replace(fmt.Sprintf("%v", this.QueuedJoinAccept), "MACState_JoinAccept", "MACState_JoinAccept", 1) + `,`,
 		`PendingJoinRequest:` + strings.Replace(fmt.Sprintf("%v", this.PendingJoinRequest), "JoinRequest", "JoinRequest", 1) + `,`,
 		`RxWindowsAvailable:` + fmt.Sprintf("%v", this.RxWindowsAvailable) + `,`,
@@ -7573,8 +7867,8 @@ func (this *MACState_JoinAccept) String() string {
 	}
 	s := strings.Join([]string{`&MACState_JoinAccept{`,
 		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
-		`Request:` + strings.Replace(strings.Replace(this.Request.String(), "JoinRequest", "JoinRequest", 1), `&`, ``, 1) + `,`,
-		`Keys:` + strings.Replace(strings.Replace(this.Keys.String(), "SessionKeys", "SessionKeys", 1), `&`, ``, 1) + `,`,
+		`Request:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Request), "JoinRequest", "JoinRequest", 1), `&`, ``, 1) + `,`,
+		`Keys:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Keys), "SessionKeys", "SessionKeys", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7595,6 +7889,26 @@ func (this *EndDevice) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForRecentADRUplinks := "[]*UplinkMessage{"
+	for _, f := range this.RecentADRUplinks {
+		repeatedStringForRecentADRUplinks += strings.Replace(fmt.Sprintf("%v", f), "UplinkMessage", "UplinkMessage", 1) + ","
+	}
+	repeatedStringForRecentADRUplinks += "}"
+	repeatedStringForRecentUplinks := "[]*UplinkMessage{"
+	for _, f := range this.RecentUplinks {
+		repeatedStringForRecentUplinks += strings.Replace(fmt.Sprintf("%v", f), "UplinkMessage", "UplinkMessage", 1) + ","
+	}
+	repeatedStringForRecentUplinks += "}"
+	repeatedStringForRecentDownlinks := "[]*DownlinkMessage{"
+	for _, f := range this.RecentDownlinks {
+		repeatedStringForRecentDownlinks += strings.Replace(fmt.Sprintf("%v", f), "DownlinkMessage", "DownlinkMessage", 1) + ","
+	}
+	repeatedStringForRecentDownlinks += "}"
+	repeatedStringForQueuedApplicationDownlinks := "[]*ApplicationDownlink{"
+	for _, f := range this.QueuedApplicationDownlinks {
+		repeatedStringForQueuedApplicationDownlinks += strings.Replace(fmt.Sprintf("%v", f), "ApplicationDownlink", "ApplicationDownlink", 1) + ","
+	}
+	repeatedStringForQueuedApplicationDownlinks += "}"
 	keysForAttributes := make([]string, 0, len(this.Attributes))
 	for k := range this.Attributes {
 		keysForAttributes = append(keysForAttributes, k)
@@ -7616,13 +7930,13 @@ func (this *EndDevice) String() string {
 	}
 	mapStringForLocations += "}"
 	s := strings.Join([]string{`&EndDevice{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
 		`Attributes:` + mapStringForAttributes + `,`,
-		`VersionIDs:` + strings.Replace(fmt.Sprintf("%v", this.VersionIDs), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1) + `,`,
+		`VersionIDs:` + strings.Replace(this.VersionIDs.String(), "EndDeviceVersionIdentifiers", "EndDeviceVersionIdentifiers", 1) + `,`,
 		`ServiceProfileID:` + fmt.Sprintf("%v", this.ServiceProfileID) + `,`,
 		`NetworkServerAddress:` + fmt.Sprintf("%v", this.NetworkServerAddress) + `,`,
 		`ApplicationServerAddress:` + fmt.Sprintf("%v", this.ApplicationServerAddress) + `,`,
@@ -7639,10 +7953,10 @@ func (this *EndDevice) String() string {
 		`ResetsJoinNonces:` + fmt.Sprintf("%v", this.ResetsJoinNonces) + `,`,
 		`RootKeys:` + strings.Replace(fmt.Sprintf("%v", this.RootKeys), "RootKeys", "RootKeys", 1) + `,`,
 		`NetID:` + fmt.Sprintf("%v", this.NetID) + `,`,
-		`MACSettings:` + strings.Replace(fmt.Sprintf("%v", this.MACSettings), "MACSettings", "MACSettings", 1) + `,`,
-		`MACState:` + strings.Replace(fmt.Sprintf("%v", this.MACState), "MACState", "MACState", 1) + `,`,
-		`Session:` + strings.Replace(fmt.Sprintf("%v", this.Session), "Session", "Session", 1) + `,`,
-		`PendingSession:` + strings.Replace(fmt.Sprintf("%v", this.PendingSession), "Session", "Session", 1) + `,`,
+		`MACSettings:` + strings.Replace(this.MACSettings.String(), "MACSettings", "MACSettings", 1) + `,`,
+		`MACState:` + strings.Replace(this.MACState.String(), "MACState", "MACState", 1) + `,`,
+		`Session:` + strings.Replace(this.Session.String(), "Session", "Session", 1) + `,`,
+		`PendingSession:` + strings.Replace(this.PendingSession.String(), "Session", "Session", 1) + `,`,
 		`LastDevNonce:` + fmt.Sprintf("%v", this.LastDevNonce) + `,`,
 		`UsedDevNonces:` + fmt.Sprintf("%v", this.UsedDevNonces) + `,`,
 		`LastJoinNonce:` + fmt.Sprintf("%v", this.LastJoinNonce) + `,`,
@@ -7652,16 +7966,16 @@ func (this *EndDevice) String() string {
 		`PowerState:` + fmt.Sprintf("%v", this.PowerState) + `,`,
 		`BatteryPercentage:` + strings.Replace(fmt.Sprintf("%v", this.BatteryPercentage), "FloatValue", "types.FloatValue", 1) + `,`,
 		`DownlinkMargin:` + fmt.Sprintf("%v", this.DownlinkMargin) + `,`,
-		`RecentADRUplinks:` + strings.Replace(fmt.Sprintf("%v", this.RecentADRUplinks), "UplinkMessage", "UplinkMessage", 1) + `,`,
-		`RecentUplinks:` + strings.Replace(fmt.Sprintf("%v", this.RecentUplinks), "UplinkMessage", "UplinkMessage", 1) + `,`,
-		`RecentDownlinks:` + strings.Replace(fmt.Sprintf("%v", this.RecentDownlinks), "DownlinkMessage", "DownlinkMessage", 1) + `,`,
-		`QueuedApplicationDownlinks:` + strings.Replace(fmt.Sprintf("%v", this.QueuedApplicationDownlinks), "ApplicationDownlink", "ApplicationDownlink", 1) + `,`,
+		`RecentADRUplinks:` + repeatedStringForRecentADRUplinks + `,`,
+		`RecentUplinks:` + repeatedStringForRecentUplinks + `,`,
+		`RecentDownlinks:` + repeatedStringForRecentDownlinks + `,`,
+		`QueuedApplicationDownlinks:` + repeatedStringForQueuedApplicationDownlinks + `,`,
 		`Formatters:` + strings.Replace(fmt.Sprintf("%v", this.Formatters), "MessagePayloadFormatters", "MessagePayloadFormatters", 1) + `,`,
 		`ProvisionerID:` + fmt.Sprintf("%v", this.ProvisionerID) + `,`,
 		`ProvisioningData:` + strings.Replace(fmt.Sprintf("%v", this.ProvisioningData), "Struct", "types.Struct", 1) + `,`,
-		`PendingMACState:` + strings.Replace(fmt.Sprintf("%v", this.PendingMACState), "MACState", "MACState", 1) + `,`,
+		`PendingMACState:` + strings.Replace(this.PendingMACState.String(), "MACState", "MACState", 1) + `,`,
 		`Multicast:` + fmt.Sprintf("%v", this.Multicast) + `,`,
-		`ClaimAuthenticationCode:` + strings.Replace(fmt.Sprintf("%v", this.ClaimAuthenticationCode), "EndDeviceAuthenticationCode", "EndDeviceAuthenticationCode", 1) + `,`,
+		`ClaimAuthenticationCode:` + strings.Replace(this.ClaimAuthenticationCode.String(), "EndDeviceAuthenticationCode", "EndDeviceAuthenticationCode", 1) + `,`,
 		`NetworkServerKEKLabel:` + fmt.Sprintf("%v", this.NetworkServerKEKLabel) + `,`,
 		`ApplicationServerKEKLabel:` + fmt.Sprintf("%v", this.ApplicationServerKEKLabel) + `,`,
 		`ApplicationServerID:` + fmt.Sprintf("%v", this.ApplicationServerID) + `,`,
@@ -7673,8 +7987,13 @@ func (this *EndDevices) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForEndDevices := "[]*EndDevice{"
+	for _, f := range this.EndDevices {
+		repeatedStringForEndDevices += strings.Replace(f.String(), "EndDevice", "EndDevice", 1) + ","
+	}
+	repeatedStringForEndDevices += "}"
 	s := strings.Join([]string{`&EndDevices{`,
-		`EndDevices:` + strings.Replace(fmt.Sprintf("%v", this.EndDevices), "EndDevice", "EndDevice", 1) + `,`,
+		`EndDevices:` + repeatedStringForEndDevices + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7695,7 +8014,7 @@ func (this *UpdateEndDeviceRequest) String() string {
 	}
 	s := strings.Join([]string{`&UpdateEndDeviceRequest{`,
 		`EndDevice:` + strings.Replace(strings.Replace(this.EndDevice.String(), "EndDevice", "EndDevice", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7705,8 +8024,8 @@ func (this *GetEndDeviceRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&GetEndDeviceRequest{`,
-		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(this.EndDeviceIdentifiers.String(), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`EndDeviceIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.EndDeviceIdentifiers), "EndDeviceIdentifiers", "EndDeviceIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7727,8 +8046,8 @@ func (this *ListEndDevicesRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListEndDevicesRequest{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`Order:` + fmt.Sprintf("%v", this.Order) + `,`,
 		`Limit:` + fmt.Sprintf("%v", this.Limit) + `,`,
 		`Page:` + fmt.Sprintf("%v", this.Page) + `,`,
@@ -7742,7 +8061,7 @@ func (this *SetEndDeviceRequest) String() string {
 	}
 	s := strings.Join([]string{`&SetEndDeviceRequest{`,
 		`EndDevice:` + strings.Replace(strings.Replace(this.EndDevice.String(), "EndDevice", "EndDevice", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -7753,7 +8072,7 @@ func (this *EndDeviceTemplate) String() string {
 	}
 	s := strings.Join([]string{`&EndDeviceTemplate{`,
 		`EndDevice:` + strings.Replace(strings.Replace(this.EndDevice.String(), "EndDevice", "EndDevice", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`MappingKey:` + fmt.Sprintf("%v", this.MappingKey) + `,`,
 		`}`,
 	}, "")

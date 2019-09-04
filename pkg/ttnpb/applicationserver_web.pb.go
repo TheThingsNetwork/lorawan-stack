@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 	time "time"
@@ -21,6 +22,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -34,7 +37,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ApplicationWebhookIdentifiers struct {
 	ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,embedded=application_ids" json:"application_ids"`
@@ -56,7 +59,7 @@ func (m *ApplicationWebhookIdentifiers) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_ApplicationWebhookIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +104,7 @@ func (m *ApplicationWebhookTemplateIdentifiers) XXX_Marshal(b []byte, determinis
 		return xxx_messageInfo_ApplicationWebhookTemplateIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -154,7 +157,7 @@ func (m *ApplicationWebhookTemplateField) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_ApplicationWebhookTemplateField.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -246,7 +249,7 @@ func (m *ApplicationWebhookTemplate) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_ApplicationWebhookTemplate.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -404,7 +407,7 @@ func (m *ApplicationWebhookTemplate_Message) XXX_Marshal(b []byte, deterministic
 		return xxx_messageInfo_ApplicationWebhookTemplate_Message.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -449,7 +452,7 @@ func (m *ApplicationWebhookTemplates) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_ApplicationWebhookTemplates.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -515,7 +518,7 @@ func (m *ApplicationWebhook) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_ApplicationWebhook.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -652,7 +655,7 @@ func (m *ApplicationWebhook_Message) XXX_Marshal(b []byte, deterministic bool) (
 		return xxx_messageInfo_ApplicationWebhook_Message.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -697,7 +700,7 @@ func (m *ApplicationWebhooks) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_ApplicationWebhooks.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -743,7 +746,7 @@ func (m *ApplicationWebhookFormats) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_ApplicationWebhookFormats.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -789,7 +792,7 @@ func (m *GetApplicationWebhookRequest) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_GetApplicationWebhookRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -835,7 +838,7 @@ func (m *ListApplicationWebhooksRequest) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_ListApplicationWebhooksRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -881,7 +884,7 @@ func (m *SetApplicationWebhookRequest) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_SetApplicationWebhookRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -927,7 +930,7 @@ func (m *GetApplicationWebhookTemplateRequest) XXX_Marshal(b []byte, determinist
 		return xxx_messageInfo_GetApplicationWebhookTemplateRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -974,7 +977,7 @@ func (m *ListApplicationWebhookTemplatesRequest) XXX_Marshal(b []byte, determini
 		return xxx_messageInfo_ListApplicationWebhookTemplatesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1783,6 +1786,32 @@ type ApplicationWebhookRegistryServer interface {
 	Delete(context.Context, *ApplicationWebhookIdentifiers) (*types.Empty, error)
 }
 
+// UnimplementedApplicationWebhookRegistryServer can be embedded to have forward compatible implementations.
+type UnimplementedApplicationWebhookRegistryServer struct {
+}
+
+func (*UnimplementedApplicationWebhookRegistryServer) GetFormats(ctx context.Context, req *types.Empty) (*ApplicationWebhookFormats, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFormats not implemented")
+}
+func (*UnimplementedApplicationWebhookRegistryServer) GetTemplate(ctx context.Context, req *GetApplicationWebhookTemplateRequest) (*ApplicationWebhookTemplate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTemplate not implemented")
+}
+func (*UnimplementedApplicationWebhookRegistryServer) ListTemplates(ctx context.Context, req *ListApplicationWebhookTemplatesRequest) (*ApplicationWebhookTemplates, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTemplates not implemented")
+}
+func (*UnimplementedApplicationWebhookRegistryServer) Get(ctx context.Context, req *GetApplicationWebhookRequest) (*ApplicationWebhook, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedApplicationWebhookRegistryServer) List(ctx context.Context, req *ListApplicationWebhooksRequest) (*ApplicationWebhooks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedApplicationWebhookRegistryServer) Set(ctx context.Context, req *SetApplicationWebhookRequest) (*ApplicationWebhook, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
+}
+func (*UnimplementedApplicationWebhookRegistryServer) Delete(ctx context.Context, req *ApplicationWebhookIdentifiers) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+
 func RegisterApplicationWebhookRegistryServer(s *grpc.Server, srv ApplicationWebhookRegistryServer) {
 	s.RegisterService(&_ApplicationWebhookRegistry_serviceDesc, srv)
 }
@@ -1953,7 +1982,7 @@ var _ApplicationWebhookRegistry_serviceDesc = grpc.ServiceDesc{
 func (m *ApplicationWebhookIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1961,31 +1990,39 @@ func (m *ApplicationWebhookIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationWebhookIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhookIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n1, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
 	if len(m.WebhookID) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.WebhookID)
+		copy(dAtA[i:], m.WebhookID)
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.WebhookID)))
-		i += copy(dAtA[i:], m.WebhookID)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhookTemplateIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1993,23 +2030,29 @@ func (m *ApplicationWebhookTemplateIdentifiers) Marshal() (dAtA []byte, err erro
 }
 
 func (m *ApplicationWebhookTemplateIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhookTemplateIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.TemplateID) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.TemplateID)
+		copy(dAtA[i:], m.TemplateID)
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.TemplateID)))
-		i += copy(dAtA[i:], m.TemplateID)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhookTemplateField) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2017,51 +2060,60 @@ func (m *ApplicationWebhookTemplateField) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationWebhookTemplateField) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhookTemplateField) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.ID)))
-		i += copy(dAtA[i:], m.ID)
-	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
+	if len(m.DefaultValue) > 0 {
+		i -= len(m.DefaultValue)
+		copy(dAtA[i:], m.DefaultValue)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.DefaultValue)))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if m.Secret {
-		dAtA[i] = 0x20
-		i++
+		i--
 		if m.Secret {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x20
 	}
-	if len(m.DefaultValue) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.DefaultValue)))
-		i += copy(dAtA[i:], m.DefaultValue)
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.ID) > 0 {
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.ID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhookTemplate) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2069,182 +2121,216 @@ func (m *ApplicationWebhookTemplate) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationWebhookTemplate) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhookTemplate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookTemplateIdentifiers.Size()))
-	n2, err := m.ApplicationWebhookTemplateIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Description) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Description)))
-		i += copy(dAtA[i:], m.Description)
-	}
-	if len(m.LogoURL) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.LogoURL)))
-		i += copy(dAtA[i:], m.LogoURL)
-	}
-	if len(m.InfoURL) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.InfoURL)))
-		i += copy(dAtA[i:], m.InfoURL)
-	}
-	if len(m.DocumentationURL) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.DocumentationURL)))
-		i += copy(dAtA[i:], m.DocumentationURL)
-	}
-	if len(m.BaseURL) > 0 {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.BaseURL)))
-		i += copy(dAtA[i:], m.BaseURL)
-	}
-	if len(m.Headers) > 0 {
-		for k := range m.Headers {
-			dAtA[i] = 0x42
-			i++
-			v := m.Headers[k]
-			mapSize := 1 + len(k) + sovApplicationserverWeb(uint64(len(k))) + 1 + len(v) + sovApplicationserverWeb(uint64(len(v)))
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if len(m.Format) > 0 {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Format)))
-		i += copy(dAtA[i:], m.Format)
-	}
-	if len(m.Fields) > 0 {
-		for _, msg := range m.Fields {
-			dAtA[i] = 0x52
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.LocationSolved != nil {
+		{
+			size, err := m.LocationSolved.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 		}
-	}
-	if m.UplinkMessage != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.UplinkMessage.Size()))
-		n3, err := m.UplinkMessage.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	if m.JoinAccept != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.JoinAccept.Size()))
-		n4, err := m.JoinAccept.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
-	}
-	if m.DownlinkAck != nil {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkAck.Size()))
-		n5, err := m.DownlinkAck.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
-	}
-	if m.DownlinkNack != nil {
-		dAtA[i] = 0x72
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkNack.Size()))
-		n6, err := m.DownlinkNack.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n6
-	}
-	if m.DownlinkSent != nil {
-		dAtA[i] = 0x7a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkSent.Size()))
-		n7, err := m.DownlinkSent.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	if m.DownlinkFailed != nil {
-		dAtA[i] = 0x82
-		i++
+		i--
 		dAtA[i] = 0x1
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkFailed.Size()))
-		n8, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n8
+		i--
+		dAtA[i] = 0x92
 	}
 	if m.DownlinkQueued != nil {
+		{
+			size, err := m.DownlinkQueued.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
 		dAtA[i] = 0x8a
-		i++
+	}
+	if m.DownlinkFailed != nil {
+		{
+			size, err := m.DownlinkFailed.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x1
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkQueued.Size()))
-		n9, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
+		i--
+		dAtA[i] = 0x82
+	}
+	if m.DownlinkSent != nil {
+		{
+			size, err := m.DownlinkSent.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x7a
+	}
+	if m.DownlinkNack != nil {
+		{
+			size, err := m.DownlinkNack.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x72
+	}
+	if m.DownlinkAck != nil {
+		{
+			size, err := m.DownlinkAck.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x6a
+	}
+	if m.JoinAccept != nil {
+		{
+			size, err := m.JoinAccept.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x62
+	}
+	if m.UplinkMessage != nil {
+		{
+			size, err := m.UplinkMessage.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.Fields) > 0 {
+		for iNdEx := len(m.Fields) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Fields[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x52
+		}
+	}
+	if len(m.Format) > 0 {
+		i -= len(m.Format)
+		copy(dAtA[i:], m.Format)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Format)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if len(m.Headers) > 0 {
+		for k := range m.Headers {
+			v := m.Headers[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x42
+		}
+	}
+	if len(m.BaseURL) > 0 {
+		i -= len(m.BaseURL)
+		copy(dAtA[i:], m.BaseURL)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.BaseURL)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.DocumentationURL) > 0 {
+		i -= len(m.DocumentationURL)
+		copy(dAtA[i:], m.DocumentationURL)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.DocumentationURL)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.InfoURL) > 0 {
+		i -= len(m.InfoURL)
+		copy(dAtA[i:], m.InfoURL)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.InfoURL)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.LogoURL) > 0 {
+		i -= len(m.LogoURL)
+		copy(dAtA[i:], m.LogoURL)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.LogoURL)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.ApplicationWebhookTemplateIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n9
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	if m.LocationSolved != nil {
-		dAtA[i] = 0x92
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.LocationSolved.Size()))
-		n10, err := m.LocationSolved.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n10
-	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhookTemplate_Message) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2252,23 +2338,29 @@ func (m *ApplicationWebhookTemplate_Message) Marshal() (dAtA []byte, err error) 
 }
 
 func (m *ApplicationWebhookTemplate_Message) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhookTemplate_Message) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Path) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.Path)
+		copy(dAtA[i:], m.Path)
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Path)))
-		i += copy(dAtA[i:], m.Path)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhookTemplates) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2276,29 +2368,36 @@ func (m *ApplicationWebhookTemplates) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationWebhookTemplates) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhookTemplates) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Templates) > 0 {
-		for _, msg := range m.Templates {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Templates) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Templates[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhook) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2306,179 +2405,210 @@ func (m *ApplicationWebhook) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationWebhook) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhook) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookIdentifiers.Size()))
-	n11, err := m.ApplicationWebhookIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if len(m.TemplateFields) > 0 {
+		for k := range m.TemplateFields {
+			v := m.TemplateFields[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x82
+		}
 	}
-	i += n11
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
-	n12, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.ApplicationWebhookTemplateIdentifiers != nil {
+		{
+			size, err := m.ApplicationWebhookTemplateIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x7a
 	}
-	i += n12
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
-	n13, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil {
-		return 0, err
+	if m.LocationSolved != nil {
+		{
+			size, err := m.LocationSolved.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x72
 	}
-	i += n13
-	if len(m.BaseURL) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.BaseURL)))
-		i += copy(dAtA[i:], m.BaseURL)
+	if m.DownlinkQueued != nil {
+		{
+			size, err := m.DownlinkQueued.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x6a
+	}
+	if m.DownlinkFailed != nil {
+		{
+			size, err := m.DownlinkFailed.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x62
+	}
+	if m.DownlinkSent != nil {
+		{
+			size, err := m.DownlinkSent.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x5a
+	}
+	if m.DownlinkNack != nil {
+		{
+			size, err := m.DownlinkNack.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x52
+	}
+	if m.DownlinkAck != nil {
+		{
+			size, err := m.DownlinkAck.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.JoinAccept != nil {
+		{
+			size, err := m.JoinAccept.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.UplinkMessage != nil {
+		{
+			size, err := m.UplinkMessage.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.Format) > 0 {
+		i -= len(m.Format)
+		copy(dAtA[i:], m.Format)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Format)))
+		i--
+		dAtA[i] = 0x32
 	}
 	if len(m.Headers) > 0 {
 		for k := range m.Headers {
-			dAtA[i] = 0x2a
-			i++
 			v := m.Headers[k]
-			mapSize := 1 + len(k) + sovApplicationserverWeb(uint64(len(k))) + 1 + len(v) + sovApplicationserverWeb(uint64(len(v)))
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if len(m.Format) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Format)))
-		i += copy(dAtA[i:], m.Format)
-	}
-	if m.UplinkMessage != nil {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.UplinkMessage.Size()))
-		n14, err := m.UplinkMessage.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n14
-	}
-	if m.JoinAccept != nil {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.JoinAccept.Size()))
-		n15, err := m.JoinAccept.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n15
-	}
-	if m.DownlinkAck != nil {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkAck.Size()))
-		n16, err := m.DownlinkAck.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n16
-	}
-	if m.DownlinkNack != nil {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkNack.Size()))
-		n17, err := m.DownlinkNack.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n17
-	}
-	if m.DownlinkSent != nil {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkSent.Size()))
-		n18, err := m.DownlinkSent.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n18
-	}
-	if m.DownlinkFailed != nil {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkFailed.Size()))
-		n19, err := m.DownlinkFailed.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n19
-	}
-	if m.DownlinkQueued != nil {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.DownlinkQueued.Size()))
-		n20, err := m.DownlinkQueued.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n20
-	}
-	if m.LocationSolved != nil {
-		dAtA[i] = 0x72
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.LocationSolved.Size()))
-		n21, err := m.LocationSolved.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n21
-	}
-	if m.ApplicationWebhookTemplateIdentifiers != nil {
-		dAtA[i] = 0x7a
-		i++
-		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookTemplateIdentifiers.Size()))
-		n22, err := m.ApplicationWebhookTemplateIdentifiers.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n22
-	}
-	if len(m.TemplateFields) > 0 {
-		for k := range m.TemplateFields {
-			dAtA[i] = 0x82
-			i++
-			dAtA[i] = 0x1
-			i++
-			v := m.TemplateFields[k]
-			mapSize := 1 + len(k) + sovApplicationserverWeb(uint64(len(k))) + 1 + len(v) + sovApplicationserverWeb(uint64(len(v)))
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
+			i--
 			dAtA[i] = 0x12
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x2a
 		}
 	}
-	return i, nil
+	if len(m.BaseURL) > 0 {
+		i -= len(m.BaseURL)
+		copy(dAtA[i:], m.BaseURL)
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.BaseURL)))
+		i--
+		dAtA[i] = 0x22
+	}
+	n20, err20 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt):])
+	if err20 != nil {
+		return 0, err20
+	}
+	i -= n20
+	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(n20))
+	i--
+	dAtA[i] = 0x1a
+	n21, err21 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt):])
+	if err21 != nil {
+		return 0, err21
+	}
+	i -= n21
+	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(n21))
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ApplicationWebhookIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhook_Message) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2486,23 +2616,29 @@ func (m *ApplicationWebhook_Message) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationWebhook_Message) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhook_Message) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Path) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.Path)
+		copy(dAtA[i:], m.Path)
 		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(m.Path)))
-		i += copy(dAtA[i:], m.Path)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhooks) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2510,29 +2646,36 @@ func (m *ApplicationWebhooks) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationWebhooks) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhooks) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Webhooks) > 0 {
-		for _, msg := range m.Webhooks {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Webhooks) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Webhooks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ApplicationWebhookFormats) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2540,34 +2683,41 @@ func (m *ApplicationWebhookFormats) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationWebhookFormats) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationWebhookFormats) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Formats) > 0 {
 		for k := range m.Formats {
-			dAtA[i] = 0xa
-			i++
 			v := m.Formats[k]
-			mapSize := 1 + len(k) + sovApplicationserverWeb(uint64(len(k))) + 1 + len(v) + sovApplicationserverWeb(uint64(len(v)))
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintApplicationserverWeb(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GetApplicationWebhookRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2575,33 +2725,42 @@ func (m *GetApplicationWebhookRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GetApplicationWebhookRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetApplicationWebhookRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookIdentifiers.Size()))
-	n23, err := m.ApplicationWebhookIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n23
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n24, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationWebhookIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n24
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListApplicationWebhooksRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2609,33 +2768,42 @@ func (m *ListApplicationWebhooksRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListApplicationWebhooksRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListApplicationWebhooksRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n25, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n25
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n26, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n26
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *SetApplicationWebhookRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2643,33 +2811,42 @@ func (m *SetApplicationWebhookRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SetApplicationWebhookRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SetApplicationWebhookRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhook.Size()))
-	n27, err := m.ApplicationWebhook.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n27
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n28, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationWebhook.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n28
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *GetApplicationWebhookTemplateRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2677,33 +2854,42 @@ func (m *GetApplicationWebhookTemplateRequest) Marshal() (dAtA []byte, err error
 }
 
 func (m *GetApplicationWebhookTemplateRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetApplicationWebhookTemplateRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.ApplicationWebhookTemplateIdentifiers.Size()))
-	n29, err := m.ApplicationWebhookTemplateIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n29
+	i--
 	dAtA[i] = 0x12
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n30, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationWebhookTemplateIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n30
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *ListApplicationWebhookTemplatesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2711,29 +2897,38 @@ func (m *ListApplicationWebhookTemplatesRequest) Marshal() (dAtA []byte, err err
 }
 
 func (m *ListApplicationWebhookTemplatesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListApplicationWebhookTemplatesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintApplicationserverWeb(dAtA, i, uint64(m.FieldMask.Size()))
-	n31, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintApplicationserverWeb(dAtA, i, uint64(size))
 	}
-	i += n31
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintApplicationserverWeb(dAtA []byte, offset int, v uint64) int {
+	offset -= sovApplicationserverWeb(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedApplicationWebhookIdentifiers(r randyApplicationserverWeb, easy bool) *ApplicationWebhookIdentifiers {
 	this := &ApplicationWebhookIdentifiers{}
@@ -2775,7 +2970,7 @@ func NewPopulatedApplicationWebhookTemplate(r randyApplicationserverWeb, easy bo
 	this.InfoURL = randStringApplicationserverWeb(r)
 	this.DocumentationURL = randStringApplicationserverWeb(r)
 	this.BaseURL = randStringApplicationserverWeb(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v3 := r.Intn(10)
 		this.Headers = make(map[string]string)
 		for i := 0; i < v3; i++ {
@@ -2783,35 +2978,35 @@ func NewPopulatedApplicationWebhookTemplate(r randyApplicationserverWeb, easy bo
 		}
 	}
 	this.Format = randStringApplicationserverWeb(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v4 := r.Intn(5)
 		this.Fields = make([]*ApplicationWebhookTemplateField, v4)
 		for i := 0; i < v4; i++ {
 			this.Fields[i] = NewPopulatedApplicationWebhookTemplateField(r, easy)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.UplinkMessage = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.JoinAccept = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkAck = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkNack = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkSent = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkFailed = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkQueued = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LocationSolved = NewPopulatedApplicationWebhookTemplate_Message(r, easy)
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -2829,7 +3024,7 @@ func NewPopulatedApplicationWebhookTemplate_Message(r randyApplicationserverWeb,
 
 func NewPopulatedApplicationWebhookTemplates(r randyApplicationserverWeb, easy bool) *ApplicationWebhookTemplates {
 	this := &ApplicationWebhookTemplates{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v5 := r.Intn(5)
 		this.Templates = make([]*ApplicationWebhookTemplate, v5)
 		for i := 0; i < v5; i++ {
@@ -2850,7 +3045,7 @@ func NewPopulatedApplicationWebhook(r randyApplicationserverWeb, easy bool) *App
 	v8 := github_com_gogo_protobuf_types.NewPopulatedStdTime(r, easy)
 	this.UpdatedAt = *v8
 	this.BaseURL = randStringApplicationserverWeb(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v9 := r.Intn(10)
 		this.Headers = make(map[string]string)
 		for i := 0; i < v9; i++ {
@@ -2858,34 +3053,34 @@ func NewPopulatedApplicationWebhook(r randyApplicationserverWeb, easy bool) *App
 		}
 	}
 	this.Format = randStringApplicationserverWeb(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.UplinkMessage = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.JoinAccept = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkAck = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkNack = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkSent = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkFailed = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.DownlinkQueued = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.LocationSolved = NewPopulatedApplicationWebhook_Message(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		this.ApplicationWebhookTemplateIdentifiers = NewPopulatedApplicationWebhookTemplateIdentifiers(r, easy)
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v10 := r.Intn(10)
 		this.TemplateFields = make(map[string]string)
 		for i := 0; i < v10; i++ {
@@ -2907,7 +3102,7 @@ func NewPopulatedApplicationWebhook_Message(r randyApplicationserverWeb, easy bo
 
 func NewPopulatedApplicationWebhooks(r randyApplicationserverWeb, easy bool) *ApplicationWebhooks {
 	this := &ApplicationWebhooks{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v11 := r.Intn(5)
 		this.Webhooks = make([]*ApplicationWebhook, v11)
 		for i := 0; i < v11; i++ {
@@ -2921,7 +3116,7 @@ func NewPopulatedApplicationWebhooks(r randyApplicationserverWeb, easy bool) *Ap
 
 func NewPopulatedApplicationWebhookFormats(r randyApplicationserverWeb, easy bool) *ApplicationWebhookFormats {
 	this := &ApplicationWebhookFormats{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v12 := r.Intn(10)
 		this.Formats = make(map[string]string)
 		for i := 0; i < v12; i++ {
@@ -3411,14 +3606,7 @@ func (m *ListApplicationWebhookTemplatesRequest) Size() (n int) {
 }
 
 func sovApplicationserverWeb(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozApplicationserverWeb(x uint64) (n int) {
 	return sovApplicationserverWeb((x << 1) ^ uint64((int64(x) >> 63)))
@@ -3428,7 +3616,7 @@ func (this *ApplicationWebhookIdentifiers) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ApplicationWebhookIdentifiers{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`WebhookID:` + fmt.Sprintf("%v", this.WebhookID) + `,`,
 		`}`,
 	}, "")
@@ -3462,6 +3650,11 @@ func (this *ApplicationWebhookTemplate) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForFields := "[]*ApplicationWebhookTemplateField{"
+	for _, f := range this.Fields {
+		repeatedStringForFields += strings.Replace(f.String(), "ApplicationWebhookTemplateField", "ApplicationWebhookTemplateField", 1) + ","
+	}
+	repeatedStringForFields += "}"
 	keysForHeaders := make([]string, 0, len(this.Headers))
 	for k := range this.Headers {
 		keysForHeaders = append(keysForHeaders, k)
@@ -3482,7 +3675,7 @@ func (this *ApplicationWebhookTemplate) String() string {
 		`BaseURL:` + fmt.Sprintf("%v", this.BaseURL) + `,`,
 		`Headers:` + mapStringForHeaders + `,`,
 		`Format:` + fmt.Sprintf("%v", this.Format) + `,`,
-		`Fields:` + strings.Replace(fmt.Sprintf("%v", this.Fields), "ApplicationWebhookTemplateField", "ApplicationWebhookTemplateField", 1) + `,`,
+		`Fields:` + repeatedStringForFields + `,`,
 		`UplinkMessage:` + strings.Replace(fmt.Sprintf("%v", this.UplinkMessage), "ApplicationWebhookTemplate_Message", "ApplicationWebhookTemplate_Message", 1) + `,`,
 		`JoinAccept:` + strings.Replace(fmt.Sprintf("%v", this.JoinAccept), "ApplicationWebhookTemplate_Message", "ApplicationWebhookTemplate_Message", 1) + `,`,
 		`DownlinkAck:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkAck), "ApplicationWebhookTemplate_Message", "ApplicationWebhookTemplate_Message", 1) + `,`,
@@ -3509,8 +3702,13 @@ func (this *ApplicationWebhookTemplates) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForTemplates := "[]*ApplicationWebhookTemplate{"
+	for _, f := range this.Templates {
+		repeatedStringForTemplates += strings.Replace(f.String(), "ApplicationWebhookTemplate", "ApplicationWebhookTemplate", 1) + ","
+	}
+	repeatedStringForTemplates += "}"
 	s := strings.Join([]string{`&ApplicationWebhookTemplates{`,
-		`Templates:` + strings.Replace(fmt.Sprintf("%v", this.Templates), "ApplicationWebhookTemplate", "ApplicationWebhookTemplate", 1) + `,`,
+		`Templates:` + repeatedStringForTemplates + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3541,8 +3739,8 @@ func (this *ApplicationWebhook) String() string {
 	mapStringForTemplateFields += "}"
 	s := strings.Join([]string{`&ApplicationWebhook{`,
 		`ApplicationWebhookIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationWebhookIdentifiers.String(), "ApplicationWebhookIdentifiers", "ApplicationWebhookIdentifiers", 1), `&`, ``, 1) + `,`,
-		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
-		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`CreatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
+		`UpdatedAt:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "types.Timestamp", 1), `&`, ``, 1) + `,`,
 		`BaseURL:` + fmt.Sprintf("%v", this.BaseURL) + `,`,
 		`Headers:` + mapStringForHeaders + `,`,
 		`Format:` + fmt.Sprintf("%v", this.Format) + `,`,
@@ -3554,7 +3752,7 @@ func (this *ApplicationWebhook) String() string {
 		`DownlinkFailed:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkFailed), "ApplicationWebhook_Message", "ApplicationWebhook_Message", 1) + `,`,
 		`DownlinkQueued:` + strings.Replace(fmt.Sprintf("%v", this.DownlinkQueued), "ApplicationWebhook_Message", "ApplicationWebhook_Message", 1) + `,`,
 		`LocationSolved:` + strings.Replace(fmt.Sprintf("%v", this.LocationSolved), "ApplicationWebhook_Message", "ApplicationWebhook_Message", 1) + `,`,
-		`ApplicationWebhookTemplateIdentifiers:` + strings.Replace(fmt.Sprintf("%v", this.ApplicationWebhookTemplateIdentifiers), "ApplicationWebhookTemplateIdentifiers", "ApplicationWebhookTemplateIdentifiers", 1) + `,`,
+		`ApplicationWebhookTemplateIdentifiers:` + strings.Replace(this.ApplicationWebhookTemplateIdentifiers.String(), "ApplicationWebhookTemplateIdentifiers", "ApplicationWebhookTemplateIdentifiers", 1) + `,`,
 		`TemplateFields:` + mapStringForTemplateFields + `,`,
 		`}`,
 	}, "")
@@ -3574,8 +3772,13 @@ func (this *ApplicationWebhooks) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForWebhooks := "[]*ApplicationWebhook{"
+	for _, f := range this.Webhooks {
+		repeatedStringForWebhooks += strings.Replace(f.String(), "ApplicationWebhook", "ApplicationWebhook", 1) + ","
+	}
+	repeatedStringForWebhooks += "}"
 	s := strings.Join([]string{`&ApplicationWebhooks{`,
-		`Webhooks:` + strings.Replace(fmt.Sprintf("%v", this.Webhooks), "ApplicationWebhook", "ApplicationWebhook", 1) + `,`,
+		`Webhooks:` + repeatedStringForWebhooks + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3606,7 +3809,7 @@ func (this *GetApplicationWebhookRequest) String() string {
 	}
 	s := strings.Join([]string{`&GetApplicationWebhookRequest{`,
 		`ApplicationWebhookIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationWebhookIdentifiers.String(), "ApplicationWebhookIdentifiers", "ApplicationWebhookIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3616,8 +3819,8 @@ func (this *ListApplicationWebhooksRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListApplicationWebhooksRequest{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3628,7 +3831,7 @@ func (this *SetApplicationWebhookRequest) String() string {
 	}
 	s := strings.Join([]string{`&SetApplicationWebhookRequest{`,
 		`ApplicationWebhook:` + strings.Replace(strings.Replace(this.ApplicationWebhook.String(), "ApplicationWebhook", "ApplicationWebhook", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3639,7 +3842,7 @@ func (this *GetApplicationWebhookTemplateRequest) String() string {
 	}
 	s := strings.Join([]string{`&GetApplicationWebhookTemplateRequest{`,
 		`ApplicationWebhookTemplateIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationWebhookTemplateIdentifiers.String(), "ApplicationWebhookTemplateIdentifiers", "ApplicationWebhookTemplateIdentifiers", 1), `&`, ``, 1) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -3649,7 +3852,7 @@ func (this *ListApplicationWebhookTemplatesRequest) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&ListApplicationWebhookTemplatesRequest{`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

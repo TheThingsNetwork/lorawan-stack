@@ -9,6 +9,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strconv "strconv"
 	strings "strings"
@@ -33,7 +34,7 @@ var _ = time.Kitchen
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type LocationSource int32
 
@@ -141,7 +142,7 @@ func (m *RxMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_RxMetadata.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -307,7 +308,7 @@ func (m *Location) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Location.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -574,7 +575,7 @@ func (this *Location) Equal(that interface{}) bool {
 func (m *RxMetadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -582,143 +583,159 @@ func (m *RxMetadata) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *RxMetadata) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RxMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintMetadata(dAtA, i, uint64(m.GatewayIdentifiers.Size()))
-	n1, err := m.GatewayIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	if m.AntennaIndex != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.AntennaIndex))
-	}
-	if m.Time != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time)))
-		n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.Advanced != nil {
+		{
+			size, err := m.Advanced.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMetadata(dAtA, i, uint64(size))
 		}
-		i += n2
-	}
-	if m.Timestamp != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Timestamp))
-	}
-	if m.FineTimestamp != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintMetadata(dAtA, i, m.FineTimestamp)
-	}
-	if len(m.EncryptedFineTimestamp) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestamp)))
-		i += copy(dAtA[i:], m.EncryptedFineTimestamp)
-	}
-	if len(m.EncryptedFineTimestampKeyID) > 0 {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestampKeyID)))
-		i += copy(dAtA[i:], m.EncryptedFineTimestampKeyID)
-	}
-	if m.RSSI != 0 {
-		dAtA[i] = 0x45
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSI)))
-		i += 4
-	}
-	if m.ChannelRSSI != 0 {
-		dAtA[i] = 0x4d
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.ChannelRSSI)))
-		i += 4
-	}
-	if m.RSSIStandardDeviation != 0 {
-		dAtA[i] = 0x55
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIStandardDeviation)))
-		i += 4
-	}
-	if m.SNR != 0 {
-		dAtA[i] = 0x5d
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.SNR)))
-		i += 4
-	}
-	if m.FrequencyOffset != 0 {
-		dAtA[i] = 0x60
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.FrequencyOffset))
-	}
-	if m.Location != nil {
-		dAtA[i] = 0x6a
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Location.Size()))
-		n3, err := m.Location.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	if m.DownlinkPathConstraint != 0 {
-		dAtA[i] = 0x70
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.DownlinkPathConstraint))
-	}
-	if len(m.UplinkToken) > 0 {
-		dAtA[i] = 0x7a
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(len(m.UplinkToken)))
-		i += copy(dAtA[i:], m.UplinkToken)
-	}
-	if m.SignalRSSI != nil {
-		dAtA[i] = 0x82
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.SignalRSSI.Size()))
-		n4, err := m.SignalRSSI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
+		i--
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0x9a
 	}
 	if m.ChannelIndex != 0 {
-		dAtA[i] = 0x88
-		i++
-		dAtA[i] = 0x1
-		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(m.ChannelIndex))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x88
 	}
-	if m.Advanced != nil {
-		dAtA[i] = 0x9a
-		i++
-		dAtA[i] = 0x6
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Advanced.Size()))
-		n5, err := m.Advanced.MarshalTo(dAtA[i:])
+	if m.SignalRSSI != nil {
+		{
+			size, err := m.SignalRSSI.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMetadata(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
+	}
+	if len(m.UplinkToken) > 0 {
+		i -= len(m.UplinkToken)
+		copy(dAtA[i:], m.UplinkToken)
+		i = encodeVarintMetadata(dAtA, i, uint64(len(m.UplinkToken)))
+		i--
+		dAtA[i] = 0x7a
+	}
+	if m.DownlinkPathConstraint != 0 {
+		i = encodeVarintMetadata(dAtA, i, uint64(m.DownlinkPathConstraint))
+		i--
+		dAtA[i] = 0x70
+	}
+	if m.Location != nil {
+		{
+			size, err := m.Location.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMetadata(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x6a
+	}
+	if m.FrequencyOffset != 0 {
+		i = encodeVarintMetadata(dAtA, i, uint64(m.FrequencyOffset))
+		i--
+		dAtA[i] = 0x60
+	}
+	if m.SNR != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.SNR)))
+		i--
+		dAtA[i] = 0x5d
+	}
+	if m.RSSIStandardDeviation != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSIStandardDeviation)))
+		i--
+		dAtA[i] = 0x55
+	}
+	if m.ChannelRSSI != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.ChannelRSSI)))
+		i--
+		dAtA[i] = 0x4d
+	}
+	if m.RSSI != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], math.Float32bits(float32(m.RSSI)))
+		i--
+		dAtA[i] = 0x45
+	}
+	if len(m.EncryptedFineTimestampKeyID) > 0 {
+		i -= len(m.EncryptedFineTimestampKeyID)
+		copy(dAtA[i:], m.EncryptedFineTimestampKeyID)
+		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestampKeyID)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.EncryptedFineTimestamp) > 0 {
+		i -= len(m.EncryptedFineTimestamp)
+		copy(dAtA[i:], m.EncryptedFineTimestamp)
+		i = encodeVarintMetadata(dAtA, i, uint64(len(m.EncryptedFineTimestamp)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.FineTimestamp != 0 {
+		i = encodeVarintMetadata(dAtA, i, m.FineTimestamp)
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.Timestamp != 0 {
+		i = encodeVarintMetadata(dAtA, i, uint64(m.Timestamp))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Time != nil {
+		n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Time, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Time):])
+		if err4 != nil {
+			return 0, err4
+		}
+		i -= n4
+		i = encodeVarintMetadata(dAtA, i, uint64(n4))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.AntennaIndex != 0 {
+		i = encodeVarintMetadata(dAtA, i, uint64(m.AntennaIndex))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.GatewayIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n5
+		i -= size
+		i = encodeVarintMetadata(dAtA, i, uint64(size))
 	}
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Location) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -726,48 +743,55 @@ func (m *Location) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *Location) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Location) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Latitude != 0 {
-		dAtA[i] = 0x9
-		i++
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(float64(m.Latitude)))
-		i += 8
-	}
-	if m.Longitude != 0 {
-		dAtA[i] = 0x11
-		i++
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(float64(m.Longitude)))
-		i += 8
-	}
-	if m.Altitude != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Altitude))
+	if m.Source != 0 {
+		i = encodeVarintMetadata(dAtA, i, uint64(m.Source))
+		i--
+		dAtA[i] = 0x28
 	}
 	if m.Accuracy != 0 {
-		dAtA[i] = 0x20
-		i++
 		i = encodeVarintMetadata(dAtA, i, uint64(m.Accuracy))
+		i--
+		dAtA[i] = 0x20
 	}
-	if m.Source != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintMetadata(dAtA, i, uint64(m.Source))
+	if m.Altitude != 0 {
+		i = encodeVarintMetadata(dAtA, i, uint64(m.Altitude))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.Longitude != 0 {
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(float64(m.Longitude)))
+		i--
+		dAtA[i] = 0x11
+	}
+	if m.Latitude != 0 {
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], math.Float64bits(float64(m.Latitude)))
+		i--
+		dAtA[i] = 0x9
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintMetadata(dAtA []byte, offset int, v uint64) int {
+	offset -= sovMetadata(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedLocation(r randyMetadata, easy bool) *Location {
 	this := &Location{}
@@ -959,14 +983,7 @@ func (m *Location) Size() (n int) {
 }
 
 func sovMetadata(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozMetadata(x uint64) (n int) {
 	return sovMetadata((x << 1) ^ uint64((int64(x) >> 63)))
@@ -976,7 +993,7 @@ func (this *RxMetadata) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&RxMetadata{`,
-		`GatewayIdentifiers:` + strings.Replace(strings.Replace(this.GatewayIdentifiers.String(), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
+		`GatewayIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.GatewayIdentifiers), "GatewayIdentifiers", "GatewayIdentifiers", 1), `&`, ``, 1) + `,`,
 		`AntennaIndex:` + fmt.Sprintf("%v", this.AntennaIndex) + `,`,
 		`Time:` + strings.Replace(fmt.Sprintf("%v", this.Time), "Timestamp", "types.Timestamp", 1) + `,`,
 		`Timestamp:` + fmt.Sprintf("%v", this.Timestamp) + `,`,
@@ -988,7 +1005,7 @@ func (this *RxMetadata) String() string {
 		`RSSIStandardDeviation:` + fmt.Sprintf("%v", this.RSSIStandardDeviation) + `,`,
 		`SNR:` + fmt.Sprintf("%v", this.SNR) + `,`,
 		`FrequencyOffset:` + fmt.Sprintf("%v", this.FrequencyOffset) + `,`,
-		`Location:` + strings.Replace(fmt.Sprintf("%v", this.Location), "Location", "Location", 1) + `,`,
+		`Location:` + strings.Replace(this.Location.String(), "Location", "Location", 1) + `,`,
 		`DownlinkPathConstraint:` + fmt.Sprintf("%v", this.DownlinkPathConstraint) + `,`,
 		`UplinkToken:` + fmt.Sprintf("%v", this.UplinkToken) + `,`,
 		`SignalRSSI:` + strings.Replace(fmt.Sprintf("%v", this.SignalRSSI), "FloatValue", "types.FloatValue", 1) + `,`,

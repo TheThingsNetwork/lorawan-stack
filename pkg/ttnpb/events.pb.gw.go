@@ -53,6 +53,21 @@ func request_Events_Stream_0(ctx context.Context, marshaler runtime.Marshaler, c
 
 }
 
+// RegisterEventsHandlerServer registers the http handlers for service Events to "mux".
+// UnaryRPC     :call EventsServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+func RegisterEventsHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EventsServer) error {
+
+	mux.Handle("POST", pattern_Events_Stream_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
+		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+		return
+	})
+
+	return nil
+}
+
 // RegisterEventsHandlerFromEndpoint is same as RegisterEventsHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEventsHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {

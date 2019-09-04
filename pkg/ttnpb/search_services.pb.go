@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -19,6 +20,8 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -31,7 +34,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // This message is used for finding entities in the EntityRegistrySearch service.
 type SearchEntitiesRequest struct {
@@ -61,7 +64,7 @@ func (m *SearchEntitiesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_SearchEntitiesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -149,7 +152,7 @@ func (m *SearchEndDevicesRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_SearchEndDevicesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -488,6 +491,26 @@ type EntityRegistrySearchServer interface {
 	SearchUsers(context.Context, *SearchEntitiesRequest) (*Users, error)
 }
 
+// UnimplementedEntityRegistrySearchServer can be embedded to have forward compatible implementations.
+type UnimplementedEntityRegistrySearchServer struct {
+}
+
+func (*UnimplementedEntityRegistrySearchServer) SearchApplications(ctx context.Context, req *SearchEntitiesRequest) (*Applications, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchApplications not implemented")
+}
+func (*UnimplementedEntityRegistrySearchServer) SearchClients(ctx context.Context, req *SearchEntitiesRequest) (*Clients, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchClients not implemented")
+}
+func (*UnimplementedEntityRegistrySearchServer) SearchGateways(ctx context.Context, req *SearchEntitiesRequest) (*Gateways, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchGateways not implemented")
+}
+func (*UnimplementedEntityRegistrySearchServer) SearchOrganizations(ctx context.Context, req *SearchEntitiesRequest) (*Organizations, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchOrganizations not implemented")
+}
+func (*UnimplementedEntityRegistrySearchServer) SearchUsers(ctx context.Context, req *SearchEntitiesRequest) (*Users, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchUsers not implemented")
+}
+
 func RegisterEntityRegistrySearchServer(s *grpc.Server, srv EntityRegistrySearchServer) {
 	s.RegisterService(&_EntityRegistrySearch_serviceDesc, srv)
 }
@@ -640,6 +663,14 @@ type EndDeviceRegistrySearchServer interface {
 	SearchEndDevices(context.Context, *SearchEndDevicesRequest) (*EndDevices, error)
 }
 
+// UnimplementedEndDeviceRegistrySearchServer can be embedded to have forward compatible implementations.
+type UnimplementedEndDeviceRegistrySearchServer struct {
+}
+
+func (*UnimplementedEndDeviceRegistrySearchServer) SearchEndDevices(ctx context.Context, req *SearchEndDevicesRequest) (*EndDevices, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchEndDevices not implemented")
+}
+
 func RegisterEndDeviceRegistrySearchServer(s *grpc.Server, srv EndDeviceRegistrySearchServer) {
 	s.RegisterService(&_EndDeviceRegistrySearch_serviceDesc, srv)
 }
@@ -678,7 +709,7 @@ var _EndDeviceRegistrySearch_serviceDesc = grpc.ServiceDesc{
 func (m *SearchEntitiesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -686,60 +717,72 @@ func (m *SearchEntitiesRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SearchEntitiesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SearchEntitiesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.IDContains) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.IDContains)))
-		i += copy(dAtA[i:], m.IDContains)
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSearchServices(dAtA, i, uint64(size))
 	}
-	if len(m.NameContains) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.NameContains)))
-		i += copy(dAtA[i:], m.NameContains)
-	}
-	if len(m.DescriptionContains) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DescriptionContains)))
-		i += copy(dAtA[i:], m.DescriptionContains)
-	}
+	i--
+	dAtA[i] = 0x32
 	if len(m.AttributesContain) > 0 {
 		for k := range m.AttributesContain {
-			dAtA[i] = 0x22
-			i++
 			v := m.AttributesContain[k]
-			mapSize := 1 + len(k) + sovSearchServices(uint64(len(k))) + 1 + len(v) + sovSearchServices(uint64(len(v)))
-			i = encodeVarintSearchServices(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintSearchServices(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintSearchServices(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintSearchServices(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x22
 		}
 	}
-	dAtA[i] = 0x32
-	i++
-	i = encodeVarintSearchServices(dAtA, i, uint64(m.FieldMask.Size()))
-	n1, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	if len(m.DescriptionContains) > 0 {
+		i -= len(m.DescriptionContains)
+		copy(dAtA[i:], m.DescriptionContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DescriptionContains)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	i += n1
-	return i, nil
+	if len(m.NameContains) > 0 {
+		i -= len(m.NameContains)
+		copy(dAtA[i:], m.NameContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.NameContains)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.IDContains) > 0 {
+		i -= len(m.IDContains)
+		copy(dAtA[i:], m.IDContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.IDContains)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *SearchEndDevicesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -747,97 +790,116 @@ func (m *SearchEndDevicesRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SearchEndDevicesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SearchEndDevicesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintSearchServices(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n2, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.FieldMask.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSearchServices(dAtA, i, uint64(size))
 	}
-	i += n2
-	if len(m.IDContains) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.IDContains)))
-		i += copy(dAtA[i:], m.IDContains)
+	i--
+	dAtA[i] = 0x4a
+	if len(m.DevAddrContains) > 0 {
+		i -= len(m.DevAddrContains)
+		copy(dAtA[i:], m.DevAddrContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DevAddrContains)))
+		i--
+		dAtA[i] = 0x42
 	}
-	if len(m.NameContains) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.NameContains)))
-		i += copy(dAtA[i:], m.NameContains)
+	if len(m.JoinEUIContains) > 0 {
+		i -= len(m.JoinEUIContains)
+		copy(dAtA[i:], m.JoinEUIContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.JoinEUIContains)))
+		i--
+		dAtA[i] = 0x3a
 	}
-	if len(m.DescriptionContains) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DescriptionContains)))
-		i += copy(dAtA[i:], m.DescriptionContains)
+	if len(m.DevEUIContains) > 0 {
+		i -= len(m.DevEUIContains)
+		copy(dAtA[i:], m.DevEUIContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DevEUIContains)))
+		i--
+		dAtA[i] = 0x32
 	}
 	if len(m.AttributesContain) > 0 {
 		for k := range m.AttributesContain {
-			dAtA[i] = 0x2a
-			i++
 			v := m.AttributesContain[k]
-			mapSize := 1 + len(k) + sovSearchServices(uint64(len(k))) + 1 + len(v) + sovSearchServices(uint64(len(v)))
-			i = encodeVarintSearchServices(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintSearchServices(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintSearchServices(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintSearchServices(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintSearchServices(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.DevEUIContains) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DevEUIContains)))
-		i += copy(dAtA[i:], m.DevEUIContains)
+	if len(m.DescriptionContains) > 0 {
+		i -= len(m.DescriptionContains)
+		copy(dAtA[i:], m.DescriptionContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DescriptionContains)))
+		i--
+		dAtA[i] = 0x22
 	}
-	if len(m.JoinEUIContains) > 0 {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.JoinEUIContains)))
-		i += copy(dAtA[i:], m.JoinEUIContains)
+	if len(m.NameContains) > 0 {
+		i -= len(m.NameContains)
+		copy(dAtA[i:], m.NameContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.NameContains)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	if len(m.DevAddrContains) > 0 {
-		dAtA[i] = 0x42
-		i++
-		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.DevAddrContains)))
-		i += copy(dAtA[i:], m.DevAddrContains)
+	if len(m.IDContains) > 0 {
+		i -= len(m.IDContains)
+		copy(dAtA[i:], m.IDContains)
+		i = encodeVarintSearchServices(dAtA, i, uint64(len(m.IDContains)))
+		i--
+		dAtA[i] = 0x12
 	}
-	dAtA[i] = 0x4a
-	i++
-	i = encodeVarintSearchServices(dAtA, i, uint64(m.FieldMask.Size()))
-	n3, err := m.FieldMask.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSearchServices(dAtA, i, uint64(size))
 	}
-	i += n3
-	return i, nil
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintSearchServices(dAtA []byte, offset int, v uint64) int {
+	offset -= sovSearchServices(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedSearchEntitiesRequest(r randySearchServices, easy bool) *SearchEntitiesRequest {
 	this := &SearchEntitiesRequest{}
 	this.IDContains = randStringSearchServices(r)
 	this.NameContains = randStringSearchServices(r)
 	this.DescriptionContains = randStringSearchServices(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
 		for i := 0; i < v1; i++ {
@@ -858,7 +920,7 @@ func NewPopulatedSearchEndDevicesRequest(r randySearchServices, easy bool) *Sear
 	this.IDContains = randStringSearchServices(r)
 	this.NameContains = randStringSearchServices(r)
 	this.DescriptionContains = randStringSearchServices(r)
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v4 := r.Intn(10)
 		this.AttributesContain = make(map[string]string)
 		for i := 0; i < v4; i++ {
@@ -1024,14 +1086,7 @@ func (m *SearchEndDevicesRequest) Size() (n int) {
 }
 
 func sovSearchServices(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozSearchServices(x uint64) (n int) {
 	return sovSearchServices((x << 1) ^ uint64((int64(x) >> 63)))
@@ -1055,7 +1110,7 @@ func (this *SearchEntitiesRequest) String() string {
 		`NameContains:` + fmt.Sprintf("%v", this.NameContains) + `,`,
 		`DescriptionContains:` + fmt.Sprintf("%v", this.DescriptionContains) + `,`,
 		`AttributesContain:` + mapStringForAttributesContain + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1075,7 +1130,7 @@ func (this *SearchEndDevicesRequest) String() string {
 	}
 	mapStringForAttributesContain += "}"
 	s := strings.Join([]string{`&SearchEndDevicesRequest{`,
-		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(this.ApplicationIdentifiers.String(), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
+		`ApplicationIdentifiers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ApplicationIdentifiers), "ApplicationIdentifiers", "ApplicationIdentifiers", 1), `&`, ``, 1) + `,`,
 		`IDContains:` + fmt.Sprintf("%v", this.IDContains) + `,`,
 		`NameContains:` + fmt.Sprintf("%v", this.NameContains) + `,`,
 		`DescriptionContains:` + fmt.Sprintf("%v", this.DescriptionContains) + `,`,
@@ -1083,7 +1138,7 @@ func (this *SearchEndDevicesRequest) String() string {
 		`DevEUIContains:` + fmt.Sprintf("%v", this.DevEUIContains) + `,`,
 		`JoinEUIContains:` + fmt.Sprintf("%v", this.JoinEUIContains) + `,`,
 		`DevAddrContains:` + fmt.Sprintf("%v", this.DevAddrContains) + `,`,
-		`FieldMask:` + strings.Replace(strings.Replace(this.FieldMask.String(), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
+		`FieldMask:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.FieldMask), "FieldMask", "types.FieldMask", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s

@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	reflect "reflect"
 	strings "strings"
 
@@ -27,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ApplicationIdentifiers struct {
 	ApplicationID        string   `protobuf:"bytes,1,opt,name=application_id,json=applicationId,proto3" json:"application_id,omitempty"`
@@ -48,7 +49,7 @@ func (m *ApplicationIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_ApplicationIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -93,7 +94,7 @@ func (m *ClientIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_ClientIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -145,7 +146,7 @@ func (m *EndDeviceIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_EndDeviceIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -192,7 +193,7 @@ func (m *GatewayIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_GatewayIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -238,7 +239,7 @@ func (m *OrganizationIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_OrganizationIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -286,7 +287,7 @@ func (m *UserIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return xxx_messageInfo_UserIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -342,7 +343,7 @@ func (m *OrganizationOrUserIdentifiers) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_OrganizationOrUserIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -399,78 +400,12 @@ func (m *OrganizationOrUserIdentifiers) GetUserIDs() *UserIdentifiers {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*OrganizationOrUserIdentifiers) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _OrganizationOrUserIdentifiers_OneofMarshaler, _OrganizationOrUserIdentifiers_OneofUnmarshaler, _OrganizationOrUserIdentifiers_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*OrganizationOrUserIdentifiers) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*OrganizationOrUserIdentifiers_OrganizationIDs)(nil),
 		(*OrganizationOrUserIdentifiers_UserIDs)(nil),
 	}
-}
-
-func _OrganizationOrUserIdentifiers_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*OrganizationOrUserIdentifiers)
-	// ids
-	switch x := m.Ids.(type) {
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.OrganizationIDs); err != nil {
-			return err
-		}
-	case *OrganizationOrUserIdentifiers_UserIDs:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.UserIDs); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("OrganizationOrUserIdentifiers.Ids has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _OrganizationOrUserIdentifiers_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*OrganizationOrUserIdentifiers)
-	switch tag {
-	case 1: // ids.organization_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(OrganizationIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &OrganizationOrUserIdentifiers_OrganizationIDs{msg}
-		return true, err
-	case 2: // ids.user_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(UserIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &OrganizationOrUserIdentifiers_UserIDs{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _OrganizationOrUserIdentifiers_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*OrganizationOrUserIdentifiers)
-	// ids
-	switch x := m.Ids.(type) {
-	case *OrganizationOrUserIdentifiers_OrganizationIDs:
-		s := proto.Size(x.OrganizationIDs)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *OrganizationOrUserIdentifiers_UserIDs:
-		s := proto.Size(x.UserIDs)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // EntityIdentifiers contains one of the possible entity identifiers.
@@ -500,7 +435,7 @@ func (m *EntityIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_EntityIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -601,9 +536,9 @@ func (m *EntityIdentifiers) GetUserIDs() *UserIdentifiers {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*EntityIdentifiers) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _EntityIdentifiers_OneofMarshaler, _EntityIdentifiers_OneofUnmarshaler, _EntityIdentifiers_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*EntityIdentifiers) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*EntityIdentifiers_ApplicationIDs)(nil),
 		(*EntityIdentifiers_ClientIDs)(nil),
 		(*EntityIdentifiers_DeviceIDs)(nil),
@@ -611,144 +546,6 @@ func (*EntityIdentifiers) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buf
 		(*EntityIdentifiers_OrganizationIDs)(nil),
 		(*EntityIdentifiers_UserIDs)(nil),
 	}
-}
-
-func _EntityIdentifiers_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*EntityIdentifiers)
-	// ids
-	switch x := m.Ids.(type) {
-	case *EntityIdentifiers_ApplicationIDs:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ApplicationIDs); err != nil {
-			return err
-		}
-	case *EntityIdentifiers_ClientIDs:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ClientIDs); err != nil {
-			return err
-		}
-	case *EntityIdentifiers_DeviceIDs:
-		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.DeviceIDs); err != nil {
-			return err
-		}
-	case *EntityIdentifiers_GatewayIDs:
-		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.GatewayIDs); err != nil {
-			return err
-		}
-	case *EntityIdentifiers_OrganizationIDs:
-		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.OrganizationIDs); err != nil {
-			return err
-		}
-	case *EntityIdentifiers_UserIDs:
-		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.UserIDs); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("EntityIdentifiers.Ids has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _EntityIdentifiers_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*EntityIdentifiers)
-	switch tag {
-	case 1: // ids.application_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ApplicationIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &EntityIdentifiers_ApplicationIDs{msg}
-		return true, err
-	case 2: // ids.client_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ClientIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &EntityIdentifiers_ClientIDs{msg}
-		return true, err
-	case 3: // ids.device_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(EndDeviceIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &EntityIdentifiers_DeviceIDs{msg}
-		return true, err
-	case 4: // ids.gateway_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(GatewayIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &EntityIdentifiers_GatewayIDs{msg}
-		return true, err
-	case 5: // ids.organization_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(OrganizationIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &EntityIdentifiers_OrganizationIDs{msg}
-		return true, err
-	case 6: // ids.user_ids
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(UserIdentifiers)
-		err := b.DecodeMessage(msg)
-		m.Ids = &EntityIdentifiers_UserIDs{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _EntityIdentifiers_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*EntityIdentifiers)
-	// ids
-	switch x := m.Ids.(type) {
-	case *EntityIdentifiers_ApplicationIDs:
-		s := proto.Size(x.ApplicationIDs)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *EntityIdentifiers_ClientIDs:
-		s := proto.Size(x.ClientIDs)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *EntityIdentifiers_DeviceIDs:
-		s := proto.Size(x.DeviceIDs)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *EntityIdentifiers_GatewayIDs:
-		s := proto.Size(x.GatewayIDs)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *EntityIdentifiers_OrganizationIDs:
-		s := proto.Size(x.OrganizationIDs)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *EntityIdentifiers_UserIDs:
-		s := proto.Size(x.UserIDs)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // Combine the identifiers of multiple entities.
@@ -772,7 +569,7 @@ func (m *CombinedIdentifiers) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_CombinedIdentifiers.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1352,7 +1149,7 @@ func (this *CombinedIdentifiers) Equal(that interface{}) bool {
 func (m *ApplicationIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1360,23 +1157,29 @@ func (m *ApplicationIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ApplicationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ApplicationIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.ApplicationID) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.ApplicationID)
+		copy(dAtA[i:], m.ApplicationID)
 		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.ApplicationID)))
-		i += copy(dAtA[i:], m.ApplicationID)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ClientIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1384,23 +1187,29 @@ func (m *ClientIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ClientIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClientIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.ClientID) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.ClientID)
+		copy(dAtA[i:], m.ClientID)
 		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.ClientID)))
-		i += copy(dAtA[i:], m.ClientID)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *EndDeviceIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1408,61 +1217,75 @@ func (m *EndDeviceIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EndDeviceIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EndDeviceIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.DeviceID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.DeviceID)))
-		i += copy(dAtA[i:], m.DeviceID)
-	}
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintIdentifiers(dAtA, i, uint64(m.ApplicationIdentifiers.Size()))
-	n1, err := m.ApplicationIdentifiers.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	if m.DevEUI != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevEUI.Size()))
-		n2, err := m.DevEUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if m.DevAddr != nil {
+		{
+			size := m.DevAddr.Size()
+			i -= size
+			if _, err := m.DevAddr.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n2
+		i--
+		dAtA[i] = 0x32
 	}
 	if m.JoinEUI != nil {
+		{
+			size := m.JoinEUI.Size()
+			i -= size
+			if _, err := m.JoinEUI.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.JoinEUI.Size()))
-		n3, err := m.JoinEUI.MarshalTo(dAtA[i:])
+	}
+	if m.DevEUI != nil {
+		{
+			size := m.DevEUI.Size()
+			i -= size
+			if _, err := m.DevEUI.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	{
+		size, err := m.ApplicationIdentifiers.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
-		i += n3
+		i -= size
+		i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 	}
-	if m.DevAddr != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DevAddr.Size()))
-		n4, err := m.DevAddr.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
+	i--
+	dAtA[i] = 0x12
+	if len(m.DeviceID) > 0 {
+		i -= len(m.DeviceID)
+		copy(dAtA[i:], m.DeviceID)
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.DeviceID)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *GatewayIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1470,33 +1293,41 @@ func (m *GatewayIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *GatewayIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GatewayIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.GatewayID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.GatewayID)))
-		i += copy(dAtA[i:], m.GatewayID)
-	}
 	if m.EUI != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.EUI.Size()))
-		n5, err := m.EUI.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.EUI.Size()
+			i -= size
+			if _, err := m.EUI.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n5
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.GatewayID) > 0 {
+		i -= len(m.GatewayID)
+		copy(dAtA[i:], m.GatewayID)
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.GatewayID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *OrganizationIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1504,23 +1335,29 @@ func (m *OrganizationIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *OrganizationIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OrganizationIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.OrganizationID) > 0 {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.OrganizationID)
+		copy(dAtA[i:], m.OrganizationID)
 		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.OrganizationID)))
-		i += copy(dAtA[i:], m.OrganizationID)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *UserIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1528,29 +1365,36 @@ func (m *UserIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *UserIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UserIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.UserID) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.UserID)))
-		i += copy(dAtA[i:], m.UserID)
-	}
 	if len(m.Email) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.Email)
+		copy(dAtA[i:], m.Email)
 		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.Email)))
-		i += copy(dAtA[i:], m.Email)
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.UserID) > 0 {
+		i -= len(m.UserID)
+		copy(dAtA[i:], m.UserID)
+		i = encodeVarintIdentifiers(dAtA, i, uint64(len(m.UserID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *OrganizationOrUserIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1558,52 +1402,71 @@ func (m *OrganizationOrUserIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *OrganizationOrUserIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *OrganizationOrUserIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Ids != nil {
-		nn6, err := m.Ids.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Ids.Size()
+			i -= size
+			if _, err := m.Ids.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn6
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *OrganizationOrUserIdentifiers_OrganizationIDs) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *OrganizationOrUserIdentifiers_OrganizationIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.OrganizationIDs != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.OrganizationIDs.Size()))
-		n7, err := m.OrganizationIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.OrganizationIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n7
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *OrganizationOrUserIdentifiers_UserIDs) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *OrganizationOrUserIdentifiers_UserIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.UserIDs != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.UserIDs.Size()))
-		n8, err := m.UserIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.UserIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n8
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1611,108 +1474,151 @@ func (m *EntityIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *EntityIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EntityIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Ids != nil {
-		nn9, err := m.Ids.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Ids.Size()
+			i -= size
+			if _, err := m.Ids.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn9
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *EntityIdentifiers_ApplicationIDs) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *EntityIdentifiers_ApplicationIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ApplicationIDs != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.ApplicationIDs.Size()))
-		n10, err := m.ApplicationIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ApplicationIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n10
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_ClientIDs) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *EntityIdentifiers_ClientIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.ClientIDs != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.ClientIDs.Size()))
-		n11, err := m.ClientIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.ClientIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n11
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_DeviceIDs) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *EntityIdentifiers_DeviceIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.DeviceIDs != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.DeviceIDs.Size()))
-		n12, err := m.DeviceIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.DeviceIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n12
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_GatewayIDs) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *EntityIdentifiers_GatewayIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.GatewayIDs != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.GatewayIDs.Size()))
-		n13, err := m.GatewayIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.GatewayIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n13
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_OrganizationIDs) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *EntityIdentifiers_OrganizationIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.OrganizationIDs != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.OrganizationIDs.Size()))
-		n14, err := m.OrganizationIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.OrganizationIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n14
+		i--
+		dAtA[i] = 0x2a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_UserIDs) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+}
+
+func (m *EntityIdentifiers_UserIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.UserIDs != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintIdentifiers(dAtA, i, uint64(m.UserIDs.Size()))
-		n15, err := m.UserIDs.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.UserIDs.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 		}
-		i += n15
+		i--
+		dAtA[i] = 0x32
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *CombinedIdentifiers) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1720,33 +1626,42 @@ func (m *CombinedIdentifiers) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CombinedIdentifiers) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CombinedIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.EntityIdentifiers) > 0 {
-		for _, msg := range m.EntityIdentifiers {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintIdentifiers(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.EntityIdentifiers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.EntityIdentifiers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintIdentifiers(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintIdentifiers(dAtA []byte, offset int, v uint64) int {
+	offset -= sovIdentifiers(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedOrganizationOrUserIdentifiers(r randyIdentifiers, easy bool) *OrganizationOrUserIdentifiers {
 	this := &OrganizationOrUserIdentifiers{}
@@ -1826,7 +1741,7 @@ func NewPopulatedEntityIdentifiers_UserIDs(r randyIdentifiers, easy bool) *Entit
 }
 func NewPopulatedCombinedIdentifiers(r randyIdentifiers, easy bool) *CombinedIdentifiers {
 	this := &CombinedIdentifiers{}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(5)
 		this.EntityIdentifiers = make([]*EntityIdentifiers, v1)
 		for i := 0; i < v1; i++ {
@@ -2146,14 +2061,7 @@ func (m *CombinedIdentifiers) Size() (n int) {
 }
 
 func sovIdentifiers(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozIdentifiers(x uint64) (n int) {
 	return sovIdentifiers((x << 1) ^ uint64((int64(x) >> 63)))
@@ -2328,8 +2236,13 @@ func (this *CombinedIdentifiers) String() string {
 	if this == nil {
 		return "nil"
 	}
+	repeatedStringForEntityIdentifiers := "[]*EntityIdentifiers{"
+	for _, f := range this.EntityIdentifiers {
+		repeatedStringForEntityIdentifiers += strings.Replace(f.String(), "EntityIdentifiers", "EntityIdentifiers", 1) + ","
+	}
+	repeatedStringForEntityIdentifiers += "}"
 	s := strings.Join([]string{`&CombinedIdentifiers{`,
-		`EntityIdentifiers:` + strings.Replace(fmt.Sprintf("%v", this.EntityIdentifiers), "EntityIdentifiers", "EntityIdentifiers", 1) + `,`,
+		`EntityIdentifiers:` + repeatedStringForEntityIdentifiers + `,`,
 		`}`,
 	}, "")
 	return s
