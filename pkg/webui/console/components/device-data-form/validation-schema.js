@@ -69,7 +69,7 @@ const validationSchema = Yup.object({
           }),
       }),
     mac_settings: Yup.object().when('activation_mode', {
-      is: isOTAA,
+      is: isABP,
       then: schema =>
         schema.shape({
           resets_f_cnt: Yup.boolean(),
@@ -98,7 +98,7 @@ const validationSchema = Yup.object({
   }) // ABP related entries
   .shape({
     resets_join_nonces: Yup.boolean().when('activation_mode', {
-      is: isABP,
+      is: isOTAA,
       then: schema => schema,
       otherwise: schema => schema.strip(),
     }),
