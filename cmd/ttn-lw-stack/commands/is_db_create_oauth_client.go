@@ -18,6 +18,7 @@ import (
 	"context"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/pkg/auth"
@@ -88,24 +89,52 @@ var (
 				return err
 			}
 
-			logger.Info("Creating OAuth client...")
+			cliFieldMask := &pbtypes.FieldMask{Paths: []string{
+				"name",
+				"secret",
+				"redirect_uris",
+				"state",
+				"skip_authorization",
+				"endorsed",
+				"grants",
+				"rights",
+			}}
+			cli := &ttnpb.Client{
+				ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: clientID},
+			}
+
 			err = store.Transact(ctx, db, func(db *gorm.DB) error {
 				cliStore := store.GetClientStore(db)
-				cli, err := cliStore.CreateClient(ctx, &ttnpb.Client{
-					ClientIdentifiers: ttnpb.ClientIdentifiers{ClientID: clientID},
-					Name:              name,
-					Secret:            hashedSecret,
-					RedirectURIs:      redirectURIs,
-					State:             ttnpb.STATE_APPROVED,
-					SkipAuthorization: authorized,
-					Endorsed:          endorsed,
-					Grants:            []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN},
-					Rights:            []ttnpb.Right{ttnpb.RIGHT_ALL},
-				})
-				if err != nil {
-					return err
+
+				var cliExists bool
+				if _, err := cliStore.GetClient(ctx, &cli.ClientIdentifiers, cliFieldMask); err == nil {
+					cliExists = true
 				}
+				cli.Name = name
+				cli.Secret = hashedSecret
+				cli.RedirectURIs = redirectURIs
+				cli.State = ttnpb.STATE_APPROVED
+				cli.SkipAuthorization = authorized
+				cli.Endorsed = endorsed
+				cli.Grants = []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN}
+				cli.Rights = []ttnpb.Right{ttnpb.RIGHT_ALL}
+
+				if cliExists {
+					logger.Info("Updating OAuth client...")
+					if _, err = cliStore.UpdateClient(ctx, cli, cliFieldMask); err != nil {
+						return err
+					}
+					logger.WithField("secret", secret).Info("Updated OAuth client")
+				} else {
+					logger.Info("Creating OAuth client...")
+					if _, err = cliStore.CreateClient(ctx, cli); err != nil {
+						return err
+					}
+					logger.WithField("secret", secret).Info("Created OAuth client")
+				}
+
 				if owner != "" {
+					logger.Info("Setting owner rights...")
 					memberStore := store.GetMembershipStore(db)
 					err = memberStore.SetMember(
 						ctx,
@@ -116,6 +145,7 @@ var (
 					if err != nil {
 						return err
 					}
+					logger.Info("Set owner rights")
 				}
 				return nil
 			})
@@ -124,7 +154,6 @@ var (
 				return err
 			}
 
-			logger.WithField("secret", secret).Info("Created OAuth client")
 			return nil
 		},
 	}

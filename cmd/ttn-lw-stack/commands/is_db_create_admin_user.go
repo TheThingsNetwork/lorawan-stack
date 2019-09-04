@@ -19,6 +19,7 @@ import (
 	"os"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/pkg/auth"
@@ -83,22 +84,45 @@ var (
 
 			now := time.Now()
 
-			logger.Info("Creating user...")
-			userStore := store.GetUserStore(db)
-			_, err = userStore.CreateUser(ctx, &ttnpb.User{
-				UserIdentifiers:                ttnpb.UserIdentifiers{UserID: userID},
-				PrimaryEmailAddress:            email,
-				PrimaryEmailAddressValidatedAt: &now,
-				Password:                       hashedPassword,
-				PasswordUpdatedAt:              &now,
-				State:                          ttnpb.STATE_APPROVED,
-				Admin:                          true,
-			})
-			if err != nil {
-				return err
+			usrFieldMask := &pbtypes.FieldMask{Paths: []string{
+				"primary_email_address",
+				"primary_email_address_validated_at",
+				"password",
+				"password_updated_at",
+				"state",
+				"admin",
+			}}
+			usr := &ttnpb.User{
+				UserIdentifiers: ttnpb.UserIdentifiers{UserID: userID},
 			}
 
-			logger.Info("Created user")
+			usrStore := store.GetUserStore(db)
+
+			var usrExists bool
+			if _, err := usrStore.GetUser(ctx, &usr.UserIdentifiers, usrFieldMask); err == nil {
+				usrExists = true
+			}
+			usr.PrimaryEmailAddress = email
+			usr.PrimaryEmailAddressValidatedAt = &now
+			usr.Password = hashedPassword
+			usr.PasswordUpdatedAt = &now
+			usr.State = ttnpb.STATE_APPROVED
+			usr.Admin = true
+
+			if usrExists {
+				logger.Info("Updating user...")
+				if _, err = usrStore.UpdateUser(ctx, usr, usrFieldMask); err != nil {
+					return err
+				}
+				logger.Info("Updated user")
+			} else {
+				logger.Info("Creating user...")
+				if _, err = usrStore.CreateUser(ctx, usr); err != nil {
+					return err
+				}
+				logger.Info("Created user")
+			}
+
 			return nil
 		},
 	}
