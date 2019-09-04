@@ -186,5 +186,6 @@ export default {
   organization: {
     get: ttnClient.Organizations.getById.bind(ttnClient.Organizations),
     eventsSubscribe: ttnClient.Organizations.openStream.bind(ttnClient.Organizations),
+    delete: ttnClient.Organizations.deleteById.bind(ttnClient.Organizations),
   },
 }
