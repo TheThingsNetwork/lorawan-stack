@@ -18,6 +18,8 @@ import {
   CREATE_ORG_SUCCESS,
   GET_ORG,
   GET_ORG_SUCCESS,
+  UPDATE_ORG_SUCCESS,
+  DELETE_ORG_SUCCESS,
 } from '../actions/organizations'
 
 const organization = function(state = {}, organization) {
@@ -56,6 +58,7 @@ const organizations = function(state = defaultState, { type, payload }) {
       }
     case CREATE_ORG_SUCCESS:
     case GET_ORG_SUCCESS:
+    case UPDATE_ORG_SUCCESS:
       const id = getOrganizationId(payload)
 
       return {
@@ -64,6 +67,13 @@ const organizations = function(state = defaultState, { type, payload }) {
           ...state.entities,
           [id]: organization(state.entities[id], payload),
         },
+      }
+    case DELETE_ORG_SUCCESS:
+      const { [payload.id]: deleted, ...rest } = state.entities
+
+      return {
+        selectedOrganization: null,
+        entities: rest,
       }
     default:
       return state

@@ -19,8 +19,6 @@ import * as Yup from 'yup'
 
 import Form from '../../../components/form'
 import Input from '../../../components/input'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
 
 import { id as organizationIdRegexp } from '../../lib/regexp'
 import PropTypes from '../../../lib/prop-types'
@@ -41,7 +39,6 @@ const validationSchema = Yup.object().shape({
 })
 
 const m = defineMessages({
-  createOrganization: 'Create Organization',
   orgDescPlaceholder: 'Description for my new organization',
   orgIdPlaceholder: 'my-new-organization',
   orgNamePlaceholder: 'My New Organization',
@@ -49,7 +46,9 @@ const m = defineMessages({
 
 class OrganizationForm extends React.Component {
   static propTypes = {
+    children: PropTypes.node.isRequired,
     error: PropTypes.error,
+    formRef: Form.propTypes.formikRef,
     initialValues: PropTypes.shape({
       ids: PropTypes.shape({
         organization_id: PropTypes.string.isRequired,
@@ -60,12 +59,15 @@ class OrganizationForm extends React.Component {
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func,
+    update: PropTypes.bool,
   }
 
   static defaultProps = {
+    update: false,
     error: '',
     onSubmitFailure: () => null,
     onSubmitSuccess: () => null,
+    formRef: undefined,
   }
 
   @bind
@@ -83,7 +85,7 @@ class OrganizationForm extends React.Component {
   }
 
   render() {
-    const { error, initialValues } = this.props
+    const { error, initialValues, update, children, formRef } = this.props
 
     return (
       <Form
@@ -91,12 +93,14 @@ class OrganizationForm extends React.Component {
         onSubmit={this.handleSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
+        formikRef={formRef}
       >
         <Form.Field
           title={sharedMessages.organizationId}
           name="ids.organization_id"
           placeholder={m.orgIdPlaceholder}
-          autoFocus
+          autoFocus={!update}
+          disabled={update}
           required
           component={Input}
         />
@@ -113,9 +117,7 @@ class OrganizationForm extends React.Component {
           placeholder={m.orgDescPlaceholder}
           component={Input}
         />
-        <SubmitBar>
-          <Form.Submit message={m.createOrganization} component={SubmitButton} />
-        </SubmitBar>
+        {children}
       </Form>
     )
   }
