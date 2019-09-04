@@ -41,7 +41,12 @@ const {
   DEFAULT_LOCALE = 'en',
 } = process.env
 
-const DEV_SERVER_BUILD = process.env.DEV_SERVER_BUILD && process.env.DEV_SERVER_BUILD === 'true'
+const DEV_SERVER_BUILD = Boolean(
+  process.env.DEV_SERVER_BUILD && process.env.DEV_SERVER_BUILD === 'true',
+)
+const WEBPACK_DISABLE_HMR = Boolean(
+  process.env.WEBPACK_DISABLE_HMR && process.env.WEBPACK_DISABLE_HMR === 'true',
+)
 const ASSETS_ROOT = '/assets'
 
 const context = path.resolve(CONTEXT)
@@ -108,7 +113,7 @@ export default {
   devServer: {
     port: 8080,
     inline: true,
-    hot: true,
+    hot: !WEBPACK_DISABLE_HMR,
     stats: 'minimal',
     publicPath: `${ASSETS_ROOT}/`,
     proxy: [
