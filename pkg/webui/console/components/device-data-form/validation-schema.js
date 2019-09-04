@@ -98,7 +98,7 @@ const validationSchema = Yup.object({
   }) // ABP related entries
   .shape({
     resets_join_nonces: Yup.boolean().when('activation_mode', {
-      is: isABP,
+      is: isOTAA,
       then: schema => schema,
       otherwise: schema => schema.strip(),
     }),
