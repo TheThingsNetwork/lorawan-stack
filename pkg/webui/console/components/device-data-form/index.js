@@ -207,16 +207,6 @@ class DeviceDataForm extends Component {
           component={Input}
         />
         <Form.Field
-          title={sharedMessages.nwkKey}
-          name="root_keys.nwk_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={m.leaveBlankPlaceholder}
-          description={m.nwkKeyDescription}
-          component={Input}
-        />
-        <Form.Field
           title={sharedMessages.appKey}
           name="root_keys.app_key.key"
           type="byte"
@@ -224,6 +214,16 @@ class DeviceDataForm extends Component {
           max={16}
           placeholder={m.leaveBlankPlaceholder}
           description={m.appKeyDescription}
+          component={Input}
+        />
+        <Form.Field
+          title={sharedMessages.nwkKey}
+          name="root_keys.nwk_key.key"
+          type="byte"
+          min={16}
+          max={16}
+          placeholder={m.leaveBlankPlaceholder}
+          description={m.nwkKeyDescription}
           component={Input}
         />
         <Form.Field
