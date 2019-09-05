@@ -24,9 +24,9 @@ import (
 )
 
 var (
-	evtEnqueueLinkADRRequest = defineEnqueueMACRequestEvent("link_adr", "ADR request")()
-	evtReceiveLinkADRAccept  = defineReceiveMACAcceptEvent("link_adr", "ADR request")()
-	evtReceiveLinkADRReject  = defineReceiveMACRejectEvent("link_adr", "ADR request")()
+	evtEnqueueLinkADRRequest = defineEnqueueMACRequestEvent("link_adr", "link ADR")()
+	evtReceiveLinkADRAccept  = defineReceiveMACAcceptEvent("link_adr", "link ADR")()
+	evtReceiveLinkADRReject  = defineReceiveMACRejectEvent("link_adr", "link ADR")()
 )
 
 func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) (uint16, uint16, bool, error) {
