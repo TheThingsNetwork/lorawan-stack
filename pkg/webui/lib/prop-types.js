@@ -142,4 +142,11 @@ PropTypes.match = PropTypes.shape({
   url: PropTypes.string.isRequired,
 })
 
+PropTypes.location = PropTypes.shape({
+  hash: PropTypes.string,
+  key: PropTypes.string,
+  pathname: PropTypes.string.isRequired,
+  search: PropTypes.string,
+})
+
 export default PropTypes
