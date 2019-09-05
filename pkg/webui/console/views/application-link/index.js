@@ -65,7 +65,6 @@ const m = defineMessages({
   linkedSince: 'Linked Since',
   nsAddress: 'Network Server Address',
   nsCluster: 'Network Server is within a cluster',
-  nsDescription: 'Leave empty to link to the Network Server in the same cluster',
   statistics: 'Statistics',
   unlink: 'Unlink',
   unlinkSuccess: 'Successfully unlinked',
@@ -251,9 +250,9 @@ class ApplicationLink extends React.Component {
             >
               <Form.Field
                 component={Input}
-                description={m.nsDescription}
+                description={sharedMessages.nsEmptyDefault}
                 name="network_server_address"
-                title={m.nsAddress}
+                title={sharedMessages.nsAddress}
                 autoFocus
               />
               <Form.Field
