@@ -143,21 +143,6 @@ func (g Go) Lint() error {
 	return execGo("run", append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
 }
 
-// Misspell fixes common spelling mistakes in Go files.
-func (g Go) Misspell() error {
-	dirs, err := g.packageDirs()
-	if err != nil {
-		return err
-	}
-	if len(dirs) == 0 {
-		return nil
-	}
-	if mg.Verbose() {
-		fmt.Printf("Fixing common spelling mistakes in %d Go packages\n", len(dirs))
-	}
-	return execGo("run", append([]string{"github.com/client9/misspell/cmd/misspell", "-w"}, dirs...)...)
-}
-
 // Unconvert removes unnecessary type conversions from Go files.
 func (g Go) Unconvert() error {
 	dirs, err := g.packageDirs()
@@ -175,7 +160,7 @@ func (g Go) Unconvert() error {
 
 // Quality runs code quality checks on Go files.
 func (g Go) Quality() {
-	mg.Deps(g.Fmt, g.Misspell, g.Unconvert)
+	mg.Deps(g.Fmt, g.Unconvert)
 	g.Lint() // Errors are allowed.
 }
 

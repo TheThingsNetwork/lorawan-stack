@@ -274,7 +274,7 @@ mage js:translations
 ```
 *Note: When using `mage js:serve`, this command will be run automatically after any change*
 
-The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and commited, any discrepancy in the locales file with the defined messages will lead to a CI failure.
+The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and committed, any discrepancy in the locales file with the defined messages will lead to a CI failure.
 
 ### Frontend Folder Structure
 ⟶ `pkg/webui`

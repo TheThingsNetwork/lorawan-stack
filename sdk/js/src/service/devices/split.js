@@ -75,7 +75,7 @@ export function splitGetPaths(paths, base) {
 /** A wrapper function to obtain a request tree for reading values to a device
  * @param {Object} api - The Api object as passed to the service
  * @param {Object} stackConfig - The Things Stack config object
- * @param {boolean} ignoreDisabledComponents - A flag indicating wheter queries
+ * @param {boolean} ignoreDisabledComponents - A flag indicating whether queries
  * against disabled components should be ignored insread of throwing
  * @param {string} operation - The operation, an enum of 'set', 'get' and 'delete'
  * @param {string} requestTree - The request tree, as returned by the splitPaths

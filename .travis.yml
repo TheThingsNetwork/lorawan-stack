@@ -5,7 +5,7 @@ os: linux
 git:
   depth: false
 language: go
-go: 1.12.x
+go: 1.13.x
 go_import_path: go.thethings.network/lorawan-stack
 env:
   global:
@@ -107,7 +107,7 @@ script:
 - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:lint; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:unconvert; fi
 - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:fmt; fi
-- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:misspell; fi
+- if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE dev:misspell; fi
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
     if [[ "$RUN_GOARCH" == "amd64" ]]; then
