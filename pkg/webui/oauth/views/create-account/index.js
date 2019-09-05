@@ -23,18 +23,20 @@ import * as Yup from 'yup'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 import Button from '../../../components/button'
 import Input from '../../../components/input'
 import Form from '../../../components/form'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
+import { selectApplicationSiteName } from '../../../lib/selectors/env'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import Spinner from '../../../components/spinner'
 
 import style from './create-account.styl'
 
 const m = defineMessages({
-  createAccount: 'Create The Things Stack Account',
+  createAccount: 'Create a new {siteName} Account',
   register: 'Register',
 })
 
@@ -82,6 +84,7 @@ const getSuccessMessage = function(state) {
   state => ({
     fetching: state.user.fetching,
     user: state.user.user,
+    siteName: selectApplicationSiteName(),
   }),
   {
     push,
@@ -90,6 +93,19 @@ const getSuccessMessage = function(state) {
 )
 @bind
 export default class CreateAccount extends React.PureComponent {
+  static propTypes = {
+    fetching: PropTypes.bool.isRequired,
+    location: PropTypes.location.isRequired,
+    push: PropTypes.func.isRequired,
+    replace: PropTypes.func.isRequired,
+    siteName: PropTypes.string.isRequired,
+    user: PropTypes.user,
+  }
+
+  static defaultProps = {
+    user: undefined,
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -128,7 +144,7 @@ export default class CreateAccount extends React.PureComponent {
 
   render() {
     const { error } = this.state
-    const { user, fetching } = this.props
+    const { user, fetching, siteName } = this.props
 
     if (fetching) {
       return (
@@ -153,7 +169,12 @@ export default class CreateAccount extends React.PureComponent {
         <Row justify="center" align="center" className={style.fullHeight}>
           <Col sm={12} md={8} lg={5}>
             <IntlHelmet title={m.register} />
-            <Message content={m.createAccount} component="h1" className={style.title} />
+            <Message
+              content={m.createAccount}
+              values={{ siteName }}
+              component="h1"
+              className={style.title}
+            />
             <Form
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
