@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>HTTP Webhooks - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.56.3" />
+<link href="https://thethingsstack.io/v3.1.2index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.1.2/guides/getting-started/webhooks/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.1.2/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.1.2/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.1.2/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.1.2/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.1.2</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.1.2/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.1.2/guides/">Guides</a></li>
+<li><a href="/v3.1.2/concepts/">Concepts</a></li>
+<li><a href="/v3.1.2/components/">Components</a></li>
+<li><a href="/v3.1.2/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>HTTP Webhooks</h1>
+
+<p>The webhooks feature allows the Application Server to send application related messages to specific HTTP(S) endpoints.</p>
+
+<h2 id="creating-webhooks">Creating webhooks</h2>
+
+<p>The Things Stack supports multiple formats to encode messages. To show supported formats, use:</p>
+
+<pre><code>$ ttn-lw-cli applications webhooks get-formats
+</code></pre>
+
+<p>The <code>json</code> formatter uses the same format as the <a href="/v3.1.2/guides/getting-started/mqtt/">MQTT server</a>.</p>
+
+<p>Creating a webhook requires you to have an HTTP(S) endpoint available, in this example <code>https://app.example.com/lorahooks</code>:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli applications webhooks set \
+  --application-id app1 \
+  --webhook-id wh1 \
+  --format json \
+  --base-url https://app.example.com/lorahooks \
+  --join-accept.path /join \
+  --uplink-message.path /up
+</code></pre>
+
+<p>This will create a webhook <code>wh1</code> for the application <code>app1</code> with JSON formatting. The paths are appended to the base URL. So, the Application Server will perform <code>POST</code> requests on the endpoint <code>https://app.example.com/lorahooks/join</code> for join-accepts and <code>https://app.example.com/lorahooks/up</code> for uplink messages.</p>
+
+<blockquote>
+<p>Note: You can also specify URL paths for downlink events. See <code>ttn-lw-cli applications webhooks set --help</code> for more information.</p>
+
+<p>Note: If you don&rsquo;t have an endpoint available for testing, use for example <a href="https://postb.in">PostBin</a>.</p>
+</blockquote>
+
+<h2 id="scheduling-downlink">Scheduling downlink</h2>
+
+<p>You can schedule downlink messages using webhooks too. This requires an API key with traffic writing rights, which can be created as follows:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli applications api-keys create \
+  --name wh-client \
+  --application-id app1 \
+  --right-application-traffic-down-write
+</code></pre>
+
+<p>Pass the API key as bearer token on the <code>Authorization</code> header.</p>
+
+<p>The path are:</p>
+
+<ul>
+<li>For push: <code>/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push</code></li>
+<li>For replace: <code>/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/replace</code></li>
+</ul>
+
+<p>For example:</p>
+
+<pre><code>$ curl https://thethings.example.com/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
+  -X POST \
+  -H 'Authorization: Bearer NNSXS.VEEBURF3KR77ZR..' \
+  --data '{&quot;downlinks&quot;:[{&quot;frm_payload&quot;:&quot;vu8=&quot;,&quot;f_port&quot;:15,&quot;priority&quot;:&quot;NORMAL&quot;}]}'
+</code></pre>
+<div class="edit-meta">
+Last updated on 26 Aug 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/webhooks/_index.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.1.2/guides/getting-started/mqtt/" title="MQTT Server"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - MQTT Server</a>
+<a class="nav nav-next" href="/v3.1.2/guides/events/" title="Working with Events">Next - Working with Events <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.1.2">Home</a></li>
+
+<li class="parent"><a href="/v3.1.2/guides/">Guides</a>
+<ul class="sub-menu">
+
+<li class="parent"><a href="/v3.1.2/guides/getting-started/">Getting Started</a>
+<ul class="sub-menu">
+<li class=""><a href="/v3.1.2/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/v3.1.2/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.1.2/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.1.2/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class="parent active"><a href="/v3.1.2/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.1.2/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/components/">Components</a>
+</li>
+
+<li class=""><a href="/v3.1.2/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/v3.1.2/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

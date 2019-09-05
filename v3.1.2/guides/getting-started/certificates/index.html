@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Certificates - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.56.3" />
+<link href="https://thethingsstack.io/v3.1.2index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.1.2/guides/getting-started/certificates/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.1.2/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.1.2/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.1.2/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.1.2/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.1.2</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.1.2/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.1.2/guides/">Guides</a></li>
+<li><a href="/v3.1.2/concepts/">Concepts</a></li>
+<li><a href="/v3.1.2/components/">Components</a></li>
+<li><a href="/v3.1.2/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Certificates</h1>
+
+<h2 id="certificates">Certificates</h2>
+
+<p>The Things Stack will be configured with Transport Layer Security (TLS) and HTTPS. This requires a TLS certificate and a corresponding key. In this guide we&rsquo;ll request a free, trusted certificate from <a href="https://letsencrypt.org/getting-started/">Let&rsquo;s Encrypt</a>, but if you already have a certificate (<code>cert.pem</code>) and key (<code>key.pem</code>), you can also use those.</p>
+
+<h3 id="automatic-certificate-management-acme">Automatic Certificate Management (ACME)</h3>
+
+<p>For automatic certificates, we&rsquo;re going to need an <code>acme</code> directory where The Things Stack can store the certificate data:</p>
+
+<pre><code class="language-bash">$ mkdir ./acme
+$ chown 886:886 ./acme
+</code></pre>
+
+<blockquote>
+<p><code>886</code> is the uid and the gid of the user that runs The Things Stack in the Docker container. If you don&rsquo;t set these permissions, you&rsquo;ll get an error saying something like <code>open /var/lib/acme/acme_account+key&lt;...&gt;: permission denied</code>.</p>
+</blockquote>
+
+<h3 id="custom-certificates">Custom Certificates</h3>
+
+<p>If you want to use the certificate (<code>cert.pem</code>) and key (<code>key.pem</code>) that you already have, you also need to set these permissions.</p>
+
+<pre><code class="language-bash">$ chown 886:886 ./cert.pem ./key.pem
+</code></pre>
+
+<blockquote>
+<p>If you don&rsquo;t set these permissions, you&rsquo;ll get an error saying something like <code>/run/secrets/key.pem: permission denied</code>.</p>
+</blockquote>
+
+<h3 id="self-signed-development-certificates">Self-Signed Development Certificates</h3>
+
+<p>It is possible to make The Things Stack use self-signed development certificates with similar configuration as you would have for custom certificates. Creating and trusting self-signed certificates is not covered by this guide.</p>
+<div class="edit-meta">
+Last updated on 26 Aug 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/certificates.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.1.2/guides/getting-started/installation/" title="Installation"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - Installation</a>
+<a class="nav nav-next" href="/v3.1.2/guides/getting-started/configuration/" title="Configuration">Next - Configuration <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.1.2">Home</a></li>
+
+<li class="parent"><a href="/v3.1.2/guides/">Guides</a>
+<ul class="sub-menu">
+
+<li class="parent"><a href="/v3.1.2/guides/getting-started/">Getting Started</a>
+<ul class="sub-menu">
+<li class=""><a href="/v3.1.2/guides/getting-started/installation/">Installation</a></li>
+<li class="active"><a href="/v3.1.2/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.1.2/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.1.2/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.1.2/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/components/">Components</a>
+</li>
+
+<li class=""><a href="/v3.1.2/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/v3.1.2/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

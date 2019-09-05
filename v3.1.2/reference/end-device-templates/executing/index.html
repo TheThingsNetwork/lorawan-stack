@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Executing Templates - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.56.3" />
+<link href="https://thethingsstack.io/v3.1.2index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.1.2/reference/end-device-templates/executing/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.1.2/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.1.2/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.1.2/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.1.2/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.1.2</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.1.2/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.1.2/guides/">Guides</a></li>
+<li><a href="/v3.1.2/concepts/">Concepts</a></li>
+<li><a href="/v3.1.2/components/">Components</a></li>
+<li><a href="/v3.1.2/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Executing Templates</h1><div class="panel panel-primary panel-header">
+  <h3>Command-line interface only</h3>
+  The instructions below use the command-line interface (CLI). <a href="https://thethingsstack.io/v3.1.2/guides/getting-started/installation/">Learn how to install the CLI</a>
+</div>
+
+
+<p>Once you created or converted a template, you can execute the template with the <code>end-device templates execute</code> command to obtain an end device that can be created.</p>
+
+<blockquote>
+<p>The examples use a template that has been created as follows:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli end-device template extend \
+  --lorawan-version 1.0.3 \
+  --lorawan-phy-version 1.0.3-a \
+  --frequency-plan-id US_902_928 &gt; example.json
+</code></pre>
+</blockquote>
+
+<p>You can execute an end device as follows:</p>
+
+<pre><code class="language-bash">$ cat example.json | ttn-lw-cli end-device template execute
+</code></pre>
+
+<p><details><summary>Show output</summary></p>
+
+<pre><code class="language-json">{
+  &quot;ids&quot;: {
+    &quot;application_ids&quot;: {
+
+    }
+  },
+  &quot;created_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+  &quot;updated_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+  &quot;lorawan_version&quot;: &quot;1.0.3&quot;,
+  &quot;lorawan_phy_version&quot;: &quot;1.0.3-a&quot;,
+  &quot;frequency_plan_id&quot;: &quot;US_902_928&quot;
+}
+</code></pre>
+
+<p></details></p>
+
+<p>The <code>end-device template execute</code> command <strong>does not create</strong> the end device. You can, however, easily pipe the output of <code>end-device template execute</code> to create the device. But first, you need to personalize the devices by assigning EUIs since this is a generic device template, see <a href="/v3.1.2/reference/end-device-templates/assigning-euis/">Assigning EUIs</a>.</p>
+
+<pre><code class="language-bash">$ cat example.json \
+  | ttn-lw-cli end-device template assign-euis 70b3d57ed0000000 70b3d57ed0000001 \
+  | ttn-lw-cli end-device template execute \
+  | ttn-lw-cli device create --application-id test-app
+</code></pre>
+
+<p><details><summary>Show output</summary></p>
+
+<pre><code class="language-json">{
+  &quot;ids&quot;: {
+    &quot;device_id&quot;: &quot;eui-70b3d57ed0000001&quot;,
+    &quot;application_ids&quot;: {
+      &quot;application_id&quot;: &quot;test-app&quot;
+    },
+    &quot;dev_eui&quot;: &quot;70B3D57ED0000001&quot;,
+    &quot;join_eui&quot;: &quot;70B3D57ED0000000&quot;
+  },
+  &quot;created_at&quot;: &quot;2019-07-18T12:43:15.937Z&quot;,
+  &quot;updated_at&quot;: &quot;2019-07-18T12:43:16.032962Z&quot;,
+  &quot;attributes&quot;: {
+  },
+  &quot;network_server_address&quot;: &quot;thethings.example.com&quot;,
+  &quot;application_server_address&quot;: &quot;thethings.example.com&quot;,
+  &quot;join_server_address&quot;: &quot;thethings.example.com&quot;,
+  &quot;lorawan_version&quot;: &quot;1.0.3&quot;,
+  &quot;lorawan_phy_version&quot;: &quot;1.0.3-a&quot;,
+  &quot;frequency_plan_id&quot;: &quot;US_902_928&quot;,
+  &quot;supports_join&quot;: true
+}
+</code></pre>
+
+<p></details></p>
+<div class="edit-meta">
+Last updated on 26 Aug 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/end-device-templates/executing.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.1.2/reference/end-device-templates/converting/" title="Converting Templates"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - Converting Templates</a>
+<a class="nav nav-next" href="/v3.1.2/reference/end-device-templates/mapping/" title="Mapping Templates">Next - Mapping Templates <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.1.2">Home</a></li>
+
+<li class=""><a href="/v3.1.2/guides/">Guides</a>
+<ul class="">
+
+<li class=""><a href="/v3.1.2/guides/getting-started/">Getting Started</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/v3.1.2/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.1.2/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.1.2/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.1.2/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.1.2/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/components/">Components</a>
+</li>
+
+<li class="parent"><a href="/v3.1.2/reference/">Reference</a>
+<ul class="sub-menu">
+
+<li class="parent"><a href="/v3.1.2/reference/end-device-templates/">End Device Templates</a>
+<ul class="sub-menu">
+<li class=""><a href="/v3.1.2/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class="active"><a href="/v3.1.2/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.1.2/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/v3.1.2/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/v3.1.2/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>
