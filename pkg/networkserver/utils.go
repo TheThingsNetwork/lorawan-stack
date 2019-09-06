@@ -183,7 +183,7 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		macState.CurrentParameters.Rx2Frequency = defaults.Rx2Frequency.Value
 	}
 	macState.DesiredParameters.Rx2Frequency = macState.CurrentParameters.Rx2Frequency
-	if dev.GetMACSettings().GetDesiredRx2Frequency() != nil && dev.MACSettings.Rx2Frequency.Value != 0 {
+	if dev.GetMACSettings().GetDesiredRx2Frequency() != nil && dev.MACSettings.DesiredRx2Frequency.Value != 0 {
 		macState.DesiredParameters.Rx2Frequency = dev.MACSettings.DesiredRx2Frequency.Value
 	} else if fp.Rx2Channel != nil {
 		macState.DesiredParameters.Rx2Frequency = fp.Rx2Channel.Frequency
