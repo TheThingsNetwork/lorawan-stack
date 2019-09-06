@@ -1167,6 +1167,30 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "desired_adr_ack_limit":
+
+			if v, ok := interface{}(m.GetDesiredADRAckLimit()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_adr_ack_limit",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "desired_adr_ack_delay":
+
+			if v, ok := interface{}(m.GetDesiredADRAckDelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_adr_ack_delay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return MACSettingsValidationError{
 				field:  name,
@@ -3736,6 +3760,188 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACSettings_RxDelayValueValidationError{}
+
+// ValidateFields checks the field values on
+// MACSettings_ADRAckLimitExponentValue with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *MACSettings_ADRAckLimitExponentValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACSettings_ADRAckLimitExponentValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if _, ok := ADRAckLimitExponent_name[int32(m.GetValue())]; !ok {
+				return MACSettings_ADRAckLimitExponentValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return MACSettings_ADRAckLimitExponentValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACSettings_ADRAckLimitExponentValueValidationError is the validation error
+// returned by MACSettings_ADRAckLimitExponentValue.ValidateFields if the
+// designated constraints aren't met.
+type MACSettings_ADRAckLimitExponentValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACSettings_ADRAckLimitExponentValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACSettings_ADRAckLimitExponentValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACSettings_ADRAckLimitExponentValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACSettings_ADRAckLimitExponentValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACSettings_ADRAckLimitExponentValueValidationError) ErrorName() string {
+	return "MACSettings_ADRAckLimitExponentValueValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACSettings_ADRAckLimitExponentValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACSettings_ADRAckLimitExponentValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACSettings_ADRAckLimitExponentValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACSettings_ADRAckLimitExponentValueValidationError{}
+
+// ValidateFields checks the field values on
+// MACSettings_ADRAckDelayExponentValue with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *MACSettings_ADRAckDelayExponentValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACSettings_ADRAckDelayExponentValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if _, ok := ADRAckDelayExponent_name[int32(m.GetValue())]; !ok {
+				return MACSettings_ADRAckDelayExponentValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return MACSettings_ADRAckDelayExponentValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACSettings_ADRAckDelayExponentValueValidationError is the validation error
+// returned by MACSettings_ADRAckDelayExponentValue.ValidateFields if the
+// designated constraints aren't met.
+type MACSettings_ADRAckDelayExponentValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACSettings_ADRAckDelayExponentValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACSettings_ADRAckDelayExponentValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACSettings_ADRAckDelayExponentValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACSettings_ADRAckDelayExponentValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACSettings_ADRAckDelayExponentValueValidationError) ErrorName() string {
+	return "MACSettings_ADRAckDelayExponentValueValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACSettings_ADRAckDelayExponentValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACSettings_ADRAckDelayExponentValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACSettings_ADRAckDelayExponentValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACSettings_ADRAckDelayExponentValueValidationError{}
 
 // ValidateFields checks the field values on MACState_JoinAccept with the rules
 // defined in the proto definition for this message. If any rules are

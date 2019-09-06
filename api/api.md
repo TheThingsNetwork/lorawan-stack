@@ -122,6 +122,8 @@
   - [Message `MACParameters`](#ttn.lorawan.v3.MACParameters)
   - [Message `MACParameters.Channel`](#ttn.lorawan.v3.MACParameters.Channel)
   - [Message `MACSettings`](#ttn.lorawan.v3.MACSettings)
+  - [Message `MACSettings.ADRAckDelayExponentValue`](#ttn.lorawan.v3.MACSettings.ADRAckDelayExponentValue)
+  - [Message `MACSettings.ADRAckLimitExponentValue`](#ttn.lorawan.v3.MACSettings.ADRAckLimitExponentValue)
   - [Message `MACSettings.AggregatedDutyCycleValue`](#ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue)
   - [Message `MACSettings.DataRateIndexValue`](#ttn.lorawan.v3.MACSettings.DataRateIndexValue)
   - [Message `MACSettings.PingSlotPeriodValue`](#ttn.lorawan.v3.MACSettings.PingSlotPeriodValue)
@@ -2023,6 +2025,8 @@ This is used internally by the Network Server and is read only.
 | `desired_rx2_data_rate_index` | [`MACSettings.DataRateIndexValue`](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
 | `desired_rx2_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
 | `desired_max_duty_cycle` | [`MACSettings.AggregatedDutyCycleValue`](#ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue) |  | The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
+| `desired_adr_ack_limit` | [`MACSettings.ADRAckLimitExponentValue`](#ttn.lorawan.v3.MACSettings.ADRAckLimitExponentValue) |  | The ADR ACK limit exponent Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
+| `desired_adr_ack_delay` | [`MACSettings.ADRAckDelayExponentValue`](#ttn.lorawan.v3.MACSettings.ADRAckDelayExponentValue) |  | The ADR ACK delay exponent Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
 
 #### Field Rules
 
@@ -2032,6 +2036,30 @@ This is used internally by the Network Server and is read only.
 | `rx1_data_rate_offset` | <p>`uint32.lte`: `7`</p> |
 | `rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `desired_rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
+
+### <a name="ttn.lorawan.v3.MACSettings.ADRAckDelayExponentValue">Message `MACSettings.ADRAckDelayExponentValue`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`ADRAckDelayExponent`](#ttn.lorawan.v3.ADRAckDelayExponent) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `value` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MACSettings.ADRAckLimitExponentValue">Message `MACSettings.ADRAckLimitExponentValue`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [`ADRAckLimitExponent`](#ttn.lorawan.v3.ADRAckLimitExponent) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `value` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue">Message `MACSettings.AggregatedDutyCycleValue`</a>
 

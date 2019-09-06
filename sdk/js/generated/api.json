@@ -7723,6 +7723,84 @@
               "fullType": "ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "desired_adr_ack_limit",
+              "description": "The ADR ACK limit exponent Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "ADRAckLimitExponentValue",
+              "longType": "MACSettings.ADRAckLimitExponentValue",
+              "fullType": "ttn.lorawan.v3.MACSettings.ADRAckLimitExponentValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "desired_adr_ack_delay",
+              "description": "The ADR ACK delay exponent Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "ADRAckDelayExponentValue",
+              "longType": "MACSettings.ADRAckDelayExponentValue",
+              "fullType": "ttn.lorawan.v3.MACSettings.ADRAckDelayExponentValue",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ADRAckDelayExponentValue",
+          "longName": "MACSettings.ADRAckDelayExponentValue",
+          "fullName": "ttn.lorawan.v3.MACSettings.ADRAckDelayExponentValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "ADRAckDelayExponent",
+              "longType": "ADRAckDelayExponent",
+              "fullType": "ttn.lorawan.v3.ADRAckDelayExponent",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ADRAckLimitExponentValue",
+          "longName": "MACSettings.ADRAckLimitExponentValue",
+          "fullName": "ttn.lorawan.v3.MACSettings.ADRAckLimitExponentValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "ADRAckLimitExponent",
+              "longType": "ADRAckLimitExponent",
+              "fullType": "ttn.lorawan.v3.ADRAckLimitExponent",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },

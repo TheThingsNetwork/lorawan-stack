@@ -189,6 +189,12 @@ message MACSettings {
   message RxDelayValue {
     RxDelay value = 1 [(validate.rules).enum.defined_only = true];
   }
+  message ADRAckLimitExponentValue {
+    ADRAckLimitExponent value = 1 [(validate.rules).enum.defined_only = true];
+  }
+  message ADRAckDelayExponentValue {
+    ADRAckDelayExponent value = 1 [(validate.rules).enum.defined_only = true];
+  }
 
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
   // If unset, the default value from Network Server configuration will be used.
@@ -263,6 +269,13 @@ message MACSettings {
   // The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration will be used.
   AggregatedDutyCycleValue desired_max_duty_cycle = 22;
+
+  // The ADR ACK limit Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration will be used.
+  ADRAckLimitExponentValue desired_adr_ack_limit = 23 [(gogoproto.customname) = "DesiredADRAckLimit"];
+  // The ADR ACK delay Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration will be used.
+  ADRAckDelayExponentValue desired_adr_ack_delay = 24 [(gogoproto.customname) = "DesiredADRAckDelay"];
 }
 
 // MACState represents the state of MAC layer of the device.

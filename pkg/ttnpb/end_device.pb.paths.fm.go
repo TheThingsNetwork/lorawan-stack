@@ -128,6 +128,10 @@ var EndDeviceVersionFieldPathsNested = []string{
 	"default_mac_settings.adr_margin",
 	"default_mac_settings.class_b_timeout",
 	"default_mac_settings.class_c_timeout",
+	"default_mac_settings.desired_adr_ack_delay",
+	"default_mac_settings.desired_adr_ack_delay.value",
+	"default_mac_settings.desired_adr_ack_limit",
+	"default_mac_settings.desired_adr_ack_limit.value",
 	"default_mac_settings.desired_max_duty_cycle",
 	"default_mac_settings.desired_max_duty_cycle.value",
 	"default_mac_settings.desired_rx1_data_rate_offset",
@@ -191,6 +195,10 @@ var MACSettingsFieldPathsNested = []string{
 	"adr_margin",
 	"class_b_timeout",
 	"class_c_timeout",
+	"desired_adr_ack_delay",
+	"desired_adr_ack_delay.value",
+	"desired_adr_ack_limit",
+	"desired_adr_ack_limit.value",
 	"desired_max_duty_cycle",
 	"desired_max_duty_cycle.value",
 	"desired_rx1_data_rate_offset",
@@ -224,6 +232,8 @@ var MACSettingsFieldPathsTopLevel = []string{
 	"adr_margin",
 	"class_b_timeout",
 	"class_c_timeout",
+	"desired_adr_ack_delay",
+	"desired_adr_ack_limit",
 	"desired_max_duty_cycle",
 	"desired_rx1_data_rate_offset",
 	"desired_rx1_delay",
@@ -510,6 +520,10 @@ var EndDeviceFieldPathsNested = []string{
 	"mac_settings.adr_margin",
 	"mac_settings.class_b_timeout",
 	"mac_settings.class_c_timeout",
+	"mac_settings.desired_adr_ack_delay",
+	"mac_settings.desired_adr_ack_delay.value",
+	"mac_settings.desired_adr_ack_limit",
+	"mac_settings.desired_adr_ack_limit.value",
 	"mac_settings.desired_max_duty_cycle",
 	"mac_settings.desired_max_duty_cycle.value",
 	"mac_settings.desired_rx1_data_rate_offset",
@@ -1121,6 +1135,10 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
+	"end_device.mac_settings.desired_adr_ack_delay",
+	"end_device.mac_settings.desired_adr_ack_delay.value",
+	"end_device.mac_settings.desired_adr_ack_limit",
+	"end_device.mac_settings.desired_adr_ack_limit.value",
 	"end_device.mac_settings.desired_max_duty_cycle",
 	"end_device.mac_settings.desired_max_duty_cycle.value",
 	"end_device.mac_settings.desired_rx1_data_rate_offset",
@@ -1677,6 +1695,10 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
+	"end_device.mac_settings.desired_adr_ack_delay",
+	"end_device.mac_settings.desired_adr_ack_delay.value",
+	"end_device.mac_settings.desired_adr_ack_limit",
+	"end_device.mac_settings.desired_adr_ack_limit.value",
 	"end_device.mac_settings.desired_max_duty_cycle",
 	"end_device.mac_settings.desired_max_duty_cycle.value",
 	"end_device.mac_settings.desired_rx1_data_rate_offset",
@@ -2275,6 +2297,10 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
+	"end_device.mac_settings.desired_adr_ack_delay",
+	"end_device.mac_settings.desired_adr_ack_delay.value",
+	"end_device.mac_settings.desired_adr_ack_limit",
+	"end_device.mac_settings.desired_adr_ack_limit.value",
 	"end_device.mac_settings.desired_max_duty_cycle",
 	"end_device.mac_settings.desired_max_duty_cycle.value",
 	"end_device.mac_settings.desired_rx1_data_rate_offset",
@@ -2833,6 +2859,10 @@ var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device.mac_settings.adr_margin",
 	"end_device.mac_settings.class_b_timeout",
 	"end_device.mac_settings.class_c_timeout",
+	"end_device.mac_settings.desired_adr_ack_delay",
+	"end_device.mac_settings.desired_adr_ack_delay.value",
+	"end_device.mac_settings.desired_adr_ack_limit",
+	"end_device.mac_settings.desired_adr_ack_limit.value",
 	"end_device.mac_settings.desired_max_duty_cycle",
 	"end_device.mac_settings.desired_max_duty_cycle.value",
 	"end_device.mac_settings.desired_rx1_data_rate_offset",
@@ -3419,6 +3449,20 @@ var MACSettings_RxDelayValueFieldPathsNested = []string{
 }
 
 var MACSettings_RxDelayValueFieldPathsTopLevel = []string{
+	"value",
+}
+var MACSettings_ADRAckLimitExponentValueFieldPathsNested = []string{
+	"value",
+}
+
+var MACSettings_ADRAckLimitExponentValueFieldPathsTopLevel = []string{
+	"value",
+}
+var MACSettings_ADRAckDelayExponentValueFieldPathsNested = []string{
+	"value",
+}
+
+var MACSettings_ADRAckDelayExponentValueFieldPathsTopLevel = []string{
 	"value",
 }
 var MACState_JoinAcceptFieldPathsNested = []string{

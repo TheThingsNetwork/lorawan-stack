@@ -903,6 +903,48 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 					dst.DesiredMaxDutyCycle = nil
 				}
 			}
+		case "desired_adr_ack_limit":
+			if len(subs) > 0 {
+				newDst := dst.DesiredADRAckLimit
+				if newDst == nil {
+					newDst = &MACSettings_ADRAckLimitExponentValue{}
+					dst.DesiredADRAckLimit = newDst
+				}
+				var newSrc *MACSettings_ADRAckLimitExponentValue
+				if src != nil {
+					newSrc = src.DesiredADRAckLimit
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DesiredADRAckLimit = src.DesiredADRAckLimit
+				} else {
+					dst.DesiredADRAckLimit = nil
+				}
+			}
+		case "desired_adr_ack_delay":
+			if len(subs) > 0 {
+				newDst := dst.DesiredADRAckDelay
+				if newDst == nil {
+					newDst = &MACSettings_ADRAckDelayExponentValue{}
+					dst.DesiredADRAckDelay = newDst
+				}
+				var newSrc *MACSettings_ADRAckDelayExponentValue
+				if src != nil {
+					newSrc = src.DesiredADRAckDelay
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DesiredADRAckDelay = src.DesiredADRAckDelay
+				} else {
+					dst.DesiredADRAckDelay = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -2264,6 +2306,48 @@ func (dst *MACSettings_RxDelayValue) SetFields(src *MACSettings_RxDelayValue, pa
 				dst.Value = src.Value
 			} else {
 				var zero RxDelay
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACSettings_ADRAckLimitExponentValue) SetFields(src *MACSettings_ADRAckLimitExponentValue, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero ADRAckLimitExponent
+				dst.Value = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *MACSettings_ADRAckDelayExponentValue) SetFields(src *MACSettings_ADRAckDelayExponentValue, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "value":
+			if len(subs) > 0 {
+				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Value = src.Value
+			} else {
+				var zero ADRAckDelayExponent
 				dst.Value = zero
 			}
 

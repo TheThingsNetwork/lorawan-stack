@@ -6386,6 +6386,22 @@
         }
       }
     },
+    "MACSettingsADRAckDelayExponentValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3ADRAckDelayExponent"
+        }
+      }
+    },
+    "MACSettingsADRAckLimitExponentValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3ADRAckLimitExponent"
+        }
+      }
+    },
     "MACSettingsAggregatedDutyCycleValue": {
       "type": "object",
       "properties": {
@@ -9508,6 +9524,14 @@
         "desired_max_duty_cycle": {
           "$ref": "#/definitions/MACSettingsAggregatedDutyCycleValue",
           "description": "The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "desired_adr_ack_limit": {
+          "$ref": "#/definitions/MACSettingsADRAckLimitExponentValue",
+          "description": "The ADR ACK limit exponent Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "desired_adr_ack_delay": {
+          "$ref": "#/definitions/MACSettingsADRAckDelayExponentValue",
+          "description": "The ADR ACK delay exponent Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
         }
       }
     },
