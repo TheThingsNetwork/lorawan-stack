@@ -193,23 +193,9 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 			}
 
 		case "adr_ack_limit":
-
-			if val := m.GetADRAckLimit(); val < 1 || val > 32768 {
-				return MACParametersValidationError{
-					field:  "adr_ack_limit",
-					reason: "value must be inside range [1, 32768]",
-				}
-			}
-
+			// no validation rules for ADRAckLimit
 		case "adr_ack_delay":
-
-			if val := m.GetADRAckDelay(); val < 1 || val > 32768 {
-				return MACParametersValidationError{
-					field:  "adr_ack_delay",
-					reason: "value must be inside range [1, 32768]",
-				}
-			}
-
+			// no validation rules for ADRAckDelay
 		case "rx1_delay":
 
 			if _, ok := RxDelay_name[int32(m.GetRx1Delay())]; !ok {
@@ -342,6 +328,30 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACParametersValidationError{
 						field:  "downlink_dwell_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "adr_ack_limit_exponent":
+
+			if v, ok := interface{}(m.GetADRAckLimitExponent()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACParametersValidationError{
+						field:  "adr_ack_limit_exponent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "adr_ack_delay_exponent":
+
+			if v, ok := interface{}(m.GetADRAckDelayExponent()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACParametersValidationError{
+						field:  "adr_ack_delay_exponent",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

@@ -69,9 +69,11 @@ message MACParameters {
   // ADR: number of retransmissions.
   uint32 adr_nb_trans = 6 [(gogoproto.customname) = "ADRNbTrans", (validate.rules).uint32.lte = 15];
   // ADR: number of messages to wait before setting ADRAckReq.
-  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit", (validate.rules).uint32 = {gte: 1, lte: 32768}];
+  // This field is deprecated, use adr_ack_limit_exponent instead.
+  uint32 adr_ack_limit = 7 [(gogoproto.customname) = "ADRAckLimit", deprecated = true];
   // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
-  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay", (validate.rules).uint32 = {gte: 1, lte: 32768}];
+  // This field is deprecated, use adr_ack_delay_exponent instead.
+  uint32 adr_ack_delay = 8 [(gogoproto.customname) = "ADRAckDelay", deprecated = true];
   // Rx1 delay (Rx2 delay is Rx1 delay + 1 second).
   RxDelay rx1_delay = 9 [(validate.rules).enum.defined_only = true];
   // Data rate offset for Rx1.
@@ -116,6 +118,11 @@ message MACParameters {
   // Whether downlink dwell time is set (400ms).
   // If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).
   google.protobuf.BoolValue downlink_dwell_time = 21;
+
+  // ADR: number of messages to wait before setting ADRAckReq.
+  ADRAckLimitExponentValue adr_ack_limit_exponent = 22 [(gogoproto.customname) = "ADRAckLimitExponent"];
+  // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
+  ADRAckDelayExponentValue adr_ack_delay_exponent = 23 [(gogoproto.customname) = "ADRAckDelayExponent"];
 }
 
 message EndDeviceBrand {
@@ -252,10 +259,10 @@ message MACSettings {
   AggregatedDutyCycleValue desired_max_duty_cycle = 22;
 
   // The ADR ACK limit Network Server should configure device to use via MAC commands.
-  // If unset, the default value from Network Server configuration will be used.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   ADRAckLimitExponentValue desired_adr_ack_limit = 23 [(gogoproto.customname) = "DesiredADRAckLimit"];
   // The ADR ACK delay Network Server should configure device to use via MAC commands.
-  // If unset, the default value from Network Server configuration will be used.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   ADRAckDelayExponentValue desired_adr_ack_delay = 24 [(gogoproto.customname) = "DesiredADRAckDelay"];
 }
 

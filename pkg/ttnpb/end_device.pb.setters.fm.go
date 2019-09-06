@@ -289,6 +289,48 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			} else {
 				dst.DownlinkDwellTime = nil
 			}
+		case "adr_ack_limit_exponent":
+			if len(subs) > 0 {
+				newDst := dst.ADRAckLimitExponent
+				if newDst == nil {
+					newDst = &ADRAckLimitExponentValue{}
+					dst.ADRAckLimitExponent = newDst
+				}
+				var newSrc *ADRAckLimitExponentValue
+				if src != nil {
+					newSrc = src.ADRAckLimitExponent
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ADRAckLimitExponent = src.ADRAckLimitExponent
+				} else {
+					dst.ADRAckLimitExponent = nil
+				}
+			}
+		case "adr_ack_delay_exponent":
+			if len(subs) > 0 {
+				newDst := dst.ADRAckDelayExponent
+				if newDst == nil {
+					newDst = &ADRAckDelayExponentValue{}
+					dst.ADRAckDelayExponent = newDst
+				}
+				var newSrc *ADRAckDelayExponentValue
+				if src != nil {
+					newSrc = src.ADRAckDelayExponent
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ADRAckDelayExponent = src.ADRAckDelayExponent
+				} else {
+					dst.ADRAckDelayExponent = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

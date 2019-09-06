@@ -7099,50 +7099,6 @@
               }
             },
             {
-              "name": "adr_ack_limit",
-              "description": "ADR: number of messages to wait before setting ADRAckReq.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "uint32.lte",
-                    "value": 32768
-                  },
-                  {
-                    "name": "uint32.gte",
-                    "value": 1
-                  }
-                ]
-              }
-            },
-            {
-              "name": "adr_ack_delay",
-              "description": "ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "uint32.lte",
-                    "value": 32768
-                  },
-                  {
-                    "name": "uint32.gte",
-                    "value": 1
-                  }
-                ]
-              }
-            },
-            {
               "name": "rx1_delay",
               "description": "Rx1 delay (Rx2 delay is Rx1 delay + 1 second).",
               "label": "",
@@ -7367,6 +7323,42 @@
               "fullType": "google.protobuf.BoolValue",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "adr_ack_limit",
+              "description": "ADR: number of messages to wait before setting ADRAckReq.",
+              "label": "",
+              "type": "ADRAckLimitExponent",
+              "longType": "ADRAckLimitExponent",
+              "fullType": "ttn.lorawan.v3.ADRAckLimitExponent",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "adr_ack_delay",
+              "description": "ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.",
+              "label": "",
+              "type": "ADRAckDelayExponent",
+              "longType": "ADRAckDelayExponent",
+              "fullType": "ttn.lorawan.v3.ADRAckDelayExponent",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -7726,7 +7718,7 @@
             },
             {
               "name": "desired_adr_ack_limit",
-              "description": "The ADR ACK limit exponent Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "description": "The ADR ACK limit Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
               "type": "ADRAckLimitExponentValue",
               "longType": "MACSettings.ADRAckLimitExponentValue",
@@ -7736,7 +7728,7 @@
             },
             {
               "name": "desired_adr_ack_delay",
-              "description": "The ADR ACK delay exponent Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "description": "The ADR ACK delay Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
               "type": "ADRAckDelayExponentValue",
               "longType": "MACSettings.ADRAckDelayExponentValue",
