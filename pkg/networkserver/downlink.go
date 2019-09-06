@@ -111,6 +111,13 @@ func (s generateDownlinkState) appendApplicationUplinks(ups []*ttnpb.Application
 	}
 }
 
+func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Time {
+	if dev.GetMACState().GetLastConfirmedDownlinkAt() == nil {
+		return time.Time{}
+	}
+	return dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, defaults))
+}
+
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the generated downlink, application uplinks associated with the generation and error, if any.
 // generateDownlink may mutate the device in order to record the downlink generated.
@@ -240,7 +247,8 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			if mType == ttnpb.MType_UNCONFIRMED_DOWN &&
 				spec[cmd.CID].ExpectAnswer &&
 				dev.MACState.DeviceClass == ttnpb.CLASS_C &&
-				dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+				dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 &&
+				nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).Before(time.Now()) {
 				logger.Debug("Use confirmed downlink to get immediate answer")
 				mType = ttnpb.MType_CONFIRMED_DOWN
 			}
@@ -437,9 +445,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 
 	needsAck := mType == ttnpb.MType_CONFIRMED_DOWN || len(dev.MACState.PendingRequests) > 0
-	if needsAck &&
-		dev.MACState.LastConfirmedDownlinkAt != nil &&
-		dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings)).After(time.Now()) {
+	if needsAck && nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).After(time.Now()) {
 		return nil, st, errConfirmedDownlinkTooSoon
 	}
 
@@ -817,7 +823,7 @@ const gsScheduleWindow = 30 * time.Second
 // nsScheduleWindow is the time interval, which is sufficient for NS to ensure downlink is scheduled.
 var nsScheduleWindow = time.Second
 
-func (ns *NetworkServer) recordDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genState generateDownlinkState, down *scheduledDownlink) (nextDownlinkAt time.Time) {
+func recordDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genState generateDownlinkState, down *scheduledDownlink, defaults ttnpb.MACSettings) (nextDownlinkAt time.Time) {
 	if genState.ApplicationDownlink == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && genDown.FCnt > dev.Session.LastNFCntDown {
 		dev.Session.LastNFCntDown = genDown.FCnt
 	}
@@ -831,7 +837,7 @@ func (ns *NetworkServer) recordDownlink(dev *ttnpb.EndDevice, genDown *generated
 	if dev.MACState.DeviceClass == ttnpb.CLASS_C {
 		var nextConfirmedAt time.Time
 		if dev.MACState.LastConfirmedDownlinkAt != nil {
-			nextConfirmedAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
+			nextConfirmedAt = nextConfirmedClassCDownlinkAt(dev, defaults)
 		}
 		if nextConfirmedAt.After(down.TransmitAt) {
 			nextDownlinkAt = nextConfirmedAt
@@ -1035,7 +1041,7 @@ func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.E
 		),
 		applicationUpAppender: genState.appendApplicationUplinks,
 		QueuedEvents:          genState.Events,
-		NextDownlinkAt:        ns.recordDownlink(dev, genDown, genState, down),
+		NextDownlinkAt:        recordDownlink(dev, genDown, genState, down, ns.defaultMACSettings),
 		Scheduled:             true,
 	}
 }
@@ -1347,7 +1353,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					return dev, sets, nil
 				}
 
-				if t := ns.recordDownlink(dev, genDown, genState, down); !t.IsZero() {
+				if t := recordDownlink(dev, genDown, genState, down, ns.defaultMACSettings); !t.IsZero() {
 					nextDownlinkAt = t
 				}
 				queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, true)
