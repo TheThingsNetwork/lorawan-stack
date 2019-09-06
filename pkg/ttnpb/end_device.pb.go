@@ -151,7 +151,7 @@ func (m *Session) GetStartedAt() time.Time {
 }
 
 // MACParameters represent the parameters of the device's MAC layer (active or desired).
-// This is used internally by the Network Server and is read only.
+// This is used internally by the Network Server.
 type MACParameters struct {
 	// Maximum EIRP (dBm).
 	MaxEIRP float32 `protobuf:"fixed32,1,opt,name=max_eirp,json=maxEirp,proto3" json:"max_eirp,omitempty"`

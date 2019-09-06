@@ -54,7 +54,7 @@ message Session {
 }
 
 // MACParameters represent the parameters of the device's MAC layer (active or desired).
-// This is used internally by the Network Server and is read only.
+// This is used internally by the Network Server.
 message MACParameters {
   option (gogoproto.populate) = false;
 
