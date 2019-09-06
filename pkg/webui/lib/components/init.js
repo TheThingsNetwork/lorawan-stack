@@ -25,8 +25,8 @@ import '../../styles/main.styl'
 // React grid configuration
 // Keep these in line with styles/variables.less
 setConfiguration({
-  breakpoints: [480, 768, 1000, 1280],
-  containerWidths: [365, 650, 880, 1140],
+  breakpoints: [480, 768, 1080, 1280],
+  containerWidths: [768, 1000, 1140, 1140],
   gutterWidth: 28,
 })
 
