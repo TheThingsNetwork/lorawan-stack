@@ -776,7 +776,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						Rx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},
@@ -878,7 +878,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
 					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						Rx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},
@@ -982,7 +982,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_3_REV_A,
 					LoRaWANVersion:       ttnpb.MAC_V1_0_3,
 					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						Rx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},
@@ -1092,7 +1092,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
 					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						Rx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},
@@ -1205,7 +1205,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
 					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						Rx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},
@@ -1433,7 +1433,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 					MACSettings: &ttnpb.MACSettings{
-						DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						DesiredRx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},
@@ -1614,7 +1614,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
 					MACSettings: &ttnpb.MACSettings{
-						DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						DesiredRx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},
@@ -1834,7 +1834,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 					MACSettings: &ttnpb.MACSettings{
-						DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						DesiredRx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},
@@ -2051,7 +2051,7 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
 					MACSettings: &ttnpb.MACSettings{
-						DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+						DesiredRx1Delay: &ttnpb.RxDelayValue{
 							Value: ttnpb.RX_DELAY_3,
 						},
 					},

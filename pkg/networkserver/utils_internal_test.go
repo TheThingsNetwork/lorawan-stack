@@ -39,7 +39,7 @@ func TestNewMACState(t *testing.T) {
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
-					DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
 				},
@@ -58,7 +58,7 @@ func TestNewMACState(t *testing.T) {
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
-					DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
 				},
@@ -77,7 +77,7 @@ func TestNewMACState(t *testing.T) {
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
 				MACSettings: &ttnpb.MACSettings{
-					DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
 				},
@@ -96,7 +96,7 @@ func TestNewMACState(t *testing.T) {
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACSettings: &ttnpb.MACSettings{
-					DesiredRx1Delay: &ttnpb.MACSettings_RxDelayValue{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
 						Value: ttnpb.RX_DELAY_13,
 					},
 				},

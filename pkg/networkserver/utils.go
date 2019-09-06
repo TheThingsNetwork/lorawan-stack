@@ -129,11 +129,21 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 	macState.CurrentParameters.ADRNbTrans = 1
 	macState.DesiredParameters.ADRNbTrans = macState.CurrentParameters.ADRNbTrans
 
-	macState.CurrentParameters.ADRAckLimit = uint32(phy.ADRAckLimit)
-	macState.DesiredParameters.ADRAckLimit = macState.CurrentParameters.ADRAckLimit
+	macState.CurrentParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit}
+	macState.DesiredParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit}
+	if dev.GetMACSettings().GetDesiredADRAckLimitExponent() != nil {
+		macState.DesiredParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: dev.MACSettings.DesiredADRAckLimitExponent.Value}
+	} else if defaults.DesiredADRAckLimitExponent != nil {
+		macState.DesiredParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: defaults.DesiredADRAckLimitExponent.Value}
+	}
 
-	macState.CurrentParameters.ADRAckDelay = uint32(phy.ADRAckDelay)
-	macState.DesiredParameters.ADRAckDelay = macState.CurrentParameters.ADRAckDelay
+	macState.CurrentParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay}
+	macState.DesiredParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay}
+	if dev.GetMACSettings().GetDesiredADRAckDelayExponent() != nil {
+		macState.DesiredParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: dev.MACSettings.DesiredADRAckDelayExponent.Value}
+	} else if defaults.DesiredADRAckDelayExponent != nil {
+		macState.DesiredParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: defaults.DesiredADRAckDelayExponent.Value}
+	}
 
 	macState.CurrentParameters.Rx1Delay = ttnpb.RxDelay(phy.ReceiveDelay1.Seconds())
 	if dev.GetMACSettings().GetRx1Delay() != nil {
@@ -196,7 +206,13 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		macState.CurrentParameters.MaxDutyCycle = dev.MACSettings.MaxDutyCycle.Value
 	}
 	macState.DesiredParameters.MaxDutyCycle = macState.CurrentParameters.MaxDutyCycle
+	if dev.GetMACSettings().GetDesiredMaxDutyCycle() != nil {
+		macState.DesiredParameters.MaxDutyCycle = dev.MACSettings.DesiredMaxDutyCycle.Value
+	} else if defaults.DesiredMaxDutyCycle != nil {
+		macState.DesiredParameters.MaxDutyCycle = defaults.DesiredMaxDutyCycle.Value
+	}
 
+	// TODO: Support rejoins. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
 	macState.CurrentParameters.RejoinTimePeriodicity = ttnpb.REJOIN_TIME_0
 	macState.DesiredParameters.RejoinTimePeriodicity = macState.CurrentParameters.RejoinTimePeriodicity
 
@@ -225,6 +241,7 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		macState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)
 	}
 
+	// TODO: Support class B. (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 	macState.CurrentParameters.BeaconFrequency = 0
 	macState.DesiredParameters.BeaconFrequency = macState.CurrentParameters.BeaconFrequency
 

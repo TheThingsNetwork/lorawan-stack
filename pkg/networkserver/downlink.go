@@ -222,7 +222,14 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		}
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 			enqueuers = append(enqueuers,
-				enqueueADRParamSetupReq,
+				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) (uint16, uint16, bool) {
+					newMaxDownLen, newMaxUpLen, ok, err := enqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, ns.FrequencyPlans)
+					if err != nil {
+						logger.WithError(err).Error("Failed to enqueue ADRParamSetupReq")
+						return maxDownLen, maxUpLen, false
+					}
+					return newMaxDownLen, newMaxUpLen, ok
+				},
 				enqueueForceRejoinReq,
 				enqueueRejoinParamSetupReq,
 			)

@@ -173,8 +173,8 @@ func MakeDefaultEU868MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MA
 		LoRaWANVersion:      ver,
 		PingSlotPeriodicity: ttnpb.PING_EVERY_1S,
 		CurrentParameters: ttnpb.MACParameters{
-			ADRAckDelay:            32,
-			ADRAckLimit:            64,
+			ADRAckDelayExponent:    &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+			ADRAckLimitExponent:    &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 			ADRNbTrans:             1,
 			MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:                16,
@@ -187,8 +187,8 @@ func MakeDefaultEU868MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MA
 			Channels:               MakeEU868Channels(),
 		},
 		DesiredParameters: ttnpb.MACParameters{
-			ADRAckDelay:            32,
-			ADRAckLimit:            64,
+			ADRAckDelayExponent:    &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+			ADRAckLimitExponent:    &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 			ADRNbTrans:             1,
 			MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:                16,
@@ -269,8 +269,8 @@ func MakeDefaultUS915MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MA
 		LoRaWANVersion:      ver,
 		PingSlotPeriodicity: ttnpb.PING_EVERY_1S,
 		CurrentParameters: ttnpb.MACParameters{
-			ADRAckDelay:            32,
-			ADRAckLimit:            64,
+			ADRAckDelayExponent:    &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+			ADRAckLimitExponent:    &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 			ADRNbTrans:             1,
 			MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:                30,
@@ -283,8 +283,8 @@ func MakeDefaultUS915MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MA
 			Channels:               MakeUS915Channels(),
 		},
 		DesiredParameters: ttnpb.MACParameters{
-			ADRAckDelay:            32,
-			ADRAckLimit:            64,
+			ADRAckDelayExponent:    &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+			ADRAckLimitExponent:    &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 			ADRNbTrans:             1,
 			MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:                30,

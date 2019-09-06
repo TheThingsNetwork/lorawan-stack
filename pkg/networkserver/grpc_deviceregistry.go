@@ -22,6 +22,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -52,7 +53,22 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 			return nil, err
 		}
 	}
-	dev, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, req.FieldMask.Paths)
+
+	gets := req.FieldMask.Paths
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_delay") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.adr_ack_delay_exponent") {
+		gets = append(gets, "mac_state.current_parameters.adr_ack_delay_exponent")
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_limit") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.adr_ack_limit_exponent") {
+		gets = append(gets, "mac_state.current_parameters.adr_ack_limit_exponent")
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_delay") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.adr_ack_delay_exponent") {
+		gets = append(gets, "mac_state.desired_parameters.adr_ack_delay_exponent")
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_limit") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.adr_ack_limit_exponent") {
+		gets = append(gets, "mac_state.desired_parameters.adr_ack_limit_exponent")
+	}
+
+	dev, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +108,21 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 				return nil, err
 			}
 			s.val.NwkSEncKey = &ttnpb.KeyEnvelope{Key: &key}
+		}
+	}
+
+	if dev.MACState != nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_delay") && dev.MACState.CurrentParameters.ADRAckDelayExponent != nil {
+			dev.MACState.CurrentParameters.ADRAckDelay = lorawan.ADRAckDelayExponentToUint32(dev.MACState.CurrentParameters.ADRAckDelayExponent.Value)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_limit") && dev.MACState.CurrentParameters.ADRAckLimitExponent != nil {
+			dev.MACState.CurrentParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(dev.MACState.CurrentParameters.ADRAckLimitExponent.Value)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_delay") && dev.MACState.DesiredParameters.ADRAckDelayExponent != nil {
+			dev.MACState.DesiredParameters.ADRAckDelay = lorawan.ADRAckDelayExponentToUint32(dev.MACState.DesiredParameters.ADRAckDelayExponent.Value)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_limit") && dev.MACState.DesiredParameters.ADRAckLimitExponent != nil {
+			dev.MACState.DesiredParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(dev.MACState.DesiredParameters.ADRAckLimitExponent.Value)
 		}
 	}
 	return dev, nil
@@ -242,6 +273,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.status_count_periodicity")
 		}
 
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_adr_ack_delay_exponent.value") && req.EndDevice.GetMACSettings().GetDesiredADRAckDelayExponent() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_adr_ack_delay_exponent")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_adr_ack_limit_exponent.value") && req.EndDevice.GetMACSettings().GetDesiredADRAckLimitExponent() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_adr_ack_limit_exponent")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_max_duty_cycle.value") && req.EndDevice.GetMACSettings().GetDesiredMaxDutyCycle() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_max_duty_cycle")
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx1_data_rate_offset.value") && req.EndDevice.GetMACSettings().GetDesiredRx1DataRateOffset() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx1_data_rate_offset")
