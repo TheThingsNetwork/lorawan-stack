@@ -81,6 +81,8 @@ PropTypes.gatewayStats = PropTypes.shape({
   uplink_count: PropTypes.string,
   downlink_count: PropTypes.string,
   round_trip_times: PropTypes.shape({}),
+  last_status_received_at: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)])
+    .isRequired,
 })
 
 PropTypes.application = PropTypes.shape({
