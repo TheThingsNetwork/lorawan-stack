@@ -177,13 +177,13 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.class_b_timeout") && req.EndDevice.GetMACSettings().GetClassBTimeout() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.class_b_timeout")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_periodicity") && req.EndDevice.GetMACSettings().GetPingSlotPeriodicity() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_periodicity.value") && req.EndDevice.GetMACSettings().GetPingSlotPeriodicity() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_periodicity")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_date_rate_index") && req.EndDevice.GetMACSettings().GetPingSlotDataRateIndex() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_date_rate_index.value") && req.EndDevice.GetMACSettings().GetPingSlotDataRateIndex() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_date_rate_index")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_frequency") && req.EndDevice.GetMACSettings().GetPingSlotFrequency() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.ping_slot_frequency.value") && req.EndDevice.GetMACSettings().GetPingSlotFrequency() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.ping_slot_frequency")
 		}
 
@@ -191,55 +191,56 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.class_c_timeout")
 		}
 
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx1_delay") && req.EndDevice.GetMACSettings().GetRx1Delay() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx1_delay.value") && req.EndDevice.GetMACSettings().GetRx1Delay() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx1_delay")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx1_data_rate_offset") && req.EndDevice.GetMACSettings().GetRx1DataRateOffset() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx1_data_rate_offset.value") && req.EndDevice.GetMACSettings().GetRx1DataRateOffset() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx1_data_rate_offset")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_data_rate_index") && req.EndDevice.GetMACSettings().GetRx2DataRateIndex() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_data_rate_index.value") && req.EndDevice.GetMACSettings().GetRx2DataRateIndex() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx2_data_rate_index")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_frequency") && req.EndDevice.GetMACSettings().GetRx2Frequency() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.rx2_frequency.value") && req.EndDevice.GetMACSettings().GetRx2Frequency() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.rx2_frequency")
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.factory_preset_frequencies") && len(req.EndDevice.GetMACSettings().GetFactoryPresetFrequencies()) == 0 {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.factory_preset_frequencies")
 		}
 
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.max_duty_cycle") && req.EndDevice.GetMACSettings().GetMaxDutyCycle() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.max_duty_cycle.value") && req.EndDevice.GetMACSettings().GetMaxDutyCycle() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.max_duty_cycle")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.supports_32_bit_f_cnt") && req.EndDevice.GetMACSettings().GetSupports32BitFCnt() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.supports_32_bit_f_cnt.value") && req.EndDevice.GetMACSettings().GetSupports32BitFCnt() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.supports_32_bit_f_cnt")
 		}
 
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.use_adr") && req.EndDevice.GetMACSettings().GetUseADR() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.use_adr.value") && req.EndDevice.GetMACSettings().GetUseADR() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.use_adr")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.adr_margin") && req.EndDevice.GetMACSettings().GetADRMargin() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.adr_margin.value") && req.EndDevice.GetMACSettings().GetADRMargin() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.adr_margin")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.resets_f_cnt") && req.EndDevice.GetMACSettings().GetResetsFCnt() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.resets_f_cnt.value") && req.EndDevice.GetMACSettings().GetResetsFCnt() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.resets_f_cnt")
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.status_time_periodicity") && req.EndDevice.GetMACSettings().GetStatusTimePeriodicity() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.status_time_periodicity")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.status_count_periodicity") && req.EndDevice.GetMACSettings().GetStatusCountPeriodicity() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.status_count_periodicity.value") && req.EndDevice.GetMACSettings().GetStatusCountPeriodicity() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.status_count_periodicity")
 		}
 
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx1_delay") && req.EndDevice.GetMACSettings().GetDesiredRx1Delay() == nil {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx1_delay")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx1_data_rate_offset") && req.EndDevice.GetMACSettings().GetDesiredRx1DataRateOffset() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx1_data_rate_offset.value") && req.EndDevice.GetMACSettings().GetDesiredRx1DataRateOffset() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx1_data_rate_offset")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_data_rate_index") && req.EndDevice.GetMACSettings().GetDesiredRx2DataRateIndex() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx1_delay.value") && req.EndDevice.GetMACSettings().GetDesiredRx1Delay() == nil {
+			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx1_delay")
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_data_rate_index.value") && req.EndDevice.GetMACSettings().GetDesiredRx2DataRateIndex() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx2_data_rate_index")
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_frequency") && req.EndDevice.GetMACSettings().GetDesiredRx2Frequency() == nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_settings.desired_rx2_frequency.value") && req.EndDevice.GetMACSettings().GetDesiredRx2Frequency() == nil {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "mac_settings.desired_rx2_frequency")
 		}
 
