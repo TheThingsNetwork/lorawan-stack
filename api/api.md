@@ -2022,6 +2022,7 @@ This is used internally by the Network Server and is read only.
 | `desired_rx1_data_rate_offset` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from Network Server configuration will be used. |
 | `desired_rx2_data_rate_index` | [`MACSettings.DataRateIndexValue`](#ttn.lorawan.v3.MACSettings.DataRateIndexValue) |  | The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
 | `desired_rx2_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | The Rx2 frequency index Network Server should configure device to use via MAC commands. If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used. |
+| `desired_max_duty_cycle` | [`MACSettings.AggregatedDutyCycleValue`](#ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue) |  | The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
 
 #### Field Rules
 

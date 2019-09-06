@@ -9504,6 +9504,10 @@
           "type": "string",
           "format": "uint64",
           "description": "The Rx2 frequency index Network Server should configure device to use via MAC commands.\nIf unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used."
+        },
+        "desired_max_duty_cycle": {
+          "$ref": "#/definitions/MACSettingsAggregatedDutyCycleValue",
+          "description": "The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
         }
       }
     },

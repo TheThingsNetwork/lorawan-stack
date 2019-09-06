@@ -259,6 +259,10 @@ message MACSettings {
   // The Rx2 frequency index Network Server should configure device to use via MAC commands.
   // If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.
   google.protobuf.UInt64Value desired_rx2_frequency = 21 [(validate.rules).uint64.gte = 100000];
+
+  // The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration will be used.
+  AggregatedDutyCycleValue desired_max_duty_cycle = 22;
 }
 
 // MACState represents the state of MAC layer of the device.

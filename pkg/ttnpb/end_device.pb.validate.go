@@ -1155,6 +1155,18 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 			}
 
+		case "desired_max_duty_cycle":
+
+			if v, ok := interface{}(m.GetDesiredMaxDutyCycle()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_max_duty_cycle",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return MACSettingsValidationError{
 				field:  name,

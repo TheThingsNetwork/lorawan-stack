@@ -882,6 +882,27 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			} else {
 				dst.DesiredRx2Frequency = nil
 			}
+		case "desired_max_duty_cycle":
+			if len(subs) > 0 {
+				newDst := dst.DesiredMaxDutyCycle
+				if newDst == nil {
+					newDst = &MACSettings_AggregatedDutyCycleValue{}
+					dst.DesiredMaxDutyCycle = newDst
+				}
+				var newSrc *MACSettings_AggregatedDutyCycleValue
+				if src != nil {
+					newSrc = src.DesiredMaxDutyCycle
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DesiredMaxDutyCycle = src.DesiredMaxDutyCycle
+				} else {
+					dst.DesiredMaxDutyCycle = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

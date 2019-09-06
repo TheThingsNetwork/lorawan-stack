@@ -7713,6 +7713,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "desired_max_duty_cycle",
+              "description": "The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "AggregatedDutyCycleValue",
+              "longType": "MACSettings.AggregatedDutyCycleValue",
+              "fullType": "ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
