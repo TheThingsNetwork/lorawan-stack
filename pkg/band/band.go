@@ -155,9 +155,9 @@ type Band struct {
 	// MaxFCntGap
 	MaxFCntGap uint
 	// ADRAckLimit
-	ADRAckLimit uint8
+	ADRAckLimit ttnpb.ADRAckLimitExponent
 	// ADRAckDelay
-	ADRAckDelay   uint8
+	ADRAckDelay   ttnpb.ADRAckDelayExponent
 	MinAckTimeout time.Duration
 	MaxAckTimeout time.Duration
 

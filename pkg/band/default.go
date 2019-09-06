@@ -14,7 +14,11 @@
 
 package band
 
-import "time"
+import (
+	"time"
+
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+)
 
 const (
 	defaultReceiveDelay1 time.Duration = time.Second
@@ -25,8 +29,8 @@ const (
 
 	defaultMaxFCntGap uint = 16384
 
-	defaultADRAckLimit uint8 = 64
-	defaultADRAckDelay uint8 = 32
+	defaultADRAckLimit = ttnpb.ADR_ACK_LIMIT_64
+	defaultADRAckDelay = ttnpb.ADR_ACK_DELAY_32
 
 	// Random delay between 1 and 3 seconds
 	defaultAckTimeout       time.Duration = 2 * time.Second
