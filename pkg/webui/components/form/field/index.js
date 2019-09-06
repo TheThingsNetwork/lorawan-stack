@@ -187,12 +187,13 @@ class FormField extends React.Component {
           <Message content={title} className={style.title} />
           <span className={style.reqicon}>&middot;</span>
         </label>
-        <Component
-          className={style.component}
-          {...fieldComponentProps}
-          {...getPassThroughProps(this.props, FormField.propTypes)}
-        />
-        {fieldMessage}
+        <div className={style.componentArea}>
+          <Component
+            {...fieldComponentProps}
+            {...getPassThroughProps(this.props, FormField.propTypes)}
+          />
+          {fieldMessage}
+        </div>
       </div>
     )
   }
