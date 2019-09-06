@@ -23,7 +23,7 @@ import * as Yup from 'yup'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
-import { selectApplicationRootPath } from '../../../lib/selectors/env'
+import { selectApplicationRootPath, selectApplicationSiteName } from '../../../lib/selectors/env'
 import PropTypes from '../../../lib/prop-types'
 
 import Button from '../../../components/button'
@@ -40,7 +40,6 @@ const m = defineMessages({
   createAccount: 'Create an account',
   forgotPassword: 'Forgot password?',
   loginToContinue: 'Please login to continue',
-  stackAccount: 'The Things Stack Account',
 })
 
 const validationSchema = Yup.object().shape({
@@ -48,11 +47,11 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required(sharedMessages.validateRequired),
 })
 
-const appRoot = selectApplicationRootPath()
-
 @withRouter
 @connect(
-  null,
+  () => ({
+    siteName: selectApplicationSiteName(),
+  }),
   {
     replace,
   },
@@ -60,8 +59,9 @@ const appRoot = selectApplicationRootPath()
 @bind
 export default class OAuth extends React.PureComponent {
   static propTypes = {
-    location: PropTypes.string.isRequired,
+    location: PropTypes.location.isRequired,
     replace: PropTypes.func.isRequired,
+    siteName: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -106,6 +106,7 @@ export default class OAuth extends React.PureComponent {
     }
 
     const { info } = this.props.location.state || ''
+    const { siteName } = this.props
 
     return (
       <div className={style.fullHeightCenter}>
@@ -118,9 +119,7 @@ export default class OAuth extends React.PureComponent {
             </div>
           </div>
           <div className={style.right}>
-            <h1>
-              <Message content={m.stackAccount} />
-            </h1>
+            <h1>{siteName}</h1>
             <Form
               onSubmit={this.handleSubmit}
               initialValues={initialValues}
@@ -153,6 +152,8 @@ export default class OAuth extends React.PureComponent {
     )
   }
 }
+
+const appRoot = selectApplicationRootPath()
 
 function url(location, omitQuery = false) {
   const query = Query.parse(location.search)

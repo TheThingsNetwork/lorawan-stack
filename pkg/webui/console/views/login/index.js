@@ -20,7 +20,8 @@ import { defineMessages } from 'react-intl'
 import { Redirect } from 'react-router-dom'
 import { Container, Row, Col } from 'react-grid-system'
 
-import { withEnv } from '../../../lib/components/env'
+import PropTypes from '../../../lib/prop-types'
+import { selectApplicationSiteName, selectApplicationRootPath } from '../../../lib/selectors/env'
 import Button from '../../../components/button'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
@@ -29,22 +30,29 @@ import Message from '../../../lib/components/message'
 import style from './login.styl'
 
 const m = defineMessages({
-  welcome: 'Welcome to {stackConsole}',
-  login: 'You need to be logged in to use this site',
-  loginWithStackAccount: 'Login with your The Things Stack Account',
+  welcome: 'Welcome to {siteName}',
+  loginSub: 'You need to be logged in to use this site',
 })
 
-@withEnv
 @connect(state => ({
   user: state.user.user,
+  siteName: selectApplicationSiteName(),
+  appRoot: selectApplicationRootPath(),
 }))
 @bind
 export default class Login extends React.PureComponent {
+  static propTypes = {
+    appRoot: PropTypes.string.isRequired,
+    siteName: PropTypes.string.isRequired,
+    user: PropTypes.user,
+  }
+
+  static defaultProps = {
+    user: undefined,
+  }
+
   render() {
-    const {
-      user,
-      env: { appRoot },
-    } = this.props
+    const { user, appRoot, siteName } = this.props
     const { next } = Query.parse(location.search)
     const redirectAppend = next ? `?next=${next}` : ''
 
@@ -61,13 +69,14 @@ export default class Login extends React.PureComponent {
             <Col>
               <Message
                 className={style.loginHeader}
-                values={{ stackConsole: 'The Things Stack Console' }}
+                values={{ siteName }}
                 component="h2"
                 content={m.welcome}
               />
-              <Message className={style.loginSub} content={m.login} />
+              <Message className={style.loginSub} content={m.loginSub} />
               <Button.AnchorLink
-                message={m.loginWithStackAccount}
+                className={style.loginButton}
+                message={sharedMessages.login}
                 href={`${appRoot}/login/ttn-stack${redirectAppend}`}
               />
             </Col>
