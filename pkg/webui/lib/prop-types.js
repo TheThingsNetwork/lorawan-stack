@@ -45,6 +45,7 @@ PropTypes.error = PropTypes.oneOfType([
     message: PropTypes.string,
     stack: PropTypes.object,
   }),
+  PropTypes.instanceOf(Error),
 ])
 
 PropTypes.link = PropTypes.shape({
