@@ -445,7 +445,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 
 	needsAck := mType == ttnpb.MType_CONFIRMED_DOWN || len(dev.MACState.PendingRequests) > 0
-	if needsAck && nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).After(time.Now()) {
+	if class == ttnpb.CLASS_C && needsAck && nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).After(time.Now()) {
 		return nil, st, errConfirmedDownlinkTooSoon
 	}
 
