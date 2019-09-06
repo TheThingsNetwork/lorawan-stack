@@ -108,7 +108,7 @@ export default class ApplicationPayloadFormatters extends React.Component {
     return (
       <Container>
         <Row>
-          <Col sm={12}>
+          <Col>
             {linkWarning}
             <Switch>
               <Route path={`${match.url}/uplink`} component={ApplicationUplinkPayloadFormatters} />

@@ -35,7 +35,7 @@ class ApplicationDeviceList extends React.Component {
       <Container>
         <Row>
           <IntlHelmet title={sharedMessages.devices} />
-          <Col sm={12}>
+          <Col>
             <DevicesTable pageSize={PAGE_SIZES.REGULAR} />
           </Col>
         </Row>

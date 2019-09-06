@@ -145,7 +145,7 @@ export default class Device extends React.Component {
         <IntlHelmet titleTemplate={`%s - ${deviceName || devId} - ${siteName}`} />
         <Container>
           <Row>
-            <Col lg={12}>
+            <Col>
               <h2 className={style.title}>{deviceName || devId}</h2>
               <Tabs className={style.tabs} narrow tabs={tabs} />
             </Col>

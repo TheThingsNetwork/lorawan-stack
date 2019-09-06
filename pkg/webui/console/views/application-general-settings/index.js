@@ -139,7 +139,7 @@ export default class ApplicationGeneralSettings extends React.Component {
       <Container>
         <IntlHelmet title={sharedMessages.generalSettings} />
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <Message component="h2" content={sharedMessages.generalSettings} />
           </Col>
         </Row>

@@ -69,12 +69,12 @@ export default class DevicePayloadFormatters extends Component {
     return (
       <Container>
         <Row>
-          <Col sm={12}>
+          <Col>
             <Tab className={style.tabs} tabs={tabs} divider />
           </Col>
         </Row>
         <Row>
-          <Col sm={12}>
+          <Col>
             <Switch>
               <Redirect exact from={url} to={`${url}/uplink`} />
               <Route exact path={`${url}/uplink`} component={DeviceUplinkPayloadFormatters} />

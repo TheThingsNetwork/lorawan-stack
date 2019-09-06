@@ -165,11 +165,13 @@ export default class GatewayGeneralSettings extends React.Component {
     return (
       <Container>
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <IntlHelmet title={sharedMessages.generalSettings} />
             <Message component="h2" content={sharedMessages.generalSettings} />
           </Col>
-          <Col sm={12} md={8}>
+        </Row>
+        <Row>
+          <Col lg={8} md={12}>
             <GatewayDataForm
               error={error}
               onSubmit={this.handleSubmit}

@@ -28,7 +28,7 @@ class List extends React.Component {
       <Container>
         <Row>
           <IntlHelmet title={sharedMessages.organizations} />
-          <Col sm={12}>
+          <Col>
             <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
           </Col>
         </Row>

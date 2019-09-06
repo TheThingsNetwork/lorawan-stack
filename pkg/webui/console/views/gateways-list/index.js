@@ -27,7 +27,7 @@ export default class GatewaysList extends React.Component {
       <Container>
         <Row>
           <IntlHelmet title={sharedMessages.gateways} />
-          <Col sm={12}>
+          <Col>
             <GatewaysTable pageSize={PAGE_SIZES.REGULAR} />
           </Col>
         </Row>

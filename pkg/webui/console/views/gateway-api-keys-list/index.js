@@ -41,7 +41,7 @@ export default class GatewayApiKeys extends React.Component {
       <Container>
         <Row>
           <IntlHelmet title={sharedMessages.apiKeys} />
-          <Col sm={12}>
+          <Col>
             <ApiKeysTable
               entityId={gtwId}
               pageSize={PAGE_SIZES.REGULAR}

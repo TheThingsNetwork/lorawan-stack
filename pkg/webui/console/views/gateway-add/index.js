@@ -96,12 +96,14 @@ export default class GatewayAdd extends React.Component {
 
     return (
       <Container>
-        <Row className={style.wrapper}>
-          <Col sm={12}>
+        <Row>
+          <Col>
             <IntlHelmet title={sharedMessages.addGateway} />
-            <Message component="h2" content={sharedMessages.addGateway} />
+            <Message className={style.title} component="h2" content={sharedMessages.addGateway} />
           </Col>
-          <Col sm={12} md={8}>
+        </Row>
+        <Row>
+          <Col md={10} lg={9}>
             <GatewayDataForm
               error={error}
               onSubmit={this.handleSubmit}

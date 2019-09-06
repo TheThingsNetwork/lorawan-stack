@@ -66,7 +66,7 @@ export default class ApplicationIntegrationAdd extends Component {
     return (
       <Container>
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <IntlHelmet title={sharedMessages.addWebhook} />
             <Message component="h2" content={sharedMessages.addWebhook} />
           </Col>

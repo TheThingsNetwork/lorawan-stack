@@ -30,7 +30,7 @@ export default class ApplicationIntegrationsList extends Component {
       <Container>
         <Row>
           <IntlHelmet title={sharedMessages.integrations} />
-          <Col sm={12}>
+          <Col>
             <WebhooksTable pageSize={PAGE_SIZES.REGULAR} appId={appId} />
           </Col>
         </Row>

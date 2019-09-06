@@ -37,7 +37,7 @@ export default class Code extends React.Component {
     return (
       <Container>
         <Row>
-          <Col xs={12}>
+          <Col>
             <Message component="h2" content={m.code} />
             <SafeInspector data={query.code} initiallyVisible hideable={false} isBytes={false} />
           </Col>

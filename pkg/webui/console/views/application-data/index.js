@@ -49,13 +49,13 @@ export default class Data extends React.Component {
     return (
       <Container>
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <IntlHelmet title={m.appData} />
             <Message component="h2" content={m.appData} />
           </Col>
         </Row>
         <Row>
-          <Col sm={12} className={style.wrapper}>
+          <Col className={style.wrapper}>
             <ApplicationEvents appId={appId} />
           </Col>
         </Row>

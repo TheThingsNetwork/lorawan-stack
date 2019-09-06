@@ -47,13 +47,13 @@ export default class Data extends React.Component {
     return (
       <Container>
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <IntlHelmet title={m.gtwData} />
             <Message component="h2" content={m.gtwData} />
           </Col>
         </Row>
         <Row>
-          <Col sm={12} className={style.wrapper}>
+          <Col className={style.wrapper} lg={8} md={12}>
             <GatewayEvents gtwId={gtwId} />
           </Col>
         </Row>

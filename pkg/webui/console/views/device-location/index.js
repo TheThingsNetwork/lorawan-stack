@@ -134,7 +134,7 @@ export default class DeviceGeneralSettings extends React.Component {
       <Container>
         <IntlHelmet title={sharedMessages.location} />
         <Row>
-          <Col sm={12} md={12} lg={8} xl={8}>
+          <Col lg={8} md={12}>
             <LocationForm
               entityId={devId}
               formTitle={m.setDeviceLocation}

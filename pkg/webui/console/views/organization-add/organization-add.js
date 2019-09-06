@@ -71,12 +71,18 @@ class Add extends React.Component {
 
     return (
       <Container>
-        <Row className={style.wrapper}>
-          <Col sm={12}>
+        <Row>
+          <Col>
             <IntlHelmet title={sharedMessages.addOrganization} />
-            <Message component="h2" content={sharedMessages.addOrganization} />
+            <Message
+              className={style.title}
+              component="h2"
+              content={sharedMessages.addOrganization}
+            />
           </Col>
-          <Col sm={12} md={8} lg={8} xl={8}>
+        </Row>
+        <Row>
+          <Col md={10} lg={9}>
             <OrganizationForm
               error={error}
               onSubmit={createOrganization}

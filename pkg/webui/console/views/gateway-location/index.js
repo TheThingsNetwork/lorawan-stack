@@ -141,7 +141,7 @@ export default class GatewayLocation extends React.Component {
       <Container>
         <IntlHelmet title={sharedMessages.location} />
         <Row>
-          <Col sm={12} md={12} lg={8} xl={8} className={style.container}>
+          <Col className={style.container} lg={8} md={12}>
             <LocationForm
               entityId={gtwId}
               formTitle={m.setGatewayLocation}
