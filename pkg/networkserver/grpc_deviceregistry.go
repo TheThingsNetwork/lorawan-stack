@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -137,12 +138,20 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	gets := req.FieldMask.Paths
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") {
-		gets = append(gets,
-			"mac_state.current_parameters",
-			"mac_state.desired_parameters",
-			"queued_application_downlinks",
-		)
+	var setsMACState bool
+	for _, p := range req.FieldMask.Paths {
+		if p == "mac_state" {
+			setsMACState = true
+			break
+		}
+		if strings.HasPrefix(p, "mac_state.") {
+			setsMACState = true
+			gets = append(gets,
+				"mac_state",
+				"queued_application_downlinks",
+			)
+			break
+		}
 	}
 
 	var evt events.Event
@@ -168,9 +177,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
 				sets = append(sets, "ids.dev_addr")
 			}
-			addDownlinkTask = ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") &&
-				req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A &&
-				(len(dev.QueuedApplicationDownlinks) > 0 || !dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters))
+			addDownlinkTask = setsMACState &&
+				(ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") && req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A ||
+					dev.GetMACState().GetDeviceClass() != ttnpb.CLASS_A) &&
+				(len(dev.QueuedApplicationDownlinks) > 0 ||
+					!dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters))
+
 			return &req.EndDevice, sets, nil
 		}
 
