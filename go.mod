@@ -14,7 +14,8 @@ replace github.com/blang/semver => github.com/blang/semver v0.0.0-20190414182527
 // github.com/goreleaser/goreleaser uses invalid syntax for dependency version.
 replace github.com/go-macaron/cors => github.com/go-macaron/cors v0.0.0-20190418220122-6fd6a9bfe14e
 
-// goreleaser depends on version of github.com/Azure/go-autorest, which has broken module management. See https://github.com/Azure/go-autorest/issues/414.
+// github.com/goreleaser/goreleaser depends on version of github.com/Azure/go-autorest, which has broken module management.
+// See https://github.com/Azure/go-autorest/issues/414.
 replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v11.1.2+incompatible
 
 // Ensure only one version of golang.org/x/crypto is required.
@@ -41,11 +42,6 @@ replace golang.org/x/xerrors => golang.org/x/xerrors v0.0.0-20190717185122-a985d
 require (
 	cloud.google.com/go/pubsub v1.0.1 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
-	github.com/Azure/azure-pipeline-go v0.2.2 // indirect
-	github.com/Azure/azure-sdk-for-go v33.1.0+incompatible // indirect
-	github.com/Azure/azure-storage-blob-go v0.8.0 // indirect
-	github.com/Azure/go-autorest v13.0.0+incompatible // indirect
-	github.com/Azure/go-autorest/tracing v0.5.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea
@@ -104,7 +100,6 @@ require (
 	github.com/lib/pq v1.2.0
 	github.com/magefile/mage v1.8.1-0.20190718165527-e1fda1a0ffba
 	github.com/markbates/inflect v1.0.4 // indirect
-	github.com/mattn/go-ieproxy v0.0.0-20190805055040-f9202b1cfdeb // indirect
 	github.com/mattn/go-isatty v0.0.9
 	github.com/mattn/go-zglob v0.0.1 // indirect
 	github.com/mattn/goveralls v0.0.2
