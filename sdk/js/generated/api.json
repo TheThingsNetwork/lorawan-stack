@@ -7029,7 +7029,7 @@
           "name": "MACParameters",
           "longName": "MACParameters",
           "fullName": "ttn.lorawan.v3.MACParameters",
-          "description": "MACParameters represent the parameters of the device's MAC layer (active or desired).\nThis is used internally by the Network Server and is read only.",
+          "description": "MACParameters represent the parameters of the device's MAC layer (active or desired).\nThis is used internally by the Network Server.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -7096,6 +7096,32 @@
                     "value": 15
                   }
                 ]
+              }
+            },
+            {
+              "name": "adr_ack_limit",
+              "description": "ADR: number of messages to wait before setting ADRAckReq.\nThis field is deprecated, use adr_ack_limit_exponent instead.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
+            },
+            {
+              "name": "adr_ack_delay",
+              "description": "ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.\nThis field is deprecated, use adr_ack_delay_exponent instead.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
               }
             },
             {
@@ -7325,40 +7351,24 @@
               "defaultValue": ""
             },
             {
-              "name": "adr_ack_limit",
+              "name": "adr_ack_limit_exponent",
               "description": "ADR: number of messages to wait before setting ADRAckReq.",
               "label": "",
-              "type": "ADRAckLimitExponent",
-              "longType": "ADRAckLimitExponent",
-              "fullType": "ttn.lorawan.v3.ADRAckLimitExponent",
+              "type": "ADRAckLimitExponentValue",
+              "longType": "ADRAckLimitExponentValue",
+              "fullType": "ttn.lorawan.v3.ADRAckLimitExponentValue",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
-              "name": "adr_ack_delay",
+              "name": "adr_ack_delay_exponent",
               "description": "ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.",
               "label": "",
-              "type": "ADRAckDelayExponent",
-              "longType": "ADRAckDelayExponent",
-              "fullType": "ttn.lorawan.v3.ADRAckDelayExponent",
+              "type": "ADRAckDelayExponentValue",
+              "longType": "ADRAckDelayExponentValue",
+              "fullType": "ttn.lorawan.v3.ADRAckDelayExponentValue",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
+              "defaultValue": ""
             }
           ]
         },
@@ -7479,8 +7489,8 @@
               "description": "Periodicity of the class B ping slot.\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
               "type": "PingSlotPeriodValue",
-              "longType": "MACSettings.PingSlotPeriodValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.PingSlotPeriodValue",
+              "longType": "PingSlotPeriodValue",
+              "fullType": "ttn.lorawan.v3.PingSlotPeriodValue",
               "ismap": false,
               "defaultValue": ""
             },
@@ -7489,8 +7499,8 @@
               "description": "Data rate index of the class B ping slot.\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
               "type": "DataRateIndexValue",
-              "longType": "MACSettings.DataRateIndexValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
               "ismap": false,
               "defaultValue": ""
             },
@@ -7527,8 +7537,8 @@
               "description": "Class A Rx1 delay.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
               "label": "",
               "type": "RxDelayValue",
-              "longType": "MACSettings.RxDelayValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.RxDelayValue",
+              "longType": "RxDelayValue",
+              "fullType": "ttn.lorawan.v3.RxDelayValue",
               "ismap": false,
               "defaultValue": ""
             },
@@ -7555,8 +7565,8 @@
               "description": "Data rate index for Rx2.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
               "label": "",
               "type": "DataRateIndexValue",
-              "longType": "MACSettings.DataRateIndexValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
               "ismap": false,
               "defaultValue": ""
             },
@@ -7593,8 +7603,8 @@
               "description": "Maximum uplink duty cycle (of all channels).",
               "label": "",
               "type": "AggregatedDutyCycleValue",
-              "longType": "MACSettings.AggregatedDutyCycleValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue",
+              "longType": "AggregatedDutyCycleValue",
+              "fullType": "ttn.lorawan.v3.AggregatedDutyCycleValue",
               "ismap": false,
               "defaultValue": ""
             },
@@ -7663,8 +7673,8 @@
               "description": "The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
               "label": "",
               "type": "RxDelayValue",
-              "longType": "MACSettings.RxDelayValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.RxDelayValue",
+              "longType": "RxDelayValue",
+              "fullType": "ttn.lorawan.v3.RxDelayValue",
               "ismap": false,
               "defaultValue": ""
             },
@@ -7683,8 +7693,8 @@
               "description": "The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept.\nIf unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.",
               "label": "",
               "type": "DataRateIndexValue",
-              "longType": "MACSettings.DataRateIndexValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
               "ismap": false,
               "defaultValue": ""
             },
@@ -7711,204 +7721,30 @@
               "description": "The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
               "type": "AggregatedDutyCycleValue",
-              "longType": "MACSettings.AggregatedDutyCycleValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue",
+              "longType": "AggregatedDutyCycleValue",
+              "fullType": "ttn.lorawan.v3.AggregatedDutyCycleValue",
               "ismap": false,
               "defaultValue": ""
             },
             {
-              "name": "desired_adr_ack_limit",
-              "description": "The ADR ACK limit Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "name": "desired_adr_ack_limit_exponent",
+              "description": "The ADR ACK limit Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
               "label": "",
               "type": "ADRAckLimitExponentValue",
-              "longType": "MACSettings.ADRAckLimitExponentValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.ADRAckLimitExponentValue",
+              "longType": "ADRAckLimitExponentValue",
+              "fullType": "ttn.lorawan.v3.ADRAckLimitExponentValue",
               "ismap": false,
               "defaultValue": ""
             },
             {
-              "name": "desired_adr_ack_delay",
-              "description": "The ADR ACK delay Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "name": "desired_adr_ack_delay_exponent",
+              "description": "The ADR ACK delay Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
               "label": "",
               "type": "ADRAckDelayExponentValue",
-              "longType": "MACSettings.ADRAckDelayExponentValue",
-              "fullType": "ttn.lorawan.v3.MACSettings.ADRAckDelayExponentValue",
+              "longType": "ADRAckDelayExponentValue",
+              "fullType": "ttn.lorawan.v3.ADRAckDelayExponentValue",
               "ismap": false,
               "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "ADRAckDelayExponentValue",
-          "longName": "MACSettings.ADRAckDelayExponentValue",
-          "fullName": "ttn.lorawan.v3.MACSettings.ADRAckDelayExponentValue",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "ADRAckDelayExponent",
-              "longType": "ADRAckDelayExponent",
-              "fullType": "ttn.lorawan.v3.ADRAckDelayExponent",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "ADRAckLimitExponentValue",
-          "longName": "MACSettings.ADRAckLimitExponentValue",
-          "fullName": "ttn.lorawan.v3.MACSettings.ADRAckLimitExponentValue",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "ADRAckLimitExponent",
-              "longType": "ADRAckLimitExponent",
-              "fullType": "ttn.lorawan.v3.ADRAckLimitExponent",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "AggregatedDutyCycleValue",
-          "longName": "MACSettings.AggregatedDutyCycleValue",
-          "fullName": "ttn.lorawan.v3.MACSettings.AggregatedDutyCycleValue",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "AggregatedDutyCycle",
-              "longType": "AggregatedDutyCycle",
-              "fullType": "ttn.lorawan.v3.AggregatedDutyCycle",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "DataRateIndexValue",
-          "longName": "MACSettings.DataRateIndexValue",
-          "fullName": "ttn.lorawan.v3.MACSettings.DataRateIndexValue",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "DataRateIndex",
-              "longType": "DataRateIndex",
-              "fullType": "ttn.lorawan.v3.DataRateIndex",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "PingSlotPeriodValue",
-          "longName": "MACSettings.PingSlotPeriodValue",
-          "fullName": "ttn.lorawan.v3.MACSettings.PingSlotPeriodValue",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "PingSlotPeriod",
-              "longType": "PingSlotPeriod",
-              "fullType": "ttn.lorawan.v3.PingSlotPeriod",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "RxDelayValue",
-          "longName": "MACSettings.RxDelayValue",
-          "fullName": "ttn.lorawan.v3.MACSettings.RxDelayValue",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "RxDelay",
-              "longType": "RxDelay",
-              "fullType": "ttn.lorawan.v3.RxDelay",
-              "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
             }
           ]
         },
@@ -14582,6 +14418,93 @@
       "extensions": [],
       "messages": [
         {
+          "name": "ADRAckDelayExponentValue",
+          "longName": "ADRAckDelayExponentValue",
+          "fullName": "ttn.lorawan.v3.ADRAckDelayExponentValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "ADRAckDelayExponent",
+              "longType": "ADRAckDelayExponent",
+              "fullType": "ttn.lorawan.v3.ADRAckDelayExponent",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ADRAckLimitExponentValue",
+          "longName": "ADRAckLimitExponentValue",
+          "fullName": "ttn.lorawan.v3.ADRAckLimitExponentValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "ADRAckLimitExponent",
+              "longType": "ADRAckLimitExponent",
+              "fullType": "ttn.lorawan.v3.ADRAckLimitExponent",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AggregatedDutyCycleValue",
+          "longName": "AggregatedDutyCycleValue",
+          "fullName": "ttn.lorawan.v3.AggregatedDutyCycleValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "AggregatedDutyCycle",
+              "longType": "AggregatedDutyCycle",
+              "fullType": "ttn.lorawan.v3.AggregatedDutyCycle",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "CFList",
           "longName": "CFList",
           "fullName": "ttn.lorawan.v3.CFList",
@@ -14715,6 +14638,35 @@
               "fullType": "ttn.lorawan.v3.FSKDataRate",
               "ismap": false,
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DataRateIndexValue",
+          "longName": "DataRateIndexValue",
+          "fullName": "ttn.lorawan.v3.DataRateIndexValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
@@ -16923,6 +16875,35 @@
           ]
         },
         {
+          "name": "PingSlotPeriodValue",
+          "longName": "PingSlotPeriodValue",
+          "fullName": "ttn.lorawan.v3.PingSlotPeriodValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "PingSlotPeriod",
+              "longType": "PingSlotPeriod",
+              "fullType": "ttn.lorawan.v3.PingSlotPeriod",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "RejoinRequestPayload",
           "longName": "RejoinRequestPayload",
           "fullName": "ttn.lorawan.v3.RejoinRequestPayload",
@@ -16988,6 +16969,35 @@
               "fullType": "uint32",
               "ismap": false,
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RxDelayValue",
+          "longName": "RxDelayValue",
+          "fullName": "ttn.lorawan.v3.RxDelayValue",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "RxDelay",
+              "longType": "RxDelay",
+              "fullType": "ttn.lorawan.v3.RxDelay",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },
