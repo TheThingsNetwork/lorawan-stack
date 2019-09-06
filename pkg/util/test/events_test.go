@@ -83,3 +83,34 @@ func TestCollectEvents(t *testing.T) {
 		testEvent2,
 	})
 }
+
+func TestRedirectEvents(t *testing.T) {
+	ctx := Context()
+	testEvent1 := events.Define("test-redirect-events-1", "test-event-1")(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}, nil)
+	testEvent2 := events.Define("test-redirect-events-2", "test-event-2")(ctx, ttnpb.GatewayIdentifiers{GatewayID: "test-gtw"}, nil)
+	ch := make(chan events.Event, 2)
+	defer RedirectEvents(ch)()
+	events.Publish(testEvent1)
+	events.Publish(testEvent2)
+	close(ch)
+	var evs []events.Event
+	for ev := range ch {
+		evs = append(evs, ev)
+	}
+	assertions.New(t).So(
+		evs, should.Resemble, []events.Event{
+			testEvent1,
+			testEvent2,
+		},
+	)
+}
+
+func TestWaitEvent(t *testing.T) {
+	ctx := Context()
+	ch := make(chan events.Event, 1)
+	ch <- events.Define("test-wait-event-1", "test-event-1")(ctx, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"}, nil)
+	defer close(ch)
+	assertions.New(t).So(
+		WaitEvent(ctx, ch, "test-wait-event-1"),
+		should.BeTrue)
+}
