@@ -81,7 +81,7 @@ class GatewayStatistic extends React.PureComponent {
       <Status className={style.status} status={statusIndicator}>
         <Message className={style.lastSeen} content={message} />
         {statusIndicator === 'good' && (
-          <DateTime.Relative value={statistics.last_status_received_at || new Date()} />
+          <DateTime.Relative value={statistics.last_status_received_at} />
         )}
       </Status>
     )
