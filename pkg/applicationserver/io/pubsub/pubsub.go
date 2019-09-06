@@ -105,6 +105,7 @@ type integration struct {
 	ttnpb.ApplicationPubSub
 	ctx    context.Context
 	cancel errorcontext.CancelFunc
+	closed chan struct{}
 
 	conn *provider.Connection
 
@@ -236,18 +237,22 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		ApplicationPubSub: *pb,
 		ctx:               ctx,
 		cancel:            cancel,
+		closed:            make(chan struct{}),
 		server:            ps.server,
 	}
 	if _, loaded := ps.integrations.LoadOrStore(psUID, i); loaded {
+		log.FromContext(ctx).Warn("Integration already started")
 		return errAlreadyConfigured.WithAttributes("application_uid", appUID, "pub_sub_id", pb.PubSubID)
 	}
 	go func() {
 		<-ctx.Done()
 		ps.integrationErrors.Store(psUID, ctx.Err())
 		ps.integrations.Delete(psUID)
-		if err := ctx.Err(); !errors.IsCanceled(err) {
+		if err := ctx.Err(); err != nil && !errors.IsCanceled(err) {
+			log.FromContext(ctx).WithError(err).Warn("Integration failed")
 			registerIntegrationFail(ctx, i, err)
 		}
+		close(i.closed)
 	}()
 	provider, err := provider.GetProvider(pb)
 	if err != nil {
@@ -291,6 +296,7 @@ func (ps *PubSub) stop(ctx context.Context, ids ttnpb.ApplicationPubSubIdentifie
 			"pub_sub_id", ids.PubSubID,
 		)).Debug("Integration canceled")
 		i.cancel(context.Canceled)
+		<-i.closed
 	} else {
 		ps.integrationErrors.Delete(psUID)
 	}
