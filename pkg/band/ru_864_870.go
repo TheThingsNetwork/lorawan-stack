@@ -111,7 +111,8 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 14,
-		TxOffset: [16]float32{0, -2, -4, -6, -8, -10, -12, -14,
+		TxOffset: [16]float32{
+			0, -2, -4, -6, -8, -10, -12, -14,
 			0, 0, 0, 0, 0, 0, 0, // RFU
 			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
