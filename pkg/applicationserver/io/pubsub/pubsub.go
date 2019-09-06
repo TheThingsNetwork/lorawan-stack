@@ -245,6 +245,9 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		<-ctx.Done()
 		ps.integrationErrors.Store(psUID, ctx.Err())
 		ps.integrations.Delete(psUID)
+		if err := ctx.Err(); !errors.IsCanceled(err) {
+			registerIntegrationFail(ctx, i, err)
+		}
 	}()
 	provider, err := provider.GetProvider(pb)
 	if err != nil {
@@ -268,10 +271,12 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	go i.handleUp(ctx)
 	i.startHandleDown(ctx)
 	logger.Info("Started")
+	registerIntegrationStart(ctx, i)
 	<-ctx.Done()
 	if err := ctx.Err(); errors.IsCanceled(err) {
 		logger.Info("Integration canceled")
 		i.conn.Shutdown(ctx)
+		registerIntegrationStop(ctx, i)
 	}
 	return
 }
