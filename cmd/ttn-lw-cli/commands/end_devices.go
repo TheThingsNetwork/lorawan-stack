@@ -15,9 +15,12 @@
 package commands
 
 import (
+	"bufio"
 	"context"
+	"encoding/hex"
 	stdio "io"
 	"os"
+	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -405,8 +408,9 @@ var (
 			}
 			if withClaimAuthenticationCode, _ := cmd.Flags().GetBool("with-claim-authentication-code"); withClaimAuthenticationCode {
 				device.ClaimAuthenticationCode = &ttnpb.EndDeviceAuthenticationCode{
-					Value: random.Bytes(4),
+					Value: strings.ToUpper(hex.EncodeToString(random.Bytes(4))),
 				}
+				paths = append(paths, "claim_authentication_code")
 			}
 
 			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
@@ -717,6 +721,110 @@ var (
 			return deleteEndDevice(ctx, devID)
 		},
 	}
+	endDevicesClaimCommand = &cobra.Command{
+		Use:   "claim [application-id]",
+		Short: "Claim an end device (EXPERIMENTAL)",
+		Long: `Claim an end device (EXPERIMENTAL)
+
+The claiming procedure transfers devices from the source application to the
+target application using the Device Claiming Server, thereby transferring
+ownership of the device.
+
+Authentication of device claiming is by the device's JoinEUI, DevEUI and claim
+authentication code as stored in the Join Server. This information is typically
+encoded in a QR code. This command supports claiming by QR code (via stdin), as
+well as providing the claim information through the flags --source-join-eui,
+--source-dev-eui, --source-authentication-code.
+
+Claim authentication code validity is controlled by the owner of the device by
+setting the value and optionally a time window when the code is valid. As part
+of the claiming, the claim authentication code is invalidated by default to
+block subsequent claiming attempts. You can keep the claim authentication code
+valid by specifying --invalidate-authentication-code=false.
+
+As part of claiming, you can optionally provide the target NetID, Network Server
+KEK label and Application Server ID and KEK label. The Network Server and
+Application Server addresses will be taken from the CLI configuration. These
+values will be stored in the Join Server.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			targetAppID := getApplicationID(cmd.Flags(), args)
+			if targetAppID == nil {
+				return errNoApplicationID
+			}
+
+			req := &ttnpb.ClaimEndDeviceRequest{
+				TargetApplicationIDs: *targetAppID,
+			}
+
+			var joinEUI, devEUI *types.EUI64
+			if joinEUIHex, _ := cmd.Flags().GetString("source-join-eui"); joinEUIHex != "" {
+				joinEUI = new(types.EUI64)
+				if err := joinEUI.UnmarshalText([]byte(joinEUIHex)); err != nil {
+					return err
+				}
+			}
+			if devEUIHex, _ := cmd.Flags().GetString("source-dev-eui"); devEUIHex != "" {
+				devEUI = new(types.EUI64)
+				if err := devEUI.UnmarshalText([]byte(devEUIHex)); err != nil {
+					return err
+				}
+			}
+			if joinEUI != nil && devEUI != nil {
+				authenticationCode, _ := cmd.Flags().GetString("source-authentication-code")
+				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
+					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
+						JoinEUI:            *joinEUI,
+						DevEUI:             *devEUI,
+						AuthenticationCode: authenticationCode,
+					},
+				}
+			} else {
+				if joinEUI != nil || devEUI != nil {
+					logger.Warn("Either target JoinEUI or DevEUI specified but need both, not considering any and using scan mode")
+				}
+				if !io.IsPipe(os.Stdin) {
+					logger.Info("Scan QR code")
+				}
+				qrCode, err := bufio.NewReader(os.Stdin).ReadBytes('\n')
+				if err != nil {
+					return err
+				}
+				qrCode = qrCode[:len(qrCode)-1]
+				logger.WithField("code", string(qrCode)).Debug("Scanned QR code")
+				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_QRCode{
+					QRCode: qrCode,
+				}
+			}
+
+			req.TargetDeviceID, _ = cmd.Flags().GetString("target-device-id")
+			if netIDHex, _ := cmd.Flags().GetString("target-net-id"); netIDHex != "" {
+				if err := req.TargetNetID.UnmarshalText([]byte(netIDHex)); err != nil {
+					return err
+				}
+			}
+			if config.NetworkServerEnabled {
+				req.TargetNetworkServerAddress = config.NetworkServerGRPCAddress
+			}
+			req.TargetNetworkServerKEKLabel, _ = cmd.Flags().GetString("target-network-server-kek-label")
+			if config.ApplicationServerEnabled {
+				req.TargetApplicationServerAddress = config.ApplicationServerGRPCAddress
+			}
+			req.TargetApplicationServerKEKLabel, _ = cmd.Flags().GetString("target-application-server-kek-label")
+			req.TargetApplicationServerID, _ = cmd.Flags().GetString("target-application-server-id")
+			req.InvalidateAuthenticationCode, _ = cmd.Flags().GetBool("invalidate-authentication-code")
+
+			dcs, err := api.Dial(ctx, config.DeviceClaimServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			ids, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).Claim(ctx, req)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, ids)
+		},
+	}
 )
 
 func init() {
@@ -775,6 +883,17 @@ func init() {
 	endDevicesCommand.AddCommand(endDevicesProvisionCommand)
 	endDevicesDeleteCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesCommand.AddCommand(endDevicesDeleteCommand)
+	endDevicesClaimCommand.Flags().AddFlagSet(applicationIDFlags())
+	endDevicesClaimCommand.Flags().String("source-join-eui", "", "(hex)")
+	endDevicesClaimCommand.Flags().String("source-dev-eui", "", "(hex)")
+	endDevicesClaimCommand.Flags().String("source-authentication-code", "", "(hex)")
+	endDevicesClaimCommand.Flags().String("target-device-id", "", "")
+	endDevicesClaimCommand.Flags().String("target-net-id", "", "(hex)")
+	endDevicesClaimCommand.Flags().String("target-network-server-kek-label", "", "")
+	endDevicesClaimCommand.Flags().String("target-application-server-kek-label", "", "")
+	endDevicesClaimCommand.Flags().String("target-application-server-id", "", "")
+	endDevicesClaimCommand.Flags().Bool("invalidate-authentication-code", true, "invalidate the claim authentication code to block subsequent claiming attempts")
+	endDevicesCommand.AddCommand(endDevicesClaimCommand)
 
 	endDevicesCommand.AddCommand(applicationsDownlinkCommand)
 
