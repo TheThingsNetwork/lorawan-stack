@@ -27,6 +27,7 @@ import {
   createEventsSelector,
   createEventsErrorSelector,
   createEventsStatusSelector,
+  createLatestEventSelector,
 } from './events'
 import { createRightsSelector, createUniversalRightsSelector } from './rights'
 import { createApiKeysSelector, createApiKeysStoreSelector } from './api-keys'
@@ -72,6 +73,7 @@ export const selectGatewaysError = state => selectGtwsError(state)
 export const selectGatewayEvents = createEventsSelector(ENTITY)
 export const selectGatewayEventsError = createEventsErrorSelector(ENTITY)
 export const selectGatewayEventsStatus = createEventsStatusSelector(ENTITY)
+export const selectLatestGatewayEvent = createLatestEventSelector(ENTITY)
 
 // Api Keys
 export const selectGatewayApiKeysStore = createApiKeysStoreSelector(ENTITY)

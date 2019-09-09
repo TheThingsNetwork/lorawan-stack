@@ -18,20 +18,29 @@ import {
   selectGatewayStatistics,
   selectGatewayStatisticsError,
   selectGatewayStatisticsIsFetching,
+  selectLatestGatewayEvent,
 } from '../../store/selectors/gateways'
-import { startGatewayStatistics, stopGatewayStatistics } from '../../store/actions/gateways'
+import {
+  startGatewayStatistics,
+  stopGatewayStatistics,
+  updateGatewayStatistics,
+} from '../../store/actions/gateways'
+
+import withConnectionReactor from './gateway-connection-reactor'
 
 export default GatewayConnection =>
   connect(
-    function(state, props) {
+    function(state, ownProps) {
       return {
-        statistics: selectGatewayStatistics(state, props),
-        error: selectGatewayStatisticsError(state, props),
-        fetching: selectGatewayStatisticsIsFetching(state, props),
+        statistics: selectGatewayStatistics(state, ownProps),
+        error: selectGatewayStatisticsError(state, ownProps),
+        fetching: selectGatewayStatisticsIsFetching(state, ownProps),
+        latestEvent: selectLatestGatewayEvent(state, ownProps.gtwId),
       }
     },
     (dispatch, ownProps) => ({
       startStatistics: () => dispatch(startGatewayStatistics(ownProps.gtwId)),
       stopStatistics: () => dispatch(stopGatewayStatistics()),
+      updateGatewayStatistics: () => dispatch(updateGatewayStatistics(ownProps.gtwId)),
     }),
-  )(GatewayConnection)
+  )(withConnectionReactor(GatewayConnection))
