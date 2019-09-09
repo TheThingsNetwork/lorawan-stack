@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { FormattedNumber } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
@@ -88,18 +89,21 @@ class GatewayConnection extends React.PureComponent {
       return null
     }
 
-    const uplinkCount = statistics.uplink_count || 0
-    const downlinkCount = statistics.downlink_count || 0
+    const uplinks = statistics.uplink_count || '0'
+    const downlinks = statistics.downlink_count || '0'
+
+    const uplinkCount = parseInt(uplinks) || 0
+    const downlinkCount = parseInt(downlinks) || 0
 
     return (
       <React.Fragment>
         <span className={style.messageCount}>
           <Icon className={style.icon} icon="uplink" />
-          <span>{uplinkCount}</span>
+          <FormattedNumber value={uplinkCount} />
         </span>
         <span className={style.messageCount}>
           <Icon className={style.icon} icon="downlink" />
-          <span>{downlinkCount}</span>
+          <FormattedNumber value={downlinkCount} />
         </span>
       </React.Fragment>
     )
