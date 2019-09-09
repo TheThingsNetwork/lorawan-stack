@@ -38,6 +38,9 @@ import style from './create-account.styl'
 const m = defineMessages({
   createAccount: 'Create a new {siteName} Account',
   register: 'Register',
+  registrationApproved: 'You have successfully registered and can login now',
+  registrationPending:
+    'You have successfully sent the registration request. Please wait until an admin approves it.',
 })
 
 const validationSchema = Yup.object().shape({

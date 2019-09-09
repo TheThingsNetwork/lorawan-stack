@@ -353,6 +353,8 @@
   "oauth.views.code.index.code": "Xxxx Xxxxxxxxxxxxx Xxxx",
   "oauth.views.create-account.index.createAccount": "Xxxxxx x xxx {siteName} Xxxxxxx",
   "oauth.views.create-account.index.register": "Xxxxxxxx",
+  "oauth.views.create-account.index.registrationApproved": "Xxx xxxx xxxxxxxxxxxx xxxxxxxxxx xxx xxx xxxxx xxx",
+  "oauth.views.create-account.index.registrationPending": "Xxx xxxx xxxxxxxxxxxx xxxx xxx xxxxxxxxxxxx xxxxxxx. Xxxxxx xxxx xxxxx xx xxxxx xxxxxxxx xx.",
   "oauth.views.forgot-password.index.loginPage": "Xxxxx Xxxx",
   "oauth.views.forgot-password.index.forgotPassword": "Xxxxxx Xxxxxxxx",
   "oauth.views.forgot-password.index.passwordRequested": "Xxx xxxx xxxxxxx xx xxxxx xxxx xxxxx xxxxxxxxxxxx xxxxxxx.",

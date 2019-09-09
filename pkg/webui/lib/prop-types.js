@@ -147,6 +147,9 @@ PropTypes.location = PropTypes.shape({
   key: PropTypes.string,
   pathname: PropTypes.string.isRequired,
   search: PropTypes.string,
+  state: PropTypes.shape({
+    info: PropTypes.message,
+  }),
 })
 
 export default PropTypes

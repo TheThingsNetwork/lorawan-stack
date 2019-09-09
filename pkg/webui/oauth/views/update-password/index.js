@@ -83,10 +83,15 @@ const initialValues = {
 export default class UpdatePassword extends React.PureComponent {
   static propTypes = {
     fetching: PropTypes.bool.isRequired,
-    user: PropTypes.object,
     handleCancelUpdate: PropTypes.func.isRequired,
     handlePasswordChanged: PropTypes.func.isRequired,
     handleSessionRevoked: PropTypes.func.isRequired,
+    location: PropTypes.location.isRequired,
+    user: PropTypes.user,
+  }
+
+  static defaultProps = {
+    user: undefined,
   }
 
   state = {
