@@ -20,6 +20,9 @@ type basePathFetcher struct {
 }
 
 func (f basePathFetcher) File(pathElements ...string) ([]byte, error) {
+	if len(pathElements) == 0 {
+		return nil, errFilenameNotSpecified
+	}
 	return f.Interface.File(append(f.basePath, pathElements...)...)
 }
 

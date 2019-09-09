@@ -17,7 +17,8 @@ package fetch
 import "go.thethings.network/lorawan-stack/pkg/errors"
 
 var (
-	errFileNotFound      = errors.DefineNotFound("file_not_found", "file `{filename}` not found")
-	errCouldNotFetchFile = errors.Define("fetch_file", "could not fetch file `{filename}`")
-	errCouldNotReadFile  = errors.DefineCorruption("read_file", "could not read file `{filename}`")
+	errCouldNotFetchFile    = errors.Define("fetch_file", "could not fetch file `{filename}`")
+	errCouldNotReadFile     = errors.DefineCorruption("read_file", "could not read file `{filename}`")
+	errFilenameNotSpecified = errors.DefineInvalidArgument("no_filename", "filename not specified")
+	errFileNotFound         = errors.DefineNotFound("file_not_found", "file `{filename}` not found")
 )

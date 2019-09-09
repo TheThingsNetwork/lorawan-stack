@@ -40,6 +40,10 @@ func FromBucket(bucket *blob.Bucket, basePath string) Interface {
 }
 
 func (f *bucketFetcher) File(pathElements ...string) ([]byte, error) {
+	if len(pathElements) == 0 {
+		return nil, errFilenameNotSpecified
+	}
+
 	start := time.Now()
 	content, err := f.bucket.ReadAll(context.TODO(), filepath.Join(append([]string{f.base}, pathElements...)...))
 	if err == nil {

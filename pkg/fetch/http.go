@@ -34,7 +34,12 @@ type httpFetcher struct {
 }
 
 func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
+	if len(pathElements) == 0 {
+		return nil, errFilenameNotSpecified
+	}
+
 	start := time.Now()
+
 	filename := strings.TrimLeft(path.Join(pathElements...), "/")
 	url := fmt.Sprintf("%s/%s", f.base, filename)
 

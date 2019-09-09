@@ -36,6 +36,10 @@ func NewMemFetcher(store map[string][]byte) Interface {
 
 // File gets content from memory.
 func (f *memFetcher) File(pathElements ...string) ([]byte, error) {
+	if len(pathElements) == 0 {
+		return nil, errFilenameNotSpecified
+	}
+
 	start := time.Now()
 
 	path := memFetcherPath(pathElements...)

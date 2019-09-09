@@ -39,7 +39,12 @@ func FromFilesystem(basePath string) Interface {
 }
 
 func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
+	if len(pathElements) == 0 {
+		return nil, errFilenameNotSpecified
+	}
+
 	start := time.Now()
+
 	var path string
 	if f.base != "" {
 		path = filepath.Join(append([]string{f.base}, pathElements...)...)
