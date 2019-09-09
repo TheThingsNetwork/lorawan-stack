@@ -142,7 +142,7 @@ const startGatewayStatisticsLogic = createLogic({
   },
   async process({ cancelled$, action, getState }, dispatch, done) {
     const { id } = action.payload
-    const { timeout = 5000 } = action.meta
+    const { timeout = 60000 } = action.meta
 
     const gsConfig = selectGsConfig()
     const gtw = selectGatewayById(getState(), id)
