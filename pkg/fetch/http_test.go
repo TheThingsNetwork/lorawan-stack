@@ -32,9 +32,16 @@ func TestHTTP(t *testing.T) {
 
 	// Invalid path
 	{
-		fetcher := fetch.FromHTTP("", false)
-		_, err := fetcher.File("test")
-		a.So(err, should.NotBeNil)
+		fetcher, err := fetch.FromHTTP("", false)
+		if a.So(err, should.BeNil) && a.So(fetcher, should.NotBeNil) {
+			_, err = fetcher.File("test")
+			a.So(err, should.BeError)
+		}
+
+		fetcher, err = fetch.FromHTTP("/asd", false)
+		if a.So(err, should.NotBeNil) {
+			a.So(fetcher, should.BeNil)
+		}
 	}
 
 	httpmock.Activate()
@@ -46,13 +53,17 @@ func TestHTTP(t *testing.T) {
 	httpmock.RegisterResponder("GET", fmt.Sprintf("%s/success", serverHost), httpmock.NewStringResponder(200, content))
 	httpmock.RegisterResponder("GET", fmt.Sprintf("%s/fail", serverHost), httpmock.NewStringResponder(500, ""))
 
-	fetcher := fetch.FromHTTP(serverHost, false)
+	fetcher, err := fetch.FromHTTP(serverHost, false)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to construct HTTP fetcher: %v", err)
+	}
 
 	// Valid response code
 	{
 		receivedContent, err := fetcher.File("success")
-		a.So(err, should.BeNil)
-		a.So(string(receivedContent), should.Equal, content)
+		if a.So(err, should.BeNil) {
+			a.So(string(receivedContent), should.Equal, content)
+		}
 	}
 
 	// Internal error response code
@@ -89,7 +100,10 @@ func TestHTTPCache(t *testing.T) {
 
 	time.Sleep(10 * test.Delay)
 
-	fetcher := fetch.FromHTTP(fmt.Sprintf("http://%s", s.Addr), true)
+	fetcher, err := fetch.FromHTTP(fmt.Sprintf("http://%s", s.Addr), true)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to construct HTTP fetcher: %v", err)
+	}
 
 	receivedContent, err := fetcher.File("cached")
 	a.So(err, should.BeNil)

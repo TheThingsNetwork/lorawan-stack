@@ -34,7 +34,11 @@ func boolPtr(v bool) *bool                       { return &v }
 func durationPtr(v time.Duration) *time.Duration { return &v }
 
 func Example() {
-	store := frequencyplans.NewStore(fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans", true))
+	fetcher, err := fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans", true)
+	if err != nil {
+		panic(err)
+	}
+	store := frequencyplans.NewStore(fetcher)
 
 	ids, err := store.GetAllIDs()
 	if err != nil {

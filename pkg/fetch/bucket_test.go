@@ -15,11 +15,9 @@
 package fetch_test
 
 import (
-	"fmt"
+	"io/ioutil"
 	"os"
-	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/blob"
@@ -29,10 +27,9 @@ import (
 )
 
 func TestBucket(t *testing.T) {
-	tmpDir := filepath.Join(os.TempDir(), fmt.Sprintf("FetchTestBucket_%d", time.Now().UnixNano()/1000000))
-	err := os.Mkdir(tmpDir, 0755)
+	tmpDir, err := ioutil.TempDir("", "FetchTestBucket")
 	if err != nil {
-		panic(err)
+		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
 	defer os.RemoveAll(tmpDir)
 

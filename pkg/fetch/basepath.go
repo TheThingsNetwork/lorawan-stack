@@ -14,7 +14,9 @@
 
 package fetch
 
-import "strings"
+import (
+	"path/filepath"
+)
 
 type basePathFetcher struct {
 	Interface
@@ -25,12 +27,15 @@ func (f basePathFetcher) File(pathElements ...string) ([]byte, error) {
 	if len(pathElements) == 0 {
 		return nil, errFilenameNotSpecified
 	}
-	if strings.HasPrefix(pathElements[0], "/") {
+
+	// NOTE: filepath.IsAbs returns true for paths starting with '/' on all supported operating systems.
+	if filepath.IsAbs(pathElements[0]) {
 		return f.Interface.File(pathElements...)
 	}
 	return f.Interface.File(append(f.basePath, pathElements...)...)
 }
 
+// WithBasePath returns an Interface, which preprends basePath to non-absolute requested paths.
 func WithBasePath(f Interface, basePath ...string) Interface {
 	return basePathFetcher{
 		Interface: f,

@@ -34,7 +34,11 @@ func TestBuild(t *testing.T) {
 	if _, err := os.Stat(localPath); err == nil {
 		fetcher = fetch.FromFilesystem(localPath)
 	} else {
-		fetcher = fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master", true)
+		var err error
+		fetcher, err = fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master", true)
+		if err != nil {
+			t.Fatalf("Failed to construct HTTP fetcher: %v", err)
+		}
 	}
 	store := frequencyplans.NewStore(fetcher)
 
@@ -43,7 +47,11 @@ func TestBuild(t *testing.T) {
 	if _, err := os.Stat(referenceLocalPath); err == nil {
 		referenceFetcher = fetch.FromFilesystem(referenceLocalPath)
 	} else {
-		referenceFetcher = fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/master", true)
+		var err error
+		referenceFetcher, err = fetch.FromHTTP("https://raw.githubusercontent.com/TheThingsNetwork/gateway-conf/master", true)
+		if err != nil {
+			t.Fatalf("Failed to construct HTTP fetcher: %v", err)
+		}
 	}
 
 	var shouldResembleReference = func(actual interface{}, expected ...interface{}) string {

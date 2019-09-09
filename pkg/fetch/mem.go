@@ -15,11 +15,9 @@
 package fetch
 
 import (
-	"strings"
+	"path"
 	"time"
 )
-
-const memFetcherSeparator = "/"
 
 // MemFetcher represents the memory fetcher.
 type memFetcher struct {
@@ -42,16 +40,12 @@ func (f *memFetcher) File(pathElements ...string) ([]byte, error) {
 
 	start := time.Now()
 
-	path := memFetcherPath(pathElements...)
-	content, ok := f.store[path]
+	p := path.Join(pathElements...)
+	content, ok := f.store[p]
 	if !ok {
-		return nil, errFileNotFound.WithAttributes("filename", path)
+		return nil, errFileNotFound.WithAttributes("filename", p)
 	}
 
 	f.observeLatency(time.Since(start))
 	return content, nil
-}
-
-func memFetcherPath(pathElements ...string) string {
-	return strings.Join(pathElements, memFetcherSeparator)
 }

@@ -21,7 +21,10 @@ import (
 )
 
 func Example() {
-	fetcher := fetch.FromHTTP("http://webserver.thethings.network/repository", true)
+	fetcher, err := fetch.FromHTTP("http://webserver.thethings.network/repository", true)
+	if err != nil {
+		panic(err)
+	}
 	content, err := fetcher.File("README.md")
 	if err != nil {
 		panic(err)

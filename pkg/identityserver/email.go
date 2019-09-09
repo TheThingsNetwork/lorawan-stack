@@ -29,12 +29,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func (is *IdentityServer) getEmailTemplates(ctx context.Context) *email.TemplateRegistry {
+func (is *IdentityServer) getEmailTemplates(ctx context.Context) (*email.TemplateRegistry, error) {
 	c := &is.configFromContext(ctx).Email.Templates
 	c.registryMu.Lock()
 	defer c.registryMu.Unlock()
 	if c.registry != nil {
-		return c.registry
+		return c.registry, nil
 	}
 	var fetcher fetch.Interface
 	switch {
@@ -43,12 +43,16 @@ func (is *IdentityServer) getEmailTemplates(ctx context.Context) *email.Template
 	case c.Directory != "":
 		fetcher = fetch.FromFilesystem(c.Directory)
 	case c.URL != "":
-		fetcher = fetch.FromHTTP(c.URL, true)
+		var err error
+		fetcher, err = fetch.FromHTTP(c.URL, true)
+		if err != nil {
+			return nil, err
+		}
 	default:
 		fetcher = nil
 	}
 	c.registry = email.NewTemplateRegistry(fetcher, c.Includes...)
-	return c.registry
+	return c.registry, nil
 }
 
 // SendEmail sends an email.
@@ -72,7 +76,12 @@ func (is *IdentityServer) SendEmail(ctx context.Context, f func(emails.Data) ema
 	if messageData == nil {
 		return nil
 	}
-	message, err := is.getEmailTemplates(ctx).Render(messageData)
+
+	templates, err := is.getEmailTemplates(ctx)
+	if err != nil {
+		return err
+	}
+	message, err := templates.Render(messageData)
 	if err != nil {
 		return err
 	}
