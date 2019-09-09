@@ -26,17 +26,6 @@ type fsFetcher struct {
 	root string
 }
 
-// FromFilesystem returns an interface that fetches files from the local filesystem.
-func FromFilesystem(rootElements ...string) Interface {
-	root := filepath.Join(rootElements...)
-	return fsFetcher{
-		baseFetcher: baseFetcher{
-			latency: fetchLatency.WithLabelValues("fs", root),
-		},
-		root: root,
-	}
-}
-
 func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
 	if len(pathElements) == 0 {
 		return nil, errFilenameNotSpecified
@@ -59,4 +48,15 @@ func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
 		return nil, errFileNotFound.WithAttributes("filename", p)
 	}
 	return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", p)
+}
+
+// FromFilesystem returns an interface that fetches files from the local filesystem.
+func FromFilesystem(rootElements ...string) Interface {
+	root := filepath.Join(rootElements...)
+	return fsFetcher{
+		baseFetcher: baseFetcher{
+			latency: fetchLatency.WithLabelValues("fs", root),
+		},
+		root: root,
+	}
 }

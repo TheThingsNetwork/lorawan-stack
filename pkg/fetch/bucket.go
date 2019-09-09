@@ -29,18 +29,6 @@ type bucketFetcher struct {
 	root   string
 }
 
-// FromBucket returns an interface that fetches files from the given blob bucket.
-func FromBucket(bucket *blob.Bucket, root string) Interface {
-	root = path.Clean(root)
-	return &bucketFetcher{
-		baseFetcher: baseFetcher{
-			latency: fetchLatency.WithLabelValues("bucket", root),
-		},
-		bucket: bucket,
-		root:   root,
-	}
-}
-
 func (f *bucketFetcher) File(pathElements ...string) ([]byte, error) {
 	if len(pathElements) == 0 {
 		return nil, errFilenameNotSpecified
@@ -63,4 +51,16 @@ func (f *bucketFetcher) File(pathElements ...string) ([]byte, error) {
 		return nil, errFileNotFound.WithAttributes("filename", p)
 	}
 	return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", p)
+}
+
+// FromBucket returns an interface that fetches files from the given blob bucket.
+func FromBucket(bucket *blob.Bucket, root string) Interface {
+	root = path.Clean(root)
+	return &bucketFetcher{
+		baseFetcher: baseFetcher{
+			latency: fetchLatency.WithLabelValues("bucket", root),
+		},
+		bucket: bucket,
+		root:   root,
+	}
 }

@@ -25,13 +25,6 @@ type memFetcher struct {
 	store map[string][]byte
 }
 
-// NewMemFetcher initializes a new memory fetcher.
-func NewMemFetcher(store map[string][]byte) Interface {
-	return &memFetcher{
-		store: store,
-	}
-}
-
 // File gets content from memory.
 func (f *memFetcher) File(pathElements ...string) ([]byte, error) {
 	if len(pathElements) == 0 {
@@ -48,4 +41,11 @@ func (f *memFetcher) File(pathElements ...string) ([]byte, error) {
 
 	f.observeLatency(time.Since(start))
 	return content, nil
+}
+
+// NewMemFetcher initializes a new memory fetcher.
+func NewMemFetcher(store map[string][]byte) Interface {
+	return &memFetcher{
+		store: store,
+	}
 }
