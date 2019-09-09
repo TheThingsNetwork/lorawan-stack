@@ -82,7 +82,6 @@ const appHTML = `{{- $assetsBaseURL := .AssetsBaseURL -}}
     <link rel="shortcut icon" type="image/x-icon" href="{{$assetsBaseURL}}/{{.IconPrefix}}favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="{{$assetsBaseURL}}/{{.IconPrefix}}touch-icon.png">
 
-    <link href="https://fonts.gstatic.com/s/materialicons/v38/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2" rel="preload" as="font" type="font/woff2" crossorigin>
     {{range .CSSFiles}}<link href="{{$assetsBaseURL}}/{{.}}" rel="stylesheet">{{end}}
   </head>
   <body>
