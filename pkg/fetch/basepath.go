@@ -14,6 +14,8 @@
 
 package fetch
 
+import "strings"
+
 type basePathFetcher struct {
 	Interface
 	basePath []string
@@ -22,6 +24,9 @@ type basePathFetcher struct {
 func (f basePathFetcher) File(pathElements ...string) ([]byte, error) {
 	if len(pathElements) == 0 {
 		return nil, errFilenameNotSpecified
+	}
+	if strings.HasPrefix(pathElements[0], "/") {
+		return f.Interface.File(pathElements...)
 	}
 	return f.Interface.File(append(f.basePath, pathElements...)...)
 }
