@@ -14,20 +14,34 @@
 
 import React from 'react'
 
+import {
+  isGsStatusReceiveEvent,
+  isGsDownlinkSendEvent,
+  isGsUplinkReceiveEvent,
+} from '../../../lib/selectors/event'
 import PropTypes from '../../../lib/prop-types'
 
+/**
+ * `withConnectionReactor` is a HOC that handles gateway connection statistics updates based on
+ * gateway uplink, downlink and connection events.
+ * @param {Object} Component - React component to be wrapped by the reactor.
+ * @returns {Object} - A wrapped react component.
+ */
 const withConnectionReactor = Component => {
   class ConnectionReactor extends React.PureComponent {
     componentDidUpdate(prevProps) {
       const { latestEvent, updateGatewayStatistics } = this.props
-      if (
-        Boolean(latestEvent) &&
-        latestEvent !== prevProps.latestEvent &&
-        (latestEvent.name === 'gs.up.receive' ||
-          latestEvent.name === 'gs.down.send' ||
-          latestEvent.name === 'gs.status.receive')
-      ) {
-        updateGatewayStatistics()
+
+      if (Boolean(latestEvent) && latestEvent !== prevProps.latestEvent) {
+        const { name } = latestEvent
+        const isHeartBeatEvent =
+          isGsDownlinkSendEvent(name) ||
+          isGsUplinkReceiveEvent(name) ||
+          isGsStatusReceiveEvent(name)
+
+        if (isHeartBeatEvent) {
+          updateGatewayStatistics()
+        }
       }
     }
 
