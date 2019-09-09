@@ -83,10 +83,11 @@ const validationSchema = Yup.object().shape({
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
   static propTypes = {
-    application: PropTypes.object,
-    updateApplication: PropTypes.func.isRequired,
+    application: PropTypes.application.isRequired,
     deleteApplication: PropTypes.func.isRequired,
+    match: PropTypes.match.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
+    updateApplication: PropTypes.func.isRequired,
   }
 
   state = {
