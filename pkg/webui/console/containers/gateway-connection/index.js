@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -33,10 +32,9 @@ import {
 } from '../../store/selectors/gateways'
 import { startGatewayStatistics, stopGatewayStatistics } from '../../store/actions/gateways'
 
-import style from './gateway-statistics.styl'
+import style from './gateway-connection.styl'
 
-@bind
-class GatewayStatistic extends React.PureComponent {
+class GatewayConnection extends React.PureComponent {
   componentDidMount() {
     const { startStatistics } = this.props
 
@@ -127,7 +125,7 @@ class GatewayStatistic extends React.PureComponent {
   }
 }
 
-GatewayStatistic.propTypes = {
+GatewayConnection.propTypes = {
   className: PropTypes.string,
   error: PropTypes.error,
   fetching: PropTypes.bool,
@@ -136,7 +134,7 @@ GatewayStatistic.propTypes = {
   stopStatistics: PropTypes.func.isRequired,
 }
 
-GatewayStatistic.defaultProps = {
+GatewayConnection.defaultProps = {
   className: undefined,
   fetching: false,
   error: null,
@@ -155,4 +153,4 @@ export default connect(
     startStatistics: () => dispatch(startGatewayStatistics(ownProps.gtwId)),
     stopStatistics: () => dispatch(stopGatewayStatistics()),
   }),
-)(GatewayStatistic)
+)(GatewayConnection)
