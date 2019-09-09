@@ -134,7 +134,6 @@ export default class ApplicationGeneralSettings extends React.Component {
   render() {
     const { application } = this.props
     const { error } = this.state
-
     return (
       <Container>
         <IntlHelmet title={sharedMessages.generalSettings} />
@@ -164,7 +163,14 @@ export default class ApplicationGeneralSettings extends React.Component {
                   naked
                   message={m.deleteApp}
                   modalData={{
-                    message: { values: { appName: application.name }, ...m.modalWarning },
+                    message: {
+                      values: {
+                        appName: application.name
+                          ? application.name
+                          : application.ids.application_id,
+                      },
+                      ...m.modalWarning,
+                    },
                   }}
                   onApprove={this.handleDelete}
                 />
