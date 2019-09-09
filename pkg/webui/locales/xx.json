@@ -100,6 +100,8 @@
   "console.containers.dev-addr-input.dev-addr-input.generate": "Xxxxxxxx Xxxxxx Xxxxxxx",
   "console.containers.dev-addr-input.index.devAddrFetchingFailure": "Xxxxx xxx xxxxxxxx xxxxxx xxxxxxx",
   "console.containers.freq-plans-select.index.freqPlansFetchingFailure": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxxxx xxxxx",
+  "console.containers.join-eui-prefixes-input.index.prefixesFetchingFailure": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxxx",
+  "console.containers.join-eui-prefixes-input.join-eui-prefixes-input.empty": "Xx xxxxxx",
   "console.containers.webhook-formats-select.index.formatFetchingFailure": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxx xxxxxxx",
   "console.containers.webhooks-table.index.format": "Xxxxxx",
   "console.containers.webhooks-table.index.baseUrl": "Xxxx XXX",

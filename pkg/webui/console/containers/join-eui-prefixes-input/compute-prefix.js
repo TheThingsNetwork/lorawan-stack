@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import user from './user'
-import init from './init'
-import applications from './applications'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import configuration from './configuration'
-import organizations from './organizations'
-import js from './join-server'
+const CHAR_BYTES = 4
 
-export default [
-  ...user,
-  ...init,
-  ...applications,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...configuration,
-  ...organizations,
-  ...js,
-]
+/**
+ * Computes the join EUI prefix given `joinEUI` and its `length`.
+ * @param {string} joinEUI - The join EUI.
+ * @param {number} length - The length of the prefix.
+ * @returns {string} - The join EUI prefix.
+ */
+function computePrefix(joinEUI, length = 0) {
+  // TODO: Support generating all prefixes that dont fulfil `length % CHAR_BYTES === 0`
+  // (https://github.com/TheThingsNetwork/lorawan-stack/issues/1263)
+  return joinEUI.slice(0, Math.ceil(length / CHAR_BYTES))
+}
+
+export default computePrefix

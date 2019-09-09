@@ -12,24 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import user from './user'
-import init from './init'
-import applications from './applications'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import configuration from './configuration'
-import organizations from './organizations'
-import js from './join-server'
+import { connect } from 'react-redux'
 
-export default [
-  ...user,
-  ...init,
-  ...applications,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...configuration,
-  ...organizations,
-  ...js,
-]
+import {
+  selectJoinEUIPrefixes,
+  selectJoinEUIPrefixesError,
+  selectJoinEUIPrefixesFetching,
+} from '../../store/selectors/join-server'
+import { getJoinEUIPrefixes } from '../../store/actions/join-server'
+
+const mapStateToProps = state => ({
+  fetching: selectJoinEUIPrefixesFetching(state),
+  error: selectJoinEUIPrefixesError(state),
+  prefixes: selectJoinEUIPrefixes(state),
+})
+
+const mapDispatchToProps = dispatch => ({
+  getPrefixes: () => dispatch(getJoinEUIPrefixes()),
+})
+
+export default Component =>
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(Component)

@@ -172,7 +172,7 @@ export default {
     ),
   },
   js: {
-    joinEUIPRefixes: {
+    joinEUIPrefixes: {
       list: ttnClient.Js.listJoinEUIPrefixes.bind(ttnClient.Js),
     },
   },

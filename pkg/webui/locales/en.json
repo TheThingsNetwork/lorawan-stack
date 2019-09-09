@@ -100,6 +100,8 @@
   "console.containers.dev-addr-input.dev-addr-input.generate": "Generate Device Address",
   "console.containers.dev-addr-input.index.devAddrFetchingFailure": "Could not generate device address",
   "console.containers.freq-plans-select.index.freqPlansFetchingFailure": "Could not retrieve the list of available frequency plans",
+  "console.containers.join-eui-prefixes-input.index.prefixesFetchingFailure": "Could not retrieve the list of available prefixes",
+  "console.containers.join-eui-prefixes-input.join-eui-prefixes-input.empty": "No prefix",
   "console.containers.webhook-formats-select.index.formatFetchingFailure": "Could not retrieve the list of available webhook formats",
   "console.containers.webhooks-table.index.format": "Format",
   "console.containers.webhooks-table.index.baseUrl": "Base URL",

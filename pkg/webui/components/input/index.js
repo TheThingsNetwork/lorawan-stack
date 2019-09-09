@@ -26,30 +26,29 @@ import Toggled from './toggled'
 
 import style from './input.styl'
 
-@injectIntl
 @bind
 class Input extends React.Component {
   static propTypes = {
-    icon: PropTypes.string,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    onChange: PropTypes.func,
-    onEnter: PropTypes.func,
-    placeholder: PropTypes.message,
-    error: PropTypes.bool,
-    warning: PropTypes.bool,
-    valid: PropTypes.bool,
-    disabled: PropTypes.bool,
-    readOnly: PropTypes.bool,
-    type: PropTypes.string.isRequired,
-    label: PropTypes.string,
-    loading: PropTypes.bool,
-    title: PropTypes.message,
-    code: PropTypes.bool,
     action: PropTypes.shape({
       ...Button.propTypes,
     }),
+    code: PropTypes.bool,
+    disabled: PropTypes.bool,
+    error: PropTypes.bool,
+    icon: PropTypes.string,
+    label: PropTypes.string,
+    loading: PropTypes.bool,
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    onEnter: PropTypes.func,
+    onFocus: PropTypes.func,
+    placeholder: PropTypes.message,
+    readOnly: PropTypes.bool,
+    title: PropTypes.message,
+    type: PropTypes.string.isRequired,
+    valid: PropTypes.bool,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    warning: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -106,6 +105,7 @@ class Input extends React.Component {
       horizontal,
       code,
       action,
+      forwardedRef,
       ...rest
     } = this.props
 
@@ -215,4 +215,4 @@ const Valid = function(props) {
 
 Input.Toggled = Toggled
 
-export default Input
+export default injectIntl(Input, { forwardRef: true })

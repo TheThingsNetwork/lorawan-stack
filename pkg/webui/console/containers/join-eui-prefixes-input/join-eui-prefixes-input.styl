@@ -12,24 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import user from './user'
-import init from './init'
-import applications from './applications'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import configuration from './configuration'
-import organizations from './organizations'
-import js from './join-server'
+.container
+  display: flex
+  flex-wrap: wrap
 
-export default [
-  ...user,
-  ...init,
-  ...applications,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...configuration,
-  ...organizations,
-  ...js,
-]
+  .select
+    flex-basis: 100%
+    margin-bottom: $cs.xs
+
+  .byte
+    flex-basis: 100%
+
++media-query-min($bp.s)
+  .container
+    flex-wrap: nowrap
+
+    .select
+      flex-basis: 30%
+      margin-right: $cs.xs
+      margin-bottom: 0
+
+    .select + .byte
+      flex-basis: 70%
