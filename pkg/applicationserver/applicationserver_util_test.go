@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	Timeout          = (1 << 8) * test.Delay
+	Timeout          = (1 << 6) * test.Delay
 	EventsBufferSize = (1 << 6)
 )
 
