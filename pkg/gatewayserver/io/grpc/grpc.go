@@ -38,7 +38,8 @@ func New(server io.Server) ttnpb.GtwGsServer {
 	return &impl{server}
 }
 
-func (*impl) Protocol() string { return "grpc" }
+func (*impl) Protocol() string            { return "grpc" }
+func (*impl) SupportsStatusMessage() bool { return true }
 
 var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_uid}`")
 

@@ -74,7 +74,8 @@ type srv struct {
 	firewall    Firewall
 }
 
-func (*srv) Protocol() string { return "udp" }
+func (*srv) Protocol() string            { return "udp" }
+func (*srv) SupportsStatusMessage() bool { return true }
 
 // Start starts the UDP frontend.
 func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) {
