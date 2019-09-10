@@ -19,6 +19,7 @@ import (
 	"crypto"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"net"
 	"net/url"
 	"strings"
@@ -45,6 +46,17 @@ type ServerConfig struct {
 	AllowCUPSURIUpdate bool `name:"allow-cups-uri-update" description:"Allow CUPS URI updates"`
 }
 
+func adaptAuthorization(originalAuth string) string {
+	if originalAuth == "" {
+		return originalAuth
+	}
+	var prefix, key string
+	if _, err := fmt.Sscanf(originalAuth, "%v %v", &prefix, &key); err != nil {
+		return originalAuth
+	}
+	return key
+}
+
 // NewServer returns a new CUPS server from this config on top of the component.
 func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option) *Server {
 	var registerUnknownTo *ttnpb.OrganizationOrUserIdentifiers
@@ -64,6 +76,14 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 			return grpc.PerRPCCredentials(rpcmetadata.MD{
 				AuthType:      "bearer",
 				AuthValue:     conf.RegisterUnknown.APIKey,
+				AllowInsecure: c.AllowInsecureForCredentials(),
+			})
+		}))
+	} else {
+		opts = append(opts, WithAuth(func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+			return grpc.PerRPCCredentials(rpcmetadata.MD{
+				AuthType:      "bearer",
+				AuthValue:     adaptAuthorization(auth),
 				AllowInsecure: c.AllowInsecureForCredentials(),
 			})
 		}))
