@@ -21,6 +21,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/email"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
@@ -202,12 +203,31 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
-	// Require that caller has at least the rights we're giving to the collaborator.
-	if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Collaborator.Rights...); err != nil {
-		return nil, err
-	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return is.getMembershipStore(ctx, db).SetMember(
+		store := is.getMembershipStore(ctx, db)
+
+		if len(req.Collaborator.Rights) > 0 {
+			newRights := ttnpb.RightsFrom(req.Collaborator.Rights...)
+			existingRights, err := store.GetMember(
+				ctx,
+				&req.Collaborator.OrganizationOrUserIdentifiers,
+				req.GatewayIdentifiers,
+			)
+
+			if err != nil && !errors.IsNotFound(err) {
+				return err
+			}
+			// Require the caller to have all added rights.
+			if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, newRights.Sub(existingRights).GetRights()...); err != nil {
+				return err
+			}
+			// Require the caller to have all removed rights.
+			if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, existingRights.Sub(newRights).GetRights()...); err != nil {
+				return err
+			}
+		}
+
+		return store.SetMember(
 			ctx,
 			&req.Collaborator.OrganizationOrUserIdentifiers,
 			req.GatewayIdentifiers,
