@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GatewayConnectionReactor should match snapshot 1`] = `
+<ConnectionReactor
+  componentProp="prop"
+  latestEvent={
+    Object {
+      "identifiers": Array [
+        "id",
+      ],
+      "name": "test.name",
+      "time": "2019-09-10T07:30:14.232137918Z",
+    }
+  }
+  updateGatewayStatistics={[Function]}
+>
+  <TestComponent
+    componentProp="prop"
+  >
+    <div>
+      test
+    </div>
+  </TestComponent>
+</ConnectionReactor>
+`;
