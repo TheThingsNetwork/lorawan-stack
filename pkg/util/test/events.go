@@ -156,3 +156,30 @@ func CollectEvents(f func()) []events.Event {
 	f()
 	return evs
 }
+
+// RedirectEvents redirects the published events to the
+// provided channel until the returned function is called.
+func RedirectEvents(ch chan events.Event) func() {
+	return SetDefaultEventsPubSub(&MockEventPubSub{
+		PublishFunc:     func(ev events.Event) { ch <- ev },
+		SubscribeFunc:   func(name string, hdl events.Handler) error { return nil },
+		UnsubscribeFunc: func(name string, hdl events.Handler) {},
+	})
+}
+
+// WaitEvent waits for a specific event to be sent to the channel.
+func WaitEvent(ctx context.Context, ch chan events.Event, name string) bool {
+	for {
+		select {
+		case <-ctx.Done():
+			return false
+		case ev, ok := <-ch:
+			if !ok {
+				panic("channel is closed")
+			}
+			if ev.Name() == name {
+				return true
+			}
+		}
+	}
+}

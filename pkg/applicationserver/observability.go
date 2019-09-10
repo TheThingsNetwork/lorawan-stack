@@ -253,6 +253,7 @@ func registerLinkStop(ctx context.Context, link *link) {
 
 func registerLinkFail(ctx context.Context, link *link, err error) {
 	events.Publish(evtLinkFail(ctx, link.ApplicationIdentifiers, err))
+	asMetrics.linksFailed.WithLabelValues(ctx, link.NetworkServerAddress).Inc()
 }
 
 func registerSubscribe(ctx context.Context, sub *io.Subscription) {

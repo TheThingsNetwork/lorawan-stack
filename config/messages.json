@@ -1601,6 +1601,15 @@
       "file": "format.go"
     }
   },
+  "error:pkg/applicationserver/io/pubsub:integration_failed": {
+    "translations": {
+      "en": "integration {pub_sub_id} failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "observability.go"
+    }
+  },
   "error:pkg/applicationserver/io/web/redis:invalid_fieldmask": {
     "translations": {
       "en": "invalid fieldmask"
@@ -5954,6 +5963,51 @@
     },
     "description": {
       "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.pubsub.delete": {
+    "translations": {
+      "en": "delete pubsub"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "observability.go"
+    }
+  },
+  "event:as.pubsub.fail": {
+    "translations": {
+      "en": "fail pubsub"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "observability.go"
+    }
+  },
+  "event:as.pubsub.set": {
+    "translations": {
+      "en": "set pubsub"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "observability.go"
+    }
+  },
+  "event:as.pubsub.start": {
+    "translations": {
+      "en": "start pubsub"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
+      "file": "observability.go"
+    }
+  },
+  "event:as.pubsub.stop": {
+    "translations": {
+      "en": "stop pubsub"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub",
       "file": "observability.go"
     }
   },

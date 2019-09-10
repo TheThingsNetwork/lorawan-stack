@@ -88,6 +88,7 @@ type link struct {
 	ttnpb.ApplicationLink
 	ctx    context.Context
 	cancel errorcontext.CancelFunc
+	closed chan struct{}
 
 	conn      *grpc.ClientConn
 	connName  string
@@ -161,12 +162,14 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		ApplicationLink:        *target,
 		ctx:                    ctx,
 		cancel:                 cancel,
+		closed:                 make(chan struct{}),
 		connReady:              make(chan struct{}),
 		subscribeCh:            make(chan *io.Subscription, 1),
 		unsubscribeCh:          make(chan *io.Subscription, 1),
 		upCh:                   make(chan *io.ContextualApplicationUp, linkBufferSize),
 	}
 	if _, loaded := as.links.LoadOrStore(uid, l); loaded {
+		log.FromContext(ctx).Warn("Link already started")
 		return errAlreadyLinked.WithAttributes("application_uid", uid)
 	}
 	go func() {
@@ -177,6 +180,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 			log.FromContext(ctx).WithError(err).Warn("Link failed")
 			registerLinkFail(ctx, l, err)
 		}
+		close(l.closed)
 	}()
 	if err := as.connectLink(ctx, l); err != nil {
 		return err
@@ -264,6 +268,7 @@ func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.Applicati
 		l := val.(*link)
 		log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlink")
 		l.cancel(context.Canceled)
+		<-l.closed
 	} else {
 		as.linkErrors.Delete(uid)
 	}
