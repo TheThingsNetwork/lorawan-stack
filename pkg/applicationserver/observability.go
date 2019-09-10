@@ -108,7 +108,7 @@ var asMetrics = &messageMetrics{
 	linksStarted: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "links_started",
+			Name:      "links_started_total",
 			Help:      "Number of links started",
 		},
 		[]string{networkServer},
@@ -116,7 +116,7 @@ var asMetrics = &messageMetrics{
 	linksStopped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "links_stopped",
+			Name:      "links_stopped_total",
 			Help:      "Number of links stopped",
 		},
 		[]string{networkServer},
@@ -124,7 +124,7 @@ var asMetrics = &messageMetrics{
 	linksFailed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "links_failed",
+			Name:      "links_failed_total",
 			Help:      "Number of links failed",
 		},
 		[]string{networkServer},
@@ -132,7 +132,7 @@ var asMetrics = &messageMetrics{
 	subscriptionsStarted: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "subscriptions_started",
+			Name:      "subscriptions_started_total",
 			Help:      "Number of subscriptions started",
 		},
 		[]string{protocol},
@@ -140,7 +140,7 @@ var asMetrics = &messageMetrics{
 	subscriptionsStopped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "subscriptions_stopped",
+			Name:      "subscriptions_stopped_total",
 			Help:      "Number of subscriptions stopped",
 		},
 		[]string{protocol},
