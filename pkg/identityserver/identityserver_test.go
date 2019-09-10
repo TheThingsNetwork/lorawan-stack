@@ -34,7 +34,7 @@ import (
 var (
 	setup        sync.Once
 	dbConnString string
-	population   = store.NewPopulator(13, 42)
+	population   = store.NewPopulator(14, 42)
 )
 
 var (
@@ -49,6 +49,7 @@ var (
 	appAccessCollaboratorUser, appAccessCollaboratorUserIdx = getTestUser()
 	clientAccessUser, clientAccessUserIdx                   = getTestUser()
 	gatewayAccessUser, gatewayAccessUserIdx                 = getTestUser()
+	gtwAccessCollaboratorUser, gtwAccessCollaboratorUserIdx = getTestUser()
 	organizationAccessUser, organizationAccessUserIdx       = getTestUser()
 	userAccessUser, userAccessUserIdx                       = getTestUser()
 	paginationUser, paginationUserIdx                       = getTestUser()
