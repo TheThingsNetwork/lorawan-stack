@@ -9,14 +9,14 @@ replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries
 replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
 
 // github.com/blang/semver doesn't have a v3 semantic import.
-replace github.com/blang/semver => github.com/blang/semver v0.0.0-20190414182527-1a9109f8c4a1
+replace github.com/blang/semver v3.5.1+incompatible => github.com/blang/semver v0.0.0-20190414182527-1a9109f8c4a1
 
 // github.com/goreleaser/goreleaser uses invalid syntax for dependency version.
-replace github.com/go-macaron/cors => github.com/go-macaron/cors v0.0.0-20190418220122-6fd6a9bfe14e
+replace github.com/go-macaron/cors v0.0.0-20190309005821-6fd6a9bfe14e9 => github.com/go-macaron/cors v0.0.0-20190418220122-6fd6a9bfe14e
 
 // github.com/goreleaser/goreleaser depends on version of github.com/Azure/go-autorest, which has broken module management.
 // See https://github.com/Azure/go-autorest/issues/414.
-replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v11.1.2+incompatible
+replace github.com/Azure/go-autorest v12.0.0+incompatible => github.com/Azure/go-autorest v11.1.2+incompatible
 
 // Ensure only one version of golang.org/x/crypto is required.
 replace golang.org/x/crypto => golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472
