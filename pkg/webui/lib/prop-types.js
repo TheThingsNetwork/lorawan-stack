@@ -83,6 +83,16 @@ PropTypes.gatewayStats = PropTypes.shape({
   round_trip_times: PropTypes.shape({}),
 })
 
+PropTypes.application = PropTypes.shape({
+  created_at: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  ids: PropTypes.shape({
+    application_id: PropTypes.string.isRequired,
+  }).isRequired,
+  name: PropTypes.string,
+  updated_at: PropTypes.string.isRequired,
+})
+
 PropTypes.user = PropTypes.shape({
   ids: PropTypes.shape({
     user_id: PropTypes.string.isRequired,

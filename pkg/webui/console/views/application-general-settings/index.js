@@ -83,10 +83,11 @@ const validationSchema = Yup.object().shape({
 @bind
 export default class ApplicationGeneralSettings extends React.Component {
   static propTypes = {
-    application: PropTypes.object,
-    updateApplication: PropTypes.func.isRequired,
+    application: PropTypes.application.isRequired,
     deleteApplication: PropTypes.func.isRequired,
+    match: PropTypes.match.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
+    updateApplication: PropTypes.func.isRequired,
   }
 
   state = {
@@ -134,7 +135,6 @@ export default class ApplicationGeneralSettings extends React.Component {
   render() {
     const { application } = this.props
     const { error } = this.state
-
     return (
       <Container>
         <IntlHelmet title={sharedMessages.generalSettings} />
@@ -164,7 +164,14 @@ export default class ApplicationGeneralSettings extends React.Component {
                   naked
                   message={m.deleteApp}
                   modalData={{
-                    message: { values: { appName: application.name }, ...m.modalWarning },
+                    message: {
+                      values: {
+                        appName: application.name
+                          ? application.name
+                          : application.ids.application_id,
+                      },
+                      ...m.modalWarning,
+                    },
                   }}
                   onApprove={this.handleDelete}
                 />
