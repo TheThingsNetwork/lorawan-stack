@@ -86,7 +86,8 @@ type connection struct {
 	io      *io.Connection
 }
 
-func (*connection) Protocol() string { return "mqtt" }
+func (*connection) Protocol() string            { return "mqtt" }
+func (*connection) SupportsStatusMessage() bool { return true }
 
 func (c *connection) setup(ctx context.Context) error {
 	ctx = auth.NewContextWithInterface(ctx, c)

@@ -39,6 +39,8 @@ const (
 type Frontend interface {
 	// Protocol returns the protocol used in the frontend.
 	Protocol() string
+	// SupportsStatusMessage returns true if the protocol supports status messages.
+	SupportsStatusMessage() bool
 }
 
 // Server represents the Gateway Server to gateway frontends.
@@ -69,11 +71,12 @@ type Connection struct {
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
 
-	protocol  string
-	gateway   *ttnpb.Gateway
-	fp        *frequencyplans.FrequencyPlan
-	scheduler *scheduling.Scheduler
-	rtts      *rtts
+	protocol              string
+	supportsStatusMessage bool
+	gateway               *ttnpb.Gateway
+	fp                    *frequencyplans.FrequencyPlan
+	scheduler             *scheduling.Scheduler
+	rtts                  *rtts
 
 	upCh     chan *ttnpb.UplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -82,20 +85,21 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, cancelCtx errorcontext.CancelFunc, protocol string, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) *Connection {
+func NewConnection(ctx context.Context, cancelCtx errorcontext.CancelFunc, protocol string, supportsStatusMessage bool, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) *Connection {
 	return &Connection{
-		ctx:         ctx,
-		cancelCtx:   cancelCtx,
-		protocol:    protocol,
-		gateway:     gateway,
-		fp:          fp,
-		scheduler:   scheduler,
-		rtts:        newRTTs(maxRTTs),
-		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
-		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
-		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
-		txAckCh:     make(chan *ttnpb.TxAcknowledgment, bufferSize),
-		connectTime: time.Now().UnixNano(),
+		ctx:                   ctx,
+		cancelCtx:             cancelCtx,
+		protocol:              protocol,
+		supportsStatusMessage: supportsStatusMessage,
+		gateway:               gateway,
+		fp:                    fp,
+		scheduler:             scheduler,
+		rtts:                  newRTTs(maxRTTs),
+		upCh:                  make(chan *ttnpb.UplinkMessage, bufferSize),
+		downCh:                make(chan *ttnpb.DownlinkMessage, bufferSize),
+		statusCh:              make(chan *ttnpb.GatewayStatus, bufferSize),
+		txAckCh:               make(chan *ttnpb.TxAcknowledgment, bufferSize),
+		connectTime:           time.Now().UnixNano(),
 	}
 }
 
@@ -111,7 +115,7 @@ func (c *Connection) Disconnect(err error) {
 func (c *Connection) Protocol() string { return c.protocol }
 
 // SupportsStatusMessage returns true if the protocol supports status messages.
-func (c *Connection) SupportsStatusMessage() bool { return c.protocol != "basicstation" }
+func (c *Connection) SupportsStatusMessage() bool { return c.supportsStatusMessage }
 
 // Gateway returns the gateway entity.
 func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }

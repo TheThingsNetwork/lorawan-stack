@@ -370,7 +370,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
-	conn := io.NewConnection(ctx, cancelCtx, frontend.Protocol(), gtw, fp, scheduler)
+	conn := io.NewConnection(ctx, cancelCtx, frontend.Protocol(), frontend.SupportsStatusMessage(), gtw, fp, scheduler)
 	gs.connections.Store(uid, conn)
 	registerGatewayConnect(ctx, ids)
 	logger.Info("Connected")
@@ -379,7 +379,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	for _, handler := range gs.upstreamHandlers {
 		go func(handler upstream.Handler) {
 			logger := log.FromContext(ctx).WithField("handler", handler.GetName())
-			if err := handler.ConnectGateway(ctx, uid, conn); err != nil {
+			if err := handler.ConnectGateway(ctx, ids, conn); err != nil {
 				logger.WithError(err).Warn("Gateway connect errored on upstream")
 			}
 		}(handler)
