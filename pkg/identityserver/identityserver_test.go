@@ -34,23 +34,24 @@ import (
 var (
 	setup        sync.Once
 	dbConnString string
-	population   = store.NewPopulator(12, 42)
+	population   = store.NewPopulator(13, 42)
 )
 
 var (
-	userIndex                                         int
-	newUser, newUserIdx                               = getTestUser()
-	rejectedUser, rejectedUserIdx                     = getTestUser()
-	defaultUser, defaultUserIdx                       = getTestUser()
-	suspendedUser, suspendedUserIdx                   = getTestUser()
-	adminUser, adminUserIdx                           = getTestUser()
-	collaboratorUser, collaboratorUserIdx             = getTestUser()
-	applicationAccessUser, applicationAccessUserIdx   = getTestUser()
-	clientAccessUser, clientAccessUserIdx             = getTestUser()
-	gatewayAccessUser, gatewayAccessUserIdx           = getTestUser()
-	organizationAccessUser, organizationAccessUserIdx = getTestUser()
-	userAccessUser, userAccessUserIdx                 = getTestUser()
-	paginationUser, paginationUserIdx                 = getTestUser()
+	userIndex                                               int
+	newUser, newUserIdx                                     = getTestUser()
+	rejectedUser, rejectedUserIdx                           = getTestUser()
+	defaultUser, defaultUserIdx                             = getTestUser()
+	suspendedUser, suspendedUserIdx                         = getTestUser()
+	adminUser, adminUserIdx                                 = getTestUser()
+	collaboratorUser, collaboratorUserIdx                   = getTestUser()
+	applicationAccessUser, applicationAccessUserIdx         = getTestUser()
+	appAccessCollaboratorUser, appAccessCollaboratorUserIdx = getTestUser()
+	clientAccessUser, clientAccessUserIdx                   = getTestUser()
+	gatewayAccessUser, gatewayAccessUserIdx                 = getTestUser()
+	organizationAccessUser, organizationAccessUserIdx       = getTestUser()
+	userAccessUser, userAccessUserIdx                       = getTestUser()
+	paginationUser, paginationUserIdx                       = getTestUser()
 )
 
 var now = time.Now()

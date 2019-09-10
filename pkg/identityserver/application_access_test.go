@@ -34,6 +34,13 @@ func init() {
 			ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
 		}
 	}
+	appAccessCollaboratorUser.Admin = false
+	appAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
+	for _, apiKey := range userAPIKeys(&appAccessCollaboratorUser.UserIdentifiers).APIKeys {
+		apiKey.Rights = []ttnpb.Right{
+			ttnpb.RIGHT_APPLICATION_ALL,
+		}
+	}
 }
 
 func TestApplicationAccessNotFound(t *testing.T) {
@@ -104,11 +111,13 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
+		// Choose right that the user does not have and hence cannot add
+		right := ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIdentifiers: applicationID,
 			Collaborator: ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Rights:                        []ttnpb.Right{right},
 			},
 		}, creds)
 
@@ -310,5 +319,126 @@ func TestApplicationAccessCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL})
+	})
+}
+
+func TestApplicationAccessCollaboratorRights(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		userID, usrCreds := defaultUser.UserIdentifiers, userCreds(defaultUserIdx)
+		applicationID := userApplications(&userID).Applications[0].ApplicationIdentifiers
+		collaboratorID := applicationAccessUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+		collaboratorCreds := userCreds(applicationAccessUserIdx)
+		removedCollaboratorID := appAccessCollaboratorUser.UserIdentifiers.OrganizationOrUserIdentifiers()
+
+		reg := ttnpb.NewApplicationAccessClient(cc)
+
+		_, err := reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIdentifiers: applicationID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *collaboratorID,
+				Rights: []ttnpb.Right{
+					ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
+					ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
+				},
+			},
+		}, usrCreds)
+
+		a.So(err, should.BeNil)
+
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIdentifiers: applicationID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Rights: []ttnpb.Right{
+					ttnpb.RIGHT_APPLICATION_ALL,
+				},
+			},
+		}, usrCreds)
+
+		a.So(err, should.BeNil)
+
+		// Try revoking rights for the collaborator with RIGHT_APPLICATION_ALL without having it
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIdentifiers: applicationID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Rights: []ttnpb.Right{
+					ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
+					ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
+				},
+			},
+		}, collaboratorCreds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		// Remove RIGHT_APPLICATION_ALL from collaborator to be removed
+		newRights := ttnpb.AllApplicationRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_ALL))
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIdentifiers: applicationID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Rights:                        newRights.Rights,
+			},
+		}, usrCreds)
+
+		a.So(err, should.BeNil)
+
+		newRights = newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS))
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIdentifiers: applicationID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Rights:                        newRights.Rights,
+			},
+		}, collaboratorCreds)
+
+		a.So(err, should.BeNil)
+
+		// Try revoking RIGHT_APPLICATION_INFO without having it
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIdentifiers: applicationID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO)).Rights,
+			},
+		}, collaboratorCreds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		res, err := reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+			ApplicationIdentifiers:        applicationID,
+			OrganizationOrUserIdentifiers: *removedCollaboratorID,
+		}, collaboratorCreds)
+
+		if a.So(err, should.BeNil) {
+			a.So(res.Rights, should.Resemble, newRights.Rights)
+		}
+
+		// Delete collaborator with more rights
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIdentifiers: applicationID,
+			Collaborator: ttnpb.Collaborator{
+				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Rights:                        []ttnpb.Right{},
+			},
+		}, collaboratorCreds)
+
+		a.So(err, should.BeNil)
+
+		_, err = reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+			ApplicationIdentifiers:        applicationID,
+			OrganizationOrUserIdentifiers: *removedCollaboratorID,
+		}, collaboratorCreds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 }
