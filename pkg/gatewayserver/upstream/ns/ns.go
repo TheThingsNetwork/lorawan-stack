@@ -61,30 +61,30 @@ func (h *Handler) Setup() error {
 }
 
 // ConnectGateway implements upstream.Handler.
-func (h *Handler) ConnectGateway(ctx context.Context, _ string, gtwConn *io.Connection) error {
+func (h *Handler) ConnectGateway(ctx context.Context, _ ttnpb.GatewayIdentifiers, gtwConn *io.Connection) error {
 	h.c.ClaimIDs(ctx, gtwConn.Gateway().GatewayIdentifiers)
-	for {
-		select {
-		case <-ctx.Done():
-			h.c.UnclaimIDs(ctx, gtwConn.Gateway().GatewayIdentifiers)
-			return ctx.Err()
-		default:
-			return nil
-		}
+	select {
+	case <-ctx.Done():
+		h.c.UnclaimIDs(ctx, gtwConn.Gateway().GatewayIdentifiers)
+		return ctx.Err()
+	default:
+		return nil
 	}
 }
 
 // HandleUp implements upstream.Handler.
-func (h *Handler) HandleUp(ctx context.Context, gatewayUID string, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUp) error {
+func (h *Handler) HandleUp(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUp) error {
 	nsConn, err := h.c.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
-	if err == nil {
+	if err != nil {
 		return errNotFound.WithCause(err).WithAttributes("ids", ids)
 	}
 	client := ttnpb.NewGsNsClient(nsConn)
 	for _, up := range msg.UplinkMessages {
-		_, err := client.HandleUplink(ctx, up, h.c.WithClusterAuth())
-		if err != nil {
-			return err
+		if h.name == "cluster" {
+			_, err := client.HandleUplink(ctx, up, h.c.WithClusterAuth())
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil

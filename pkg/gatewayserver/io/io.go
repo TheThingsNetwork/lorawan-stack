@@ -85,7 +85,12 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, cancelCtx errorcontext.CancelFunc, protocol string, supportsStatusMessage bool, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) *Connection {
+func NewConnection(ctx context.Context, protocol string, supportsStatusMessage bool, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool) (*Connection, error) {
+	ctx, cancelCtx := errorcontext.New(ctx)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, enforceDutyCycle, nil)
+	if err != nil {
+		return nil, err
+	}
 	return &Connection{
 		ctx:                   ctx,
 		cancelCtx:             cancelCtx,
@@ -100,7 +105,7 @@ func NewConnection(ctx context.Context, cancelCtx errorcontext.CancelFunc, proto
 		statusCh:              make(chan *ttnpb.GatewayStatus, bufferSize),
 		txAckCh:               make(chan *ttnpb.TxAcknowledgment, bufferSize),
 		connectTime:           time.Now().UnixNano(),
-	}
+	}, nil
 }
 
 // Context returns the connection context.

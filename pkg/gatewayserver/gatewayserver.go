@@ -31,7 +31,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -40,7 +39,6 @@ import (
 	iogrpc "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/upstream"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/upstream/ns"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -113,8 +111,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		return nil, err
 	}
 	if len(forward) == 0 {
-		forward["ttn.lorawan.v3.GsNs:cluster"] = []types.DevAddrPrefix{{}}
+		forward[""] = []types.DevAddrPrefix{{}}
 	}
+
 	gs = &GatewayServer{
 		Component:                 c,
 		ctx:                       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
@@ -219,17 +218,22 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	for name, prefix := range gs.forward {
-		str := strings.Split(name, ":")
-		if len(str) != 2 {
-			continue
-		}
-		switch str[0] {
-		case "ttn.lorawan.v3.GsNs":
-			gs.upstreamHandlers[str[1]] = ns.NewHandler(ctx, str[1], c, prefix)
-		default:
-			return nil, errUpstreamType.WithAttributes("name", name)
+		if name == "" {
+			gs.upstreamHandlers["cluster"] = ns.NewHandler(ctx, "cluster", c, prefix)
+		} else {
+			str := strings.Split(name, ":")
+			if len(str) != 2 {
+				continue
+			}
+			switch str[0] {
+			case "ttn.lorawan.v3.GsNs":
+				gs.upstreamHandlers[str[1]] = ns.NewHandler(ctx, str[1], c, prefix)
+			default:
+				return nil, errUpstreamType.WithAttributes("name", name)
+			}
 		}
 	}
+
 	for _, handler := range gs.upstreamHandlers {
 		if err := handler.Setup(); err != nil {
 			return nil, errStartUpstream.WithCause(err).WithAttributes("name", handler.GetName())
@@ -308,7 +312,6 @@ var (
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
 func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
-	ctx, cancelCtx := errorcontext.New(ctx)
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
@@ -365,12 +368,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	if err != nil {
 		return nil, err
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, gtw.EnforceDutyCycle, nil)
+
+	conn, err := io.NewConnection(ctx, frontend.Protocol(), frontend.SupportsStatusMessage(), gtw, fp, gtw.EnforceDutyCycle)
 	if err != nil {
 		return nil, err
 	}
-
-	conn := io.NewConnection(ctx, cancelCtx, frontend.Protocol(), frontend.SupportsStatusMessage(), gtw, fp, scheduler)
 	gs.connections.Store(uid, conn)
 	registerGatewayConnect(ctx, ids)
 	logger.Info("Connected")
@@ -380,7 +382,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		go func(handler upstream.Handler) {
 			logger := log.FromContext(ctx).WithField("handler", handler.GetName())
 			if err := handler.ConnectGateway(ctx, ids, conn); err != nil {
-				logger.WithError(err).Warn("Gateway connect errored on upstream")
+				logger.WithError(err).Warn("Failed to connect gateway on upstream")
 			}
 		}(handler)
 	}
@@ -476,7 +478,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					gtwUp := &ttnpb.GatewayUp{
 						UplinkMessages: []*ttnpb.UplinkMessage{msg},
 					}
-					if err := handler.HandleUp(ctx, conn.Gateway().GatewayID, ids, gtwUp); err != nil {
+					if err := handler.HandleUp(ctx, conn.Gateway().GatewayIdentifiers, ids, gtwUp); err != nil {
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
 						break
 					}
