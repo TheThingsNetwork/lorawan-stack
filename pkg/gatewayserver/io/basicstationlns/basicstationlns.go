@@ -161,7 +161,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
-func (s *srv) handleTraffic(c echo.Context) error {
+func (s *srv) handleTraffic(c echo.Context) (retErr error) {
 	var sessionID int32
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
@@ -228,9 +228,9 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		logger.WithError(err).Warn("Failed to connect")
 		return err
 	}
-	defer func(error) {
-		conn.Disconnect(err)
-	}(err)
+	defer func() {
+		conn.Disconnect(retErr)
+	}()
 
 	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
