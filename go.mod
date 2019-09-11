@@ -19,22 +19,22 @@ replace github.com/go-macaron/cors v0.0.0-20190309005821-6fd6a9bfe14e9 => github
 replace github.com/Azure/go-autorest v12.0.0+incompatible => github.com/Azure/go-autorest v11.1.2+incompatible
 
 // Ensure only one version of golang.org/x/crypto is required.
-replace golang.org/x/crypto => golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472
+replace golang.org/x/crypto => golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
 
 // Ensure only one version of golang.org/x/image is required.
-replace golang.org/x/image => golang.org/x/image v0.0.0-20190902063713-cb417be4ba39 // indirect
+replace golang.org/x/image => golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a // indirect
 
 // Ensure only one version of golang.org/x/net is required.
-replace golang.org/x/net => golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
+replace golang.org/x/net => golang.org/x/net v0.0.0-20190909003024-a7b16738d86b
 
 // Ensure only one version of golang.org/x/oauth2 is required.
 replace golang.org/x/oauth2 => golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 
 // Ensure only one version of golang.org/x/sys is required.
-replace golang.org/x/sys => golang.org/x/sys v0.0.0-20190904154756-749cb33beabd // indirect
+replace golang.org/x/sys => golang.org/x/sys v0.0.0-20190910064555-bbd175535a8b // indirect
 
 // Ensure only one version of golang.org/x/tools is required.
-replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190905035308-adb45749da8e
+replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190911022129-16c5e0f7d110
 
 // Ensure only one version of golang.org/x/xerrors is required.
 replace golang.org/x/xerrors => golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7
@@ -42,6 +42,8 @@ replace golang.org/x/xerrors => golang.org/x/xerrors v0.0.0-20190717185122-a985d
 require (
 	cloud.google.com/go/pubsub v1.0.1 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
+	github.com/Azure/azure-pipeline-go v0.2.2 // indirect
+	github.com/Azure/azure-storage-blob-go v0.8.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea
@@ -49,9 +51,10 @@ require (
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
 	github.com/alecthomas/chroma v0.6.6 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
-	github.com/alecthomas/units v0.0.0-20190717042225-c3de453c63f4 // indirect
+	github.com/alecthomas/units v0.0.0-20190910110746-680d30ca3117 // indirect
 	github.com/apex/log v1.1.1 // indirect
-	github.com/aws/aws-sdk-go v1.23.15
+	github.com/aws/aws-sdk-go v1.23.19
+	github.com/bep/tmc v0.5.1 // indirect
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb // indirect
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/certifi/gocertifi v0.0.0-20190905060710-a5e0173ced67 // indirect
@@ -66,11 +69,11 @@ require (
 	github.com/gobuffalo/envy v1.7.0 // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.0
-	github.com/gohugoio/hugo v0.58.0
+	github.com/gohugoio/hugo v0.58.1
 	github.com/golang/gddo v0.0.0-20190904175337-72a348e765d2
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-github/v25 v25.1.3 // indirect
-	github.com/goreleaser/goreleaser v0.117.1
+	github.com/goreleaser/goreleaser v0.117.2
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.1
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
@@ -100,11 +103,12 @@ require (
 	github.com/lib/pq v1.2.0
 	github.com/magefile/mage v1.8.1-0.20190718165527-e1fda1a0ffba
 	github.com/markbates/inflect v1.0.4 // indirect
+	github.com/mattn/go-ieproxy v0.0.0-20190805055040-f9202b1cfdeb // indirect
 	github.com/mattn/go-isatty v0.0.9
 	github.com/mattn/go-zglob v0.0.1 // indirect
 	github.com/mattn/goveralls v0.0.2
 	github.com/mdempsky/unconvert v0.0.0-20190325185700-2f5dc3378ed3
-	github.com/mgechev/revive v0.0.0-20190831212952-fa5acbc1f032
+	github.com/mgechev/revive v0.0.0-20190910172647-84deee41635a
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/muesli/smartcrop v0.3.0 // indirect
@@ -120,7 +124,7 @@ require (
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4 // indirect
 	github.com/prometheus/procfs v0.0.4 // indirect
 	github.com/robertkrimen/otto v0.0.0-20180617131154-15f95af6e78d
-	github.com/rogpeppe/go-internal v1.3.1 // indirect
+	github.com/rogpeppe/go-internal v1.3.2 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible
@@ -131,21 +135,20 @@ require (
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.4.0
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	github.com/tdewolff/minify/v2 v2.5.1 // indirect
-	github.com/tdewolff/parse/v2 v2.3.9 // indirect
+	github.com/tdewolff/minify/v2 v2.5.2 // indirect
 	github.com/xanzy/go-gitlab v0.20.1 // indirect
 	go.opencensus.io v0.22.1
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
-	gocloud.dev v0.16.0
+	gocloud.dev v0.17.0
 	gocloud.dev/pubsub/natspubsub v0.16.0
-	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472
-	golang.org/x/image v0.0.0-20190902063713-cb417be4ba39 // indirect
-	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
+	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
+	golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a // indirect
+	golang.org/x/net v0.0.0-20190909003024-a7b16738d86b
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sys v0.0.0-20190904154756-749cb33beabd // indirect
-	golang.org/x/tools v0.0.0-20190905035308-adb45749da8e
+	golang.org/x/sys v0.0.0-20190910064555-bbd175535a8b // indirect
+	golang.org/x/tools v0.0.0-20190911022129-16c5e0f7d110
 	golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7
-	google.golang.org/api v0.9.0
+	google.golang.org/api v0.10.0
 	google.golang.org/appengine v1.6.2 // indirect
 	google.golang.org/genproto v0.0.0-20190905072037-92dd089d5514
 	google.golang.org/grpc v1.23.0
