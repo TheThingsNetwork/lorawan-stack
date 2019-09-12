@@ -616,7 +616,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
 
 				go handleFirstUplink()
-				go handleDuplicateUplink()
+				defer time.AfterFunc((1<<3)*test.Delay, handleDuplicateUplink).Stop()
 
 				a.So(assertDuplicateHandleUplink(), should.BeTrue)
 
