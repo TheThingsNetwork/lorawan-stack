@@ -87,9 +87,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_INFO,
-			ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,    // We need to write attributes.
-			ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS, // We need to create API keys.
-			ttnpb.RIGHT_GATEWAY_LINK,              // We need to create the LNS API key with this right.
+			ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
 		},
 	}, auth)
 	if err != nil {
