@@ -88,7 +88,7 @@ services:
 
       # If using (self) signed certificates:
       - TTN_LW_TLS_CERTIFICATE=/run/secrets/cert.pem
-      - TTN_LW_CA=/run/secrets/cert.pem
+      - TTN_LW_TLS_ROOT_CA=/run/secrets/cert.pem
       - TTN_LW_TLS_KEY=/run/secrets/key.pem
 
       # HTTP Server configuration:
