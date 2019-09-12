@@ -386,7 +386,6 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			}
 		}(handler)
 	}
-
 	return conn, nil
 }
 

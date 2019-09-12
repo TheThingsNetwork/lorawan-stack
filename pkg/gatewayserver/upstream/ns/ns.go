@@ -61,11 +61,11 @@ func (h *Handler) Setup() error {
 }
 
 // ConnectGateway implements upstream.Handler.
-func (h *Handler) ConnectGateway(ctx context.Context, _ ttnpb.GatewayIdentifiers, gtwConn *io.Connection) error {
-	h.c.ClaimIDs(ctx, gtwConn.Gateway().GatewayIdentifiers)
+func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, _ *io.Connection) error {
+	h.c.ClaimIDs(ctx, ids)
 	select {
 	case <-ctx.Done():
-		h.c.UnclaimIDs(ctx, gtwConn.Gateway().GatewayIdentifiers)
+		h.c.UnclaimIDs(ctx, ids)
 		return ctx.Err()
 	default:
 		return nil
