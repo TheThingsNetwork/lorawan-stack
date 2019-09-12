@@ -27,29 +27,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	pbtypes "github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"google.golang.org/grpc"
 )
 
 const (
-	cupsAttribute               = "cups"
-	cupsURIAttribute            = "cups-uri"
-	cupsLastSeenAttribute       = "cups-last-seen"
-	cupsCredentialsIDAttribute  = "cups-credentials-id"
-	cupsCredentialsAttribute    = "cups-credentials"
-	cupsCredentialsCRCAttribute = "cups-credentials-crc"
-	cupsStationAttribute        = "cups-station"
-	cupsModelAttribute          = "cups-model"
-	cupsPackageAttribute        = "cups-package"
-	lnsCredentialsIDAttribute   = "lns-credentials-id"
-	lnsCredentialsAttribute     = "lns-credentials"
-	lnsCredentialsCRCAttribute  = "lns-credentials-crc"
+	cupsAttribute              = "cups"
+	cupsURIAttribute           = "cups-uri"
+	cupsLastSeenAttribute      = "cups-last-seen"
+	cupsCredentialsIDAttribute = "cups-credentials-id"
+	cupsCredentialsAttribute   = "cups-credentials"
+	cupsStationAttribute       = "cups-station"
+	cupsModelAttribute         = "cups-model"
+	cupsPackageAttribute       = "cups-package"
+	lnsCredentialsIDAttribute  = "lns-credentials-id"
+	lnsCredentialsAttribute    = "lns-credentials"
 )
 
 var (
@@ -58,7 +55,70 @@ var (
 	errInvalidToken    = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
 )
 
-var getGatewayMask = types.FieldMask{Paths: []string{
+func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*ttnpb.Gateway, error) {
+	logger := log.FromContext(ctx)
+	ids := ttnpb.GatewayIdentifiers{
+		GatewayID: fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String())),
+		EUI:       &req.Router.EUI64,
+	}
+	logger = logger.WithField("gateway_uid", unique.ID(ctx, ids))
+	registry, err := s.getRegistry(ctx, &ids)
+	if err != nil {
+		return nil, err
+	}
+	auth := s.defaultOwnerAuth(ctx)
+	gtw, err := registry.Create(ctx, &ttnpb.CreateGatewayRequest{
+		Gateway: ttnpb.Gateway{
+			GatewayIdentifiers:   ids,
+			GatewayServerAddress: s.defaultLNSURI,
+		},
+		Collaborator: s.defaultOwner,
+	}, auth)
+	if err != nil {
+		return nil, err
+	}
+	logger.Info("Created new gateway")
+	accessRegistry, err := s.getAccess(ctx, &gtw.GatewayIdentifiers)
+	if err != nil {
+		return nil, err
+	}
+	cupsKey, err := accessRegistry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+		GatewayIdentifiers: gtw.GatewayIdentifiers,
+		Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
+		Rights: []ttnpb.Right{
+			ttnpb.RIGHT_GATEWAY_INFO,
+			ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,    // We need to write attributes.
+			ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS, // We need to create API keys.
+			ttnpb.RIGHT_GATEWAY_LINK,              // We need to create the LNS API key with this right.
+		},
+	}, auth)
+	if err != nil {
+		return nil, err
+	}
+	logger.WithField("api_key_id", cupsKey.ID).Info("Created gateway API key for CUPS")
+	lnsKey, err := accessRegistry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+		GatewayIdentifiers: gtw.GatewayIdentifiers,
+		Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
+		Rights: []ttnpb.Right{
+			ttnpb.RIGHT_GATEWAY_INFO,
+			ttnpb.RIGHT_GATEWAY_LINK,
+		},
+	}, auth)
+	if err != nil {
+		return nil, err
+	}
+	logger.WithField("api_key_id", lnsKey.ID).Info("Created gateway API key for LNS")
+	gtw.Attributes = map[string]string{
+		cupsAttribute:              "true",
+		cupsCredentialsIDAttribute: cupsKey.ID,
+		cupsCredentialsAttribute:   fmt.Sprintf("Bearer %s", cupsKey.Key),
+		lnsCredentialsIDAttribute:  lnsKey.ID,
+		lnsCredentialsAttribute:    fmt.Sprintf("Bearer %s", lnsKey.Key),
+	}
+	return gtw, nil
+}
+
+var getGatewayMask = pbtypes.FieldMask{Paths: []string{
 	"attributes",
 	"version_ids",
 	"gateway_server_address",
@@ -66,81 +126,6 @@ var getGatewayMask = types.FieldMask{Paths: []string{
 	"update_channel",
 	"frequency_plan_id",
 }}
-
-func (s *Server) getOrRegisterGateway(ctx context.Context, req UpdateInfoRequest, authHeader string) (gtw *ttnpb.Gateway, err error) {
-	logger := log.FromContext(ctx)
-	serverAuth := s.getAuth(ctx, req.Router.EUI64, authHeader)
-
-	logger.Info("Finding gateway...")
-	registry, err := s.getRegistry(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-	ids, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-		EUI: req.Router.EUI64,
-	}, serverAuth)
-
-	if errors.IsNotFound(err) && s.registerUnknown {
-		gatewayID := fmt.Sprintf("eui-%s", strings.ToLower(req.Router.EUI64.String()))
-		logger.WithField("gateway_id", gatewayID).Info("Registering new gateway")
-		ids := ttnpb.GatewayIdentifiers{
-			GatewayID: gatewayID,
-			EUI:       &req.Router.EUI64,
-		}
-		registry, err = s.getRegistry(ctx, &ids)
-		if err != nil {
-			return nil, err
-		}
-		return registry.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: ttnpb.Gateway{
-				GatewayIdentifiers: ids,
-				Attributes: map[string]string{
-					cupsAttribute:               "true",
-					cupsCredentialsAttribute:    authHeader,
-					cupsCredentialsCRCAttribute: strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10),
-					lnsCredentialsCRCAttribute:  strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10),
-				},
-				GatewayServerAddress: req.LNSURI,
-			},
-			Collaborator: s.defaultOwner,
-		}, serverAuth)
-	} else if err != nil {
-		return nil, err
-	}
-
-	registry, err = s.getRegistry(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-	logger = logger.WithField("gateway_id", ids.GetGatewayID())
-
-	if md := rpcmetadata.FromIncomingContext(ctx); strings.ToLower(md.AuthType) == "bearer" && md.AuthValue != "" {
-		logger.Debug("Getting gateway with request credentials")
-		md.AllowInsecure = s.component.AllowInsecureForCredentials()
-		if gtw, err = registry.Get(ctx, &ttnpb.GetGatewayRequest{
-			GatewayIdentifiers: *ids,
-			FieldMask:          getGatewayMask,
-		}, grpc.PerRPCCredentials(md)); err == nil {
-			return gtw, nil
-		} else if !errors.IsUnauthenticated(err) && !errors.IsPermissionDenied(err) {
-			return nil, err
-		}
-	}
-
-	logger.Debug("Getting gateway with server credentials")
-	gtw, err = registry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIdentifiers: *ids,
-		FieldMask:          getGatewayMask,
-	}, serverAuth)
-	if err != nil {
-		return nil, err
-	}
-	if gtw.Attributes[cupsCredentialsAttribute] != "" && authHeader != gtw.Attributes[cupsCredentialsAttribute] {
-		return nil, errInvalidToken
-	}
-
-	return gtw, nil
-}
 
 // UpdateInfo implements the CUPS update-info handler.
 func (s *Server) UpdateInfo(c echo.Context) error {
@@ -159,14 +144,37 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	authHeader := c.Request().Header.Get(echo.HeaderAuthorization)
-	if authHeader == "" {
-		return errUnauthenticated
-	}
-	gtw, err := s.getOrRegisterGateway(ctx, req, authHeader)
+	registry, err := s.getRegistry(ctx, nil)
 	if err != nil {
 		return err
 	}
+	serverAuth := s.getServerAuth(ctx)
+	gatewayAuth, err := rpcmetadata.WithForwardedAuth(ctx, s.component.AllowInsecureForCredentials())
+	if err != nil {
+		return err
+	}
+
+	var gtw *ttnpb.Gateway
+	ids, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
+		EUI: req.Router.EUI64,
+	}, serverAuth)
+	if err == nil {
+		logger.WithField("gateway_uid", unique.ID(ctx, ids)).Debug("Found gateway for EUI")
+		gtw, err = registry.Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: *ids,
+			FieldMask:          getGatewayMask,
+		}, gatewayAuth)
+	} else if errors.IsNotFound(err) && s.registerUnknown {
+		gtw, err = s.registerGateway(ctx, req)
+		if err != nil {
+			return err
+		}
+	}
+	if err != nil {
+		return err
+	}
+
+	logger = logger.WithField("gateway_uid", unique.ID(ctx, gtw.GatewayIdentifiers))
 
 	if gtw.Attributes == nil {
 		gtw.Attributes = make(map[string]string)
@@ -179,17 +187,36 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 
 	res := UpdateInfoResponse{}
-	authorization := s.getAuth(ctx, req.Router.EUI64, authHeader)
 
 	if gtw.Attributes[cupsURIAttribute] == "" {
 		gtw.Attributes[cupsURIAttribute] = req.CUPSURI
-	} else if s.allowCUPSURIUpdate && gtw.Attributes[cupsURIAttribute] != req.CUPSURI {
+	}
+	if s.allowCUPSURIUpdate && gtw.Attributes[cupsURIAttribute] != req.CUPSURI {
 		res.CUPSURI = gtw.Attributes[cupsURIAttribute]
 	}
 
+	if credentials := gtw.Attributes[cupsCredentialsAttribute]; credentials != "" {
+		cupsTrust, err := s.getTrust(gtw.Attributes[cupsURIAttribute])
+		if err != nil {
+			return err
+		}
+		cupsCredentials, err := TokenCredentials(cupsTrust, credentials)
+		if err != nil {
+			return err
+		}
+		if crc32.ChecksumIEEE(cupsCredentials) != req.CUPSCredentialsCRC {
+			res.CUPSCredentials = cupsCredentials
+		}
+	}
+
 	if gtw.GatewayServerAddress == "" {
-		gtw.GatewayServerAddress = req.LNSURI
-	} else if gtw.GatewayServerAddress != req.LNSURI {
+		if req.LNSURI != "" {
+			gtw.GatewayServerAddress = req.LNSURI
+		} else {
+			gtw.GatewayServerAddress = s.defaultLNSURI
+		}
+	}
+	if gtw.GatewayServerAddress != req.LNSURI {
 		scheme, host, port, err := parseAddress(gtw.GatewayServerAddress)
 		if err != nil {
 			return err
@@ -204,102 +231,20 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
 	}
 
-	if gtw.Attributes[cupsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.CUPSCredentialsCRC), 10) {
-		if gtw.Attributes[cupsCredentialsAttribute] == "" {
-			registry, err := s.getAccess(ctx, &gtw.GatewayIdentifiers)
-			if err != nil {
-				return err
-			}
-			apiKey, err := registry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-				GatewayIdentifiers: gtw.GatewayIdentifiers,
-				Name:               fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
-				Rights: []ttnpb.Right{
-					ttnpb.RIGHT_GATEWAY_INFO,              // We need to read private attributes.
-					ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,    // We need to write attributes.
-					ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS, // We need to create API keys.
-					ttnpb.RIGHT_GATEWAY_LINK,              // We need to create the LNS API key with this right.
-				},
-			}, authorization)
-			if err != nil {
-				return err
-			}
-			if gtw.Attributes[cupsCredentialsIDAttribute] != "" {
-				_, err = registry.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
-					GatewayIdentifiers: gtw.GatewayIdentifiers,
-					APIKey: ttnpb.APIKey{
-						ID:     gtw.Attributes[cupsCredentialsIDAttribute],
-						Rights: nil,
-					},
-				}, authorization)
-				if err != nil {
-					return err
-				}
-			}
-			gtw.Attributes[cupsCredentialsIDAttribute] = apiKey.ID
-			gtw.Attributes[cupsCredentialsAttribute] = apiKey.Key
-		}
-		trust, err := s.getTrust(gtw.Attributes[cupsURIAttribute])
+	if credentials := gtw.Attributes[lnsCredentialsAttribute]; credentials != "" {
+		lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
 		if err != nil {
 			return err
 		}
-		if trust != nil {
-			creds, err := TokenCredentials(trust, gtw.Attributes[cupsCredentialsAttribute])
-			if err != nil {
-				return err
-			}
-			res.CUPSCredentials = creds
-			gtw.Attributes[cupsCredentialsCRCAttribute] = strconv.FormatUint(uint64(crc32.ChecksumIEEE(res.CUPSCredentials)), 10)
-		} else {
-			delete(gtw.Attributes, cupsCredentialsCRCAttribute)
-		}
-	}
-	if gtw.Attributes[lnsCredentialsCRCAttribute] != strconv.FormatUint(uint64(req.LNSCredentialsCRC), 10) {
-		if gtw.Attributes[lnsCredentialsAttribute] == "" {
-			registry, err := s.getAccess(ctx, &gtw.GatewayIdentifiers)
-			if err != nil {
-				return err
-			}
-			apiKey, err := registry.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-				GatewayIdentifiers: gtw.GatewayIdentifiers,
-				Name:               fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
-				Rights: []ttnpb.Right{
-					ttnpb.RIGHT_GATEWAY_INFO,
-					ttnpb.RIGHT_GATEWAY_LINK,
-				},
-			}, authorization)
-			if err != nil {
-				return err
-			}
-			if gtw.Attributes[lnsCredentialsIDAttribute] != "" {
-				_, err = registry.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
-					GatewayIdentifiers: gtw.GatewayIdentifiers,
-					APIKey: ttnpb.APIKey{
-						ID:     gtw.Attributes[lnsCredentialsIDAttribute],
-						Rights: nil,
-					},
-				}, authorization)
-				if err != nil {
-					return err
-				}
-			}
-			gtw.Attributes[lnsCredentialsIDAttribute] = apiKey.ID
-			gtw.Attributes[lnsCredentialsAttribute] = apiKey.Key
-		}
-		trust, err := s.getTrust(gtw.GatewayServerAddress)
+		lnsCredentials, err := TokenCredentials(lnsTrust, credentials)
 		if err != nil {
 			return err
 		}
-		if trust != nil {
-			creds, err := TokenCredentials(trust, gtw.Attributes[lnsCredentialsAttribute])
-			if err != nil {
-				return err
-			}
-			res.LNSCredentials = creds
-			gtw.Attributes[lnsCredentialsCRCAttribute] = strconv.FormatUint(uint64(crc32.ChecksumIEEE(res.LNSCredentials)), 10)
-		} else {
-			delete(gtw.Attributes, lnsCredentialsCRCAttribute)
+		if crc32.ChecksumIEEE(lnsCredentials) != req.LNSCredentialsCRC {
+			res.LNSCredentials = lnsCredentials
 		}
 	}
+
 	if gtw.AutoUpdate {
 		// TODO: Compare the Station, Model, Package, version_ids and update_channel in order to check if any updates are required
 		// (https://github.com/TheThingsNetwork/lorawan-stack/issues/365)
@@ -333,16 +278,16 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	gtw.Attributes[cupsModelAttribute] = req.Model
 	gtw.Attributes[cupsPackageAttribute] = req.Package
 
-	registry, err := s.getRegistry(ctx, &gtw.GatewayIdentifiers)
+	registry, err = s.getRegistry(ctx, &gtw.GatewayIdentifiers)
 	if err != nil {
 		return err
 	}
 	gtw, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 		Gateway: *gtw,
-		FieldMask: types.FieldMask{Paths: []string{
+		FieldMask: pbtypes.FieldMask{Paths: []string{
 			"attributes",
 		}},
-	}, authorization)
+	}, gatewayAuth)
 	if err != nil {
 		return err
 	}
