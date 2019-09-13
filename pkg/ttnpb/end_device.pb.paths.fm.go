@@ -3423,48 +3423,6 @@ var MACParameters_ChannelFieldPathsTopLevel = []string{
 	"min_data_rate_index",
 	"uplink_frequency",
 }
-var MACSettings_DataRateIndexValueFieldPathsNested = []string{
-	"value",
-}
-
-var MACSettings_DataRateIndexValueFieldPathsTopLevel = []string{
-	"value",
-}
-var MACSettings_PingSlotPeriodValueFieldPathsNested = []string{
-	"value",
-}
-
-var MACSettings_PingSlotPeriodValueFieldPathsTopLevel = []string{
-	"value",
-}
-var MACSettings_AggregatedDutyCycleValueFieldPathsNested = []string{
-	"value",
-}
-
-var MACSettings_AggregatedDutyCycleValueFieldPathsTopLevel = []string{
-	"value",
-}
-var MACSettings_RxDelayValueFieldPathsNested = []string{
-	"value",
-}
-
-var MACSettings_RxDelayValueFieldPathsTopLevel = []string{
-	"value",
-}
-var MACSettings_ADRAckLimitExponentValueFieldPathsNested = []string{
-	"value",
-}
-
-var MACSettings_ADRAckLimitExponentValueFieldPathsTopLevel = []string{
-	"value",
-}
-var MACSettings_ADRAckDelayExponentValueFieldPathsNested = []string{
-	"value",
-}
-
-var MACSettings_ADRAckDelayExponentValueFieldPathsTopLevel = []string{
-	"value",
-}
 var MACState_JoinAcceptFieldPathsNested = []string{
 	"keys",
 	"keys.app_s_key",

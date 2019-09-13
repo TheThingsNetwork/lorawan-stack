@@ -756,3 +756,22 @@ enum Minor {
   MINOR_RFU_14 = 14;
   MINOR_RFU_15 = 15;
 }
+
+message DataRateIndexValue {
+  DataRateIndex value = 1 [(validate.rules).enum.defined_only = true];
+}
+message PingSlotPeriodValue {
+  PingSlotPeriod value = 1 [(validate.rules).enum.defined_only = true];
+}
+message AggregatedDutyCycleValue {
+  AggregatedDutyCycle value = 1 [(validate.rules).enum.defined_only = true];
+}
+message RxDelayValue {
+  RxDelay value = 1 [(validate.rules).enum.defined_only = true];
+}
+message ADRAckLimitExponentValue {
+  ADRAckLimitExponent value = 1 [(validate.rules).enum.defined_only = true];
+}
+message ADRAckDelayExponentValue {
+  ADRAckDelayExponent value = 1 [(validate.rules).enum.defined_only = true];
+}

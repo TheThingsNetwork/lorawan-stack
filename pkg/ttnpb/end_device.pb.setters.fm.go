@@ -622,10 +622,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.PingSlotPeriodicity
 				if newDst == nil {
-					newDst = &MACSettings_PingSlotPeriodValue{}
+					newDst = &PingSlotPeriodValue{}
 					dst.PingSlotPeriodicity = newDst
 				}
-				var newSrc *MACSettings_PingSlotPeriodValue
+				var newSrc *PingSlotPeriodValue
 				if src != nil {
 					newSrc = src.PingSlotPeriodicity
 				}
@@ -643,10 +643,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.PingSlotDataRateIndex
 				if newDst == nil {
-					newDst = &MACSettings_DataRateIndexValue{}
+					newDst = &DataRateIndexValue{}
 					dst.PingSlotDataRateIndex = newDst
 				}
-				var newSrc *MACSettings_DataRateIndexValue
+				var newSrc *DataRateIndexValue
 				if src != nil {
 					newSrc = src.PingSlotDataRateIndex
 				}
@@ -682,10 +682,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.Rx1Delay
 				if newDst == nil {
-					newDst = &MACSettings_RxDelayValue{}
+					newDst = &RxDelayValue{}
 					dst.Rx1Delay = newDst
 				}
-				var newSrc *MACSettings_RxDelayValue
+				var newSrc *RxDelayValue
 				if src != nil {
 					newSrc = src.Rx1Delay
 				}
@@ -712,10 +712,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.Rx2DataRateIndex
 				if newDst == nil {
-					newDst = &MACSettings_DataRateIndexValue{}
+					newDst = &DataRateIndexValue{}
 					dst.Rx2DataRateIndex = newDst
 				}
-				var newSrc *MACSettings_DataRateIndexValue
+				var newSrc *DataRateIndexValue
 				if src != nil {
 					newSrc = src.Rx2DataRateIndex
 				}
@@ -751,10 +751,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.MaxDutyCycle
 				if newDst == nil {
-					newDst = &MACSettings_AggregatedDutyCycleValue{}
+					newDst = &AggregatedDutyCycleValue{}
 					dst.MaxDutyCycle = newDst
 				}
-				var newSrc *MACSettings_AggregatedDutyCycleValue
+				var newSrc *AggregatedDutyCycleValue
 				if src != nil {
 					newSrc = src.MaxDutyCycle
 				}
@@ -826,10 +826,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.DesiredRx1Delay
 				if newDst == nil {
-					newDst = &MACSettings_RxDelayValue{}
+					newDst = &RxDelayValue{}
 					dst.DesiredRx1Delay = newDst
 				}
-				var newSrc *MACSettings_RxDelayValue
+				var newSrc *RxDelayValue
 				if src != nil {
 					newSrc = src.DesiredRx1Delay
 				}
@@ -856,10 +856,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.DesiredRx2DataRateIndex
 				if newDst == nil {
-					newDst = &MACSettings_DataRateIndexValue{}
+					newDst = &DataRateIndexValue{}
 					dst.DesiredRx2DataRateIndex = newDst
 				}
-				var newSrc *MACSettings_DataRateIndexValue
+				var newSrc *DataRateIndexValue
 				if src != nil {
 					newSrc = src.DesiredRx2DataRateIndex
 				}
@@ -886,10 +886,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.DesiredMaxDutyCycle
 				if newDst == nil {
-					newDst = &MACSettings_AggregatedDutyCycleValue{}
+					newDst = &AggregatedDutyCycleValue{}
 					dst.DesiredMaxDutyCycle = newDst
 				}
-				var newSrc *MACSettings_AggregatedDutyCycleValue
+				var newSrc *AggregatedDutyCycleValue
 				if src != nil {
 					newSrc = src.DesiredMaxDutyCycle
 				}
@@ -907,10 +907,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.DesiredADRAckLimit
 				if newDst == nil {
-					newDst = &MACSettings_ADRAckLimitExponentValue{}
+					newDst = &ADRAckLimitExponentValue{}
 					dst.DesiredADRAckLimit = newDst
 				}
-				var newSrc *MACSettings_ADRAckLimitExponentValue
+				var newSrc *ADRAckLimitExponentValue
 				if src != nil {
 					newSrc = src.DesiredADRAckLimit
 				}
@@ -928,10 +928,10 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			if len(subs) > 0 {
 				newDst := dst.DesiredADRAckDelay
 				if newDst == nil {
-					newDst = &MACSettings_ADRAckDelayExponentValue{}
+					newDst = &ADRAckDelayExponentValue{}
 					dst.DesiredADRAckDelay = newDst
 				}
-				var newSrc *MACSettings_ADRAckDelayExponentValue
+				var newSrc *ADRAckDelayExponentValue
 				if src != nil {
 					newSrc = src.DesiredADRAckDelay
 				}
@@ -2223,132 +2223,6 @@ func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ..
 			} else {
 				var zero bool
 				dst.EnableUplink = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MACSettings_DataRateIndexValue) SetFields(src *MACSettings_DataRateIndexValue, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "value":
-			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Value = src.Value
-			} else {
-				var zero DataRateIndex
-				dst.Value = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MACSettings_PingSlotPeriodValue) SetFields(src *MACSettings_PingSlotPeriodValue, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "value":
-			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Value = src.Value
-			} else {
-				var zero PingSlotPeriod
-				dst.Value = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MACSettings_AggregatedDutyCycleValue) SetFields(src *MACSettings_AggregatedDutyCycleValue, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "value":
-			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Value = src.Value
-			} else {
-				var zero AggregatedDutyCycle
-				dst.Value = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MACSettings_RxDelayValue) SetFields(src *MACSettings_RxDelayValue, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "value":
-			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Value = src.Value
-			} else {
-				var zero RxDelay
-				dst.Value = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MACSettings_ADRAckLimitExponentValue) SetFields(src *MACSettings_ADRAckLimitExponentValue, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "value":
-			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Value = src.Value
-			} else {
-				var zero ADRAckLimitExponent
-				dst.Value = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MACSettings_ADRAckDelayExponentValue) SetFields(src *MACSettings_ADRAckDelayExponentValue, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "value":
-			if len(subs) > 0 {
-				return fmt.Errorf("'value' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Value = src.Value
-			} else {
-				var zero ADRAckDelayExponent
-				dst.Value = zero
 			}
 
 		default:
