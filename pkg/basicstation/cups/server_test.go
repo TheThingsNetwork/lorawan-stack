@@ -36,7 +36,7 @@ import (
 func TestGetTrust(t *testing.T) {
 	a := assertions.New(t)
 
-	s := new(Server)
+	s := NewServer(nil)
 
 	for _, addr := range []string{
 		"thethingsnetwork.org:443",

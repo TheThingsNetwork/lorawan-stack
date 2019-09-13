@@ -22,6 +22,7 @@ import (
 	"net"
 	"net/url"
 	"strings"
+	"sync"
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -29,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -100,6 +102,10 @@ type Server struct {
 
 	tlsConfig *tls.Config
 	trust     *x509.Certificate
+
+	getTrustOnce singleflight.Group
+	trustCacheMu sync.RWMutex
+	trustCache   map[string]*x509.Certificate
 
 	signers map[uint32]crypto.Signer
 }
@@ -215,8 +221,9 @@ func WithAuth(auth func(ctx context.Context) grpc.CallOption) Option {
 // and gateway access clients.
 func NewServer(c *component.Component, options ...Option) *Server {
 	s := &Server{
-		component: c,
-		signers:   make(map[uint32]crypto.Signer),
+		component:  c,
+		signers:    make(map[uint32]crypto.Signer),
+		trustCache: make(map[string]*x509.Certificate),
 	}
 	for _, opt := range options {
 		opt(s)
@@ -292,18 +299,41 @@ func (s *Server) getTrust(address string) (*x509.Certificate, error) {
 	if port == "" {
 		port = "443"
 	}
-	conn, err := tls.Dial("tcp", net.JoinHostPort(host, port), s.tlsConfig)
+	address = net.JoinHostPort(host, port)
+
+	trustI, err, _ := s.getTrustOnce.Do(address, func() (interface{}, error) {
+		s.trustCacheMu.RLock()
+		trust, ok := s.trustCache[address]
+		s.trustCacheMu.RUnlock()
+		if ok {
+			return trust, nil
+		}
+
+		conn, err := tls.Dial("tcp", net.JoinHostPort(host, port), s.tlsConfig)
+		if err != nil {
+			return nil, err
+		}
+		defer conn.Close()
+		if verifiedChains := conn.ConnectionState().VerifiedChains; len(verifiedChains) > 0 {
+			chain := verifiedChains[0]
+			trust = chain[len(chain)-1]
+		}
+		if s.tlsConfig != nil && s.tlsConfig.InsecureSkipVerify {
+			chain := conn.ConnectionState().PeerCertificates
+			trust = chain[len(chain)-1]
+		}
+
+		if trust != nil {
+			s.trustCacheMu.Lock()
+			s.trustCache[address] = trust
+			s.trustCacheMu.Unlock()
+			return trust, nil
+		}
+
+		return nil, errNoTrust
+	})
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
-	if verifiedChains := conn.ConnectionState().VerifiedChains; len(verifiedChains) > 0 {
-		chain := verifiedChains[0]
-		return chain[len(chain)-1], nil
-	}
-	if s.tlsConfig != nil && s.tlsConfig.InsecureSkipVerify {
-		chain := conn.ConnectionState().PeerCertificates
-		return chain[len(chain)-1], nil
-	}
-	return nil, errNoTrust
+	return trustI.(*x509.Certificate), nil
 }
