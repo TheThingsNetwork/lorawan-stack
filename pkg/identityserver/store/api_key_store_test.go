@@ -89,15 +89,18 @@ func TestAPIKeyStore(t *testing.T) {
 				}
 
 				err := store.CreateAPIKey(ctx, tt.Identifiers, key)
+
 				a.So(err, should.BeNil)
 
 				keys, err := store.FindAPIKeys(ctx, tt.Identifiers)
+
 				a.So(err, should.BeNil)
 				if a.So(keys, should.HaveLength, 1) {
 					a.So(keys[0], should.Resemble, key)
 				}
 
 				ids, got, err := store.GetAPIKey(ctx, key.ID)
+
 				a.So(err, should.BeNil)
 				a.So(ids, should.Resemble, tt.Identifiers)
 				a.So(got, should.Resemble, key)
@@ -107,28 +110,35 @@ func TestAPIKeyStore(t *testing.T) {
 					Name:   fmt.Sprintf("Updated %s API key", tt.Name),
 					Rights: tt.Rights,
 				})
+
 				a.So(err, should.BeNil)
 
 				ids, got, err = store.GetAPIKey(ctx, key.ID)
+
 				a.So(err, should.BeNil)
-				a.So(got, should.Resemble, updated)
 				a.So(ids, should.Resemble, tt.Identifiers)
-				a.So(got.Name, should.NotEqual, key.Name)
-				a.So(got.Rights, should.Resemble, key.Rights)
+				if a.So(got, should.NotBeNil) {
+					a.So(got, should.Resemble, updated)
+					a.So(got.Name, should.NotEqual, key.Name)
+					a.So(got.Rights, should.Resemble, key.Rights)
+				}
 
 				updated, err = store.UpdateAPIKey(ctx, tt.Identifiers, &ttnpb.APIKey{
 					ID: strings.ToUpper(fmt.Sprintf("%sKEYID", tt.Name)),
 					// Empty rights
 				})
+
 				a.So(err, should.BeNil)
 				a.So(updated, should.BeNil)
 
 				_, _, err = store.GetAPIKey(ctx, key.ID)
+
 				if a.So(err, should.NotBeNil) {
 					a.So(errors.IsNotFound(err), should.BeTrue)
 				}
 
 				keys, err = store.FindAPIKeys(ctx, tt.Identifiers)
+
 				a.So(err, should.BeNil)
 				a.So(keys, should.HaveLength, 0)
 			})

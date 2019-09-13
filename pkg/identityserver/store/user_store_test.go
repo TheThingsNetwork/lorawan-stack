@@ -51,29 +51,36 @@ func TestUserStore(t *testing.T) {
 				},
 			},
 		})
+
 		a.So(err, should.BeNil)
-		a.So(created.UserID, should.Equal, "foo")
-		a.So(created.Name, should.Equal, "Foo User")
-		a.So(created.Description, should.Equal, "The Amazing Foo User")
-		a.So(created.Attributes, should.HaveLength, 3)
-		if a.So(created.ProfilePicture, should.NotBeNil) {
-			a.So(created.ProfilePicture.Embedded, should.NotBeNil)
+		if a.So(created, should.NotBeNil) {
+			a.So(created.UserID, should.Equal, "foo")
+			a.So(created.Name, should.Equal, "Foo User")
+			a.So(created.Description, should.Equal, "The Amazing Foo User")
+			a.So(created.Attributes, should.HaveLength, 3)
+			if a.So(created.ProfilePicture, should.NotBeNil) {
+				a.So(created.ProfilePicture.Embedded, should.NotBeNil)
+			}
+			a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
-		a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-		a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 
 		got, err := store.GetUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"}, &types.FieldMask{Paths: []string{"name", "attributes"}})
+
 		a.So(err, should.BeNil)
-		a.So(got.UserID, should.Equal, "foo")
-		a.So(got.Name, should.Equal, "Foo User")
-		a.So(got.Description, should.BeEmpty)
-		a.So(got.Attributes, should.HaveLength, 3)
-		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-		a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.UserID, should.Equal, "foo")
+			a.So(got.Name, should.Equal, "Foo User")
+			a.So(got.Description, should.BeEmpty)
+			a.So(got.Attributes, should.HaveLength, 3)
+			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+		}
 
 		_, err = store.UpdateUser(ctx, &ttnpb.User{
 			UserIdentifiers: ttnpb.UserIdentifiers{UserID: "bar"},
 		}, nil)
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
@@ -91,39 +98,49 @@ func TestUserStore(t *testing.T) {
 				Sizes: map[uint32]string{0: "https://example.com/profile_picture.jpg"},
 			},
 		}, &types.FieldMask{Paths: []string{"description", "attributes", "profile_picture"}})
+
 		a.So(err, should.BeNil)
-		a.So(updated.Description, should.Equal, "The Amazing Foobar User")
-		a.So(updated.Attributes, should.HaveLength, 3)
-		if a.So(updated.ProfilePicture, should.NotBeNil) && a.So(updated.ProfilePicture.Sizes, should.HaveLength, 1) {
-			a.So(updated.ProfilePicture.Sizes[0], should.Equal, "https://example.com/profile_picture.jpg")
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.Description, should.Equal, "The Amazing Foobar User")
+			a.So(updated.Attributes, should.HaveLength, 3)
+			if a.So(updated.ProfilePicture, should.NotBeNil) && a.So(updated.ProfilePicture.Sizes, should.HaveLength, 1) {
+				a.So(updated.ProfilePicture.Sizes[0], should.Equal, "https://example.com/profile_picture.jpg")
+			}
+			a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
+			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 		}
-		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
-		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
 		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"}, nil)
+
 		a.So(err, should.BeNil)
-		a.So(got.UserID, should.Equal, created.UserID)
-		a.So(got.Name, should.Equal, created.Name)
-		a.So(got.Description, should.Equal, updated.Description)
-		a.So(got.Attributes, should.Resemble, updated.Attributes)
-		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-		a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.UserID, should.Equal, created.UserID)
+			a.So(got.Name, should.Equal, created.Name)
+			a.So(got.Description, should.Equal, updated.Description)
+			a.So(got.Attributes, should.Resemble, updated.Attributes)
+			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
+		}
 
 		list, err := store.FindUsers(ctx, nil, &types.FieldMask{Paths: []string{"name"}})
+
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
 		err = store.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"})
+
 		a.So(err, should.BeNil)
 
 		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserID: "foo"}, nil)
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
 		list, err = store.FindUsers(ctx, nil, nil)
+
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 	})

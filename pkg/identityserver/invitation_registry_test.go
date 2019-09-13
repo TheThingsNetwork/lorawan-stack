@@ -34,11 +34,13 @@ func TestInvitationsPermissionDenied(t *testing.T) {
 		_, err := reg.Send(ctx, &ttnpb.SendInvitationRequest{
 			Email: "foobar@example.com",
 		})
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		listInvit, err := reg.List(ctx, &ttnpb.ListInvitationsRequest{})
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
@@ -47,6 +49,7 @@ func TestInvitationsPermissionDenied(t *testing.T) {
 		_, err = reg.Delete(ctx, &ttnpb.DeleteInvitationRequest{
 			Email: "foobar@example.com",
 		})
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
@@ -67,7 +70,9 @@ func TestInvitationsCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(invit.Email, should.Equal, "foobar@example.com")
+		if a.So(invit, should.NotBeNil) {
+			a.So(invit.Email, should.Equal, "foobar@example.com")
+		}
 
 		_, err = reg.Send(ctx, &ttnpb.SendInvitationRequest{
 			Email: "foobar@example.com",
@@ -78,16 +83,21 @@ func TestInvitationsCRUD(t *testing.T) {
 		}
 
 		invits, err := reg.List(ctx, &ttnpb.ListInvitationsRequest{}, creds)
+
 		a.So(err, should.BeNil)
 		a.So(invits.Invitations[0].Email, should.Equal, "foobar@example.com")
 
 		_, err = reg.Delete(ctx, &ttnpb.DeleteInvitationRequest{
 			Email: "foobar@example.com",
 		}, creds)
+
 		a.So(err, should.BeNil)
 
 		invits, err = reg.List(ctx, &ttnpb.ListInvitationsRequest{}, creds)
+
 		a.So(err, should.BeNil)
-		a.So(invits.Invitations, should.BeEmpty)
+		if a.So(invits, should.NotBeNil) {
+			a.So(invits.Invitations, should.BeEmpty)
+		}
 	})
 }

@@ -144,11 +144,12 @@ func TestEndDevicesCRUD(t *testing.T) {
 			},
 		}, creds)
 
-		a.So(created, should.NotBeNil)
-		a.So(created.CreatedAt, should.HappenAfter, start)
-		a.So(created.UpdatedAt, should.HappenAfter, start)
-		a.So(created.Name, should.Equal, "test-device-name")
 		a.So(err, should.BeNil)
+		if a.So(created, should.NotBeNil) {
+			a.So(created.CreatedAt, should.HappenAfter, start)
+			a.So(created.UpdatedAt, should.HappenAfter, start)
+			a.So(created.Name, should.Equal, "test-device-name")
+		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			FieldMask: pbtypes.FieldMask{Paths: []string{"name"}},
@@ -158,9 +159,10 @@ func TestEndDevicesCRUD(t *testing.T) {
 			},
 		}, creds)
 
-		a.So(got, should.NotBeNil)
-		a.So(got.Name, should.Equal, "test-device-name")
 		a.So(err, should.BeNil)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, "test-device-name")
+		}
 
 		ids, err := reg.GetIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
 			JoinEUI: joinEUI,
@@ -168,7 +170,9 @@ func TestEndDevicesCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(*ids, should.Resemble, created.EndDeviceIdentifiers)
+		if a.So(ids, should.NotBeNil) {
+			a.So(*ids, should.Resemble, created.EndDeviceIdentifiers)
+		}
 
 		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			FieldMask:              pbtypes.FieldMask{Paths: []string{"name"}},
@@ -176,9 +180,10 @@ func TestEndDevicesCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(list.EndDevices, should.HaveLength, 1) {
-			a.So(list.EndDevices[0], should.NotBeNil)
-			a.So(list.EndDevices[0].Name, should.Equal, "test-device-name")
+		if a.So(list, should.NotBeNil) && a.So(list.EndDevices, should.HaveLength, 1) {
+			if a.So(list.EndDevices[0], should.NotBeNil) {
+				a.So(list.EndDevices[0].Name, should.Equal, "test-device-name")
+			}
 		}
 
 		start = time.Now()
@@ -194,10 +199,11 @@ func TestEndDevicesCRUD(t *testing.T) {
 			},
 		}, creds)
 
-		a.So(updated, should.NotBeNil)
-		a.So(updated.Name, should.Equal, "test-device-name-new")
-		a.So(updated.UpdatedAt, should.HappenAfter, start)
 		a.So(err, should.BeNil)
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.Name, should.Equal, "test-device-name-new")
+			a.So(updated.UpdatedAt, should.HappenAfter, start)
+		}
 
 		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
 			DeviceID:               "test-device-id",

@@ -37,6 +37,7 @@ func TestEntityAccess(t *testing.T) {
 			a := assertions.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(newUserIdx), grpc.Header(&md))
+
 			a.So(err, should.BeNil)
 			a.So(md.Get("warning"), should.Contain, "Restricted rights until email address validated")
 			a.So(md.Get("warning"), should.Contain, "Restricted rights while account pending")
@@ -50,6 +51,7 @@ func TestEntityAccess(t *testing.T) {
 			a := assertions.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(rejectedUserIdx), grpc.Header(&md))
+
 			a.So(err, should.BeNil)
 			a.So(md.Get("warning"), should.Contain, "Restricted rights after account rejection")
 			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
@@ -62,6 +64,7 @@ func TestEntityAccess(t *testing.T) {
 			a := assertions.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(suspendedUserIdx), grpc.Header(&md))
+
 			a.So(err, should.BeNil)
 			a.So(md.Get("warning"), should.Contain, "Restricted rights after account suspension")
 			if a.So(authInfo.GetAPIKey(), should.NotBeNil) {
@@ -74,6 +77,7 @@ func TestEntityAccess(t *testing.T) {
 			a := assertions.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(adminUserIdx), grpc.Header(&md))
+
 			a.So(err, should.BeNil)
 			a.So(authInfo.GetUniversalRights().GetRights(), should.NotBeEmpty)
 		})
@@ -82,6 +86,7 @@ func TestEntityAccess(t *testing.T) {
 			a := assertions.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, is.WithClusterAuth(), grpc.Header(&md))
+
 			a.So(err, should.BeNil)
 			a.So(authInfo.GetUniversalRights().GetRights(), should.NotBeEmpty)
 		})

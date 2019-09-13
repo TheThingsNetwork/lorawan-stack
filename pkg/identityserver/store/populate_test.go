@@ -34,6 +34,7 @@ func TestPopulate(t *testing.T) {
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, models...)
 		err := p.Populate(ctx, db)
+
 		a.So(err, should.BeNil)
 	})
 }

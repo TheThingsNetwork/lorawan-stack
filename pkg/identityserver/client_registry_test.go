@@ -83,7 +83,9 @@ func TestClientsPermissionDenied(t *testing.T) {
 		})
 
 		a.So(err, should.BeNil)
-		a.So(listRes.Clients, should.BeEmpty)
+		if a.So(listRes, should.NotBeNil) {
+			a.So(listRes.Clients, should.BeEmpty)
+		}
 
 		_, err = reg.List(ctx, &ttnpb.ListClientsRequest{
 			Collaborator: ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
@@ -133,7 +135,9 @@ func TestClientsCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(created.Name, should.Equal, "Foo Client")
+		if a.So(created, should.NotBeNil) {
+			a.So(created.Name, should.Equal, "Foo Client")
+		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetClientRequest{
 			ClientIdentifiers: created.ClientIdentifiers,
@@ -141,7 +145,9 @@ func TestClientsCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(got.Name, should.Equal, created.Name)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, created.Name)
+		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
 			ClientIdentifiers: created.ClientIdentifiers,
@@ -168,15 +174,18 @@ func TestClientsCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(updated.Name, should.Equal, "Updated Name")
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.Name, should.Equal, "Updated Name")
+		}
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListClientsRequest{
 				FieldMask:    types.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
+
 			a.So(err, should.BeNil)
-			if a.So(list.Clients, should.NotBeEmpty) {
+			if a.So(list, should.NotBeNil) && a.So(list.Clients, should.NotBeEmpty) {
 				var found bool
 				for _, item := range list.Clients {
 					if item.ClientIdentifiers == created.ClientIdentifiers {
@@ -189,6 +198,7 @@ func TestClientsCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &created.ClientIdentifiers, creds)
+
 		a.So(err, should.BeNil)
 	})
 }
@@ -209,9 +219,10 @@ func TestClientsPagination(t *testing.T) {
 			Page:         1,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Clients, should.HaveLength, 2)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Clients, should.HaveLength, 2)
+		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListClientsRequest{
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
@@ -220,9 +231,10 @@ func TestClientsPagination(t *testing.T) {
 			Page:         2,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Clients, should.HaveLength, 1)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Clients, should.HaveLength, 1)
+		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListClientsRequest{
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
@@ -231,8 +243,9 @@ func TestClientsPagination(t *testing.T) {
 			Page:         3,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Clients, should.BeEmpty)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Clients, should.BeEmpty)
+		}
 	})
 }
