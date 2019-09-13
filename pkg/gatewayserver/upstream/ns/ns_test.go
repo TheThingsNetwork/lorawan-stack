@@ -50,7 +50,6 @@ func TestNSHandler(t *testing.T) {
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 	h := NewHandler(ctx, "cluster", c, nil)
-	go h.ConnectGateway(ctx, gtwIds, nil)
 
 	for i, tc := range []struct {
 		Name                 string

@@ -76,6 +76,7 @@ type srv struct {
 
 func (*srv) Protocol() string            { return "udp" }
 func (*srv) SupportsStatusMessage() bool { return true }
+func (*srv) SupportsDownlinkClaim() bool { return true }
 
 // Start starts the UDP frontend.
 func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) {
@@ -314,10 +315,18 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 	return nil
 }
 
-var errDownlinkPathExpired = errors.DefineAborted("downlink_path_expired", "downlink path expired")
+var (
+	errClaimDownlinkFailed = errors.DefineUnavailable("downlink_claim", "failed to claim downlink")
+	errDownlinkPathExpired = errors.DefineAborted("downlink_path_expired", "downlink path expired")
+)
 
 func (s *srv) handleDown(ctx context.Context, state *state) error {
 	logger := log.FromContext(ctx)
+	if err := s.server.ClaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers); err != nil {
+		logger.WithError(err).Error("Failed to claim downlink")
+		return errClaimDownlinkFailed.WithCause(err)
+	}
+	defer s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
 	healthCheck := time.NewTicker(s.config.DownlinkPathExpires / 2)
 	defer healthCheck.Stop()
 	for {
@@ -374,6 +383,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 			lastSeenPull := time.Unix(0, atomic.LoadInt64(&state.lastSeenPull))
 			if time.Since(lastSeenPull) > s.config.DownlinkPathExpires {
 				logger.Debug("Downlink path expired")
+				s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
 				state.lastDownlinkPath.Store(downlinkPath{})
 				state.startHandleDownMu.Lock()
 				state.startHandleDown = &sync.Once{}
