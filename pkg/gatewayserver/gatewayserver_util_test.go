@@ -20,7 +20,6 @@ import (
 	"net"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -42,29 +41,6 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 		}
 	}
 	panic("could not connect to peer")
-}
-
-type mockNS struct {
-	upCh chan *ttnpb.UplinkMessage
-}
-
-func startMockNS(ctx context.Context) (*mockNS, string) {
-	ns := &mockNS{
-		upCh: make(chan *ttnpb.UplinkMessage, 1),
-	}
-	srv := rpcserver.New(ctx)
-	ttnpb.RegisterGsNsServer(srv.Server, ns)
-	lis, err := net.Listen("tcp", ":0")
-	if err != nil {
-		panic(err)
-	}
-	go srv.Serve(lis)
-	return ns, lis.Addr().String()
-}
-
-func (ns *mockNS) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*pbtypes.Empty, error) {
-	ns.upCh <- msg
-	return &pbtypes.Empty{}, nil
 }
 
 type mockIS struct {

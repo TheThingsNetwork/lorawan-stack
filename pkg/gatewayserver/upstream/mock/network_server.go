@@ -24,16 +24,15 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// NetworkServer is a mock NS for GS tests.
-type NetworkServer struct {
-	ttnpb.GsNsServer
-	uplinkMessages []*ttnpb.UplinkMessage
+// NS is a mock NS for GS tests.
+type NS struct {
+	upCh chan *ttnpb.UplinkMessage
 }
 
-// NewNS creates and starts an instance of the mock NS.
-func NewNS(ctx context.Context) (*NetworkServer, string) {
-	ns := &NetworkServer{
-		uplinkMessages: make([]*ttnpb.UplinkMessage, 0),
+// StartNS starts the mock NS.
+func StartNS(ctx context.Context) (*NS, string) {
+	ns := &NS{
+		upCh: make(chan *ttnpb.UplinkMessage, 1),
 	}
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterGsNsServer(srv.Server, ns)
@@ -46,12 +45,12 @@ func NewNS(ctx context.Context) (*NetworkServer, string) {
 }
 
 // HandleUplink implements ttnpb.GsNsServer
-func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessage) (*types.Empty, error) {
-	ns.uplinkMessages = append(ns.uplinkMessages, up)
+func (ns *NS) HandleUplink(ctx context.Context, msg *ttnpb.UplinkMessage) (*types.Empty, error) {
+	ns.upCh <- msg
 	return &types.Empty{}, nil
 }
 
-// GetUpMessages returns the stored messages.
-func (ns *NetworkServer) GetUpMessages() []*ttnpb.UplinkMessage {
-	return ns.uplinkMessages
+// Up returns the upstream channel.
+func (ns *NS) Up() <-chan *ttnpb.UplinkMessage {
+	return ns.upCh
 }

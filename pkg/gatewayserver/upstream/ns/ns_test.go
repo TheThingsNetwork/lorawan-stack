@@ -17,6 +17,7 @@ package ns
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -29,12 +30,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+var timeout = (1 << 5) * test.Delay
+
 func TestNSHandler(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	gtwIds := ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
-	ns, nsAddr := mock.NewNS(ctx)
+	ns, nsAddr := mock.StartNS(ctx)
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
@@ -51,7 +54,7 @@ func TestNSHandler(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 	h := NewHandler(ctx, "cluster", c, nil)
 
-	for i, tc := range []struct {
+	for _, tc := range []struct {
 		Name                 string
 		UplinkMessage        *ttnpb.UplinkMessage
 		EndDeviceIdentifiers ttnpb.EndDeviceIdentifiers
@@ -92,12 +95,13 @@ func TestNSHandler(t *testing.T) {
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Error sending upstream message: %v", err)
 			}
-			upmsgs := ns.GetUpMessages()
-			if !a.So(len(upmsgs), should.Equal, i+1) {
-				t.Fatalf("Unexpected number of messages received: %d", len(upmsgs))
-			}
-			if !a.So(upmsgs[i], should.Resemble, tc.UplinkMessage) {
-				t.Fatalf("Unexpected upstream message: %v", upmsgs[i])
+			select {
+			case msg := <-ns.Up():
+				if !a.So(msg, should.Resemble, tc.UplinkMessage) {
+					t.Fatalf("Unexpected upstream message: %v", msg)
+				}
+			case <-time.After(timeout):
+				t.Fatal("Expected uplink event timeout")
 			}
 		})
 	}
