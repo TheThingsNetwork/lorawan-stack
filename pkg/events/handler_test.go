@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -72,12 +71,12 @@ func TestChannelReceive(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(test.Context())
 
-	a.So(eventChan.ReceiveTimeout(time.Millisecond), should.NotBeNil)
+	a.So(eventChan.ReceiveTimeout(test.Delay), should.NotBeNil)
 	a.So(eventChan.ReceiveContext(ctx), should.NotBeNil)
 
 	cancel()
 
-	a.So(eventChan.ReceiveTimeout(time.Millisecond), should.BeNil)
+	a.So(eventChan.ReceiveTimeout(test.Delay), should.BeNil)
 	a.So(eventChan.ReceiveContext(ctx), should.BeNil)
 }
 
