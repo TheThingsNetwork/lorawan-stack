@@ -88,6 +88,7 @@ archives:
 nfpms:
   - id: stack
     builds:
+      - cli
       - stack
     vendor: The Things Network
     homepage: https://www.thethingsnetwork.org
@@ -106,6 +107,7 @@ nfpms:
 snapcrafts:
   - id: stack
     builds:
+      - cli
       - stack
     name: ttn-lw-stack
     summary: The Things Stack for LoRaWAN
