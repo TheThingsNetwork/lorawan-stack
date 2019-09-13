@@ -76,6 +76,8 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 	}, component.TaskRestartOnFailure, 0.1, linkBackoff...)
 }
 
+type upstreamTrafficHandler func(context.Context, *ttnpb.ApplicationUp, *link) error
+
 type link struct {
 	// Align for sync/atomic.
 	ups,
@@ -94,6 +96,8 @@ type link struct {
 	connName  string
 	connReady chan struct{}
 	callOpts  []grpc.CallOption
+
+	handleUp upstreamTrafficHandler
 
 	subscribeCh   chan *io.Subscription
 	unsubscribeCh chan *io.Subscription
@@ -164,6 +168,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		cancel:                 cancel,
 		closed:                 make(chan struct{}),
 		connReady:              make(chan struct{}),
+		handleUp:               as.handleUp,
 		subscribeCh:            make(chan *io.Subscription, 1),
 		unsubscribeCh:          make(chan *io.Subscription, 1),
 		upCh:                   make(chan *io.ContextualApplicationUp, linkBufferSize),
@@ -226,34 +231,10 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		atomic.AddUint64(&l.ups, 1)
 		atomic.StoreInt64(&l.lastUpTime, time.Now().UnixNano())
 
-		ctx := events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
-		up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
-		registerReceiveUp(ctx, up, l.connName)
-
-		handleUpErr := as.handleUp(ctx, up, l)
-		if err := stream.Send(ttnpb.Empty); err != nil {
+		err = l.sendUp(ctx, up, func() error { return stream.Send(ttnpb.Empty) })
+		if err != nil {
 			return err
 		}
-
-		switch p := up.Up.(type) {
-		case *ttnpb.ApplicationUp_JoinAccept:
-			p.JoinAccept.AppSKey = nil
-			p.JoinAccept.InvalidatedDownlinks = nil
-		case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
-			continue
-		}
-
-		if handleUpErr != nil {
-			logger.WithError(handleUpErr).Warn("Failed to process upstream message")
-			registerDropUp(ctx, up, handleUpErr)
-			continue
-		}
-
-		l.upCh <- &io.ContextualApplicationUp{
-			Context:       ctx,
-			ApplicationUp: up,
-		}
-		registerForwardUp(ctx, up)
 	}
 }
 
@@ -314,6 +295,48 @@ func (l *link) run() {
 			}
 		}
 	}
+}
+
+// SendUp processes the given uplink and then sends it to the application frontends.
+func (as *ApplicationServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	link, err := as.getLink(ctx, up.ApplicationIdentifiers)
+	if err != nil {
+		return err
+	}
+	<-link.connReady
+	return link.sendUp(ctx, up, func() error { return nil })
+}
+
+func (l *link) sendUp(ctx context.Context, up *ttnpb.ApplicationUp, ack func() error) error {
+	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIDs, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
+	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+	registerReceiveUp(ctx, up, l.connName)
+
+	handleUpErr := l.handleUp(ctx, up, l)
+	if err := ack(); err != nil {
+		return err
+	}
+
+	switch p := up.Up.(type) {
+	case *ttnpb.ApplicationUp_JoinAccept:
+		p.JoinAccept.AppSKey = nil
+		p.JoinAccept.InvalidatedDownlinks = nil
+	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
+		return nil
+	}
+
+	if handleUpErr != nil {
+		log.FromContext(ctx).WithError(handleUpErr).Warn("Failed to process upstream message")
+		registerDropUp(ctx, up, handleUpErr)
+		return nil
+	}
+
+	l.upCh <- &io.ContextualApplicationUp{
+		Context:       ctx,
+		ApplicationUp: up,
+	}
+	registerForwardUp(ctx, up)
+	return nil
 }
 
 // GetLinkTime returns the timestamp when the link got established.
