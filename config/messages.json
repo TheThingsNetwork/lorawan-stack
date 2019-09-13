@@ -3068,6 +3068,15 @@
       "file": "udp.go"
     }
   },
+  "error:pkg/gatewayserver/io/udp:downlink_claim": {
+    "translations": {
+      "en": "failed to claim downlink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "udp.go"
+    }
+  },
   "error:pkg/gatewayserver/io/udp:downlink_path_expired": {
     "translations": {
       "en": "downlink path expired"
