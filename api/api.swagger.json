@@ -916,6 +916,61 @@
         ]
       }
     },
+    "/as/applications/{application_ids.application_id}/devices/{device_id}/packages": {
+      "get": {
+        "summary": "List returns the available packages for the end device.",
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackages"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
     "/as/applications/{application_ids.application_id}/link": {
       "get": {
         "operationId": "GetLink",
@@ -1052,6 +1107,52 @@
         ],
         "tags": [
           "AppAs"
+        ]
+      }
+    },
+    "/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}": {
+      "put": {
+        "summary": "SetAssociation updates or creates the application package association on the FPort of the end device.",
+        "operationId": "SetAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageAssociation"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "association.ids.end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "association.ids.end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "association.ids.f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetApplicationPackageAssociationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
         ]
       }
     },
@@ -1266,6 +1367,223 @@
         ],
         "tags": [
           "AppAs"
+        ]
+      }
+    },
+    "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}": {
+      "delete": {
+        "summary": "DeleteAssociation removes the application package association on the FPort of the end device.",
+        "operationId": "DeleteAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations": {
+      "get": {
+        "summary": "ListAssociations returns all of the application package associations of the end device.",
+        "operationId": "ListAssociations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageAssociations"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.\nEach page is ordered by the FPort.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
+        ]
+      }
+    },
+    "/as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}": {
+      "get": {
+        "summary": "Get returns the application package association registered on the FPort of the end device.",
+        "operationId": "GetAssociation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ApplicationPackageAssociation"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids.end_device_ids.application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ids.end_device_ids.device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "ids.f_port",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "ids.end_device_ids.dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "ids.end_device_ids.join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "ids.end_device_ids.dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationPackageRegistry"
         ]
       }
     },
@@ -7041,6 +7359,74 @@
         }
       }
     },
+    "v3ApplicationPackage": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "default_f_port": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "v3ApplicationPackageAssociation": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3ApplicationPackageAssociationIdentifiers"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "package_name": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
+    "v3ApplicationPackageAssociationIdentifiers": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "f_port": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "v3ApplicationPackageAssociations": {
+      "type": "object",
+      "properties": {
+        "associations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationPackageAssociation"
+          }
+        }
+      }
+    },
+    "v3ApplicationPackages": {
+      "type": "object",
+      "properties": {
+        "packages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationPackage"
+          }
+        }
+      }
+    },
     "v3ApplicationPubSub": {
       "type": "object",
       "properties": {
@@ -10500,6 +10886,17 @@
         },
         "link": {
           "$ref": "#/definitions/v3ApplicationLink"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask"
+        }
+      }
+    },
+    "v3SetApplicationPackageAssociationRequest": {
+      "type": "object",
+      "properties": {
+        "association": {
+          "$ref": "#/definitions/v3ApplicationPackageAssociation"
         },
         "field_mask": {
           "$ref": "#/definitions/protobufFieldMask"

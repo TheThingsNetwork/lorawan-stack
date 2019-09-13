@@ -1626,6 +1626,514 @@
       ]
     },
     {
+      "name": "lorawan-stack/api/applicationserver_packages.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "ApplicationPackage",
+          "longName": "ApplicationPackage",
+          "fullName": "ttn.lorawan.v3.ApplicationPackage",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "default_f_port",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ApplicationPackageAssociation",
+          "longName": "ApplicationPackageAssociation",
+          "fullName": "ttn.lorawan.v3.ApplicationPackageAssociation",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationPackageAssociationIdentifiers",
+              "longType": "ApplicationPackageAssociationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "created_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "updated_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "package_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 20
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "data",
+              "description": "",
+              "label": "",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ApplicationPackageAssociationIdentifiers",
+          "longName": "ApplicationPackageAssociationIdentifiers",
+          "fullName": "ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "f_port",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 255
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ApplicationPackageAssociations",
+          "longName": "ApplicationPackageAssociations",
+          "fullName": "ttn.lorawan.v3.ApplicationPackageAssociations",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "associations",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationPackageAssociation",
+              "longType": "ApplicationPackageAssociation",
+              "fullType": "ttn.lorawan.v3.ApplicationPackageAssociation",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ApplicationPackages",
+          "longName": "ApplicationPackages",
+          "fullName": "ttn.lorawan.v3.ApplicationPackages",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "packages",
+              "description": "",
+              "label": "repeated",
+              "type": "ApplicationPackage",
+              "longType": "ApplicationPackage",
+              "fullType": "ttn.lorawan.v3.ApplicationPackage",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetApplicationPackageAssociationRequest",
+          "longName": "GetApplicationPackageAssociationRequest",
+          "fullName": "ttn.lorawan.v3.GetApplicationPackageAssociationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationPackageAssociationIdentifiers",
+              "longType": "ApplicationPackageAssociationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListApplicationPackageAssociationRequest",
+          "longName": "ListApplicationPackageAssociationRequest",
+          "fullName": "ttn.lorawan.v3.ListApplicationPackageAssociationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.\nEach page is ordered by the FPort.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 10
+                  }
+                ]
+              }
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SetApplicationPackageAssociationRequest",
+          "longName": "SetApplicationPackageAssociationRequest",
+          "fullName": "ttn.lorawan.v3.SetApplicationPackageAssociationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "association",
+              "description": "",
+              "label": "",
+              "type": "ApplicationPackageAssociation",
+              "longType": "ApplicationPackageAssociation",
+              "fullType": "ttn.lorawan.v3.ApplicationPackageAssociation",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "ApplicationPackageRegistry",
+          "longName": "ApplicationPackageRegistry",
+          "fullName": "ttn.lorawan.v3.ApplicationPackageRegistry",
+          "description": "",
+          "methods": [
+            {
+              "name": "List",
+              "description": "List returns the available packages for the end device.",
+              "requestType": "EndDeviceIdentifiers",
+              "requestLongType": "EndDeviceIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "requestStreaming": false,
+              "responseType": "ApplicationPackages",
+              "responseLongType": "ApplicationPackages",
+              "responseFullType": "ttn.lorawan.v3.ApplicationPackages",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/applications/{application_ids.application_id}/devices/{device_id}/packages"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetAssociation",
+              "description": "Get returns the application package association registered on the FPort of the end device.",
+              "requestType": "GetApplicationPackageAssociationRequest",
+              "requestLongType": "GetApplicationPackageAssociationRequest",
+              "requestFullType": "ttn.lorawan.v3.GetApplicationPackageAssociationRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationPackageAssociation",
+              "responseLongType": "ApplicationPackageAssociation",
+              "responseFullType": "ttn.lorawan.v3.ApplicationPackageAssociation",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListAssociations",
+              "description": "ListAssociations returns all of the application package associations of the end device.",
+              "requestType": "ListApplicationPackageAssociationRequest",
+              "requestLongType": "ListApplicationPackageAssociationRequest",
+              "requestFullType": "ttn.lorawan.v3.ListApplicationPackageAssociationRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationPackageAssociations",
+              "responseLongType": "ApplicationPackageAssociations",
+              "responseFullType": "ttn.lorawan.v3.ApplicationPackageAssociations",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "SetAssociation",
+              "description": "SetAssociation updates or creates the application package association on the FPort of the end device.",
+              "requestType": "SetApplicationPackageAssociationRequest",
+              "requestLongType": "SetApplicationPackageAssociationRequest",
+              "requestFullType": "ttn.lorawan.v3.SetApplicationPackageAssociationRequest",
+              "requestStreaming": false,
+              "responseType": "ApplicationPackageAssociation",
+              "responseLongType": "ApplicationPackageAssociation",
+              "responseFullType": "ttn.lorawan.v3.ApplicationPackageAssociation",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DeleteAssociation",
+              "description": "DeleteAssociation removes the application package association on the FPort of the end device.",
+              "requestType": "ApplicationPackageAssociationIdentifiers",
+              "requestLongType": "ApplicationPackageAssociationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationPackageAssociationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "lorawan-stack/api/applicationserver_pubsub.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
