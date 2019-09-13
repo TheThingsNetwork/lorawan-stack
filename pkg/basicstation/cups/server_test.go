@@ -25,7 +25,10 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -171,8 +174,15 @@ var (
 	mockAuthFunc     = func(ctx context.Context) grpc.CallOption {
 		return mockFallbackAuth
 	}
-	mockGatewayEUI  = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
-	mockErrNotFound = grpc.Errorf(codes.NotFound, "not found")
+	mockGatewayEUI    = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
+	mockErrNotFound   = grpc.Errorf(codes.NotFound, "not found")
+	mockRightsFetcher = rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+		md := rpcmetadata.FromIncomingContext(ctx)
+		if md.AuthType == "Bearer" {
+			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC), nil
+		}
+		return nil, rights.ErrNoGatewayRights
+	})
 )
 
 func TestServer(t *testing.T) {
@@ -189,6 +199,10 @@ func TestServer(t *testing.T) {
 	}{
 		{
 			Name: "No Auth",
+			StoreSetup: func(c *mockGatewayClient) {
+				c.res.Get = mockGateway()
+				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+			},
 			RequestSetup: func(req *http.Request) {
 				req.Header.Del(echo.HeaderAuthorization)
 			},
@@ -331,7 +345,10 @@ func TestServer(t *testing.T) {
 				WithRegistries(store, store),
 			}, tt.Options...)...)
 			req := httptest.NewRequest(http.MethodPost, "/update-info", strings.NewReader(updateInfoRequest))
-			req = req.WithContext(test.Context())
+			ctx := test.Context()
+			ctx = log.NewContext(ctx, test.GetLogger(t))
+			ctx = rights.NewContextWithFetcher(ctx, mockRightsFetcher)
+			req = req.WithContext(ctx)
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			req.Header.Set(echo.HeaderAuthorization, "random string")
 			if tt.RequestSetup != nil {

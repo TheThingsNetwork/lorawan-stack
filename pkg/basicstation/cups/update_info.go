@@ -19,6 +19,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/sha512"
+	"crypto/subtle"
 	"fmt"
 	"hash/crc32"
 	"net"
@@ -29,15 +30,19 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
 	cupsAttribute              = "cups"
+	cupsAuthHeaderAttribute    = "cups-auth-header"
 	cupsURIAttribute           = "cups-uri"
 	cupsLastSeenAttribute      = "cups-last-seen"
 	cupsCredentialsIDAttribute = "cups-credentials-id"
@@ -54,6 +59,15 @@ var (
 	errCUPSNotEnabled  = errors.DefinePermissionDenied("cups_not_enabled", "CUPS is not enabled for gateway `{gateway_uid}`")
 	errInvalidToken    = errors.DefinePermissionDenied("invalid_token", "invalid provisioning token")
 )
+
+func getAuthHeader(ctx context.Context) string {
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if authorization := md.Get("authorization"); len(authorization) > 0 {
+			return authorization[len(authorization)-1]
+		}
+	}
+	return ""
+}
 
 func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*ttnpb.Gateway, error) {
 	logger := log.FromContext(ctx)
@@ -108,6 +122,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	logger.WithField("api_key_id", lnsKey.ID).Info("Created gateway API key for LNS")
 	gtw.Attributes = map[string]string{
 		cupsAttribute:              "true",
+		cupsAuthHeaderAttribute:    getAuthHeader(ctx),
 		cupsCredentialsIDAttribute: cupsKey.ID,
 		cupsCredentialsAttribute:   fmt.Sprintf("Bearer %s", cupsKey.Key),
 		lnsCredentialsIDAttribute:  lnsKey.ID,
@@ -147,10 +162,6 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		return err
 	}
 	serverAuth := s.getServerAuth(ctx)
-	gatewayAuth, err := rpcmetadata.WithForwardedAuth(ctx, s.component.AllowInsecureForCredentials())
-	if err != nil {
-		return err
-	}
 
 	var gtw *ttnpb.Gateway
 	ids, err := registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
@@ -161,7 +172,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		gtw, err = registry.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: *ids,
 			FieldMask:          getGatewayMask,
-		}, gatewayAuth)
+		}, serverAuth)
 	} else if errors.IsNotFound(err) && s.registerUnknown {
 		gtw, err = s.registerGateway(ctx, req)
 		if err != nil {
@@ -173,6 +184,29 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 
 	logger = logger.WithField("gateway_uid", unique.ID(ctx, gtw.GatewayIdentifiers))
+
+	var gatewayAuth grpc.CallOption
+	if rights.RequireGateway(ctx, gtw.GatewayIdentifiers,
+		ttnpb.RIGHT_GATEWAY_INFO,
+		ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+	) == nil {
+		logger.Debug("Authorized with The Things Stack token")
+		gatewayAuth, err = rpcmetadata.WithForwardedAuth(ctx, s.component.AllowInsecureForCredentials())
+		if err != nil {
+			return err
+		}
+	} else if gtw.Attributes[cupsAuthHeaderAttribute] != "" {
+		if subtle.ConstantTimeCompare([]byte(getAuthHeader(ctx)), []byte(gtw.Attributes[cupsAuthHeaderAttribute])) != 1 {
+			return errInvalidToken
+		}
+		logger.Debug("Authorized with CUPS Auth Header")
+		md := rpcmetadata.FromIncomingContext(ctx)
+		md.AuthType, md.AuthValue = "Bearer", gtw.Attributes[cupsCredentialsAttribute]
+		md.AllowInsecure = s.component.AllowInsecureForCredentials()
+		gatewayAuth = grpc.PerRPCCredentials(md)
+	} else {
+		return errUnauthenticated
+	}
 
 	if gtw.Attributes == nil {
 		gtw.Attributes = make(map[string]string)
