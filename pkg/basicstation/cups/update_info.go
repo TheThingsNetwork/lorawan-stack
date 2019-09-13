@@ -194,6 +194,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 
 	if credentials := gtw.Attributes[cupsCredentialsAttribute]; credentials != "" {
+		logger.WithField("cups_uri", gtw.Attributes[cupsURIAttribute]).Debug("Getting trusted certificate for CUPS...")
 		cupsTrust, err := s.getTrust(gtw.Attributes[cupsURIAttribute])
 		if err != nil {
 			return err
@@ -230,6 +231,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 	}
 
 	if credentials := gtw.Attributes[lnsCredentialsAttribute]; credentials != "" {
+		logger.WithField("lns_uri", gtw.GatewayServerAddress).Debug("Getting trusted certificate for LNS...")
 		lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
 		if err != nil {
 			return err
