@@ -369,7 +369,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
-	conn, err := io.NewConnection(ctx, frontend.Protocol(), frontend.SupportsStatusMessage(), gtw, fp, gtw.EnforceDutyCycle)
+	conn, err := io.NewConnection(ctx, frontend.Protocol(), frontend.SupportsStatusMessage(), frontend.SupportsDownlinkClaim(), gtw, fp, gtw.EnforceDutyCycle)
 	if err != nil {
 		return nil, err
 	}
@@ -597,4 +597,14 @@ func (gs *GatewayServer) GetFrequencyPlan(ctx context.Context, ids ttnpb.Gateway
 		return nil, err
 	}
 	return gs.FrequencyPlans.GetByID(fpID)
+}
+
+// ClaimDownlink claims the downlink path for the given gateway.
+func (gs *GatewayServer) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return gs.ClaimIDs(ctx, ids)
+}
+
+// UnclaimDownlink releases the claim of the downlink path for the given gateway.
+func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+	return gs.UnclaimIDs(ctx, ids)
 }

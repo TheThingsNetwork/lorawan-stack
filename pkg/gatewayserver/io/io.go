@@ -41,6 +41,8 @@ type Frontend interface {
 	Protocol() string
 	// SupportsStatusMessage returns true if the protocol supports status messages.
 	SupportsStatusMessage() bool
+	// SupportsDownlinkClaim returns true if the frontend can itself claim downlinks.
+	SupportsDownlinkClaim() bool
 }
 
 // Server represents the Gateway Server to gateway frontends.
@@ -55,6 +57,10 @@ type Server interface {
 	Connect(ctx context.Context, frontend Frontend, ids ttnpb.GatewayIdentifiers) (*Connection, error)
 	// GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
 	GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error)
+	// ClaimDownlink claims the downlink path for the given gateway.
+	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
+	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
+	UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 }
 
 // Connection is a connection to a gateway managed by a frontend.
@@ -73,6 +79,7 @@ type Connection struct {
 
 	protocol              string
 	supportsStatusMessage bool
+	supportsDownlinkClaim bool
 	gateway               *ttnpb.Gateway
 	fp                    *frequencyplans.FrequencyPlan
 	scheduler             *scheduling.Scheduler
@@ -85,7 +92,7 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, protocol string, supportsStatusMessage bool, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool) (*Connection, error) {
+func NewConnection(ctx context.Context, protocol string, supportsStatusMessage bool, supportsDownlinkClaim bool, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool) (*Connection, error) {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	scheduler, err := scheduling.NewScheduler(ctx, fp, enforceDutyCycle, nil)
 	if err != nil {
@@ -96,6 +103,7 @@ func NewConnection(ctx context.Context, protocol string, supportsStatusMessage b
 		cancelCtx:             cancelCtx,
 		protocol:              protocol,
 		supportsStatusMessage: supportsStatusMessage,
+		supportsDownlinkClaim: supportsDownlinkClaim,
 		gateway:               gateway,
 		fp:                    fp,
 		scheduler:             scheduler,
@@ -121,6 +129,9 @@ func (c *Connection) Protocol() string { return c.protocol }
 
 // SupportsStatusMessage returns true if the protocol supports status messages.
 func (c *Connection) SupportsStatusMessage() bool { return c.supportsStatusMessage }
+
+// SupportsDownlinkClaim returns true if the protocol can claim downlinks independent of the upstream.
+func (c *Connection) SupportsDownlinkClaim() bool { return c.supportsDownlinkClaim }
 
 // Gateway returns the gateway entity.
 func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }

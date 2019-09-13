@@ -62,6 +62,7 @@ type srv struct {
 
 func (*srv) Protocol() string            { return "basicstation" }
 func (*srv) SupportsStatusMessage() bool { return false }
+func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
 func New(ctx context.Context, server io.Server) *echo.Echo {

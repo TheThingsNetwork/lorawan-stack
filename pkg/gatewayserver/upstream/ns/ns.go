@@ -61,7 +61,11 @@ func (h *Handler) Setup() error {
 }
 
 // ConnectGateway implements upstream.Handler.
-func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, _ *io.Connection) error {
+func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, conn *io.Connection) error {
+	// If the frontend can claim downlinks, don't claim automatically on connection.
+	if conn.SupportsDownlinkClaim() {
+		return nil
+	}
 	h.c.ClaimIDs(ctx, ids)
 	select {
 	case <-ctx.Done():
