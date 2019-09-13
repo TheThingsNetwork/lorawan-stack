@@ -46,6 +46,19 @@ var (
 	}
 )
 
+func TestGatewayConfigurationServer(t *testing.T) {
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	conf := &component.Config{}
+	c := component.MustNew(test.GetLogger(t), conf)
+
+	test.Must(New(c, testConfig))
+	test.Must(c.Start(), nil)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER)
+}
+
 func TestWeb(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
