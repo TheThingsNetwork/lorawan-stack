@@ -2231,6 +2231,7 @@ Power state of the device.
 | `CRYPTO_SERVER` | 7 |  |
 | `DEVICE_TEMPLATE_CONVERTER` | 8 |  |
 | `DEVICE_CLAIMING_SERVER` | 9 |  |
+| `GATEWAY_CONFIGURATION_SERVER` | 10 |  |
 
 ### <a name="ttn.lorawan.v3.DownlinkPathConstraint">Enum `DownlinkPathConstraint`</a>
 
