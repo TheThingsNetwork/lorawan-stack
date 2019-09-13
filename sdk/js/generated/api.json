@@ -8493,6 +8493,11 @@
               "name": "DEVICE_CLAIMING_SERVER",
               "number": "9",
               "description": ""
+            },
+            {
+              "name": "GATEWAY_CONFIGURATION_SERVER",
+              "number": "10",
+              "description": ""
             }
           ]
         },

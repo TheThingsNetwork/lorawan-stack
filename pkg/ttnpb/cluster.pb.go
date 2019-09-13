@@ -285,7 +285,7 @@ func NewPopulatedPeerInfo(r randyCluster, easy bool) *PeerInfo {
 	v1 := r.Intn(10)
 	this.Roles = make([]ClusterRole, v1)
 	for i := 0; i < v1; i++ {
-		this.Roles[i] = ClusterRole([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}[r.Intn(10)])
+		this.Roles[i] = ClusterRole([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}[r.Intn(11)])
 	}
 	if r.Intn(5) != 0 {
 		v2 := r.Intn(10)
