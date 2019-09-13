@@ -144,90 +144,6 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	maxDownLen, maxUpLen = maxDownLen-5, maxUpLen-5
 
 	var fPending bool
-	var st generateDownlinkState
-	var skipAppDown bool
-	var startIdx int
-	for _, down := range dev.QueuedApplicationDownlinks {
-		logger := loggerWithApplicationDownlinkFields(logger, down)
-
-		switch {
-		case len(down.FRMPayload) > int(maxDownLen):
-			logger.WithField("max_down_len", maxDownLen).Debug("Drop application downlink with payload length exceeding band regulations")
-			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-				CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
-				Up: &ttnpb.ApplicationUp_DownlinkFailed{
-					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-						ApplicationDownlink: *down,
-						Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong),
-					},
-				},
-			})
-			startIdx++
-			skipAppDown = true
-
-		case down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
-			logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
-			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
-				Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
-					DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
-						Downlinks:    dev.QueuedApplicationDownlinks,
-						LastFCntDown: dev.Session.LastNFCntDown + 1,
-					},
-				},
-			})
-			startIdx = len(dev.QueuedApplicationDownlinks)
-			skipAppDown = true
-
-		case down.Confirmed && dev.Multicast:
-			logger.Debug("Drop confirmed application downlink for multicast device")
-			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
-				Up: &ttnpb.ApplicationUp_DownlinkFailed{
-					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-						ApplicationDownlink: *down,
-						Error:               *ttnpb.ErrorDetailsToProto(errConfirmedMulticastDownlink),
-					},
-				},
-			})
-			startIdx++
-			skipAppDown = true
-
-		case down.ClassBC != nil:
-			if down.ClassBC.AbsoluteTime != nil && down.ClassBC.AbsoluteTime.Before(time.Now()) {
-				logger.Debug("Drop expired downlink")
-				st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-					CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
-					Up: &ttnpb.ApplicationUp_DownlinkFailed{
-						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-							ApplicationDownlink: *down,
-							Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
-						},
-					},
-				})
-				startIdx++
-				continue
-			}
-
-			if class == ttnpb.CLASS_A {
-				logger.Debug("Skip class B/C downlink for class A downlink")
-				if dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.MACState.QueuedResponses) == 0 {
-					dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[startIdx:]
-					st.NeedsDownlinkQueueUpdate = startIdx > 0
-					return nil, st, errNoDownlink
-				}
-				skipAppDown = true
-			}
-		}
-		break
-	}
-	dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[startIdx:]
-	st.NeedsDownlinkQueueUpdate = startIdx > 0
-
 	spec := lorawan.DefaultMACCommands
 	cmds := make([]*ttnpb.MACCommand, 0, len(dev.MACState.QueuedResponses)+len(dev.MACState.PendingRequests))
 	var lostResps []*ttnpb.MACCommand
@@ -361,6 +277,90 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		"ack", pld.FHDR.FCtrl.Ack,
 		"adr", pld.FHDR.FCtrl.ADR,
 	))
+
+	var st generateDownlinkState
+	var skipAppDown bool
+	var startIdx int
+	for _, down := range dev.QueuedApplicationDownlinks {
+		logger := loggerWithApplicationDownlinkFields(logger, down)
+
+		switch {
+		case len(down.FRMPayload) > int(maxDownLen):
+			logger.WithField("max_down_len", maxDownLen).Debug("Drop application downlink with payload length exceeding band regulations")
+			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
+				Up: &ttnpb.ApplicationUp_DownlinkFailed{
+					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+						ApplicationDownlink: *down,
+						Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong),
+					},
+				},
+			})
+			startIdx++
+			skipAppDown = true
+
+		case down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
+			logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
+			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+				Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+					DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+						Downlinks:    dev.QueuedApplicationDownlinks,
+						LastFCntDown: dev.Session.LastNFCntDown + 1,
+					},
+				},
+			})
+			startIdx = len(dev.QueuedApplicationDownlinks)
+			skipAppDown = true
+
+		case down.Confirmed && dev.Multicast:
+			logger.Debug("Drop confirmed application downlink for multicast device")
+			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
+				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+				CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
+				Up: &ttnpb.ApplicationUp_DownlinkFailed{
+					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+						ApplicationDownlink: *down,
+						Error:               *ttnpb.ErrorDetailsToProto(errConfirmedMulticastDownlink),
+					},
+				},
+			})
+			startIdx++
+			skipAppDown = true
+
+		case down.ClassBC != nil:
+			if down.ClassBC.AbsoluteTime != nil && down.ClassBC.AbsoluteTime.Before(time.Now()) {
+				logger.Debug("Drop expired downlink")
+				st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+					CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
+					Up: &ttnpb.ApplicationUp_DownlinkFailed{
+						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+							ApplicationDownlink: *down,
+							Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
+						},
+					},
+				})
+				startIdx++
+				continue
+			}
+
+			if class == ttnpb.CLASS_A {
+				logger.Debug("Skip class B/C downlink for class A downlink")
+				if dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.MACState.QueuedResponses) == 0 {
+					dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[startIdx:]
+					st.NeedsDownlinkQueueUpdate = startIdx > 0
+					return nil, st, errNoDownlink
+				}
+				skipAppDown = true
+			}
+		}
+		break
+	}
+	dev.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks[startIdx:]
+	st.NeedsDownlinkQueueUpdate = startIdx > 0
 
 	switch {
 	case !skipAppDown && len(dev.QueuedApplicationDownlinks) > 0 && len(cmdBuf) <= fOptsCapacity:
