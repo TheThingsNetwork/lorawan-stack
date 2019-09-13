@@ -381,7 +381,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	for _, handler := range gs.upstreamHandlers {
 		go func(handler upstream.Handler) {
 			logger := log.FromContext(ctx).WithField("handler", handler.GetName())
-			if err := handler.ConnectGateway(ctx, ids, conn); err != nil {
+			if err := handler.ConnectGateway(conn.Context(), ids, conn); err != nil {
 				logger.WithError(err).Warn("Failed to connect gateway on upstream")
 			}
 		}(handler)
