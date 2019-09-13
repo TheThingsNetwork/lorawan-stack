@@ -246,7 +246,11 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			}
 		}
 	}
-	logger = logger.WithField("mac_count", len(cmds))
+	logger = logger.WithFields(log.Fields(
+		"mac_count", len(cmds),
+		"mac_len", len(cmdBuf),
+		"max_down_len", maxDownLen,
+	))
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
@@ -286,18 +290,22 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 		switch {
 		case len(down.FRMPayload) > int(maxDownLen):
-			logger.WithField("max_down_len", maxDownLen).Debug("Drop application downlink with payload length exceeding band regulations")
-			st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-				CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
-				Up: &ttnpb.ApplicationUp_DownlinkFailed{
-					DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-						ApplicationDownlink: *down,
-						Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong),
+			if len(down.FRMPayload) <= int(maxDownLen)+len(cmdBuf) {
+				logger.Debug("Skip application downlink with payload length exceeding band regulations due to FOpts field being non-empty")
+			} else {
+				logger.Debug("Drop application downlink with payload length exceeding band regulations")
+				st.baseApplicationUps = append(st.baseApplicationUps, &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+					CorrelationIDs:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIDs...),
+					Up: &ttnpb.ApplicationUp_DownlinkFailed{
+						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+							ApplicationDownlink: *down,
+							Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong),
+						},
 					},
-				},
-			})
-			startIdx++
+				})
+				startIdx++
+			}
 			skipAppDown = true
 
 		case down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
