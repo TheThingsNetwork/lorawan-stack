@@ -153,7 +153,7 @@ func mockGateway() *ttnpb.Gateway {
 			EUI:       &mockGatewayEUI,
 		},
 		Attributes: map[string]string{
-			cupsURIAttribute:           "https://mh.sm.tc:7007",
+			cupsURIAttribute:           "https://example.com:443",
 			cupsCredentialsIDAttribute: "KEYID",
 			cupsCredentialsAttribute:   "Bearer KEYCONTENTS",
 			cupsStationAttribute:       "2.0.0(minihub/debug) 2018-12-06 09:30:35",
@@ -162,7 +162,7 @@ func mockGateway() *ttnpb.Gateway {
 			lnsCredentialsIDAttribute:  "KEYID",
 			lnsCredentialsAttribute:    "Bearer KEYCONTENTS",
 		},
-		GatewayServerAddress: "wss://mh.sm.tc:7000",
+		GatewayServerAddress: "wss://example.com:443",
 	}
 }
 
@@ -221,7 +221,7 @@ func TestServer(t *testing.T) {
 			},
 			Options: []Option{
 				WithRegisterUnknown(&ttnpb.OrganizationOrUserIdentifiers{}, mockAuthFunc),
-				WithDefaultLNSURI("wss://mh.sm.tc:7000"),
+				WithDefaultLNSURI("wss://example.com:443"),
 			},
 			AssertError: should.BeNil,
 			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
@@ -229,7 +229,7 @@ func TestServer(t *testing.T) {
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
 				a.So(res.CUPSURI, should.BeEmpty) // No update.
-				a.So(res.LNSURI, should.Equal, "wss://mh.sm.tc:7000")
+				a.So(res.LNSURI, should.Equal, "wss://example.com:443")
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
 				a.So(res.LNSCredentials, should.NotBeEmpty)
 				a.So(res.SignatureKeyCRC, should.BeZeroValue)
@@ -287,8 +287,8 @@ func TestServer(t *testing.T) {
 				var res UpdateInfoResponse
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
-				a.So(res.CUPSURI, should.Equal, "https://mh.sm.tc:7007")
-				a.So(res.LNSURI, should.Equal, "wss://mh.sm.tc:7000")
+				a.So(res.CUPSURI, should.Equal, "https://example.com:443")
+				a.So(res.LNSURI, should.Equal, "wss://example.com:443")
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
 				a.So(res.LNSCredentials, should.NotBeEmpty)
 				a.So(res.SignatureKeyCRC, should.BeZeroValue)
