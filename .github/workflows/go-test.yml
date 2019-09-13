@@ -1,0 +1,76 @@
+name: Go Code
+
+on:
+  push:
+    paths:
+    - '**.go'
+  pull_request:
+    paths:
+    - '**.go'
+
+jobs:
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+        go-version: '1.13'
+    - name: Check out code
+      uses: actions/checkout@v1
+    - name: Make Mage
+      run: make mage
+    - name: Check headers
+      run: ./mage headers:check
+    - name: Format Go code
+      run: ./mage go:fmt
+    - name: Fix common spelling mistakes
+      run: ./mage dev:misspell
+    - name: Remove unnecessary type conversions
+      run: ./mage go:unconvert
+    - name: Generate i18n messages
+      run: ./mage go:messages
+    - name: Check for diff
+      run: make git.diff
+
+  test:
+    name: Tests
+    runs-on: ubuntu-18.04
+    services:
+      postgres:
+        image: postgres
+        ports:
+        - '5432/tcp'
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: ''
+      redis:
+        image: redis
+        ports:
+          - '6379/tcp'
+    steps:
+    - name: Create ttn_lorawan_is_test DB
+      uses: docker://postgres
+      with:
+        entrypoint: /usr/bin/createdb
+        args: -h postgres -U root ttn_lorawan_is_test
+    - name: Create ttn_lorawan_is_store_test DB
+      uses: docker://postgres
+      with:
+        entrypoint: /usr/bin/createdb
+        args: -h postgres -U root ttn_lorawan_is_store_test
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+        go-version: '1.13'
+    - name: Check out code
+      uses: actions/checkout@v1
+    - name: Make Mage
+      run: make mage
+    - name: mage go:test
+      env:
+        SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
+        REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
+        TEST_REDIS: '1'
+      run: ./mage go:test
