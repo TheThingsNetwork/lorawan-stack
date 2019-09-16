@@ -128,7 +128,8 @@ service GatewayAccess {
     };
   }
 
-  // Set the rights of a collaborator (member) on the gateway.
+  // Set the rights of a collaborator (member) on the gateway. It is required for the caller to
+  // have all assigned or/and removed rights.
   // Setting a collaborator without rights, removes them.
   rpc SetCollaborator(SetGatewayCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {

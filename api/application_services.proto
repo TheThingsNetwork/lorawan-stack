@@ -125,7 +125,8 @@ service ApplicationAccess {
     };
   }
 
-  // Set the rights of a collaborator (member) on the application.
+  // Set the rights of a collaborator (member) on the application. It is required for the caller to
+  // have all assigned or/and removed rights.
   // Setting a collaborator without rights, removes them.
   rpc SetCollaborator(SetApplicationCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {

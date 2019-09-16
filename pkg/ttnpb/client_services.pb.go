@@ -331,7 +331,8 @@ type ClientAccessClient interface {
 	// Get the rights of a collaborator (member) of the client.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(ctx context.Context, in *GetClientCollaboratorRequest, opts ...grpc.CallOption) (*GetCollaboratorResponse, error)
-	// Set the rights of a collaborator (member) on the client.
+	// Set the rights of a collaborator (member) on the client. It is required for the caller to
+	// have all assigned or/and removed rights.
 	// Setting a collaborator without rights, removes them.
 	SetCollaborator(ctx context.Context, in *SetClientCollaboratorRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	ListCollaborators(ctx context.Context, in *ListClientCollaboratorsRequest, opts ...grpc.CallOption) (*Collaborators, error)
@@ -387,7 +388,8 @@ type ClientAccessServer interface {
 	// Get the rights of a collaborator (member) of the client.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(context.Context, *GetClientCollaboratorRequest) (*GetCollaboratorResponse, error)
-	// Set the rights of a collaborator (member) on the client.
+	// Set the rights of a collaborator (member) on the client. It is required for the caller to
+	// have all assigned or/and removed rights.
 	// Setting a collaborator without rights, removes them.
 	SetCollaborator(context.Context, *SetClientCollaboratorRequest) (*types.Empty, error)
 	ListCollaborators(context.Context, *ListClientCollaboratorsRequest) (*Collaborators, error)

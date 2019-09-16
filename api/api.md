@@ -630,7 +630,7 @@ where the user or organization is collaborator on.
 | `GetAPIKey` | [`GetApplicationAPIKeyRequest`](#ttn.lorawan.v3.GetApplicationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `UpdateAPIKey` | [`UpdateApplicationAPIKeyRequest`](#ttn.lorawan.v3.UpdateApplicationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an existing application API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | `GetCollaborator` | [`GetApplicationCollaboratorRequest`](#ttn.lorawan.v3.GetApplicationCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the application. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
-| `SetCollaborator` | [`SetApplicationCollaboratorRequest`](#ttn.lorawan.v3.SetApplicationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the application. Setting a collaborator without rights, removes them. |
+| `SetCollaborator` | [`SetApplicationCollaboratorRequest`](#ttn.lorawan.v3.SetApplicationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the application. It is required for the caller to have all assigned or/and removed rights. Setting a collaborator without rights, removes them. |
 | `ListCollaborators` | [`ListApplicationCollaboratorsRequest`](#ttn.lorawan.v3.ListApplicationCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) |  |
 
 #### HTTP bindings
@@ -1404,7 +1404,7 @@ The OAuth2 flows an OAuth client can use to get an access token.
 | ----------- | ------------ | ------------- | ------------|
 | `ListRights` | [`ClientIdentifiers`](#ttn.lorawan.v3.ClientIdentifiers) | [`Rights`](#ttn.lorawan.v3.Rights) |  |
 | `GetCollaborator` | [`GetClientCollaboratorRequest`](#ttn.lorawan.v3.GetClientCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the client. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
-| `SetCollaborator` | [`SetClientCollaboratorRequest`](#ttn.lorawan.v3.SetClientCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the client. Setting a collaborator without rights, removes them. |
+| `SetCollaborator` | [`SetClientCollaboratorRequest`](#ttn.lorawan.v3.SetClientCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the client. It is required for the caller to have all assigned or/and removed rights. Setting a collaborator without rights, removes them. |
 | `ListCollaborators` | [`ListClientCollaboratorsRequest`](#ttn.lorawan.v3.ListClientCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) |  |
 
 #### HTTP bindings
@@ -2729,7 +2729,7 @@ where the user or organization is collaborator on.
 | `GetAPIKey` | [`GetGatewayAPIKeyRequest`](#ttn.lorawan.v3.GetGatewayAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `UpdateAPIKey` | [`UpdateGatewayAPIKeyRequest`](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an existing gateway API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | `GetCollaborator` | [`GetGatewayCollaboratorRequest`](#ttn.lorawan.v3.GetGatewayCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the gateway. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
-| `SetCollaborator` | [`SetGatewayCollaboratorRequest`](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the gateway. Setting a collaborator without rights, removes them. |
+| `SetCollaborator` | [`SetGatewayCollaboratorRequest`](#ttn.lorawan.v3.SetGatewayCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the gateway. It is required for the caller to have all assigned or/and removed rights. Setting a collaborator without rights, removes them. |
 | `ListCollaborators` | [`ListGatewayCollaboratorsRequest`](#ttn.lorawan.v3.ListGatewayCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) |  |
 
 #### HTTP bindings
@@ -5115,7 +5115,7 @@ where the user or organization is collaborator on.
 | `GetAPIKey` | [`GetOrganizationAPIKeyRequest`](#ttn.lorawan.v3.GetOrganizationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) |  |
 | `UpdateAPIKey` | [`UpdateOrganizationAPIKeyRequest`](#ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest) | [`APIKey`](#ttn.lorawan.v3.APIKey) | Update the rights of an existing organization API key. To generate an API key, the CreateAPIKey should be used. To delete an API key, update it with zero rights. |
 | `GetCollaborator` | [`GetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.GetOrganizationCollaboratorRequest) | [`GetCollaboratorResponse`](#ttn.lorawan.v3.GetCollaboratorResponse) | Get the rights of a collaborator (member) of the organization. Pseudo-rights in the response (such as the "_ALL" right) are not expanded. |
-| `SetCollaborator` | [`SetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the organization. Setting a collaborator without rights, removes them. Note that only users can collaborate (be member of) an organization. |
+| `SetCollaborator` | [`SetOrganizationCollaboratorRequest`](#ttn.lorawan.v3.SetOrganizationCollaboratorRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Set the rights of a collaborator (member) on the organization. It is required for the caller to have all assigned or/and removed rights. Setting a collaborator without rights, removes them. Note that only users can collaborate (be member of) an organization. |
 | `ListCollaborators` | [`ListOrganizationCollaboratorsRequest`](#ttn.lorawan.v3.ListOrganizationCollaboratorsRequest) | [`Collaborators`](#ttn.lorawan.v3.Collaborators) |  |
 
 #### HTTP bindings
