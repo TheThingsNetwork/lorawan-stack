@@ -42,7 +42,7 @@ export default class ApplicationApiKeys extends React.Component {
       <Container>
         <Row>
           <IntlHelmet title={sharedMessages.apiKeys} />
-          <Col sm={12}>
+          <Col>
             <ApiKeysTable
               pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={this.baseDataSelector}

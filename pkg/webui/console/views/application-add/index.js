@@ -176,7 +176,7 @@ export default class Add extends React.Component {
             <IntlHelmet title={sharedMessages.addApplication} />
             <Message component="h2" content={sharedMessages.addApplication} />
           </Col>
-          <Col className={style.form} sm={12} md={8} lg={8} xl={8}>
+          <Col className={style.form} md={10} lg={9}>
             <Form
               error={error}
               onSubmit={this.handleSubmit}

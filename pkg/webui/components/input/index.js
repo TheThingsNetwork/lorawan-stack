@@ -139,6 +139,7 @@ class Input extends React.Component {
       [style.disabled]: disabled,
       [style.code]: code,
       [style.actionable]: hasAction,
+      [style.textarea]: type === 'textarea',
     })
 
     return (

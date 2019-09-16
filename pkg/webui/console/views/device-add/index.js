@@ -97,12 +97,14 @@ export default class DeviceAdd extends Component {
 
     return (
       <Container>
-        <Row className={style.wrapper}>
-          <Col sm={12}>
+        <Row>
+          <Col>
             <IntlHelmet title={sharedMessages.addDevice} />
-            <Message component="h2" content={sharedMessages.addDevice} />
+            <Message className={style.title} component="h2" content={sharedMessages.addDevice} />
           </Col>
-          <Col className={style.form} sm={12} md={12} lg={8} xl={8}>
+        </Row>
+        <Row>
+          <Col className={style.form} lg={8} md={12}>
             <DeviceDataForm
               error={error}
               onSubmit={this.handleSubmit}

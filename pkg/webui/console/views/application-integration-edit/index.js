@@ -143,7 +143,7 @@ export default class ApplicationIntegrationEdit extends Component {
     return (
       <Container>
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <IntlHelmet title={m.editWebhook} />
             <Message component="h2" content={sharedMessages.editWebhook} />
           </Col>

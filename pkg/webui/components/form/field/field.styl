@@ -15,18 +15,22 @@
 +media-query-min($bp.xxs)
   .horizontal.field
     flex-direction: row
+    justify-content: space-between
+    flex-wrap: nowrap
 
     .title
       font-weight: normal
 
-    .component
-      width: 70%
+    .component-area
+      display: flex
+      flex-grow: 1
+      width: calc(100% - 14rem)
+      flex-direction: column
 
     .label
-      width: 30%
-
-    .description, .err, .warn
-      margin-left: 30%
+      display: flex
+      width: 14rem
+      font-weight: normal
 
 .field
   margin-bottom: $cs.l
@@ -34,9 +38,8 @@
   flex-wrap: wrap
   width: 100%
 
-  &:not(.horizontal)
-    .label
-      font-weight: 600
+  .label
+    font-weight: 600
 
 .reqicon
   display: none
@@ -57,7 +60,7 @@
   font-weight: normal
   color: $tc-subtle-gray
 
-.component
+.component-area
   flex-shrink: 0
   width: 100%
 

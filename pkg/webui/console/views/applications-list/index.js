@@ -28,7 +28,7 @@ export default class List extends React.Component {
       <Container>
         <Row>
           <IntlHelmet title={sharedMessages.applications} />
-          <Col sm={12}>
+          <Col>
             <ApplicationsTable pageSize={PAGE_SIZES.REGULAR} />
           </Col>
         </Row>

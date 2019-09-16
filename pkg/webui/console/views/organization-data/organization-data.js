@@ -51,13 +51,13 @@ export default class Data extends React.Component {
     return (
       <Container>
         <Row>
-          <Col sm={12}>
+          <Col>
             <IntlHelmet title={m.orgData} />
             <Message component="h2" content={m.orgData} />
           </Col>
         </Row>
         <Row>
-          <Col sm={12} className={style.wrapper}>
+          <Col className={style.wrapper}>
             <OrganizationEvents orgId={orgId} />
           </Col>
         </Row>

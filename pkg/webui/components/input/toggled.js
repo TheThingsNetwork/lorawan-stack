@@ -57,6 +57,7 @@ class Toggled extends Component {
         {isEnabled && (
           <Input
             {...rest}
+            className={style.input}
             type="text"
             value={value.value || ''}
             onChange={this.handleInputChange}

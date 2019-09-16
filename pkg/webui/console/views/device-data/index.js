@@ -52,7 +52,7 @@ export default class Data extends React.Component {
       <Container>
         <IntlHelmet title={sharedMessages.data} />
         <Row>
-          <Col sm={12}>
+          <Col>
             <DeviceEvents devIds={devIds} />
           </Col>
         </Row>

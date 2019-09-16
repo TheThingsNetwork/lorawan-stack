@@ -43,7 +43,7 @@ export default class ApplicationCollaborators extends React.Component {
       <Container>
         <Row>
           <IntlHelmet title={sharedMessages.collaborators} />
-          <Col sm={12}>
+          <Col>
             <CollaboratorsTable
               pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={this.baseDataSelector}

@@ -157,7 +157,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
     return (
       <Container>
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <IntlHelmet
               title={sharedMessages.collaboratorEdit}
               values={{ collaboratorId: collaborator.id }}

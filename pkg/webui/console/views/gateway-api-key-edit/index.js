@@ -102,7 +102,7 @@ export default class GatewayApiKeyEdit extends React.Component {
     return (
       <Container>
         <Row>
-          <Col lg={8} md={12}>
+          <Col>
             <IntlHelmet title={sharedMessages.keyEdit} />
             <Message component="h2" content={sharedMessages.keyEdit} />
           </Col>

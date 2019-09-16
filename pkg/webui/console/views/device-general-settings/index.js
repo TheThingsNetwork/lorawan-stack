@@ -104,7 +104,7 @@ export default class DeviceGeneralSettings extends React.Component {
       <Container>
         <IntlHelmet title={sharedMessages.generalSettings} />
         <Row>
-          <Col sm={12} md={12} lg={8} xl={8}>
+          <Col lg={8} md={12}>
             <DeviceDataForm
               error={error}
               onSubmit={this.handleSubmit}
