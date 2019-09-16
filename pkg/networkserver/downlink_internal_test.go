@@ -1568,13 +1568,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -1586,7 +1586,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -1822,13 +1822,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -1840,7 +1840,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -2123,13 +2123,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -2141,7 +2141,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -2558,13 +2558,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -2576,7 +2576,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -2879,13 +2879,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -2897,7 +2897,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -2960,13 +2960,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x81,
+							0b1_0_0_0_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -3262,13 +3262,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x81,
+							0b1_0_0_0_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -3571,13 +3571,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x81,
+							0b1_0_0_0_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -3851,13 +3851,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x81,
+							0b1_0_0_0_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}

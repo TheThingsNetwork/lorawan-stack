@@ -234,7 +234,7 @@ func TestHandleUplink(t *testing.T) {
 			CorrelationIDs: correlationIDs[:],
 			RawPayload: []byte{
 				/* MHDR */
-				0x00,
+				0b000_000_00,
 				/* Join-request */
 				/** JoinEUI **/
 				joinEUI[7], joinEUI[6], joinEUI[5], joinEUI[4], joinEUI[3], joinEUI[2], joinEUI[1], joinEUI[0],
@@ -282,7 +282,7 @@ func TestHandleUplink(t *testing.T) {
 			CorrelationIDs: correlationIDs[:],
 			RawPayload: []byte{
 				/* MHDR */
-				0xc0,
+				0b110_000_00,
 				/* Rejoin-request */
 				/** Rejoin Type **/
 				0x00,
@@ -376,7 +376,7 @@ func TestHandleUplink(t *testing.T) {
 				uint32(fCnt),
 				append([]byte{
 					/* MHDR */
-					0x40,
+					0b010_000_00,
 					/* MACPayload */
 					/** FHDR **/
 					/*** DevAddr ***/
@@ -428,7 +428,7 @@ func TestHandleUplink(t *testing.T) {
 					append(
 						append([]byte{
 							/* MHDR */
-							0x40,
+							0b010_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
@@ -538,7 +538,7 @@ func TestHandleUplink(t *testing.T) {
 					return &ttnpb.UplinkMessage{
 						RawPayload: []byte{
 							/* MHDR */
-							0x01,
+							0b000_000_01,
 							/* Join-request */
 							/** JoinEUI **/
 							joinEUI[7], joinEUI[6], joinEUI[5], joinEUI[4], joinEUI[3], joinEUI[2], joinEUI[1], joinEUI[0],
@@ -592,7 +592,7 @@ func TestHandleUplink(t *testing.T) {
 					return &ttnpb.UplinkMessage{
 						RawPayload: []byte{
 							/* MHDR */
-							0xe0,
+							0b111_000_00,
 						},
 						RxMetadata: MakeRxMetadataSlice(),
 					}
