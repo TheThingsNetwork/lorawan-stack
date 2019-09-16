@@ -1024,10 +1024,12 @@ func (ns *NetworkServer) attemptClassADownlink(ctx context.Context, dev *ttnpb.E
 			applicationUpAppender: genState.appendApplicationUplinks,
 		}
 	}
+	if genState.ApplicationDownlink != nil {
+		sets = append(sets, "queued_application_downlinks")
+	}
 	return downlinkAttemptResult{
 		SetPaths: append(sets,
 			"mac_state",
-			"queued_application_downlinks",
 			"recent_downlinks",
 			"session",
 		),
@@ -1350,12 +1352,15 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				}
 				queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, true)
 				queuedEvents = append(queuedEvents, genState.Events...)
-				return dev, []string{
+
+				if genState.ApplicationDownlink != nil {
+					sets = append(sets, "queued_application_downlinks")
+				}
+				return dev, append(sets,
 					"mac_state",
-					"queued_application_downlinks",
 					"recent_downlinks",
 					"session",
-				}, nil
+				), nil
 			},
 		)
 		if len(queuedApplicationUplinks) > 0 {
