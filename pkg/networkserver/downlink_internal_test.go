@@ -974,7 +974,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.1/RX1,RX2/no downlink",
+			Name: "Class A/windows open/1.1/RX1,RX2 available/no MAC/no application downlink",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1035,8 +1035,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					MACSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						CopyUplinkMessage(lastUp),
@@ -1113,7 +1113,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.0.3/RX1,RX2/FCnt too low",
+			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/FCnt too low",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1174,8 +1174,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					MACSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
@@ -1277,7 +1277,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.0.3/RX1,RX2/payload too long",
+			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/payload too long",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1338,8 +1338,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					MACSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
@@ -1433,7 +1433,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.1/RX1,RX2/application downlink/FOpts present/EU868/scheduling fail",
+			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868/scheduling fail",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1685,7 +1685,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.1/RX1,RX2/application downlink/FOpts present/EU868",
+			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1986,7 +1986,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 		// Adapted from https://github.com/TheThingsNetwork/lorawan-stack/issues/866#issue-461484955.
 		{
-			Name: "Class A/windows open/1.0.2/RX1, RX2 does not fit/application downlink/FOpts present/EU868",
+			Name: "Class A/windows open/1.0.2/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/RX2 does not fit/data+MAC/RX1,RX2/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -2418,7 +2418,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RX1,RX2/application downlink/FOpts present/EU868",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -2739,7 +2739,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows closed/1.1/RX1,RX2,RXC/application downlink/no absolute time/no forced gateways/FOpts present/EU868",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2,RXC/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -3126,7 +3126,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RXC/application downlink/absolute time within window/no forced gateways/FOpts present/EU868",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -3435,7 +3435,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RXC/application downlink/absolute time within window/no forced gateways/FOpts present/EU868/non-retryable errors",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868/non-retryable errors",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -3715,7 +3715,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/RXC/application downlink/absolute time within window/no forced gateways/windows open/FOpts present/EU868/1.1/retryable error",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868/retryable error",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -3988,7 +3988,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/RXC/application downlink/absolute time outside window",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC/classBC application downlink/absolute time outside window",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -4044,7 +4044,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACSettings: &ttnpb.MACSettings{
-						ClassCTimeout: DurationPtr(42 * time.Second),
+						ClassCTimeout:          DurationPtr(42 * time.Second),
+						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					MACState: &ttnpb.MACState{
 						CurrentParameters:  *CopyMACParameters(eu868macParameters),
@@ -4154,7 +4156,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/RX2/expired application downlinks",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC/expired application downlinks",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -4322,7 +4324,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "join-accept/windows open/RX2/no active MAC state/window open/EU868/1.1",
+			Name: "join-accept/windows open/RX1,RX2 available/no active MAC state/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
