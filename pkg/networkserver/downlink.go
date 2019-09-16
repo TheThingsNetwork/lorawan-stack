@@ -137,11 +137,11 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	))
 	logger := log.FromContext(ctx)
 
-	// NOTE: len(MHDR) + len(MIC) = 1 + 4 = 5
-	if maxDownLen < 5 || maxUpLen < 5 {
+	// NOTE: len(MHDR) + len(FHDR) + len(MIC) = 1 + 7 + 4 = 12
+	if maxDownLen < 12 || maxUpLen < 12 {
 		panic("payload length limits too short to generate downlink")
 	}
-	maxDownLen, maxUpLen = maxDownLen-5, maxUpLen-5
+	maxDownLen, maxUpLen = maxDownLen-12, maxUpLen-12
 
 	var fPending bool
 	spec := lorawan.DefaultMACCommands
