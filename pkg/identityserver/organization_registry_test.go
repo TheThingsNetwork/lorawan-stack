@@ -71,16 +71,18 @@ func TestOrganizationsNestedError(t *testing.T) {
 			Collaborator: *org.OrganizationOrUserIdentifiers(),
 		}, creds)
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
 
 		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
 			Collaborator: org.OrganizationOrUserIdentifiers(),
 		}, creds)
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
 	})
 }
 
@@ -116,7 +118,9 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 		})
 
 		a.So(err, should.BeNil)
-		a.So(listRes.Organizations, should.BeEmpty)
+		if a.So(listRes, should.NotBeNil) {
+			a.So(listRes.Organizations, should.BeEmpty)
+		}
 
 		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			Collaborator: ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
@@ -166,7 +170,9 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(created.Name, should.Equal, "Foo Organization")
+		if a.So(created, should.NotBeNil) {
+			a.So(created.Name, should.Equal, "Foo Organization")
+		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetOrganizationRequest{
 			OrganizationIdentifiers: created.OrganizationIdentifiers,
@@ -174,7 +180,9 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(got.Name, should.Equal, created.Name)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, created.Name)
+		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
 			OrganizationIdentifiers: created.OrganizationIdentifiers,
@@ -201,15 +209,18 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(updated.Name, should.Equal, "Updated Name")
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.Name, should.Equal, "Updated Name")
+		}
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 				FieldMask:    types.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
+
 			a.So(err, should.BeNil)
-			if a.So(list.Organizations, should.NotBeEmpty) {
+			if a.So(list, should.NotBeNil) && a.So(list.Organizations, should.NotBeEmpty) {
 				var found bool
 				for _, item := range list.Organizations {
 					if item.OrganizationIdentifiers == created.OrganizationIdentifiers {
@@ -222,6 +233,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &created.OrganizationIdentifiers, creds)
+
 		a.So(err, should.BeNil)
 	})
 }
@@ -242,9 +254,10 @@ func TestOrganizationsPagination(t *testing.T) {
 			Page:         1,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Organizations, should.HaveLength, 2)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Organizations, should.HaveLength, 2)
+		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
@@ -253,9 +266,10 @@ func TestOrganizationsPagination(t *testing.T) {
 			Page:         2,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Organizations, should.HaveLength, 1)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Organizations, should.HaveLength, 1)
+		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
 			FieldMask:    types.FieldMask{Paths: []string{"name"}},
@@ -264,8 +278,9 @@ func TestOrganizationsPagination(t *testing.T) {
 			Page:         3,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Organizations, should.BeEmpty)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Organizations, should.BeEmpty)
+		}
 	})
 }

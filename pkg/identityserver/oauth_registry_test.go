@@ -62,8 +62,7 @@ func TestOAuthRegistry(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(authorizations, should.NotBeNil)
-		if a.So(authorizations.Authorizations, should.HaveLength, 1) {
+		if a.So(authorizations, should.NotBeNil) && a.So(authorizations.Authorizations, should.HaveLength, 1) {
 			a.So(authorizations.Authorizations[0].ClientIDs.ClientID, should.Equal, client.ClientID)
 		}
 
@@ -73,8 +72,7 @@ func TestOAuthRegistry(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(tokens, should.NotBeNil)
-		if a.So(tokens.Tokens, should.HaveLength, 1) {
+		if a.So(tokens, should.NotBeNil) && a.So(tokens.Tokens, should.HaveLength, 1) {
 			a.So(tokens.Tokens[0].ID, should.Equal, "access_token_id")
 		}
 
@@ -83,6 +81,7 @@ func TestOAuthRegistry(t *testing.T) {
 			ClientIDs: client.ClientIdentifiers,
 			ID:        "access_token_id",
 		}, creds)
+
 		a.So(err, should.BeNil)
 
 		tokens, err = reg.ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
@@ -91,13 +90,15 @@ func TestOAuthRegistry(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(tokens, should.NotBeNil)
-		a.So(tokens.Tokens, should.BeEmpty)
+		if a.So(tokens, should.NotBeNil) {
+			a.So(tokens.Tokens, should.BeEmpty)
+		}
 
 		_, err = reg.Delete(ctx, &ttnpb.OAuthClientAuthorizationIdentifiers{
 			UserIDs:   user.UserIdentifiers,
 			ClientIDs: client.ClientIdentifiers,
 		}, creds)
+
 		a.So(err, should.BeNil)
 
 		authorizations, err = reg.List(ctx, &ttnpb.ListOAuthClientAuthorizationsRequest{
@@ -105,7 +106,8 @@ func TestOAuthRegistry(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(authorizations, should.NotBeNil)
-		a.So(authorizations.Authorizations, should.BeEmpty)
+		if a.So(authorizations, should.NotBeNil) {
+			a.So(authorizations.Authorizations, should.BeEmpty)
+		}
 	})
 }

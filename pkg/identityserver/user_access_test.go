@@ -53,18 +53,20 @@ func TestUserAccessNotFound(t *testing.T) {
 			KeyID:           apiKey.ID,
 		}, creds)
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		a.So(got, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIdentifiers: userID,
 			APIKey:          apiKey,
 		}, creds)
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		a.So(updated, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsNotFound(err), should.BeTrue)
 	})
 }
 
@@ -83,9 +85,10 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 			Rights:          []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
 		}, creds)
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 		a.So(APIKey, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		APIKey = userAPIKeys(&userID).APIKeys[0]
 		APIKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_ALL}
@@ -95,9 +98,10 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 			APIKey:          *APIKey,
 		}, creds)
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 		a.So(updated, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	})
 }
 
@@ -113,26 +117,29 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 
 		rights, err := reg.ListRights(ctx, &userID)
 
-		a.So(rights, should.NotBeNil)
-		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
+		if a.So(rights, should.NotBeNil) {
+			a.So(rights.Rights, should.BeEmpty)
+		}
 
 		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
 			UserIdentifiers: userID,
 			KeyID:           APIKeyID,
 		})
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 		a.So(APIKey, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
 			UserIdentifiers: userID,
 		})
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 		a.So(APIKeys, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
 			UserIdentifiers: userID,
@@ -140,9 +147,10 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 			Rights:          []ttnpb.Right{ttnpb.RIGHT_ALL},
 		})
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 		a.So(APIKey, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		APIKey = userAPIKeys(&userID).APIKeys[0]
 
@@ -151,9 +159,10 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 			APIKey:          *APIKey,
 		})
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 		a.So(updated, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	})
 }
 
@@ -168,9 +177,9 @@ func TestUserAccessClusterAuth(t *testing.T) {
 
 		rights, err := reg.ListRights(ctx, &userID, is.WithClusterAuth())
 
+		a.So(err, should.BeNil)
 		a.So(rights, should.NotBeNil)
 		a.So(ttnpb.AllClusterRights.Intersect(ttnpb.AllUserRights).Sub(rights).Rights, should.BeEmpty)
-		a.So(err, should.BeNil)
 	})
 }
 
@@ -185,17 +194,20 @@ func TestUserAccessCRUD(t *testing.T) {
 
 		rights, err := reg.ListRights(ctx, &user.UserIdentifiers, creds)
 
-		a.So(rights, should.NotBeNil)
-		a.So(rights.Rights, should.NotBeEmpty)
 		a.So(err, should.BeNil)
+		if a.So(rights, should.NotBeNil) {
+			a.So(rights.Rights, should.NotBeEmpty)
+		}
 
 		modifiedUserID := user.UserIdentifiers
 		modifiedUserID.UserID = reverse(modifiedUserID.UserID)
 
 		rights, err = reg.ListRights(ctx, &modifiedUserID, creds)
-		a.So(rights, should.NotBeNil)
-		a.So(rights.Rights, should.BeEmpty)
+
 		a.So(err, should.BeNil)
+		if a.So(rights, should.NotBeNil) {
+			a.So(rights.Rights, should.BeEmpty)
+		}
 
 		userAPIKeys := userAPIKeys(&user.UserIdentifiers)
 		userKey := userAPIKeys.APIKeys[0]
@@ -205,10 +217,11 @@ func TestUserAccessCRUD(t *testing.T) {
 			KeyID:           userKey.ID,
 		}, creds)
 
-		a.So(APIKey, should.NotBeNil)
 		a.So(err, should.BeNil)
-		a.So(APIKey.ID, should.Equal, userKey.ID)
-		a.So(APIKey.Key, should.BeEmpty)
+		if a.So(APIKey, should.NotBeNil) {
+			a.So(APIKey.ID, should.Equal, userKey.ID)
+			a.So(APIKey.Key, should.BeEmpty)
+		}
 
 		sort.Slice(userAPIKeys.APIKeys, func(i int, j int) bool { return userAPIKeys.APIKeys[i].Name < userAPIKeys.APIKeys[j].Name })
 		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
@@ -216,8 +229,8 @@ func TestUserAccessCRUD(t *testing.T) {
 		}, creds)
 		sort.Slice(apiKeys.APIKeys, func(i int, j int) bool { return apiKeys.APIKeys[i].Name < apiKeys.APIKeys[j].Name })
 
-		a.So(apiKeys, should.NotBeNil)
 		a.So(err, should.BeNil)
+		a.So(apiKeys, should.NotBeNil)
 		a.So(len(apiKeys.APIKeys), should.Equal, len(userAPIKeys.APIKeys))
 		for i, APIkey := range apiKeys.APIKeys {
 			a.So(APIkey.Name, should.Equal, userAPIKeys.APIKeys[i].Name)
@@ -231,9 +244,10 @@ func TestUserAccessCRUD(t *testing.T) {
 			Rights:          []ttnpb.Right{ttnpb.RIGHT_ALL},
 		}, creds)
 
-		a.So(created, should.NotBeNil)
-		a.So(created.Name, should.Equal, createdAPIKeyName)
 		a.So(err, should.BeNil)
+		if a.So(created, should.NotBeNil) {
+			a.So(created.Name, should.Equal, createdAPIKeyName)
+		}
 
 		newAPIKeyName := "test-new-api-key"
 		created.Name = newAPIKeyName
@@ -242,8 +256,9 @@ func TestUserAccessCRUD(t *testing.T) {
 			APIKey:          *created,
 		}, creds)
 
-		a.So(updated, should.NotBeNil)
-		a.So(updated.Name, should.Equal, newAPIKeyName)
 		a.So(err, should.BeNil)
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.Name, should.Equal, newAPIKeyName)
+		}
 	})
 }

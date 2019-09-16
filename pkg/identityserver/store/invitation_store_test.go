@@ -42,19 +42,27 @@ func TestInvitationStore(t *testing.T) {
 			Token:     "invitation-token",
 			ExpiresAt: cleanTime(now.Add(time.Hour * 24 * 7)),
 		})
+
 		a.So(err, should.BeNil)
-		a.So(invitation.Email, should.Equal, "john.doe@example.com")
+		if a.So(invitation, should.NotBeNil) {
+			a.So(invitation.Email, should.Equal, "john.doe@example.com")
+		}
 
 		_, err = store.GetInvitation(ctx, "wrong-invitation-token")
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
 		got, err := store.GetInvitation(ctx, "invitation-token")
+
 		a.So(err, should.BeNil)
-		a.So(got.Email, should.Equal, invitation.Email)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Email, should.Equal, invitation.Email)
+		}
 
 		invitations, err := store.FindInvitations(ctx)
+
 		a.So(err, should.BeNil)
 		if a.So(invitations, should.HaveLength, 1) {
 			a.So(invitations[0].Email, should.Equal, invitation.Email)
@@ -66,19 +74,23 @@ func TestInvitationStore(t *testing.T) {
 		}
 
 		err = store.SetInvitationAcceptedBy(ctx, "wrong-invitation-token", &newUser.UserIdentifiers)
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
 		err = store.SetInvitationAcceptedBy(ctx, "invitation-token", &newUser.UserIdentifiers)
+
 		a.So(err, should.BeNil)
 
 		err = store.SetInvitationAcceptedBy(ctx, "invitation-token", &newUser.UserIdentifiers)
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsAlreadyExists(err), should.BeTrue)
 		}
 
 		err = store.DeleteInvitation(ctx, "john.doe@example.com")
+
 		a.So(err, should.NotBeNil)
 
 		_, err = store.CreateInvitation(ctx, &ttnpb.Invitation{
@@ -86,9 +98,11 @@ func TestInvitationStore(t *testing.T) {
 			Token:     "other-invitation-token",
 			ExpiresAt: cleanTime(now.Add(time.Hour * 24 * 7)),
 		})
+
 		a.So(err, should.BeNil)
 
 		err = store.DeleteInvitation(ctx, "jane.doe@example.com")
+
 		a.So(err, should.BeNil)
 	})
 }

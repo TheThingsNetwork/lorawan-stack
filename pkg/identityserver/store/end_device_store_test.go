@@ -61,32 +61,39 @@ func TestEndDeviceStore(t *testing.T) {
 				"": {Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY},
 			},
 		})
+
 		a.So(err, should.BeNil)
-		a.So(created.DeviceID, should.Equal, deviceID.DeviceID)
-		a.So(created.Name, should.Equal, "Foo EndDevice")
-		a.So(created.Description, should.Equal, "The Amazing Foo EndDevice")
-		a.So(created.Attributes, should.HaveLength, 3)
-		a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-		a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+		if a.So(created, should.NotBeNil) {
+			a.So(created.DeviceID, should.Equal, deviceID.DeviceID)
+			a.So(created.Name, should.Equal, "Foo EndDevice")
+			a.So(created.Description, should.Equal, "The Amazing Foo EndDevice")
+			a.So(created.Attributes, should.HaveLength, 3)
+			a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+		}
 
 		got, err := store.GetEndDevice(ctx,
 			&deviceID,
 			&ptypes.FieldMask{Paths: []string{"name", "attributes", "locations"}},
 		)
+
 		a.So(err, should.BeNil)
-		a.So(got.DeviceID, should.Equal, deviceID.DeviceID)
-		a.So(got.Name, should.Equal, "Foo EndDevice")
-		a.So(got.Description, should.BeEmpty)
-		a.So(got.Attributes, should.HaveLength, 3)
-		if a.So(got.Locations, should.HaveLength, 1) {
-			a.So(got.Locations[""], should.Resemble, &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY})
+		if a.So(got, should.NotBeNil) {
+			a.So(got.DeviceID, should.Equal, deviceID.DeviceID)
+			a.So(got.Name, should.Equal, "Foo EndDevice")
+			a.So(got.Description, should.BeEmpty)
+			a.So(got.Attributes, should.HaveLength, 3)
+			if a.So(got.Locations, should.HaveLength, 1) {
+				a.So(got.Locations[""], should.Resemble, &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY})
+			}
+			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
 		}
-		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-		a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
 
 		_, err = store.UpdateEndDevice(ctx, &ttnpb.EndDevice{
 			EndDeviceIdentifiers: deviceNewID,
 		}, nil)
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
@@ -105,27 +112,34 @@ func TestEndDeviceStore(t *testing.T) {
 				"geo": {Latitude: 12.345, Longitude: 23.456, Accuracy: 500, Source: ttnpb.SOURCE_LORA_RSSI_GEOLOCATION},
 			},
 		}, &ptypes.FieldMask{Paths: []string{"description", "attributes", "locations"}})
+
 		a.So(err, should.BeNil)
-		a.So(updated.Description, should.Equal, "The Amazing Foobar EndDevice")
-		a.So(updated.Attributes, should.HaveLength, 3)
-		if a.So(updated.Locations, should.HaveLength, 2) {
-			a.So(updated.Locations[""], should.Resemble, &ttnpb.Location{Latitude: 12.3456, Longitude: 23.4567, Altitude: 1091, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY})
-			a.So(updated.Locations["geo"], should.Resemble, &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Accuracy: 500, Source: ttnpb.SOURCE_LORA_RSSI_GEOLOCATION})
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.Description, should.Equal, "The Amazing Foobar EndDevice")
+			a.So(updated.Attributes, should.HaveLength, 3)
+			if a.So(updated.Locations, should.HaveLength, 2) {
+				a.So(updated.Locations[""], should.Resemble, &ttnpb.Location{Latitude: 12.3456, Longitude: 23.4567, Altitude: 1091, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY})
+				a.So(updated.Locations["geo"], should.Resemble, &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Accuracy: 500, Source: ttnpb.SOURCE_LORA_RSSI_GEOLOCATION})
+			}
+			a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
+			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 		}
-		a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
-		a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
 
 		got, err = store.GetEndDevice(ctx, &deviceID, nil)
+
 		a.So(err, should.BeNil)
-		a.So(got.DeviceID, should.Equal, created.DeviceID)
-		a.So(got.Name, should.Equal, created.Name)
-		a.So(got.Description, should.Equal, updated.Description)
-		a.So(got.Attributes, should.Resemble, updated.Attributes)
-		a.So(got.Locations, should.Resemble, updated.Locations)
-		a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-		a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.DeviceID, should.Equal, created.DeviceID)
+			a.So(got.Name, should.Equal, created.Name)
+			a.So(got.Description, should.Equal, updated.Description)
+			a.So(got.Attributes, should.Resemble, updated.Attributes)
+			a.So(got.Locations, should.Resemble, updated.Locations)
+			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
+		}
 
 		count, err := store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+
 		a.So(err, should.BeNil)
 		a.So(count, should.Equal, 1)
 
@@ -133,6 +147,7 @@ func TestEndDeviceStore(t *testing.T) {
 			&deviceID.ApplicationIdentifiers,
 			&ptypes.FieldMask{Paths: []string{"name"}},
 		)
+
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
@@ -142,6 +157,7 @@ func TestEndDeviceStore(t *testing.T) {
 			[]*ttnpb.EndDeviceIdentifiers{&deviceID},
 			&ptypes.FieldMask{Paths: []string{"name"}},
 		)
+
 		a.So(err, should.BeNil)
 		if a.So(devices, should.HaveLength, 1) {
 			a.So(devices[0].Name, should.EndWith, got.Name)
@@ -160,15 +176,19 @@ func TestEndDeviceStore(t *testing.T) {
 				"": {Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY},
 			},
 		})
+
 		a.So(err, should.BeNil)
-		a.So(createdNew.DeviceID, should.Equal, deviceNewID.DeviceID)
-		a.So(createdNew.Name, should.Equal, "Bar EndDevice")
-		a.So(createdNew.Description, should.Equal, "The Amazing Bar EndDevice")
-		a.So(createdNew.Attributes, should.HaveLength, 3)
-		a.So(createdNew.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-		a.So(createdNew.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+		if a.So(createdNew, should.NotBeNil) {
+			a.So(createdNew.DeviceID, should.Equal, deviceNewID.DeviceID)
+			a.So(createdNew.Name, should.Equal, "Bar EndDevice")
+			a.So(createdNew.Description, should.Equal, "The Amazing Bar EndDevice")
+			a.So(createdNew.Attributes, should.HaveLength, 3)
+			a.So(createdNew.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(createdNew.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+		}
 
 		count, err = store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+
 		a.So(err, should.BeNil)
 		a.So(count, should.Equal, 2)
 
@@ -176,6 +196,7 @@ func TestEndDeviceStore(t *testing.T) {
 			&deviceID.ApplicationIdentifiers,
 			nil,
 		)
+
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 2) {
 			a.So(list, should.Contain, got)
@@ -186,6 +207,7 @@ func TestEndDeviceStore(t *testing.T) {
 			[]*ttnpb.EndDeviceIdentifiers{&deviceID, &deviceNewID},
 			nil,
 		)
+
 		a.So(err, should.BeNil)
 		if a.So(devices, should.HaveLength, 2) {
 			a.So(list, should.Contain, got)
@@ -193,32 +215,39 @@ func TestEndDeviceStore(t *testing.T) {
 		}
 
 		err = store.DeleteEndDevice(ctx, &deviceID)
+
 		a.So(err, should.BeNil)
 
 		got, err = store.GetEndDevice(ctx, &deviceID, nil)
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
 		err = store.DeleteEndDevice(ctx, &deviceNewID)
+
 		a.So(err, should.BeNil)
 
 		got, err = store.GetEndDevice(ctx, &deviceNewID, nil)
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
 		count, err = store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+
 		a.So(err, should.BeNil)
 		a.So(count, should.Equal, 0)
 
 		list, err = store.ListEndDevices(ctx, &deviceID.ApplicationIdentifiers, nil)
+
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
 		devices, err = store.FindEndDevices(ctx,
 			[]*ttnpb.EndDeviceIdentifiers{&deviceID},
 			nil)
+
 		a.So(err, should.BeNil)
 		a.So(devices, should.BeEmpty)
 
@@ -231,9 +260,10 @@ func TestEndDeviceStore(t *testing.T) {
 				},
 			},
 			nil)
-		a.So(devices, should.BeNil)
+
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		}
+		a.So(devices, should.BeNil)
 	})
 }

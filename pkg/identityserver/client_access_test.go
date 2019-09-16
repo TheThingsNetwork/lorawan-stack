@@ -54,8 +54,9 @@ func TestClientAccessRightsPermissionDenied(t *testing.T) {
 			},
 		}, creds)
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 	})
 }
 
@@ -72,17 +73,19 @@ func TestClientAccessPermissionDenied(t *testing.T) {
 
 		rights, err := reg.ListRights(ctx, &clientID)
 
-		a.So(rights, should.NotBeNil)
-		a.So(rights.Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
+		if a.So(rights, should.NotBeNil) {
+			a.So(rights.Rights, should.BeEmpty)
+		}
 
 		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
 			ClientIdentifiers: clientID,
 		})
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsUnauthenticated(err), should.BeTrue)
+		}
 		a.So(collaborators, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsUnauthenticated(err), should.BeTrue)
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIdentifiers: clientID,
@@ -92,8 +95,9 @@ func TestClientAccessPermissionDenied(t *testing.T) {
 			},
 		})
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 	})
 }
 
@@ -109,9 +113,10 @@ func TestClientAccessClusterAuth(t *testing.T) {
 
 		rights, err := reg.ListRights(ctx, &clientID, is.WithClusterAuth())
 
-		a.So(rights, should.NotBeNil)
-		a.So(ttnpb.AllClusterRights.Intersect(ttnpb.AllClientRights).Sub(rights).Rights, should.BeEmpty)
 		a.So(err, should.BeNil)
+		if a.So(rights, should.NotBeNil) {
+			a.So(ttnpb.AllClusterRights.Intersect(ttnpb.AllClientRights).Sub(rights).Rights, should.BeEmpty)
+		}
 	})
 }
 
@@ -128,25 +133,29 @@ func TestClientAccessCRUD(t *testing.T) {
 
 		rights, err := reg.ListRights(ctx, &clientID, creds)
 
-		a.So(rights, should.NotBeNil)
-		a.So(rights.Rights, should.Contain, ttnpb.RIGHT_CLIENT_ALL)
 		a.So(err, should.BeNil)
+		if a.So(rights, should.NotBeNil) {
+			a.So(rights.Rights, should.Contain, ttnpb.RIGHT_CLIENT_ALL)
+		}
 
 		modifiedClientID := clientID
 		modifiedClientID.ClientID = reverse(modifiedClientID.ClientID)
 
 		rights, err = reg.ListRights(ctx, &modifiedClientID, creds)
-		a.So(rights, should.NotBeNil)
-		a.So(rights.Rights, should.BeEmpty)
+
 		a.So(err, should.BeNil)
+		if a.So(rights, should.NotBeNil) {
+			a.So(rights.Rights, should.BeEmpty)
+		}
 
 		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
 			ClientIdentifiers: clientID,
 		}, creds)
 
-		a.So(collaborators, should.NotBeNil)
-		a.So(collaborators.Collaborators, should.NotBeEmpty)
 		a.So(err, should.BeNil)
+		if a.So(collaborators, should.NotBeNil) {
+			a.So(collaborators.Collaborators, should.NotBeEmpty)
+		}
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIdentifiers: clientID,
@@ -164,6 +173,8 @@ func TestClientAccessCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL})
+		if a.So(res, should.NotBeNil) {
+			a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL})
+		}
 	})
 }

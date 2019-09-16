@@ -80,8 +80,9 @@ func TestTemporaryValidPassword(t *testing.T) {
 			UserIdentifiers: userID,
 		})
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
 	})
 }
 
@@ -102,8 +103,8 @@ func TestUsersPermissionNotRequired(t *testing.T) {
 			},
 		})
 
-		a.So(created, should.NotBeNil)
 		a.So(err, should.BeNil)
+		a.So(created, should.NotBeNil)
 	})
 }
 
@@ -122,8 +123,9 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 			New:             "new password",
 		})
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsInternal(err), should.BeTrue)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsInternal(err), should.BeTrue)
+		}
 	})
 }
 
@@ -143,8 +145,9 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 // 			FieldMask:       types.FieldMask{Paths: []string{"name"}},
 // 		})
 
-// 		a.So(err, should.NotBeNil)
-// 		a.So(errors.IsUnauthenticated(err), should.BeTrue)
+// 		if a.So(err, should.NotBeNil) {
+// 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
+// 		}
 
 // 		_, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
 // 			User: ttnpb.User{
@@ -154,8 +157,9 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 // 			FieldMask: types.FieldMask{Paths: []string{"name"}},
 // 		})
 
-// 		a.So(err, should.NotBeNil)
-// 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 		if a.So(err, should.NotBeNil) {
+// 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 		}
 
 // 		_, err = reg.UpdatePassword(ctx, &ttnpb.UpdateUserPasswordRequest{
 // 			UserIdentifiers: userID,
@@ -163,13 +167,15 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 // 			New:             "new password",
 // 		})
 
-// 		a.So(err, should.NotBeNil)
-// 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 		if a.So(err, should.NotBeNil) {
+// 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 		}
 
 // 		_, err = reg.Delete(ctx, &user.UserIdentifiers)
 
-// 		a.So(err, should.NotBeNil)
-// 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 		if a.So(err, should.NotBeNil) {
+// 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+// 		}
 // 	})
 // }
 
@@ -188,8 +194,10 @@ func TestUsersWeakPassword(t *testing.T) {
 				Password:        weakPassword,
 			},
 		})
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
 
 		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)
 
@@ -202,8 +210,9 @@ func TestUsersWeakPassword(t *testing.T) {
 			New:             newPassword,
 		}, creds)
 
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+		}
 
 		afterUpdate, err := reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
@@ -211,7 +220,9 @@ func TestUsersWeakPassword(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(*afterUpdate.PasswordUpdatedAt, should.Equal, *user.PasswordUpdatedAt)
+		if a.So(afterUpdate, should.NotBeNil) && a.So(afterUpdate.PasswordUpdatedAt, should.NotBeNil) {
+			a.So(*afterUpdate.PasswordUpdatedAt, should.Equal, *user.PasswordUpdatedAt)
+		}
 	})
 }
 
@@ -230,12 +241,13 @@ func TestUsersCRUD(t *testing.T) {
 			FieldMask:       types.FieldMask{Paths: []string{"name", "admin", "created_at", "updated_at"}},
 		}, creds)
 
-		a.So(got, should.NotBeNil)
-		a.So(got.Name, should.Equal, user.Name)
-		a.So(got.Admin, should.Equal, user.Admin)
-		a.So(got.CreatedAt, should.Equal, user.CreatedAt)
-		a.So(got.UpdatedAt, should.Equal, user.UpdatedAt)
 		a.So(err, should.BeNil)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, user.Name)
+			a.So(got.Admin, should.Equal, user.Admin)
+			a.So(got.CreatedAt, should.Equal, user.CreatedAt)
+			a.So(got.UpdatedAt, should.Equal, user.UpdatedAt)
+		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
 			UserIdentifiers: user.UserIdentifiers,
@@ -264,11 +276,12 @@ func TestUsersCRUD(t *testing.T) {
 			FieldMask: types.FieldMask{Paths: []string{"name", "created_at", "updated_at"}},
 		}, creds)
 
-		a.So(updated, should.NotBeNil)
-		a.So(updated.Name, should.Equal, updatedName)
-		a.So(updated.CreatedAt, should.Equal, user.CreatedAt)
-		a.So(updated.UpdatedAt, should.HappenAfter, updateTime)
 		a.So(err, should.BeNil)
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.Name, should.Equal, updatedName)
+			a.So(updated.CreatedAt, should.Equal, user.CreatedAt)
+			a.So(updated.UpdatedAt, should.HappenAfter, updateTime)
+		}
 
 		passwordUpdateTime := time.Now()
 		oldPassword := user.Password
@@ -288,9 +301,12 @@ func TestUsersCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(*afterUpdate.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
+		if a.So(afterUpdate, should.NotBeNil) && a.So(afterUpdate.PasswordUpdatedAt, should.NotBeNil) {
+			a.So(*afterUpdate.PasswordUpdatedAt, should.HappenAfter, passwordUpdateTime)
+		}
 
 		_, err = reg.Delete(ctx, &user.UserIdentifiers, creds)
+
 		a.So(err, should.BeNil)
 
 		empty, err := reg.Get(ctx, &ttnpb.GetUserRequest{
@@ -298,8 +314,8 @@ func TestUsersCRUD(t *testing.T) {
 			FieldMask:       types.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
-		a.So(empty, should.BeNil)
 		a.So(err, should.NotBeNil)
+		a.So(empty, should.BeNil)
 
 		// NOTE: For other entities, this would be a NotFound, but in this case
 		// the user's credentials become invalid when the user is deleted.
@@ -310,8 +326,9 @@ func TestUsersCRUD(t *testing.T) {
 			FieldMask:       types.FieldMask{Paths: []string{"name"}},
 		}, userCreds(adminUserIdx))
 
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		a.So(empty, should.BeNil)
-		a.So(err, should.NotBeNil)
-		a.So(errors.IsNotFound(err), should.BeTrue)
 	})
 }

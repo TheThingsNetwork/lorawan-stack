@@ -60,20 +60,21 @@ func TestMakeSquare(t *testing.T) {
 			png.Encode(&b, tt.Image)
 
 			pic, err := picture.MakeSquare(&b, 500)
-			a.So(err, should.BeNil)
 
-			if a.So(pic.Embedded, should.NotBeNil) {
+			a.So(err, should.BeNil)
+			if a.So(pic, should.NotBeNil) && a.So(pic.Embedded, should.NotBeNil) {
 				a.So(pic.Embedded.MimeType, should.Equal, "image/png")
 
 				img, _, err := image.Decode(bytes.NewBuffer(pic.Embedded.Data))
+
 				a.So(err, should.BeNil)
-
-				a.So(img.Bounds(), should.Resemble, image.Rect(0, 0, tt.ExpectedBounds, tt.ExpectedBounds))
-
-				a.So(img.At(tt.ExpectedBounds/2-10, tt.ExpectedBounds/2-10), beSameColorAs, color.Black)
-				a.So(img.At(tt.ExpectedBounds/2+10, tt.ExpectedBounds/2-10), beSameColorAs, color.White)
-				a.So(img.At(tt.ExpectedBounds/2-10, tt.ExpectedBounds/2+10), beSameColorAs, color.White)
-				a.So(img.At(tt.ExpectedBounds/2+10, tt.ExpectedBounds/2+10), beSameColorAs, color.Black)
+				if a.So(img, should.NotBeNil) {
+					a.So(img.Bounds(), should.Resemble, image.Rect(0, 0, tt.ExpectedBounds, tt.ExpectedBounds))
+					a.So(img.At(tt.ExpectedBounds/2-10, tt.ExpectedBounds/2-10), beSameColorAs, color.Black)
+					a.So(img.At(tt.ExpectedBounds/2+10, tt.ExpectedBounds/2-10), beSameColorAs, color.White)
+					a.So(img.At(tt.ExpectedBounds/2-10, tt.ExpectedBounds/2+10), beSameColorAs, color.White)
+					a.So(img.At(tt.ExpectedBounds/2+10, tt.ExpectedBounds/2+10), beSameColorAs, color.Black)
+				}
 			}
 		})
 	}

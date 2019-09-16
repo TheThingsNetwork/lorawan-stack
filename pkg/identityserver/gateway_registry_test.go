@@ -84,7 +84,9 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 		})
 
 		a.So(err, should.BeNil)
-		a.So(listRes.Gateways, should.BeEmpty)
+		if a.So(listRes, should.NotBeNil) {
+			a.So(listRes.Gateways, should.BeEmpty)
+		}
 
 		_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			Collaborator: ttnpb.UserIdentifiers{UserID: "foo-usr"}.OrganizationOrUserIdentifiers(),
@@ -139,7 +141,9 @@ func TestGatewaysCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(created.Name, should.Equal, "Foo Gateway")
+		if a.So(created, should.NotBeNil) {
+			a.So(created.Name, should.Equal, "Foo Gateway")
+		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
@@ -147,17 +151,21 @@ func TestGatewaysCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(got.EUI, should.NotBeNil) {
-			a.So(*got.EUI, should.Equal, eui)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, created.Name)
+			if a.So(got.EUI, should.NotBeNil) {
+				a.So(*got.EUI, should.Equal, eui)
+			}
 		}
-		a.So(got.Name, should.Equal, created.Name)
 
 		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			EUI: eui,
 		}, credsWithoutRights)
 
 		a.So(err, should.BeNil)
-		a.So(ids.GatewayID, should.Equal, created.GatewayID)
+		if a.So(ids, should.NotBeNil) {
+			a.So(ids.GatewayID, should.Equal, created.GatewayID)
+		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIdentifiers: created.GatewayIdentifiers,
@@ -184,15 +192,18 @@ func TestGatewaysCRUD(t *testing.T) {
 		}, creds)
 
 		a.So(err, should.BeNil)
-		a.So(updated.Name, should.Equal, "Updated Name")
+		if a.So(updated, should.NotBeNil) {
+			a.So(updated.Name, should.Equal, "Updated Name")
+		}
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
 				FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
+
 			a.So(err, should.BeNil)
-			if a.So(list.Gateways, should.NotBeEmpty) {
+			if a.So(list, should.NotBeNil) && a.So(list.Gateways, should.NotBeEmpty) {
 				var found bool
 				for _, item := range list.Gateways {
 					if item.GatewayID == created.GatewayID {
@@ -205,6 +216,7 @@ func TestGatewaysCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &created.GatewayIdentifiers, creds)
+
 		a.So(err, should.BeNil)
 	})
 }
@@ -225,9 +237,10 @@ func TestGatewaysPagination(t *testing.T) {
 			Page:         1,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Gateways, should.HaveLength, 2)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Gateways, should.HaveLength, 2)
+		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListGatewaysRequest{
 			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
@@ -236,9 +249,10 @@ func TestGatewaysPagination(t *testing.T) {
 			Page:         2,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Gateways, should.HaveLength, 1)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Gateways, should.HaveLength, 1)
+		}
 
 		list, err = reg.List(test.Context(), &ttnpb.ListGatewaysRequest{
 			FieldMask:    ptypes.FieldMask{Paths: []string{"name"}},
@@ -247,8 +261,9 @@ func TestGatewaysPagination(t *testing.T) {
 			Page:         3,
 		}, creds)
 
-		a.So(list, should.NotBeNil)
-		a.So(list.Gateways, should.BeEmpty)
 		a.So(err, should.BeNil)
+		if a.So(list, should.NotBeNil) {
+			a.So(list.Gateways, should.BeEmpty)
+		}
 	})
 }

@@ -55,9 +55,10 @@ func TestOAuthStore(t *testing.T) {
 
 			empty, err := store.GetAuthorization(ctx, userIDs, clientIDs)
 
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 			a.So(empty, should.BeNil)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
 
 			start := time.Now()
 
@@ -67,27 +68,30 @@ func TestOAuthStore(t *testing.T) {
 				Rights:    rights,
 			})
 
-			a.So(created, should.NotBeNil)
 			a.So(err, should.BeNil)
-			a.So(created.UserIDs.UserID, should.Equal, "test-user")
-			a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
-			a.So(created.CreatedAt, should.HappenAfter, start)
-			a.So(created.UpdatedAt, should.HappenAfter, start)
+			a.So(created, should.NotBeNil)
+			if a.So(created, should.NotBeNil) {
+				a.So(created.UserIDs.UserID, should.Equal, "test-user")
+				a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
+				a.So(created.CreatedAt, should.HappenAfter, start)
+				a.So(created.UpdatedAt, should.HappenAfter, start)
+			}
 
 			got, err := store.GetAuthorization(ctx, userIDs, clientIDs)
 
-			a.So(got, should.NotBeNil)
 			a.So(err, should.BeNil)
-			a.So(created.UserIDs.UserID, should.Equal, "test-user")
-			a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
-			a.So(got.CreatedAt, should.HappenAfter, start)
-			a.So(got.UpdatedAt, should.HappenAfter, start)
+			a.So(got, should.NotBeNil)
+			if a.So(got, should.NotBeNil) {
+				a.So(created.UserIDs.UserID, should.Equal, "test-user")
+				a.So(created.ClientIDs.ClientID, should.Equal, "test-client")
+				a.So(got.CreatedAt, should.HappenAfter, start)
+				a.So(got.UpdatedAt, should.HappenAfter, start)
+			}
 
 			list, err := store.ListAuthorizations(ctx, userIDs)
 
-			a.So(list, should.NotBeNil)
 			a.So(err, should.BeNil)
-			if a.So(list, should.HaveLength, 1) {
+			if a.So(list, should.NotBeNil) && a.So(list, should.HaveLength, 1) {
 				a.So(list[0], should.Resemble, got)
 			}
 
@@ -97,9 +101,10 @@ func TestOAuthStore(t *testing.T) {
 
 			deleted, err := store.GetAuthorization(ctx, userIDs, clientIDs)
 
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 			a.So(deleted, should.BeNil)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
 		})
 
 		t.Run("Authorization Code", func(t *testing.T) {
@@ -111,20 +116,23 @@ func TestOAuthStore(t *testing.T) {
 
 			authCode, err := store.GetAuthorizationCode(ctx, "")
 
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 			a.So(authCode, should.BeNil)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
 
 			empty, err := store.GetAuthorizationCode(ctx, code)
 
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 			a.So(empty, should.BeNil)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
 
 			err = store.DeleteAuthorizationCode(ctx, "")
 
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 
 			start := time.Now()
 
@@ -141,18 +149,19 @@ func TestOAuthStore(t *testing.T) {
 
 			got, err := store.GetAuthorizationCode(ctx, code)
 
-			a.So(got, should.NotBeNil)
 			a.So(err, should.BeNil)
-			a.So(got.UserIDs.UserID, should.Equal, userIDs.UserID)
-			a.So(got.ClientIDs.ClientID, should.Equal, clientIDs.ClientID)
-			a.So(got.Code, should.Equal, code)
-			a.So(got.RedirectURI, should.Equal, redirectURI)
-			a.So(got.State, should.Equal, state)
-			a.So(got.CreatedAt, should.HappenAfter, start)
-			a.So(got.Rights, should.HaveLength, len(rights))
-
-			for _, right := range rights {
-				a.So(got.Rights, should.Contain, right)
+			if a.So(got, should.NotBeNil) {
+				a.So(got.UserIDs.UserID, should.Equal, userIDs.UserID)
+				a.So(got.ClientIDs.ClientID, should.Equal, clientIDs.ClientID)
+				a.So(got.Code, should.Equal, code)
+				a.So(got.RedirectURI, should.Equal, redirectURI)
+				a.So(got.State, should.Equal, state)
+				a.So(got.CreatedAt, should.HappenAfter, start)
+				if a.So(got.Rights, should.HaveLength, len(rights)) {
+					for _, right := range rights {
+						a.So(got.Rights, should.Contain, right)
+					}
+				}
 			}
 
 			err = store.DeleteAuthorizationCode(ctx, code)
@@ -161,9 +170,10 @@ func TestOAuthStore(t *testing.T) {
 
 			deleted, err := store.GetAuthorizationCode(ctx, code)
 
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 			a.So(deleted, should.BeNil)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
 		})
 
 		t.Run("Access Token", func(t *testing.T) {
@@ -176,20 +186,23 @@ func TestOAuthStore(t *testing.T) {
 
 			accessToken, err := store.GetAccessToken(ctx, "")
 
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 			a.So(accessToken, should.BeNil)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
 
 			err = store.DeleteAccessToken(ctx, "")
 
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 
 			empty, err := store.GetAccessToken(ctx, tokenID)
 
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 			a.So(empty, should.BeNil)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
 
 			start := time.Now()
 
@@ -206,25 +219,25 @@ func TestOAuthStore(t *testing.T) {
 
 			got, err := store.GetAccessToken(ctx, tokenID)
 
-			a.So(got, should.NotBeNil)
 			a.So(err, should.BeNil)
-			a.So(got.UserIDs.UserID, should.Equal, userIDs.UserID)
-			a.So(got.ClientIDs.ClientID, should.Equal, clientIDs.ClientID)
-			a.So(got.ID, should.Equal, tokenID)
-			a.So(got.AccessToken, should.Equal, access)
-			a.So(got.RefreshToken, should.Equal, refresh)
-			a.So(got.CreatedAt, should.HappenAfter, start)
-			a.So(got.Rights, should.HaveLength, len(rights))
-
-			for _, right := range rights {
-				a.So(got.Rights, should.Contain, right)
+			if a.So(got, should.NotBeNil) {
+				a.So(got.UserIDs.UserID, should.Equal, userIDs.UserID)
+				a.So(got.ClientIDs.ClientID, should.Equal, clientIDs.ClientID)
+				a.So(got.ID, should.Equal, tokenID)
+				a.So(got.AccessToken, should.Equal, access)
+				a.So(got.RefreshToken, should.Equal, refresh)
+				a.So(got.CreatedAt, should.HappenAfter, start)
+				if a.So(got.Rights, should.HaveLength, len(rights)) {
+					for _, right := range rights {
+						a.So(got.Rights, should.Contain, right)
+					}
+				}
 			}
 
 			list, err := store.ListAccessTokens(ctx, userIDs, clientIDs)
 
-			a.So(list, should.NotBeNil)
 			a.So(err, should.BeNil)
-			if a.So(list, should.HaveLength, 1) {
+			if a.So(list, should.NotBeNil) && a.So(list, should.HaveLength, 1) {
 				a.So(list[0], should.Resemble, got)
 			}
 
@@ -234,9 +247,10 @@ func TestOAuthStore(t *testing.T) {
 
 			deleted, err := store.GetAccessToken(ctx, tokenID)
 
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
 			a.So(deleted, should.BeNil)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsNotFound(err), should.BeTrue)
 		})
 	})
 }

@@ -38,35 +38,50 @@ func TestRegistrySearch(t *testing.T) {
 			NameContains: "%",
 			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
+
 		a.So(err, should.BeNil)
-		a.So(apps.Applications, should.NotBeEmpty)
+		if a.So(apps, should.NotBeNil) {
+			a.So(apps.Applications, should.NotBeEmpty)
+		}
 
 		clis, err := cli.SearchClients(ctx, &ttnpb.SearchEntitiesRequest{
 			NameContains: "%",
 			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
+
 		a.So(err, should.BeNil)
-		a.So(clis.Clients, should.NotBeEmpty)
+		if a.So(clis, should.NotBeNil) {
+			a.So(clis.Clients, should.NotBeEmpty)
+		}
 
 		gtws, err := cli.SearchGateways(ctx, &ttnpb.SearchEntitiesRequest{
 			NameContains: "%",
 			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
+
 		a.So(err, should.BeNil)
-		a.So(gtws.Gateways, should.NotBeEmpty)
+		if a.So(gtws, should.NotBeNil) {
+			a.So(gtws.Gateways, should.NotBeEmpty)
+		}
 
 		orgs, err := cli.SearchOrganizations(ctx, &ttnpb.SearchEntitiesRequest{
 			NameContains: "%",
 			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
+
 		a.So(err, should.BeNil)
-		a.So(orgs.Organizations, should.NotBeEmpty)
+		if a.So(orgs, should.NotBeNil) {
+			a.So(orgs.Organizations, should.NotBeEmpty)
+		}
 
 		usrs, err := cli.SearchUsers(ctx, &ttnpb.SearchEntitiesRequest{
 			NameContains: "%",
 			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
+
 		a.So(err, should.BeNil)
-		a.So(usrs.Users, should.NotBeEmpty)
+		if a.So(usrs, should.NotBeNil) {
+			a.So(usrs.Users, should.NotBeEmpty)
+		}
 	})
 }

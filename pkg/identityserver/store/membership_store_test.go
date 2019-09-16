@@ -77,6 +77,7 @@ func TestFindIndirectMemberships(t *testing.T) {
 		})
 
 		common, err := store.FindIndirectMemberships(ctx, &ttnpb.UserIdentifiers{UserID: "test-user"}, &ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"})
+
 		if a.So(err, should.BeNil) {
 			a.So(common, should.HaveLength, 2)
 		}
@@ -216,11 +217,13 @@ func TestMembershipStore(t *testing.T) {
 				a := assertions.New(t)
 
 				memberEntityRights, err := store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
+
 				if a.So(err, should.NotBeNil) {
 					a.So(errors.IsNotFound(err), should.BeTrue)
 				}
 
 				memberships, err := store.FindMemberships(ctx, tt.Identifiers, tt.EntityType, false)
+
 				if a.So(err, should.BeNil) {
 					a.So(memberships, should.BeEmpty)
 				}
@@ -231,13 +234,16 @@ func TestMembershipStore(t *testing.T) {
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom(tt.Rights...),
 				)
+
 				a.So(err, should.BeNil)
 
 				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
+
 				a.So(err, should.BeNil)
 				a.So(memberEntityRights.GetRights(), should.Resemble, tt.Rights)
 
 				memberships, err = store.FindMemberships(ctx, tt.Identifiers, tt.EntityType, false)
+
 				if a.So(err, should.BeNil) {
 					if a.So(memberships, should.HaveLength, 1) {
 						a.So(memberships[0], should.Resemble, tt.MemberIdentifiers)
@@ -245,6 +251,7 @@ func TestMembershipStore(t *testing.T) {
 				}
 
 				members, err := store.FindMembers(ctx, tt.MemberIdentifiers)
+
 				a.So(err, should.BeNil)
 				if a.So(members, should.HaveLength, 1) {
 					for ouid, rights := range members {
@@ -259,9 +266,11 @@ func TestMembershipStore(t *testing.T) {
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom(tt.RightsUpdated...),
 				)
+
 				a.So(err, should.BeNil)
 
 				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
+
 				a.So(err, should.BeNil)
 				a.So(memberEntityRights.GetRights(), should.Resemble, tt.RightsUpdated)
 
@@ -274,11 +283,13 @@ func TestMembershipStore(t *testing.T) {
 
 				a.So(err, should.BeNil)
 				memberEntityRights, err = store.GetMember(ctx, tt.Identifiers, tt.MemberIdentifiers)
+
 				if a.So(err, should.NotBeNil) {
 					a.So(errors.IsNotFound(err), should.BeTrue)
 				}
 
 				memberships, err = store.FindMemberships(ctx, tt.Identifiers, tt.EntityType, false)
+
 				if a.So(err, should.BeNil) {
 					a.So(memberships, should.BeEmpty)
 				}
@@ -293,8 +304,10 @@ func TestMembershipStore(t *testing.T) {
 				ttnpb.OrganizationIdentifiers{OrganizationID: "other-org"},
 				ttnpb.RightsFrom([]ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL}...),
 			)
-			a.So(err, should.NotBeNil)
-			a.So(errors.IsInvalidArgument(err), should.BeTrue)
+
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			}
 		})
 
 		userNotFoundIDs := ttnpb.UserIdentifiers{UserID: "test-usr-not-found"}.OrganizationOrUserIdentifiers()
@@ -357,10 +370,13 @@ func TestMembershipStore(t *testing.T) {
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom([]ttnpb.Right{}...),
 				)
-				a.So(err, should.NotBeNil)
-				a.So(errors.IsNotFound(err), should.BeTrue)
+
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
 
 				members, err := store.FindMembers(ctx, tt.MemberIdentifiers)
+
 				if a.So(err, should.BeNil) {
 					a.So(members, should.BeEmpty)
 				}
@@ -424,10 +440,13 @@ func TestMembershipStore(t *testing.T) {
 					tt.MemberIdentifiers,
 					ttnpb.RightsFrom([]ttnpb.Right{}...),
 				)
-				a.So(err, should.NotBeNil)
-				a.So(errors.IsNotFound(err), should.BeTrue)
+
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
 
 				members, err := store.FindMembers(ctx, tt.MemberIdentifiers)
+
 				if a.So(err, should.BeNil) {
 					a.So(members, should.BeEmpty)
 				}

@@ -49,7 +49,9 @@ func TestGetEmailTemplates(t *testing.T) {
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		registry := is.getEmailTemplates(ctx)
-		a.So(registry, should.NotBeNil)
+		if !a.So(registry, should.NotBeNil) {
+			t.FailNow()
+		}
 
 		for _, tc := range []struct {
 			name    string
@@ -87,6 +89,7 @@ func TestGetEmailTemplates(t *testing.T) {
 				email.User.Email = tc.message.RecipientAddress
 
 				message, err := registry.Render(email)
+
 				a.So(err, should.BeNil)
 				a.So(message, should.Resemble, tc.message)
 			})
