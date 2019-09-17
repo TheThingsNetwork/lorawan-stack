@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"time"
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -309,7 +310,9 @@ func (s *Server) getTrust(address string) (*x509.Certificate, error) {
 			return trust, nil
 		}
 
-		conn, err := tls.Dial("tcp", net.JoinHostPort(host, port), s.tlsConfig)
+		conn, err := tls.DialWithDialer(&net.Dialer{
+			Timeout: 5 * time.Second,
+		}, "tcp", address, s.tlsConfig)
 		if err != nil {
 			return nil, err
 		}
