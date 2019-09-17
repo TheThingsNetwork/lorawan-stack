@@ -3108,7 +3108,7 @@ func TestHandleUplink(t *testing.T) {
 			timeout := (1 << 12) * test.Delay
 
 			t.Run("no link", func(t *testing.T) {
-				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout)
+				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout, true)
 				handleTest(ctx, ns, env, nil, func() {
 					defer stop()
 					assertions.New(t).So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
@@ -3116,23 +3116,14 @@ func TestHandleUplink(t *testing.T) {
 			})
 
 			t.Run("active link", func(t *testing.T) {
-				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout)
+				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout, true)
 
-				link, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, appID)
+				link, linkEndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID)
 				if !ok {
 					t.Fatal("Failed to link application")
 				}
 
 				a := assertions.New(t)
-
-				var evCorrelationIDs []string
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					evCorrelationIDs = ev.CorrelationIDs()
-					return a.So(evCorrelationIDs, should.HaveLength, 1) &&
-						a.So(ev, should.ResembleEvent, EvtBeginApplicationLink(events.ContextWithCorrelationID(ctx, evCorrelationIDs...), appID, nil))
-				}), should.BeTrue) {
-					t.FailNow()
-				}
 
 				asRecvCh := make(chan AsNsLinkRecvRequest)
 				wg := &sync.WaitGroup{}
@@ -3172,17 +3163,12 @@ func TestHandleUplink(t *testing.T) {
 				handleTest(ctx, ns, env, asRecvCh, func() {
 					defer stop()
 
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
-						if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-							return a.So(ev, should.ResembleEvent, EvtEndApplicationLink(events.ContextWithCorrelationID(ctx, evCorrelationIDs...), appID, nil))
-						}), should.BeTrue) {
-							return
-						}
-					}()
 					a.So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
-					wg.Wait() // prevent panic when assertions in goroutines fail
+					if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+						return a.So(ev, should.ResembleEvent, linkEndEvent(context.Canceled))
+					}), should.BeTrue) {
+						return
+					}
 				})
 			})
 		})

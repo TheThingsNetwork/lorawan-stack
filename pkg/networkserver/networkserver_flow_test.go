@@ -23,13 +23,9 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
-	"go.thethings.network/lorawan-stack/pkg/cluster"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -40,7 +36,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, appID ttnpb.ApplicationIdentifiers, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
+func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, eventsPublishCh <-chan test.EventPubSubPublishRequest, create bool, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, bool) {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
 
@@ -68,8 +64,10 @@ func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-cha
 		wg.Done()
 	}()
 
+	var reqCIDs []string
 	if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 		func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			reqCIDs = events.CorrelationIDsFromContext(ctx)
 			return a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS) && a.So(ids, should.BeNil)
 		},
 		test.ClusterGetPeerResponse{
@@ -81,14 +79,33 @@ func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-cha
 		return nil, false
 	}
 
+	a.So(reqCIDs, should.HaveLength, 1)
+
 	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
 		func(ctx context.Context, ids ttnpb.Identifiers) bool {
 			md := rpcmetadata.FromIncomingContext(ctx)
 			return a.So(md.AuthType, should.Equal, "Bearer") &&
 				a.So(md.AuthValue, should.Equal, "set-key") &&
-				a.So(ids, should.Resemble, &appID)
+				a.So(ids, should.Resemble, &req.EndDevice.ApplicationIdentifiers)
 		}, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 	), should.BeTrue) {
+		return nil, false
+	}
+
+	if !a.So(test.AssertEventPubSubPublishRequest(ctx, eventsPublishCh, func(ev events.Event) bool {
+		if !a.So(ev, should.NotBeNil) {
+			return false
+		}
+		if create {
+			return a.So(ev, should.ResembleEvent, EvtCreateEndDevice(events.ContextWithCorrelationID(test.Context(), reqCIDs...), req.EndDevice.EndDeviceIdentifiers, nil))
+		}
+		return a.So(ev, should.ResembleEvent, EvtUpdateEndDevice(events.ContextWithCorrelationID(test.Context(), reqCIDs...), req.EndDevice.EndDeviceIdentifiers, nil))
+	}), should.BeTrue) {
+		if create {
+			t.Error("Failed to assert end device create event")
+		} else {
+			t.Error("Failed to assert end device update event")
+		}
 		return nil, false
 	}
 
@@ -99,64 +116,32 @@ func AssertSetDevice(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-cha
 	return dev, a.So(err, should.BeNil)
 }
 
-func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, tq DownlinkTaskQueue) {
+func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientConn, conf Config, env TestEnvironment) {
 	t := test.MustTFromContext(ctx)
 	a := assertions.New(t)
-
-	authCh := make(chan test.ClusterAuthRequest)
-	getPeerCh := make(chan test.ClusterGetPeerRequest)
-
-	netID := test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
 
 	appID := ttnpb.ApplicationIdentifiers{ApplicationID: "flow-test-app-id"}
 	devID := "flow-test-dev-id"
 
-	ns := test.Must(New(
-		component.MustNew(
-			test.GetLogger(t),
-			&component.Config{},
-			component.WithClusterNew(func(_ context.Context, conf *config.Cluster, options ...cluster.Option) (cluster.Cluster, error) {
-				return &test.MockCluster{
-					AuthFunc:    test.MakeClusterAuthChFunc(authCh),
-					GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),
-					JoinFunc:    test.ClusterJoinNilFunc,
-					WithVerifiedSourceFunc: func(ctx context.Context) context.Context {
-						return clusterauth.NewContext(ctx, nil)
-					},
-				}, nil
-			}),
-		),
-		&Config{
-			NetID:         netID,
-			Devices:       reg,
-			DownlinkTasks: tq,
-			DownlinkPriorities: DownlinkPriorityConfig{
-				JoinAccept:             "highest",
-				MACCommands:            "highest",
-				MaxApplicationDownlink: "high",
-			},
-			DefaultMACSettings: MACSettingConfig{
-				DesiredRx1Delay: func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_6),
-			},
-			DeduplicationWindow: (1 << 5) * test.Delay,
-			CooldownWindow:      (1 << 6) * test.Delay,
-		},
-	)).(*NetworkServer)
-	ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
-	test.Must(nil, ns.Start())
-	defer ns.Close()
-
-	conn := ns.LoopbackConn()
-
 	start := time.Now()
 
-	link, ok := AssertLinkApplication(ctx, conn, getPeerCh, appID)
+	linkCtx, closeLink := context.WithCancel(ctx)
+	link, linkEndEvent, ok := AssertLinkApplication(linkCtx, conn, env.Cluster.GetPeer, env.Events, appID)
 	if !a.So(ok, should.BeTrue) || !a.So(link, should.NotBeNil) {
-		t.Error("Failed to link application")
+		t.Error("AS link assertion failed")
+		closeLink()
 		return
 	}
+	defer func() {
+		closeLink()
+		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, linkEndEvent(context.Canceled))
+		}), should.BeTrue) {
+			t.Error("AS link end event assertion failed")
+		}
+	}()
 
-	dev, ok := AssertSetDevice(ctx, conn, getPeerCh, appID, &ttnpb.SetEndDeviceRequest{
+	dev, ok := AssertSetDevice(ctx, conn, env.Cluster.GetPeer, env.Events, true, &ttnpb.SetEndDeviceRequest{
 		EndDevice: ttnpb.EndDevice{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               devID,
@@ -290,8 +275,10 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			handleUplinkErrCh <- err
 		}).Stop()
 
-		if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
+		var reqCIDs []string
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
 			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				reqCIDs = events.CorrelationIDsFromContext(ctx)
 				return a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 						DeviceID:               devID,
@@ -302,17 +289,20 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			},
 			test.ClusterGetPeerResponse{Peer: jsPeer},
 		), should.BeTrue) {
+			t.Error("JS peer request assertion failed")
 			return
 		}
 
-		if !a.So(AssertAuthNsJsHandleJoinRequest(ctx, authCh, handleJoinCh, func(ctx context.Context, req *ttnpb.JoinRequest) bool {
+		a.So(reqCIDs, should.HaveLength, 4)
+		a.So(reqCIDs, should.Contain, "GsNs-1")
+		a.So(reqCIDs, should.Contain, "GsNs-2")
+
+		if !a.So(AssertAuthNsJsHandleJoinRequest(ctx, env.Cluster.Auth, handleJoinCh, func(ctx context.Context, req *ttnpb.JoinRequest) bool {
 			devAddr = req.DevAddr
-			return a.So(req.CorrelationIDs, should.Contain, "GsNs-1") &&
-				a.So(req.CorrelationIDs, should.Contain, "GsNs-2") &&
-				a.So(req.CorrelationIDs, should.HaveLength, 4) &&
+			return a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCIDs) &&
 				a.So(req.DevAddr, should.NotBeEmpty) &&
-				a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-				a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
+				a.So(req.DevAddr.NwkID(), should.Resemble, conf.NetID.ID()) &&
+				a.So(req.DevAddr.NetIDType(), should.Equal, conf.NetID.Type()) &&
 				a.So(req, should.Resemble, &ttnpb.JoinRequest{
 					Payload: &ttnpb.Message{
 						Payload: &ttnpb.Message_JoinRequestPayload{
@@ -327,7 +317,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 					RawPayload:         payload,
 					DevAddr:            req.DevAddr,
 					SelectedMACVersion: ttnpb.MAC_V1_0_2,
-					NetID:              netID,
+					NetID:              conf.NetID,
 					RxDelay:            ttnpb.RX_DELAY_6,
 					CFList: &ttnpb.CFList{
 						Type: ttnpb.CFListType_FREQUENCIES,
@@ -357,6 +347,20 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			return
 		}
 
+		reqCIDs = append(reqCIDs, "NsJs-1", "NsJs-2")
+
+		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+				}, nil))
+		}), should.BeTrue) {
+			t.Error("Join-request forward event assertion failed")
+		}
+
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for duplicate HandleUplink to return")
@@ -367,6 +371,18 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 				t.Errorf("Failed to handle duplicate uplink: %s", err)
 				return
 			}
+		}
+
+		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+				}, 2))
+		}), should.BeTrue) {
+			t.Error("Metadata merge event assertion failed")
 		}
 
 		var asUp *ttnpb.ApplicationUp
@@ -381,11 +397,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			t.Errorf("Failed to receive AS uplink: %s", err)
 			return
 		}
-		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-1")
-		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-2")
-		a.So(asUp.CorrelationIDs, should.Contain, "NsJs-1")
-		a.So(asUp.CorrelationIDs, should.Contain, "NsJs-2")
-		a.So(asUp.CorrelationIDs, should.HaveLength, 6)
+		a.So(asUp.CorrelationIDs, should.HaveSameElementsDeep, reqCIDs)
 		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               devID,
@@ -427,7 +439,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 		}
 		close(handleUplinkErrCh)
 
-		if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
 			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
@@ -439,7 +451,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			return
 		}
 
-		if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
 			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
@@ -451,7 +463,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			return
 		}
 
-		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlinkCh,
+		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, env.Cluster.Auth, scheduleDownlinkCh,
 			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
 				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
 					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
@@ -692,7 +704,41 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			return
 		}
 
-		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
+		if !a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 3, func(evs ...events.Event) bool {
+			return a.So(evs, should.HaveSameElements, []events.Event{
+				// Uplink:
+				EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), asUp.CorrelationIDs...),
+					ttnpb.EndDeviceIdentifiers{
+						DeviceID:               devID,
+						ApplicationIdentifiers: appID,
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevAddr:                &devAddr,
+					}, 2),
+				EvtForwardDataUplink(events.ContextWithCorrelationID(test.Context(), asUp.CorrelationIDs...),
+					ttnpb.EndDeviceIdentifiers{
+						DeviceID:               devID,
+						ApplicationIdentifiers: appID,
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevAddr:                &devAddr,
+					}, nil),
+
+				// Downlink:
+				EvtEnqueueDevStatusRequest(events.ContextWithCorrelationID(test.Context(), asUp.CorrelationIDs...),
+					ttnpb.EndDeviceIdentifiers{
+						DeviceID:               devID,
+						ApplicationIdentifiers: appID,
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevAddr:                &devAddr,
+					}, nil),
+			}, test.EventEqual)
+		}), should.BeTrue) {
+			t.Fatal("Events assertion failed")
+		}
+
+		a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
 			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
@@ -702,7 +748,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			test.ClusterGetPeerResponse{Peer: gsPeer},
 		), should.BeTrue)
 
-		a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
+		a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
 			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
 					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
@@ -712,7 +758,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 			test.ClusterGetPeerResponse{Peer: gsPeer},
 		), should.BeTrue)
 
-		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, authCh, scheduleDownlinkCh,
+		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, env.Cluster.Auth, scheduleDownlinkCh,
 			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
 				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
 					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
@@ -829,8 +875,8 @@ func TestFlow(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
-			for flow, handleFlowTest := range map[string]func(context.Context, DeviceRegistry, DownlinkTaskQueue){
-				"Class A/OTAA/EU868/1.0.2": handleOTAAClassA868FlowTest1_0_2,
+			for flow, handleFlowTest := range map[string]func(context.Context, *grpc.ClientConn, Config, TestEnvironment){
+				"Class A/OTAA/EU868/1.0.2": handleClassAOTAAEU868FlowTest1_0_2,
 			} {
 				t.Run(flow, func(t *testing.T) {
 					reg, regClose := tc.NewRegistry(t)
@@ -851,10 +897,26 @@ func TestFlow(t *testing.T) {
 						}()
 					}
 
-					ctx := test.ContextWithT(test.Context(), t)
-					ctx, cancel := context.WithTimeout(ctx, (1<<13)*test.Delay)
-					defer cancel()
-					handleFlowTest(ctx, reg, tq)
+					conf := Config{
+						NetID:         test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID),
+						Devices:       reg,
+						DownlinkTasks: tq,
+						DownlinkPriorities: DownlinkPriorityConfig{
+							JoinAccept:             "highest",
+							MACCommands:            "highest",
+							MaxApplicationDownlink: "high",
+						},
+						DefaultMACSettings: MACSettingConfig{
+							DesiredRx1Delay: func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_6),
+						},
+						DeduplicationWindow: (1 << 5) * test.Delay,
+						CooldownWindow:      (1 << 6) * test.Delay,
+					}
+
+					ns, ctx, env, stop := StartTest(t, conf, (1<<13)*test.Delay, false)
+					defer stop()
+
+					handleFlowTest(ctx, ns.LoopbackConn(), conf, env)
 				})
 			}
 		})

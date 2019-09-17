@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -47,13 +48,17 @@ var (
 	ErrUnsupportedLoRaWANVersion = errUnsupportedLoRaWANVersion
 
 	EvtBeginApplicationLink    = evtBeginApplicationLink
+	EvtCreateEndDevice         = evtCreateEndDevice
+	EvtDeleteEndDevice         = evtDeleteEndDevice
 	EvtDropJoinRequest         = evtDropJoinRequest
 	EvtEndApplicationLink      = evtEndApplicationLink
+	EvtEnqueueDevStatusRequest = evtEnqueueDevStatusRequest
 	EvtEnqueueLinkCheckAnswer  = evtEnqueueLinkCheckAnswer
 	EvtForwardDataUplink       = evtForwardDataUplink
 	EvtForwardJoinRequest      = evtForwardJoinRequest
 	EvtMergeMetadata           = evtMergeMetadata
 	EvtReceiveLinkCheckRequest = evtReceiveLinkCheckRequest
+	EvtUpdateEndDevice         = evtUpdateEndDevice
 
 	Timeout = (1 << 10) * test.Delay
 )
@@ -910,7 +915,7 @@ func AssertAuthNsGsScheduleDownlinkRequest(ctx context.Context, authReqCh <-chan
 	return AssertNsGsScheduleDownlinkRequest(ctx, scheduleReqCh, scheduleAssert, scheduleResp)
 }
 
-func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, appID ttnpb.ApplicationIdentifiers) (ttnpb.AsNs_LinkApplicationClient, bool) {
+func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, eventsPublishCh <-chan test.EventPubSubPublishRequest, appID ttnpb.ApplicationIdentifiers, replaceEvents ...events.Event) (ttnpb.AsNs_LinkApplicationClient, func(interface{}) events.Event, bool) {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
 
@@ -939,8 +944,10 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 		wg.Done()
 	}()
 
+	var reqCIDs []string
 	if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 		func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			reqCIDs = events.CorrelationIDsFromContext(ctx)
 			return a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS) && a.So(ids, should.BeNil)
 		},
 		test.ClusterGetPeerResponse{
@@ -949,25 +956,42 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 			}),
 		},
 	), should.BeTrue) {
-		return nil, false
+		return nil, nil, false
 	}
+
+	a.So(reqCIDs, should.HaveLength, 1)
 
 	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
 		func(ctx context.Context, ids ttnpb.Identifiers) bool {
 			md := rpcmetadata.FromIncomingContext(ctx)
-			return a.So(md.AuthType, should.Equal, "Bearer") &&
+			cids := events.CorrelationIDsFromContext(ctx)
+			return a.So(cids, should.NotResemble, reqCIDs) &&
+				a.So(cids, should.HaveLength, 1) &&
+				a.So(md.AuthType, should.Equal, "Bearer") &&
 				a.So(md.AuthValue, should.Equal, "link-application-key") &&
 				a.So(ids, should.Resemble, &appID)
 		}, ttnpb.RIGHT_APPLICATION_LINK,
 	), should.BeTrue) {
-		return nil, false
+		return nil, nil, false
+	}
+
+	if !a.So(test.AssertEventPubSubPublishRequests(ctx, eventsPublishCh, 1+len(replaceEvents), func(evs ...events.Event) bool {
+		return a.So(evs, should.HaveSameElements, append(
+			[]events.Event{EvtBeginApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, nil)},
+			replaceEvents...,
+		), test.EventEqual)
+	}), should.BeTrue) {
+		t.Error("AS link events assertion failed")
+		return nil, nil, false
 	}
 
 	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
 		t.Error("Timed out while waiting for AS link to open")
-		return nil, false
+		return nil, nil, false
 	}
-	return link, a.So(err, should.BeNil)
+	return link, func(v interface{}) events.Event {
+		return EvtEndApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, v)
+	}, a.So(err, should.BeNil)
 }
 
 func AssertNetworkServerClose(ctx context.Context, ns *NetworkServer) bool {

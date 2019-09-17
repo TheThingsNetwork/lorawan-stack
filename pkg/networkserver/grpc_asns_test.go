@@ -17,7 +17,6 @@ package networkserver_test
 import (
 	"context"
 	"io"
-	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -38,7 +37,7 @@ import (
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
 
-	ns, ctx, env, stop := StartTest(t, Config{}, (1<<12)*test.Delay)
+	ns, ctx, env, stop := StartTest(t, Config{}, (1<<12)*test.Delay, true)
 	defer stop()
 
 	<-env.DownlinkTasks.Pop
@@ -51,41 +50,20 @@ func TestLinkApplication(t *testing.T) {
 		ApplicationID: "link-application-app-2",
 	}
 
-	link1, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, appID1)
+	link1, link1EndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID1)
 	if !a.So(ok, should.BeTrue) {
 		t.Fatal("Failed to link application 1")
 	}
-	var link1CorrelationIDs []string
-	a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-		link1CorrelationIDs = ev.CorrelationIDs()
-		a.So(link1CorrelationIDs, should.HaveLength, 1)
-		return a.So(ev, should.ResembleEvent, EvtBeginApplicationLink(events.ContextWithCorrelationID(ctx, link1CorrelationIDs...), appID1, nil))
-	}), should.BeTrue)
 
-	link2, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, appID2)
+	link2, link2EndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID2)
 	if !a.So(ok, should.BeTrue) {
 		t.Fatal("Failed to link application 2")
 	}
-	var link2CorrelationIDs []string
-	a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-		link2CorrelationIDs = ev.CorrelationIDs()
-		a.So(link2CorrelationIDs, should.HaveLength, 1)
-		return a.So(ev, should.ResembleEvent, EvtBeginApplicationLink(events.ContextWithCorrelationID(ctx, link2CorrelationIDs...), appID2, nil))
-	}), should.BeTrue)
 
-	newLink1, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, appID1)
+	newLink1, newLink1EndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID1, link1EndEvent(nil))
 	if !a.So(ok, should.BeTrue) {
 		t.Fatal("Failed to relink application 1")
 	}
-	a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-		return a.So(ev, should.ResembleEvent, EvtEndApplicationLink(events.ContextWithCorrelationID(ctx, link1CorrelationIDs...), appID1, nil))
-	}), should.BeTrue)
-	var newLink1CorrelationIDs []string
-	a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-		newLink1CorrelationIDs = ev.CorrelationIDs()
-		a.So(newLink1CorrelationIDs, should.HaveLength, 1)
-		return a.So(ev, should.ResembleEvent, EvtBeginApplicationLink(events.ContextWithCorrelationID(ctx, newLink1CorrelationIDs...), appID1, nil))
-	}), should.BeTrue)
 
 	up, err := link1.Recv()
 	if !a.So(up, should.BeNil) {
@@ -93,28 +71,16 @@ func TestLinkApplication(t *testing.T) {
 	}
 	a.So(err, should.Resemble, io.EOF)
 
-	var evs []events.Event
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-			evs = append(evs, ev)
-			return true
-		}), should.BeTrue)
-		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-			evs = append(evs, ev)
-			return true
-		}), should.BeTrue)
-	}()
-
 	a.So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
 
-	wg.Wait()
-	a.So(evs, should.HaveSameElements, []events.Event{
-		EvtEndApplicationLink(events.ContextWithCorrelationID(ctx, newLink1CorrelationIDs...), appID1, nil),
-		EvtEndApplicationLink(events.ContextWithCorrelationID(ctx, link2CorrelationIDs...), appID2, nil),
-	}, test.EventEqual)
+	if !a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 2, func(evs ...events.Event) bool {
+		return a.So(evs, should.HaveSameElements, []events.Event{
+			newLink1EndEvent(context.Canceled),
+			link2EndEvent(context.Canceled),
+		}, test.EventEqual)
+	}), should.BeTrue) {
+		t.Fatal("AS link end events assertion failed")
+	}
 
 	up, err = newLink1.Recv()
 	if !a.So(up, should.BeNil) {
