@@ -19,7 +19,6 @@ import (
 	"context"
 	"crypto/tls"
 	"hash/fnv"
-	"io"
 	"sync"
 	"time"
 
@@ -314,19 +313,4 @@ func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 // Roles returns the roles that the Network Server fulfills.
 func (ns *NetworkServer) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_NETWORK_SERVER}
-}
-
-func (ns *NetworkServer) Close() {
-	ns.Component.Close()
-
-	logger := ns.Logger()
-	ns.applicationServers.Range(func(k interface{}, v interface{}) bool {
-		logger := logger.WithField("application_uid", k.(string))
-		logger.Debug("Close Application Server link")
-		if err := v.(io.Closer).Close(); err != nil {
-			logger.WithError(err).Warn("Failed to close AS link")
-		}
-		logger.Debug("Application Server link closed")
-		return true
-	})
 }
