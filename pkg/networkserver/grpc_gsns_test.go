@@ -2397,17 +2397,6 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2429,6 +2418,17 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
 					return false
 				}
 
@@ -2609,17 +2609,6 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2641,6 +2630,17 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
 					return false
 				}
 
@@ -2823,17 +2823,6 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2855,6 +2844,17 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
 					return false
 				}
 
@@ -3041,6 +3041,12 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
+				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
+				}), should.BeTrue) {
+					return false
+				}
+
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
@@ -3049,12 +3055,6 @@ func TestHandleUplink(t *testing.T) {
 				},
 					nil,
 				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
-				}), should.BeTrue) {
 					return false
 				}
 

@@ -873,11 +873,9 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 
 	if len(queuedEvents) > 0 {
-		go func() {
-			for _, ev := range queuedEvents {
-				events.Publish(ev(ctx, stored.EndDeviceIdentifiers))
-			}
-		}()
+		for _, ev := range queuedEvents {
+			events.Publish(ev(ctx, stored.EndDeviceIdentifiers))
+		}
 	}
 
 	startAt := up.ReceivedAt.Add(stored.MACState.CurrentParameters.Rx1Delay.Duration() - nsScheduleWindow)

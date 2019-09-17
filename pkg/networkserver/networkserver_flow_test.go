@@ -597,7 +597,9 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 		go handleFirstUplink()
 		defer time.AfterFunc((1<<3)*test.Delay, handleDuplicateUplink).Stop()
 
-		assertDuplicateHandleUplink := func() bool {
+		assertDuplicateHandleUplink := func(ctx context.Context) bool {
+			t := test.MustTFromContext(ctx)
+			t.Helper()
 			select {
 			case <-ctx.Done():
 				t.Error("Timed out while waiting for duplicate HandleUplink to return")
@@ -611,13 +613,71 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 			}
 			return true
 		}
+		a.So(assertDuplicateHandleUplink(ctx), should.BeTrue)
 
-		a.So(assertDuplicateHandleUplink(), should.BeTrue)
+		var reqCIDs []string
+		assertHandleUplink := func(ctx context.Context, evReq test.EventPubSubPublishRequest) bool {
+			t := test.MustTFromContext(ctx)
+			t.Helper()
+
+			reqCIDs = evReq.Event.CorrelationIDs()
+			if !a.So(evReq.Event, should.ResembleEvent, EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevAddr:                &devAddr,
+				}, 2)) {
+				t.Error("Metadata merge event assertion failed")
+				return false
+			}
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for events.Publish response of merge event to be processed")
+				return false
+
+			case evReq.Response <- struct{}{}:
+			}
+
+			if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+				return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+					ttnpb.EndDeviceIdentifiers{
+						DeviceID:               devID,
+						ApplicationIdentifiers: appID,
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevAddr:                &devAddr,
+					}, nil))
+			}), should.BeTrue) {
+				t.Error("Uplink forward event assertion failed")
+				return false
+			}
+
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for HandleUplink to return")
+				return false
+
+			case err := <-handleUplinkErrCh:
+				if !a.So(err, should.BeNil) {
+					t.Errorf("Failed to handle uplink: %s", err)
+					return false
+				}
+			}
+			return true
+		}
 
 		select {
 		case <-ctx.Done():
-			t.Error("Timed out while waiting for HandleUplink to return")
+			t.Error("Timed out while waiting for an event or HandleUplink error")
 			return
+
+		case evReq := <-env.Events:
+			if !a.So(assertHandleUplink(ctx, evReq), should.BeTrue) {
+				t.Error("Failed to assert first HandleUplink")
+				return
+			}
 
 		case err := <-handleUplinkErrCh:
 			if err != nil {
@@ -630,22 +690,25 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 				go handleFirstUplink()
 				defer time.AfterFunc((1<<3)*test.Delay, handleDuplicateUplink).Stop()
 
-				a.So(assertDuplicateHandleUplink(), should.BeTrue)
-
+				a.So(assertDuplicateHandleUplink(ctx), should.BeTrue)
 				select {
 				case <-ctx.Done():
-					t.Error("Timed out while waiting for HandleUplink to return")
+					t.Error("Timed out while waiting for an event")
 					return
 
-				case err = <-handleUplinkErrCh:
+				case evReq := <-env.Events:
+					if !a.So(assertHandleUplink(ctx, evReq), should.BeTrue) {
+						t.Error("Failed to assert first HandleUplink")
+						return
+					}
 				}
-			}
-			if !a.So(err, should.BeNil) {
-				t.Errorf("Failed to handle uplink: %s", err)
-				return
 			}
 		}
 		close(handleUplinkErrCh)
+
+		a.So(reqCIDs, should.HaveLength, 4)
+		a.So(reqCIDs, should.Contain, "GsNs-1")
+		a.So(reqCIDs, should.Contain, "GsNs-2")
 
 		var asUp *ttnpb.ApplicationUp
 		var err error
@@ -661,9 +724,6 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 		}
 
 		a.So(asUp.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, mds)
-		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-1")
-		a.So(asUp.CorrelationIDs, should.Contain, "GsNs-2")
-		a.So(asUp.CorrelationIDs, should.HaveLength, 4)
 		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               devID,
@@ -672,7 +732,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 				DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				DevAddr:                &devAddr,
 			},
-			CorrelationIDs: asUp.CorrelationIDs,
+			CorrelationIDs: reqCIDs,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
 				SessionKeyID: []byte("session-key-id"),
 				FPort:        0x42,
@@ -704,38 +764,18 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 			return
 		}
 
-		if !a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 3, func(evs ...events.Event) bool {
-			return a.So(evs, should.HaveSameElements, []events.Event{
-				// Uplink:
-				EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), asUp.CorrelationIDs...),
-					ttnpb.EndDeviceIdentifiers{
-						DeviceID:               devID,
-						ApplicationIdentifiers: appID,
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevAddr:                &devAddr,
-					}, 2),
-				EvtForwardDataUplink(events.ContextWithCorrelationID(test.Context(), asUp.CorrelationIDs...),
-					ttnpb.EndDeviceIdentifiers{
-						DeviceID:               devID,
-						ApplicationIdentifiers: appID,
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevAddr:                &devAddr,
-					}, nil),
-
-				// Downlink:
-				EvtEnqueueDevStatusRequest(events.ContextWithCorrelationID(test.Context(), asUp.CorrelationIDs...),
-					ttnpb.EndDeviceIdentifiers{
-						DeviceID:               devID,
-						ApplicationIdentifiers: appID,
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevAddr:                &devAddr,
-					}, nil),
-			}, test.EventEqual)
+		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtEnqueueDevStatusRequest(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevAddr:                &devAddr,
+				}, nil))
 		}), should.BeTrue) {
-			t.Fatal("Events assertion failed")
+			t.Error("DevStatus enqueue event assertion failed")
+			return
 		}
 
 		a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
