@@ -19,6 +19,7 @@ import (
 	"crypto/tls"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -149,26 +150,6 @@ const updateInfoRequest = `{
   ]
 }`
 
-func mockGateway() *ttnpb.Gateway {
-	return &ttnpb.Gateway{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-			GatewayID: "test-gateway",
-			EUI:       &mockGatewayEUI,
-		},
-		Attributes: map[string]string{
-			cupsURIAttribute:           "https://example.com:443",
-			cupsCredentialsIDAttribute: "KEYID",
-			cupsCredentialsAttribute:   "Bearer KEYCONTENTS",
-			cupsStationAttribute:       "2.0.0(minihub/debug) 2018-12-06 09:30:35",
-			cupsModelAttribute:         "minihub",
-			cupsPackageAttribute:       "2.0.0",
-			lnsCredentialsIDAttribute:  "KEYID",
-			lnsCredentialsAttribute:    "Bearer KEYCONTENTS",
-		},
-		GatewayServerAddress: "wss://example.com:443",
-	}
-}
-
 var (
 	mockFallbackAuth = grpc.PerRPCCredentials(nil)
 	mockAuthFunc     = func(ctx context.Context) grpc.CallOption {
@@ -186,6 +167,34 @@ var (
 )
 
 func TestServer(t *testing.T) {
+	tlsServer := httptest.NewTLSServer(http.HandlerFunc(http.NotFound))
+	defer tlsServer.Close()
+	tlsServerURL, _ := url.Parse(tlsServer.URL)
+
+	cupsURI := (&url.URL{Scheme: "https", Host: tlsServerURL.Host}).String()
+	lnsURI := (&url.URL{Scheme: "wss", Host: tlsServerURL.Host}).String()
+
+	mockGateway := func() *ttnpb.Gateway {
+
+		return &ttnpb.Gateway{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayID: "test-gateway",
+				EUI:       &mockGatewayEUI,
+			},
+			Attributes: map[string]string{
+				cupsURIAttribute:           cupsURI,
+				cupsCredentialsIDAttribute: "KEYID",
+				cupsCredentialsAttribute:   "Bearer KEYCONTENTS",
+				cupsStationAttribute:       "2.0.0(minihub/debug) 2018-12-06 09:30:35",
+				cupsModelAttribute:         "minihub",
+				cupsPackageAttribute:       "2.0.0",
+				lnsCredentialsIDAttribute:  "KEYID",
+				lnsCredentialsAttribute:    "Bearer KEYCONTENTS",
+			},
+			GatewayServerAddress: lnsURI,
+		}
+	}
+
 	e := echo.New()
 
 	for _, tt := range []struct {
@@ -235,7 +244,7 @@ func TestServer(t *testing.T) {
 			},
 			Options: []Option{
 				WithRegisterUnknown(&ttnpb.OrganizationOrUserIdentifiers{}, mockAuthFunc),
-				WithDefaultLNSURI("wss://example.com:443"),
+				WithDefaultLNSURI(lnsURI),
 			},
 			AssertError: should.BeNil,
 			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
@@ -243,7 +252,7 @@ func TestServer(t *testing.T) {
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
 				a.So(res.CUPSURI, should.BeEmpty) // No update.
-				a.So(res.LNSURI, should.Equal, "wss://example.com:443")
+				a.So(res.LNSURI, should.Equal, lnsURI)
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
 				a.So(res.LNSCredentials, should.NotBeEmpty)
 				a.So(res.SignatureKeyCRC, should.BeZeroValue)
@@ -301,8 +310,8 @@ func TestServer(t *testing.T) {
 				var res UpdateInfoResponse
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
-				a.So(res.CUPSURI, should.Equal, "https://example.com:443")
-				a.So(res.LNSURI, should.Equal, "wss://example.com:443")
+				a.So(res.CUPSURI, should.Equal, cupsURI)
+				a.So(res.LNSURI, should.Equal, lnsURI)
 				a.So(res.CUPSCredentials, should.NotBeEmpty)
 				a.So(res.LNSCredentials, should.NotBeEmpty)
 				a.So(res.SignatureKeyCRC, should.BeZeroValue)
