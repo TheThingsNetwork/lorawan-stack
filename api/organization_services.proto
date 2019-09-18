@@ -115,7 +115,8 @@ service OrganizationAccess {
     };
   }
 
-  // Set the rights of a collaborator (member) on the organization.
+  // Set the rights of a collaborator (member) on the organization. It is required for the caller to
+  // have all assigned or/and removed rights.
   // Setting a collaborator without rights, removes them.
   // Note that only users can collaborate (be member of) an organization.
   rpc SetCollaborator(SetOrganizationCollaboratorRequest) returns (google.protobuf.Empty) {

@@ -477,7 +477,7 @@
         ]
       },
       "put": {
-        "summary": "Set the rights of a collaborator (member) on the application.\nSetting a collaborator without rights, removes them.",
+        "summary": "Set the rights of a collaborator (member) on the application. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
@@ -2837,7 +2837,7 @@
         ]
       },
       "put": {
-        "summary": "Set the rights of a collaborator (member) on the gateway.\nSetting a collaborator without rights, removes them.",
+        "summary": "Set the rights of a collaborator (member) on the gateway. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {
@@ -4219,7 +4219,7 @@
         ]
       },
       "put": {
-        "summary": "Set the rights of a collaborator (member) on the organization.\nSetting a collaborator without rights, removes them.\nNote that only users can collaborate (be member of) an organization.",
+        "summary": "Set the rights of a collaborator (member) on the organization. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.\nNote that only users can collaborate (be member of) an organization.",
         "operationId": "SetCollaborator",
         "responses": {
           "200": {

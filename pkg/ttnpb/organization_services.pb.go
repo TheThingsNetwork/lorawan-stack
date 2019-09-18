@@ -345,7 +345,8 @@ type OrganizationAccessClient interface {
 	// Get the rights of a collaborator (member) of the organization.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(ctx context.Context, in *GetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*GetCollaboratorResponse, error)
-	// Set the rights of a collaborator (member) on the organization.
+	// Set the rights of a collaborator (member) on the organization. It is required for the caller to
+	// have all assigned or/and removed rights.
 	// Setting a collaborator without rights, removes them.
 	// Note that only users can collaborate (be member of) an organization.
 	SetCollaborator(ctx context.Context, in *SetOrganizationCollaboratorRequest, opts ...grpc.CallOption) (*types.Empty, error)
@@ -445,7 +446,8 @@ type OrganizationAccessServer interface {
 	// Get the rights of a collaborator (member) of the organization.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(context.Context, *GetOrganizationCollaboratorRequest) (*GetCollaboratorResponse, error)
-	// Set the rights of a collaborator (member) on the organization.
+	// Set the rights of a collaborator (member) on the organization. It is required for the caller to
+	// have all assigned or/and removed rights.
 	// Setting a collaborator without rights, removes them.
 	// Note that only users can collaborate (be member of) an organization.
 	SetCollaborator(context.Context, *SetOrganizationCollaboratorRequest) (*types.Empty, error)

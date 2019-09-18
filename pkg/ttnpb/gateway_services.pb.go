@@ -475,7 +475,8 @@ type GatewayAccessClient interface {
 	// Get the rights of a collaborator (member) of the gateway.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(ctx context.Context, in *GetGatewayCollaboratorRequest, opts ...grpc.CallOption) (*GetCollaboratorResponse, error)
-	// Set the rights of a collaborator (member) on the gateway.
+	// Set the rights of a collaborator (member) on the gateway. It is required for the caller to
+	// have all assigned or/and removed rights.
 	// Setting a collaborator without rights, removes them.
 	SetCollaborator(ctx context.Context, in *SetGatewayCollaboratorRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	ListCollaborators(ctx context.Context, in *ListGatewayCollaboratorsRequest, opts ...grpc.CallOption) (*Collaborators, error)
@@ -574,7 +575,8 @@ type GatewayAccessServer interface {
 	// Get the rights of a collaborator (member) of the gateway.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
 	GetCollaborator(context.Context, *GetGatewayCollaboratorRequest) (*GetCollaboratorResponse, error)
-	// Set the rights of a collaborator (member) on the gateway.
+	// Set the rights of a collaborator (member) on the gateway. It is required for the caller to
+	// have all assigned or/and removed rights.
 	// Setting a collaborator without rights, removes them.
 	SetCollaborator(context.Context, *SetGatewayCollaboratorRequest) (*types.Empty, error)
 	ListCollaborators(context.Context, *ListGatewayCollaboratorsRequest) (*Collaborators, error)
