@@ -100,7 +100,7 @@ var (
 		"failed to start frontend listener `{protocol}` on address `{address}`",
 	)
 	errNotConnected  = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
-	errStartUpstream = errors.DefineFailedPrecondition("upstream", "upstream `{name}` failed to start")
+	errSetupUpstream = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
 	errUpstreamType  = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{name}` not implemented")
 )
 
@@ -221,7 +221,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		if name == "" {
 			gs.upstreamHandlers["cluster"] = ns.NewHandler(ctx, "cluster", c, prefix)
 		} else {
-			str := strings.Split(name, ":")
+			str := strings.SplitN(name, ":", 2)
 			if len(str) != 2 {
 				continue
 			}
@@ -236,7 +236,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 	for _, handler := range gs.upstreamHandlers {
 		if err := handler.Setup(); err != nil {
-			return nil, errStartUpstream.WithCause(err).WithAttributes("name", handler.GetName())
+			return nil, errSetupUpstream.WithCause(err).WithAttributes("name", handler.GetName())
 		}
 	}
 
@@ -369,7 +369,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
-	conn, err := io.NewConnection(ctx, frontend.Protocol(), frontend.SupportsStatusMessage(), frontend.SupportsDownlinkClaim(), gtw, fp, gtw.EnforceDutyCycle)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fp, gtw.EnforceDutyCycle)
 	if err != nil {
 		return nil, err
 	}
