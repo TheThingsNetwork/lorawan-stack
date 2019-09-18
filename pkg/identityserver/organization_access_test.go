@@ -105,11 +105,17 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
+		// Choose right that the user does not have and hence cannot add
+		right := ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC
 		APIKey = organizationAPIKeys(&organizationID).APIKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIdentifiers: organizationID,
-			APIKey:                  *APIKey,
+			APIKey: ttnpb.APIKey{
+				ID:     APIKey.ID,
+				Name:   APIKey.Name,
+				Rights: []ttnpb.Right{right},
+			},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
