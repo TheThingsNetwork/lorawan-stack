@@ -473,7 +473,7 @@ func TestVersion(t *testing.T) {
 					{0, 0, 0},
 				},
 				SX1301Config: []pfconfig.SX1301Config{
-					pfconfig.SX1301Config{
+					{
 						LoRaWANPublic: true,
 						ClockSource:   1,
 						AntennaGain:   0,
@@ -556,7 +556,7 @@ func TestVersion(t *testing.T) {
 				NoDwellTime: true,
 				NoDutyCycle: true,
 				SX1301Config: []pfconfig.SX1301Config{
-					pfconfig.SX1301Config{
+					{
 						LoRaWANPublic: true,
 						ClockSource:   1,
 						AntennaGain:   0,
