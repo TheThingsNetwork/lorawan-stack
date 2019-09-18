@@ -100,8 +100,8 @@ var (
 		"failed to start frontend listener `{protocol}` on address `{address}`",
 	)
 	errNotConnected  = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
-	errSetupUpstream = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
-	errUpstreamType  = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{name}` not implemented")
+	errSetupUpstream = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{hostname}`")
+	errUpstreamType  = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{hostname}` not implemented")
 )
 
 // New returns new *GatewayServer.
@@ -217,11 +217,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	for name, prefix := range gs.forward {
-		if name == "" {
+	for hostname, prefix := range gs.forward {
+		if hostname == "" {
 			gs.upstreamHandlers["cluster"] = ns.NewHandler(ctx, "cluster", c, prefix)
 		} else {
-			str := strings.SplitN(name, ":", 2)
+			str := strings.SplitN(hostname, ":", 2)
 			if len(str) != 2 {
 				continue
 			}
@@ -229,14 +229,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			case "ttn.lorawan.v3.GsNs":
 				gs.upstreamHandlers[str[1]] = ns.NewHandler(ctx, str[1], c, prefix)
 			default:
-				return nil, errUpstreamType.WithAttributes("name", name)
+				return nil, errUpstreamType.WithAttributes("hostname", hostname)
 			}
 		}
 	}
 
 	for _, handler := range gs.upstreamHandlers {
 		if err := handler.Setup(); err != nil {
-			return nil, errSetupUpstream.WithCause(err).WithAttributes("name", handler.GetName())
+			return nil, errSetupUpstream.WithCause(err).WithAttributes("hostname", handler.GetHostName())
 		}
 	}
 
@@ -380,7 +380,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 
 	for _, handler := range gs.upstreamHandlers {
 		go func(handler upstream.Handler) {
-			logger := log.FromContext(ctx).WithField("handler", handler.GetName())
+			logger := log.FromContext(ctx).WithField("handler", handler.GetHostName())
 			if err := handler.ConnectGateway(conn.Context(), ids, conn); err != nil {
 				logger.WithError(err).Warn("Failed to connect gateway on upstream")
 			}
@@ -498,7 +498,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			return false
 		}
 		hosts = append(hosts, &upstreamHost{
-			name: handler.GetName(),
+			name: handler.GetHostName(),
 			handler: func(ids *ttnpb.EndDeviceIdentifiers) upstream.Handler {
 				if ids != nil && ids.DevAddr != nil && !passDevAddr(handler.GetDevAddrPrefixes(), *ids.DevAddr) {
 					return nil

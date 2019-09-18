@@ -24,8 +24,8 @@ import (
 
 // Handler represents the upstream handler that connects to an upstream host.
 type Handler interface {
-	// GetName returns the name of this upstream handler.
-	GetName() string
+	// GetHostName returns the hostname of the upstream.
+	GetHostName() string
 	// GetDevAddrPrefixes returns the device addr prefixes for this upstream handler. It's used to claim an uplink based on it's DevAddr.
 	GetDevAddrPrefixes() []types.DevAddrPrefix
 	// Setup performs all the preparation necessary to connect the handler to a particular upstream host.
