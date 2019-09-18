@@ -175,15 +175,13 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		}, serverAuth)
 	} else if errors.IsNotFound(err) && s.registerUnknown {
 		gtw, err = s.registerGateway(ctx, req)
-		if err != nil {
-			return err
-		}
 	}
 	if err != nil {
 		return err
 	}
 
-	logger = logger.WithField("gateway_uid", unique.ID(ctx, gtw.GatewayIdentifiers))
+	uid := unique.ID(ctx, gtw.GatewayIdentifiers)
+	logger = logger.WithField("gateway_uid", uid)
 
 	var gatewayAuth grpc.CallOption
 	if rights.RequireGateway(ctx, gtw.GatewayIdentifiers,
@@ -214,7 +212,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 
 	if s.requireExplicitEnable || gtw.Attributes[cupsAttribute] != "" {
 		if cups, _ := strconv.ParseBool(gtw.Attributes[cupsAttribute]); !cups {
-			return errCUPSNotEnabled.WithAttributes("gateway_uid", unique.ID(ctx, gtw.GatewayIdentifiers))
+			return errCUPSNotEnabled.WithAttributes("gateway_uid", uid)
 		}
 	}
 
