@@ -84,6 +84,7 @@
     "history": "^4.9.0",
     "intl": "^1.2.5",
     "intl-pluralrules": "^1.0.3",
+    "leaflet": "^1.5.1",
     "lottie-web": "^5.5.7",
     "prop-types": "^15.6.0",
     "query-string": "^5.0.1",
