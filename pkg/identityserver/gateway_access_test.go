@@ -103,11 +103,17 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
+		// Choose right that the user does not have and hence cannot add
+		right := ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC
 		APIKey = gatewayAPIKeys(&gatewayID).APIKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
 			GatewayIdentifiers: gatewayID,
-			APIKey:             *APIKey,
+			APIKey: ttnpb.APIKey{
+				ID:     APIKey.ID,
+				Name:   APIKey.Name,
+				Rights: []ttnpb.Right{right},
+			},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -343,7 +349,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 	})
 }
 
-func TestGatewayAccessCollaboratorRights(t *testing.T) {
+func TestGatewayAccessRights(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
