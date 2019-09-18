@@ -15,6 +15,8 @@
 package shared
 
 import (
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	gs "go.thethings.network/lorawan-stack/cmd/internal/shared/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
 )
 
@@ -25,5 +27,7 @@ var DefaultGatewayConfigurationServerConfig = gatewayconfigurationserver.Config{
 
 func init() {
 	DefaultGatewayConfigurationServerConfig.TheThingsGateway.Default.UpdateChannel = "stable"
+	DefaultGatewayConfigurationServerConfig.TheThingsGateway.Default.MQTTServer = "mqtts://" + shared.DefaultPublicHost + gs.DefaultGatewayServerConfig.MQTT.ListenTLS
 	DefaultGatewayConfigurationServerConfig.TheThingsGateway.Default.FirmwareURL = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
+	DefaultGatewayConfigurationServerConfig.BasicStation.Default.LNSURI = "wss://" + shared.DefaultPublicHost + gs.DefaultGatewayServerConfig.BasicStation.ListenTLS
 }

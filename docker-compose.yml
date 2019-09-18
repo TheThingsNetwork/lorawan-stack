@@ -88,7 +88,7 @@ services:
 
       # If using (self) signed certificates:
       - TTN_LW_TLS_CERTIFICATE=/run/secrets/cert.pem
-      - TTN_LW_CA=/run/secrets/cert.pem
+      - TTN_LW_TLS_ROOT_CA=/run/secrets/cert.pem
       - TTN_LW_TLS_KEY=/run/secrets/key.pem
 
       # HTTP Server configuration:
@@ -112,6 +112,10 @@ services:
       # - TTN_LW_IS_EMAIL_SMTP_ADDRESS=enter mail server address
       # - TTN_LW_IS_EMAIL_SMTP_USERNAME=enter username
       # - TTN_LW_IS_EMAIL_SMTP_PASSWORD=enter password
+
+      # If Gateway Configuration Server enabled, defaults for "thethings.example.com":
+      # - TTN_LW_GCS_BASIC_STATION_DEFAULT_LNS_URI=wss://thethings.example.com:8887
+      # - TTN_LW_GCS_THE_THINGS_GATEWAY_DEFAULT_MQTT_SERVER=mqtts://thethings.example.com:8882
 
       # Web UI configuration for "thethings.example.com":
       # - TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://thethings.example.com/oauth

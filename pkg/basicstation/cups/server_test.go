@@ -15,19 +15,21 @@
 package cups
 
 import (
-	"bytes"
 	"context"
-	"crypto/x509"
+	"crypto/tls"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -38,7 +40,7 @@ import (
 func TestGetTrust(t *testing.T) {
 	a := assertions.New(t)
 
-	s := new(Server)
+	s := NewServer(nil)
 
 	for _, addr := range []string{
 		"thethingsnetwork.org:443",
@@ -136,10 +138,10 @@ func (m *mockGatewayClient) UpdateAPIKey(ctx context.Context, in *ttnpb.UpdateGa
 
 const updateInfoRequest = `{
   "router": "58a0:cbff:fe80:19",
-  "cupsUri": "https://mh.sm.tc:7007",
-  "tcUri": "wss://mh.sm.tc:7000",
+  "cupsUri": "https://mh.sm.tc:7000",
+  "tcUri": "",
   "cupsCredCrc": 1398343300,
-  "tcCredCrc": 3337464763,
+  "tcCredCrc": 0,
   "station": "2.0.0(minihub/debug) 2018-12-06 09:30:35",
   "model": "minihub",
   "package": "2.0.0",
@@ -148,34 +150,51 @@ const updateInfoRequest = `{
   ]
 }`
 
-func mockGateway() *ttnpb.Gateway {
-	return &ttnpb.Gateway{
-		GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-			GatewayID: "test-gateway",
-			EUI:       &mockGatewayEUI,
-		},
-		Attributes: map[string]string{
-			cupsURIAttribute:            "https://mh.sm.tc:7007",
-			cupsCredentialsCRCAttribute: "1398343300",
-			lnsCredentialsCRCAttribute:  "3337464763",
-			cupsStationAttribute:        "2.0.0(minihub/debug) 2018-12-06 09:30:35",
-			cupsModelAttribute:          "minihub",
-			cupsPackageAttribute:        "2.0.0",
-		},
-		GatewayServerAddress: "wss://mh.sm.tc:7000",
-	}
-}
-
 var (
 	mockFallbackAuth = grpc.PerRPCCredentials(nil)
-	mockAuthFunc     = func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
+	mockAuthFunc     = func(ctx context.Context) grpc.CallOption {
 		return mockFallbackAuth
 	}
-	mockGatewayEUI  = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
-	mockErrNotFound = grpc.Errorf(codes.NotFound, "not found")
+	mockGatewayEUI    = types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x19}
+	mockErrNotFound   = grpc.Errorf(codes.NotFound, "not found")
+	mockRightsFetcher = rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+		md := rpcmetadata.FromIncomingContext(ctx)
+		if md.AuthType == "Bearer" {
+			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC), nil
+		}
+		return nil, rights.ErrNoGatewayRights
+	})
 )
 
 func TestServer(t *testing.T) {
+	tlsServer := httptest.NewTLSServer(http.HandlerFunc(http.NotFound))
+	defer tlsServer.Close()
+	tlsServerURL, _ := url.Parse(tlsServer.URL)
+
+	cupsURI := (&url.URL{Scheme: "https", Host: tlsServerURL.Host}).String()
+	lnsURI := (&url.URL{Scheme: "wss", Host: tlsServerURL.Host}).String()
+
+	mockGateway := func() *ttnpb.Gateway {
+
+		return &ttnpb.Gateway{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayID: "test-gateway",
+				EUI:       &mockGatewayEUI,
+			},
+			Attributes: map[string]string{
+				cupsURIAttribute:           cupsURI,
+				cupsCredentialsIDAttribute: "KEYID",
+				cupsCredentialsAttribute:   "Bearer KEYCONTENTS",
+				cupsStationAttribute:       "2.0.0(minihub/debug) 2018-12-06 09:30:35",
+				cupsModelAttribute:         "minihub",
+				cupsPackageAttribute:       "2.0.0",
+				lnsCredentialsIDAttribute:  "KEYID",
+				lnsCredentialsAttribute:    "Bearer KEYCONTENTS",
+			},
+			GatewayServerAddress: lnsURI,
+		}
+	}
+
 	e := echo.New()
 
 	for _, tt := range []struct {
@@ -189,6 +208,10 @@ func TestServer(t *testing.T) {
 	}{
 		{
 			Name: "No Auth",
+			StoreSetup: func(c *mockGatewayClient) {
+				c.res.Get = mockGateway()
+				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+			},
 			RequestSetup: func(req *http.Request) {
 				req.Header.Del(echo.HeaderAuthorization)
 			},
@@ -205,21 +228,62 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
-			Name: "No Changes",
+			Name: "Register New Gateway",
 			StoreSetup: func(c *mockGatewayClient) {
-				c.res.Get = mockGateway()
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
+				c.err.GetIdentifiersForEUI = mockErrNotFound
+				c.res.Create = &ttnpb.Gateway{
+					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayID: "eui-58a0cbfffe800019",
+						EUI:       &mockGatewayEUI,
+					},
+				}
+				c.res.CreateAPIKey = &ttnpb.APIKey{
+					ID:  "KEYID",
+					Key: "KEYCONTENTS",
+				}
+			},
+			Options: []Option{
+				WithRegisterUnknown(&ttnpb.OrganizationOrUserIdentifiers{}, mockAuthFunc),
+				WithDefaultLNSURI(lnsURI),
 			},
 			AssertError: should.BeNil,
 			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
 				var res UpdateInfoResponse
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
-				a.So(res, should.Resemble, UpdateInfoResponse{})
+				a.So(res.CUPSURI, should.BeEmpty) // No update.
+				a.So(res.LNSURI, should.Equal, lnsURI)
+				a.So(res.CUPSCredentials, should.NotBeEmpty)
+				a.So(res.LNSCredentials, should.NotBeEmpty)
+				a.So(res.SignatureKeyCRC, should.BeZeroValue)
+				a.So(res.Signature, should.BeEmpty)
+				a.So(res.UpdateData, should.BeEmpty)
+			},
+			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
+				if a.So(s.req.Create, should.NotBeNil) {
+					a.So(s.req.Create.GatewayIdentifiers.GatewayID, should.Equal, "eui-58a0cbfffe800019")
+					a.So(s.req.Create.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
+				}
+				if a.So(s.req.Update, should.NotBeNil) {
+					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "eui-58a0cbfffe800019")
+					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
+					expectedAttributes := mockGateway().Attributes
+					for _, attr := range []string{
+						cupsCredentialsIDAttribute,
+						cupsCredentialsAttribute,
+						cupsStationAttribute,
+						cupsModelAttribute,
+						cupsPackageAttribute,
+						lnsCredentialsIDAttribute,
+						lnsCredentialsAttribute,
+					} {
+						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+					}
+				}
 			},
 		},
 		{
-			Name: "Not Explicitly Enabled",
+			Name: "CUPS Not Enabled For Gateway",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway()
 				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
@@ -230,73 +294,48 @@ func TestServer(t *testing.T) {
 			AssertError: should.NotBeNil,
 		},
 		{
-			Name: "Invalid Credentials",
+			Name: "Existing Gateway",
 			StoreSetup: func(c *mockGatewayClient) {
 				c.res.Get = mockGateway()
 				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
-				c.res.Get.Attributes[cupsCredentialsAttribute] = "other string"
-			},
-			AssertError: should.NotBeNil,
-		},
-		{
-			Name: "Register New Gateway",
-			StoreSetup: func(c *mockGatewayClient) {
-				c.err.GetIdentifiersForEUI = mockErrNotFound
-				c.res.Create = mockGateway()
 			},
 			Options: []Option{
-				WithRegisterUnknown(&ttnpb.OrganizationOrUserIdentifiers{}),
-			},
-			AssertError: should.BeNil,
-			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
-				var res UpdateInfoResponse
-				err := res.UnmarshalBinary(rec.Body.Bytes())
-				a.So(err, should.BeNil)
-				a.So(res, should.Resemble, UpdateInfoResponse{})
-			},
-			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
-				a.So(s.req.Update.Gateway.Attributes[cupsCredentialsCRCAttribute], should.NotBeEmpty)
-				a.So(s.req.Update.Gateway.Attributes[lnsCredentialsCRCAttribute], should.NotBeEmpty)
-			},
-		},
-		{
-			Name: "Updated Config",
-			StoreSetup: func(c *mockGatewayClient) {
-				c.res.Get = mockGateway()
-				c.res.GetIdentifiersForEUI = &c.res.Get.GatewayIdentifiers
-				c.res.Get.Attributes[cupsURIAttribute] = "https://thethingsnetwork.org:443"
-				c.res.Get.GatewayServerAddress = "wss://thethingsnetwork.org:443"
-				c.res.Get.Attributes[cupsCredentialsCRCAttribute] = ""
-				c.res.Get.Attributes[lnsCredentialsCRCAttribute] = ""
-				c.res.CreateAPIKey = &ttnpb.APIKey{
-					ID:  "KEYID",
-					Key: "KEYCONTENTS",
-				}
-			},
-			Options: []Option{
-				WithTrust(&x509.Certificate{
-					Raw: []byte("FAKE CERTIFICATE CONTENTS"),
-				}),
 				WithAllowCUPSURIUpdate(true),
 			},
 			RequestSetup: func(req *http.Request) {
-				req.Header.Set(echo.HeaderAuthorization, "Bearer "+auth.JoinToken(auth.APIKey, "ID", "KEY"))
+				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
 			},
 			AssertError: should.BeNil,
 			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
 				var res UpdateInfoResponse
 				err := res.UnmarshalBinary(rec.Body.Bytes())
 				a.So(err, should.BeNil)
-				a.So(res.CUPSURI, should.Equal, "https://thethingsnetwork.org:443")
-				a.So(res.LNSURI, should.Equal, "wss://thethingsnetwork.org:443")
-				a.So(bytes.Contains(res.CUPSCredentials, []byte("FAKE CERTIFICATE CONTENTS")), should.BeFalse)
-				a.So(bytes.Contains(res.CUPSCredentials, []byte("KEYCONTENTS")), should.BeTrue)
-				a.So(bytes.Contains(res.LNSCredentials, []byte("KEYCONTENTS")), should.BeTrue)
-				a.So(bytes.Equal(res.CUPSCredentials, res.LNSCredentials), should.BeTrue)
+				a.So(res.CUPSURI, should.Equal, cupsURI)
+				a.So(res.LNSURI, should.Equal, lnsURI)
+				a.So(res.CUPSCredentials, should.NotBeEmpty)
+				a.So(res.LNSCredentials, should.NotBeEmpty)
+				a.So(res.SignatureKeyCRC, should.BeZeroValue)
+				a.So(res.Signature, should.BeEmpty)
+				a.So(res.UpdateData, should.BeEmpty)
 			},
 			AssertStore: func(a *assertions.Assertion, s *mockGatewayClient) {
-				a.So(s.req.Update.Gateway.Attributes[cupsCredentialsCRCAttribute], should.NotBeEmpty)
-				a.So(s.req.Update.Gateway.Attributes[lnsCredentialsCRCAttribute], should.NotBeEmpty)
+				if a.So(s.req.Update, should.NotBeNil) {
+					a.So(s.req.Update.GatewayIdentifiers.GatewayID, should.Equal, "test-gateway")
+					a.So(s.req.Update.GatewayIdentifiers.EUI, should.Resemble, &mockGatewayEUI)
+					expectedAttributes := mockGateway().Attributes
+					for _, attr := range []string{
+						cupsURIAttribute,
+						cupsCredentialsIDAttribute,
+						cupsCredentialsAttribute,
+						cupsStationAttribute,
+						cupsModelAttribute,
+						cupsPackageAttribute,
+						lnsCredentialsIDAttribute,
+						lnsCredentialsAttribute,
+					} {
+						a.So(s.req.Update.Attributes[attr], should.Equal, expectedAttributes[attr])
+					}
+				}
 			},
 		},
 	} {
@@ -308,11 +347,17 @@ func TestServer(t *testing.T) {
 			}
 
 			s := NewServer(component.MustNew(test.GetLogger(t), &component.Config{}), append([]Option{
+				WithTLSConfig(&tls.Config{
+					InsecureSkipVerify: true,
+				}),
 				WithAuth(mockAuthFunc),
 				WithRegistries(store, store),
 			}, tt.Options...)...)
 			req := httptest.NewRequest(http.MethodPost, "/update-info", strings.NewReader(updateInfoRequest))
-			req = req.WithContext(test.Context())
+			ctx := test.Context()
+			ctx = log.NewContext(ctx, test.GetLogger(t))
+			ctx = rights.NewContextWithFetcher(ctx, mockRightsFetcher)
+			req = req.WithContext(ctx)
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			req.Header.Set(echo.HeaderAuthorization, "random string")
 			if tt.RequestSetup != nil {

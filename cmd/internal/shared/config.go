@@ -126,8 +126,11 @@ var DefaultServiceBase = config.ServiceBase{
 	KeyVault:         DefaultKeyVaultConfig,
 }
 
+// DefaultPublicHost is the default public host where The Things Stack is served.
+var DefaultPublicHost = "localhost"
+
 // DefaultPublicURL is the default public URL where The Things Stack is served.
-var DefaultPublicURL = "http://localhost:1885"
+var DefaultPublicURL = "http://" + DefaultPublicHost + ":1885"
 
 // DefaultAssetsBaseURL is the default public URL where the assets are served.
 var DefaultAssetsBaseURL = DefaultHTTPConfig.Static.Mount

@@ -2215,7 +2215,7 @@
   },
   "error:pkg/basicstation/cups:no_trust": {
     "translations": {
-      "en": "no trusted certificate configured"
+      "en": "no trusted certificate found"
     },
     "description": {
       "package": "pkg/basicstation/cups",

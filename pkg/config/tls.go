@@ -49,10 +49,11 @@ func (a ACME) IsZero() bool {
 
 // TLS represents TLS configuration.
 type TLS struct {
-	RootCA      string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
-	Certificate string `name:"certificate" description:"Location of TLS certificate"`
-	Key         string `name:"key" description:"Location of TLS private key"`
-	ACME        ACME   `name:"acme"`
+	RootCA             string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
+	InsecureSkipVerify bool   `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`
+	Certificate        string `name:"certificate" description:"Location of TLS certificate"`
+	Key                string `name:"key" description:"Location of TLS private key"`
+	ACME               ACME   `name:"acme"`
 }
 
 // IsZero returns whether the TLS configuration is empty.
@@ -116,7 +117,8 @@ func (t TLS) Config(ctx context.Context) (*tls.Config, error) {
 	}))
 
 	return &tls.Config{
-		RootCAs: rootCAs,
+		RootCAs:            rootCAs,
+		InsecureSkipVerify: t.InsecureSkipVerify,
 		GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
 			return cv.Load().(*tls.Certificate), nil
 		},

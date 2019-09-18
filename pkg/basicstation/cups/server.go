@@ -22,14 +22,16 @@ import (
 	"net"
 	"net/url"
 	"strings"
+	"sync"
+	"time"
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -42,11 +44,19 @@ type ServerConfig struct {
 		ID     string `name:"id" description:"ID of the account to register unknown gateways to"`
 		APIKey string `name:"api-key" description:"API Key to use for unknown gateway registration"`
 	} `name:"owner-for-unknown"`
+	Default struct {
+		LNSURI string `name:"lns-uri" description:"The default LNS URI that the gateways should use"`
+	} `name:"default" description:"Default gateway settings"`
 	AllowCUPSURIUpdate bool `name:"allow-cups-uri-update" description:"Allow CUPS URI updates"`
 }
 
 // NewServer returns a new CUPS server from this config on top of the component.
 func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option) *Server {
+	opts := []Option{
+		WithExplicitEnable(conf.ExplicitEnable),
+		WithAllowCUPSURIUpdate(conf.AllowCUPSURIUpdate),
+		WithDefaultLNSURI(conf.Default.LNSURI),
+	}
 	var registerUnknownTo *ttnpb.OrganizationOrUserIdentifiers
 	switch conf.RegisterUnknown.Type {
 	case "user":
@@ -54,22 +64,19 @@ func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option)
 	case "organization":
 		registerUnknownTo = ttnpb.OrganizationIdentifiers{OrganizationID: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
 	}
-	opts := []Option{
-		WithExplicitEnable(conf.ExplicitEnable),
-		WithRegisterUnknown(registerUnknownTo),
-		WithAllowCUPSURIUpdate(conf.AllowCUPSURIUpdate),
-	}
-	if conf.RegisterUnknown.APIKey != "" {
-		opts = append(opts, WithAuth(func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption {
-			return grpc.PerRPCCredentials(rpcmetadata.MD{
-				AuthType:      "bearer",
-				AuthValue:     conf.RegisterUnknown.APIKey,
-				AllowInsecure: c.AllowInsecureForCredentials(),
-			})
-		}))
+	if registerUnknownTo != nil && conf.RegisterUnknown.APIKey != "" {
+		opts = append(opts,
+			WithRegisterUnknown(registerUnknownTo, func(ctx context.Context) grpc.CallOption {
+				return grpc.PerRPCCredentials(rpcmetadata.MD{
+					AuthType:      "bearer",
+					AuthValue:     conf.RegisterUnknown.APIKey,
+					AllowInsecure: c.AllowInsecureForCredentials(),
+				})
+			}),
+		)
 	}
 	if tlsConfig, err := c.GetTLSConfig(c.Context()); err == nil {
-		opts = append(opts, WithRootCAs(tlsConfig.RootCAs))
+		opts = append(opts, WithTLSConfig(tlsConfig))
 	}
 	s := NewServer(c, append(opts, customOpts...)...)
 	c.RegisterWeb(s)
@@ -84,24 +91,29 @@ type Server struct {
 	// clients from the appropriate cluster peer.
 	registry ttnpb.GatewayRegistryClient
 	access   ttnpb.GatewayAccessClient
-
-	auth func(context.Context, types.EUI64, string) grpc.CallOption
+	auth     func(context.Context) grpc.CallOption
 
 	requireExplicitEnable bool
 	registerUnknown       bool
 	defaultOwner          ttnpb.OrganizationOrUserIdentifiers
+	defaultOwnerAuth      func(context.Context) grpc.CallOption
+	defaultLNSURI         string
 
 	allowCUPSURIUpdate bool
 
-	rootCAs *x509.CertPool
-	trust   *x509.Certificate
+	tlsConfig *tls.Config
+	trust     *x509.Certificate
+
+	getTrustOnce singleflight.Group
+	trustCacheMu sync.RWMutex
+	trustCache   map[string]*x509.Certificate
 
 	signers map[uint32]crypto.Signer
 }
 
-func (s *Server) getAuth(ctx context.Context, eui types.EUI64, auth string) grpc.CallOption {
+func (s *Server) getServerAuth(ctx context.Context) grpc.CallOption {
 	if s.auth != nil {
-		return s.auth(ctx, eui, auth)
+		return s.auth(ctx)
 	}
 	return s.component.WithClusterAuth()
 }
@@ -131,15 +143,6 @@ func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (
 // Option configures the CUPSServer.
 type Option func(s *Server)
 
-// WithAuth sets the auth function for gateways that don't provide TTN auth.
-// When this auth method is used, the CUPS server will look up the cups-credentials
-// attribute in the gateway registry.
-func WithAuth(auth func(ctx context.Context, gatewayEUI types.EUI64, auth string) grpc.CallOption) Option {
-	return func(s *Server) {
-		s.auth = auth
-	}
-}
-
 // WithExplicitEnable requires CUPS to be explicitly enabled with a cups attribute
 // in the gateway registry.
 func WithExplicitEnable(enable bool) Option {
@@ -151,12 +154,12 @@ func WithExplicitEnable(enable bool) Option {
 // WithRegisterUnknown configures the CUPS server to register gateways if they
 // do not already exist in the registry. The gateways will be registered under the
 // given owner.
-func WithRegisterUnknown(owner *ttnpb.OrganizationOrUserIdentifiers) Option {
+func WithRegisterUnknown(owner *ttnpb.OrganizationOrUserIdentifiers, auth func(context.Context) grpc.CallOption) Option {
 	return func(s *Server) {
 		if owner != nil {
-			s.registerUnknown, s.defaultOwner = true, *owner
+			s.registerUnknown, s.defaultOwner, s.defaultOwnerAuth = true, *owner, auth
 		} else {
-			s.registerUnknown, s.defaultOwner = false, ttnpb.OrganizationOrUserIdentifiers{}
+			s.registerUnknown, s.defaultOwner, s.defaultOwnerAuth = false, ttnpb.OrganizationOrUserIdentifiers{}, nil
 		}
 	}
 }
@@ -169,6 +172,14 @@ func WithAllowCUPSURIUpdate(allow bool) Option {
 	}
 }
 
+// WithDefaultLNSURI configures the CUPS server with a default LNS URI to use when
+// no Gateway Server address is registered for a gateway.
+func WithDefaultLNSURI(uri string) Option {
+	return func(s *Server) {
+		s.defaultLNSURI = uri
+	}
+}
+
 // WithTrust configures the CUPS server to return the given certificate to gateways
 // as trusted certificate for the CUPS server. This should typically be the certificate
 // of the Root CA in the chain of the CUPS server's TLS certificate.
@@ -178,11 +189,11 @@ func WithTrust(cert *x509.Certificate) Option {
 	}
 }
 
-// WithRootCAs configures the CUPS server with the given Root CAs that will be used
-// to lookup CUPS/LNS Root CAs.
-func WithRootCAs(pool *x509.CertPool) Option {
+// WithTLSConfig configures the CUPS server with the given TLS config that will
+// be used to lookup CUPS/LNS Root CAs.
+func WithTLSConfig(tlsConfig *tls.Config) Option {
 	return func(s *Server) {
-		s.rootCAs = pool
+		s.tlsConfig = tlsConfig
 	}
 }
 
@@ -200,12 +211,20 @@ func WithRegistries(registry ttnpb.GatewayRegistryClient, access ttnpb.GatewayAc
 	}
 }
 
+// WithAuth overrides the CUPS server's server auth func.
+func WithAuth(auth func(ctx context.Context) grpc.CallOption) Option {
+	return func(s *Server) {
+		s.auth = auth
+	}
+}
+
 // NewServer returns a new CUPS server on top of the given gateway registry
 // and gateway access clients.
 func NewServer(c *component.Component, options ...Option) *Server {
 	s := &Server{
-		component: c,
-		signers:   make(map[uint32]crypto.Signer),
+		component:  c,
+		signers:    make(map[uint32]crypto.Signer),
+		trustCache: make(map[string]*x509.Certificate),
 	}
 	for _, opt := range options {
 		opt(s)
@@ -229,7 +248,7 @@ func getContext(c echo.Context) context.Context {
 	return metadata.NewIncomingContext(ctx, md)
 }
 
-var errNoTrust = errors.DefineInternal("no_trust", "no trusted certificate configured")
+var errNoTrust = errors.DefineInternal("no_trust", "no trusted certificate found")
 
 // parseAddress parses a CUPS or LNS address.
 //
@@ -269,10 +288,10 @@ func parseAddress(address string) (scheme, host, port string, err error) {
 
 func (s *Server) getTrust(address string) (*x509.Certificate, error) {
 	if address == "" {
-		if s.trust == nil {
-			return nil, errNoTrust
+		if s.trust != nil {
+			return s.trust, nil
 		}
-		return s.trust, nil
+		return nil, errNoTrust
 	}
 	_, host, port, err := parseAddress(address)
 	if err != nil {
@@ -281,11 +300,43 @@ func (s *Server) getTrust(address string) (*x509.Certificate, error) {
 	if port == "" {
 		port = "443"
 	}
-	conn, err := tls.Dial("tcp", net.JoinHostPort(host, port), &tls.Config{RootCAs: s.rootCAs})
+	address = net.JoinHostPort(host, port)
+
+	trustI, err, _ := s.getTrustOnce.Do(address, func() (interface{}, error) {
+		s.trustCacheMu.RLock()
+		trust, ok := s.trustCache[address]
+		s.trustCacheMu.RUnlock()
+		if ok {
+			return trust, nil
+		}
+
+		conn, err := tls.DialWithDialer(&net.Dialer{
+			Timeout: 5 * time.Second,
+		}, "tcp", address, s.tlsConfig)
+		if err != nil {
+			return nil, err
+		}
+		defer conn.Close()
+		if verifiedChains := conn.ConnectionState().VerifiedChains; len(verifiedChains) > 0 {
+			chain := verifiedChains[0]
+			trust = chain[len(chain)-1]
+		}
+		if s.tlsConfig != nil && s.tlsConfig.InsecureSkipVerify {
+			chain := conn.ConnectionState().PeerCertificates
+			trust = chain[len(chain)-1]
+		}
+
+		if trust != nil {
+			s.trustCacheMu.Lock()
+			s.trustCache[address] = trust
+			s.trustCacheMu.Unlock()
+			return trust, nil
+		}
+
+		return nil, errNoTrust
+	})
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
-	certChain := conn.ConnectionState().VerifiedChains[0]
-	return certChain[len(certChain)-1], nil
+	return trustI.(*x509.Certificate), nil
 }
