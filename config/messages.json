@@ -3358,7 +3358,7 @@
   },
   "error:pkg/gatewayserver:upstream": {
     "translations": {
-      "en": "failed to setup upstream `{name}`"
+      "en": "failed to setup upstream `{hostname}`"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -3367,7 +3367,7 @@
   },
   "error:pkg/gatewayserver:upstream_type_not_implemented": {
     "translations": {
-      "en": "upstream `{name}` not implemented"
+      "en": "upstream `{hostname}` not implemented"
     },
     "description": {
       "package": "pkg/gatewayserver",

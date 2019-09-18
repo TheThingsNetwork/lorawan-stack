@@ -28,7 +28,7 @@ import (
 // Handler is the upstream handler.
 type Handler struct {
 	ctx             context.Context
-	name            string
+	hostname        string
 	c               *component.Component
 	devAddrPrefixes []types.DevAddrPrefix
 }
@@ -36,18 +36,18 @@ type Handler struct {
 var errNotFound = errors.DefineNotFound("network_server_not_found", "network server not found for ids `ids`")
 
 // NewHandler returns a new upstream handler.
-func NewHandler(ctx context.Context, name string, c *component.Component, devAddrPrefixes []types.DevAddrPrefix) *Handler {
+func NewHandler(ctx context.Context, hostname string, c *component.Component, devAddrPrefixes []types.DevAddrPrefix) *Handler {
 	return &Handler{
 		ctx:             ctx,
-		name:            name,
+		hostname:        hostname,
 		c:               c,
 		devAddrPrefixes: devAddrPrefixes,
 	}
 }
 
-// GetName implements upstream.Handler.
-func (h *Handler) GetName() string {
-	return h.name
+// GetHostName implements upstream.Handler.
+func (h *Handler) GetHostName() string {
+	return h.hostname
 }
 
 // GetDevAddrPrefixes implements upstream.Handler.
@@ -84,7 +84,7 @@ func (h *Handler) HandleUp(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids 
 	}
 	client := ttnpb.NewGsNsClient(nsConn)
 	for _, up := range msg.UplinkMessages {
-		if h.name == "cluster" {
+		if h.hostname == "cluster" {
 			_, err := client.HandleUplink(ctx, up, h.c.WithClusterAuth())
 			if err != nil {
 				return err
