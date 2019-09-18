@@ -103,11 +103,17 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 		}
 		a.So(APIKey, should.BeNil)
 
+		// Choose right that the user does not have and hence cannot add
+		right := ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC
 		APIKey = applicationAPIKeys(&applicationID).APIKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIdentifiers: applicationID,
-			APIKey:                 *APIKey,
+			APIKey: ttnpb.APIKey{
+				ID:     APIKey.ID,
+				Name:   APIKey.Name,
+				Rights: []ttnpb.Right{right},
+			},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -115,8 +121,6 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 		}
 		a.So(updated, should.BeNil)
 
-		// Choose right that the user does not have and hence cannot add
-		right := ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIdentifiers: applicationID,
 			Collaborator: ttnpb.Collaborator{
