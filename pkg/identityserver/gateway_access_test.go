@@ -30,6 +30,7 @@ func init() {
 	gatewayAccessUser.State = ttnpb.STATE_APPROVED
 	for _, apiKey := range userAPIKeys(&gatewayAccessUser.UserIdentifiers).APIKeys {
 		apiKey.Rights = []ttnpb.Right{
+			ttnpb.RIGHT_GATEWAY_LINK,
 			ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
 			ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
 		}
@@ -367,6 +368,7 @@ func TestGatewayAccessRights(t *testing.T) {
 			Collaborator: ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *collaboratorID,
 				Rights: []ttnpb.Right{
+					ttnpb.RIGHT_GATEWAY_LINK,
 					ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
 					ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
 				},
@@ -387,12 +389,40 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
+		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			Rights:             []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+		}, usrCreds)
+
+		a.So(err, should.BeNil)
+		if a.So(APIKey, should.NotBeNil) && a.So(APIKey.Rights, should.NotBeNil) {
+			a.So(APIKey.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL})
+		}
+
 		// Try revoking rights for the collaborator with RIGHT_GATEWAY_ALL without having it
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIdentifiers: gatewayID,
 			Collaborator: ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
 				Rights: []ttnpb.Right{
+					ttnpb.RIGHT_GATEWAY_LINK,
+					ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
+					ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
+				},
+			},
+		}, collaboratorCreds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		// Try revoking rights for the api key with RIGHT_GATEWAY_ALL without having it
+		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			APIKey: ttnpb.APIKey{
+				ID: APIKey.ID,
+				Rights: []ttnpb.Right{
+					ttnpb.RIGHT_GATEWAY_LINK,
 					ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
 					ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
 				},
@@ -415,7 +445,34 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		newRights = newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS))
+		// Remove RIGHT_GATEWAY_ALL from api key to be removed
+		key, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			APIKey: ttnpb.APIKey{
+				ID:     APIKey.ID,
+				Rights: newRights.Rights,
+			},
+		}, usrCreds)
+
+		a.So(err, should.BeNil)
+		if a.So(key, should.NotBeNil) && a.So(key.Rights, should.NotBeNil) {
+			a.So(key.Rights, should.Resemble, newRights.Rights)
+		}
+
+		newRights = newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK))
+		key, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			APIKey: ttnpb.APIKey{
+				ID:     APIKey.ID,
+				Rights: newRights.Rights,
+			},
+		}, collaboratorCreds)
+
+		a.So(err, should.BeNil)
+		if a.So(key, should.NotBeNil) && a.So(key.Rights, should.NotBeNil) {
+			a.So(key.Rights, should.Resemble, newRights.Rights)
+		}
+
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIdentifiers: gatewayID,
 			Collaborator: ttnpb.Collaborator{
@@ -426,12 +483,25 @@ func TestGatewayAccessRights(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		// Try revoking RIGHT_GATEWAY_INFO without having it
+		// Try revoking RIGHT_GATEWAY_DELETE without having it
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIdentifiers: gatewayID,
 			Collaborator: ttnpb.Collaborator{
 				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO)).Rights,
+				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_DELETE)).Rights,
+			},
+		}, collaboratorCreds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		// Try revoking RIGHT_GATEWAY_DELETE from api key without having it
+		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			APIKey: ttnpb.APIKey{
+				ID:     APIKey.ID,
+				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_DELETE)).Rights,
 			},
 		}, collaboratorCreds)
 
@@ -463,6 +533,26 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
 			GatewayIdentifiers:            gatewayID,
 			OrganizationOrUserIdentifiers: *removedCollaboratorID,
+		}, collaboratorCreds)
+
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+
+		// Delete api key with more rights
+		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			APIKey: ttnpb.APIKey{
+				ID:     APIKey.ID,
+				Rights: []ttnpb.Right{},
+			},
+		}, collaboratorCreds)
+
+		a.So(err, should.BeNil)
+
+		_, err = reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+			GatewayIdentifiers: gatewayID,
+			KeyID:              APIKey.ID,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {
