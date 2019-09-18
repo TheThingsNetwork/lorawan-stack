@@ -40,8 +40,7 @@ func init() {
 	orgAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
 	for _, apiKey := range userAPIKeys(&orgAccessCollaboratorUser.UserIdentifiers).APIKeys {
 		apiKey.Rights = []ttnpb.Right{
-			ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
-			ttnpb.RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
+			ttnpb.RIGHT_ORGANIZATION_ALL,
 		}
 	}
 }
