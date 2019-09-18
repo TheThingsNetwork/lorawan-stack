@@ -89,7 +89,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	if err != nil {
 		return nil, err
 	}
-	conn, err := io.NewConnection(ctx, frontend.Protocol(), frontend.SupportsStatusMessage(), frontend.SupportsDownlinkClaim(), gtw, fp, true)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fp, true)
 	if err != nil {
 		return nil, err
 	}

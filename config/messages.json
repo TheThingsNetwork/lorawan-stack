@@ -3358,7 +3358,7 @@
   },
   "error:pkg/gatewayserver:upstream": {
     "translations": {
-      "en": "upstream `{name}` failed to start"
+      "en": "failed to setup upstream `{name}`"
     },
     "description": {
       "package": "pkg/gatewayserver",

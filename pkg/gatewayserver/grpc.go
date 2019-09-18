@@ -39,7 +39,7 @@ func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttn
 	stats := &ttnpb.GatewayConnectionStats{}
 	ct := conn.ConnectTime()
 	stats.ConnectedAt = &ct
-	stats.Protocol = conn.Protocol()
+	stats.Protocol = conn.Frontend().Protocol()
 	if s, t, ok := conn.StatusStats(); ok {
 		stats.LastStatusReceivedAt = &t
 		stats.LastStatus = s
