@@ -99,7 +99,7 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 		)).WithError(err).Warn("Failed to cancel integration")
 	}
 	ps.startTask(ps.ctx, req.ApplicationPubSubIdentifiers)
-	events.Publish(evtSetPubSub(ctx, req.ApplicationPubSubIdentifiers, nil))
+	events.Publish(evtSetPubSub(ctx, req.ApplicationIdentifiers, req.ApplicationPubSubIdentifiers))
 	return pubsub, nil
 }
 
@@ -126,6 +126,6 @@ func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdenti
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtDeletePubSub(ctx, *ids, nil))
+	events.Publish(evtDeletePubSub(ctx, ids.ApplicationIdentifiers, *ids))
 	return ttnpb.Empty, nil
 }
