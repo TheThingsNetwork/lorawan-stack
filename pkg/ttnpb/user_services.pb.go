@@ -378,7 +378,7 @@ type UserAccessClient interface {
 	GetAPIKey(ctx context.Context, in *GetUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Update the rights of an existing user API key. To generate an API key,
 	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights.
+	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateUserAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 }
 
@@ -443,7 +443,7 @@ type UserAccessServer interface {
 	GetAPIKey(context.Context, *GetUserAPIKeyRequest) (*APIKey, error)
 	// Update the rights of an existing user API key. To generate an API key,
 	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights.
+	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
 	UpdateAPIKey(context.Context, *UpdateUserAPIKeyRequest) (*APIKey, error)
 }
 

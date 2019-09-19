@@ -340,7 +340,7 @@ type OrganizationAccessClient interface {
 	GetAPIKey(ctx context.Context, in *GetOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Update the rights of an existing organization API key. To generate an API key,
 	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights.
+	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateOrganizationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Get the rights of a collaborator (member) of the organization.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
@@ -441,7 +441,7 @@ type OrganizationAccessServer interface {
 	GetAPIKey(context.Context, *GetOrganizationAPIKeyRequest) (*APIKey, error)
 	// Update the rights of an existing organization API key. To generate an API key,
 	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights.
+	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
 	UpdateAPIKey(context.Context, *UpdateOrganizationAPIKeyRequest) (*APIKey, error)
 	// Get the rights of a collaborator (member) of the organization.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.

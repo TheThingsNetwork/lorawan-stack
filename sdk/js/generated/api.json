@@ -858,7 +858,7 @@
             },
             {
               "name": "UpdateAPIKey",
-              "description": "Update the rights of an existing application API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights.",
+              "description": "Update the rights of an existing application API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
               "requestType": "UpdateApplicationAPIKeyRequest",
               "requestLongType": "UpdateApplicationAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateApplicationAPIKeyRequest",
@@ -10727,7 +10727,7 @@
             },
             {
               "name": "UpdateAPIKey",
-              "description": "Update the rights of an existing gateway API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights.",
+              "description": "Update the rights of an existing gateway API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
               "requestType": "UpdateGatewayAPIKeyRequest",
               "requestLongType": "UpdateGatewayAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateGatewayAPIKeyRequest",
@@ -20687,7 +20687,7 @@
             },
             {
               "name": "UpdateAPIKey",
-              "description": "Update the rights of an existing organization API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights.",
+              "description": "Update the rights of an existing organization API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
               "requestType": "UpdateOrganizationAPIKeyRequest",
               "requestLongType": "UpdateOrganizationAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateOrganizationAPIKeyRequest",
@@ -23445,7 +23445,7 @@
             },
             {
               "name": "UpdateAPIKey",
-              "description": "Update the rights of an existing user API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights.",
+              "description": "Update the rights of an existing user API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
               "requestType": "UpdateUserAPIKeyRequest",
               "requestLongType": "UpdateUserAPIKeyRequest",
               "requestFullType": "ttn.lorawan.v3.UpdateUserAPIKeyRequest",

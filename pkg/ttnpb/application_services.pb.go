@@ -343,7 +343,7 @@ type ApplicationAccessClient interface {
 	GetAPIKey(ctx context.Context, in *GetApplicationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Update the rights of an existing application API key. To generate an API key,
 	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights.
+	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateApplicationAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Get the rights of a collaborator (member) of the application.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
@@ -443,7 +443,7 @@ type ApplicationAccessServer interface {
 	GetAPIKey(context.Context, *GetApplicationAPIKeyRequest) (*APIKey, error)
 	// Update the rights of an existing application API key. To generate an API key,
 	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights.
+	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
 	UpdateAPIKey(context.Context, *UpdateApplicationAPIKeyRequest) (*APIKey, error)
 	// Get the rights of a collaborator (member) of the application.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.

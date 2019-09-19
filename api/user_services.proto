@@ -100,7 +100,7 @@ service UserAccess {
 
   // Update the rights of an existing user API key. To generate an API key,
   // the CreateAPIKey should be used. To delete an API key, update it
-  // with zero rights.
+  // with zero rights. It is required for the caller to have all assigned or/and removed rights.
   rpc UpdateAPIKey(UpdateUserAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/users/{user_ids.user_id}/api-keys/{api_key.id}"
