@@ -146,6 +146,8 @@ func (c *SX1301Config) UnmarshalJSON(msg []byte) error {
 			var index int
 			if _, err := fmt.Sscanf(key, "chan_multiSF_%d", &index); err == nil {
 				chanMap[index] = channel
+			} else {
+				return err
 			}
 		case strings.HasPrefix(key, "tx_lut_"):
 			var txLut TxLUTConfig
@@ -155,6 +157,8 @@ func (c *SX1301Config) UnmarshalJSON(msg []byte) error {
 			var index int
 			if _, err := fmt.Sscanf(key, "tx_lut_%d", &index); err == nil {
 				txLutMap[index] = txLut
+			} else {
+				return err
 			}
 		case strings.HasPrefix(key, "radio_"):
 			var radio RFConfig
@@ -164,6 +168,8 @@ func (c *SX1301Config) UnmarshalJSON(msg []byte) error {
 			var index int
 			if _, err := fmt.Sscanf(key, "radio_%d", &index); err == nil {
 				radioMap[index] = radio
+			} else {
+				return err
 			}
 		}
 	}
