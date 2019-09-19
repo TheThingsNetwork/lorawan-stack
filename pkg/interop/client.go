@@ -379,7 +379,10 @@ const InteropClientConfigurationName = "config.yaml"
 // NewClient return new interop client.
 // fallbackTLS is optional.
 func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.Config) (*Client, error) {
-	fetcher := conf.Fetcher()
+	fetcher, err := conf.Fetcher()
+	if err != nil {
+		return nil, errUnknownConfig.WithCause(err)
+	}
 	if fetcher == nil {
 		return nil, errUnknownConfig
 	}

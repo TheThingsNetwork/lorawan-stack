@@ -61,7 +61,11 @@ func (c TemplatesConfig) NewTemplateStore() (*TemplateStore, error) {
 	case c.Directory != "":
 		fetcher = fetch.FromFilesystem(c.Directory)
 	case c.URL != "":
-		fetcher = fetch.FromHTTP(c.URL, true)
+		var err error
+		fetcher, err = fetch.FromHTTP(c.URL, true)
+		if err != nil {
+			return nil, err
+		}
 	default:
 		return nil, nil
 	}

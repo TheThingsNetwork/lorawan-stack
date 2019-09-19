@@ -119,6 +119,11 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	ctx = log.NewContext(ctx, logger)
 
+	fps, err := config.FrequencyPlans.Store()
+	if err != nil {
+		return nil, err
+	}
+
 	c := &Component{
 		ctx:                ctx,
 		cancelCtx:          cancel,
@@ -131,7 +136,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 
 		tcpListeners: make(map[string]*listener),
 
-		FrequencyPlans: config.FrequencyPlans.Store(),
+		FrequencyPlans: fps,
 		KeyVault:       config.KeyVault.KeyVault(),
 	}
 

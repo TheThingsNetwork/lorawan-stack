@@ -45,16 +45,15 @@ func TestWithBasePath(t *testing.T) {
 		AssertBytes    func(*testing.T, []byte) bool
 	}{
 		{
-			Name:  "empty base path/empty path",
-			Bytes: []byte{0x42, 0x41},
+			Name: "empty base path/empty path",
 			AssertPath: func(t *testing.T, pathElements ...string) bool {
 				return assertions.New(t).So(pathElements, should.BeEmpty)
 			},
 			AssertError: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.BeNil)
+				return assertions.New(t).So(err, should.BeError)
 			},
 			AssertBytes: func(t *testing.T, b []byte) bool {
-				return assertions.New(t).So(b, should.Resemble, []byte{0x42, 0x41})
+				return assertions.New(t).So(b, should.BeNil)
 			},
 		},
 		{
@@ -72,11 +71,11 @@ func TestWithBasePath(t *testing.T) {
 			},
 		},
 		{
-			Name:     "base [foo bar baz]/empty path",
-			BasePath: []string{"foo", "bar", "baz"},
-			Bytes:    []byte{0x42, 0x41},
+			Name:  "empty base path/path [/foo bar baz]",
+			Path:  []string{"/foo", "bar", "baz"},
+			Bytes: []byte{0x42, 0x41},
 			AssertPath: func(t *testing.T, pathElements ...string) bool {
-				return assertions.New(t).So(pathElements, should.Resemble, []string{"foo", "bar", "baz"})
+				return assertions.New(t).So(pathElements, should.Resemble, []string{"/foo", "bar", "baz"})
 			},
 			AssertError: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(err, should.BeNil)
@@ -86,12 +85,40 @@ func TestWithBasePath(t *testing.T) {
 			},
 		},
 		{
+			Name:     "base [foo bar baz]/empty path",
+			BasePath: []string{"foo", "bar", "baz"},
+			AssertPath: func(t *testing.T, pathElements ...string) bool {
+				return assertions.New(t).So(pathElements, should.Resemble, []string{"foo", "bar", "baz"})
+			},
+			AssertError: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeError)
+			},
+			AssertBytes: func(t *testing.T, b []byte) bool {
+				return assertions.New(t).So(b, should.BeNil)
+			},
+		},
+		{
 			Name:     "base [foo bar baz]/path [42 baz bar foo]",
 			BasePath: []string{"foo", "bar", "baz"},
 			Path:     []string{"42", "baz", "bar", "foo"},
 			Bytes:    []byte{0x42, 0x41},
 			AssertPath: func(t *testing.T, pathElements ...string) bool {
 				return assertions.New(t).So(pathElements, should.Resemble, []string{"foo", "bar", "baz", "42", "baz", "bar", "foo"})
+			},
+			AssertError: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+			AssertBytes: func(t *testing.T, b []byte) bool {
+				return assertions.New(t).So(b, should.Resemble, []byte{0x42, 0x41})
+			},
+		},
+		{
+			Name:     "base [foo bar baz]/path [/42 baz bar foo]",
+			BasePath: []string{"foo", "bar", "baz"},
+			Path:     []string{"/42", "baz", "bar", "foo"},
+			Bytes:    []byte{0x42, 0x41},
+			AssertPath: func(t *testing.T, pathElements ...string) bool {
+				return assertions.New(t).So(pathElements, should.Resemble, []string{"/42", "baz", "bar", "foo"})
 			},
 			AssertError: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(err, should.BeNil)

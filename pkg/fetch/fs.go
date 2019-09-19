@@ -23,37 +23,40 @@ import (
 
 type fsFetcher struct {
 	baseFetcher
-}
-
-// FromFilesystem returns an interface that fetches files from the local filesystem
-func FromFilesystem(basePath string) Interface {
-	if basePath != "" {
-		basePath = filepath.Clean(basePath)
-	}
-	return fsFetcher{
-		baseFetcher{
-			base:    basePath,
-			latency: fetchLatency.WithLabelValues("fs", basePath),
-		},
-	}
+	root string
 }
 
 func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
-	start := time.Now()
-	var path string
-	if f.base != "" {
-		path = filepath.Join(append([]string{f.base}, pathElements...)...)
-	} else {
-		path = filepath.Join(pathElements...)
+	if len(pathElements) == 0 {
+		return nil, errFilenameNotSpecified
 	}
-	content, err := ioutil.ReadFile(path)
+
+	start := time.Now()
+
+	p := filepath.Join(pathElements...)
+	rp, err := realOSPath(f.root, p)
+	if err != nil {
+		return nil, err
+	}
+	content, err := ioutil.ReadFile(rp)
 	if err == nil {
 		f.observeLatency(time.Since(start))
 		return content, nil
 	}
 
 	if os.IsNotExist(err) {
-		return nil, errFileNotFound.WithAttributes("filename", filepath.Join(pathElements...))
+		return nil, errFileNotFound.WithAttributes("filename", p)
 	}
-	return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", filepath.Join(pathElements...))
+	return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", p)
+}
+
+// FromFilesystem returns an interface that fetches files from the local filesystem.
+func FromFilesystem(rootElements ...string) Interface {
+	root := filepath.Join(rootElements...)
+	return fsFetcher{
+		baseFetcher: baseFetcher{
+			latency: fetchLatency.WithLabelValues("fs", root),
+		},
+		root: root,
+	}
 }

@@ -16,7 +16,7 @@ package fetch
 
 import (
 	"context"
-	"path/filepath"
+	"path"
 	"time"
 
 	"gocloud.dev/blob"
@@ -26,29 +26,41 @@ import (
 type bucketFetcher struct {
 	baseFetcher
 	bucket *blob.Bucket
-}
-
-// FromBucket returns an interface that fetches files from the given blob bucket.
-func FromBucket(bucket *blob.Bucket, basePath string) Interface {
-	return &bucketFetcher{
-		baseFetcher: baseFetcher{
-			base:    basePath,
-			latency: fetchLatency.WithLabelValues("bucket", basePath),
-		},
-		bucket: bucket,
-	}
+	root   string
 }
 
 func (f *bucketFetcher) File(pathElements ...string) ([]byte, error) {
+	if len(pathElements) == 0 {
+		return nil, errFilenameNotSpecified
+	}
+
 	start := time.Now()
-	content, err := f.bucket.ReadAll(context.TODO(), filepath.Join(append([]string{f.base}, pathElements...)...))
+
+	p := path.Join(pathElements...)
+	rp, err := realPath(f.root, p)
+	if err != nil {
+		return nil, err
+	}
+	content, err := f.bucket.ReadAll(context.TODO(), rp)
 	if err == nil {
 		f.observeLatency(time.Since(start))
 		return content, nil
 	}
 
 	if gcerrors.Code(err) == gcerrors.NotFound {
-		return nil, errFileNotFound.WithAttributes("filename", filepath.Join(pathElements...))
+		return nil, errFileNotFound.WithAttributes("filename", p)
 	}
-	return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", filepath.Join(pathElements...))
+	return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", p)
+}
+
+// FromBucket returns an interface that fetches files from the given blob bucket.
+func FromBucket(bucket *blob.Bucket, root string) Interface {
+	root = path.Clean(root)
+	return &bucketFetcher{
+		baseFetcher: baseFetcher{
+			latency: fetchLatency.WithLabelValues("bucket", root),
+		},
+		bucket: bucket,
+		root:   root,
+	}
 }

@@ -2744,9 +2744,45 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/fetch:filename_not_specified": {
+    "translations": {
+      "en": "filename not specified"
+    },
+    "description": {
+      "package": "pkg/fetch",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/fetch:read_file": {
     "translations": {
       "en": "could not read file `{filename}`"
+    },
+    "description": {
+      "package": "pkg/fetch",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/fetch:scheme_not_specified": {
+    "translations": {
+      "en": "URI scheme not specified"
+    },
+    "description": {
+      "package": "pkg/fetch",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/fetch:scheme_specified": {
+    "translations": {
+      "en": "URI scheme should not be specified"
+    },
+    "description": {
+      "package": "pkg/fetch",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/fetch:volume_specified": {
+    "translations": {
+      "en": "volume should not be specified"
     },
     "description": {
       "package": "pkg/fetch",

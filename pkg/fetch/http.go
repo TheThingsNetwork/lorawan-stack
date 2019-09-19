@@ -15,11 +15,10 @@
 package fetch
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/gregjones/httpcache"
@@ -31,49 +30,64 @@ const timeout = 10 * time.Second
 type httpFetcher struct {
 	baseFetcher
 	httpClient *http.Client
+	root       *url.URL
 }
 
 func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
+	if len(pathElements) == 0 {
+		return nil, errFilenameNotSpecified
+	}
+
 	start := time.Now()
-	filename := strings.TrimLeft(path.Join(pathElements...), "/")
-	url := fmt.Sprintf("%s/%s", f.base, filename)
+
+	p := path.Join(pathElements...)
+	url, err := realURLPath(f.root, p)
+	if err != nil {
+		return nil, err
+	}
 
 	resp, err := f.httpClient.Get(url)
 	if err != nil {
-		return nil, errCouldNotFetchFile.WithCause(err).WithAttributes("filename", filename)
+		return nil, errCouldNotFetchFile.WithCause(err).WithAttributes("filename", p)
 	}
-
 	if err = errors.FromHTTP(resp); err != nil {
-		return nil, errCouldNotFetchFile.WithCause(err).WithAttributes("filename", filename)
+		return nil, errCouldNotFetchFile.WithCause(err).WithAttributes("filename", p)
 	}
+	defer resp.Body.Close()
 
 	result, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-
 	if err != nil {
-		return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", filename)
+		return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", p)
 	}
-
 	f.observeLatency(time.Since(start))
 	return result, nil
 }
 
 // FromHTTP returns an object to fetch files from a webserver.
-func FromHTTP(baseURL string, cache bool) Interface {
-	baseURL = strings.TrimRight(baseURL, "/")
+func FromHTTP(rootURL string, cache bool) (Interface, error) {
 	transport := http.DefaultTransport
 	if cache {
 		transport = httpcache.NewMemoryCacheTransport()
 	}
-	f := httpFetcher{
+	var root *url.URL
+	if rootURL != "" {
+		var err error
+		root, err = url.Parse(rootURL)
+		if err != nil {
+			return nil, err
+		}
+		if !root.IsAbs() {
+			return nil, errSchemeNotSpecified
+		}
+	}
+	return httpFetcher{
 		baseFetcher: baseFetcher{
-			base:    baseURL,
-			latency: fetchLatency.WithLabelValues("http", baseURL),
+			latency: fetchLatency.WithLabelValues("http", rootURL),
 		},
 		httpClient: &http.Client{
 			Transport: transport,
 			Timeout:   timeout,
 		},
-	}
-	return f
+		root: root,
+	}, nil
 }
