@@ -99,9 +99,10 @@ var (
 		"listen_frontend",
 		"failed to start frontend listener `{protocol}` on address `{address}`",
 	)
-	errNotConnected  = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
-	errSetupUpstream = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{hostname}`")
-	errUpstreamType  = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{hostname}` not implemented")
+	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
+	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{hostname}`")
+	errUpstreamType        = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{name}` not implemented")
+	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}`is invalid")
 )
 
 // New returns new *GatewayServer.
@@ -217,19 +218,19 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	for hostname, prefix := range gs.forward {
-		if hostname == "" {
+	for name, prefix := range gs.forward {
+		if name == "" {
 			gs.upstreamHandlers["cluster"] = ns.NewHandler(ctx, "cluster", c, prefix)
 		} else {
-			str := strings.SplitN(hostname, ":", 2)
+			str := strings.SplitN(name, ":", 2)
 			if len(str) != 2 {
-				continue
+				return nil, errInvalidUpstreamName.WithAttributes("name", name)
 			}
 			switch str[0] {
 			case "ttn.lorawan.v3.GsNs":
 				gs.upstreamHandlers[str[1]] = ns.NewHandler(ctx, str[1], c, prefix)
 			default:
-				return nil, errUpstreamType.WithAttributes("hostname", hostname)
+				return nil, errUpstreamType.WithAttributes("name", name)
 			}
 		}
 	}
