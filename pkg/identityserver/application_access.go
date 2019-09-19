@@ -140,14 +140,30 @@ func (is *IdentityServer) getApplicationAPIKey(ctx context.Context, req *ttnpb.G
 
 func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
+	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	// Require that caller has at least the rights of the API key.
-	if err = rights.RequireApplication(ctx, req.ApplicationIdentifiers, req.Rights...); err != nil {
-		return nil, err
-	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		if len(req.APIKey.Rights) > 0 {
+			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.APIKey.ID)
+			if err != nil {
+				return err
+			}
+
+			newRights := ttnpb.RightsFrom(req.APIKey.Rights...)
+			existingRights := ttnpb.RightsFrom(key.Rights...)
+
+			// Require the caller to have all added rights.
+			if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, newRights.Sub(existingRights).GetRights()...); err != nil {
+				return err
+			}
+			// Require the caller to have all removed rights.
+			if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, existingRights.Sub(newRights).GetRights()...); err != nil {
+				return err
+			}
+		}
+
 		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIdentifiers, &req.APIKey)
 		return err
 	})

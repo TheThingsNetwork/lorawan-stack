@@ -470,7 +470,7 @@ type GatewayAccessClient interface {
 	GetAPIKey(ctx context.Context, in *GetGatewayAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Update the rights of an existing gateway API key. To generate an API key,
 	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights.
+	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
 	UpdateAPIKey(ctx context.Context, in *UpdateGatewayAPIKeyRequest, opts ...grpc.CallOption) (*APIKey, error)
 	// Get the rights of a collaborator (member) of the gateway.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
@@ -570,7 +570,7 @@ type GatewayAccessServer interface {
 	GetAPIKey(context.Context, *GetGatewayAPIKeyRequest) (*APIKey, error)
 	// Update the rights of an existing gateway API key. To generate an API key,
 	// the CreateAPIKey should be used. To delete an API key, update it
-	// with zero rights.
+	// with zero rights. It is required for the caller to have all assigned or/and removed rights.
 	UpdateAPIKey(context.Context, *UpdateGatewayAPIKeyRequest) (*APIKey, error)
 	// Get the rights of a collaborator (member) of the gateway.
 	// Pseudo-rights in the response (such as the "_ALL" right) are not expanded.

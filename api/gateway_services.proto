@@ -106,7 +106,7 @@ service GatewayAccess {
 
   // Update the rights of an existing gateway API key. To generate an API key,
   // the CreateAPIKey should be used. To delete an API key, update it
-  // with zero rights.
+  // with zero rights. It is required for the caller to have all assigned or/and removed rights.
   rpc UpdateAPIKey(UpdateGatewayAPIKeyRequest) returns (APIKey) {
     option (google.api.http) = {
       put: "/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}"

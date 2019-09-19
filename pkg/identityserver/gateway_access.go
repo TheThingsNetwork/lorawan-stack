@@ -143,11 +143,27 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	// Require that caller has at least the rights of the API key.
-	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, req.Rights...); err != nil {
-		return nil, err
-	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		if len(req.APIKey.Rights) > 0 {
+			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.APIKey.ID)
+			if err != nil {
+				return err
+			}
+
+			newRights := ttnpb.RightsFrom(req.APIKey.Rights...)
+			existingRights := ttnpb.RightsFrom(key.Rights...)
+
+			// Require the caller to have all added rights.
+			if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, newRights.Sub(existingRights).GetRights()...); err != nil {
+				return err
+			}
+			// Require the caller to have all removed rights.
+			if err := rights.RequireGateway(ctx, req.GatewayIdentifiers, existingRights.Sub(newRights).GetRights()...); err != nil {
+				return err
+			}
+		}
+
 		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GatewayIdentifiers, &req.APIKey)
 		return err
 	})
