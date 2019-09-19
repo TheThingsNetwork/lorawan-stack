@@ -293,7 +293,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				logger.WithError(err).Debug("Failed to parse message type")
 				continue
 			}
-			logger = logger.WithFields(log.Fields(
+			logger := logger.WithFields(log.Fields(
 				"upstream_type", typ,
 			))
 			receivedAt := time.Now()
