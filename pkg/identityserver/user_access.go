@@ -131,11 +131,27 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
-	// Require that caller has at least the rights of the API key.
-	if err = rights.RequireUser(ctx, req.UserIdentifiers, req.Rights...); err != nil {
-		return nil, err
-	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		if len(req.APIKey.Rights) > 0 {
+			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.APIKey.ID)
+			if err != nil {
+				return err
+			}
+
+			newRights := ttnpb.RightsFrom(req.APIKey.Rights...)
+			existingRights := ttnpb.RightsFrom(key.Rights...)
+
+			// Require the caller to have all added rights.
+			if err := rights.RequireUser(ctx, req.UserIdentifiers, newRights.Sub(existingRights).GetRights()...); err != nil {
+				return err
+			}
+			// Require the caller to have all removed rights.
+			if err := rights.RequireUser(ctx, req.UserIdentifiers, existingRights.Sub(newRights).GetRights()...); err != nil {
+				return err
+			}
+		}
+
 		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIdentifiers, &req.APIKey)
 		return err
 	})
