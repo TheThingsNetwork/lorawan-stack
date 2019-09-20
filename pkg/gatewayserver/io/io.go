@@ -39,8 +39,6 @@ const (
 type Frontend interface {
 	// Protocol returns the protocol used in the frontend.
 	Protocol() string
-	// SupportsStatusMessage returns true if the protocol supports status messages.
-	SupportsStatusMessage() bool
 	// SupportsDownlinkClaim returns true if the frontend can itself claim downlinks.
 	SupportsDownlinkClaim() bool
 }

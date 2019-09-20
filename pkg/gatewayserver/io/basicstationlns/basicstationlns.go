@@ -25,6 +25,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
@@ -61,7 +62,6 @@ type srv struct {
 }
 
 func (*srv) Protocol() string            { return "basicstation" }
-func (*srv) SupportsStatusMessage() bool { return false }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
@@ -327,7 +327,23 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				stat := &ttnpb.GatewayStatus{
 					Time: receivedAt,
 					Versions: map[string]string{
-						"platform": fmt.Sprintf("%s:%s", version.Model, version.Station),
+						"station":  version.Station,
+						"firmware": version.Firmware,
+						"package":  version.Package,
+					},
+					Advanced: &pbtypes.Struct{
+						Fields: map[string]*pbtypes.Value{
+							"model": {
+								Kind: &pbtypes.Value_StringValue{
+									StringValue: version.Model,
+								},
+							},
+							"features": {
+								Kind: &pbtypes.Value_StringValue{
+									StringValue: version.Features,
+								},
+							},
+						},
 					},
 				}
 				if err := conn.HandleStatus(stat); err != nil {

@@ -31,7 +31,6 @@ type Frontend struct {
 }
 
 func (*Frontend) Protocol() string            { return "mock" }
-func (*Frontend) SupportsStatusMessage() bool { return true }
 func (*Frontend) SupportsDownlinkClaim() bool { return true }
 
 // ConnectFrontend connects a new mock front-end to the given server.
