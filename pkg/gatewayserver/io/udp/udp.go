@@ -75,7 +75,6 @@ type srv struct {
 }
 
 func (*srv) Protocol() string            { return "udp" }
-func (*srv) SupportsStatusMessage() bool { return true }
 func (*srv) SupportsDownlinkClaim() bool { return true }
 
 // Start starts the UDP frontend.

@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
@@ -537,7 +538,19 @@ func TestVersion(t *testing.T) {
 			},
 			ExpectedStatusMessage: ttnpb.GatewayStatus{
 				Versions: map[string]string{
-					"platform": fmt.Sprintf("test-model:test-station"),
+					"station":  "test-station",
+					"firmware": "1.0.0",
+					"package":  "test-package",
+				},
+				Advanced: &pbtypes.Struct{
+					Fields: map[string]*pbtypes.Value{
+						"model": {
+							Kind: &pbtypes.Value_StringValue{StringValue: "test-model"},
+						},
+						"features": {
+							Kind: &pbtypes.Value_StringValue{StringValue: "prod gps"},
+						},
+					},
 				},
 			},
 		},
@@ -625,7 +638,19 @@ func TestVersion(t *testing.T) {
 			},
 			ExpectedStatusMessage: ttnpb.GatewayStatus{
 				Versions: map[string]string{
-					"platform": fmt.Sprintf("test-model:test-station-rc1"),
+					"station":  "test-station-rc1",
+					"firmware": "1.0.0",
+					"package":  "test-package",
+				},
+				Advanced: &pbtypes.Struct{
+					Fields: map[string]*pbtypes.Value{
+						"model": {
+							Kind: &pbtypes.Value_StringValue{StringValue: "test-model"},
+						},
+						"features": {
+							Kind: &pbtypes.Value_StringValue{StringValue: "rmtsh gps"},
+						},
+					},
 				},
 			},
 		},

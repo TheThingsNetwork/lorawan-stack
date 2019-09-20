@@ -87,7 +87,6 @@ type connection struct {
 }
 
 func (*connection) Protocol() string            { return "mqtt" }
-func (*connection) SupportsStatusMessage() bool { return true }
 func (*connection) SupportsDownlinkClaim() bool { return false }
 
 func (c *connection) setup(ctx context.Context) error {
