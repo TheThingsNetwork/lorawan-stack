@@ -443,10 +443,18 @@ func TestVersion(t *testing.T) {
 	}
 	defer conn.Close()
 
+	var gsConn *io.Connection
+	select {
+	case gsConn = <-gs.Connections():
+	case <-time.After(timeout):
+		t.Fatal("Connection timeout")
+	}
+
 	for _, tc := range []struct {
-		Name                 string
-		VersionQuery         interface{}
-		ExpectedRouterConfig interface{}
+		Name                  string
+		VersionQuery          interface{}
+		ExpectedRouterConfig  interface{}
+		ExpectedStatusMessage ttnpb.GatewayStatus
 	}{
 		{
 			Name: "VersionProd",
@@ -527,11 +535,16 @@ func TestVersion(t *testing.T) {
 					},
 				},
 			},
+			ExpectedStatusMessage: ttnpb.GatewayStatus{
+				Versions: map[string]string{
+					"platform": fmt.Sprintf("test-model:test-station"),
+				},
+			},
 		},
 		{
 			Name: "VersionDebug",
 			VersionQuery: messages.Version{
-				Station:  "test-station",
+				Station:  "test-station-rc1",
 				Firmware: "1.0.0",
 				Package:  "test-package",
 				Model:    "test-model",
@@ -610,6 +623,11 @@ func TestVersion(t *testing.T) {
 					},
 				},
 			},
+			ExpectedStatusMessage: ttnpb.GatewayStatus{
+				Versions: map[string]string{
+					"platform": fmt.Sprintf("test-model:test-station-rc1"),
+				},
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -638,6 +656,14 @@ func TestVersion(t *testing.T) {
 				}
 				response.MuxTime = tc.ExpectedRouterConfig.(messages.RouterConfig).MuxTime
 				a.So(response, should.Resemble, tc.ExpectedRouterConfig)
+			case <-time.After(timeout):
+				t.Fatalf("Read message timeout")
+			}
+			select {
+			case stat := <-gsConn.Status():
+				a.So(time.Since(stat.Time), should.BeLessThan, timeout)
+				stat.Time = time.Time{}
+				a.So(stat, should.Resemble, &tc.ExpectedStatusMessage)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
 			}
