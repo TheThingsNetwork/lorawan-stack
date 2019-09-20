@@ -305,7 +305,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.WithError(err).Debug("Failed to unmarshal version message")
 					return err
 				}
-				logger = logger.WithFields(log.Fields(
+				logger := logger.WithFields(log.Fields(
 					"station", version.Station,
 					"firmware", version.Firmware,
 					"model", version.Model,
@@ -323,6 +323,15 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
 					logger.WithError(err).Warn("Failed to send router configuration")
 					return err
+				}
+				stat := &ttnpb.GatewayStatus{
+					Time: receivedAt,
+					Versions: map[string]string{
+						"platform": fmt.Sprintf("%s:%s", version.Model, version.Station),
+					},
+				}
+				if err := conn.HandleStatus(stat); err != nil {
+					logger.WithError(err).Warn("Failed to send status message")
 				}
 
 			case messages.TypeUpstreamJoinRequest:
