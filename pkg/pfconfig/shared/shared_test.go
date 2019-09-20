@@ -147,7 +147,18 @@ func TestSX1301Conf(t *testing.T) {
 			if !(a.So(*cfg, should.Resemble, tc.SX1301Config)) {
 				t.Fatalf("Invalid config: %v", cfg)
 			}
+			msg, err := cfg.MarshalJSON()
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			var unmarshaledCfg SX1301Config
+			err = unmarshaledCfg.UnmarshalJSON(msg)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			if !(a.So(unmarshaledCfg, should.Resemble, *cfg)) {
+				t.Fatalf("Invalid config after unmarshaling: %v", cfg)
+			}
 		})
 	}
-
 }

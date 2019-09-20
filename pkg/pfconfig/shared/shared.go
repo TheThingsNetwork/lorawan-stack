@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
@@ -27,7 +28,6 @@ import (
 )
 
 // SX1301Config contains the configuration for the SX1301 concentrator.
-// It marshals to compliant JSON, but does currently **not** unmarshal from it.
 type SX1301Config struct {
 	LoRaWANPublic       bool
 	ClockSource         uint8
@@ -40,10 +40,7 @@ type SX1301Config struct {
 	TxLUTConfigs        []TxLUTConfig
 }
 
-var errUnmarshalNotImplemented = errors.DefineUnimplemented(
-	"unmarshal_not_implemented",
-	"unmarshaling SX1301 config is not implemented",
-)
+var errInvalidKey = errors.DefineInvalidArgument("invalid_key", "key `{key}` invalid")
 
 type kv struct {
 	key   string
@@ -108,10 +105,86 @@ func (c SX1301Config) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
-// UnmarshalJSON implements json.Unmarshaler. It currently just errors because
-// unmarshaling is not supported.
-func (c *SX1301Config) UnmarshalJSON(_ []byte) error {
-	return errUnmarshalNotImplemented
+// UnmarshalJSON implements json.Unmarshaler.
+func (c *SX1301Config) UnmarshalJSON(msg []byte) error {
+	var root map[string]json.RawMessage
+	if err := json.Unmarshal(msg, &root); err != nil {
+		return err
+	}
+	radioMap, txLutMap, chanMap := make(map[int]RFConfig), make(map[int]TxLUTConfig), make(map[int]IFConfig)
+	for key, value := range root {
+		switch {
+		case key == "lorawan_public":
+			if err := json.Unmarshal(value, &c.LoRaWANPublic); err != nil {
+				return err
+			}
+		case key == "antenna_gain":
+			if err := json.Unmarshal(value, &c.AntennaGain); err != nil {
+				return err
+			}
+		case key == "clksrc":
+			if err := json.Unmarshal(value, &c.ClockSource); err != nil {
+				return err
+			}
+		case key == "lbt_cfg":
+			if err := json.Unmarshal(value, &c.LBTConfig); err != nil {
+				return err
+			}
+		case key == "chan_Lora_std":
+			if err := json.Unmarshal(value, &c.LoRaStandardChannel); err != nil {
+				return err
+			}
+		case key == "chan_FSK":
+			if err := json.Unmarshal(value, &c.FSKChannel); err != nil {
+				return err
+			}
+		case strings.HasPrefix(key, "chan_multiSF_"):
+			var channel IFConfig
+			if err := json.Unmarshal(value, &channel); err != nil {
+				return err
+			}
+			var index int
+			if _, err := fmt.Sscanf(key, "chan_multiSF_%d", &index); err == nil {
+				chanMap[index] = channel
+			} else {
+				return err
+			}
+		case strings.HasPrefix(key, "tx_lut_"):
+			var txLut TxLUTConfig
+			if err := json.Unmarshal(value, &txLut); err != nil {
+				return err
+			}
+			var index int
+			if _, err := fmt.Sscanf(key, "tx_lut_%d", &index); err == nil {
+				txLutMap[index] = txLut
+			} else {
+				return err
+			}
+		case strings.HasPrefix(key, "radio_"):
+			var radio RFConfig
+			if err := json.Unmarshal(value, &radio); err != nil {
+				return err
+			}
+			var index int
+			if _, err := fmt.Sscanf(key, "radio_%d", &index); err == nil {
+				radioMap[index] = radio
+			} else {
+				return err
+			}
+		}
+	}
+
+	c.Radios, c.TxLUTConfigs, c.Channels = make([]RFConfig, len(radioMap)), make([]TxLUTConfig, len(txLutMap)), make([]IFConfig, len(chanMap))
+	for key, value := range radioMap {
+		c.Radios[key] = value
+	}
+	for key, value := range txLutMap {
+		c.TxLUTConfigs[key] = value
+	}
+	for key, value := range chanMap {
+		c.Channels[key] = value
+	}
+	return nil
 }
 
 // LBTConfig contains the configuration for listen-before-talk.

@@ -5228,9 +5228,9 @@
       "file": "server.go"
     }
   },
-  "error:pkg/pfconfig/shared:unmarshal_not_implemented": {
+  "error:pkg/pfconfig/shared:invalid_key": {
     "translations": {
-      "en": "unmarshaling SX1301 config is not implemented"
+      "en": "key `{key}` invalid"
     },
     "description": {
       "package": "pkg/pfconfig/shared",
