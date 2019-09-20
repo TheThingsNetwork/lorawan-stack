@@ -27,6 +27,8 @@ import (
 
 type server struct {
 	*component.Component
+	subscriptionsMu sync.RWMutex
+	subscriptions   map[string][]*io.Subscription
 	subscriptionsCh chan *io.Subscription
 	downlinkQueueMu sync.RWMutex
 	downlinkQueue   map[string][]*ttnpb.ApplicationDownlink
@@ -43,6 +45,7 @@ type Server interface {
 func NewServer(c *component.Component) Server {
 	return &server{
 		Component:       c,
+		subscriptions:   make(map[string][]*io.Subscription),
 		subscriptionsCh: make(chan *io.Subscription, 10),
 		downlinkQueue:   make(map[string][]*ttnpb.ApplicationDownlink),
 	}
@@ -53,12 +56,26 @@ func (s *server) FillContext(ctx context.Context) context.Context {
 	return s.Component.FillContext(ctx)
 }
 
+func (s *server) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	s.subscriptionsMu.Lock()
+	defer s.subscriptionsMu.Unlock()
+	for _, sub := range s.subscriptions[unique.ID(ctx, up.ApplicationIdentifiers)] {
+		if err := sub.SendUp(ctx, up); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Subscribe implements io.Server.
 func (s *server) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*io.Subscription, error) {
 	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
 	sub := io.NewSubscription(ctx, protocol, &ids)
+	s.subscriptionsMu.Lock()
+	s.subscriptions[unique.ID(ctx, ids)] = append(s.subscriptions[unique.ID(ctx, ids)], sub)
+	s.subscriptionsMu.Unlock()
 	select {
 	case s.subscriptionsCh <- sub:
 	default:

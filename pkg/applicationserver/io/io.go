@@ -25,13 +25,15 @@ import (
 
 const bufferSize = 32
 
-// Server represents the Application Server to gateway frontends.
+// Server represents the Application Server to application frontends.
 type Server interface {
 	// GetBaseConfig returns the component configuration.
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillContext fills the given context.
 	// This method should only be used for request contexts.
 	FillContext(ctx context.Context) context.Context
+	// SendUp sends upstream traffic to the Application Server.
+	SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error
 	// Subscribe subscribes an application or integration by its identifiers to the Application Server, and returns a
 	// Subscription for traffic and control.
 	Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*Subscription, error)
