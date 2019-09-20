@@ -15,8 +15,10 @@
 package shared
 
 import (
+	"fmt"
 	"time"
 
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 )
 
@@ -26,6 +28,8 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 	MQTT: applicationserver.MQTTConfig{
 		Listen:    ":1883",
 		ListenTLS: ":8883",
+		Public:    fmt.Sprintf("mqtt://%s:1883", shared.DefaultPublicHost),
+		PublicTLS: fmt.Sprintf("mqtts://%s:8883", shared.DefaultPublicHost),
 	},
 	Webhooks: applicationserver.WebhooksConfig{
 		Target:    "direct",

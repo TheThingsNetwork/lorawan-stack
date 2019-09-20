@@ -328,6 +328,9 @@
   - [Message `Location`](#ttn.lorawan.v3.Location)
   - [Message `RxMetadata`](#ttn.lorawan.v3.RxMetadata)
   - [Enum `LocationSource`](#ttn.lorawan.v3.LocationSource)
+- [File `lorawan-stack/api/mqtt.proto`](#lorawan-stack/api/mqtt.proto)
+  - [Message `MQTTConfiguration`](#ttn.lorawan.v3.MQTTConfiguration)
+  - [Message `MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo)
 - [File `lorawan-stack/api/networkserver.proto`](#lorawan-stack/api/networkserver.proto)
   - [Message `GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse)
   - [Service `AsNs`](#ttn.lorawan.v3.AsNs)
@@ -745,6 +748,7 @@ The AppAs service connects an application or integration to an Application Serve
 | `DownlinkQueuePush` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `DownlinkQueueReplace` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) |  |
+| `GetMQTTConnectionInfo` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) |  |
 
 #### HTTP bindings
 
@@ -753,6 +757,7 @@ The AppAs service connects an application or integration to an Application Serve
 | `DownlinkQueuePush` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push` | `*` |
 | `DownlinkQueueReplace` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace` | `*` |
 | `DownlinkQueueList` | `GET` | `/api/v3/as/applications/{application_ids.application_id}/devices/{device_id}/down` |  |
+| `GetMQTTConnectionInfo` | `GET` | `/api/v3/as/applications/{application_id}/mqtt-connection-info` |  |
 
 ### <a name="ttn.lorawan.v3.As">Service `As`</a>
 
@@ -4692,6 +4697,33 @@ a message corresponds to one RxMetadata.
 | `SOURCE_COMBINED_GEOLOCATION` | 9 | The location is estimated by a combination of geolocation sources.
 
 More estimation methods can be added. |
+
+## <a name="lorawan-stack/api/mqtt.proto">File `lorawan-stack/api/mqtt.proto`</a>
+
+### <a name="ttn.lorawan.v3.MQTTConfiguration">Message `MQTTConfiguration`</a>
+
+MQTTConfiguration represents the configuration of an MQTT frontend.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `public_address` | [`string`](#string) |  | The public listen address of the frontend. |
+| `public_tls_address` | [`string`](#string) |  | The public listen address of the TLS frontend. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `public_address` | <p>`string.uri`: `true`</p> |
+| `public_tls_address` | <p>`string.uri`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.MQTTConnectionInfo">Message `MQTTConnectionInfo`</a>
+
+MQTTConnectionInfo provides both MQTTConfiguration and MQTTUsername.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `config` | [`MQTTConfiguration`](#ttn.lorawan.v3.MQTTConfiguration) |  |  |
+| `username` | [`string`](#string) |  |  |
 
 ## <a name="lorawan-stack/api/networkserver.proto">File `lorawan-stack/api/networkserver.proto`</a>
 

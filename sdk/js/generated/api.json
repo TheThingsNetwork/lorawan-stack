@@ -1421,6 +1421,28 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "GetMQTTConnectionInfo",
+              "description": "",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "MQTTConnectionInfo",
+              "responseLongType": "MQTTConnectionInfo",
+              "responseFullType": "ttn.lorawan.v3.MQTTConnectionInfo",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/applications/{application_id}/mqtt-connection-info"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },
@@ -18891,6 +18913,98 @@
               "type": "Struct",
               "longType": "google.protobuf.Struct",
               "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "lorawan-stack/api/mqtt.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MQTTConfiguration",
+          "longName": "MQTTConfiguration",
+          "fullName": "ttn.lorawan.v3.MQTTConfiguration",
+          "description": "MQTTConfiguration represents the configuration of an MQTT frontend.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "public_address",
+              "description": "The public listen address of the frontend.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "public_tls_address",
+              "description": "The public listen address of the TLS frontend.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.uri",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "MQTTConnectionInfo",
+          "longName": "MQTTConnectionInfo",
+          "fullName": "ttn.lorawan.v3.MQTTConnectionInfo",
+          "description": "MQTTConnectionInfo provides both MQTTConfiguration and MQTTUsername.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "config",
+              "description": "",
+              "label": "",
+              "type": "MQTTConfiguration",
+              "longType": "MQTTConfiguration",
+              "fullType": "ttn.lorawan.v3.MQTTConfiguration",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "username",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "defaultValue": ""
             }

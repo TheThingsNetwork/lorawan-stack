@@ -1031,6 +1031,30 @@
         ]
       }
     },
+    "/as/applications/{application_id}/mqtt-connection-info": {
+      "get": {
+        "operationId": "GetMQTTConnectionInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3MQTTConnectionInfo"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppAs"
+        ]
+      }
+    },
     "/as/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
         "summary": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
@@ -9506,6 +9530,32 @@
           "$ref": "#/definitions/v3Major"
         }
       }
+    },
+    "v3MQTTConfiguration": {
+      "type": "object",
+      "properties": {
+        "public_address": {
+          "type": "string",
+          "description": "The public listen address of the frontend."
+        },
+        "public_tls_address": {
+          "type": "string",
+          "description": "The public listen address of the TLS frontend."
+        }
+      },
+      "description": "MQTTConfiguration represents the configuration of an MQTT frontend."
+    },
+    "v3MQTTConnectionInfo": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/definitions/v3MQTTConfiguration"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "description": "MQTTConnectionInfo provides both MQTTConfiguration and MQTTUsername."
     },
     "v3MType": {
       "type": "string",

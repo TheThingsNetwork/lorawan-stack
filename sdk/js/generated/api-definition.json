@@ -277,6 +277,18 @@
           ]
         }
       ]
+    },
+    "GetMQTTConnectionInfo": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{application_id}/mqtt-connection-info",
+          "parameters": [
+            "application_id"
+          ]
+        }
+      ]
     }
   },
   "As": {

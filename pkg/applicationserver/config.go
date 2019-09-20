@@ -79,6 +79,8 @@ func (c Config) GetLinkMode() (LinkMode, error) {
 type MQTTConfig struct {
 	Listen    string `name:"listen" description:"Address for the MQTT frontend to listen on"`
 	ListenTLS string `name:"listen-tls" description:"Address for the MQTTS frontend to listen on"`
+	Public    string `name:"public" description:"Public address of the MQTT frontend"`
+	PublicTLS string `name:"public-tls" description:"Public address of the MQTTs frontend"`
 }
 
 var (

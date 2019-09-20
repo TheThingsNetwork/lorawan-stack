@@ -803,3 +803,33 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 	_, err = client.DownlinkQueueReplace(ctx, req, link.callOpts...)
 	return err
 }
+
+type ctxConfigKeyType struct{}
+
+// GetConfig returns the Application Server config based on the context.
+func (as *ApplicationServer) GetConfig(ctx context.Context) (*Config, error) {
+	if val, ok := ctx.Value(&ctxConfigKeyType{}).(*Config); ok {
+		return val, nil
+	}
+	return as.config, nil
+}
+
+// GetMQTTConnectionInfo returns the addresses and username used for the MQTT frontend.
+func (as *ApplicationServer) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
+	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
+		return nil, err
+	}
+	config, err := as.GetConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.MQTTConnectionInfo{
+		MQTTConfig: &ttnpb.MQTTConfig{
+			PublicAddress:    config.MQTT.Public,
+			PublicTLSAddress: config.MQTT.PublicTLS,
+		},
+		MQTTUsername: &ttnpb.MQTTUsername{
+			Username: unique.ID(ctx, *ids),
+		},
+	}, nil
+}
