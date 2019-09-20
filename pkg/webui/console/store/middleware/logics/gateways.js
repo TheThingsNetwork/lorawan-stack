@@ -206,10 +206,6 @@ const updateGatewayStatisticsLogic = createRequestLogic({
 
     const stats = await api.gateway.stats(id)
 
-    if (!Boolean(stats.last_status_received_at)) {
-      stats.last_status_received_at = new Date()
-    }
-
     return { stats }
   },
 })
