@@ -36,7 +36,6 @@ import PropTypes from '../../../lib/prop-types'
 import m from './messages'
 import validationSchema from './validation-schema'
 
-@bind
 class DeviceDataForm extends Component {
   constructor(props) {
     super(props)
@@ -54,22 +53,27 @@ class DeviceDataForm extends Component {
     }
   }
 
+  @bind
   handleOTAASelect() {
     this.setState({ otaa: true })
   }
 
+  @bind
   handleABPSelect() {
     this.setState({ otaa: false })
   }
 
+  @bind
   handleResetsJoinNoncesChange(evt) {
     this.setState({ resets_join_nonces: evt.target.checked })
   }
 
+  @bind
   handleResetsFrameCountersChange(evt) {
     this.setState({ resets_f_cnt: evt.target.checked })
   }
 
+  @bind
   async handleSubmit(values, { setSubmitting, resetForm }) {
     const { onSubmit, onSubmitSuccess, initialValues, update } = this.props
     const deviceId = getDeviceId(initialValues)
@@ -94,6 +98,7 @@ class DeviceDataForm extends Component {
     }
   }
 
+  @bind
   async handleDelete() {
     const { onDelete, onDeleteSuccess, initialValues } = this.props
     const deviceId = getDeviceId(initialValues)
