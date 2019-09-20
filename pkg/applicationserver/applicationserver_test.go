@@ -34,6 +34,7 @@ import (
 	nats_client "github.com/nats-io/nats.go"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	iomqtt "go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 	iopubsubredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
 	iowebredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
@@ -268,7 +269,7 @@ hardware_versions:
 		LinkMode: "all",
 		Devices:  deviceRegistry,
 		Links:    linkRegistry,
-		MQTT: applicationserver.MQTTConfig{
+		MQTT: iomqtt.Config{
 			Listen: ":1883",
 		},
 		Webhooks: applicationserver.WebhooksConfig{

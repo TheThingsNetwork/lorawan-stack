@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
@@ -43,6 +42,7 @@ var (
 
 type asImplementation struct {
 	*component.Component
+	ttnpb.UnimplementedAppAsServer
 
 	up chan *ttnpb.ApplicationUp
 }
@@ -59,16 +59,6 @@ func (as *asImplementation) Subscribe(id *ttnpb.ApplicationIdentifiers, stream t
 			stream.Send(up)
 		}
 	}
-}
-
-func (as *asImplementation) DownlinkQueuePush(context.Context, *ttnpb.DownlinkQueueRequest) (*types.Empty, error) {
-	return nil, errors.New("not implemented")
-}
-func (as *asImplementation) DownlinkQueueReplace(context.Context, *ttnpb.DownlinkQueueRequest) (*types.Empty, error) {
-	return nil, errors.New("not implemented")
-}
-func (as *asImplementation) DownlinkQueueList(context.Context, *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationDownlinks, error) {
-	return nil, errors.New("not implemented")
 }
 
 type gsImplementation struct {

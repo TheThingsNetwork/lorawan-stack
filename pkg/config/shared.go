@@ -15,6 +15,7 @@
 package config
 
 import (
+	"context"
 	"crypto/tls"
 	"time"
 
@@ -291,4 +292,17 @@ type ServiceBase struct {
 	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
 	Rights           Rights                 `name:"rights"`
 	KeyVault         KeyVault               `name:"key-vault"`
+}
+
+// MQTT contains the listen and public addresses of an MQTT frontend.
+type MQTT struct {
+	Listen    string `name:"listen" description:"Address for the MQTT frontend to listen on"`
+	ListenTLS string `name:"listen-tls" description:"Address for the MQTTS frontend to listen on"`
+	Public    string `name:"public" description:"Public address of the MQTT frontend"`
+	PublicTLS string `name:"public-tls" description:"Public address of the MQTTs frontend"`
+}
+
+// MQTTConfigProvider provides contextual access to MQTT configuration.
+type MQTTConfigProvider interface {
+	GetMQTTConfig(context.Context) (*MQTT, error)
 }

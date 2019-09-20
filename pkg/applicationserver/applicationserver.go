@@ -51,10 +51,12 @@ import (
 
 // ApplicationServer implements the Application Server component.
 //
-// The Application Server exposes the As, AppAs and AsEndDeviceRegistry services.
+// The Application Server exposes the As, AppAs, AsEndDeviceRegistry and AsMQTTConfiguration services.
 type ApplicationServer struct {
 	*component.Component
 	ctx context.Context
+
+	config *Config
 
 	linkMode         LinkMode
 	linkRegistry     LinkRegistry
@@ -122,6 +124,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	as = &ApplicationServer{
 		Component:      c,
 		ctx:            ctx,
+		config:         conf,
 		linkMode:       linkMode,
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
@@ -141,7 +144,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	}
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{AS: as}
-	as.grpc.appAs = iogrpc.New(as)
+	as.grpc.appAs = iogrpc.New(as, iogrpc.WithMQTTConfigProvider(as))
 
 	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
@@ -152,7 +155,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	for _, version := range []struct {
 		Format mqtt.Format
-		Config MQTTConfig
+		Config config.MQTT
 	}{
 		{
 			Format: mqtt.JSON,
@@ -221,6 +224,7 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsHandler(as.Context(), s, conn)
 	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn)
+	ttnpb.RegisterAsMQTTConfigurationHandler(as.Context(), s, conn)
 	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
@@ -814,22 +818,11 @@ func (as *ApplicationServer) GetConfig(ctx context.Context) (*Config, error) {
 	return as.config, nil
 }
 
-// GetMQTTConnectionInfo returns the addresses and username used for the MQTT frontend.
-func (as *ApplicationServer) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
-	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
-		return nil, err
-	}
+// GetMQTTConfig returns the MQTT frontend configuration based on the context.
+func (as *ApplicationServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, error) {
 	config, err := as.GetConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &ttnpb.MQTTConnectionInfo{
-		MQTTConfig: &ttnpb.MQTTConfig{
-			PublicAddress:    config.MQTT.Public,
-			PublicTLSAddress: config.MQTT.PublicTLS,
-		},
-		MQTTUsername: &ttnpb.MQTTUsername{
-			Username: unique.ID(ctx, *ids),
-		},
-	}, nil
+	return &config.MQTT, nil
 }

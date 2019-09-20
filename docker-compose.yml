@@ -113,6 +113,14 @@ services:
       # - TTN_LW_IS_EMAIL_SMTP_USERNAME=enter username
       # - TTN_LW_IS_EMAIL_SMTP_PASSWORD=enter password
 
+      # If Application Server enabled, defaults for "thethings.example.com":
+      # - TTN_LW_AS_MQTT_PUBLIC=mqtt://thethings.example.com:1883
+      # - TTN_LW_AS_MQTT_PUBLIC_TLS=mqtts://thethings.example.com:8883
+
+      # If Gateway Server enabled, defaults for "thethings.example.com":
+      # - TTN_LW_GS_MQTT_PUBLIC=mqtt://thethings.example.com:1883
+      # - TTN_LW_GS_MQTT_PUBLIC_TLS=mqtts://thethings.example.com:8883
+
       # If Gateway Configuration Server enabled, defaults for "thethings.example.com":
       # - TTN_LW_GCS_BASIC_STATION_DEFAULT_LNS_URI=wss://thethings.example.com:8887
       # - TTN_LW_GCS_THE_THINGS_GATEWAY_DEFAULT_MQTT_SERVER=mqtts://thethings.example.com:8882

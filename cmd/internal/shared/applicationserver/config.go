@@ -20,12 +20,13 @@ import (
 
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 )
 
 // DefaultApplicationServerConfig is the default configuration for the Application Server.
 var DefaultApplicationServerConfig = applicationserver.Config{
 	LinkMode: "all",
-	MQTT: applicationserver.MQTTConfig{
+	MQTT: mqtt.Config{
 		Listen:    ":1883",
 		ListenTLS: ":8883",
 		Public:    fmt.Sprintf("mqtt://%s:1883", shared.DefaultPublicHost),
