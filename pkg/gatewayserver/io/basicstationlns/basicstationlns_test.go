@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
@@ -443,10 +444,18 @@ func TestVersion(t *testing.T) {
 	}
 	defer conn.Close()
 
+	var gsConn *io.Connection
+	select {
+	case gsConn = <-gs.Connections():
+	case <-time.After(timeout):
+		t.Fatal("Connection timeout")
+	}
+
 	for _, tc := range []struct {
-		Name                 string
-		VersionQuery         interface{}
-		ExpectedRouterConfig interface{}
+		Name                  string
+		VersionQuery          interface{}
+		ExpectedRouterConfig  interface{}
+		ExpectedStatusMessage ttnpb.GatewayStatus
 	}{
 		{
 			Name: "VersionProd",
@@ -527,11 +536,28 @@ func TestVersion(t *testing.T) {
 					},
 				},
 			},
+			ExpectedStatusMessage: ttnpb.GatewayStatus{
+				Versions: map[string]string{
+					"station":  "test-station",
+					"firmware": "1.0.0",
+					"package":  "test-package",
+				},
+				Advanced: &pbtypes.Struct{
+					Fields: map[string]*pbtypes.Value{
+						"model": {
+							Kind: &pbtypes.Value_StringValue{StringValue: "test-model"},
+						},
+						"features": {
+							Kind: &pbtypes.Value_StringValue{StringValue: "prod gps"},
+						},
+					},
+				},
+			},
 		},
 		{
 			Name: "VersionDebug",
 			VersionQuery: messages.Version{
-				Station:  "test-station",
+				Station:  "test-station-rc1",
 				Firmware: "1.0.0",
 				Package:  "test-package",
 				Model:    "test-model",
@@ -610,6 +636,23 @@ func TestVersion(t *testing.T) {
 					},
 				},
 			},
+			ExpectedStatusMessage: ttnpb.GatewayStatus{
+				Versions: map[string]string{
+					"station":  "test-station-rc1",
+					"firmware": "1.0.0",
+					"package":  "test-package",
+				},
+				Advanced: &pbtypes.Struct{
+					Fields: map[string]*pbtypes.Value{
+						"model": {
+							Kind: &pbtypes.Value_StringValue{StringValue: "test-model"},
+						},
+						"features": {
+							Kind: &pbtypes.Value_StringValue{StringValue: "rmtsh gps"},
+						},
+					},
+				},
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -638,6 +681,14 @@ func TestVersion(t *testing.T) {
 				}
 				response.MuxTime = tc.ExpectedRouterConfig.(messages.RouterConfig).MuxTime
 				a.So(response, should.Resemble, tc.ExpectedRouterConfig)
+			case <-time.After(timeout):
+				t.Fatalf("Read message timeout")
+			}
+			select {
+			case stat := <-gsConn.Status():
+				a.So(time.Since(stat.Time), should.BeLessThan, timeout)
+				stat.Time = time.Time{}
+				a.So(stat, should.Resemble, &tc.ExpectedStatusMessage)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
 			}
@@ -941,7 +992,7 @@ func TestTraffic(t *testing.T) {
 			}
 
 			if tc.InputNetworkDownstream != nil {
-				if _, err := gsConn.SendDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
+				if _, err := gsConn.ScheduleDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
 
@@ -1222,7 +1273,7 @@ func TestRTT(t *testing.T) {
 			}
 
 			if tc.InputNetworkDownstream != nil {
-				if _, err := gsConn.SendDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
+				if _, err := gsConn.ScheduleDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
 

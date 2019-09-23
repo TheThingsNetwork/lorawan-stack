@@ -74,7 +74,8 @@ type srv struct {
 	firewall    Firewall
 }
 
-func (*srv) Protocol() string { return "udp" }
+func (*srv) Protocol() string            { return "udp" }
+func (*srv) SupportsDownlinkClaim() bool { return true }
 
 // Start starts the UDP frontend.
 func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) {
@@ -324,7 +325,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 		logger.WithError(err).Error("Failed to claim downlink")
 		return errClaimDownlinkFailed.WithCause(err)
 	}
-
+	defer s.server.UnclaimDownlink(ctx, state.io.Gateway().GatewayIdentifiers)
 	healthCheck := time.NewTicker(s.config.DownlinkPathExpires / 2)
 	defer healthCheck.Stop()
 	for {

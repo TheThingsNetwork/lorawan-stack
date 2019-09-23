@@ -70,7 +70,7 @@ func Test(t *testing.T) {
 	a.So(conn.Context(), should.HaveParentContextOrEqual, gtwCtx)
 	a.So(time.Since(conn.ConnectTime()), should.BeLessThan, timeout)
 	a.So(conn.Gateway(), should.Resemble, gtw)
-	a.So(conn.Protocol(), should.Equal, "mock")
+	a.So(conn.Frontend().Protocol(), should.Equal, "mock")
 
 	{
 		frontend.Up <- &ttnpb.UplinkMessage{
@@ -342,7 +342,7 @@ func Test(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			_, err := conn.SendDown(tc.Path, tc.Message)
+			_, err := conn.ScheduleDown(tc.Path, tc.Message)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)

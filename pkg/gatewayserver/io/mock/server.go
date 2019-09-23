@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -90,11 +89,11 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	if err != nil {
 		return nil, err
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fp, true)
 	if err != nil {
 		return nil, err
 	}
-	conn := io.NewConnection(ctx, frontend.Protocol(), gtw, fp, scheduler)
+
 	s.connections[unique.ID(ctx, ids)] = conn
 	select {
 	case s.connectionsCh <- conn:

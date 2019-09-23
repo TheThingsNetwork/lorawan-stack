@@ -30,7 +30,8 @@ type Frontend struct {
 	Down   chan *ttnpb.DownlinkMessage
 }
 
-func (*Frontend) Protocol() string { return "mock" }
+func (*Frontend) Protocol() string            { return "mock" }
+func (*Frontend) SupportsDownlinkClaim() bool { return true }
 
 // ConnectFrontend connects a new mock front-end to the given server.
 // The gateway time starts at Unix epoch.

@@ -86,7 +86,8 @@ type connection struct {
 	io      *io.Connection
 }
 
-func (*connection) Protocol() string { return "mqtt" }
+func (*connection) Protocol() string            { return "mqtt" }
+func (*connection) SupportsDownlinkClaim() bool { return false }
 
 func (c *connection) setup(ctx context.Context) error {
 	ctx = auth.NewContextWithInterface(ctx, c)
@@ -209,20 +210,10 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
-	logger := log.FromContext(ctx)
 	c.io, err = c.server.Connect(ctx, c, ids)
 	if err != nil {
 		return nil, err
 	}
-	if err = c.server.ClaimDownlink(ctx, ids); err != nil {
-		logger.WithError(err).Error("Failed to claim downlink")
-		return nil, err
-	}
-	defer func() {
-		if err := c.server.UnclaimDownlink(ctx, ids); err != nil {
-			logger.WithError(err).Error("Failed to unclaim downlink")
-		}
-	}()
 
 	access := topicAccess{
 		gtwUID: uid,

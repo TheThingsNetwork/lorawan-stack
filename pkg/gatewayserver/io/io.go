@@ -39,6 +39,8 @@ const (
 type Frontend interface {
 	// Protocol returns the protocol used in the frontend.
 	Protocol() string
+	// SupportsDownlinkClaim returns true if the frontend can itself claim downlinks.
+	SupportsDownlinkClaim() bool
 }
 
 // Server represents the Gateway Server to gateway frontends.
@@ -73,7 +75,7 @@ type Connection struct {
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
 
-	protocol  string
+	frontend  Frontend
 	gateway   *ttnpb.Gateway
 	fp        *frequencyplans.FrequencyPlan
 	scheduler *scheduling.Scheduler
@@ -86,12 +88,17 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, scheduler *scheduling.Scheduler) *Connection {
+func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool) (*Connection, error) {
 	ctx, cancelCtx := errorcontext.New(ctx)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, enforceDutyCycle, nil)
+	if err != nil {
+		return nil, err
+	}
 	return &Connection{
-		ctx:         ctx,
-		cancelCtx:   cancelCtx,
-		protocol:    protocol,
+		ctx:       ctx,
+		cancelCtx: cancelCtx,
+
+		frontend:    frontend,
 		gateway:     gateway,
 		fp:          fp,
 		scheduler:   scheduler,
@@ -101,7 +108,7 @@ func NewConnection(ctx context.Context, protocol string, gateway *ttnpb.Gateway,
 		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
 		txAckCh:     make(chan *ttnpb.TxAcknowledgment, bufferSize),
 		connectTime: time.Now().UnixNano(),
-	}
+	}, nil
 }
 
 // Context returns the connection context.
@@ -112,8 +119,8 @@ func (c *Connection) Disconnect(err error) {
 	c.cancelCtx(err)
 }
 
-// Protocol returns the protocol used for the connection, i.e. grpc, mqtt or udp.
-func (c *Connection) Protocol() string { return c.protocol }
+// Frontend returns the frontend using this connection.
+func (c *Connection) Frontend() Frontend { return c.frontend }
 
 // Gateway returns the gateway entity.
 func (c *Connection) Gateway() *ttnpb.Gateway { return c.gateway }
@@ -224,9 +231,23 @@ func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ids ttnpb.Gat
 	return *fixed, 0, nil
 }
 
-// SendDown schedules and sends a downlink message by using the given path and updates the downlink stats.
+// SendDown sends the downlink message directly on the downlink channel.
+func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
+	select {
+	case <-c.ctx.Done():
+		return c.ctx.Err()
+	case c.downCh <- msg:
+		atomic.AddUint64(&c.downlinks, 1)
+		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
+	default:
+		return errBufferFull
+	}
+	return nil
+}
+
+// ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
-func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
+func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
 	if c.gateway.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
 		return 0, errNotAllowed
 	}
@@ -364,14 +385,9 @@ func (c *Connection) SendDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessa
 			PathErrors: protoErrs,
 		})
 	}
-	select {
-	case <-c.ctx.Done():
-		return 0, c.ctx.Err()
-	case c.downCh <- msg:
-		atomic.AddUint64(&c.downlinks, 1)
-		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
-	default:
-		return 0, errBufferFull
+	err = c.SendDown(msg)
+	if err != nil {
+		return 0, err
 	}
 	return delay, nil
 }

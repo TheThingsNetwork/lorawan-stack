@@ -3239,6 +3239,15 @@
       "file": "scheduler.go"
     }
   },
+  "error:pkg/gatewayserver/upstream/ns:network_server_not_found": {
+    "translations": {
+      "en": "network server not found for ids `ids`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/upstream/ns",
+      "file": "ns.go"
+    }
+  },
   "error:pkg/gatewayserver:empty_identifiers": {
     "translations": {
       "en": "empty identifiers"
@@ -3269,6 +3278,15 @@
   "error:pkg/gatewayserver:host_handle": {
     "translations": {
       "en": "host `{host}` failed to handle message"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:invalid_upstream_name": {
+    "translations": {
+      "en": "upstream `{name}`is invalid"
     },
     "description": {
       "package": "pkg/gatewayserver",
@@ -3345,6 +3363,24 @@
     "description": {
       "package": "pkg/gatewayserver",
       "file": "grpc_nsgs.go"
+    }
+  },
+  "error:pkg/gatewayserver:upstream": {
+    "translations": {
+      "en": "failed to setup upstream `{hostname}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
+  "error:pkg/gatewayserver:upstream_type_not_implemented": {
+    "translations": {
+      "en": "upstream `{name}` not implemented"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
     }
   },
   "error:pkg/identityserver/blacklist:blacklisted_id": {

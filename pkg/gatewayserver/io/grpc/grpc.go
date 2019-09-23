@@ -38,7 +38,8 @@ func New(server io.Server) ttnpb.GtwGsServer {
 	return &impl{server}
 }
 
-func (*impl) Protocol() string { return "grpc" }
+func (*impl) Protocol() string            { return "grpc" }
+func (*impl) SupportsDownlinkClaim() bool { return false }
 
 var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_uid}`")
 
@@ -71,15 +72,6 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
 		logger.WithError(err).Warn("Failed to connect")
 		return errConnect.WithCause(err).WithAttributes("gateway_uid", uid)
 	}
-	if err = s.server.ClaimDownlink(ctx, ids); err != nil {
-		logger.WithError(err).Error("Failed to claim downlink")
-		return
-	}
-	defer func() {
-		if err := s.server.UnclaimDownlink(ctx, ids); err != nil {
-			logger.WithError(err).Error("Failed to unclaim downlink")
-		}
-	}()
 
 	go func() {
 		for {

@@ -25,6 +25,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
@@ -60,7 +61,8 @@ type srv struct {
 	tokens    io.DownlinkTokens
 }
 
-func (*srv) Protocol() string { return "basicstation" }
+func (*srv) Protocol() string            { return "basicstation" }
+func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
 func New(ctx context.Context, server io.Server) *echo.Echo {
@@ -160,7 +162,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
-func (s *srv) handleTraffic(c echo.Context) error {
+func (s *srv) handleTraffic(c echo.Context) (err error) {
 	var sessionID int32
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
@@ -227,14 +229,8 @@ func (s *srv) handleTraffic(c echo.Context) error {
 		logger.WithError(err).Warn("Failed to connect")
 		return err
 	}
-	if err := s.server.ClaimDownlink(ctx, ids); err != nil {
-		logger.WithError(err).Error("Failed to claim downlink")
-		return err
-	}
 	defer func() {
-		if err := s.server.UnclaimDownlink(ctx, ids); err != nil {
-			logger.WithError(err).Error("Failed to unclaim downlink")
-		}
+		conn.Disconnect(err)
 	}()
 
 	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
@@ -297,7 +293,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				logger.WithError(err).Debug("Failed to parse message type")
 				continue
 			}
-			logger = logger.WithFields(log.Fields(
+			logger := logger.WithFields(log.Fields(
 				"upstream_type", typ,
 			))
 			receivedAt := time.Now()
@@ -309,7 +305,7 @@ func (s *srv) handleTraffic(c echo.Context) error {
 					logger.WithError(err).Debug("Failed to unmarshal version message")
 					return err
 				}
-				logger = logger.WithFields(log.Fields(
+				logger := logger.WithFields(log.Fields(
 					"station", version.Station,
 					"firmware", version.Firmware,
 					"model", version.Model,
@@ -327,6 +323,31 @@ func (s *srv) handleTraffic(c echo.Context) error {
 				if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
 					logger.WithError(err).Warn("Failed to send router configuration")
 					return err
+				}
+				stat := &ttnpb.GatewayStatus{
+					Time: receivedAt,
+					Versions: map[string]string{
+						"station":  version.Station,
+						"firmware": version.Firmware,
+						"package":  version.Package,
+					},
+					Advanced: &pbtypes.Struct{
+						Fields: map[string]*pbtypes.Value{
+							"model": {
+								Kind: &pbtypes.Value_StringValue{
+									StringValue: version.Model,
+								},
+							},
+							"features": {
+								Kind: &pbtypes.Value_StringValue{
+									StringValue: version.Features,
+								},
+							},
+						},
+					},
+				}
+				if err := conn.HandleStatus(stat); err != nil {
+					logger.WithError(err).Warn("Failed to send status message")
 				}
 
 			case messages.TypeUpstreamJoinRequest:

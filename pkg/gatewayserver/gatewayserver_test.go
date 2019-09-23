@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/upstream/mock"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -65,7 +66,7 @@ func TestGatewayServer(t *testing.T) {
 
 	ctx := test.Context()
 	is, isAddr := startMockIS(ctx)
-	ns, nsAddr := startMockNS(ctx)
+	ns, nsAddr := mock.StartNS(ctx)
 
 	c := component.MustNew(test.GetLogger(t), &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -825,7 +826,7 @@ func TestGatewayServer(t *testing.T) {
 
 						for _, msgIdx := range tc.Forwards {
 							select {
-							case msg := <-ns.upCh:
+							case msg := <-ns.Up():
 								expected := tc.Up.UplinkMessages[msgIdx]
 								a.So(time.Since(msg.ReceivedAt), should.BeLessThan, timeout)
 								a.So(msg.Settings, should.Resemble, expected.Settings)
