@@ -107,18 +107,32 @@ class Marshaler {
     return this.payloadSingleResponse(result, transform)
   }
 
-  static fieldMaskFromPatch(patch, whitelist) {
-    const paths = []
+  static fieldMaskFromPatch(patch, whitelist, remaps) {
+    let paths = []
 
     traverse(patch).map(function(x) {
       if (this.node instanceof Array) {
         // Do not consider array elements and do not recurse into them
         this.update(undefined, true)
       }
-      if (!this.isRoot) {
+      if (!this.isRoot && this.isLeaf) {
         paths.push(this.path.join('.'))
       }
     })
+
+    // Field masks can sometimes be arbitrarily mapped to the actual message
+    // structure (e.g. for oneoffs). Through the remap argument, it can be
+    // accounted for that by remapping these paths.
+    if (remaps) {
+      paths = paths.map(function(path) {
+        for (const remap of remaps) {
+          if (path.startsWith(remap[0])) {
+            return path.replace(remap[0], remap[1])
+          }
+        }
+        return path
+      })
+    }
 
     return whitelist ? paths.filter(path => whitelist.includes(path)) : paths
   }
