@@ -119,6 +119,12 @@ import Devices from '../devices'
             icon: 'extension',
             exact: false,
           },
+          {
+            title: sharedMessages.pubsubs,
+            path: `${matchedUrl}/integrations/pubsubs`,
+            icon: 'extension',
+            exact: false,
+          },
         ],
       },
       {
