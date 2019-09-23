@@ -76,8 +76,8 @@ github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdko
 github.com/RoaringBitmap/roaring v0.4.7/go.mod h1:8khRDP4HmeXns4xIj9oGrKSz7XTQiJx2zgh7AcNke4w=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/TheThingsIndustries/grpc-gateway v1.11.1-gogo h1:YPQh4bzZxdzILs3PgRMDxESlOdTIzAzhKvqz/3hVeIY=
-github.com/TheThingsIndustries/grpc-gateway v1.11.1-gogo/go.mod h1:uRNj2trAYF05b6U4er4th9JsdGxGjk4qL9g/00Vi1R4=
+github.com/TheThingsIndustries/grpc-gateway v1.11.2-gogo h1:oEGQ8nZlbsz6I0bGNtEpLb81Ykbscf/LeSHS3ISWhcE=
+github.com/TheThingsIndustries/grpc-gateway v1.11.2-gogo/go.mod h1:EvDcGKZQ9TcfI3AT1bVDzaDy5ri4ICY+u7HZQ2D+fpc=
 github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed h1:rsGbnyV9cP0ocol1W17uTbZ1iWcEeg+gp3ivzW6NQ6Q=
 github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed/go.mod h1:InVSk9cxzZR1y4QaHF4CbDQ/uFeoTnbJfnwiKM04UNo=
 github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea h1:Bwdu0LN2AwuXWPPG03W9k7ahYzJodX3rSaLYuleb28g=
