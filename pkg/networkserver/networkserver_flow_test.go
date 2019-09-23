@@ -225,7 +225,7 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 
 		payload := []byte{
 			/* MHDR */
-			0x00,
+			0b000_000_00,
 			/* Join-request */
 			/** JoinEUI **/
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42,
@@ -513,13 +513,13 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 					0,
 					append([]byte{
 						/* MHDR */
-						0x40,
+						0b010_000_00,
 						/* MACPayload */
 						/** FHDR **/
 						/*** DevAddr ***/
 						devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 						/*** FCtrl ***/
-						0x80,
+						0b1_0_0_0_0000,
 						/*** FCnt ***/
 						0x00, 0x00,
 						/** FPort **/
@@ -724,13 +724,13 @@ func handleOTAAClassA868FlowTest1_0_2(ctx context.Context, reg DeviceRegistry, t
 							1,
 							append([]byte{
 								/* MHDR */
-								0x60,
+								0b011_000_00,
 								/* MACPayload */
 								/** FHDR **/
 								/*** DevAddr ***/
 								devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 								/*** FCtrl ***/
-								0x80,
+								0b1_0_0_0_0000,
 								/*** FCnt ***/
 								0x01, 0x00,
 								/** FPort **/

@@ -974,7 +974,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.1/RX1,RX2/no downlink",
+			Name: "Class A/windows open/1.1/RX1,RX2 available/no MAC/no application downlink",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1035,8 +1035,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					MACSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						CopyUplinkMessage(lastUp),
@@ -1113,7 +1113,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.0.3/RX1,RX2/FCnt too low",
+			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/FCnt too low",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1174,8 +1174,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					MACSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
@@ -1277,7 +1277,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.0.3/RX1,RX2/payload too long",
+			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/application downlink exceeds length limit",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1338,8 +1338,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					MACSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
@@ -1433,7 +1433,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.1/RX1,RX2/application downlink/FOpts present/EU868/scheduling fail",
+			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868/scheduling fail",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1568,13 +1568,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -1586,7 +1586,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -1685,7 +1685,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class A/windows open/1.1/RX1,RX2/application downlink/FOpts present/EU868",
+			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -1822,13 +1822,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -1840,7 +1840,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -1939,7 +1939,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.Resemble, []string{
+					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state",
 						"queued_application_downlinks",
 						"recent_downlinks",
@@ -1984,9 +1984,313 @@ func TestProcessDownlinkTask(t *testing.T) {
 			},
 		},
 
+		{
+			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/application downlink does not fit due to FOpts/MAC/RX1,RX2/EU868",
+			DownlinkPriorities: DownlinkPriorities{
+				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
+				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
+				MaxApplicationDownlink: ttnpb.TxSchedulePriority_NORMAL,
+			},
+			Handler: func(ctx context.Context, env TestEnvironment) bool {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+
+				start := time.Now()
+
+				var popRespCh chan<- error
+				popFuncRespCh := make(chan error)
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop to be called")
+					return false
+
+				case req := <-env.DownlinkTasks.Pop:
+					popRespCh = req.Response
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					go func() {
+						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
+						}, time.Now())
+					}()
+				}
+
+				lastUp := &ttnpb.UplinkMessage{
+					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+					DeviceChannelIndex: 3,
+					Payload: &ttnpb.Message{
+						MHDR: ttnpb.MHDR{
+							MType: ttnpb.MType_UNCONFIRMED_UP,
+						},
+						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+					},
+					ReceivedAt: time.Now().Add(-time.Second),
+					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
+					Settings: ttnpb.TxSettings{
+						DataRateIndex: ttnpb.DATA_RATE_0,
+						Frequency:     430000000,
+					},
+				}
+
+				// NOTE: Maximum FRMPayload length in both Rx1(DR0) and RX2(DR1) is 51. There are 6 bytes of FOpts, hence maximum fitting application downlink length is 45.
+				getDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_A,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						QueuedResponses: []*ttnpb.MACCommand{
+							(&ttnpb.MACCommand_ResetConf{
+								MinorVersion: 1,
+							}).MACCommand(),
+							(&ttnpb.MACCommand_LinkCheckAns{
+								Margin:       2,
+								GatewayCount: 5,
+							}).MACCommand(),
+						},
+						RxWindowsAvailable: true,
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x15,
+							FRMPayload:     bytes.Repeat([]byte{0x42}, 46),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       devAddr,
+						LastNFCntDown: 0x24,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
+				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
+					return false
+
+				case req := <-env.DeviceRegistry.SetByID:
+					setRespCh = req.Response
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
+					a.So(req.DeviceID, should.Resemble, devID)
+					a.So(req.Paths, should.Resemble, getPaths)
+
+					go func() {
+						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
+							Device: dev,
+							Paths:  sets,
+							Error:  err,
+						}
+					}()
+				}
+
+				scheduleDownlink124Ch := make(chan NsGsScheduleDownlinkRequest)
+				peer124 := NewGSPeer(ctx, &MockNsGsServer{
+					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink124Ch),
+				})
+
+				scheduleDownlink3Ch := make(chan NsGsScheduleDownlinkRequest)
+				peer3 := NewGSPeer(ctx, &MockNsGsServer{
+					ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlink3Ch),
+				})
+
+				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
+					return false
+				}
+
+				lastDown, ok := assertScheduleRxMetadataGateways(
+					ctx,
+					env.Cluster.Auth,
+					scheduleDownlink124Ch,
+					scheduleDownlink3Ch,
+					func() []byte {
+						b := []byte{
+							/* MHDR */
+							0b011_000_00,
+							/* MACPayload */
+							/** FHDR **/
+							/*** DevAddr ***/
+							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+							/*** FCtrl ***/
+							0b1_0_0_1_0000,
+							/*** FCnt ***/
+							0x25, 0x00,
+						}
+
+						/** FPort **/
+						b = append(b, 0x0)
+
+						/** FRMPayload **/
+						b = append(b, test.Must(crypto.EncryptDownlink(
+							nwkSEncKey,
+							devAddr,
+							0x25,
+							[]byte{
+								/* ResetConf */
+								0x01, 0b0000_0001,
+								/* LinkCheckAns */
+								0x02, 0x02, 0x05,
+								/* DevStatusReq */
+								0x06,
+							},
+						)).([]byte)...)
+
+						/* MIC */
+						mic := test.Must(crypto.ComputeDownlinkMIC(
+							sNwkSIntKey,
+							devAddr,
+							0,
+							0x25,
+							b,
+						)).([4]byte)
+						return append(b, mic[:]...)
+					}(),
+					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
+						return &ttnpb.TxRequest{
+							Class:            ttnpb.CLASS_A,
+							DownlinkPaths:    paths,
+							Priority:         ttnpb.TxSchedulePriority_HIGH,
+							Rx1DataRateIndex: ttnpb.DATA_RATE_0,
+							Rx1Delay:         ttnpb.RX_DELAY_3,
+							Rx1Frequency:     431000000,
+							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
+							Rx2Frequency:     420000000,
+						}
+					},
+					NsGsScheduleDownlinkResponse{
+						Error: errors.New("test"),
+					},
+					NsGsScheduleDownlinkResponse{
+						Error: errors.New("test"),
+					},
+					NsGsScheduleDownlinkResponse{
+						Response: &ttnpb.ScheduleDownlinkResponse{
+							Delay: time.Second,
+						},
+					},
+				)
+				if !a.So(ok, should.BeTrue) {
+					t.Error("Scheduling assertion failed")
+					return false
+				}
+
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 3) {
+					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-1")
+					a.So(lastDown.CorrelationIDs, should.Contain, "correlation-up-2")
+				}
+
+				setDevice := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: appID,
+						DeviceID:               devID,
+						DevAddr:                &devAddr,
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACState: &ttnpb.MACState{
+						CurrentParameters: *CopyMACParameters(eu868macParameters),
+						DesiredParameters: *CopyMACParameters(eu868macParameters),
+						DeviceClass:       ttnpb.CLASS_A,
+						LoRaWANVersion:    ttnpb.MAC_V1_1,
+						PendingRequests: []*ttnpb.MACCommand{
+							{
+								CID: ttnpb.CID_DEV_STATUS,
+							},
+						},
+					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							FCnt:           0x42,
+							FPort:          0x15,
+							FRMPayload:     bytes.Repeat([]byte{0x42}, 46),
+							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+						},
+					},
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						CopyUplinkMessage(lastUp),
+					},
+					RecentDownlinks: []*ttnpb.DownlinkMessage{
+						lastDown,
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       devAddr,
+						LastNFCntDown: 0x25,
+						SessionKeys:   *CopySessionKeys(sessionKeys),
+					},
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID callback to return")
+
+				case resp := <-setFuncRespCh:
+					a.So(resp.Error, should.BeNil)
+					a.So(resp.Paths, should.Resemble, []string{
+						"mac_state",
+						"recent_downlinks",
+						"session",
+					})
+					if a.So(resp.Device, should.NotBeNil) &&
+						a.So(resp.Device.MACState, should.NotBeNil) &&
+						a.So(resp.Device.MACState.LastConfirmedDownlinkAt, should.NotBeNil) {
+						a.So([]time.Time{start, *resp.Device.MACState.LastConfirmedDownlinkAt, time.Now().Add(time.Second)}, should.BeChronological)
+						setDevice.MACState.LastConfirmedDownlinkAt = resp.Device.MACState.LastConfirmedDownlinkAt
+					}
+					a.So(resp.Device, should.Resemble, setDevice)
+				}
+				close(setFuncRespCh)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
+
+				case setRespCh <- DeviceRegistrySetByIDResponse{
+					Device: setDevice,
+				}:
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop callback to return")
+
+				case resp := <-popFuncRespCh:
+					a.So(resp, should.BeNil)
+				}
+				close(popFuncRespCh)
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for DownlinkTasks.Pop response to be processed")
+
+				case popRespCh <- nil:
+				}
+
+				return true
+			},
+		},
+
 		// Adapted from https://github.com/TheThingsNetwork/lorawan-stack/issues/866#issue-461484955.
 		{
-			Name: "Class A/windows open/1.0.2/RX1, RX2 does not fit/application downlink/FOpts present/EU868",
+			Name: "Class A/windows open/1.0.2/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX2 does not fit/RX1/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -2123,13 +2427,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -2141,7 +2445,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -2238,7 +2542,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.Resemble, []string{
+					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state",
 						"queued_application_downlinks",
 						"recent_downlinks",
@@ -2418,7 +2722,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RX1,RX2/application downlink/FOpts present/EU868",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -2558,13 +2862,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -2576,7 +2880,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -2678,7 +2982,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.Resemble, []string{
+					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state",
 						"queued_application_downlinks",
 						"recent_downlinks",
@@ -2739,7 +3043,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows closed/1.1/RX1,RX2,RXC/application downlink/no absolute time/no forced gateways/FOpts present/EU868",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2,RXC/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -2879,13 +3183,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x86,
+							0b1_0_0_0_0110,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -2897,7 +3201,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							0x24,
 							[]byte{
 								/* ResetConf */
-								0x01, 0x01,
+								0x01, 0b0000_0001,
 								/* LinkCheckAns */
 								0x02, 0x02, 0x05,
 								/* DevStatusReq */
@@ -2960,13 +3264,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x81,
+							0b1_0_0_0_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -3065,7 +3369,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.Resemble, []string{
+					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state",
 						"queued_application_downlinks",
 						"recent_downlinks",
@@ -3126,7 +3430,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RXC/application downlink/absolute time within window/no forced gateways/FOpts present/EU868",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -3262,13 +3566,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x81,
+							0b1_0_0_0_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -3374,7 +3678,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.Resemble, []string{
+					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state",
 						"queued_application_downlinks",
 						"recent_downlinks",
@@ -3435,7 +3739,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/1.1/RXC/application downlink/absolute time within window/no forced gateways/FOpts present/EU868/non-retryable errors",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868/non-retryable errors",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -3571,13 +3875,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x81,
+							0b1_0_0_0_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -3715,7 +4019,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/RXC/application downlink/absolute time within window/no forced gateways/windows open/FOpts present/EU868/1.1/retryable error",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868/retryable error",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -3851,13 +4155,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					func() []byte {
 						b := []byte{
 							/* MHDR */
-							0x60,
+							0b011_000_00,
 							/* MACPayload */
 							/** FHDR **/
 							/*** DevAddr ***/
 							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
 							/*** FCtrl ***/
-							0x81,
+							0b1_0_0_0_0001,
 							/*** FCnt ***/
 							0x42, 0x00,
 						}
@@ -3988,7 +4292,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/RXC/application downlink/absolute time outside window",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC/classBC application downlink/absolute time outside window",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -4044,7 +4348,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACSettings: &ttnpb.MACSettings{
-						ClassCTimeout: DurationPtr(42 * time.Second),
+						ClassCTimeout:          DurationPtr(42 * time.Second),
+						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
+						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					MACState: &ttnpb.MACState{
 						CurrentParameters:  *CopyMACParameters(eu868macParameters),
@@ -4154,7 +4460,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "Class C/windows open/RX2/expired application downlinks",
+			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC/expired application downlinks",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
@@ -4322,7 +4628,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		},
 
 		{
-			Name: "join-accept/windows open/RX2/no active MAC state/window open/EU868/1.1",
+			Name: "join-accept/windows open/RX1,RX2 available/no active MAC state/EU868",
 			DownlinkPriorities: DownlinkPriorities{
 				JoinAccept:             ttnpb.TxSchedulePriority_HIGHEST,
 				MACCommands:            ttnpb.TxSchedulePriority_HIGH,
