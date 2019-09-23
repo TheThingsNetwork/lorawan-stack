@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -143,7 +144,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 	for _, version := range []struct {
 		Format mqtt.Format
-		Config MQTTConfig
+		Config config.MQTT
 	}{
 		{
 			Format: mqtt.Protobuf,

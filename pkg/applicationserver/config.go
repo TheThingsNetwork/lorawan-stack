@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -56,7 +55,7 @@ type Config struct {
 	LinkMode string         `name:"link-mode" description:"Mode to link applications to their Network Server (all, explicit)"`
 	Devices  DeviceRegistry `name:"-"`
 	Links    LinkRegistry   `name:"-"`
-	MQTT     mqtt.Config    `name:"mqtt" description:"MQTT configuration"`
+	MQTT     config.MQTT    `name:"mqtt" description:"MQTT configuration"`
 	Webhooks WebhooksConfig `name:"webhooks" description:"Webhooks configuration"`
 	PubSub   PubSubConfig   `name:"pubsub" description:"Pub/sub messaging configuration"`
 	Interop  InteropConfig  `name:"interop" description:"Interop client configuration"`

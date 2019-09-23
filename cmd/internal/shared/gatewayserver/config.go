@@ -15,6 +15,10 @@
 package shared
 
 import (
+	"fmt"
+
+	"go.thethings.network/lorawan-stack/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 )
@@ -31,9 +35,11 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 			":1700": "",
 		},
 	},
-	MQTT: gatewayserver.MQTTConfig{
+	MQTT: config.MQTT{
 		Listen:    ":1882",
 		ListenTLS: ":8882",
+		Public:    fmt.Sprintf("mqtt://%s:1883", shared.DefaultPublicHost),
+		PublicTLS: fmt.Sprintf("mqtts://%s:8883", shared.DefaultPublicHost),
 	},
 	BasicStation: gatewayserver.BasicStationConfig{
 		Listen:    ":1887",

@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -51,7 +52,7 @@ import (
 
 // ApplicationServer implements the Application Server component.
 //
-// The Application Server exposes the As, AppAs, AsEndDeviceRegistry and AsMQTTConfiguration services.
+// The Application Server exposes the As, AppAs and AsEndDeviceRegistry services.
 type ApplicationServer struct {
 	*component.Component
 	ctx context.Context
@@ -224,7 +225,6 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterAsHandler(as.Context(), s, conn)
 	ttnpb.RegisterAsEndDeviceRegistryHandler(as.Context(), s, conn)
-	ttnpb.RegisterAsMQTTConfigurationHandler(as.Context(), s, conn)
 	ttnpb.RegisterAppAsHandler(as.Context(), s, conn)
 	if as.webhooks != nil {
 		ttnpb.RegisterApplicationWebhookRegistryHandler(as.Context(), s, conn)
