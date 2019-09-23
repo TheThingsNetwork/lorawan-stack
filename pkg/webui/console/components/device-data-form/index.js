@@ -40,17 +40,23 @@ class DeviceDataForm extends Component {
   constructor(props) {
     super(props)
 
-    const { initialValues } = this.props
+    const {
+      initialValues: { supports_join, update, root_keys = {} },
+    } = this.props
+
+    const external_js = !Boolean(Object.keys(root_keys).length)
     let otaa = true
-    if (initialValues.ids) {
-      otaa = Boolean(initialValues.supports_join)
+    if (update) {
+      otaa = Boolean(supports_join)
     }
 
     this.state = {
       otaa,
       resets_join_nonces: false,
       resets_f_cnt: false,
+      external_js,
     }
+    this.formRef = React.createRef()
   }
 
   @bind
@@ -74,10 +80,42 @@ class DeviceDataForm extends Component {
   }
 
   @bind
+  async handleExternalJoinServerChange(evt) {
+    const external_js = evt.target.checked
+    await this.setState(({ resets_join_nonces }) => ({
+      external_js,
+      resets_join_nonces: external_js ? false : resets_join_nonces,
+    }))
+
+    const { initialValues } = this.props
+    const { setValues, state } = this.formRef.current
+
+    // Reset Join Server related entries if the device is provisined by
+    // an external JS.
+    if (external_js) {
+      setValues({
+        ...state.values,
+        root_keys: {
+          nwk_key: {},
+          app_key: {},
+        },
+        resets_join_nonces: false,
+        join_server_address: undefined,
+        external_js,
+      })
+    } else {
+      setValues({
+        ...state.values,
+        ...initialValues,
+      })
+    }
+  }
+
+  @bind
   async handleSubmit(values, { setSubmitting, resetForm }) {
     const { onSubmit, onSubmitSuccess, initialValues, update } = this.props
     const deviceId = getDeviceId(initialValues)
-    const castedValues = validationSchema.cast(values)
+    const { external_js, ...castedValues } = validationSchema.cast(values)
     await this.setState({ error: '' })
 
     try {
@@ -180,16 +218,10 @@ class DeviceDataForm extends Component {
   }
 
   get OTAASection() {
-    const { resets_join_nonces } = this.state
+    const { resets_join_nonces, external_js } = this.state
     const { update } = this.props
     return (
       <React.Fragment>
-        <Form.Field
-          title={sharedMessages.joinServerAddress}
-          placeholder={sharedMessages.addressPlaceholder}
-          name="join_server_address"
-          component={Input}
-        />
         <JoinEUIPrefixesInput
           title={sharedMessages.joinEUI}
           name="ids.join_eui"
@@ -210,14 +242,29 @@ class DeviceDataForm extends Component {
           component={Input}
         />
         <Form.Field
+          title={m.externalJoinServer}
+          description={m.externalJoinServerDescription}
+          name="external_js"
+          onChange={this.handleExternalJoinServerChange}
+          component={Checkbox}
+        />
+        <Form.Field
+          title={sharedMessages.joinServerAddress}
+          placeholder={external_js ? m.external : sharedMessages.addressPlaceholder}
+          name="join_server_address"
+          component={Input}
+          disabled={external_js}
+        />
+        <Form.Field
           title={sharedMessages.appKey}
           name="root_keys.app_key.key"
           type="byte"
           min={16}
           max={16}
-          placeholder={m.leaveBlankPlaceholder}
+          placeholder={external_js ? m.provisionedByExternalJoinServer : m.leaveBlankPlaceholder}
           description={m.appKeyDescription}
           component={Input}
+          disabled={external_js}
         />
         <Form.Field
           title={sharedMessages.nwkKey}
@@ -225,9 +272,10 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={m.leaveBlankPlaceholder}
+          placeholder={external_js ? m.provisionedByExternalJoinServer : m.leaveBlankPlaceholder}
           description={m.nwkKeyDescription}
           component={Input}
+          disabled={external_js}
         />
         <Form.Field
           title={m.resetsJoinNonces}
@@ -235,13 +283,14 @@ class DeviceDataForm extends Component {
           warning={resets_join_nonces ? m.resetWarning : undefined}
           name="resets_join_nonces"
           component={Checkbox}
+          disabled={external_js}
         />
       </React.Fragment>
     )
   }
 
   render() {
-    const { otaa, error } = this.state
+    const { otaa, error, external_js } = this.state
     const { initialValues, update } = this.props
 
     let deviceId
@@ -286,6 +335,8 @@ class DeviceDataForm extends Component {
       ...emptyValues,
       ...initialValues,
       activation_mode: otaa ? 'otaa' : 'abp',
+      external_js,
+      join_server_address: external_js ? undefined : initialValues.join_server_address,
     }
 
     return (
@@ -295,6 +346,7 @@ class DeviceDataForm extends Component {
         validationSchema={validationSchema}
         submitEnabledWhenInvalid
         initialValues={formValues}
+        formikRef={this.formRef}
       >
         <Message component="h4" content={sharedMessages.generalSettings} />
         <Form.Field
