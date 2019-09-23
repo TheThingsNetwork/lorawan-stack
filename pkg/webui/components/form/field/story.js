@@ -22,6 +22,7 @@ import Input from '../../input'
 import Checkbox from '../../checkbox'
 import Radio from '../../radio-button'
 import Select from '../../select'
+import FileInput from '../../file-input'
 import Form from '..'
 
 const handleSubmit = function(data, { resetForm }) {
@@ -799,5 +800,71 @@ storiesOf('Fields/TextArea', module)
         component={Input}
       />
       <Form.Field name="disabled" title="Disabled" disabled type="textarea" component={Input} />
+    </FieldsWrapperExample>
+  ))
+
+storiesOf('Fields/FileInput', module)
+  .addDecorator((story, context) => withInfo(info)(story)(context))
+  .add('Horizontal', () => (
+    <FieldsWrapperExample
+      initialValues={{
+        default: '',
+        withValue: 'base64-value-goes-here',
+        error: '',
+      }}
+    >
+      <Form.Field name="default" title="Default" component={FileInput} />
+      <Form.Field
+        name="description"
+        title="With Description"
+        description="A file input field."
+        component={FileInput}
+      />
+      <Form.Field name="withValue" title="With initially attached file" component={FileInput} />
+      <Form.Field
+        name="error"
+        title="With error"
+        component={FileInput}
+        error="There was an error."
+      />
+      <Form.Field
+        name="warning"
+        title="With warning"
+        component={FileInput}
+        warning="A file input field."
+      />
+      <Form.Field name="disabled" title="Disabled" component={FileInput} disabled />
+    </FieldsWrapperExample>
+  ))
+  .add('Vertical', () => (
+    <FieldsWrapperExample
+      initialValues={{
+        default: '',
+        withValue: 'base64-value-goes-here',
+        error: '',
+      }}
+      horizontal={false}
+    >
+      <Form.Field name="default" title="Default" type="textarea" component={FileInput} />
+      <Form.Field
+        name="description"
+        title="With Description"
+        description="A file input field."
+        component={FileInput}
+      />
+      <Form.Field name="withValue" title="With initially attached file" component={FileInput} />
+      <Form.Field
+        name="error"
+        title="With error"
+        component={FileInput}
+        error="There was an error."
+      />
+      <Form.Field
+        name="warning"
+        title="With warning"
+        component={FileInput}
+        warning="A file input field."
+      />
+      <Form.Field name="disabled" title="Disabled" component={FileInput} disabled />
     </FieldsWrapperExample>
   ))
