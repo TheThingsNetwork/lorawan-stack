@@ -32,7 +32,8 @@ import ApplicationLink from '../application-link'
 import ApplicationCollaborators from '../application-collaborators'
 import ApplicationData from '../application-data'
 import ApplicationPayloadFormatters from '../application-payload-formatters'
-import ApplicationIntegrations from '../application-integrations'
+import ApplicationIntegrationsWebhooks from '../application-integrations-webhooks'
+import ApplicationIntegrationsPubsubs from '../application-integrations-pubsubs'
 
 import { getApplication, stopApplicationEventsStream } from '../../store/actions/applications'
 import {
@@ -92,6 +93,7 @@ import Devices from '../devices'
         title: sharedMessages.payloadFormatters,
         icon: 'code',
         nested: true,
+        exact: false,
         items: [
           {
             title: sharedMessages.uplink,
@@ -107,9 +109,17 @@ import Devices from '../devices'
       },
       {
         title: sharedMessages.integrations,
-        path: `${matchedUrl}/integrations`,
         icon: 'integration',
+        nested: true,
         exact: false,
+        items: [
+          {
+            title: sharedMessages.webhooks,
+            path: `${matchedUrl}/integrations/webhooks`,
+            icon: 'extension',
+            exact: false,
+          },
+        ],
       },
       {
         title: sharedMessages.collaborators,
@@ -161,7 +171,14 @@ export default class Application extends React.Component {
             path={`${match.path}/payload-formatters`}
             component={ApplicationPayloadFormatters}
           />
-          <Route path={`${match.path}/integrations`} component={ApplicationIntegrations} />
+          <Route
+            path={`${match.path}/integrations/webhooks`}
+            component={ApplicationIntegrationsWebhooks}
+          />
+          <Route
+            path={`${match.path}/integrations/pubsubs`}
+            component={ApplicationIntegrationsPubsubs}
+          />
         </Switch>
       </BreadcrumbView>
     )

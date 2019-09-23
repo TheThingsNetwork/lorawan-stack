@@ -70,7 +70,7 @@ const webhookEntitySelector = [
     const { appId, webhookId } = match.params
     return {
       getWebhook: () => dispatch(getWebhook(appId, webhookId, webhookEntitySelector)),
-      navigateToList: () => dispatch(replace(`/applications/${appId}/integrations`)),
+      navigateToList: () => dispatch(replace(`/applications/${appId}/integrations/webhooks`)),
     }
   },
 )
@@ -94,7 +94,7 @@ const webhookEntitySelector = [
   )
 })
 @bind
-export default class ApplicationIntegrationEdit extends Component {
+export default class ApplicationWebhookEdit extends Component {
   async handleSubmit(webhook) {
     const {
       appId,
@@ -145,7 +145,7 @@ export default class ApplicationIntegrationEdit extends Component {
         <Row>
           <Col>
             <IntlHelmet title={m.editWebhook} />
-            <Message component="h2" content={sharedMessages.editWebhook} />
+            <Message component="h2" content={m.editWebhook} />
           </Col>
         </Row>
         <Row>

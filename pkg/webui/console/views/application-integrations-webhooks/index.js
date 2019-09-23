@@ -21,32 +21,32 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import ErrorView from '../../../lib/components/error-view'
 import SubViewError from '../error/sub-view'
 
-import ApplicationIntegrationsList from '../application-integrations-list'
-import ApplicationIntegrationAdd from '../application-integration-add'
-import ApplicationIntegrationEdit from '../application-integration-edit'
+import ApplicationWebhooksList from '../application-integrations-webhooks-list'
+import ApplicationWebhookAdd from '../application-integrations-webhook-add'
+import ApplicationWebhookEdit from '../application-integrations-webhook-edit'
 
-@withBreadcrumb('apps.single.api-keys', function(props) {
+@withBreadcrumb('apps.single.integrations.webhooks', function(props) {
   const { match } = props
   const appId = match.params.appId
 
   return (
     <Breadcrumb
-      path={`/applications/${appId}/integrations`}
-      icon="integration"
-      content={sharedMessages.integrations}
+      path={`/applications/${appId}/integrations/webhooks`}
+      icon="extension"
+      content={sharedMessages.webhooks}
     />
   )
 })
-export default class ApplicationCollaborators extends React.Component {
+export default class ApplicationWebhooks extends React.Component {
   render() {
     const { match } = this.props
 
     return (
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
-          <Route exact path={`${match.path}`} component={ApplicationIntegrationsList} />
-          <Route path={`${match.path}/add`} component={ApplicationIntegrationAdd} />
-          <Route path={`${match.path}/:webhookId`} component={ApplicationIntegrationEdit} />
+          <Route exact path={`${match.path}`} component={ApplicationWebhooksList} />
+          <Route path={`${match.path}/add`} component={ApplicationWebhookAdd} />
+          <Route path={`${match.path}/:webhookId`} component={ApplicationWebhookEdit} />
         </Switch>
       </ErrorView>
     )

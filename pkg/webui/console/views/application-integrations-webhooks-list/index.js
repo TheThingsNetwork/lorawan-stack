@@ -22,7 +22,7 @@ import sharedMessages from '../../../lib/shared-messages'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-export default class ApplicationIntegrationsList extends Component {
+export default class ApplicationWebhooksList extends Component {
   render() {
     const { appId } = this.props.match.params
 
