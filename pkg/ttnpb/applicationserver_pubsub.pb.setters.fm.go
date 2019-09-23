@@ -349,7 +349,7 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 						if src != nil {
 							newSrc = src.GetNATS()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -373,7 +373,7 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 						if src != nil {
 							newSrc = src.GetMQTT()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {

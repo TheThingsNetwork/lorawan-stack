@@ -484,7 +484,7 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 						if src != nil {
 							newSrc = src.GetList()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -508,7 +508,7 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 						if src != nil {
 							newSrc = src.GetRange()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -532,7 +532,7 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 						if src != nil {
 							newSrc = src.GetFromData()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
