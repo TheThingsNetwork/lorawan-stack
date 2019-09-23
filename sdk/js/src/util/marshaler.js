@@ -115,7 +115,7 @@ class Marshaler {
         // Do not consider array elements and do not recurse into them
         this.update(undefined, true)
       }
-      if (!this.isRoot && this.isLeaf) {
+      if (this.isLeaf) {
         paths.push(this.path.join('.'))
       }
     })
