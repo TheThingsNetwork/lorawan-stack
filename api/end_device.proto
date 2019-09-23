@@ -260,10 +260,10 @@ message MACSettings {
 
   // The ADR ACK limit Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
-  ADRAckLimitExponentValue desired_adr_ack_limit = 23 [(gogoproto.customname) = "DesiredADRAckLimit"];
+  ADRAckLimitExponentValue desired_adr_ack_limit_exponent = 23 [(gogoproto.customname) = "DesiredADRAckLimitExponent"];
   // The ADR ACK delay Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
-  ADRAckDelayExponentValue desired_adr_ack_delay = 24 [(gogoproto.customname) = "DesiredADRAckDelay"];
+  ADRAckDelayExponentValue desired_adr_ack_delay_exponent = 24 [(gogoproto.customname) = "DesiredADRAckDelayExponent"];
 }
 
 // MACState represents the state of MAC layer of the device.

@@ -9517,11 +9517,11 @@
           "$ref": "#/definitions/v3AggregatedDutyCycleValue",
           "description": "The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
         },
-        "desired_adr_ack_limit": {
+        "desired_adr_ack_limit_exponent": {
           "$ref": "#/definitions/v3ADRAckLimitExponentValue",
           "description": "The ADR ACK limit Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
-        "desired_adr_ack_delay": {
+        "desired_adr_ack_delay_exponent": {
           "$ref": "#/definitions/v3ADRAckDelayExponentValue",
           "description": "The ADR ACK delay Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         }

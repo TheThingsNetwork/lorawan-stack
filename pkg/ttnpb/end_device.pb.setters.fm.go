@@ -945,46 +945,46 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 					dst.DesiredMaxDutyCycle = nil
 				}
 			}
-		case "desired_adr_ack_limit":
+		case "desired_adr_ack_limit_exponent":
 			if len(subs) > 0 {
-				newDst := dst.DesiredADRAckLimit
+				newDst := dst.DesiredADRAckLimitExponent
 				if newDst == nil {
 					newDst = &ADRAckLimitExponentValue{}
-					dst.DesiredADRAckLimit = newDst
+					dst.DesiredADRAckLimitExponent = newDst
 				}
 				var newSrc *ADRAckLimitExponentValue
 				if src != nil {
-					newSrc = src.DesiredADRAckLimit
+					newSrc = src.DesiredADRAckLimitExponent
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.DesiredADRAckLimit = src.DesiredADRAckLimit
+					dst.DesiredADRAckLimitExponent = src.DesiredADRAckLimitExponent
 				} else {
-					dst.DesiredADRAckLimit = nil
+					dst.DesiredADRAckLimitExponent = nil
 				}
 			}
-		case "desired_adr_ack_delay":
+		case "desired_adr_ack_delay_exponent":
 			if len(subs) > 0 {
-				newDst := dst.DesiredADRAckDelay
+				newDst := dst.DesiredADRAckDelayExponent
 				if newDst == nil {
 					newDst = &ADRAckDelayExponentValue{}
-					dst.DesiredADRAckDelay = newDst
+					dst.DesiredADRAckDelayExponent = newDst
 				}
 				var newSrc *ADRAckDelayExponentValue
 				if src != nil {
-					newSrc = src.DesiredADRAckDelay
+					newSrc = src.DesiredADRAckDelayExponent
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.DesiredADRAckDelay = src.DesiredADRAckDelay
+					dst.DesiredADRAckDelayExponent = src.DesiredADRAckDelayExponent
 				} else {
-					dst.DesiredADRAckDelay = nil
+					dst.DesiredADRAckDelayExponent = nil
 				}
 			}
 

@@ -1177,24 +1177,24 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "desired_adr_ack_limit":
+		case "desired_adr_ack_limit_exponent":
 
-			if v, ok := interface{}(m.GetDesiredADRAckLimit()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetDesiredADRAckLimitExponent()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
-						field:  "desired_adr_ack_limit",
+						field:  "desired_adr_ack_limit_exponent",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
 				}
 			}
 
-		case "desired_adr_ack_delay":
+		case "desired_adr_ack_delay_exponent":
 
-			if v, ok := interface{}(m.GetDesiredADRAckDelay()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetDesiredADRAckDelayExponent()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
-						field:  "desired_adr_ack_delay",
+						field:  "desired_adr_ack_delay_exponent",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
