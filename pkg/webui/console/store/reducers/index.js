@@ -42,6 +42,9 @@ import error from './ui/error'
 import webhook from './webhook'
 import webhooks from './webhooks'
 import webhookFormats from './webhook-formats'
+import pubsub from './pubsub'
+import pubsubs from './pubsubs'
+import pubsubFormats from './pubsub-formats'
 import organizations from './organizations'
 import { createNamedPaginationReducer } from './pagination'
 import js from './join-server'
@@ -59,6 +62,9 @@ export default history =>
     webhook,
     webhooks,
     webhookFormats,
+    pubsub,
+    pubsubs,
+    pubsubFormats,
     configuration,
     organizations,
     apiKeys: combineReducers({
