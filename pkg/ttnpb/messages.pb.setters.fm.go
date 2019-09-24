@@ -197,7 +197,7 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 						if src != nil {
 							newSrc = src.GetRequest()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -221,7 +221,7 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 						if src != nil {
 							newSrc = src.GetScheduled()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -741,7 +741,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetUplinkMessage()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -765,7 +765,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetJoinAccept()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -789,7 +789,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDownlinkAck()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -813,7 +813,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDownlinkNack()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -837,7 +837,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDownlinkSent()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -861,7 +861,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDownlinkFailed()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -885,7 +885,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDownlinkQueued()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -909,7 +909,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDownlinkQueueInvalidated()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -933,7 +933,7 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetLocationSolved()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {

@@ -69,7 +69,7 @@ func (dst *Message) SetFields(src *Message, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetMACPayload()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -93,7 +93,7 @@ func (dst *Message) SetFields(src *Message, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetJoinRequestPayload()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -117,7 +117,7 @@ func (dst *Message) SetFields(src *Message, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetJoinAcceptPayload()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -141,7 +141,7 @@ func (dst *Message) SetFields(src *Message, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetRejoinRequestPayload()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -737,7 +737,7 @@ func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetLoRa()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -761,7 +761,7 @@ func (dst *DataRate) SetFields(src *DataRate, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetFSK()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1016,7 +1016,7 @@ func (dst *DownlinkPath) SetFields(src *DownlinkPath, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetFixed()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1202,7 +1202,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetResetInd()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1226,7 +1226,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetResetConf()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1250,7 +1250,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetLinkCheckAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1274,7 +1274,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetLinkADRReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1298,7 +1298,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetLinkADRAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1322,7 +1322,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDutyCycleReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1346,7 +1346,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetRxParamSetupReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1370,7 +1370,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetRxParamSetupAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1394,7 +1394,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDevStatusAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1418,7 +1418,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetNewChannelReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1442,7 +1442,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetNewChannelAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1466,7 +1466,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDLChannelReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1490,7 +1490,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDLChannelAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1514,7 +1514,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetRxTimingSetupReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1538,7 +1538,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetTxParamSetupReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1562,7 +1562,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetRekeyInd()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1586,7 +1586,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetRekeyConf()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1610,7 +1610,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetADRParamSetupReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1634,7 +1634,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDeviceTimeAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1658,7 +1658,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetForceRejoinReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1682,7 +1682,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetRejoinParamSetupReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1706,7 +1706,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetRejoinParamSetupAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1730,7 +1730,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetPingSlotInfoReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1754,7 +1754,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetPingSlotChannelReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1778,7 +1778,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetPingSlotChannelAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1802,7 +1802,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetBeaconTimingAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1826,7 +1826,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetBeaconFreqReq()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1850,7 +1850,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetBeaconFreqAns()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1874,7 +1874,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDeviceModeInd()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -1898,7 +1898,7 @@ func (dst *MACCommand) SetFields(src *MACCommand, paths ...string) error {
 						if src != nil {
 							newSrc = src.GetDeviceModeConf()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {

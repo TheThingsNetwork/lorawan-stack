@@ -227,7 +227,7 @@ func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdent
 						if src != nil {
 							newSrc = src.GetOrganizationIDs()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -251,7 +251,7 @@ func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdent
 						if src != nil {
 							newSrc = src.GetUserIDs()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -307,7 +307,7 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						if src != nil {
 							newSrc = src.GetApplicationIDs()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -331,7 +331,7 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						if src != nil {
 							newSrc = src.GetClientIDs()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -355,7 +355,7 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						if src != nil {
 							newSrc = src.GetDeviceIDs()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -379,7 +379,7 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						if src != nil {
 							newSrc = src.GetGatewayIDs()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -403,7 +403,7 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						if src != nil {
 							newSrc = src.GetOrganizationIDs()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
@@ -427,7 +427,7 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 						if src != nil {
 							newSrc = src.GetUserIDs()
 						}
-						if err := newDst.SetFields(newSrc, subs...); err != nil {
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
