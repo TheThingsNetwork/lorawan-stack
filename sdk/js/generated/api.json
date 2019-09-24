@@ -11220,6 +11220,28 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "GetMQTTv2ConnectionInfo",
+              "description": "GetMQTTv2ConnectionInfo returns the MQTT server address and the username for the gateway.",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "MQTTConnectionInfo",
+              "responseLongType": "MQTTConnectionInfo",
+              "responseFullType": "ttn.lorawan.v3.MQTTConnectionInfo",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gs/gateways/{gateway_id}/mqttv2-connection-info"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },

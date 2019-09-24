@@ -222,7 +222,24 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 func (gs *GatewayServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGsServer(s, gs)
 	ttnpb.RegisterNsGsServer(s, gs)
-	ttnpb.RegisterGtwGsServer(s, iogrpc.New(gs, iogrpc.WithMQTTConfigProvider(gs)))
+	ttnpb.RegisterGtwGsServer(s, iogrpc.New(gs,
+		iogrpc.WithMQTTConfigProvider(
+			config.MQTTConfigProviderFunc(func(ctx context.Context) (*config.MQTT, error) {
+				config, err := gs.GetConfig(ctx)
+				if err != nil {
+					return nil, err
+				}
+				return &config.MQTT, nil
+			})),
+		iogrpc.WithMQTTv2ConfigProvider(
+			config.MQTTConfigProviderFunc(func(ctx context.Context) (*config.MQTT, error) {
+				config, err := gs.GetConfig(ctx)
+				if err != nil {
+					return nil, err
+				}
+				return &config.MQTTV2, nil
+			})),
+	))
 }
 
 // RegisterHandlers registers gRPC handlers.

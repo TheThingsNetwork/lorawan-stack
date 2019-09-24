@@ -1682,6 +1682,18 @@
           ]
         }
       ]
+    },
+    "GetMQTTv2ConnectionInfo": {
+      "file": "lorawan-stack/api/gatewayserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gs/gateways/{gateway_id}/mqttv2-connection-info",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
     }
   },
   "NsGs": {

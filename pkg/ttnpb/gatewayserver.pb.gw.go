@@ -98,6 +98,75 @@ func local_request_GtwGs_GetMQTTConnectionInfo_0(ctx context.Context, marshaler 
 }
 
 var (
+	filter_GtwGs_GetMQTTv2ConnectionInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
+func request_GtwGs_GetMQTTv2ConnectionInfo_0(ctx context.Context, marshaler runtime.Marshaler, client GtwGsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GatewayIdentifiers
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["gateway_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
+	}
+
+	protoReq.GatewayID, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_GtwGs_GetMQTTv2ConnectionInfo_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.GetMQTTv2ConnectionInfo(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_GtwGs_GetMQTTv2ConnectionInfo_0(ctx context.Context, marshaler runtime.Marshaler, server GtwGsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GatewayIdentifiers
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["gateway_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "gateway_id")
+	}
+
+	protoReq.GatewayID, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "gateway_id", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_GtwGs_GetMQTTv2ConnectionInfo_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.GetMQTTv2ConnectionInfo(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
 	filter_Gs_GetGatewayConnectionStats_0 = &utilities.DoubleArray{Encoding: map[string]int{"gateway_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
@@ -191,6 +260,26 @@ func RegisterGtwGsHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 
 	})
 
+	mux.Handle("GET", pattern_GtwGs_GetMQTTv2ConnectionInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_GtwGs_GetMQTTv2ConnectionInfo_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_GtwGs_GetMQTTv2ConnectionInfo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -280,15 +369,39 @@ func RegisterGtwGsHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 
 	})
 
+	mux.Handle("GET", pattern_GtwGs_GetMQTTv2ConnectionInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_GtwGs_GetMQTTv2ConnectionInfo_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_GtwGs_GetMQTTv2ConnectionInfo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
 var (
 	pattern_GtwGs_GetMQTTConnectionInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"gs", "gateways", "gateway_id", "mqtt-connection-info"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_GtwGs_GetMQTTv2ConnectionInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"gs", "gateways", "gateway_id", "mqttv2-connection-info"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
 	forward_GtwGs_GetMQTTConnectionInfo_0 = runtime.ForwardResponseMessage
+
+	forward_GtwGs_GetMQTTv2ConnectionInfo_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterGsHandlerFromEndpoint is same as RegisterGsHandler but

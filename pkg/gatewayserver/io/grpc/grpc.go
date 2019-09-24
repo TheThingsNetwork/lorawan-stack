@@ -46,9 +46,17 @@ func WithMQTTConfigProvider(provider config.MQTTConfigProvider) Option {
 	})
 }
 
+// WithMQTTv2ConfigProvider sets the MQTT v2 configuration provider for the gRPC frontend.
+func WithMQTTv2ConfigProvider(provider config.MQTTConfigProvider) Option {
+	return optionFunc(func(i *impl) {
+		i.mqttv2ConfigProvider = provider
+	})
+}
+
 type impl struct {
-	server             io.Server
-	mqttConfigProvider config.MQTTConfigProvider
+	server               io.Server
+	mqttConfigProvider   config.MQTTConfigProvider
+	mqttv2ConfigProvider config.MQTTConfigProvider
 }
 
 // New returns a new gRPC frontend.
@@ -178,14 +186,14 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 
 var errNoMQTTConfigProvider = errors.DefineUnimplemented("no_configuration_provider", "no MQTT configuration provider available")
 
-func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
+func getMQTTConnectionProvider(ctx context.Context, ids *ttnpb.GatewayIdentifiers, provider config.MQTTConfigProvider) (*ttnpb.MQTTConnectionInfo, error) {
 	if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
 		return nil, err
 	}
-	if s.mqttConfigProvider == nil {
+	if provider == nil {
 		return nil, errNoMQTTConfigProvider
 	}
-	config, err := s.mqttConfigProvider.GetMQTTConfig(ctx)
+	config, err := provider.GetMQTTConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -194,4 +202,12 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIden
 		PublicTLSAddress: config.PublicTLSAddress,
 		Username:         unique.ID(ctx, *ids),
 	}, nil
+}
+
+func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
+	return getMQTTConnectionProvider(ctx, ids, s.mqttConfigProvider)
+}
+
+func (s *impl) GetMQTTv2ConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
+	return getMQTTConnectionProvider(ctx, ids, s.mqttv2ConfigProvider)
 }

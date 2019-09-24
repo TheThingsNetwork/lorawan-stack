@@ -56,6 +56,12 @@ service GtwGs {
       get: "/gs/gateways/{gateway_id}/mqtt-connection-info"
     };
   };
+  // GetMQTTv2ConnectionInfo returns the MQTT server address and the username for the gateway.
+  rpc GetMQTTv2ConnectionInfo(GatewayIdentifiers) returns (MQTTConnectionInfo) {
+    option (google.api.http) = {
+      get: "/gs/gateways/{gateway_id}/mqttv2-connection-info"
+    };
+  };
 }
 
 message ScheduleDownlinkResponse {

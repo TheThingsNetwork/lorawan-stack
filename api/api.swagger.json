@@ -3023,6 +3023,39 @@
         ]
       }
     },
+    "/gs/gateways/{gateway_id}/mqttv2-connection-info": {
+      "get": {
+        "summary": "GetMQTTv2ConnectionInfo returns the MQTT server address and the username for the gateway.",
+        "operationId": "GetMQTTv2ConnectionInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3MQTTConnectionInfo"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "GtwGs"
+        ]
+      }
+    },
     "/invitations": {
       "get": {
         "summary": "Get the user with the given identifiers, selecting the fields given by the\nfield mask. The method may return more or less fields, depending on the rights\nof the caller.",

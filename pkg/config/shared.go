@@ -87,6 +87,7 @@ type Metrics struct {
 	Password string `name:"password" description:"Password to protect metrics endpoint (username is metrics)"`
 }
 
+// Health represents the health checks configuration.
 type Health struct {
 	Enable   bool   `name:"enable" description:"Enable health check endpoint on HTTP server"`
 	Password string `name:"password" description:"Password to protect health endpoint (username is health)"`
@@ -305,4 +306,12 @@ type MQTT struct {
 // MQTTConfigProvider provides contextual access to MQTT configuration.
 type MQTTConfigProvider interface {
 	GetMQTTConfig(context.Context) (*MQTT, error)
+}
+
+// MQTTConfigProviderFunc is an functional MQTTConfigProvider.
+type MQTTConfigProviderFunc func(context.Context) (*MQTT, error)
+
+// GetMQTTConfig implements MQTTConfigProvider.
+func (f MQTTConfigProviderFunc) GetMQTTConfig(ctx context.Context) (*MQTT, error) {
+	return f(ctx)
 }
