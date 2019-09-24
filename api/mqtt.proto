@@ -23,16 +23,12 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-// MQTTConfiguration represents the configuration of an MQTT frontend.
-message MQTTConfiguration {
+// MQTTConnectionInfo provides the connection information of an MQTT frontend.
+message MQTTConnectionInfo {
   // The public listen address of the frontend.
   string public_address = 1 [(validate.rules).string.uri = true];
   // The public listen address of the TLS frontend.
   string public_tls_address = 2 [(gogoproto.customname) = "PublicTLSAddress", (validate.rules).string.uri = true];
-}
-
-// MQTTConnectionInfo provides both MQTTConfiguration and MQTTUsername.
-message MQTTConnectionInfo {
-  MQTTConfiguration config = 1 [(gogoproto.embed) = true];
-  string username = 2;
+  // The username to be used for authentication.
+  string username = 3;
 }

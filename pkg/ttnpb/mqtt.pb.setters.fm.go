@@ -4,7 +4,7 @@ package ttnpb
 
 import fmt "fmt"
 
-func (dst *MQTTConfiguration) SetFields(src *MQTTConfiguration, paths ...string) error {
+func (dst *MQTTConnectionInfo) SetFields(src *MQTTConnectionInfo, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
 		case "public_address":
@@ -26,38 +26,6 @@ func (dst *MQTTConfiguration) SetFields(src *MQTTConfiguration, paths ...string)
 			} else {
 				var zero string
 				dst.PublicTLSAddress = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *MQTTConnectionInfo) SetFields(src *MQTTConnectionInfo, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "config":
-			if len(subs) > 0 {
-				newDst := dst.MQTTConfiguration
-				if newDst == nil {
-					newDst = &MQTTConfiguration{}
-					dst.MQTTConfiguration = newDst
-				}
-				var newSrc *MQTTConfiguration
-				if src != nil {
-					newSrc = src.MQTTConfiguration
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.MQTTConfiguration = src.MQTTConfiguration
-				} else {
-					dst.MQTTConfiguration = nil
-				}
 			}
 		case "username":
 			if len(subs) > 0 {

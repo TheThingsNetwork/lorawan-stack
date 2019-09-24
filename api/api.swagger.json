@@ -9564,7 +9564,7 @@
         }
       }
     },
-    "v3MQTTConfiguration": {
+    "v3MQTTConnectionInfo": {
       "type": "object",
       "properties": {
         "public_address": {
@@ -9574,21 +9574,13 @@
         "public_tls_address": {
           "type": "string",
           "description": "The public listen address of the TLS frontend."
-        }
-      },
-      "description": "MQTTConfiguration represents the configuration of an MQTT frontend."
-    },
-    "v3MQTTConnectionInfo": {
-      "type": "object",
-      "properties": {
-        "config": {
-          "$ref": "#/definitions/v3MQTTConfiguration"
         },
         "username": {
-          "type": "string"
+          "type": "string",
+          "description": "The username to be used for authentication."
         }
       },
-      "description": "MQTTConnectionInfo provides both MQTTConfiguration and MQTTUsername."
+      "description": "MQTTConnectionInfo provides the connection information of an MQTT frontend."
     },
     "v3MType": {
       "type": "string",

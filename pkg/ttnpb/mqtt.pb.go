@@ -30,66 +30,14 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// MQTTConfiguration represents the configuration of an MQTT frontend.
-type MQTTConfiguration struct {
+// MQTTConnectionInfo provides the connection information of an MQTT frontend.
+type MQTTConnectionInfo struct {
 	// The public listen address of the frontend.
 	PublicAddress string `protobuf:"bytes,1,opt,name=public_address,json=publicAddress,proto3" json:"public_address,omitempty"`
 	// The public listen address of the TLS frontend.
-	PublicTLSAddress     string   `protobuf:"bytes,2,opt,name=public_tls_address,json=publicTlsAddress,proto3" json:"public_tls_address,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *MQTTConfiguration) Reset()      { *m = MQTTConfiguration{} }
-func (*MQTTConfiguration) ProtoMessage() {}
-func (*MQTTConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dbbf9b6b10797b61, []int{0}
-}
-func (m *MQTTConfiguration) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MQTTConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MQTTConfiguration.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MQTTConfiguration) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MQTTConfiguration.Merge(m, src)
-}
-func (m *MQTTConfiguration) XXX_Size() int {
-	return m.Size()
-}
-func (m *MQTTConfiguration) XXX_DiscardUnknown() {
-	xxx_messageInfo_MQTTConfiguration.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MQTTConfiguration proto.InternalMessageInfo
-
-func (m *MQTTConfiguration) GetPublicAddress() string {
-	if m != nil {
-		return m.PublicAddress
-	}
-	return ""
-}
-
-func (m *MQTTConfiguration) GetPublicTLSAddress() string {
-	if m != nil {
-		return m.PublicTLSAddress
-	}
-	return ""
-}
-
-// MQTTConnectionInfo provides both MQTTConfiguration and MQTTUsername.
-type MQTTConnectionInfo struct {
-	*MQTTConfiguration   `protobuf:"bytes,1,opt,name=config,proto3,embedded=config" json:"config,omitempty"`
-	Username             string   `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	PublicTLSAddress string `protobuf:"bytes,2,opt,name=public_tls_address,json=publicTlsAddress,proto3" json:"public_tls_address,omitempty"`
+	// The username to be used for authentication.
+	Username             string   `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
@@ -97,7 +45,7 @@ type MQTTConnectionInfo struct {
 func (m *MQTTConnectionInfo) Reset()      { *m = MQTTConnectionInfo{} }
 func (*MQTTConnectionInfo) ProtoMessage() {}
 func (*MQTTConnectionInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dbbf9b6b10797b61, []int{1}
+	return fileDescriptor_dbbf9b6b10797b61, []int{0}
 }
 func (m *MQTTConnectionInfo) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -126,6 +74,20 @@ func (m *MQTTConnectionInfo) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MQTTConnectionInfo proto.InternalMessageInfo
 
+func (m *MQTTConnectionInfo) GetPublicAddress() string {
+	if m != nil {
+		return m.PublicAddress
+	}
+	return ""
+}
+
+func (m *MQTTConnectionInfo) GetPublicTLSAddress() string {
+	if m != nil {
+		return m.PublicTLSAddress
+	}
+	return ""
+}
+
 func (m *MQTTConnectionInfo) GetUsername() string {
 	if m != nil {
 		return m.Username
@@ -134,8 +96,6 @@ func (m *MQTTConnectionInfo) GetUsername() string {
 }
 
 func init() {
-	proto.RegisterType((*MQTTConfiguration)(nil), "ttn.lorawan.v3.MQTTConfiguration")
-	golang_proto.RegisterType((*MQTTConfiguration)(nil), "ttn.lorawan.v3.MQTTConfiguration")
 	proto.RegisterType((*MQTTConnectionInfo)(nil), "ttn.lorawan.v3.MQTTConnectionInfo")
 	golang_proto.RegisterType((*MQTTConnectionInfo)(nil), "ttn.lorawan.v3.MQTTConnectionInfo")
 }
@@ -146,65 +106,36 @@ func init() {
 }
 
 var fileDescriptor_dbbf9b6b10797b61 = []byte{
-	// 456 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x91, 0xbf, 0x6f, 0x13, 0x31,
-	0x14, 0xc7, 0xfd, 0xf8, 0x51, 0x95, 0x43, 0x54, 0xe5, 0x26, 0x14, 0x45, 0xaf, 0x50, 0x16, 0x06,
-	0x72, 0x27, 0xd1, 0x3f, 0x00, 0x35, 0x4c, 0x20, 0x90, 0x20, 0x64, 0x62, 0x41, 0xce, 0xc5, 0x71,
-	0xac, 0x5c, 0xec, 0xab, 0xcf, 0x97, 0xd2, 0xad, 0x63, 0xc6, 0x8e, 0x8c, 0x88, 0xa9, 0x63, 0xc7,
-	0x8e, 0x1d, 0x3b, 0x66, 0xec, 0x54, 0xf5, 0xec, 0xa5, 0x63, 0xc7, 0x8a, 0x09, 0xe1, 0x33, 0x55,
-	0xab, 0x6c, 0xef, 0xdd, 0xfb, 0x7e, 0x9e, 0x3e, 0xe7, 0x17, 0xb5, 0x73, 0xa5, 0xe9, 0x2e, 0x95,
-	0x9d, 0xd2, 0xd0, 0x6c, 0x92, 0xd2, 0x42, 0xa4, 0xd3, 0x1d, 0x63, 0x92, 0x42, 0x2b, 0xa3, 0xe2,
-	0x35, 0x63, 0x64, 0x12, 0x12, 0xc9, 0x6c, 0xab, 0xb5, 0xcd, 0x85, 0x19, 0x57, 0x83, 0x24, 0x53,
-	0xd3, 0x94, 0xc9, 0x99, 0xda, 0x2b, 0xb4, 0xfa, 0xb1, 0x97, 0xfa, 0x70, 0xd6, 0xe1, 0x4c, 0x76,
-	0x66, 0x34, 0x17, 0x43, 0x6a, 0x58, 0xba, 0x54, 0x34, 0x2b, 0x5b, 0x9d, 0x5b, 0x2b, 0xb8, 0xe2,
-	0xaa, 0x81, 0x07, 0xd5, 0xc8, 0x77, 0xbe, 0xf1, 0x55, 0x88, 0xb7, 0xb9, 0x52, 0x3c, 0x67, 0x5e,
-	0x8c, 0x4a, 0xa9, 0x0c, 0x35, 0x42, 0xc9, 0x32, 0x4c, 0x5f, 0x2e, 0xdb, 0x8b, 0x21, 0x93, 0x46,
-	0x8c, 0x04, 0xd3, 0x21, 0xb4, 0x79, 0x00, 0xd1, 0xd3, 0x4f, 0x5f, 0xfa, 0xfd, 0x77, 0x4a, 0x8e,
-	0x04, 0xaf, 0xb4, 0xdf, 0x10, 0xa7, 0xd1, 0x5a, 0x51, 0x0d, 0x72, 0x91, 0x7d, 0xa7, 0xc3, 0xa1,
-	0x66, 0x65, 0xf9, 0x0c, 0x9e, 0xc3, 0xab, 0x47, 0xdd, 0xd5, 0x3f, 0xdd, 0x87, 0xfa, 0xfe, 0x1c,
-	0xa0, 0xf7, 0xa4, 0x99, 0x6f, 0x37, 0xe3, 0xf8, 0x43, 0x14, 0x07, 0xc0, 0xe4, 0xe5, 0x0d, 0x74,
-	0xcf, 0x43, 0xed, 0xff, 0x90, 0x3d, 0xdf, 0x58, 0xff, 0xec, 0x53, 0xfd, 0x8f, 0x5f, 0x03, 0xd9,
-	0x5b, 0x6f, 0xb8, 0x7e, 0x5e, 0x86, 0x2f, 0x9b, 0x3b, 0x51, 0x1c, 0x8c, 0x24, 0xcb, 0xfe, 0xe9,
-	0xbc, 0x97, 0x23, 0x15, 0xbf, 0x8d, 0x56, 0x32, 0xef, 0xe8, 0x55, 0x1e, 0xbf, 0x79, 0x91, 0xdc,
-	0x7d, 0xfe, 0x64, 0xe9, 0x2f, 0xba, 0x0f, 0x16, 0xe7, 0x1b, 0xd0, 0x0b, 0x58, 0xdc, 0x8a, 0x56,
-	0xab, 0x92, 0x69, 0x49, 0xa7, 0xac, 0x11, 0xeb, 0xdd, 0xf4, 0xdd, 0xdf, 0x70, 0x5a, 0x23, 0x2c,
-	0x6a, 0x84, 0xb3, 0x1a, 0xc9, 0x45, 0x8d, 0xe4, 0xb2, 0x46, 0x72, 0x55, 0x23, 0xb9, 0xae, 0x11,
-	0xf6, 0x2d, 0xc2, 0xdc, 0x22, 0x39, 0xb4, 0x08, 0x47, 0x16, 0xc9, 0xb1, 0x45, 0x72, 0x62, 0x91,
-	0x9c, 0x5a, 0x84, 0x85, 0x45, 0x38, 0xb3, 0x48, 0x2e, 0x2c, 0xc2, 0xa5, 0x45, 0x72, 0x65, 0x11,
-	0xae, 0x2d, 0x92, 0x7d, 0x87, 0x64, 0xee, 0x10, 0x0e, 0x1c, 0x92, 0x9f, 0x0e, 0xe1, 0x97, 0x43,
-	0x72, 0xe8, 0x90, 0x1c, 0x39, 0x84, 0x63, 0x87, 0x70, 0xe2, 0x10, 0xbe, 0xbd, 0xe6, 0x2a, 0x31,
-	0x63, 0x66, 0xc6, 0x42, 0xf2, 0x32, 0x91, 0xcc, 0xec, 0x2a, 0x3d, 0x49, 0xef, 0x9e, 0xad, 0x98,
-	0xf0, 0xd4, 0x18, 0x59, 0x0c, 0x06, 0x2b, 0xfe, 0x62, 0x5b, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff,
-	0xe0, 0x2a, 0x54, 0x73, 0x96, 0x02, 0x00, 0x00,
+	// 419 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x90, 0xb1, 0x6f, 0xd3, 0x40,
+	0x14, 0xc6, 0xef, 0x51, 0x81, 0x8a, 0x25, 0xaa, 0xca, 0x53, 0x15, 0x45, 0x0f, 0x04, 0x0b, 0x03,
+	0xb1, 0x87, 0xfe, 0x05, 0x0d, 0x13, 0x08, 0x24, 0x08, 0x99, 0x58, 0xd0, 0xd9, 0xb9, 0x5c, 0x4e,
+	0x71, 0xee, 0x19, 0xfb, 0x39, 0xa5, 0x5b, 0xc7, 0x8c, 0x8c, 0x8c, 0x88, 0xa9, 0x0b, 0x52, 0xc7,
+	0x8e, 0x1d, 0x3b, 0x76, 0xec, 0x84, 0xea, 0xbb, 0xa5, 0x63, 0xc7, 0x8a, 0x09, 0xd5, 0x76, 0x2b,
+	0xaa, 0x6e, 0xef, 0xe9, 0xfb, 0xfd, 0x3e, 0x3d, 0xbd, 0xa0, 0x9f, 0x51, 0x21, 0x77, 0xa5, 0x1d,
+	0x94, 0x2c, 0xd3, 0x79, 0x2c, 0x73, 0x13, 0x2f, 0xbe, 0x32, 0x47, 0x79, 0x41, 0x4c, 0xe1, 0x06,
+	0xb3, 0x8d, 0x3a, 0x22, 0x5a, 0x6e, 0xf7, 0x76, 0xb4, 0xe1, 0x59, 0x95, 0x44, 0x29, 0x2d, 0x62,
+	0x65, 0x97, 0xb4, 0x97, 0x17, 0xf4, 0x6d, 0x2f, 0x6e, 0xe0, 0x74, 0xa0, 0x95, 0x1d, 0x2c, 0x65,
+	0x66, 0x26, 0x92, 0x55, 0x7c, 0x6f, 0x68, 0x2b, 0x7b, 0x83, 0xff, 0x2a, 0x34, 0x69, 0x6a, 0xe5,
+	0xa4, 0x9a, 0x36, 0x5b, 0xb3, 0x34, 0x53, 0x87, 0xf7, 0x35, 0x91, 0xce, 0x54, 0x73, 0x98, 0xb4,
+	0x96, 0x58, 0xb2, 0x21, 0x5b, 0x76, 0xe9, 0x8b, 0xfb, 0xd7, 0x9b, 0x89, 0xb2, 0x6c, 0xa6, 0x46,
+	0x15, 0x1d, 0xf4, 0xfc, 0x37, 0x04, 0xe1, 0xfb, 0x8f, 0xe3, 0xf1, 0x6b, 0xb2, 0x56, 0xa5, 0xd7,
+	0xfa, 0x1b, 0x3b, 0xa5, 0x30, 0x0e, 0x36, 0xf2, 0x2a, 0xc9, 0x4c, 0xfa, 0x45, 0x4e, 0x26, 0x85,
+	0x2a, 0xcb, 0x2d, 0x78, 0x06, 0x2f, 0x1f, 0x0f, 0xd7, 0xff, 0x0e, 0x1f, 0x16, 0x6b, 0x2b, 0x80,
+	0xd1, 0x93, 0x36, 0xdf, 0x69, 0xe3, 0xf0, 0x6d, 0x10, 0x76, 0x02, 0x67, 0xe5, 0xad, 0xf4, 0xa0,
+	0x91, 0xfa, 0x37, 0x92, 0xfb, 0xf3, 0x74, 0xf3, 0x43, 0x43, 0x8d, 0xdf, 0x7d, 0xea, 0xcc, 0xd1,
+	0x66, 0xeb, 0x8d, 0xb3, 0xf2, 0xa6, 0xab, 0x17, 0xac, 0x57, 0xa5, 0x2a, 0xac, 0x5c, 0xa8, 0xad,
+	0xb5, 0xeb, 0x86, 0xd1, 0xed, 0x3e, 0xfc, 0x05, 0x27, 0x35, 0xc2, 0x69, 0x8d, 0x70, 0x56, 0xa3,
+	0x38, 0xaf, 0x51, 0x5c, 0xd4, 0x28, 0x2e, 0x6b, 0x14, 0x57, 0x35, 0xc2, 0xbe, 0x43, 0x58, 0x39,
+	0x14, 0x07, 0x0e, 0xe1, 0xd0, 0xa1, 0x38, 0x72, 0x28, 0x8e, 0x1d, 0x8a, 0x13, 0x87, 0x70, 0xea,
+	0x10, 0xce, 0x1c, 0x8a, 0x73, 0x87, 0x70, 0xe1, 0x50, 0x5c, 0x3a, 0x84, 0x2b, 0x87, 0x62, 0xdf,
+	0xa3, 0x58, 0x79, 0x84, 0xef, 0x1e, 0xc5, 0x0f, 0x8f, 0xf0, 0xd3, 0xa3, 0x38, 0xf0, 0x28, 0x0e,
+	0x3d, 0xc2, 0x91, 0x47, 0x38, 0xf6, 0x08, 0x9f, 0x5f, 0x69, 0x8a, 0x78, 0xa6, 0x78, 0x66, 0xac,
+	0x2e, 0x23, 0xab, 0x78, 0x97, 0x8a, 0x79, 0x7c, 0xf7, 0xc1, 0xf9, 0x5c, 0xc7, 0xcc, 0x36, 0x4f,
+	0x92, 0x47, 0xcd, 0x6f, 0xb7, 0xff, 0x05, 0x00, 0x00, 0xff, 0xff, 0x5d, 0x48, 0xae, 0x0a, 0x40,
+	0x02, 0x00, 0x00,
 }
 
-func (this *MQTTConfiguration) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*MQTTConfiguration)
-	if !ok {
-		that2, ok := that.(MQTTConfiguration)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.PublicAddress != that1.PublicAddress {
-		return false
-	}
-	if this.PublicTLSAddress != that1.PublicTLSAddress {
-		return false
-	}
-	return true
-}
 func (this *MQTTConnectionInfo) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -224,7 +155,10 @@ func (this *MQTTConnectionInfo) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if !this.MQTTConfiguration.Equal(that1.MQTTConfiguration) {
+	if this.PublicAddress != that1.PublicAddress {
+		return false
+	}
+	if this.PublicTLSAddress != that1.PublicTLSAddress {
 		return false
 	}
 	if this.Username != that1.Username {
@@ -232,43 +166,6 @@ func (this *MQTTConnectionInfo) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (m *MQTTConfiguration) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MQTTConfiguration) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MQTTConfiguration) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.PublicTLSAddress) > 0 {
-		i -= len(m.PublicTLSAddress)
-		copy(dAtA[i:], m.PublicTLSAddress)
-		i = encodeVarintMqtt(dAtA, i, uint64(len(m.PublicTLSAddress)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.PublicAddress) > 0 {
-		i -= len(m.PublicAddress)
-		copy(dAtA[i:], m.PublicAddress)
-		i = encodeVarintMqtt(dAtA, i, uint64(len(m.PublicAddress)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *MQTTConnectionInfo) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -294,17 +191,19 @@ func (m *MQTTConnectionInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Username)
 		i = encodeVarintMqtt(dAtA, i, uint64(len(m.Username)))
 		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.PublicTLSAddress) > 0 {
+		i -= len(m.PublicTLSAddress)
+		copy(dAtA[i:], m.PublicTLSAddress)
+		i = encodeVarintMqtt(dAtA, i, uint64(len(m.PublicTLSAddress)))
+		i--
 		dAtA[i] = 0x12
 	}
-	if m.MQTTConfiguration != nil {
-		{
-			size, err := m.MQTTConfiguration.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintMqtt(dAtA, i, uint64(size))
-		}
+	if len(m.PublicAddress) > 0 {
+		i -= len(m.PublicAddress)
+		copy(dAtA[i:], m.PublicAddress)
+		i = encodeVarintMqtt(dAtA, i, uint64(len(m.PublicAddress)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -322,20 +221,10 @@ func encodeVarintMqtt(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func NewPopulatedMQTTConfiguration(r randyMqtt, easy bool) *MQTTConfiguration {
-	this := &MQTTConfiguration{}
-	this.PublicAddress = randStringMqtt(r)
-	this.PublicTLSAddress = randStringMqtt(r)
-	if !easy && r.Intn(10) != 0 {
-	}
-	return this
-}
-
 func NewPopulatedMQTTConnectionInfo(r randyMqtt, easy bool) *MQTTConnectionInfo {
 	this := &MQTTConnectionInfo{}
-	if r.Intn(5) != 0 {
-		this.MQTTConfiguration = NewPopulatedMQTTConfiguration(r, easy)
-	}
+	this.PublicAddress = randStringMqtt(r)
+	this.PublicTLSAddress = randStringMqtt(r)
 	this.Username = randStringMqtt(r)
 	if !easy && r.Intn(10) != 0 {
 	}
@@ -414,7 +303,7 @@ func encodeVarintPopulateMqtt(dAtA []byte, v uint64) []byte {
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
 }
-func (m *MQTTConfiguration) Size() (n int) {
+func (m *MQTTConnectionInfo) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -426,19 +315,6 @@ func (m *MQTTConfiguration) Size() (n int) {
 	}
 	l = len(m.PublicTLSAddress)
 	if l > 0 {
-		n += 1 + l + sovMqtt(uint64(l))
-	}
-	return n
-}
-
-func (m *MQTTConnectionInfo) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.MQTTConfiguration != nil {
-		l = m.MQTTConfiguration.Size()
 		n += 1 + l + sovMqtt(uint64(l))
 	}
 	l = len(m.Username)
@@ -454,23 +330,13 @@ func sovMqtt(x uint64) (n int) {
 func sozMqtt(x uint64) (n int) {
 	return sovMqtt((x << 1) ^ uint64((int64(x) >> 63)))
 }
-func (this *MQTTConfiguration) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&MQTTConfiguration{`,
-		`PublicAddress:` + fmt.Sprintf("%v", this.PublicAddress) + `,`,
-		`PublicTLSAddress:` + fmt.Sprintf("%v", this.PublicTLSAddress) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *MQTTConnectionInfo) String() string {
 	if this == nil {
 		return "nil"
 	}
 	s := strings.Join([]string{`&MQTTConnectionInfo{`,
-		`MQTTConfiguration:` + strings.Replace(this.MQTTConfiguration.String(), "MQTTConfiguration", "MQTTConfiguration", 1) + `,`,
+		`PublicAddress:` + fmt.Sprintf("%v", this.PublicAddress) + `,`,
+		`PublicTLSAddress:` + fmt.Sprintf("%v", this.PublicTLSAddress) + `,`,
 		`Username:` + fmt.Sprintf("%v", this.Username) + `,`,
 		`}`,
 	}, "")
@@ -484,7 +350,7 @@ func valueToStringMqtt(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *MQTTConfiguration) Unmarshal(dAtA []byte) error {
+func (m *MQTTConnectionInfo) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -507,10 +373,10 @@ func (m *MQTTConfiguration) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MQTTConfiguration: wiretype end group for non-group")
+			return fmt.Errorf("proto: MQTTConnectionInfo: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MQTTConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MQTTConnectionInfo: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -577,96 +443,7 @@ func (m *MQTTConfiguration) Unmarshal(dAtA []byte) error {
 			}
 			m.PublicTLSAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipMqtt(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthMqtt
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthMqtt
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MQTTConnectionInfo) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowMqtt
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MQTTConnectionInfo: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MQTTConnectionInfo: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MQTTConfiguration", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMqtt
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMqtt
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMqtt
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.MQTTConfiguration == nil {
-				m.MQTTConfiguration = &MQTTConfiguration{}
-			}
-			if err := m.MQTTConfiguration.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
 			}

@@ -18955,10 +18955,10 @@
       "extensions": [],
       "messages": [
         {
-          "name": "MQTTConfiguration",
-          "longName": "MQTTConfiguration",
-          "fullName": "ttn.lorawan.v3.MQTTConfiguration",
-          "description": "MQTTConfiguration represents the configuration of an MQTT frontend.",
+          "name": "MQTTConnectionInfo",
+          "longName": "MQTTConnectionInfo",
+          "fullName": "ttn.lorawan.v3.MQTTConnectionInfo",
+          "description": "MQTTConnectionInfo provides the connection information of an MQTT frontend.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -18998,31 +18998,10 @@
                   }
                 ]
               }
-            }
-          ]
-        },
-        {
-          "name": "MQTTConnectionInfo",
-          "longName": "MQTTConnectionInfo",
-          "fullName": "ttn.lorawan.v3.MQTTConnectionInfo",
-          "description": "MQTTConnectionInfo provides both MQTTConfiguration and MQTTUsername.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "config",
-              "description": "",
-              "label": "",
-              "type": "MQTTConfiguration",
-              "longType": "MQTTConfiguration",
-              "fullType": "ttn.lorawan.v3.MQTTConfiguration",
-              "ismap": false,
-              "defaultValue": ""
             },
             {
               "name": "username",
-              "description": "",
+              "description": "The username to be used for authentication.",
               "label": "",
               "type": "string",
               "longType": "string",

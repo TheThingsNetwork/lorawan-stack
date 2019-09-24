@@ -2,23 +2,14 @@
 
 package ttnpb
 
-var MQTTConfigurationFieldPathsNested = []string{
-	"public_address",
-	"public_tls_address",
-}
-
-var MQTTConfigurationFieldPathsTopLevel = []string{
-	"public_address",
-	"public_tls_address",
-}
 var MQTTConnectionInfoFieldPathsNested = []string{
-	"config",
-	"config.public_address",
-	"config.public_tls_address",
+	"public_address",
+	"public_tls_address",
 	"username",
 }
 
 var MQTTConnectionInfoFieldPathsTopLevel = []string{
-	"config",
+	"public_address",
+	"public_tls_address",
 	"username",
 }

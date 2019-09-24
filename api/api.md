@@ -329,7 +329,6 @@
   - [Message `RxMetadata`](#ttn.lorawan.v3.RxMetadata)
   - [Enum `LocationSource`](#ttn.lorawan.v3.LocationSource)
 - [File `lorawan-stack/api/mqtt.proto`](#lorawan-stack/api/mqtt.proto)
-  - [Message `MQTTConfiguration`](#ttn.lorawan.v3.MQTTConfiguration)
   - [Message `MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo)
 - [File `lorawan-stack/api/networkserver.proto`](#lorawan-stack/api/networkserver.proto)
   - [Message `GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse)
@@ -4707,14 +4706,15 @@ More estimation methods can be added. |
 
 ## <a name="lorawan-stack/api/mqtt.proto">File `lorawan-stack/api/mqtt.proto`</a>
 
-### <a name="ttn.lorawan.v3.MQTTConfiguration">Message `MQTTConfiguration`</a>
+### <a name="ttn.lorawan.v3.MQTTConnectionInfo">Message `MQTTConnectionInfo`</a>
 
-MQTTConfiguration represents the configuration of an MQTT frontend.
+MQTTConnectionInfo provides the connection information of an MQTT frontend.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `public_address` | [`string`](#string) |  | The public listen address of the frontend. |
 | `public_tls_address` | [`string`](#string) |  | The public listen address of the TLS frontend. |
+| `username` | [`string`](#string) |  | The username to be used for authentication. |
 
 #### Field Rules
 
@@ -4722,15 +4722,6 @@ MQTTConfiguration represents the configuration of an MQTT frontend.
 | ----- | ----------- |
 | `public_address` | <p>`string.uri`: `true`</p> |
 | `public_tls_address` | <p>`string.uri`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.MQTTConnectionInfo">Message `MQTTConnectionInfo`</a>
-
-MQTTConnectionInfo provides both MQTTConfiguration and MQTTUsername.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `config` | [`MQTTConfiguration`](#ttn.lorawan.v3.MQTTConfiguration) |  |  |
-| `username` | [`string`](#string) |  |  |
 
 ## <a name="lorawan-stack/api/networkserver.proto">File `lorawan-stack/api/networkserver.proto`</a>
 

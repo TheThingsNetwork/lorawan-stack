@@ -142,10 +142,8 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.Application
 		return nil, err
 	}
 	return &ttnpb.MQTTConnectionInfo{
-		MQTTConfiguration: &ttnpb.MQTTConfiguration{
-			PublicAddress:    config.Public,
-			PublicTLSAddress: config.PublicTLS,
-		},
-		Username: unique.ID(ctx, *ids),
+		PublicAddress:    config.Public,
+		PublicTLSAddress: config.PublicTLS,
+		Username:         unique.ID(ctx, *ids),
 	}, nil
 }
