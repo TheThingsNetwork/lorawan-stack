@@ -25,7 +25,7 @@ import toast from '../../../components/toast'
 import Message from '../../../lib/components/message'
 import SubmitBar from '../../../components/submit-bar'
 import ModalButton from '../../../components/button/modal-button'
-import FrequencyPlansSelect from '../../containers/freq-plans-select'
+import { NsFrequencyPlansSelect } from '../../containers/freq-plans-select'
 import DevAddrInput from '../../containers/dev-addr-input'
 import JoinEUIPrefixesInput from '../../containers/join-eui-prefixes-input'
 
@@ -345,12 +345,7 @@ class DeviceDataForm extends Component {
             { value: '1.1.0-b', label: 'PHY V1.1 REV B' },
           ]}
         />
-        <FrequencyPlansSelect
-          title={sharedMessages.frequencyPlan}
-          source="ns"
-          name="frequency_plan_id"
-          required
-        />
+        <NsFrequencyPlansSelect name="frequency_plan_id" required />
         <Form.Field title={m.supportsClassC} name="supports_class_c" component={Checkbox} />
         <Form.Field
           title={sharedMessages.networkServerAddress}

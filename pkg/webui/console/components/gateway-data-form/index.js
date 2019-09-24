@@ -23,7 +23,7 @@ import Checkbox from '../../../components/checkbox'
 import SubmitBar from '../../../components/submit-bar'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
-import FrequencyPlansSelect from '../../containers/freq-plans-select'
+import { GsFrequencyPlansSelect } from '../../containers/freq-plans-select'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as gatewayIdRegexp, address as addressRegexp } from '../../lib/regexp'
 
@@ -105,13 +105,7 @@ class GatewayDataForm extends React.Component {
           component={Input}
         />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
-        <FrequencyPlansSelect
-          horizontal
-          source="gs"
-          name="frequency_plan_id"
-          menuPlacement="top"
-          required
-        />
+        <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" required />
         <Form.Field
           title={m.dutyCycle}
           name="enforce_duty_cycle"
