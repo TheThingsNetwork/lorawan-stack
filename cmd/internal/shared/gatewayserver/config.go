@@ -36,10 +36,10 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 		},
 	},
 	MQTT: config.MQTT{
-		Listen:    ":1882",
-		ListenTLS: ":8882",
-		Public:    fmt.Sprintf("mqtt://%s:1883", shared.DefaultPublicHost),
-		PublicTLS: fmt.Sprintf("mqtts://%s:8883", shared.DefaultPublicHost),
+		Listen:           ":1882",
+		ListenTLS:        ":8882",
+		PublicAddress:    fmt.Sprintf("%s:1882", shared.DefaultPublicHost),
+		PublicTLSAddress: fmt.Sprintf("%s:8882", shared.DefaultPublicHost),
 	},
 	BasicStation: gatewayserver.BasicStationConfig{
 		Listen:    ":1887",

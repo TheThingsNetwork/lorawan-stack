@@ -27,10 +27,10 @@ import (
 var DefaultApplicationServerConfig = applicationserver.Config{
 	LinkMode: "all",
 	MQTT: config.MQTT{
-		Listen:    ":1883",
-		ListenTLS: ":8883",
-		Public:    fmt.Sprintf("mqtt://%s:1883", shared.DefaultPublicHost),
-		PublicTLS: fmt.Sprintf("mqtts://%s:8883", shared.DefaultPublicHost),
+		Listen:           ":1883",
+		ListenTLS:        ":8883",
+		PublicAddress:    fmt.Sprintf("%s:1883", shared.DefaultPublicHost),
+		PublicTLSAddress: fmt.Sprintf("%s:8883", shared.DefaultPublicHost),
 	},
 	Webhooks: applicationserver.WebhooksConfig{
 		Target:    "direct",

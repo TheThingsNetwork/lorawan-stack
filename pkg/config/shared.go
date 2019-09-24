@@ -296,10 +296,10 @@ type ServiceBase struct {
 
 // MQTT contains the listen and public addresses of an MQTT frontend.
 type MQTT struct {
-	Listen    string `name:"listen" description:"Address for the MQTT frontend to listen on"`
-	ListenTLS string `name:"listen-tls" description:"Address for the MQTTS frontend to listen on"`
-	Public    string `name:"public" description:"Public address of the MQTT frontend"`
-	PublicTLS string `name:"public-tls" description:"Public address of the MQTTs frontend"`
+	Listen           string `name:"listen" description:"Address for the MQTT frontend to listen on"`
+	ListenTLS        string `name:"listen-tls" description:"Address for the MQTTS frontend to listen on"`
+	PublicAddress    string `name:"public-address" description:"Public address of the MQTT frontend"`
+	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the MQTTs frontend"`
 }
 
 // MQTTConfigProvider provides contextual access to MQTT configuration.
