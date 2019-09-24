@@ -53,7 +53,7 @@ class ConsoleApp extends React.Component {
         <ErrorView ErrorComponent={FullViewError}>
           <div className={style.app}>
             <IntlHelmet
-              titleTemplate={`%s - ${siteTitle ? `${siteName} - ` : ''}${siteName}`}
+              titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
               defaultTitle={siteName}
             />
             <div id="modal-container" />
