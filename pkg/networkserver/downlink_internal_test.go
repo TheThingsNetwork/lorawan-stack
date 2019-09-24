@@ -4885,7 +4885,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ns, ctx, env, stopTest := StartTest(t, Config{}, (1<<10)*test.Delay)
+			ns, ctx, env, stopTest := StartTest(t, Config{}, (1<<10)*test.Delay, true)
 
 			ns.downlinkPriorities = tc.DownlinkPriorities
 

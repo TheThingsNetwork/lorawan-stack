@@ -93,6 +93,22 @@ func AssertEventPubSubPublishRequest(ctx context.Context, reqCh <-chan EventPubS
 	}
 }
 
+func AssertEventPubSubPublishRequests(ctx context.Context, reqCh <-chan EventPubSubPublishRequest, n int, assert func(evs ...events.Event) bool) bool {
+	t := MustTFromContext(ctx)
+	t.Helper()
+
+	var evs []events.Event
+	for i := 0; i < n; i++ {
+		if !AssertEventPubSubPublishRequest(ctx, reqCh, func(ev events.Event) bool {
+			evs = append(evs, ev)
+			return true
+		}) {
+			return false
+		}
+	}
+	return assert(evs...)
+}
+
 func EventEqual(a, b events.Event) bool {
 	if a == nil {
 		return b == nil

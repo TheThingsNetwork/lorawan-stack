@@ -2397,17 +2397,6 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2429,6 +2418,17 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
 					return false
 				}
 
@@ -2609,17 +2609,6 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2641,6 +2630,17 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
 					return false
 				}
 
@@ -2823,17 +2823,6 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2855,6 +2844,17 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
 					return false
 				}
 
@@ -3041,6 +3041,12 @@ func TestHandleUplink(t *testing.T) {
 					}
 				}
 
+				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
+				}), should.BeTrue) {
+					return false
+				}
+
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
@@ -3049,12 +3055,6 @@ func TestHandleUplink(t *testing.T) {
 				},
 					nil,
 				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
-				}), should.BeTrue) {
 					return false
 				}
 
@@ -3108,7 +3108,7 @@ func TestHandleUplink(t *testing.T) {
 			timeout := (1 << 12) * test.Delay
 
 			t.Run("no link", func(t *testing.T) {
-				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout)
+				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout, true)
 				handleTest(ctx, ns, env, nil, func() {
 					defer stop()
 					assertions.New(t).So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
@@ -3116,23 +3116,14 @@ func TestHandleUplink(t *testing.T) {
 			})
 
 			t.Run("active link", func(t *testing.T) {
-				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout)
+				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout, true)
 
-				link, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, appID)
+				link, linkEndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID)
 				if !ok {
 					t.Fatal("Failed to link application")
 				}
 
 				a := assertions.New(t)
-
-				var evCorrelationIDs []string
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					evCorrelationIDs = ev.CorrelationIDs()
-					return a.So(evCorrelationIDs, should.HaveLength, 1) &&
-						a.So(ev, should.ResembleEvent, EvtBeginApplicationLink(events.ContextWithCorrelationID(ctx, evCorrelationIDs...), appID, nil))
-				}), should.BeTrue) {
-					t.FailNow()
-				}
 
 				asRecvCh := make(chan AsNsLinkRecvRequest)
 				wg := &sync.WaitGroup{}
@@ -3172,17 +3163,12 @@ func TestHandleUplink(t *testing.T) {
 				handleTest(ctx, ns, env, asRecvCh, func() {
 					defer stop()
 
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
-						if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-							return a.So(ev, should.ResembleEvent, EvtEndApplicationLink(events.ContextWithCorrelationID(ctx, evCorrelationIDs...), appID, nil))
-						}), should.BeTrue) {
-							return
-						}
-					}()
 					a.So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
-					wg.Wait() // prevent panic when assertions in goroutines fail
+					if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+						return a.So(ev, should.ResembleEvent, linkEndEvent(context.Canceled))
+					}), should.BeTrue) {
+						return
+					}
 				})
 			})
 		})

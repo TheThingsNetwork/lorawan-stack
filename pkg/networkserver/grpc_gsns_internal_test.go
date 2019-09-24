@@ -675,7 +675,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ns, ctx, env, stop := StartTest(t, Config{NetID: netID}, (1<<10)*test.Delay)
+			ns, ctx, env, stop := StartTest(t, Config{NetID: netID}, (1<<10)*test.Delay, true)
 			defer stop()
 
 			<-env.DownlinkTasks.Pop

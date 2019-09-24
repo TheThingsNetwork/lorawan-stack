@@ -82,15 +82,17 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 	logger.Debug("Linked application")
 
 	events.Publish(evtBeginApplicationLink(ctx, ids, nil))
-	defer events.Publish(evtEndApplicationLink(ctx, ids, err))
 
 	select {
 	case <-ctx.Done():
 		err = ctx.Err()
 		logger.WithError(err).Debug("Context done - close stream")
+		events.Publish(evtEndApplicationLink(ctx, ids, err))
 		return err
+
 	case ws.closeCh <- struct{}{}:
 		logger.Debug("Link closed - close stream")
+		events.Publish(evtEndApplicationLink(ctx, ids, nil))
 		return nil
 	}
 }

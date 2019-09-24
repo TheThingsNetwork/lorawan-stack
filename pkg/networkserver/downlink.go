@@ -1380,11 +1380,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			}()
 		}
 		if len(queuedEvents) > 0 {
-			go func() {
-				for _, ev := range queuedEvents {
-					events.Publish(ev)
-				}
-			}()
+			for _, ev := range queuedEvents {
+				events.Publish(ev)
+			}
 		}
 		if err != nil {
 			setErr = true

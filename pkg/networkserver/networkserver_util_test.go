@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -47,13 +48,17 @@ var (
 	ErrUnsupportedLoRaWANVersion = errUnsupportedLoRaWANVersion
 
 	EvtBeginApplicationLink    = evtBeginApplicationLink
+	EvtCreateEndDevice         = evtCreateEndDevice
+	EvtDeleteEndDevice         = evtDeleteEndDevice
 	EvtDropJoinRequest         = evtDropJoinRequest
 	EvtEndApplicationLink      = evtEndApplicationLink
+	EvtEnqueueDevStatusRequest = evtEnqueueDevStatusRequest
 	EvtEnqueueLinkCheckAnswer  = evtEnqueueLinkCheckAnswer
 	EvtForwardDataUplink       = evtForwardDataUplink
 	EvtForwardJoinRequest      = evtForwardJoinRequest
 	EvtMergeMetadata           = evtMergeMetadata
 	EvtReceiveLinkCheckRequest = evtReceiveLinkCheckRequest
+	EvtUpdateEndDevice         = evtUpdateEndDevice
 
 	Timeout = (1 << 10) * test.Delay
 )
@@ -910,7 +915,7 @@ func AssertAuthNsGsScheduleDownlinkRequest(ctx context.Context, authReqCh <-chan
 	return AssertNsGsScheduleDownlinkRequest(ctx, scheduleReqCh, scheduleAssert, scheduleResp)
 }
 
-func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, appID ttnpb.ApplicationIdentifiers) (ttnpb.AsNs_LinkApplicationClient, bool) {
+func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, eventsPublishCh <-chan test.EventPubSubPublishRequest, appID ttnpb.ApplicationIdentifiers, replaceEvents ...events.Event) (ttnpb.AsNs_LinkApplicationClient, func(interface{}) events.Event, bool) {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
 
@@ -939,8 +944,10 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 		wg.Done()
 	}()
 
+	var reqCIDs []string
 	if !a.So(test.AssertClusterGetPeerRequest(ctx, getPeerCh,
 		func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			reqCIDs = events.CorrelationIDsFromContext(ctx)
 			return a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS) && a.So(ids, should.BeNil)
 		},
 		test.ClusterGetPeerResponse{
@@ -949,25 +956,42 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 			}),
 		},
 	), should.BeTrue) {
-		return nil, false
+		return nil, nil, false
 	}
+
+	a.So(reqCIDs, should.HaveLength, 1)
 
 	if !a.So(test.AssertListRightsRequest(ctx, listRightsCh,
 		func(ctx context.Context, ids ttnpb.Identifiers) bool {
 			md := rpcmetadata.FromIncomingContext(ctx)
-			return a.So(md.AuthType, should.Equal, "Bearer") &&
+			cids := events.CorrelationIDsFromContext(ctx)
+			return a.So(cids, should.NotResemble, reqCIDs) &&
+				a.So(cids, should.HaveLength, 1) &&
+				a.So(md.AuthType, should.Equal, "Bearer") &&
 				a.So(md.AuthValue, should.Equal, "link-application-key") &&
 				a.So(ids, should.Resemble, &appID)
 		}, ttnpb.RIGHT_APPLICATION_LINK,
 	), should.BeTrue) {
-		return nil, false
+		return nil, nil, false
+	}
+
+	if !a.So(test.AssertEventPubSubPublishRequests(ctx, eventsPublishCh, 1+len(replaceEvents), func(evs ...events.Event) bool {
+		return a.So(evs, should.HaveSameElements, append(
+			[]events.Event{EvtBeginApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, nil)},
+			replaceEvents...,
+		), test.EventEqual)
+	}), should.BeTrue) {
+		t.Error("AS link events assertion failed")
+		return nil, nil, false
 	}
 
 	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
 		t.Error("Timed out while waiting for AS link to open")
-		return nil, false
+		return nil, nil, false
 	}
-	return link, a.So(err, should.BeNil)
+	return link, func(v interface{}) events.Event {
+		return EvtEndApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, v)
+	}, a.So(err, should.BeNil)
 }
 
 func AssertNetworkServerClose(ctx context.Context, ns *NetworkServer) bool {
@@ -987,7 +1011,9 @@ type DeviceRegistryEnvironment struct {
 	SetByID     <-chan DeviceRegistrySetByIDRequest
 }
 
-func newMockDeviceRegistry() (DeviceRegistry, DeviceRegistryEnvironment, func()) {
+func newMockDeviceRegistry(t *testing.T) (DeviceRegistry, DeviceRegistryEnvironment, func()) {
+	t.Helper()
+
 	getByEUICh := make(chan DeviceRegistryGetByEUIRequest)
 	getByIDCh := make(chan DeviceRegistryGetByIDRequest)
 	rangeByAddrCh := make(chan DeviceRegistryRangeByAddrRequest)
@@ -1003,10 +1029,30 @@ func newMockDeviceRegistry() (DeviceRegistry, DeviceRegistryEnvironment, func())
 			SetByID:     setByIDCh,
 		},
 		func() {
-			close(getByEUICh)
-			close(getByIDCh)
-			close(rangeByAddrCh)
-			close(setByIDCh)
+			select {
+			case <-getByEUICh:
+				t.Error("DeviceRegistry.GetByEUI call missed")
+			default:
+				close(getByEUICh)
+			}
+			select {
+			case <-getByIDCh:
+				t.Error("DeviceRegistry.GetByID call missed")
+			default:
+				close(getByIDCh)
+			}
+			select {
+			case <-rangeByAddrCh:
+				t.Error("DeviceRegistry.RangeByAddr call missed")
+			default:
+				close(rangeByAddrCh)
+			}
+			select {
+			case <-setByIDCh:
+				t.Error("DeviceRegistry.SetByID call missed")
+			default:
+				close(setByIDCh)
+			}
 		}
 }
 
@@ -1015,7 +1061,9 @@ type DownlinkTaskQueueEnvironment struct {
 	Pop <-chan DownlinkTaskPopRequest
 }
 
-func newMockDownlinkTaskQueue() (DownlinkTaskQueue, DownlinkTaskQueueEnvironment, func()) {
+func newMockDownlinkTaskQueue(t *testing.T) (DownlinkTaskQueue, DownlinkTaskQueueEnvironment, func()) {
+	t.Helper()
+
 	addCh := make(chan DownlinkTaskAddRequest)
 	popCh := make(chan DownlinkTaskPopRequest)
 	return &MockDownlinkTaskQueue{
@@ -1026,8 +1074,18 @@ func newMockDownlinkTaskQueue() (DownlinkTaskQueue, DownlinkTaskQueueEnvironment
 			Pop: popCh,
 		},
 		func() {
-			close(addCh)
-			close(popCh)
+			select {
+			case <-addCh:
+				t.Error("DownlinkTaskQueue.Add call missed")
+			default:
+				close(addCh)
+			}
+			select {
+			case <-popCh:
+				t.Error("DownlinkTaskQueue.Pop call missed")
+			default:
+				close(popCh)
+			}
 		}
 }
 
@@ -1035,7 +1093,9 @@ type InteropClientEnvironment struct {
 	HandleJoinRequest <-chan InteropClientHandleJoinRequestRequest
 }
 
-func newMockInteropClient() (InteropClient, InteropClientEnvironment, func()) {
+func newMockInteropClient(t *testing.T) (InteropClient, InteropClientEnvironment, func()) {
+	t.Helper()
+
 	handleJoinCh := make(chan InteropClientHandleJoinRequestRequest)
 	return &MockInteropClient{
 			HandleJoinRequestFunc: MakeInteropClientHandleJoinRequestChFunc(handleJoinCh),
@@ -1043,7 +1103,12 @@ func newMockInteropClient() (InteropClient, InteropClientEnvironment, func()) {
 			HandleJoinRequest: handleJoinCh,
 		},
 		func() {
-			close(handleJoinCh)
+			select {
+			case <-handleJoinCh:
+				t.Error("InteropClient.HandleJoin call missed")
+			default:
+				close(handleJoinCh)
+			}
 		}
 }
 
@@ -1060,7 +1125,7 @@ type TestEnvironment struct {
 	InteropClient     *InteropClientEnvironment
 }
 
-func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option) (*NetworkServer, context.Context, TestEnvironment, func()) {
+func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplication bool, opts ...Option) (*NetworkServer, context.Context, TestEnvironment, func()) {
 	t.Helper()
 
 	logger := test.GetLogger(t)
@@ -1071,7 +1136,7 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option)
 
 	authCh := make(chan test.ClusterAuthRequest)
 	getPeerCh := make(chan test.ClusterGetPeerRequest)
-	eventsCh := make(chan test.EventPubSubPublishRequest)
+	eventsPublishCh := make(chan test.EventPubSubPublishRequest)
 
 	c := component.MustNew(
 		logger,
@@ -1089,8 +1154,16 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option)
 	)
 	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
-	collectionDoneCh := make(chan WindowEndRequest)
-	deduplicationDoneCh := make(chan WindowEndRequest)
+	var collectionDoneCh, deduplicationDoneCh chan WindowEndRequest
+	if stubDeduplication {
+		collectionDoneCh = make(chan WindowEndRequest)
+		deduplicationDoneCh = make(chan WindowEndRequest)
+
+		opts = append([]Option{
+			WithCollectionDoneFunc(MakeWindowEndChFunc(collectionDoneCh)),
+			WithDeduplicationDoneFunc(MakeWindowEndChFunc(deduplicationDoneCh)),
+		}, opts...)
+	}
 
 	env := TestEnvironment{
 		CollectionDone:    collectionDoneCh,
@@ -1098,20 +1171,20 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option)
 	}
 	env.Cluster.Auth = authCh
 	env.Cluster.GetPeer = getPeerCh
-	env.Events = eventsCh
+	env.Events = eventsPublishCh
 
 	var closeFuncs []func()
 	closeFuncs = append(closeFuncs, test.SetDefaultEventsPubSub(&test.MockEventPubSub{
-		PublishFunc: test.MakeEventPubSubPublishChFunc(eventsCh),
+		PublishFunc: test.MakeEventPubSubPublishChFunc(eventsPublishCh),
 	}))
 	if conf.Devices == nil {
-		m, mEnv, closeM := newMockDeviceRegistry()
+		m, mEnv, closeM := newMockDeviceRegistry(t)
 		conf.Devices = m
 		env.DeviceRegistry = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
 	}
 	if conf.DownlinkTasks == nil {
-		m, mEnv, closeM := newMockDownlinkTaskQueue()
+		m, mEnv, closeM := newMockDownlinkTaskQueue(t)
 		conf.DownlinkTasks = m
 		env.DownlinkTasks = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
@@ -1120,12 +1193,11 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option)
 	ns := test.Must(New(
 		c,
 		&conf,
-		WithCollectionDoneFunc(MakeWindowEndChFunc(collectionDoneCh)),
-		WithDeduplicationDoneFunc(MakeWindowEndChFunc(deduplicationDoneCh)),
+		opts...,
 	)).(*NetworkServer)
 
 	if ns.interopClient == nil {
-		m, mEnv, closeM := newMockInteropClient()
+		m, mEnv, closeM := newMockInteropClient(t)
 		ns.interopClient = m
 		env.InteropClient = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
@@ -1139,8 +1211,23 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, opts ...Option)
 		for _, f := range closeFuncs {
 			f()
 		}
-		close(authCh)
-		close(getPeerCh)
-		close(eventsCh)
+		select {
+		case <-authCh:
+			t.Error("Cluster.Auth call missed")
+		default:
+			close(authCh)
+		}
+		select {
+		case <-getPeerCh:
+			t.Error("Cluster.GetPeer call missed")
+		default:
+			close(getPeerCh)
+		}
+		select {
+		case <-eventsPublishCh:
+			t.Error("events.Publish call missed")
+		default:
+			close(eventsPublishCh)
+		}
 	}
 }
