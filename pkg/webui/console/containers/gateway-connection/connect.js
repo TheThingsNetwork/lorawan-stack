@@ -25,6 +25,7 @@ import {
   stopGatewayStatistics,
   updateGatewayStatistics,
 } from '../../store/actions/gateways'
+import { selectGatewayLastSeen } from '../../store/selectors/gateway-status'
 
 import withConnectionReactor from './gateway-connection-reactor'
 
@@ -36,6 +37,7 @@ export default GatewayConnection =>
         error: selectGatewayStatisticsError(state, ownProps),
         fetching: selectGatewayStatisticsIsFetching(state, ownProps),
         latestEvent: selectLatestGatewayEvent(state, ownProps.gtwId),
+        lastSeen: selectGatewayLastSeen(state),
       }
     },
     (dispatch, ownProps) => ({

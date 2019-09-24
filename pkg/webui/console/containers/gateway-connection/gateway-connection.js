@@ -41,12 +41,13 @@ class GatewayConnection extends React.PureComponent {
   }
 
   get status() {
-    const { statistics, error, fetching } = this.props
+    const { statistics, error, fetching, lastSeen } = this.props
 
     const isNotConnected = Boolean(error) && isNotFoundError(error)
     const isFetching = !Boolean(statistics) && fetching
     const isUnavailable = Boolean(error) && Boolean(error.message) && isTranslated(error.message)
     const hasStatistics = Boolean(statistics)
+    const hasLastSeen = Boolean(lastSeen)
 
     let statusIndicator = null
     let message = null
@@ -61,7 +62,7 @@ class GatewayConnection extends React.PureComponent {
       statusIndicator = 'unknown'
       message = error.message
     } else if (hasStatistics) {
-      message = sharedMessages.lastSeen
+      message = hasLastSeen ? sharedMessages.lastSeen : sharedMessages.connected
       statusIndicator = 'good'
     } else {
       message = sharedMessages.unknown
@@ -71,9 +72,7 @@ class GatewayConnection extends React.PureComponent {
     return (
       <Status className={style.status} status={statusIndicator}>
         <Message className={style.lastSeen} content={message} />
-        {statusIndicator === 'good' && (
-          <DateTime.Relative value={statistics.last_status_received_at} />
-        )}
+        {statusIndicator === 'good' && lastSeen && <DateTime.Relative value={lastSeen} />}
       </Status>
     )
   }
@@ -125,6 +124,7 @@ GatewayConnection.propTypes = {
   className: PropTypes.string,
   error: PropTypes.error,
   fetching: PropTypes.bool,
+  lastSeen: PropTypes.instanceOf(Date),
   startStatistics: PropTypes.func.isRequired,
   statistics: PropTypes.gatewayStats,
   stopStatistics: PropTypes.func.isRequired,
@@ -135,6 +135,7 @@ GatewayConnection.defaultProps = {
   fetching: false,
   error: null,
   statistics: null,
+  lastSeen: undefined,
 }
 
 export default GatewayConnection
