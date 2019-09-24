@@ -67,6 +67,7 @@ class FormField extends React.Component {
     name: PropTypes.string.isRequired,
     onChange: PropTypes.func,
     required: PropTypes.bool,
+    title: PropTypes.message.isRequired,
     warning: PropTypes.message,
   }
 
