@@ -19,6 +19,7 @@ import bind from 'autobind-decorator'
 import PropTypes from '../../lib/prop-types'
 import Message from '../../lib/components/message'
 import Icon from '../../components/icon'
+import Button from '../../components/button'
 
 import style from './file-input.styl'
 
@@ -28,6 +29,7 @@ const m = defineMessages({
   noFileSelected: 'No file selected',
   fileProvided: 'A file has been provided',
   tooBig: 'The selected file is too large.',
+  remove: 'Remove',
 })
 
 const dataTransform = function(content) {
@@ -96,6 +98,14 @@ export default class FileInput extends Component {
     this.fileInputRef.current.click()
   }
 
+  @bind
+  handleRemoveClick() {
+    const { onChange } = this.props
+
+    this.setState({ filename: '', error: undefined })
+    onChange(undefined)
+  }
+
   get statusMessage() {
     const { value, providedMessage } = this.props
     const { filename, error } = this.state
@@ -109,10 +119,20 @@ export default class FileInput extends Component {
           <Message className={style.error} content={error} />
         </React.Fragment>
       )
-    } else if (hasInitialValue) {
-      return <Message content={providedMessage} />
-    } else if (Boolean(filename)) {
-      return filename
+    } else if (hasInitialValue || Boolean(filename)) {
+      return (
+        <React.Fragment>
+          {hasInitialValue ? <Message content={providedMessage} /> : filename}
+          <Button
+            className={style.removeButton}
+            message={m.remove}
+            onClick={this.handleRemoveClick}
+            icon="delete"
+            secondary
+            naked
+          />
+        </React.Fragment>
+      )
     }
 
     return <Message className={style.noFile} content={m.noFileSelected} />
