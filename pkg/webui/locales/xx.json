@@ -228,6 +228,7 @@
   "lib.shared-messages.componentJoinServer": "Xxxx Xxxxxx",
   "lib.shared-messages.componentNetworkServer": "Xxxxxxx Xxxxxx",
   "lib.shared-messages.confirmPassword": "Xxxxxxx Xxxxxxxx",
+  "lib.shared-messages.connected": "Xxxxxxxxx",
   "lib.shared-messages.connecting": "Xxxxxxxxxx",
   "lib.shared-messages.createApiKey": "Xxxxxx XXX Xxx",
   "lib.shared-messages.created": "Xxxxxxx",

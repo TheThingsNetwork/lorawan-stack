@@ -228,6 +228,7 @@
   "lib.shared-messages.componentJoinServer": "Join Server",
   "lib.shared-messages.componentNetworkServer": "Network Server",
   "lib.shared-messages.confirmPassword": "Confirm Password",
+  "lib.shared-messages.connected": "Connected",
   "lib.shared-messages.connecting": "Connecting",
   "lib.shared-messages.createApiKey": "Create API Key",
   "lib.shared-messages.created": "Created",
