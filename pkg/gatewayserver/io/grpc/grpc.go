@@ -176,9 +176,14 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	return fp.ToConcentratorConfig()
 }
 
+var errNoMQTTConfigProvider = errors.DefineUnimplemented("no_configuration_provider", "no MQTT configuration provider available")
+
 func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
 	if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
 		return nil, err
+	}
+	if s.mqttConfigProvider == nil {
+		return nil, errNoMQTTConfigProvider
 	}
 	config, err := s.mqttConfigProvider.GetMQTTConfig(ctx)
 	if err != nil {

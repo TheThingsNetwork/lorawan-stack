@@ -128,9 +128,14 @@ func (s *impl) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIdenti
 	}, nil
 }
 
+var errNoMQTTConfigProvider = errors.DefineUnimplemented("no_configuration_provider", "no MQTT configuration provider available")
+
 func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
 	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
 		return nil, err
+	}
+	if s.mqttConfigProvider == nil {
+		return nil, errNoMQTTConfigProvider
 	}
 	config, err := s.mqttConfigProvider.GetMQTTConfig(ctx)
 	if err != nil {

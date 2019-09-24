@@ -1511,6 +1511,15 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/applicationserver/io/grpc:no_configuration_provider": {
+    "translations": {
+      "en": "no MQTT configuration provider available"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/applicationserver/io/mqtt:not_authorized": {
     "translations": {
       "en": "not authorized"
@@ -2981,6 +2990,15 @@
   "error:pkg/gatewayserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect gateway `{gateway_uid}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/grpc",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/grpc:no_configuration_provider": {
+    "translations": {
+      "en": "no MQTT configuration provider available"
     },
     "description": {
       "package": "pkg/gatewayserver/io/grpc",
