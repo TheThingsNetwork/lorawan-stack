@@ -577,29 +577,28 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 		}
 
 		handleUplinkErrCh := make(chan error)
-		handleFirstUplink := func() {
-			_, err := gsns.HandleUplink(ctx, makeUplink(
-				mds[0],
-				"GsNs-1", "GsNs-2",
-			))
-			t.Logf("HandleUplink returned %v", err)
-			handleUplinkErrCh <- err
-		}
-		handleDuplicateUplink := func() {
-			_, err := gsns.HandleUplink(ctx, makeUplink(
-				mds[1],
-				"GsNs-1", "GsNs-3",
-			))
-			t.Logf("Duplicate HandleUplink returned %v", err)
-			handleUplinkErrCh <- err
-		}
-
-		go handleFirstUplink()
-		defer time.AfterFunc((1<<3)*test.Delay, handleDuplicateUplink).Stop()
-
-		assertDuplicateHandleUplink := func(ctx context.Context) bool {
+		sendUplinks := func(ctx context.Context) bool {
 			t := test.MustTFromContext(ctx)
 			t.Helper()
+
+			go func() {
+				_, err := gsns.HandleUplink(ctx, makeUplink(
+					mds[0],
+					"GsNs-1", "GsNs-2",
+				))
+				t.Logf("HandleUplink returned %v", err)
+				handleUplinkErrCh <- err
+			}()
+
+			defer time.AfterFunc((1<<3)*test.Delay, func() {
+				_, err := gsns.HandleUplink(ctx, makeUplink(
+					mds[1],
+					"GsNs-1", "GsNs-3",
+				))
+				t.Logf("Duplicate HandleUplink returned %v", err)
+				handleUplinkErrCh <- err
+			}).Stop()
+
 			select {
 			case <-ctx.Done():
 				t.Error("Timed out while waiting for duplicate HandleUplink to return")
@@ -613,7 +612,9 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 			}
 			return true
 		}
-		a.So(assertDuplicateHandleUplink(ctx), should.BeTrue)
+		if !a.So(sendUplinks(ctx), should.BeTrue) {
+			t.Error("Failed to send uplinks")
+		}
 
 		var reqCIDs []string
 		assertHandleUplink := func(ctx context.Context, evReq test.EventPubSubPublishRequest) bool {
@@ -687,10 +688,10 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 				}
 				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
 
-				go handleFirstUplink()
-				defer time.AfterFunc((1<<3)*test.Delay, handleDuplicateUplink).Stop()
+				if !a.So(sendUplinks(ctx), should.BeTrue) {
+					t.Error("Failed to send uplinks")
+				}
 
-				a.So(assertDuplicateHandleUplink(ctx), should.BeTrue)
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for an event")
