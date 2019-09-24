@@ -1670,6 +1670,18 @@
     "GetConcentratorConfig": {
       "file": "lorawan-stack/api/gatewayserver.proto",
       "http": []
+    },
+    "GetMQTTConnectionInfo": {
+      "file": "lorawan-stack/api/gatewayserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gs/gateways/{gateway_id}/mqtt-connection-info",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
     }
   },
   "NsGs": {
