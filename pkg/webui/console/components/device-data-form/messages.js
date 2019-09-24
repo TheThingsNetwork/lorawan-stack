@@ -35,8 +35,6 @@ export default defineMessages({
   deviceNamePlaceholder: 'My New Device',
   external: 'External',
   externalJoinServer: 'External Join Server',
-  externalJoinServerDescription:
-    'The keys of this device are provisioned on an external Join Server',
   fwdNtwkKeyDescription: 'Forwarding Network Session Integrity Key (or LoRaWAN 1.0.x NwkSKey)',
   joinEUIDescription: 'JoinEUI identifies the Join Server (in LoRaWAN 1.0.x known as AppEUI)',
   leaveBlankPlaceholder: 'Leave blank to generate automatically',
@@ -44,7 +42,6 @@ export default defineMessages({
   nwkKeyDescription:
     'The root key to derive network session keys to secure communication between the device and the network',
   otaa: 'Over The Air Activation (OTAA)',
-  provisionedByExternalJoinServer: 'Provisioned by external Join Server',
   resetsFCnt: 'Resets Frame Counters',
   resetsJoinNonces: 'Resets Join Nonces',
   resetWarning: 'Reseting is insecure and makes your device susceptible for replay attacks',

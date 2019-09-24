@@ -34,6 +34,7 @@ const m = defineMessages({
   rootKeyId: 'Root Key ID',
   sessionInfo: 'Session Information',
   latestData: 'Latest Data',
+  rootKeys: 'Root Keys',
 })
 
 @connect(function({ device }, props) {
@@ -125,6 +126,11 @@ class DeviceOverview extends React.Component {
                 }
               : { key: sharedMessages.nwkKey, value: undefined }),
           ],
+        })
+      } else {
+        activationInfoData.items.push({
+          key: m.rootKeys,
+          value: <Message content={sharedMessages.provisionedOnExternalJoinServer} />,
         })
       }
     }

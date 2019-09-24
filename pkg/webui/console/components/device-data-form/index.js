@@ -261,7 +261,9 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={external_js ? m.provisionedByExternalJoinServer : m.leaveBlankPlaceholder}
+          placeholder={
+            external_js ? sharedMessages.provisionedOnExternalJoinServer : m.leaveBlankPlaceholder
+          }
           description={m.appKeyDescription}
           component={Input}
           disabled={external_js}
@@ -272,7 +274,9 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={external_js ? m.provisionedByExternalJoinServer : m.leaveBlankPlaceholder}
+          placeholder={
+            external_js ? sharedMessages.provisionedOnExternalJoinServer : m.leaveBlankPlaceholder
+          }
           description={m.nwkKeyDescription}
           component={Input}
           disabled={external_js}

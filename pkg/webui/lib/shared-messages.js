@@ -141,6 +141,7 @@ export default defineMessages({
   payloadFormattersUplink: 'Uplink Payload Formatters',
   phyVersion: 'PHY Version',
   privacyPolicy: 'Privacy Policy',
+  provisionedOnExternalJoinServer: 'Provisioned on external Join Server',
   refreshPage: 'Refresh page',
   removeCollaborator: 'Remove Collaborator',
   resume: 'Resume',
