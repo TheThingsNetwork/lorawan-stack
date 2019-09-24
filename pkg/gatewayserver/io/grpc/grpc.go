@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -29,13 +30,34 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
+// Option represents an option for the gRPC frontend.
+type Option interface {
+	apply(*impl)
+}
+
+type optionFunc func(*impl)
+
+func (f optionFunc) apply(i *impl) { f(i) }
+
+// WithMQTTConfigProvider sets the MQTT configuration provider for the gRPC frontend.
+func WithMQTTConfigProvider(provider config.MQTTConfigProvider) Option {
+	return optionFunc(func(i *impl) {
+		i.mqttConfigProvider = provider
+	})
+}
+
 type impl struct {
-	server io.Server
+	server             io.Server
+	mqttConfigProvider config.MQTTConfigProvider
 }
 
 // New returns a new gRPC frontend.
-func New(server io.Server) ttnpb.GtwGsServer {
-	return &impl{server}
+func New(server io.Server, opts ...Option) ttnpb.GtwGsServer {
+	i := &impl{server: server}
+	for _, opt := range opts {
+		opt.apply(i)
+	}
+	return i
 }
 
 func (*impl) Protocol() string { return "grpc" }
@@ -152,4 +174,21 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 		return nil, err
 	}
 	return fp.ToConcentratorConfig()
+}
+
+func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
+	if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
+		return nil, err
+	}
+	config, err := s.mqttConfigProvider.GetMQTTConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.MQTTConnectionInfo{
+		MQTTConfiguration: &ttnpb.MQTTConfiguration{
+			PublicAddress:    config.Public,
+			PublicTLSAddress: config.PublicTLS,
+		},
+		Username: unique.ID(ctx, *ids),
+	}, nil
 }
