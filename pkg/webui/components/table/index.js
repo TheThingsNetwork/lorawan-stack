@@ -108,7 +108,9 @@ class Tabular extends React.Component {
           return (
             <Table.Row key={rowKey} id={rowKey} onClick={onRowClick}>
               {headers.map(function(header, index) {
-                const value = getByPath(row, headers[index].name)
+                const value = headers[index].getValue
+                  ? headers[index].getValue(row)
+                  : getByPath(row, headers[index].name)
                 return (
                   <Table.DataCell key={index} centered={header.centered} small={small}>
                     {headers[index].render ? headers[index].render(value) : value}
@@ -192,6 +194,7 @@ Tabular.propTypes = {
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       displayName: PropTypes.message.isRequired,
+      getValue: PropTypes.func,
       name: PropTypes.string.isRequired,
       render: PropTypes.func,
       centered: PropTypes.bool,
