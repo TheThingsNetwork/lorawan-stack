@@ -38,7 +38,11 @@ const validationSchema = Yup.object({
     addressRegexp,
     sharedMessages.validateAddressFormat,
   ),
-  join_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
+  join_server_address: Yup.string().when('external_js', {
+    is: false,
+    then: schema => schema.matches(addressRegexp, sharedMessages.validateAddressFormat),
+    otherwise: schema => schema.default(''),
+  }),
   activation_mode: Yup.string().required(),
   supports_join_nonces: Yup.boolean(),
 }) // OTAA related entries
@@ -76,8 +80,9 @@ const validationSchema = Yup.object({
         }),
       otherwise: schema => schema.strip(),
     }),
-    root_keys: Yup.object().when('activation_mode', {
-      is: isOTAA,
+    external_js: Yup.boolean(),
+    root_keys: Yup.object().when(['activation_mode', 'external_js'], {
+      is: (mode, externalJs) => isOTAA(mode) && !externalJs,
       then: schema =>
         schema.shape({
           nwk_key: Yup.object().shape({
@@ -93,12 +98,16 @@ const validationSchema = Yup.object({
               .default(random16BytesString),
           }),
         }),
-      otherwise: schema => schema.strip(),
+      otherwise: schema =>
+        schema.shape({
+          nwk_key: Yup.object().strip(),
+          app_key: Yup.object().strip(),
+        }),
     }),
   }) // ABP related entries
   .shape({
-    resets_join_nonces: Yup.boolean().when('activation_mode', {
-      is: isOTAA,
+    resets_join_nonces: Yup.boolean().when(['activation_mode', 'external_js'], {
+      is: (mode, externalJs) => isOTAA(mode) && !externalJs,
       then: schema => schema,
       otherwise: schema => schema.strip(),
     }),
