@@ -12,28 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package devicetemplateconverter_test
+package test
 
 import (
 	"testing"
 
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
-	. "go.thethings.network/lorawan-stack/pkg/devicetemplateconverter"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
-func TestDeviceTemplateConverter(t *testing.T) {
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+// NewComponent returns a new Component that can be used for testing.
+func NewComponent(t *testing.T, config *component.Config, opts ...component.Option) *component.Component {
+	c, err := component.New(test.GetLogger(t), config, opts...)
+	if err != nil {
+		t.Fatalf("Failed to create component: %v", err)
+	}
+	return c
+}
 
-	conf := &component.Config{}
-	c := NewComponent(t, conf)
-
-	test.Must(New(c, &Config{}))
-	test.Must(c.Start(), nil)
-	defer c.Close()
-
-	mustHavePeer(ctx, c, ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER)
+// StartComponent starts the component for testing.
+func StartComponent(t *testing.T, c *component.Component) {
+	if err := c.Start(); err != nil {
+		t.Fatalf("Failed to start component: %v", err)
+	}
 }

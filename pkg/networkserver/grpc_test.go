@@ -19,6 +19,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -61,7 +62,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			a := assertions.New(t)
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				NewComponent(t, &component.Config{}),
 				&Config{
 					NetID:               tc.NetID,
 					DeduplicationWindow: 42,
@@ -139,7 +140,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			a := assertions.New(t)
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				NewComponent(t, &component.Config{}),
 				&Config{
 					NetID:               types.NetID{0x00, 0x00, 0x13},
 					DevAddrPrefixes:     tc.DevAddrPrefixes,

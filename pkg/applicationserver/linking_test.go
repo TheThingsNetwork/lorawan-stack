@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -64,7 +65,7 @@ func TestLink(t *testing.T) {
 		}, paths, nil
 	})
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{
+	c := NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			Cluster: config.Cluster{
 				NetworkServer: nsAddr,
@@ -81,7 +82,7 @@ func TestLink(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	test.Must(nil, c.Start())
+	StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 

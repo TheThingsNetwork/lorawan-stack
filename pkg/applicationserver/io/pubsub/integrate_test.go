@@ -26,6 +26,7 @@ import (
 	mock_provider "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/mock"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -80,7 +81,7 @@ func TestIntegrate(t *testing.T) {
 	})
 	a.So(err, should.BeNil)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{
+	c := NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":9185",
@@ -97,7 +98,7 @@ func TestIntegrate(t *testing.T) {
 		t.FailNow()
 	}
 	c.RegisterGRPC(&mockRegisterer{srv})
-	test.Must(nil, c.Start())
+	StartComponent(t, c)
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)

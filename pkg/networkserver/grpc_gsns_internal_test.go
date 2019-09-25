@@ -22,6 +22,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -36,7 +37,7 @@ func TestNewDevAddr(t *testing.T) {
 	// Use DevAddr prefix from NetID.
 	{
 		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), &component.Config{}),
+			NewComponent(t, &component.Config{}),
 			&Config{
 				NetID:               types.NetID{0x00, 0x00, 0x13},
 				DeduplicationWindow: 42,
@@ -61,7 +62,7 @@ func TestNewDevAddr(t *testing.T) {
 	// Configured DevAddr prefixes.
 	{
 		ns := test.Must(New(
-			component.MustNew(test.GetLogger(t), &component.Config{}),
+			NewComponent(t, &component.Config{}),
 			&Config{
 				NetID: types.NetID{0x00, 0x00, 0x13},
 				DevAddrPrefixes: []types.DevAddrPrefix{

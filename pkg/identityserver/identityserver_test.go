@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -290,7 +291,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 			panic(err)
 		}
 	})
-	c := component.MustNew(test.GetLogger(t), &component.Config{ServiceBase: config.ServiceBase{
+	c := NewComponent(t, &component.Config{ServiceBase: config.ServiceBase{
 		Base: config.Base{
 			Log: config.Log{
 				Level: log.DebugLevel,

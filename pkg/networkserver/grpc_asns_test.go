@@ -25,6 +25,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
@@ -714,7 +715,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			var addCalls, setByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -1393,7 +1394,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			var addCalls, setByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -1572,7 +1573,7 @@ func TestDownlinkQueueList(t *testing.T) {
 			var getByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {

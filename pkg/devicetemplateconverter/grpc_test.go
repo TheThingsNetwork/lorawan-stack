@@ -24,6 +24,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	. "go.thethings.network/lorawan-stack/pkg/devicetemplateconverter"
 	"go.thethings.network/lorawan-stack/pkg/devicetemplates"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -66,7 +67,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 		},
 	})
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	c := NewComponent(t, &component.Config{})
 	test.Must(New(c, &Config{
 		Enabled: []string{"test"},
 	}))

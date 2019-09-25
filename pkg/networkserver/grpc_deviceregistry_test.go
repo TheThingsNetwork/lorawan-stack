@@ -26,6 +26,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -159,7 +160,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			var getByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{
+				NewComponent(t, &component.Config{
 					ServiceBase: config.ServiceBase{
 						KeyVault: config.KeyVault{
 							Static: tc.KeyVault,
@@ -1085,7 +1086,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			var setByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -1248,7 +1249,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			var setByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {

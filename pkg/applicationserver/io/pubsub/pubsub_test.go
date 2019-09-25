@@ -27,6 +27,7 @@ import (
 	mock_provider "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/mock"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -126,13 +127,13 @@ func TestPubSub(t *testing.T) {
 	a.So(err, should.BeNil)
 	mockImpl := mockProvider.(*mock_provider.Impl)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	c := NewComponent(t, &component.Config{})
 	io := mock_server.NewServer(c)
 	_, err = pubsub.New(c, io, registry)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	test.Must(nil, c.Start())
+	StartComponent(t, c)
 	defer c.Close()
 
 	sub := <-io.Subscriptions()

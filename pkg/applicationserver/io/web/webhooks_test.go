@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -340,7 +341,7 @@ func TestWebhooks(t *testing.T) {
 				},
 			},
 		}
-		c := component.MustNew(test.GetLogger(t), conf)
+		c := NewComponent(t, conf)
 		io := mock.NewServer(c)
 		testSink := &mockSink{
 			Component: c,
@@ -348,7 +349,7 @@ func TestWebhooks(t *testing.T) {
 		}
 		w := web.NewWebhooks(ctx, testSink.Server, registry, testSink)
 		c.RegisterWeb(w)
-		test.Must(nil, c.Start())
+		StartComponent(t, c)
 		defer c.Close()
 
 		mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)

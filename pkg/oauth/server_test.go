@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -96,7 +97,7 @@ func TestOAuthFlow(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	c := component.MustNew(test.GetLogger(t), &component.Config{
+	c := NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			HTTP: config.HTTP{
 				Cookie: config.Cookie{
@@ -502,7 +503,7 @@ func TestOAuthFlow(t *testing.T) {
 func TestTokenExchange(t *testing.T) {
 	ctx := test.Context()
 	store := &mockStore{}
-	c := component.MustNew(test.GetLogger(t), &component.Config{
+	c := NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			HTTP: config.HTTP{
 				Cookie: config.Cookie{

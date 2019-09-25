@@ -28,6 +28,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	. "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -68,7 +69,7 @@ func TestGatewayServer(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	ns, nsAddr := mock.StartNS(ctx)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{
+	c := NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":9187",
@@ -112,7 +113,7 @@ func TestGatewayServer(t *testing.T) {
 	a.So(len(roles), should.Equal, 1)
 	a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
 
-	test.Must(nil, c.Start())
+	StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
