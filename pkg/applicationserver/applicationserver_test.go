@@ -268,7 +268,7 @@ hardware_versions:
 		LinkMode: "all",
 		Devices:  deviceRegistry,
 		Links:    linkRegistry,
-		MQTT: applicationserver.MQTTConfig{
+		MQTT: config.MQTT{
 			Listen: ":1883",
 		},
 		Webhooks: applicationserver.WebhooksConfig{

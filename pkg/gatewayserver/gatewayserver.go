@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -57,6 +58,8 @@ import (
 type GatewayServer struct {
 	*component.Component
 	ctx context.Context
+
+	config *Config
 
 	requireRegisteredGateways bool
 	forward                   map[string][]types.DevAddrPrefix
@@ -118,6 +121,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	gs = &GatewayServer{
 		Component:                 c,
 		ctx:                       log.NewContextWithField(c.Context(), "namespace", "gatewayserver"),
+		config:                    conf,
 		requireRegisteredGateways: conf.RequireRegisteredGateways,
 		forward:                   forward,
 		upstreamHandlers:          make(map[string]upstream.Handler),
@@ -151,7 +155,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 	for _, version := range []struct {
 		Format mqtt.Format
-		Config MQTTConfig
+		Config config.MQTT
 	}{
 		{
 			Format: mqtt.Protobuf,
@@ -249,12 +253,30 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 func (gs *GatewayServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterGsServer(s, gs)
 	ttnpb.RegisterNsGsServer(s, gs)
-	ttnpb.RegisterGtwGsServer(s, iogrpc.New(gs))
+	ttnpb.RegisterGtwGsServer(s, iogrpc.New(gs,
+		iogrpc.WithMQTTConfigProvider(
+			config.MQTTConfigProviderFunc(func(ctx context.Context) (*config.MQTT, error) {
+				config, err := gs.GetConfig(ctx)
+				if err != nil {
+					return nil, err
+				}
+				return &config.MQTT, nil
+			})),
+		iogrpc.WithMQTTv2ConfigProvider(
+			config.MQTTConfigProviderFunc(func(ctx context.Context) (*config.MQTT, error) {
+				config, err := gs.GetConfig(ctx)
+				if err != nil {
+					return nil, err
+				}
+				return &config.MQTTV2, nil
+			})),
+	))
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (gs *GatewayServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterGsHandler(gs.Context(), s, conn)
+	ttnpb.RegisterGtwGsHandler(gs.Context(), s, conn)
 }
 
 // Roles returns the roles that the Gateway Server fulfills.
@@ -608,4 +630,23 @@ func (gs *GatewayServer) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIde
 // UnclaimDownlink releases the claim of the downlink path for the given gateway.
 func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return gs.UnclaimIDs(ctx, ids)
+}
+
+type ctxConfigKeyType struct{}
+
+// GetConfig returns the Gateway Server config based on the context.
+func (gs *GatewayServer) GetConfig(ctx context.Context) (*Config, error) {
+	if val, ok := ctx.Value(&ctxConfigKeyType{}).(*Config); ok {
+		return val, nil
+	}
+	return gs.config, nil
+}
+
+// GetMQTTConfig returns the MQTT frontend configuration based on the context.
+func (gs *GatewayServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, error) {
+	config, err := gs.GetConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &config.MQTT, nil
 }

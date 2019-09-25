@@ -15,6 +15,7 @@
 package config
 
 import (
+	"context"
 	"crypto/tls"
 	"time"
 
@@ -86,6 +87,7 @@ type Metrics struct {
 	Password string `name:"password" description:"Password to protect metrics endpoint (username is metrics)"`
 }
 
+// Health represents the health checks configuration.
 type Health struct {
 	Enable   bool   `name:"enable" description:"Enable health check endpoint on HTTP server"`
 	Password string `name:"password" description:"Password to protect health endpoint (username is health)"`
@@ -291,4 +293,25 @@ type ServiceBase struct {
 	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
 	Rights           Rights                 `name:"rights"`
 	KeyVault         KeyVault               `name:"key-vault"`
+}
+
+// MQTT contains the listen and public addresses of an MQTT frontend.
+type MQTT struct {
+	Listen           string `name:"listen" description:"Address for the MQTT frontend to listen on"`
+	ListenTLS        string `name:"listen-tls" description:"Address for the MQTTS frontend to listen on"`
+	PublicAddress    string `name:"public-address" description:"Public address of the MQTT frontend"`
+	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the MQTTs frontend"`
+}
+
+// MQTTConfigProvider provides contextual access to MQTT configuration.
+type MQTTConfigProvider interface {
+	GetMQTTConfig(context.Context) (*MQTT, error)
+}
+
+// MQTTConfigProviderFunc is a functional MQTTConfigProvider.
+type MQTTConfigProviderFunc func(context.Context) (*MQTT, error)
+
+// GetMQTTConfig implements MQTTConfigProvider.
+func (f MQTTConfigProviderFunc) GetMQTTConfig(ctx context.Context) (*MQTT, error) {
+	return f(ctx)
 }

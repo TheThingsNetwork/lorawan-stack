@@ -23,6 +23,7 @@ import "lorawan-stack/api/error.proto";
 import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
+import "lorawan-stack/api/mqtt.proto";
 import "lorawan-stack/api/regional.proto";
 
 package ttn.lorawan.v3;
@@ -49,6 +50,18 @@ service GtwGs {
   rpc LinkGateway(stream GatewayUp) returns (stream GatewayDown);
   // GetConcentratorConfig associated to the gateway.
   rpc GetConcentratorConfig(google.protobuf.Empty) returns (ConcentratorConfig);
+  // Get the MQTT server address and the username for the gateway.
+  rpc GetMQTTConnectionInfo(GatewayIdentifiers) returns (MQTTConnectionInfo) {
+    option (google.api.http) = {
+      get: "/gs/gateways/{gateway_id}/mqtt-connection-info"
+    };
+  };
+  // Get the MQTTV2 server address and the username for the gateway.
+  rpc GetMQTTV2ConnectionInfo(GatewayIdentifiers) returns (MQTTConnectionInfo) {
+    option (google.api.http) = {
+      get: "/gs/gateways/{gateway_id}/mqttv2-connection-info"
+    };
+  };
 }
 
 message ScheduleDownlinkResponse {

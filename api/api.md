@@ -328,6 +328,8 @@
   - [Message `Location`](#ttn.lorawan.v3.Location)
   - [Message `RxMetadata`](#ttn.lorawan.v3.RxMetadata)
   - [Enum `LocationSource`](#ttn.lorawan.v3.LocationSource)
+- [File `lorawan-stack/api/mqtt.proto`](#lorawan-stack/api/mqtt.proto)
+  - [Message `MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo)
 - [File `lorawan-stack/api/networkserver.proto`](#lorawan-stack/api/networkserver.proto)
   - [Message `GenerateDevAddrResponse`](#ttn.lorawan.v3.GenerateDevAddrResponse)
   - [Service `AsNs`](#ttn.lorawan.v3.AsNs)
@@ -745,6 +747,7 @@ The AppAs service connects an application or integration to an Application Serve
 | `DownlinkQueuePush` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `DownlinkQueueReplace` | [`DownlinkQueueRequest`](#ttn.lorawan.v3.DownlinkQueueRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
 | `DownlinkQueueList` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`ApplicationDownlinks`](#ttn.lorawan.v3.ApplicationDownlinks) |  |
+| `GetMQTTConnectionInfo` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) |  |
 
 #### HTTP bindings
 
@@ -753,6 +756,7 @@ The AppAs service connects an application or integration to an Application Serve
 | `DownlinkQueuePush` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push` | `*` |
 | `DownlinkQueueReplace` | `POST` | `/api/v3/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace` | `*` |
 | `DownlinkQueueList` | `GET` | `/api/v3/as/applications/{application_ids.application_id}/devices/{device_id}/down` |  |
+| `GetMQTTConnectionInfo` | `GET` | `/api/v3/as/applications/{application_id}/mqtt-connection-info` |  |
 
 ### <a name="ttn.lorawan.v3.As">Service `As`</a>
 
@@ -2835,6 +2839,15 @@ The GtwGs service connects a gateway to a Gateway Server.
 | ----------- | ------------ | ------------- | ------------|
 | `LinkGateway` | [`GatewayUp`](#ttn.lorawan.v3.GatewayUp) _stream_ | [`GatewayDown`](#ttn.lorawan.v3.GatewayDown) _stream_ | Link the gateway to the Gateway Server. |
 | `GetConcentratorConfig` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`ConcentratorConfig`](#ttn.lorawan.v3.ConcentratorConfig) | GetConcentratorConfig associated to the gateway. |
+| `GetMQTTConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get the MQTT server address and the username for the gateway. |
+| `GetMQTTV2ConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get the MQTTV2 server address and the username for the gateway. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetMQTTConnectionInfo` | `GET` | `/api/v3/gs/gateways/{gateway_id}/mqtt-connection-info` |  |
+| `GetMQTTV2ConnectionInfo` | `GET` | `/api/v3/gs/gateways/{gateway_id}/mqttv2-connection-info` |  |
 
 ### <a name="ttn.lorawan.v3.NsGs">Service `NsGs`</a>
 
@@ -4692,6 +4705,25 @@ a message corresponds to one RxMetadata.
 | `SOURCE_COMBINED_GEOLOCATION` | 9 | The location is estimated by a combination of geolocation sources.
 
 More estimation methods can be added. |
+
+## <a name="lorawan-stack/api/mqtt.proto">File `lorawan-stack/api/mqtt.proto`</a>
+
+### <a name="ttn.lorawan.v3.MQTTConnectionInfo">Message `MQTTConnectionInfo`</a>
+
+The connection information of an MQTT frontend.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `public_address` | [`string`](#string) |  | The public listen address of the frontend. |
+| `public_tls_address` | [`string`](#string) |  | The public listen address of the TLS frontend. |
+| `username` | [`string`](#string) |  | The username to be used for authentication. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `public_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `public_tls_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 
 ## <a name="lorawan-stack/api/networkserver.proto">File `lorawan-stack/api/networkserver.proto`</a>
 

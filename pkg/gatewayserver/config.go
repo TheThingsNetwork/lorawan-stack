@@ -15,15 +15,10 @@
 package gatewayserver
 
 import (
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
-
-// MQTTConfig contains MQTT configuration of the Gateway Server.
-type MQTTConfig struct {
-	Listen    string `name:"listen" description:"Address for the MQTT frontend to listen on"`
-	ListenTLS string `name:"listen-tls" description:"Address for the MQTT frontend to listen on (with TLS)"`
-}
 
 // UDPConfig defines the UDP configuration of the Gateway Server.
 type UDPConfig struct {
@@ -44,8 +39,8 @@ type Config struct {
 
 	Forward map[string][]string `name:"forward" description:"Forward the DevAddr prefixes to the specified hosts"`
 
-	MQTT         MQTTConfig         `name:"mqtt"`
-	MQTTV2       MQTTConfig         `name:"mqtt-v2"`
+	MQTT         config.MQTT        `name:"mqtt"`
+	MQTTV2       config.MQTT        `name:"mqtt-v2"`
 	UDP          UDPConfig          `name:"udp"`
 	BasicStation BasicStationConfig `name:"basic-station"`
 }

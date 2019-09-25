@@ -277,6 +277,18 @@
           ]
         }
       ]
+    },
+    "GetMQTTConnectionInfo": {
+      "file": "lorawan-stack/api/applicationserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{application_id}/mqtt-connection-info",
+          "parameters": [
+            "application_id"
+          ]
+        }
+      ]
     }
   },
   "As": {
@@ -1658,6 +1670,30 @@
     "GetConcentratorConfig": {
       "file": "lorawan-stack/api/gatewayserver.proto",
       "http": []
+    },
+    "GetMQTTConnectionInfo": {
+      "file": "lorawan-stack/api/gatewayserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gs/gateways/{gateway_id}/mqtt-connection-info",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
+    },
+    "GetMQTTV2ConnectionInfo": {
+      "file": "lorawan-stack/api/gatewayserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/gs/gateways/{gateway_id}/mqttv2-connection-info",
+          "parameters": [
+            "gateway_id"
+          ]
+        }
+      ]
     }
   },
   "NsGs": {

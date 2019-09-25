@@ -1421,6 +1421,28 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "GetMQTTConnectionInfo",
+              "description": "",
+              "requestType": "ApplicationIdentifiers",
+              "requestLongType": "ApplicationIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "requestStreaming": false,
+              "responseType": "MQTTConnectionInfo",
+              "responseLongType": "MQTTConnectionInfo",
+              "responseFullType": "ttn.lorawan.v3.MQTTConnectionInfo",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/as/applications/{application_id}/mqtt-connection-info"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },
@@ -11176,6 +11198,50 @@
               "responseLongType": "ConcentratorConfig",
               "responseFullType": "ttn.lorawan.v3.ConcentratorConfig",
               "responseStreaming": false
+            },
+            {
+              "name": "GetMQTTConnectionInfo",
+              "description": "Get the MQTT server address and the username for the gateway.",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "MQTTConnectionInfo",
+              "responseLongType": "MQTTConnectionInfo",
+              "responseFullType": "ttn.lorawan.v3.MQTTConnectionInfo",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gs/gateways/{gateway_id}/mqtt-connection-info"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetMQTTV2ConnectionInfo",
+              "description": "Get the MQTTV2 server address and the username for the gateway.",
+              "requestType": "GatewayIdentifiers",
+              "requestLongType": "GatewayIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "requestStreaming": false,
+              "responseType": "MQTTConnectionInfo",
+              "responseLongType": "MQTTConnectionInfo",
+              "responseFullType": "ttn.lorawan.v3.MQTTConnectionInfo",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/gs/gateways/{gateway_id}/mqttv2-connection-info"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },
@@ -18891,6 +18957,77 @@
               "type": "Struct",
               "longType": "google.protobuf.Struct",
               "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "lorawan-stack/api/mqtt.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MQTTConnectionInfo",
+          "longName": "MQTTConnectionInfo",
+          "fullName": "ttn.lorawan.v3.MQTTConnectionInfo",
+          "description": "The connection information of an MQTT frontend.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "public_address",
+              "description": "The public listen address of the frontend.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "public_tls_address",
+              "description": "The public listen address of the TLS frontend.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "username",
+              "description": "The username to be used for authentication.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "defaultValue": ""
             }

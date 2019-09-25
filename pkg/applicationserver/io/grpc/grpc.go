@@ -20,6 +20,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -27,13 +28,34 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
+// Option represents an option for the gRPC frontend.
+type Option interface {
+	apply(*impl)
+}
+
+type optionFunc func(*impl)
+
+func (f optionFunc) apply(i *impl) { f(i) }
+
 type impl struct {
-	server io.Server
+	server             io.Server
+	mqttConfigProvider config.MQTTConfigProvider
+}
+
+// WithMQTTConfigProvider sets the MQTT configuration provider for the gRPC frontend.
+func WithMQTTConfigProvider(provider config.MQTTConfigProvider) Option {
+	return optionFunc(func(i *impl) {
+		i.mqttConfigProvider = provider
+	})
 }
 
 // New returns a new gRPC frontend.
-func New(server io.Server) ttnpb.AppAsServer {
-	return &impl{server}
+func New(server io.Server, opts ...Option) ttnpb.AppAsServer {
+	i := &impl{server: server}
+	for _, opt := range opts {
+		opt.apply(i)
+	}
+	return i
 }
 
 var errConnect = errors.Define("connect", "failed to connect application `{application_uid}`")
@@ -103,5 +125,25 @@ func (s *impl) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIdenti
 	}
 	return &ttnpb.ApplicationDownlinks{
 		Downlinks: items,
+	}, nil
+}
+
+var errNoMQTTConfigProvider = errors.DefineUnimplemented("no_configuration_provider", "no MQTT configuration provider available")
+
+func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
+	if err := rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
+		return nil, err
+	}
+	if s.mqttConfigProvider == nil {
+		return nil, errNoMQTTConfigProvider
+	}
+	config, err := s.mqttConfigProvider.GetMQTTConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.MQTTConnectionInfo{
+		PublicAddress:    config.PublicAddress,
+		PublicTLSAddress: config.PublicTLSAddress,
+		Username:         unique.ID(ctx, *ids),
 	}, nil
 }

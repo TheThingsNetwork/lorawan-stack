@@ -1031,6 +1031,30 @@
         ]
       }
     },
+    "/as/applications/{application_id}/mqtt-connection-info": {
+      "get": {
+        "operationId": "GetMQTTConnectionInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3MQTTConnectionInfo"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AppAs"
+        ]
+      }
+    },
     "/as/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
         "summary": "Set a link configuration from the Application Server a Network Server.\nThis call returns immediately after setting the link configuration; it does not wait for a link to establish.\nTo get link statistics or errors, use the `GetLinkStats` call.",
@@ -2963,6 +2987,72 @@
         ],
         "tags": [
           "Gs"
+        ]
+      }
+    },
+    "/gs/gateways/{gateway_id}/mqtt-connection-info": {
+      "get": {
+        "summary": "Get the MQTT server address and the username for the gateway.",
+        "operationId": "GetMQTTConnectionInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3MQTTConnectionInfo"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "GtwGs"
+        ]
+      }
+    },
+    "/gs/gateways/{gateway_id}/mqttv2-connection-info": {
+      "get": {
+        "summary": "Get the MQTTV2 server address and the username for the gateway.",
+        "operationId": "GetMQTTV2ConnectionInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3MQTTConnectionInfo"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "GtwGs"
         ]
       }
     },
@@ -9506,6 +9596,24 @@
           "$ref": "#/definitions/v3Major"
         }
       }
+    },
+    "v3MQTTConnectionInfo": {
+      "type": "object",
+      "properties": {
+        "public_address": {
+          "type": "string",
+          "description": "The public listen address of the frontend."
+        },
+        "public_tls_address": {
+          "type": "string",
+          "description": "The public listen address of the TLS frontend."
+        },
+        "username": {
+          "type": "string",
+          "description": "The username to be used for authentication."
+        }
+      },
+      "description": "The connection information of an MQTT frontend."
     },
     "v3MType": {
       "type": "string",

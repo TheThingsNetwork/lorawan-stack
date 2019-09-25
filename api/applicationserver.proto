@@ -23,6 +23,7 @@ import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/end_device.proto";
 import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
+import "lorawan-stack/api/mqtt.proto";
 
 package ttn.lorawan.v3;
 
@@ -118,6 +119,11 @@ service AppAs {
       get: "/as/applications/{application_ids.application_id}/devices/{device_id}/down"
     };
   };
+  rpc GetMQTTConnectionInfo(ApplicationIdentifiers) returns (MQTTConnectionInfo) {
+    option (google.api.http) = {
+      get: "/as/applications/{application_id}/mqtt-connection-info"
+    };
+  };
 }
 
 // The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.
@@ -150,4 +156,3 @@ service AsEndDeviceRegistry {
     };
   };
 }
-
