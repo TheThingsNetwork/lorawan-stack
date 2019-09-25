@@ -50,14 +50,14 @@ service GtwGs {
   rpc LinkGateway(stream GatewayUp) returns (stream GatewayDown);
   // GetConcentratorConfig associated to the gateway.
   rpc GetConcentratorConfig(google.protobuf.Empty) returns (ConcentratorConfig);
-  // GetMQTTConnectionInfo returns the MQTT server address and the username for the gateway.
+  // Get the MQTT server address and the username for the gateway.
   rpc GetMQTTConnectionInfo(GatewayIdentifiers) returns (MQTTConnectionInfo) {
     option (google.api.http) = {
       get: "/gs/gateways/{gateway_id}/mqtt-connection-info"
     };
   };
-  // GetMQTTv2ConnectionInfo returns the MQTT server address and the username for the gateway.
-  rpc GetMQTTv2ConnectionInfo(GatewayIdentifiers) returns (MQTTConnectionInfo) {
+  // Get the MQTTV2 server address and the username for the gateway.
+  rpc GetMQTTV2ConnectionInfo(GatewayIdentifiers) returns (MQTTConnectionInfo) {
     option (google.api.http) = {
       get: "/gs/gateways/{gateway_id}/mqttv2-connection-info"
     };

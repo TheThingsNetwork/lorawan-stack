@@ -2992,7 +2992,7 @@
     },
     "/gs/gateways/{gateway_id}/mqtt-connection-info": {
       "get": {
-        "summary": "GetMQTTConnectionInfo returns the MQTT server address and the username for the gateway.",
+        "summary": "Get the MQTT server address and the username for the gateway.",
         "operationId": "GetMQTTConnectionInfo",
         "responses": {
           "200": {
@@ -3025,8 +3025,8 @@
     },
     "/gs/gateways/{gateway_id}/mqttv2-connection-info": {
       "get": {
-        "summary": "GetMQTTv2ConnectionInfo returns the MQTT server address and the username for the gateway.",
-        "operationId": "GetMQTTv2ConnectionInfo",
+        "summary": "Get the MQTTV2 server address and the username for the gateway.",
+        "operationId": "GetMQTTV2ConnectionInfo",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -9613,7 +9613,7 @@
           "description": "The username to be used for authentication."
         }
       },
-      "description": "MQTTConnectionInfo provides the connection information of an MQTT frontend."
+      "description": "The connection information of an MQTT frontend."
     },
     "v3MType": {
       "type": "string",

@@ -2839,15 +2839,15 @@ The GtwGs service connects a gateway to a Gateway Server.
 | ----------- | ------------ | ------------- | ------------|
 | `LinkGateway` | [`GatewayUp`](#ttn.lorawan.v3.GatewayUp) _stream_ | [`GatewayDown`](#ttn.lorawan.v3.GatewayDown) _stream_ | Link the gateway to the Gateway Server. |
 | `GetConcentratorConfig` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`ConcentratorConfig`](#ttn.lorawan.v3.ConcentratorConfig) | GetConcentratorConfig associated to the gateway. |
-| `GetMQTTConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | GetMQTTConnectionInfo returns the MQTT server address and the username for the gateway. |
-| `GetMQTTv2ConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | GetMQTTv2ConnectionInfo returns the MQTT server address and the username for the gateway. |
+| `GetMQTTConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get the MQTT server address and the username for the gateway. |
+| `GetMQTTV2ConnectionInfo` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) | [`MQTTConnectionInfo`](#ttn.lorawan.v3.MQTTConnectionInfo) | Get the MQTTV2 server address and the username for the gateway. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetMQTTConnectionInfo` | `GET` | `/api/v3/gs/gateways/{gateway_id}/mqtt-connection-info` |  |
-| `GetMQTTv2ConnectionInfo` | `GET` | `/api/v3/gs/gateways/{gateway_id}/mqttv2-connection-info` |  |
+| `GetMQTTV2ConnectionInfo` | `GET` | `/api/v3/gs/gateways/{gateway_id}/mqttv2-connection-info` |  |
 
 ### <a name="ttn.lorawan.v3.NsGs">Service `NsGs`</a>
 
@@ -4710,7 +4710,7 @@ More estimation methods can be added. |
 
 ### <a name="ttn.lorawan.v3.MQTTConnectionInfo">Message `MQTTConnectionInfo`</a>
 
-MQTTConnectionInfo provides the connection information of an MQTT frontend.
+The connection information of an MQTT frontend.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4722,8 +4722,8 @@ MQTTConnectionInfo provides the connection information of an MQTT frontend.
 
 | Field | Validations |
 | ----- | ----------- |
-| `public_address` | <p>`string.uri`: `true`</p> |
-| `public_tls_address` | <p>`string.uri`: `true`</p> |
+| `public_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `public_tls_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 
 ## <a name="lorawan-stack/api/networkserver.proto">File `lorawan-stack/api/networkserver.proto`</a>
 

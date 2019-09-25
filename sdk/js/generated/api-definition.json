@@ -1683,7 +1683,7 @@
         }
       ]
     },
-    "GetMQTTv2ConnectionInfo": {
+    "GetMQTTV2ConnectionInfo": {
       "file": "lorawan-stack/api/gatewayserver.proto",
       "http": [
         {

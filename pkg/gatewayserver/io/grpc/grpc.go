@@ -208,6 +208,6 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIden
 	return getMQTTConnectionProvider(ctx, ids, s.mqttConfigProvider)
 }
 
-func (s *impl) GetMQTTv2ConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
+func (s *impl) GetMQTTV2ConnectionInfo(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.MQTTConnectionInfo, error) {
 	return getMQTTConnectionProvider(ctx, ids, s.mqttv2ConfigProvider)
 }

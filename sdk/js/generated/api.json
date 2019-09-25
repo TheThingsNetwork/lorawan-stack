@@ -11201,7 +11201,7 @@
             },
             {
               "name": "GetMQTTConnectionInfo",
-              "description": "GetMQTTConnectionInfo returns the MQTT server address and the username for the gateway.",
+              "description": "Get the MQTT server address and the username for the gateway.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -11222,8 +11222,8 @@
               }
             },
             {
-              "name": "GetMQTTv2ConnectionInfo",
-              "description": "GetMQTTv2ConnectionInfo returns the MQTT server address and the username for the gateway.",
+              "name": "GetMQTTV2ConnectionInfo",
+              "description": "Get the MQTTV2 server address and the username for the gateway.",
               "requestType": "GatewayIdentifiers",
               "requestLongType": "GatewayIdentifiers",
               "requestFullType": "ttn.lorawan.v3.GatewayIdentifiers",
@@ -18980,7 +18980,7 @@
           "name": "MQTTConnectionInfo",
           "longName": "MQTTConnectionInfo",
           "fullName": "ttn.lorawan.v3.MQTTConnectionInfo",
-          "description": "MQTTConnectionInfo provides the connection information of an MQTT frontend.",
+          "description": "The connection information of an MQTT frontend.",
           "hasExtensions": false,
           "hasFields": true,
           "extensions": [],
@@ -18997,8 +18997,8 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "string.uri",
-                    "value": true
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
                   }
                 ]
               }
@@ -19015,8 +19015,8 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "string.uri",
-                    "value": true
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
                   }
                 ]
               }

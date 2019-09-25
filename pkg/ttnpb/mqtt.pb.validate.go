@@ -52,31 +52,19 @@ func (m *MQTTConnectionInfo) ValidateFields(paths ...string) error {
 		switch name {
 		case "public_address":
 
-			if uri, err := url.Parse(m.GetPublicAddress()); err != nil {
+			if !_MQTTConnectionInfo_PublicAddress_Pattern.MatchString(m.GetPublicAddress()) {
 				return MQTTConnectionInfoValidationError{
 					field:  "public_address",
-					reason: "value must be a valid URI",
-					cause:  err,
-				}
-			} else if !uri.IsAbs() {
-				return MQTTConnectionInfoValidationError{
-					field:  "public_address",
-					reason: "value must be absolute",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
 				}
 			}
 
 		case "public_tls_address":
 
-			if uri, err := url.Parse(m.GetPublicTLSAddress()); err != nil {
+			if !_MQTTConnectionInfo_PublicTLSAddress_Pattern.MatchString(m.GetPublicTLSAddress()) {
 				return MQTTConnectionInfoValidationError{
 					field:  "public_tls_address",
-					reason: "value must be a valid URI",
-					cause:  err,
-				}
-			} else if !uri.IsAbs() {
-				return MQTTConnectionInfoValidationError{
-					field:  "public_tls_address",
-					reason: "value must be absolute",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
 				}
 			}
 
@@ -147,3 +135,7 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MQTTConnectionInfoValidationError{}
+
+var _MQTTConnectionInfo_PublicAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+var _MQTTConnectionInfo_PublicTLSAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")

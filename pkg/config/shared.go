@@ -308,7 +308,7 @@ type MQTTConfigProvider interface {
 	GetMQTTConfig(context.Context) (*MQTT, error)
 }
 
-// MQTTConfigProviderFunc is an functional MQTTConfigProvider.
+// MQTTConfigProviderFunc is a functional MQTTConfigProvider.
 type MQTTConfigProviderFunc func(context.Context) (*MQTT, error)
 
 // GetMQTTConfig implements MQTTConfigProvider.
