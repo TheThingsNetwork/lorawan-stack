@@ -177,8 +177,8 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out.ADRDataRateIndex = NewPopulatedDataRateIndex(r, easy)
 	out.ADRTxPowerIndex = r.Uint32() % 16
 	out.ADRNbTrans = 1 + r.Uint32()%15
-	out.ADRAckLimit = 1 + r.Uint32()%32768
-	out.ADRAckDelay = 1 + r.Uint32()%32768
+	out.ADRAckLimitExponent = NewPopulatedADRAckLimitExponentValue(r, easy)
+	out.ADRAckDelayExponent = NewPopulatedADRAckDelayExponentValue(r, easy)
 	out.MaxDutyCycle = AggregatedDutyCycle([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}[r.Intn(16)])
 	out.Channels = make([]*MACParameters_Channel, 1+r.Intn(254))
 	for i := range out.Channels {

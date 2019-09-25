@@ -60,8 +60,8 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						ADRAckLimit: 32768,
-						ADRAckDelay: 1024,
+						ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_32768},
+						ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_1024},
 					},
 					PendingRequests: []*ttnpb.MACCommand{},
 				},

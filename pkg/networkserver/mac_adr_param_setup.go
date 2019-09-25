@@ -17,8 +17,8 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -27,10 +27,40 @@ var (
 	evtReceiveADRParamSetupAnswer  = defineReceiveMACAnswerEvent("adr_param_setup", "ADR parameter setup")()
 )
 
-func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
-	if dev.MACState.DesiredParameters.ADRAckLimit == dev.MACState.CurrentParameters.ADRAckLimit &&
-		dev.MACState.DesiredParameters.ADRAckDelay == dev.MACState.CurrentParameters.ADRAckDelay {
-		return maxDownLen, maxUpLen, true
+func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) (uint16, uint16, bool, error) {
+	var (
+		currentLimit, desiredLimit ttnpb.ADRAckLimitExponent
+		currentDelay, desiredDelay ttnpb.ADRAckDelayExponent
+	)
+
+	if dev.MACState.CurrentParameters.ADRAckLimitExponent == nil ||
+		dev.MACState.DesiredParameters.ADRAckLimitExponent == nil ||
+		dev.MACState.CurrentParameters.ADRAckDelayExponent == nil ||
+		dev.MACState.DesiredParameters.ADRAckDelayExponent == nil {
+		_, phy, err := getDeviceBandVersion(dev, fps)
+		if err != nil {
+			return maxDownLen, maxUpLen, false, err
+		}
+		currentLimit, currentDelay = phy.ADRAckLimit, phy.ADRAckDelay
+		desiredLimit, desiredDelay = currentLimit, currentDelay
+	}
+
+	if dev.MACState.CurrentParameters.ADRAckLimitExponent != nil {
+		currentLimit = dev.MACState.CurrentParameters.ADRAckLimitExponent.Value
+	}
+	if dev.MACState.DesiredParameters.ADRAckLimitExponent != nil {
+		desiredLimit = dev.MACState.DesiredParameters.ADRAckLimitExponent.Value
+	}
+
+	if dev.MACState.CurrentParameters.ADRAckDelayExponent != nil {
+		currentDelay = dev.MACState.CurrentParameters.ADRAckDelayExponent.Value
+	}
+	if dev.MACState.DesiredParameters.ADRAckDelayExponent != nil {
+		desiredDelay = dev.MACState.DesiredParameters.ADRAckDelayExponent.Value
+	}
+
+	if currentLimit == desiredLimit && currentDelay == desiredDelay {
+		return maxDownLen, maxUpLen, true, nil
 	}
 
 	var ok bool
@@ -40,13 +70,13 @@ func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 		}
 
 		req := &ttnpb.MACCommand_ADRParamSetupReq{
-			ADRAckLimitExponent: lorawan.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit),
-			ADRAckDelayExponent: lorawan.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay),
+			ADRAckLimitExponent: desiredLimit,
+			ADRAckDelayExponent: desiredDelay,
 		}
 		events.Publish(evtEnqueueADRParamSetupRequest(ctx, dev.EndDeviceIdentifiers, req))
 		return []*ttnpb.MACCommand{req.MACCommand()}, 1, true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok
+	return maxDownLen, maxUpLen, ok, nil
 }
 
 func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
@@ -54,16 +84,9 @@ func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetADRParamSetupReq()
 
-		dev.MACState.CurrentParameters.ADRAckDelay = lorawan.ADRAckDelayExponentToUint32(req.ADRAckDelayExponent)
-		dev.MACState.CurrentParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(req.ADRAckLimitExponent)
+		dev.MACState.CurrentParameters.ADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: req.ADRAckLimitExponent}
+		dev.MACState.CurrentParameters.ADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: req.ADRAckDelayExponent}
 
-		if lorawan.Uint32ToADRAckDelayExponent(dev.MACState.DesiredParameters.ADRAckDelay) == req.ADRAckDelayExponent {
-			dev.MACState.DesiredParameters.ADRAckDelay = dev.MACState.CurrentParameters.ADRAckDelay
-		}
-
-		if lorawan.Uint32ToADRAckLimitExponent(dev.MACState.DesiredParameters.ADRAckLimit) == req.ADRAckLimitExponent {
-			dev.MACState.DesiredParameters.ADRAckLimit = dev.MACState.CurrentParameters.ADRAckLimit
-		}
 		return nil
 	}, dev.MACState.PendingRequests...)
 	return []events.DefinitionDataClosure{

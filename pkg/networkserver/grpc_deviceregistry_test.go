@@ -266,6 +266,73 @@ func TestDeviceRegistrySet(t *testing.T) {
 		},
 
 		{
+			Name: "Create invalid device",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					},
+				})
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"lorawan_phy_version",
+					"lorawan_version",
+					"mac_settings.adr_margin",
+					"supports_class_b",
+					"supports_class_c",
+					"supports_join",
+				})
+
+				dev, sets, err := f(nil)
+				if !a.So(err, should.NotBeNil) {
+					return nil, errors.New("test failed")
+				}
+				a.So(dev, should.BeNil)
+				a.So(sets, should.BeNil)
+				a.So(errors.IsInvalidArgument(err), should.BeTrue)
+				return nil, err
+			},
+			Request: &ttnpb.SetEndDeviceRequest{
+				EndDevice: ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
+					LoRaWANVersion:    ttnpb.MAC_V1_0,
+					SupportsJoin:      true,
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"frequency_plan_id",
+						"lorawan_phy_version",
+						"lorawan_version",
+						"mac_settings.adr_margin",
+						"supports_class_b",
+						"supports_class_c",
+						"supports_join",
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+			SetByIDCalls: 1,
+		},
+
+		{
 			Name: "Create OTAA device",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
@@ -924,6 +991,91 @@ func TestDeviceRegistrySet(t *testing.T) {
 				expected.MACState = macState
 				return expected
 			}(),
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Update device desired MAC parameters",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					},
+				})
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"mac_state",
+					"mac_state.desired_parameters.rx2_frequency",
+					"queued_application_downlinks",
+				})
+
+				dev, sets, err := f(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DesiredParameters: ttnpb.MACParameters{
+							Rx2Frequency: 868000000,
+						},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"mac_state.desired_parameters.rx2_frequency",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DesiredParameters: ttnpb.MACParameters{
+							Rx2Frequency: 123456789,
+						},
+					},
+				})
+				return dev, nil
+			},
+			Request: &ttnpb.SetEndDeviceRequest{
+				EndDevice: ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DesiredParameters: ttnpb.MACParameters{
+							Rx2Frequency: 123456789,
+						},
+					},
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"mac_state.desired_parameters.rx2_frequency",
+					},
+				},
+			},
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+				MACState: &ttnpb.MACState{
+					DesiredParameters: ttnpb.MACParameters{
+						Rx2Frequency: 123456789,
+					},
+				},
+			},
 			SetByIDCalls: 1,
 		},
 	} {

@@ -6386,38 +6386,6 @@
         }
       }
     },
-    "MACSettingsAggregatedDutyCycleValue": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/v3AggregatedDutyCycle"
-        }
-      }
-    },
-    "MACSettingsDataRateIndexValue": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/v3DataRateIndex"
-        }
-      }
-    },
-    "MACSettingsPingSlotPeriodValue": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/v3PingSlotPeriod"
-        }
-      }
-    },
-    "MACSettingsRxDelayValue": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/v3RxDelay"
-        }
-      }
-    },
     "MACStateJoinAccept": {
       "type": "object",
       "properties": {
@@ -6670,6 +6638,14 @@
       ],
       "default": "ADR_ACK_DELAY_1"
     },
+    "v3ADRAckDelayExponentValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3ADRAckDelayExponent"
+        }
+      }
+    },
     "v3ADRAckLimitExponent": {
       "type": "string",
       "enum": [
@@ -6691,6 +6667,14 @@
         "ADR_ACK_LIMIT_32768"
       ],
       "default": "ADR_ACK_LIMIT_1"
+    },
+    "v3ADRAckLimitExponentValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3ADRAckLimitExponent"
+        }
+      }
     },
     "v3APIKey": {
       "type": "object",
@@ -6748,6 +6732,14 @@
         "DUTY_CYCLE_32768"
       ],
       "default": "DUTY_CYCLE_1"
+    },
+    "v3AggregatedDutyCycleValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3AggregatedDutyCycle"
+        }
+      }
     },
     "v3AppSKeyResponse": {
       "type": "object",
@@ -7976,6 +7968,14 @@
         "DATA_RATE_15"
       ],
       "default": "DATA_RATE_0"
+    },
+    "v3DataRateIndexValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3DataRateIndex"
+        }
+      }
     },
     "v3DeviceEIRP": {
       "type": "string",
@@ -9286,12 +9286,12 @@
         "adr_ack_limit": {
           "type": "integer",
           "format": "int64",
-          "description": "ADR: number of messages to wait before setting ADRAckReq."
+          "description": "ADR: number of messages to wait before setting ADRAckReq.\nThis field is deprecated, use adr_ack_limit_exponent instead."
         },
         "adr_ack_delay": {
           "type": "integer",
           "format": "int64",
-          "description": "ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate."
+          "description": "ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.\nThis field is deprecated, use adr_ack_delay_exponent instead."
         },
         "rx1_delay": {
           "$ref": "#/definitions/v3RxDelay",
@@ -9353,9 +9353,17 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Whether downlink dwell time is set (400ms).\nIf this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it)."
+        },
+        "adr_ack_limit_exponent": {
+          "$ref": "#/definitions/v3ADRAckLimitExponentValue",
+          "description": "ADR: number of messages to wait before setting ADRAckReq."
+        },
+        "adr_ack_delay_exponent": {
+          "$ref": "#/definitions/v3ADRAckDelayExponentValue",
+          "description": "ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate."
         }
       },
-      "description": "MACParameters represent the parameters of the device's MAC layer (active or desired).\nThis is used internally by the Network Server and is read only."
+      "description": "MACParameters represent the parameters of the device's MAC layer (active or desired).\nThis is used internally by the Network Server."
     },
     "v3MACParametersChannel": {
       "type": "object",
@@ -9412,11 +9420,11 @@
           "description": "Maximum delay for the device to answer a MAC request or a confirmed downlink frame.\nIf unset, the default value from Network Server configuration will be used."
         },
         "ping_slot_periodicity": {
-          "$ref": "#/definitions/MACSettingsPingSlotPeriodValue",
+          "$ref": "#/definitions/v3PingSlotPeriodValue",
           "description": "Periodicity of the class B ping slot.\nIf unset, the default value from Network Server configuration will be used."
         },
         "ping_slot_data_rate_index": {
-          "$ref": "#/definitions/MACSettingsDataRateIndexValue",
+          "$ref": "#/definitions/v3DataRateIndexValue",
           "description": "Data rate index of the class B ping slot.\nIf unset, the default value from Network Server configuration will be used."
         },
         "ping_slot_frequency": {
@@ -9429,7 +9437,7 @@
           "description": "Maximum delay for the device to answer a MAC request or a confirmed downlink frame.\nIf unset, the default value from Network Server configuration will be used."
         },
         "rx1_delay": {
-          "$ref": "#/definitions/MACSettingsRxDelayValue",
+          "$ref": "#/definitions/v3RxDelayValue",
           "description": "Class A Rx1 delay.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "rx1_data_rate_offset": {
@@ -9438,7 +9446,7 @@
           "description": "Rx1 data rate offset.\nIf unset, the default value from Network Server configuration will be used."
         },
         "rx2_data_rate_index": {
-          "$ref": "#/definitions/MACSettingsDataRateIndexValue",
+          "$ref": "#/definitions/v3DataRateIndexValue",
           "description": "Data rate index for Rx2.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "rx2_frequency": {
@@ -9455,7 +9463,7 @@
           "description": "List of factory-preset frequencies.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "max_duty_cycle": {
-          "$ref": "#/definitions/MACSettingsAggregatedDutyCycleValue",
+          "$ref": "#/definitions/v3AggregatedDutyCycleValue",
           "description": "Maximum uplink duty cycle (of all channels)."
         },
         "supports_32_bit_f_cnt": {
@@ -9488,7 +9496,7 @@
           "description": "Number of uplink messages after which a DevStatusReq MACCommand shall be sent.\nIf unset, the default value from Network Server configuration will be used."
         },
         "desired_rx1_delay": {
-          "$ref": "#/definitions/MACSettingsRxDelayValue",
+          "$ref": "#/definitions/v3RxDelayValue",
           "description": "The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         },
         "desired_rx1_data_rate_offset": {
@@ -9497,13 +9505,25 @@
           "description": "The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept.\nIf unset, the default value from Network Server configuration will be used."
         },
         "desired_rx2_data_rate_index": {
-          "$ref": "#/definitions/MACSettingsDataRateIndexValue",
+          "$ref": "#/definitions/v3DataRateIndexValue",
           "description": "The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept.\nIf unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used."
         },
         "desired_rx2_frequency": {
           "type": "string",
           "format": "uint64",
           "description": "The Rx2 frequency index Network Server should configure device to use via MAC commands.\nIf unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used."
+        },
+        "desired_max_duty_cycle": {
+          "$ref": "#/definitions/v3AggregatedDutyCycleValue",
+          "description": "The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "desired_adr_ack_limit_exponent": {
+          "$ref": "#/definitions/v3ADRAckLimitExponentValue",
+          "description": "The ADR ACK limit Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+        },
+        "desired_adr_ack_delay_exponent": {
+          "$ref": "#/definitions/v3ADRAckDelayExponentValue",
+          "description": "The ADR ACK delay Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         }
       }
     },
@@ -9899,6 +9919,14 @@
       ],
       "default": "PING_EVERY_1S"
     },
+    "v3PingSlotPeriodValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3PingSlotPeriod"
+        }
+      }
+    },
     "v3PowerState": {
       "type": "string",
       "enum": [
@@ -10142,6 +10170,14 @@
         "RX_DELAY_15"
       ],
       "default": "RX_DELAY_0"
+    },
+    "v3RxDelayValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v3RxDelay"
+        }
+      }
     },
     "v3RxMetadata": {
       "type": "object",

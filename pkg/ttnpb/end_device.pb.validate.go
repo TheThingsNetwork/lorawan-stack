@@ -193,23 +193,9 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 			}
 
 		case "adr_ack_limit":
-
-			if val := m.GetADRAckLimit(); val < 1 || val > 32768 {
-				return MACParametersValidationError{
-					field:  "adr_ack_limit",
-					reason: "value must be inside range [1, 32768]",
-				}
-			}
-
+			// no validation rules for ADRAckLimit
 		case "adr_ack_delay":
-
-			if val := m.GetADRAckDelay(); val < 1 || val > 32768 {
-				return MACParametersValidationError{
-					field:  "adr_ack_delay",
-					reason: "value must be inside range [1, 32768]",
-				}
-			}
-
+			// no validation rules for ADRAckDelay
 		case "rx1_delay":
 
 			if _, ok := RxDelay_name[int32(m.GetRx1Delay())]; !ok {
@@ -342,6 +328,30 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACParametersValidationError{
 						field:  "downlink_dwell_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "adr_ack_limit_exponent":
+
+			if v, ok := interface{}(m.GetADRAckLimitExponent()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACParametersValidationError{
+						field:  "adr_ack_limit_exponent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "adr_ack_delay_exponent":
+
+			if v, ok := interface{}(m.GetADRAckDelayExponent()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACParametersValidationError{
+						field:  "adr_ack_delay_exponent",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -1153,6 +1163,42 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 					}
 				}
 
+			}
+
+		case "desired_max_duty_cycle":
+
+			if v, ok := interface{}(m.GetDesiredMaxDutyCycle()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_max_duty_cycle",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "desired_adr_ack_limit_exponent":
+
+			if v, ok := interface{}(m.GetDesiredADRAckLimitExponent()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_adr_ack_limit_exponent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "desired_adr_ack_delay_exponent":
+
+			if v, ok := interface{}(m.GetDesiredADRAckDelayExponent()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_adr_ack_delay_exponent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
 			}
 
 		default:
@@ -3360,370 +3406,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACParameters_ChannelValidationError{}
-
-// ValidateFields checks the field values on MACSettings_DataRateIndexValue
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
-func (m *MACSettings_DataRateIndexValue) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = MACSettings_DataRateIndexValueFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "value":
-
-			if _, ok := DataRateIndex_name[int32(m.GetValue())]; !ok {
-				return MACSettings_DataRateIndexValueValidationError{
-					field:  "value",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
-		default:
-			return MACSettings_DataRateIndexValueValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// MACSettings_DataRateIndexValueValidationError is the validation error
-// returned by MACSettings_DataRateIndexValue.ValidateFields if the designated
-// constraints aren't met.
-type MACSettings_DataRateIndexValueValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e MACSettings_DataRateIndexValueValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e MACSettings_DataRateIndexValueValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e MACSettings_DataRateIndexValueValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e MACSettings_DataRateIndexValueValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e MACSettings_DataRateIndexValueValidationError) ErrorName() string {
-	return "MACSettings_DataRateIndexValueValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e MACSettings_DataRateIndexValueValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sMACSettings_DataRateIndexValue.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = MACSettings_DataRateIndexValueValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = MACSettings_DataRateIndexValueValidationError{}
-
-// ValidateFields checks the field values on MACSettings_PingSlotPeriodValue
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
-func (m *MACSettings_PingSlotPeriodValue) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = MACSettings_PingSlotPeriodValueFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "value":
-
-			if _, ok := PingSlotPeriod_name[int32(m.GetValue())]; !ok {
-				return MACSettings_PingSlotPeriodValueValidationError{
-					field:  "value",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
-		default:
-			return MACSettings_PingSlotPeriodValueValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// MACSettings_PingSlotPeriodValueValidationError is the validation error
-// returned by MACSettings_PingSlotPeriodValue.ValidateFields if the
-// designated constraints aren't met.
-type MACSettings_PingSlotPeriodValueValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e MACSettings_PingSlotPeriodValueValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e MACSettings_PingSlotPeriodValueValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e MACSettings_PingSlotPeriodValueValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e MACSettings_PingSlotPeriodValueValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e MACSettings_PingSlotPeriodValueValidationError) ErrorName() string {
-	return "MACSettings_PingSlotPeriodValueValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e MACSettings_PingSlotPeriodValueValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sMACSettings_PingSlotPeriodValue.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = MACSettings_PingSlotPeriodValueValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = MACSettings_PingSlotPeriodValueValidationError{}
-
-// ValidateFields checks the field values on
-// MACSettings_AggregatedDutyCycleValue with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
-func (m *MACSettings_AggregatedDutyCycleValue) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = MACSettings_AggregatedDutyCycleValueFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "value":
-
-			if _, ok := AggregatedDutyCycle_name[int32(m.GetValue())]; !ok {
-				return MACSettings_AggregatedDutyCycleValueValidationError{
-					field:  "value",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
-		default:
-			return MACSettings_AggregatedDutyCycleValueValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// MACSettings_AggregatedDutyCycleValueValidationError is the validation error
-// returned by MACSettings_AggregatedDutyCycleValue.ValidateFields if the
-// designated constraints aren't met.
-type MACSettings_AggregatedDutyCycleValueValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e MACSettings_AggregatedDutyCycleValueValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e MACSettings_AggregatedDutyCycleValueValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e MACSettings_AggregatedDutyCycleValueValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e MACSettings_AggregatedDutyCycleValueValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e MACSettings_AggregatedDutyCycleValueValidationError) ErrorName() string {
-	return "MACSettings_AggregatedDutyCycleValueValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e MACSettings_AggregatedDutyCycleValueValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sMACSettings_AggregatedDutyCycleValue.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = MACSettings_AggregatedDutyCycleValueValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = MACSettings_AggregatedDutyCycleValueValidationError{}
-
-// ValidateFields checks the field values on MACSettings_RxDelayValue with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *MACSettings_RxDelayValue) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = MACSettings_RxDelayValueFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "value":
-
-			if _, ok := RxDelay_name[int32(m.GetValue())]; !ok {
-				return MACSettings_RxDelayValueValidationError{
-					field:  "value",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
-		default:
-			return MACSettings_RxDelayValueValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// MACSettings_RxDelayValueValidationError is the validation error returned by
-// MACSettings_RxDelayValue.ValidateFields if the designated constraints
-// aren't met.
-type MACSettings_RxDelayValueValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e MACSettings_RxDelayValueValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e MACSettings_RxDelayValueValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e MACSettings_RxDelayValueValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e MACSettings_RxDelayValueValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e MACSettings_RxDelayValueValidationError) ErrorName() string {
-	return "MACSettings_RxDelayValueValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e MACSettings_RxDelayValueValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sMACSettings_RxDelayValue.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = MACSettings_RxDelayValueValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = MACSettings_RxDelayValueValidationError{}
 
 // ValidateFields checks the field values on MACState_JoinAccept with the rules
 // defined in the proto definition for this message. If any rules are

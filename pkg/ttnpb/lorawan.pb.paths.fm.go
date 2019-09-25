@@ -408,6 +408,48 @@ var MACCommandFieldPathsTopLevel = []string{
 	"cid",
 	"payload",
 }
+var DataRateIndexValueFieldPathsNested = []string{
+	"value",
+}
+
+var DataRateIndexValueFieldPathsTopLevel = []string{
+	"value",
+}
+var PingSlotPeriodValueFieldPathsNested = []string{
+	"value",
+}
+
+var PingSlotPeriodValueFieldPathsTopLevel = []string{
+	"value",
+}
+var AggregatedDutyCycleValueFieldPathsNested = []string{
+	"value",
+}
+
+var AggregatedDutyCycleValueFieldPathsTopLevel = []string{
+	"value",
+}
+var RxDelayValueFieldPathsNested = []string{
+	"value",
+}
+
+var RxDelayValueFieldPathsTopLevel = []string{
+	"value",
+}
+var ADRAckLimitExponentValueFieldPathsNested = []string{
+	"value",
+}
+
+var ADRAckLimitExponentValueFieldPathsTopLevel = []string{
+	"value",
+}
+var ADRAckDelayExponentValueFieldPathsNested = []string{
+	"value",
+}
+
+var ADRAckDelayExponentValueFieldPathsTopLevel = []string{
+	"value",
+}
 var TxSettings_DownlinkFieldPathsNested = []string{
 	"antenna_index",
 	"invert_polarization",

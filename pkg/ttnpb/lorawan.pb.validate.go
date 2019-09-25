@@ -2453,6 +2453,547 @@ var _MACCommand_CID_NotInLookup = map[MACCommandIdentifier]struct{}{
 	0: {},
 }
 
+// ValidateFields checks the field values on DataRateIndexValue with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DataRateIndexValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = DataRateIndexValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if _, ok := DataRateIndex_name[int32(m.GetValue())]; !ok {
+				return DataRateIndexValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return DataRateIndexValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// DataRateIndexValueValidationError is the validation error returned by
+// DataRateIndexValue.ValidateFields if the designated constraints aren't met.
+type DataRateIndexValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DataRateIndexValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DataRateIndexValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DataRateIndexValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DataRateIndexValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DataRateIndexValueValidationError) ErrorName() string {
+	return "DataRateIndexValueValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DataRateIndexValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDataRateIndexValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DataRateIndexValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DataRateIndexValueValidationError{}
+
+// ValidateFields checks the field values on PingSlotPeriodValue with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PingSlotPeriodValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = PingSlotPeriodValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if _, ok := PingSlotPeriod_name[int32(m.GetValue())]; !ok {
+				return PingSlotPeriodValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return PingSlotPeriodValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// PingSlotPeriodValueValidationError is the validation error returned by
+// PingSlotPeriodValue.ValidateFields if the designated constraints aren't met.
+type PingSlotPeriodValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PingSlotPeriodValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PingSlotPeriodValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PingSlotPeriodValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PingSlotPeriodValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PingSlotPeriodValueValidationError) ErrorName() string {
+	return "PingSlotPeriodValueValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PingSlotPeriodValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPingSlotPeriodValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PingSlotPeriodValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PingSlotPeriodValueValidationError{}
+
+// ValidateFields checks the field values on AggregatedDutyCycleValue with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *AggregatedDutyCycleValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = AggregatedDutyCycleValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if _, ok := AggregatedDutyCycle_name[int32(m.GetValue())]; !ok {
+				return AggregatedDutyCycleValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return AggregatedDutyCycleValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// AggregatedDutyCycleValueValidationError is the validation error returned by
+// AggregatedDutyCycleValue.ValidateFields if the designated constraints
+// aren't met.
+type AggregatedDutyCycleValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AggregatedDutyCycleValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AggregatedDutyCycleValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AggregatedDutyCycleValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AggregatedDutyCycleValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AggregatedDutyCycleValueValidationError) ErrorName() string {
+	return "AggregatedDutyCycleValueValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AggregatedDutyCycleValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAggregatedDutyCycleValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AggregatedDutyCycleValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AggregatedDutyCycleValueValidationError{}
+
+// ValidateFields checks the field values on RxDelayValue with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RxDelayValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = RxDelayValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if _, ok := RxDelay_name[int32(m.GetValue())]; !ok {
+				return RxDelayValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return RxDelayValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// RxDelayValueValidationError is the validation error returned by
+// RxDelayValue.ValidateFields if the designated constraints aren't met.
+type RxDelayValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RxDelayValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RxDelayValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RxDelayValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RxDelayValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RxDelayValueValidationError) ErrorName() string { return "RxDelayValueValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RxDelayValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRxDelayValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RxDelayValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RxDelayValueValidationError{}
+
+// ValidateFields checks the field values on ADRAckLimitExponentValue with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ADRAckLimitExponentValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ADRAckLimitExponentValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if _, ok := ADRAckLimitExponent_name[int32(m.GetValue())]; !ok {
+				return ADRAckLimitExponentValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return ADRAckLimitExponentValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ADRAckLimitExponentValueValidationError is the validation error returned by
+// ADRAckLimitExponentValue.ValidateFields if the designated constraints
+// aren't met.
+type ADRAckLimitExponentValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ADRAckLimitExponentValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ADRAckLimitExponentValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ADRAckLimitExponentValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ADRAckLimitExponentValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ADRAckLimitExponentValueValidationError) ErrorName() string {
+	return "ADRAckLimitExponentValueValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ADRAckLimitExponentValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sADRAckLimitExponentValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ADRAckLimitExponentValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ADRAckLimitExponentValueValidationError{}
+
+// ValidateFields checks the field values on ADRAckDelayExponentValue with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ADRAckDelayExponentValue) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ADRAckDelayExponentValueFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "value":
+
+			if _, ok := ADRAckDelayExponent_name[int32(m.GetValue())]; !ok {
+				return ADRAckDelayExponentValueValidationError{
+					field:  "value",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		default:
+			return ADRAckDelayExponentValueValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ADRAckDelayExponentValueValidationError is the validation error returned by
+// ADRAckDelayExponentValue.ValidateFields if the designated constraints
+// aren't met.
+type ADRAckDelayExponentValueValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ADRAckDelayExponentValueValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ADRAckDelayExponentValueValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ADRAckDelayExponentValueValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ADRAckDelayExponentValueValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ADRAckDelayExponentValueValidationError) ErrorName() string {
+	return "ADRAckDelayExponentValueValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ADRAckDelayExponentValueValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sADRAckDelayExponentValue.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ADRAckDelayExponentValueValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ADRAckDelayExponentValueValidationError{}
+
 // ValidateFields checks the field values on TxSettings_Downlink with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

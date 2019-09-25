@@ -39,7 +39,7 @@ for f in "${protos[@]}"; do
         -pe 's![[:space:]]*(repeated[[:space:]]+)?([[:alnum:]_.]+|map<[[:space:]]*[[:alnum:]]+[[:space:]]*,[[:space:]]*[[:alnum:]_.]+[[:space:]]*>)[[:space:]]+([[:alnum:]_]+)[[:space:]]*=[[:space:]]*[0-9]+.*!\3!;' \
         -pe 's!(^[[:alnum:]])([[:alnum:]]*)|_([[:alnum:]])([[:alnum:]]*)!\U\1\3\E\2\4!g;')
       to=$(echo "${l}" | perl \
-        -pe 's!.*\(gogoproto.customname\)[[:space:]]*=[[:space:]]*"([[:alnum:]]+)".*!\1!')
+        -pe 's!.*\(gogoproto.customname\)[[:space:]]*=[[:space:]]*"([[:alnum:]_]+)".*!\1!')
       ! [ "${from}" = "${to}" ] && perlArgs+=("-pe s!([^[:alnum:]])${from}([^[:alnum:]])!\\1${to}\\2!g;")
     done
   fi

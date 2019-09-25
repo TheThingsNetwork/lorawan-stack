@@ -215,7 +215,16 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		ns.defaultMACSettings.ADRMargin = &pbtypes.FloatValue{Value: *conf.DefaultMACSettings.ADRMargin}
 	}
 	if conf.DefaultMACSettings.DesiredRx1Delay != nil {
-		ns.defaultMACSettings.DesiredRx1Delay = &ttnpb.MACSettings_RxDelayValue{Value: *conf.DefaultMACSettings.DesiredRx1Delay}
+		ns.defaultMACSettings.DesiredRx1Delay = &ttnpb.RxDelayValue{Value: *conf.DefaultMACSettings.DesiredRx1Delay}
+	}
+	if conf.DefaultMACSettings.DesiredMaxDutyCycle != nil {
+		ns.defaultMACSettings.DesiredMaxDutyCycle = &ttnpb.AggregatedDutyCycleValue{Value: *conf.DefaultMACSettings.DesiredMaxDutyCycle}
+	}
+	if conf.DefaultMACSettings.DesiredADRAckLimitExponent != nil {
+		ns.defaultMACSettings.DesiredADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: *conf.DefaultMACSettings.DesiredADRAckLimitExponent}
+	}
+	if conf.DefaultMACSettings.DesiredADRAckDelayExponent != nil {
+		ns.defaultMACSettings.DesiredADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: *conf.DefaultMACSettings.DesiredADRAckDelayExponent}
 	}
 	if conf.DefaultMACSettings.StatusCountPeriodicity != nil {
 		ns.defaultMACSettings.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *conf.DefaultMACSettings.StatusCountPeriodicity}

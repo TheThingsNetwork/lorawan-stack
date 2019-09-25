@@ -201,7 +201,8 @@ func TestGenerateChMask(t *testing.T) {
 				false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false,
 			},
 			Expected: []ChMaskCntlPair{
-				{0, [16]bool{false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false}}},
+				{0, [16]bool{false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false}},
+			},
 		},
 		{
 			Name:     "16 channels/all on",

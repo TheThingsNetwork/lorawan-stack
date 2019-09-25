@@ -38,12 +38,15 @@ type Config struct {
 
 // MACSettingConfig defines MAC-layer configuration.
 type MACSettingConfig struct {
-	ADRMargin              *float32       `name:"adr-margin" description:"The default margin Network Server should add in ADR requests if not configured in device's MAC settings"`
-	DesiredRx1Delay        *ttnpb.RxDelay `name:"desired-rx1-delay" description:"Desired Rx1Delay value Network Server should use if not configured in device's MAC settings"`
-	ClassBTimeout          *time.Duration `name:"class-b-timeout" description:"Deadline for a device in class B mode to respond to requests from the Network Server if not configured in device's MAC settings"`
-	ClassCTimeout          *time.Duration `name:"class-c-timeout" description:"Deadline for a device in class C mode to respond to requests from the Network Server if not configured in device's MAC settings"`
-	StatusTimePeriodicity  *time.Duration `name:"status-time-periodicity" description:"The interval after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
-	StatusCountPeriodicity *uint32        `name:"status-count-periodicity" description:"Number of uplink messages after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
+	ADRMargin                  *float32                   `name:"adr-margin" description:"The default margin Network Server should add in ADR requests if not configured in device's MAC settings"`
+	DesiredRx1Delay            *ttnpb.RxDelay             `name:"desired-rx1-delay" description:"Desired Rx1Delay value Network Server should use if not configured in device's MAC settings"`
+	DesiredMaxDutyCycle        *ttnpb.AggregatedDutyCycle `name:"desired-max-duty-cycle" description:"Desired MaxDutyCycle value Network Server should use if not configured in device's MAC settings"`
+	DesiredADRAckLimitExponent *ttnpb.ADRAckLimitExponent `name:"desired-adr-ack-limit-exponent" description:"Desired ADR_ACK_LIMIT value Network Server should use if not configured in device's MAC settings"`
+	DesiredADRAckDelayExponent *ttnpb.ADRAckDelayExponent `name:"desired-adr-ack-delay-exponent" description:"Desired ADR_ACK_DELAY value Network Server should use if not configured in device's MAC settings"`
+	ClassBTimeout              *time.Duration             `name:"class-b-timeout" description:"Deadline for a device in class B mode to respond to requests from the Network Server if not configured in device's MAC settings"`
+	ClassCTimeout              *time.Duration             `name:"class-c-timeout" description:"Deadline for a device in class C mode to respond to requests from the Network Server if not configured in device's MAC settings"`
+	StatusTimePeriodicity      *time.Duration             `name:"status-time-periodicity" description:"The interval after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
+	StatusCountPeriodicity     *uint32                    `name:"status-count-periodicity" description:"Number of uplink messages after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
 }
 
 // DownlinkPriorityConfig defines priorities for downlink messages.
