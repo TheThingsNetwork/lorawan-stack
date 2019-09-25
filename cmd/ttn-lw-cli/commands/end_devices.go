@@ -100,7 +100,7 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 		applicationID = args[0]
 		deviceID = args[1]
 	default:
-		logger.Warn("multiple IDs found in arguments, considering the first")
+		logger.Warn("Multiple IDs found in arguments, considering the first")
 		applicationID = args[0]
 		deviceID = args[1]
 	}

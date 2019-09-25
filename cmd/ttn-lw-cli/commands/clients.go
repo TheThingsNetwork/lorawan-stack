@@ -44,7 +44,7 @@ func getClientID(flagSet *pflag.FlagSet, args []string) *ttnpb.ClientIdentifiers
 	var clientID string
 	if len(args) > 0 {
 		if len(args) > 1 {
-			logger.Warn("multiple IDs found in arguments, considering only the first")
+			logger.Warn("Multiple IDs found in arguments, considering only the first")
 		}
 		clientID = args[0]
 	} else {

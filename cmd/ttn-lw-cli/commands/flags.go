@@ -119,7 +119,7 @@ func getAPIKeyID(flagSet *pflag.FlagSet, args []string, i int) string {
 	var apiKeyID string
 	if len(args) > 0+i {
 		if len(args) > 1+i {
-			logger.Warn("multiple API key IDs found in arguments, considering only the first")
+			logger.Warn("Multiple API key IDs found in arguments, considering only the first")
 		}
 		apiKeyID = args[0+i]
 	} else {

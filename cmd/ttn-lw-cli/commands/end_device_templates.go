@@ -53,7 +53,7 @@ func getTemplateFormatID(flagSet *pflag.FlagSet, args []string) string {
 	var formatID string
 	if len(args) > 0 {
 		if len(args) > 1 {
-			logger.Warn("multiple IDs found in arguments, considering only the first")
+			logger.Warn("Multiple IDs found in arguments, considering only the first")
 		}
 		formatID = args[0]
 	} else {
@@ -218,7 +218,7 @@ This command takes end device templates from stdin.`,
 				joinEUIHex = args[0]
 				startDevEUIHex = args[1]
 			default:
-				logger.Warn("multiple EUIs found in arguments, considering the first")
+				logger.Warn("Multiple EUIs found in arguments, considering the first")
 				joinEUIHex = args[0]
 				startDevEUIHex = args[1]
 			}

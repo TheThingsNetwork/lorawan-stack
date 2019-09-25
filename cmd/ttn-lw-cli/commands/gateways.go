@@ -55,7 +55,7 @@ func getGatewayID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb
 		gatewayID = args[0]
 		gatewayEUIHex = args[1]
 	default:
-		logger.Warn("multiple IDs found in arguments, considering the first")
+		logger.Warn("Multiple IDs found in arguments, considering the first")
 		gatewayID = args[0]
 		gatewayEUIHex = args[1]
 	}

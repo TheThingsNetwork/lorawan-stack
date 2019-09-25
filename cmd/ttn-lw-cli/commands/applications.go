@@ -44,7 +44,7 @@ func getApplicationID(flagSet *pflag.FlagSet, args []string) *ttnpb.ApplicationI
 	var applicationID string
 	if len(args) > 0 {
 		if len(args) > 1 {
-			logger.Warn("multiple IDs found in arguments, considering only the first")
+			logger.Warn("Multiple IDs found in arguments, considering only the first")
 		}
 		applicationID = args[0]
 	} else {
