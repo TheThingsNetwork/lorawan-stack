@@ -27,9 +27,9 @@ import (
 type LoRaAllianceTR005Draft2 struct {
 	JoinEUI,
 	DevEUI types.EUI64
-	VendorID             [2]byte
-	ModelID              [2]byte
-	DeviceValidationCode []byte
+	VendorID [2]byte
+	ModelID  [2]byte
+	DeviceValidationCode,
 	SerialNumber,
 	Proprietary string
 }
@@ -65,8 +65,8 @@ func (m LoRaAllianceTR005Draft2) MarshalText() ([]byte, error) {
 		return nil, err
 	}
 	var ext string
-	if len(m.DeviceValidationCode) > 0 {
-		ext += fmt.Sprintf("%%V%X", m.DeviceValidationCode[:])
+	if m.DeviceValidationCode != "" {
+		ext += fmt.Sprintf("%%V%s", m.DeviceValidationCode)
 	}
 	if m.SerialNumber != "" {
 		ext += fmt.Sprintf("%%S%s", m.SerialNumber)
@@ -113,11 +113,7 @@ func (m *LoRaAllianceTR005Draft2) UnmarshalText(text []byte) error {
 			val := ext[1:]
 			switch ext[0] {
 			case 'V':
-				if buf, err := hex.DecodeString(val); err == nil {
-					m.DeviceValidationCode = buf
-				} else {
-					return errFormat.WithCause(err)
-				}
+				m.DeviceValidationCode = val
 			case 'S':
 				m.SerialNumber = val
 			case 'P':
@@ -129,6 +125,6 @@ func (m *LoRaAllianceTR005Draft2) UnmarshalText(text []byte) error {
 }
 
 // AuthenticatedEndDeviceIdentifiers implements the AuthenticatedEndDeviceIdentifiers interface.
-func (m *LoRaAllianceTR005Draft2) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode []byte) {
+func (m *LoRaAllianceTR005Draft2) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string) {
 	return m.JoinEUI, m.DevEUI, m.DeviceValidationCode
 }

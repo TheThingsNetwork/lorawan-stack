@@ -51,7 +51,7 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 				DevEUI:               types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				VendorID:             [2]byte{0x42, 0xff},
 				ModelID:              [2]byte{0xff, 0x42},
-				DeviceValidationCode: []byte{0x01, 0x02},
+				DeviceValidationCode: "0102",
 				SerialNumber:         "SERIAL",
 				Proprietary:          "PROPRIETARY",
 			},
@@ -65,7 +65,7 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 				DevEUI:               types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				VendorID:             [2]byte{0x42, 0xff},
 				ModelID:              [2]byte{0xff, 0x42},
-				DeviceValidationCode: []byte{},
+				DeviceValidationCode: "",
 			},
 		},
 		{
@@ -85,13 +85,6 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 		{
 			Name: "Invalid/ProdID",
 			Data: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42AABB"),
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
-			},
-		},
-		{
-			Name: "Invalid/DevVCode",
-			Data: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%VGHIJKLMN"),
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 			},

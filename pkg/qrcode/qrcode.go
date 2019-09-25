@@ -31,7 +31,7 @@ type Data interface {
 
 // AuthenticatedEndDeviceIdentifiers defines end device identifiers with authentication code.
 type AuthenticatedEndDeviceIdentifiers interface {
-	AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode []byte)
+	AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string)
 }
 
 var (
