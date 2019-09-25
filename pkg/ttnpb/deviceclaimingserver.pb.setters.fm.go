@@ -242,7 +242,8 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			if src != nil {
 				dst.AuthenticationCode = src.AuthenticationCode
 			} else {
-				dst.AuthenticationCode = nil
+				var zero string
+				dst.AuthenticationCode = zero
 			}
 
 		default:

@@ -1192,7 +1192,8 @@ func (dst *EndDeviceAuthenticationCode) SetFields(src *EndDeviceAuthenticationCo
 			if src != nil {
 				dst.Value = src.Value
 			} else {
-				dst.Value = nil
+				var zero string
+				dst.Value = zero
 			}
 		case "valid_from":
 			if len(subs) > 0 {

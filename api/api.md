@@ -1607,13 +1607,13 @@ PeerInfo
 | ----- | ---- | ----- | ----------- |
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `dev_eui` | [`bytes`](#bytes) |  |  |
-| `authentication_code` | [`bytes`](#bytes) |  |  |
+| `authentication_code` | [`string`](#string) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `authentication_code` | <p>`bytes.min_len`: `1`</p><p>`bytes.max_len`: `8`</p> |
+| `authentication_code` | <p>`string.pattern`: `^[A-Z0-9]{1,32}$`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 
@@ -1759,7 +1759,7 @@ Authentication code for end devices.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `value` | [`bytes`](#bytes) |  |  |
+| `value` | [`string`](#string) |  |  |
 | `valid_from` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `valid_to` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 
@@ -1767,7 +1767,7 @@ Authentication code for end devices.
 
 | Field | Validations |
 | ----- | ----------- |
-| `value` | <p>`bytes.min_len`: `1`</p><p>`bytes.max_len`: `8`</p> |
+| `value` | <p>`string.pattern`: `^[A-Z0-9]{1,32}$`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceBrand">Message `EndDeviceBrand`</a>
 

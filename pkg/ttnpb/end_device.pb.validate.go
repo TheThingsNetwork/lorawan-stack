@@ -1498,10 +1498,10 @@ func (m *EndDeviceAuthenticationCode) ValidateFields(paths ...string) error {
 		switch name {
 		case "value":
 
-			if l := len(m.GetValue()); l < 1 || l > 8 {
+			if !_EndDeviceAuthenticationCode_Value_Pattern.MatchString(m.GetValue()) {
 				return EndDeviceAuthenticationCodeValidationError{
 					field:  "value",
-					reason: "value length must be between 1 and 8 bytes, inclusive",
+					reason: "value does not match regex pattern \"^[A-Z0-9]{1,32}$\"",
 				}
 			}
 
@@ -1595,6 +1595,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = EndDeviceAuthenticationCodeValidationError{}
+
+var _EndDeviceAuthenticationCode_Value_Pattern = regexp.MustCompile("^[A-Z0-9]{1,32}$")
 
 // ValidateFields checks the field values on EndDevice with the rules defined
 // in the proto definition for this message. If any rules are violated, an
