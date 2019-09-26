@@ -32,7 +32,7 @@ func TestDeviceTemplateConverter(t *testing.T) {
 	c := NewComponent(t, conf)
 
 	test.Must(New(c, &Config{}))
-	test.Must(c.Start(), nil)
+	StartComponent(t, c)
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_DEVICE_TEMPLATE_CONVERTER)

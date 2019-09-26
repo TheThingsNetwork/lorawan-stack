@@ -318,7 +318,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			js.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, js.Start())
+			StartComponent(t, js.Component)
 			defer js.Close()
 
 			ctx := js.FillContext(test.Context())
@@ -650,7 +650,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			js.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, js.Start())
+			StartComponent(t, js.Component)
 			defer js.Close()
 
 			ctx := js.FillContext(test.Context())
@@ -859,7 +859,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			js.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, js.Start())
+			StartComponent(t, js.Component)
 			defer js.Close()
 
 			ctx := js.FillContext(test.Context())

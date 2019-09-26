@@ -310,11 +310,9 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	}
 	is, err := New(c, conf)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-	if err = is.Start(); err != nil {
-		panic(err)
-	}
+	StartComponent(t, c)
 	return is, is.LoopbackConn()
 }
 

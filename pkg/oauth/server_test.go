@@ -118,9 +118,7 @@ func TestOAuthFlow(t *testing.T) {
 		},
 	})
 	c.RegisterWeb(s)
-	if err = c.Start(); err != nil {
-		panic(err)
-	}
+	StartComponent(t, c)
 
 	for _, tt := range []struct {
 		Name             string
@@ -523,9 +521,7 @@ func TestTokenExchange(t *testing.T) {
 		},
 	})
 	c.RegisterWeb(s)
-	if err := c.Start(); err != nil {
-		panic(err)
-	}
+	StartComponent(t, c)
 
 	for _, tt := range []struct {
 		Name         string

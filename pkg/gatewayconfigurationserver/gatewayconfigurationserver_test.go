@@ -54,7 +54,7 @@ func TestGatewayConfigurationServer(t *testing.T) {
 	c := NewComponent(t, conf)
 
 	test.Must(New(c, testConfig))
-	test.Must(c.Start(), nil)
+	StartComponent(t, c)
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER)
@@ -95,8 +95,7 @@ func TestWeb(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(gcs, should.NotBeNil)
 
-	err = c.Start()
-	a.So(err, should.BeNil)
+	StartComponent(t, c)
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)

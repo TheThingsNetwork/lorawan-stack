@@ -72,7 +72,7 @@ func TestGenerateDevAddr(t *testing.T) {
 					},
 				})).(*NetworkServer)
 
-			test.Must(nil, ns.Start())
+			StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(test.Context(), ttnpb.Empty)
@@ -151,7 +151,7 @@ func TestGenerateDevAddr(t *testing.T) {
 					},
 				})).(*NetworkServer)
 
-			test.Must(nil, ns.Start())
+			StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			hasOneOfPrefixes := func(devAddr *types.DevAddr, seen map[types.DevAddrPrefix]int, prefixes ...types.DevAddrPrefix) bool {

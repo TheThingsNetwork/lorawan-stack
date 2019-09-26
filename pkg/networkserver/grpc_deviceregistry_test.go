@@ -190,7 +190,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, ns.Start())
+			StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.GetEndDeviceRequest)
@@ -1111,7 +1111,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, ns.Start())
+			StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			ctx := ns.FillContext(test.Context())
@@ -1273,7 +1273,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, ns.Start())
+			StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)

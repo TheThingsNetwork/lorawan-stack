@@ -87,7 +87,7 @@ func TestGetJoinEUIPrefixes(t *testing.T) {
 				&Config{
 					JoinEUIPrefixes: tc.JoinEUIPrefixes,
 				})).(*JoinServer)
-			test.Must(nil, js.Start())
+			StartComponent(t, js.Component)
 			defer js.Close()
 
 			resp, err := ttnpb.NewJsClient(js.LoopbackConn()).GetJoinEUIPrefixes(test.Context(), ttnpb.Empty)
