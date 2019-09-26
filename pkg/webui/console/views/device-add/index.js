@@ -109,6 +109,7 @@ export default class DeviceAdd extends Component {
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
               initialValues={initialValues}
+              jsConfig={jsConfig}
             />
           </Col>
         </Row>

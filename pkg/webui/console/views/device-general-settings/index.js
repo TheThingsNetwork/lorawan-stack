@@ -32,12 +32,14 @@ import { updateDevice } from '../../store/actions/device'
 import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/device'
+import { selectJsConfig } from '../../../lib/selectors/env'
 
 @connect(
   state => ({
     device: selectSelectedDevice(state),
     devId: selectSelectedDeviceId(state),
     appId: selectSelectedApplicationId(state),
+    jsConfig: selectJsConfig(),
   }),
   dispatch => ({
     ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
@@ -64,6 +66,7 @@ export default class DeviceGeneralSettings extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     device: PropTypes.device.isRequired,
+    jsConfig: PropTypes.stackComponent.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     updateDevice: PropTypes.func.isRequired,
   }
@@ -96,7 +99,7 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   render() {
-    const { device: initialValues, onDeleteSuccess } = this.props
+    const { device: initialValues, onDeleteSuccess, jsConfig } = this.props
     const { error } = this.state
 
     return (
@@ -110,6 +113,7 @@ export default class DeviceGeneralSettings extends React.Component {
               onDelete={this.handleDelete}
               onDeleteSuccess={onDeleteSuccess}
               initialValues={initialValues}
+              jsConfig={jsConfig}
               update
             />
           </Col>

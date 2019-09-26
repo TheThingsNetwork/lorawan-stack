@@ -87,7 +87,7 @@ class DeviceDataForm extends Component {
       resets_join_nonces: external_js ? false : resets_join_nonces,
     }))
 
-    const { initialValues } = this.props
+    const { initialValues, jsConfig } = this.props
     const { setValues, state } = this.formRef.current
 
     // Reset Join Server related entries if the device is provisined by
@@ -104,9 +104,17 @@ class DeviceDataForm extends Component {
         external_js,
       })
     } else {
+      let { join_server_address } = initialValues
+
+      // Reset `join_server_address` if is present after disabling external JS provisioning.
+      if (jsConfig.enabled && !Boolean(join_server_address)) {
+        join_server_address = new URL(jsConfig.base_url).hostname
+      }
+
       setValues({
         ...state.values,
-        ...initialValues,
+        join_server_address,
+        external_js,
       })
     }
   }
@@ -492,6 +500,7 @@ const initialValuesPropType = PropTypes.shape({
 
 DeviceDataForm.propTypes = {
   initialValues: initialValuesPropType,
+  jsConfig: PropTypes.stackComponent.isRequired,
   onDelete: PropTypes.func,
   onDeleteSuccess: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
