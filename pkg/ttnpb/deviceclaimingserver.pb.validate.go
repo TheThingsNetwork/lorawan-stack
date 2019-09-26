@@ -150,13 +150,18 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 
 				case "qr_code":
 
-					if l := len(m.GetQRCode()); l < 1 || l > 1024 {
+					if l := len(m.GetQRCode()); l < 0 || l > 1024 {
 						return ClaimEndDeviceRequestValidationError{
 							field:  "qr_code",
-							reason: "value length must be between 1 and 1024 bytes, inclusive",
+							reason: "value length must be between 0 and 1024 bytes, inclusive",
 						}
 					}
 
+				default:
+					return ClaimEndDeviceRequestValidationError{
+						field:  "source_device",
+						reason: "value is required",
+					}
 				}
 			}
 		default:

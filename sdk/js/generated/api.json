@@ -5140,7 +5140,7 @@
                 "validate.rules": [
                   {
                     "name": "bytes.min_len",
-                    "value": 1
+                    "value": 0
                   },
                   {
                     "name": "bytes.max_len",

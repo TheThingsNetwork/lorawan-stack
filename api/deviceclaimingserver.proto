@@ -31,8 +31,9 @@ message ClaimEndDeviceRequest {
     bytes authentication_code = 3 [(validate.rules).bytes = {min_len: 1, max_len: 8}];
   }
   oneof source_device {
+    option (validate.required) = true;
     AuthenticatedIdentifiers authenticated_identifiers = 1 [(gogoproto.customname) = "AuthenticatedIdentifiers"];
-    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 1, max_len: 1024}, (gogoproto.customname) = "QRCode"];
+    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 0, max_len: 1024}, (gogoproto.customname) = "QRCode"];
   }
 
   // Application identifiers of the target end device.

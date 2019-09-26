@@ -1592,7 +1592,7 @@ PeerInfo
 
 | Field | Validations |
 | ----- | ----------- |
-| `qr_code` | <p>`bytes.min_len`: `1`</p><p>`bytes.max_len`: `1024`</p> |
+| `qr_code` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `1024`</p> |
 | `target_application_ids` | <p>`message.required`: `true`</p> |
 | `target_device_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 | `target_network_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
