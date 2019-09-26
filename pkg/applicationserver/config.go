@@ -140,18 +140,18 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 
 // NewPubSub returns a new pubsub.PubSub based on the configuration.
 // If the registry is nil, it returns nil.
-func (c PubSubConfig) NewPubSub(comp *component.Component, server io.Server, registry pubsub.Registry) (*pubsub.PubSub, error) {
-	if registry == nil {
+func (c PubSubConfig) NewPubSub(comp *component.Component, server io.Server) (*pubsub.PubSub, error) {
+	if c.Registry == nil {
 		return nil, nil
 	}
-	return pubsub.New(comp, server, registry)
+	return pubsub.New(comp, server, c.Registry)
 }
 
 // NewApplicationPackages returns a new applications packages frontend based on the configuration.
 // If the registry is nil, it returns nil.
-func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, server io.Server, registry applicationpackages.Registry) (applicationpackages.Server, error) {
-	if registry == nil {
+func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, server io.Server) (applicationpackages.Server, error) {
+	if c.Registry == nil {
 		return nil, nil
 	}
-	return applicationpackages.New(ctx, server, registry)
+	return applicationpackages.New(ctx, server, c.Registry)
 }
