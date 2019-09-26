@@ -19,6 +19,7 @@ import ApiKeys from './api-keys'
 import Link from './link'
 import Collaborators from './collaborators'
 import Webhooks from './webhooks'
+import PubSubs from './pubsubs'
 
 /**
  * Applications Class provides an abstraction on all applications and manages
@@ -56,6 +57,7 @@ class Applications {
       },
     })
     this.Webhooks = new Webhooks(api.ApplicationWebhookRegistry)
+    this.PubSubs = new PubSubs(api.ApplicationPubSubRegistry)
   }
 
   _responseTransform(response, single = true) {

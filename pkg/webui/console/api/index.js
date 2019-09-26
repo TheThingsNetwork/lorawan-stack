@@ -120,6 +120,14 @@ export default {
       delete: ttnClient.Applications.Webhooks.deleteById.bind(ttnClient.Applications.Webhooks),
       getFormats: ttnClient.Applications.Webhooks.getFormats.bind(ttnClient.Applications.Webhooks),
     },
+    pubsubs: {
+      list: ttnClient.Applications.PubSubs.getAll.bind(ttnClient.Applications.PubSubs),
+      get: ttnClient.Applications.PubSubs.getById.bind(ttnClient.Applications.PubSubs),
+      create: ttnClient.Applications.PubSubs.create.bind(ttnClient.Applications.PubSubs),
+      update: ttnClient.Applications.PubSubs.updateById.bind(ttnClient.Applications.PubSubs),
+      delete: ttnClient.Applications.PubSubs.deleteById.bind(ttnClient.Applications.PubSubs),
+      getFormats: ttnClient.Applications.PubSubs.getFormats.bind(ttnClient.Applications.PubSubs),
+    },
   },
   devices: {
     list: ttnClient.Applications.Devices.getAll.bind(ttnClient.Applications.Devices),
