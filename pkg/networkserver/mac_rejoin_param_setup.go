@@ -37,7 +37,7 @@ func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDo
 	}
 
 	var st macCommandEnqueueState
-	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DUTY_CYCLE, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_REJOIN_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
