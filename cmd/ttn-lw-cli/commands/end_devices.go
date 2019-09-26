@@ -813,7 +813,7 @@ values will be stored in the Join Server.`,
 			req.TargetApplicationServerID, _ = cmd.Flags().GetString("target-application-server-id")
 			req.InvalidateAuthenticationCode, _ = cmd.Flags().GetBool("invalidate-authentication-code")
 
-			dcs, err := api.Dial(ctx, config.DeviceClaimServerGRPCAddress)
+			dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
 			if err != nil {
 				return err
 			}

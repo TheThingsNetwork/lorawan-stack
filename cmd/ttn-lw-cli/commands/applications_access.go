@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -23,6 +24,18 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+func createApplicationAPIKey(ctx context.Context, ids ttnpb.ApplicationIdentifiers, name string, rights ...ttnpb.Right) (*ttnpb.APIKey, error) {
+	is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.NewApplicationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+		ApplicationIdentifiers: ids,
+		Name:                   name,
+		Rights:                 rights,
+	})
+}
 
 var (
 	applicationRights = &cobra.Command{
@@ -191,15 +204,7 @@ var (
 				return errNoAPIKeyRights
 			}
 
-			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
-			if err != nil {
-				return err
-			}
-			res, err := ttnpb.NewApplicationAccessClient(is).CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-				ApplicationIdentifiers: *appID,
-				Name:                   name,
-				Rights:                 rights,
-			})
+			res, err := createApplicationAPIKey(ctx, *appID, name, rights...)
 			if err != nil {
 				return err
 			}
