@@ -20,8 +20,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// AssociationRegistry is a registry for application packages data and associations.
-type AssociationRegistry interface {
+// Registry is a registry for application packages data and associations.
+type Registry interface {
 	// Get returns the association by its identifiers.
 	Get(ctx context.Context, ids ttnpb.ApplicationPackageAssociationIdentifiers, paths []string) (*ttnpb.ApplicationPackageAssociation, error)
 	// List returns all of the associations of the end device.

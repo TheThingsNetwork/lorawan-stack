@@ -1529,6 +1529,24 @@
       "file": "start.go"
     }
   },
+  "error:pkg/applicationserver/io/applicationpackages:package_already_registered": {
+    "translations": {
+      "en": "package `{name}` already registered"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/applicationpackages",
+      "file": "packages.go"
+    }
+  },
+  "error:pkg/applicationserver/io/applicationpackages:package_not_implemented": {
+    "translations": {
+      "en": "package `{name}` is not implemented"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/applicationpackages",
+      "file": "packages.go"
+    }
+  },
   "error:pkg/applicationserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect application `{application_uid}`"

@@ -27,6 +27,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/applicationpackages"
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
@@ -66,6 +67,7 @@ type ApplicationServer struct {
 	webhooks         web.Webhooks
 	webhookTemplates *web.TemplateStore
 	pubsub           *pubsub.PubSub
+	appPackages      applicationpackages.Server
 
 	links              sync.Map
 	linkErrors         sync.Map
@@ -199,6 +201,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	if as.pubsub, err = conf.PubSub.NewPubSub(c, as, conf.PubSub.Registry); err != nil {
 		return nil, err
+	}
+
+	if as.appPackages, err = conf.ApplicationPackages.NewApplicationPackages(ctx, as, conf.ApplicationPackages.Registry); err != nil {
+		return nil, err
+	} else if as.appPackages != nil {
+		as.defaultSubscribers = append(as.defaultSubscribers, as.appPackages.NewSubscription())
+		c.RegisterGRPC(as.appPackages)
 	}
 
 	c.RegisterGRPC(as)
