@@ -74,7 +74,6 @@ export default class DeviceAdd extends Component {
 
     return api.device.create(appId, device, {
       abp: values.activation_mode === 'abp',
-      withRootKeys: true,
     })
   }
 
