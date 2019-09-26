@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -27,31 +28,35 @@ var (
 	evtReceiveDLChannelReject  = defineReceiveMACRejectEvent("dl_channel", "downlink Rx1 channel frequency modification")()
 )
 
-func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
-	var ok bool
-	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_DL_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
+	var st macCommandEnqueueState
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DL_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		var cmds []*ttnpb.MACCommand
+		var evs []events.DefinitionDataClosure
 		for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
 			if dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency == dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
 				continue
 			}
 			if nDown < 1 || nUp < 1 {
-				return cmds, uint16(len(cmds)), false
+				return cmds, uint16(len(cmds)), nil, false
 			}
 			nDown--
 			nUp--
 
-			pld := &ttnpb.MACCommand_DLChannelReq{
+			req := &ttnpb.MACCommand_DLChannelReq{
 				ChannelIndex: uint32(i),
 				Frequency:    dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency,
 			}
-			cmds = append(cmds, pld.MACCommand())
-
-			events.Publish(evtEnqueueDLChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
+			cmds = append(cmds, req.MACCommand())
+			evs = append(evs, evtEnqueueDLChannelRequest.BindData(req))
+			log.FromContext(ctx).WithFields(log.Fields(
+				"channel_index", req.ChannelIndex,
+				"frequency", req.Frequency,
+			)).Debug("Enqueued DLChannelReq")
 		}
-		return cmds, uint16(len(cmds)), true
+		return cmds, uint16(len(cmds)), evs, true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok
+	return st
 }
 
 func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DLChannelAns) ([]events.DefinitionDataClosure, error) {

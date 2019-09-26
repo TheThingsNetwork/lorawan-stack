@@ -20,6 +20,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -28,7 +29,7 @@ var (
 	evtReceiveTxParamSetupAnswer  = defineReceiveMACAnswerEvent("tx_param_setup", "Tx parameter setup")()
 )
 
-func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
+func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
 	if dev.MACState.DesiredParameters.MaxEIRP == dev.MACState.CurrentParameters.MaxEIRP &&
 		(dev.MACState.DesiredParameters.UplinkDwellTime == nil ||
 			dev.MACState.CurrentParameters.UplinkDwellTime != nil &&
@@ -36,23 +37,38 @@ func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 		(dev.MACState.DesiredParameters.DownlinkDwellTime == nil ||
 			dev.MACState.CurrentParameters.DownlinkDwellTime != nil &&
 				dev.MACState.DesiredParameters.DownlinkDwellTime.Value == dev.MACState.CurrentParameters.DownlinkDwellTime.Value) {
-		return maxDownLen, maxUpLen, true
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}
 	}
 
-	var ok bool
-	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_TX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+	var st macCommandEnqueueState
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_TX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		if nDown < 1 || nUp < 1 {
-			return nil, 0, false
+			return nil, 0, nil, false
 		}
-		pld := &ttnpb.MACCommand_TxParamSetupReq{
+		req := &ttnpb.MACCommand_TxParamSetupReq{
 			MaxEIRPIndex:      lorawan.Float32ToDeviceEIRP(dev.MACState.DesiredParameters.MaxEIRP),
 			DownlinkDwellTime: dev.MACState.DesiredParameters.DownlinkDwellTime.GetValue(),
 			UplinkDwellTime:   dev.MACState.DesiredParameters.UplinkDwellTime.GetValue(),
 		}
-		events.Publish(evtEnqueueTxParamSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
-		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+		log.FromContext(ctx).WithFields(log.Fields(
+			"max_eirp_index", req.MaxEIRPIndex,
+			"downlink_dwell_time", req.DownlinkDwellTime,
+			"uplink_dwell_time", req.UplinkDwellTime,
+		)).Debug("Enqueued TxParamSetupReq")
+		return []*ttnpb.MACCommand{
+				req.MACCommand(),
+			},
+			1,
+			[]events.DefinitionDataClosure{
+				evtEnqueueTxParamSetupRequest.BindData(req),
+			},
+			true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok
+	return st
 }
 
 func handleTxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {

@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -27,24 +28,37 @@ var (
 	evtReceiveBeaconFreqAccept  = defineReceiveMACAcceptEvent("beacon_freq", "beacon frequency change")()
 )
 
-func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
+func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
 	if dev.MACState.DesiredParameters.BeaconFrequency == dev.MACState.CurrentParameters.BeaconFrequency {
-		return maxDownLen, maxUpLen, true
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}
 	}
 
-	var ok bool
-	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_BEACON_FREQ, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+	var st macCommandEnqueueState
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_BEACON_FREQ, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		if nDown < 1 || nUp < 1 {
-			return nil, 0, false
+			return nil, 0, nil, false
 		}
 
-		pld := &ttnpb.MACCommand_BeaconFreqReq{
+		req := &ttnpb.MACCommand_BeaconFreqReq{
 			Frequency: dev.MACState.DesiredParameters.BeaconFrequency,
 		}
-		events.Publish(evtEnqueueBeaconFreqRequest(ctx, dev.EndDeviceIdentifiers, pld))
-		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+		log.FromContext(ctx).WithFields(log.Fields(
+			"frequency", req.Frequency,
+		)).Debug("Enqueued BeaconFreqReq")
+		return []*ttnpb.MACCommand{
+				req.MACCommand(),
+			},
+			1,
+			[]events.DefinitionDataClosure{
+				evtEnqueueBeaconFreqRequest.BindData(req),
+			},
+			true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok
+	return st
 }
 
 func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) ([]events.DefinitionDataClosure, error) {

@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -26,23 +27,36 @@ var (
 	evtReceiveRxTimingSetupAnswer  = defineReceiveMACAnswerEvent("rx_timing_setup", "Rx timing setup")()
 )
 
-func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
+func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
 	if dev.MACState.DesiredParameters.Rx1Delay == dev.MACState.CurrentParameters.Rx1Delay {
-		return maxDownLen, maxUpLen, true
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}
 	}
 
-	var ok bool
-	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_RX_TIMING_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+	var st macCommandEnqueueState
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_TIMING_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		if nDown < 1 || nUp < 1 {
-			return nil, 0, false
+			return nil, 0, nil, false
 		}
-		pld := &ttnpb.MACCommand_RxTimingSetupReq{
+		req := &ttnpb.MACCommand_RxTimingSetupReq{
 			Delay: dev.MACState.DesiredParameters.Rx1Delay,
 		}
-		events.Publish(evtEnqueueRxTimingSetupRequest(ctx, dev.EndDeviceIdentifiers, pld))
-		return []*ttnpb.MACCommand{pld.MACCommand()}, 1, true
+		log.FromContext(ctx).WithFields(log.Fields(
+			"delay", req.Delay,
+		)).Debug("Enqueued RxTimingSetupReq")
+		return []*ttnpb.MACCommand{
+				req.MACCommand(),
+			},
+			1,
+			[]events.DefinitionDataClosure{
+				evtEnqueueRxTimingSetupRequest.BindData(req),
+			},
+			true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok
+	return st
 }
 
 func handleRxTimingSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
