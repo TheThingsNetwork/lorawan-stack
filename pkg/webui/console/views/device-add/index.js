@@ -54,7 +54,6 @@ import style from './device-add.styl'
       dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
   }),
 )
-@bind
 export default class DeviceAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -68,6 +67,7 @@ export default class DeviceAdd extends Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(values) {
     const { appId } = this.props
     const { activation_mode, ...device } = values
@@ -77,6 +77,7 @@ export default class DeviceAdd extends Component {
     })
   }
 
+  @bind
   handleSubmitSuccess(device) {
     const { appId, redirectToList } = this.props
     const deviceId = getDeviceId(device)
