@@ -34,3 +34,13 @@ export const createEventsErrorSelector = entity =>
 
     return store.error
   }
+
+export const createLatestEventSelector = function(entity) {
+  const eventsSelector = createEventsSelector(entity)
+
+  return function selectLatestEvent(state, entityId) {
+    const events = eventsSelector(state, entityId)
+
+    return events[0]
+  }
+}

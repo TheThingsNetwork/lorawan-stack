@@ -57,6 +57,7 @@ export default defineMessages({
   componentJoinServer: 'Join Server',
   componentNetworkServer: 'Network Server',
   confirmPassword: 'Confirm Password',
+  connected: 'Connected',
   connecting: 'Connecting',
   createApiKey: 'Create API Key',
   created: 'Created',

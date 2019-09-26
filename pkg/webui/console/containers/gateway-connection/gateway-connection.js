@@ -13,9 +13,8 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
-import bind from 'autobind-decorator'
 import classnames from 'classnames'
+import { FormattedNumber } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
@@ -26,17 +25,9 @@ import Message from '../../../lib/components/message'
 import Button from '../../../components/button'
 import { isNotFoundError, isTranslated } from '../../../lib/errors/utils'
 
-import {
-  selectGatewayStatistics,
-  selectGatewayStatisticsError,
-  selectGatewayStatisticsIsFetching,
-} from '../../store/selectors/gateways'
-import { startGatewayStatistics, stopGatewayStatistics } from '../../store/actions/gateways'
+import style from './gateway-connection.styl'
 
-import style from './gateway-statistics.styl'
-
-@bind
-class GatewayStatistic extends React.PureComponent {
+class GatewayConnection extends React.PureComponent {
   componentDidMount() {
     const { startStatistics } = this.props
 
@@ -50,12 +41,13 @@ class GatewayStatistic extends React.PureComponent {
   }
 
   get status() {
-    const { statistics, error, fetching } = this.props
+    const { statistics, error, fetching, lastSeen } = this.props
 
     const isNotConnected = Boolean(error) && isNotFoundError(error)
     const isFetching = !Boolean(statistics) && fetching
     const isUnavailable = Boolean(error) && Boolean(error.message) && isTranslated(error.message)
     const hasStatistics = Boolean(statistics)
+    const hasLastSeen = Boolean(lastSeen)
 
     let statusIndicator = null
     let message = null
@@ -70,7 +62,7 @@ class GatewayStatistic extends React.PureComponent {
       statusIndicator = 'unknown'
       message = error.message
     } else if (hasStatistics) {
-      message = sharedMessages.lastSeen
+      message = hasLastSeen ? sharedMessages.lastSeen : sharedMessages.connected
       statusIndicator = 'good'
     } else {
       message = sharedMessages.unknown
@@ -80,9 +72,7 @@ class GatewayStatistic extends React.PureComponent {
     return (
       <Status className={style.status} status={statusIndicator}>
         <Message className={style.lastSeen} content={message} />
-        {statusIndicator === 'good' && (
-          <DateTime.Relative value={statistics.last_status_received_at || new Date()} />
-        )}
+        {statusIndicator === 'good' && lastSeen && <DateTime.Relative value={lastSeen} />}
       </Status>
     )
   }
@@ -98,18 +88,21 @@ class GatewayStatistic extends React.PureComponent {
       return null
     }
 
-    const uplinkCount = statistics.uplink_count || 0
-    const downlinkCount = statistics.downlink_count || 0
+    const uplinks = statistics.uplink_count || '0'
+    const downlinks = statistics.downlink_count || '0'
+
+    const uplinkCount = parseInt(uplinks) || 0
+    const downlinkCount = parseInt(downlinks) || 0
 
     return (
       <React.Fragment>
         <span className={style.messageCount}>
           <Icon className={style.icon} icon="uplink" />
-          <span>{uplinkCount}</span>
+          <FormattedNumber value={uplinkCount} />
         </span>
         <span className={style.messageCount}>
           <Icon className={style.icon} icon="downlink" />
-          <span>{downlinkCount}</span>
+          <FormattedNumber value={downlinkCount} />
         </span>
       </React.Fragment>
     )
@@ -127,32 +120,22 @@ class GatewayStatistic extends React.PureComponent {
   }
 }
 
-GatewayStatistic.propTypes = {
+GatewayConnection.propTypes = {
   className: PropTypes.string,
   error: PropTypes.error,
   fetching: PropTypes.bool,
+  lastSeen: PropTypes.instanceOf(Date),
   startStatistics: PropTypes.func.isRequired,
   statistics: PropTypes.gatewayStats,
   stopStatistics: PropTypes.func.isRequired,
 }
 
-GatewayStatistic.defaultProps = {
+GatewayConnection.defaultProps = {
   className: undefined,
   fetching: false,
   error: null,
   statistics: null,
+  lastSeen: undefined,
 }
 
-export default connect(
-  function(state, props) {
-    return {
-      statistics: selectGatewayStatistics(state, props),
-      error: selectGatewayStatisticsError(state, props),
-      fetching: selectGatewayStatisticsIsFetching(state, props),
-    }
-  },
-  (dispatch, ownProps) => ({
-    startStatistics: () => dispatch(startGatewayStatistics(ownProps.gtwId)),
-    stopStatistics: () => dispatch(stopGatewayStatistics()),
-  }),
-)(GatewayStatistic)
+export default GatewayConnection

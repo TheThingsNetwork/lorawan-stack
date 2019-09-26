@@ -18,7 +18,7 @@ import sharedMessages from '../../../../lib/shared-messages'
 import api from '../../../api'
 import * as gateways from '../../actions/gateways'
 import { selectGsConfig } from '../../../../lib/selectors/env'
-import { selectGatewayById } from '../../selectors/gateways'
+import { selectGatewayById, selectGatewayStatisticsIsFetching } from '../../selectors/gateways'
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
 
@@ -142,7 +142,7 @@ const startGatewayStatisticsLogic = createLogic({
   },
   async process({ cancelled$, action, getState }, dispatch, done) {
     const { id } = action.payload
-    const { timeout = 5000 } = action.meta
+    const { timeout = 60000 } = action.meta
 
     const gsConfig = selectGsConfig()
     const gtw = selectGatewayById(getState(), id)
@@ -188,7 +188,12 @@ const startGatewayStatisticsLogic = createLogic({
     dispatch(gateways.startGatewayStatisticsSuccess())
     dispatch(gateways.updateGatewayStatistics(id))
 
-    const interval = setInterval(() => dispatch(gateways.updateGatewayStatistics(id)), timeout)
+    const interval = setInterval(() => {
+      const statsRequestInProgress = selectGatewayStatisticsIsFetching(getState())
+      if (!statsRequestInProgress) {
+        dispatch(gateways.updateGatewayStatistics(id))
+      }
+    }, timeout)
 
     cancelled$.subscribe(() => clearInterval(interval))
   },

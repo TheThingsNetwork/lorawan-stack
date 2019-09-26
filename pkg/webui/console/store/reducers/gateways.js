@@ -63,7 +63,6 @@ const statistics = function(state = defaultStatisticsState, { type, payload }) {
     case START_GTW_STATS_SUCCESS:
       return {
         ...state,
-        stats: undefined,
         error: undefined,
       }
     default:
@@ -78,6 +77,7 @@ const gateways = function(state = defaultState, action) {
     case GET_GTW:
       return {
         ...state,
+        statistics: defaultStatisticsState,
         selectedGateway: payload.id,
       }
     case GET_GTW_SUCCESS:

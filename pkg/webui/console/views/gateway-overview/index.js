@@ -18,7 +18,7 @@ import { connect } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
 
 import DataSheet from '../../../components/data-sheet'
-import GatewayStatistics from '../../containers/gateway-statistics'
+import GatewayConnection from '../../containers/gateway-connection'
 import GatewayEvents from '../../containers/gateway-events'
 import Tag from '../../../components/tag'
 
@@ -111,7 +111,7 @@ export default class GatewayOverview extends React.Component {
     return (
       <div className={style.overviewInfo}>
         <h2 className={style.title}>{name || gtwId}</h2>
-        <GatewayStatistics className={style.statistics} gtwId={gtwId} />
+        <GatewayConnection className={style.statistics} gtwId={gtwId} />
         <DataSheet data={sheetData} />
       </div>
     )
