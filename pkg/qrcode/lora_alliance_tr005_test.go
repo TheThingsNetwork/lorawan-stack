@@ -69,6 +69,18 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 			},
 		},
 		{
+			Name:          "WithEscape",
+			Data:          []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%25VABCD"),
+			CanonicalData: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%VABCD"),
+			Expected: LoRaAllianceTR005Draft2{
+				JoinEUI:              types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				DevEUI:               types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				VendorID:             [2]byte{0x42, 0xff},
+				ModelID:              [2]byte{0xff, 0x42},
+				DeviceValidationCode: "ABCD",
+			},
+		},
+		{
 			Name: "Invalid/Type",
 			Data: []byte{0x42, 0xff, 0x42, 0x42},
 			ErrorAssertion: func(t *testing.T, err error) bool {

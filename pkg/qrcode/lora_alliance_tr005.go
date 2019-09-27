@@ -107,7 +107,8 @@ func (m *LoRaAllianceTR005Draft2) UnmarshalText(text []byte) error {
 		return err
 	}
 	if len(parts) == 7 {
-		for _, ext := range strings.Split(string(parts[6]), "%") {
+		exts := strings.ReplaceAll(string(parts[6]), "%25", "%")
+		for _, ext := range strings.Split(exts, "%") {
 			if len(ext) < 1 {
 				continue
 			}
