@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
@@ -32,6 +33,22 @@ type LoRaAllianceTR005Draft2 struct {
 	DeviceValidationCode,
 	SerialNumber,
 	Proprietary string
+}
+
+// Encode implements the Data interface.
+func (m *LoRaAllianceTR005Draft2) Encode(dev *ttnpb.EndDevice) error {
+	if dev.JoinEUI == nil {
+		return errNoJoinEUI
+	}
+	if dev.DevEUI == nil {
+		return errNoDevEUI
+	}
+	*m = LoRaAllianceTR005Draft2{
+		JoinEUI:              *dev.JoinEUI,
+		DevEUI:               *dev.DevEUI,
+		DeviceValidationCode: dev.GetClaimAuthenticationCode().GetValue(),
+	}
+	return nil
 }
 
 // validTR005ExtensionChars defines the QR code alphanumeric character set except :, % and space.

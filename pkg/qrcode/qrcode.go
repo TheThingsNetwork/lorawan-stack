@@ -19,6 +19,7 @@ import (
 	"encoding"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
@@ -29,6 +30,12 @@ type Data interface {
 	encoding.TextUnmarshaler
 }
 
+// EndDeviceData represents end device QR code data.
+type EndDeviceData interface {
+	Data
+	Encode(*ttnpb.EndDevice) error
+}
+
 // AuthenticatedEndDeviceIdentifiers defines end device identifiers with authentication code.
 type AuthenticatedEndDeviceIdentifiers interface {
 	AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string)
@@ -37,6 +44,8 @@ type AuthenticatedEndDeviceIdentifiers interface {
 var (
 	errFormat    = errors.DefineInvalidArgument("format", "invalid format")
 	errCharacter = errors.DefineInvalidArgument("character", "invalid character `{r}`")
+	errNoJoinEUI = errors.DefineFailedPrecondition("no_join_eui", "no JoinEUI")
+	errNoDevEUI  = errors.DefineFailedPrecondition("no_dev_eui", "no DevEUI")
 )
 
 // Parse attempts to parse the given QR code data.
