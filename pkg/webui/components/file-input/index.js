@@ -77,7 +77,7 @@ export default class FileInput extends Component {
     const { result: content } = event.target
 
     const data = dataTransform(content)
-    onChange(data)
+    onChange(data, true)
   }
 
   @bind
@@ -103,7 +103,7 @@ export default class FileInput extends Component {
     const { onChange } = this.props
 
     this.setState({ filename: '', error: undefined })
-    onChange(undefined)
+    onChange(undefined, true)
   }
 
   get statusMessage() {

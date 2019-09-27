@@ -35,11 +35,8 @@ class KeyValueMap extends React.PureComponent {
   }
 
   removeEntry(index) {
-    const { onChange, onBlur, value } = this.props
-    onChange(value.filter((_, i) => i !== index) || [])
-
-    // Trigger also the onBlur event to enforce revalidation
-    onBlur()
+    const { onChange, value } = this.props
+    onChange(value.filter((_, i) => i !== index) || [], true)
   }
 
   addEmptyEntry() {
