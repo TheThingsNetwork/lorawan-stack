@@ -49,6 +49,7 @@ func (m LoRaAllianceTR005Draft2) validateExtensionChars(s string) error {
 // Validate implements the Data interface.
 func (m LoRaAllianceTR005Draft2) Validate() error {
 	for _, err := range []error{
+		m.validateExtensionChars(m.DeviceValidationCode),
 		m.validateExtensionChars(m.SerialNumber),
 		m.validateExtensionChars(m.Proprietary),
 	} {
