@@ -22,7 +22,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
@@ -41,7 +41,7 @@ func Test(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	c := NewComponent(t, &component.Config{})
+	c := componenttest.NewComponent(t, &component.Config{})
 	gs := mock.NewServer(c)
 
 	ids := ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}

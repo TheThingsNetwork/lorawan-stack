@@ -20,7 +20,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 )
 
 const (
@@ -32,7 +32,7 @@ func TestAdaptUpdateChannel(t *testing.T) {
 	var conf Config
 	conf.Default.UpdateChannel = testUpdateChannel
 	conf.Default.FirmwareURL = testFirmwarePath
-	s, err := conf.NewServer(NewComponent(t, &component.Config{}))
+	s, err := conf.NewServer(componenttest.NewComponent(t, &component.Config{}))
 	if err != nil {
 		t.Error(err)
 	}

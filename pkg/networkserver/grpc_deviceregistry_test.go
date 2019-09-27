@@ -26,7 +26,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -160,7 +160,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			var getByIDCalls uint64
 
 			ns := test.Must(New(
-				NewComponent(t, &component.Config{
+				componenttest.NewComponent(t, &component.Config{
 					ServiceBase: config.ServiceBase{
 						KeyVault: config.KeyVault{
 							Static: tc.KeyVault,
@@ -190,7 +190,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			StartComponent(t, ns.Component)
+			componenttest.StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.GetEndDeviceRequest)
@@ -1086,7 +1086,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			var setByIDCalls uint64
 
 			ns := test.Must(New(
-				NewComponent(t, &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -1111,7 +1111,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			StartComponent(t, ns.Component)
+			componenttest.StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			ctx := ns.FillContext(test.Context())
@@ -1249,7 +1249,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			var setByIDCalls uint64
 
 			ns := test.Must(New(
-				NewComponent(t, &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -1273,7 +1273,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			StartComponent(t, ns.Component)
+			componenttest.StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)

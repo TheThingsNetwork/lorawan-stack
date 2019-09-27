@@ -19,7 +19,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -62,7 +62,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			a := assertions.New(t)
 
 			ns := test.Must(New(
-				NewComponent(t, &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					NetID:               tc.NetID,
 					DeduplicationWindow: 42,
@@ -72,7 +72,7 @@ func TestGenerateDevAddr(t *testing.T) {
 					},
 				})).(*NetworkServer)
 
-			StartComponent(t, ns.Component)
+			componenttest.StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			devAddr, err := ttnpb.NewNsClient(ns.LoopbackConn()).GenerateDevAddr(test.Context(), ttnpb.Empty)
@@ -140,7 +140,7 @@ func TestGenerateDevAddr(t *testing.T) {
 			a := assertions.New(t)
 
 			ns := test.Must(New(
-				NewComponent(t, &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					NetID:               types.NetID{0x00, 0x00, 0x13},
 					DevAddrPrefixes:     tc.DevAddrPrefixes,
@@ -151,7 +151,7 @@ func TestGenerateDevAddr(t *testing.T) {
 					},
 				})).(*NetworkServer)
 
-			StartComponent(t, ns.Component)
+			componenttest.StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			hasOneOfPrefixes := func(devAddr *types.DevAddr, seen map[types.DevAddrPrefix]int, prefixes ...types.DevAddrPrefix) bool {

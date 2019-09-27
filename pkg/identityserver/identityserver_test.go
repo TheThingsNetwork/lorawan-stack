@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -291,7 +291,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 			panic(err)
 		}
 	})
-	c := NewComponent(t, &component.Config{ServiceBase: config.ServiceBase{
+	c := componenttest.NewComponent(t, &component.Config{ServiceBase: config.ServiceBase{
 		Base: config.Base{
 			Log: config.Log{
 				Level: log.DebugLevel,
@@ -312,7 +312,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	return is, is.LoopbackConn()
 }
 

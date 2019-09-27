@@ -26,7 +26,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -51,10 +51,10 @@ func TestGatewayConfigurationServer(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	conf := &component.Config{}
-	c := NewComponent(t, conf)
+	c := componenttest.NewComponent(t, conf)
 
 	test.Must(New(c, testConfig))
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER)
@@ -85,7 +85,7 @@ func TestWeb(t *testing.T) {
 			},
 		},
 	}
-	c := NewComponent(t, conf)
+	c := componenttest.NewComponent(t, conf)
 	c.AddContextFiller(func(ctx context.Context) context.Context {
 		ctx = newContextWithRightsFetcher(ctx)
 		return ctx
@@ -95,7 +95,7 @@ func TestWeb(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(gcs, should.NotBeNil)
 
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)

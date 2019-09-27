@@ -38,7 +38,7 @@ import (
 	iowebredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -241,7 +241,7 @@ hardware_versions:
 	}()
 	time.Sleep(Timeout)
 
-	c := NewComponent(t, &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":9184",
@@ -291,7 +291,7 @@ hardware_versions:
 	a.So(len(roles), should.Equal, 1)
 	a.So(roles[0], should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER)
 
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_JOIN_SERVER)

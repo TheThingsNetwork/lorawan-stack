@@ -21,7 +21,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/upstream/mock"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -39,7 +39,7 @@ func TestNSHandler(t *testing.T) {
 	defer cancel()
 	gtwIds := ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 	ns, nsAddr := mock.StartNS(ctx)
-	c := NewComponent(t, &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -50,7 +50,7 @@ func TestNSHandler(t *testing.T) {
 			},
 		},
 	})
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 	h := NewHandler(ctx, "cluster", c, nil)

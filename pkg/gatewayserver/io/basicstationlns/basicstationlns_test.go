@@ -28,7 +28,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
@@ -69,7 +69,7 @@ func TestClientTokenAuth(t *testing.T) {
 
 	is, isAddr := mock.NewIS(ctx)
 	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
-	c := NewComponent(t, &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -80,7 +80,7 @@ func TestClientTokenAuth(t *testing.T) {
 			},
 		},
 	})
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
@@ -172,7 +172,7 @@ func TestDiscover(t *testing.T) {
 
 	is, isAddr := mock.NewIS(ctx)
 	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
-	c := NewComponent(t, &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -183,7 +183,7 @@ func TestDiscover(t *testing.T) {
 			},
 		},
 	})
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
@@ -410,7 +410,7 @@ func TestVersion(t *testing.T) {
 
 	is, isAddr := mock.NewIS(ctx)
 	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
-	c := NewComponent(t, &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -421,7 +421,7 @@ func TestVersion(t *testing.T) {
 			},
 		},
 	})
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
@@ -706,7 +706,7 @@ func TestTraffic(t *testing.T) {
 
 	is, isAddr := mock.NewIS(ctx)
 	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
-	c := NewComponent(t, &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -717,7 +717,7 @@ func TestTraffic(t *testing.T) {
 			},
 		},
 	})
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
@@ -1036,7 +1036,7 @@ func TestRTT(t *testing.T) {
 
 	is, isAddr := mock.NewIS(ctx)
 	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
-	c := NewComponent(t, &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -1047,7 +1047,7 @@ func TestRTT(t *testing.T) {
 			},
 		},
 	})
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)

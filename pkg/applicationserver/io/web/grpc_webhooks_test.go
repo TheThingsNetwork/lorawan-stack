@@ -24,7 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -40,7 +40,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
-	c := NewComponent(t, &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -57,7 +57,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	webhookReg := &redis.WebhookRegistry{Redis: redisClient}
 	srv := web.NewWebhookRegistryRPC(webhookReg, nil)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
-	StartComponent(t, c)
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
@@ -233,9 +233,9 @@ description: Bar`),
 			store, err := config.NewTemplateStore()
 			a.So(err, should.BeNil)
 
-			c := NewComponent(t, &component.Config{})
+			c := componenttest.NewComponent(t, &component.Config{})
 			c.RegisterGRPC(&mockRegisterer{ctx, web.NewWebhookRegistryRPC(nil, store)})
-			StartComponent(t, c)
+			componenttest.StartComponent(t, c)
 			defer c.Close()
 
 			client := ttnpb.NewApplicationWebhookRegistryClient(c.LoopbackConn())

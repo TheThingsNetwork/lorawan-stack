@@ -29,7 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	. "go.thethings.network/lorawan-stack/pkg/component/test"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -5885,7 +5885,7 @@ func TestGenerateDownlink(t *testing.T) {
 			)
 			c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
-			StartComponent(t, c)
+			componenttest.StartComponent(t, c)
 
 			ns := &NetworkServer{
 				Component: c,
