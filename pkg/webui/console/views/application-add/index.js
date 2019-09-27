@@ -111,7 +111,7 @@ export default class Add extends React.Component {
       if (asEnabled && values.link) {
         try {
           const key = {
-            name: 'Application Link Key (generated automatically)',
+            name: 'Application Server Linking',
             rights: ['RIGHT_APPLICATION_LINK'],
           }
           const { key: api_key } = await api.application.apiKeys.create(appId, key)
