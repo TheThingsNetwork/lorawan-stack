@@ -87,6 +87,9 @@ func TestNSHandler(t *testing.T) {
 					}}},
 				},
 			},
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				DeviceID: "test-device",
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {

@@ -78,6 +78,9 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 
 // HandleUp implements upstream.Handler.
 func (h *Handler) HandleUp(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUp) error {
+	if (ids == ttnpb.EndDeviceIdentifiers{}) {
+		return nil
+	}
 	nsConn, err := h.c.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
 	if err != nil {
 		return errNotFound.WithCause(err).WithAttributes("ids", ids)

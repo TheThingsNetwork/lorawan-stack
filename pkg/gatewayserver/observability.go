@@ -39,6 +39,18 @@ var (
 		"gs.status.receive", "receive gateway status",
 		ttnpb.RIGHT_GATEWAY_STATUS_READ,
 	)
+	evtForwardStatus = events.Define(
+		"gs.status.forward", "forward gateway status",
+		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+	)
+	evtDropStatus = events.Define(
+		"gs.status.drop", "drop gateway status",
+		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+	)
+	evtFailStatus = events.Define(
+		"gs.status.fail", "fail to handle gateway status",
+		ttnpb.RIGHT_GATEWAY_STATUS_READ,
+	)
 	evtReceiveUp = events.Define(
 		"gs.up.receive", "receive uplink message",
 		ttnpb.RIGHT_GATEWAY_TRAFFIC_READ,
@@ -92,6 +104,30 @@ var gsMetrics = &messageMetrics{
 			Help:      "Total number of received gateway statuses",
 		},
 		[]string{gatewayID},
+	),
+	statusForwarded: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "status_forwarded_total",
+			Help:      "Total number of forwarded gateway statuses",
+		},
+		[]string{networkServer},
+	),
+	statusDropped: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "status_dropped_total",
+			Help:      "Total number of dropped gateway statuses",
+		},
+		[]string{networkServer, "error"},
+	),
+	statusFailed: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "status_failed_total",
+			Help:      "Total number of failed gateway statuses",
+		},
+		[]string{networkServer},
 	),
 	uplinkReceived: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -158,6 +194,9 @@ func init() {
 type messageMetrics struct {
 	gatewaysConnected   *metrics.ContextualGaugeVec
 	statusReceived      *metrics.ContextualCounterVec
+	statusForwarded     *metrics.ContextualCounterVec
+	statusDropped       *metrics.ContextualCounterVec
+	statusFailed        *metrics.ContextualCounterVec
 	uplinkReceived      *metrics.ContextualCounterVec
 	uplinkForwarded     *metrics.ContextualCounterVec
 	uplinkDropped       *metrics.ContextualCounterVec
@@ -204,6 +243,25 @@ func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus) {
 	events.Publish(evtReceiveStatus(ctx, gtw, status))
 	gsMetrics.statusReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
+}
+
+func registerForwardStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string) {
+	events.Publish(evtForwardStatus(ctx, gtw, status))
+	gsMetrics.statusForwarded.WithLabelValues(ctx, gtw.GatewayID).Inc()
+}
+
+func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string, err error) {
+	events.Publish(evtDropStatus(ctx, gtw, err))
+	if ttnErr, ok := errors.From(err); ok {
+		gsMetrics.statusDropped.WithLabelValues(ctx, ns, ttnErr.FullName()).Inc()
+	} else {
+		gsMetrics.statusDropped.WithLabelValues(ctx, ns, unknown).Inc()
+	}
+}
+
+func registerFailStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string) {
+	events.Publish(evtFailStatus(ctx, gtw, status))
+	gsMetrics.statusFailed.WithLabelValues(ctx, gtw.GatewayID).Inc()
 }
 
 func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
