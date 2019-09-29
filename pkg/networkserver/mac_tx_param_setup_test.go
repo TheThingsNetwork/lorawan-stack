@@ -28,16 +28,15 @@ import (
 
 func TestEnqueueTxParamSetupReq(t *testing.T) {
 	for _, tc := range []struct {
-		Name                                              string
-		Device, Expected                                  *ttnpb.EndDevice
-		AssertEvents                                      func(*testing.T, ...events.Event) bool
-		InputMaxDownlinkLength, ExpectedMaxDownlinkLength uint16
-		InputMaxUplinkLength, ExpectedMaxUplinkLength     uint16
-		Ok                                                bool
+		Name                        string
+		InputDevice, ExpectedDevice *ttnpb.EndDevice
+		MaxDownlinkLength           uint16
+		MaxUplinkLength             uint16
+		State                       macCommandEnqueueState
 	}{
 		{
 			Name: "payload fits/EIRP 26/dwell time both",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
@@ -49,7 +48,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 				},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
@@ -68,25 +67,24 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				a := assertions.New(t)
-				return a.So(evs, should.HaveLength, 1) &&
-					a.So(evs[0].Name(), should.Equal, "ns.mac.tx_param_setup.request") &&
-					a.So(evs[0].Data(), should.Resemble, &ttnpb.MACCommand_TxParamSetupReq{
+			MaxDownlinkLength: 42,
+			MaxUplinkLength:   24,
+			State: macCommandEnqueueState{
+				MaxDownLen: 40,
+				MaxUpLen:   23,
+				Ok:         true,
+				QueuedEvents: []events.DefinitionDataClosure{
+					evtEnqueueTxParamSetupRequest.BindData(&ttnpb.MACCommand_TxParamSetupReq{
 						MaxEIRPIndex:      ttnpb.DEVICE_EIRP_26,
 						DownlinkDwellTime: true,
 						UplinkDwellTime:   true,
-					})
+					}),
+				},
 			},
-			InputMaxDownlinkLength:    42,
-			InputMaxUplinkLength:      24,
-			ExpectedMaxDownlinkLength: 40,
-			ExpectedMaxUplinkLength:   23,
-			Ok:                        true,
 		},
 		{
 			Name: "payload fits/EIRP 26/no dwell time limitations",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
@@ -96,7 +94,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 				},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
@@ -106,18 +104,17 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
+			MaxDownlinkLength: 42,
+			MaxUplinkLength:   24,
+			State: macCommandEnqueueState{
+				MaxDownLen: 42,
+				MaxUpLen:   24,
+				Ok:         true,
 			},
-			InputMaxDownlinkLength:    42,
-			InputMaxUplinkLength:      24,
-			ExpectedMaxDownlinkLength: 42,
-			ExpectedMaxUplinkLength:   24,
-			Ok:                        true,
 		},
 		{
 			Name: "downlink does not fit/EIRP 26/dwell time both",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
@@ -129,7 +126,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 				},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
@@ -141,18 +138,16 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
+			MaxDownlinkLength: 1,
+			MaxUplinkLength:   24,
+			State: macCommandEnqueueState{
+				MaxDownLen: 1,
+				MaxUpLen:   24,
 			},
-			InputMaxDownlinkLength:    1,
-			InputMaxUplinkLength:      24,
-			ExpectedMaxDownlinkLength: 1,
-			ExpectedMaxUplinkLength:   24,
-			Ok:                        false,
 		},
 		{
 			Name: "uplink does not fit/EIRP 26/dwell time both",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
@@ -164,7 +159,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 				},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP: 26,
@@ -176,48 +171,39 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 				},
 			},
-			AssertEvents: func(t *testing.T, evs ...events.Event) bool {
-				return assertions.New(t).So(evs, should.BeEmpty)
+			MaxDownlinkLength: 42,
+			State: macCommandEnqueueState{
+				MaxDownLen: 42,
 			},
-			InputMaxDownlinkLength:    42,
-			InputMaxUplinkLength:      0,
-			ExpectedMaxDownlinkLength: 42,
-			ExpectedMaxUplinkLength:   0,
-			Ok:                        false,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			dev := deepcopy.Copy(tc.InputDevice).(*ttnpb.EndDevice)
 
-			var maxDownLen, maxUpLen uint16
-			var ok bool
-			evs := test.CollectEvents(func() {
-				maxDownLen, maxUpLen, ok = enqueueTxParamSetupReq(test.Context(), dev, tc.InputMaxDownlinkLength, tc.InputMaxUplinkLength)
-			})
-			a.So(dev, should.Resemble, tc.Expected)
-			a.So(maxDownLen, should.Equal, tc.ExpectedMaxDownlinkLength)
-			a.So(maxUpLen, should.Equal, tc.ExpectedMaxUplinkLength)
-			a.So(ok, should.Resemble, tc.Ok)
-			a.So(tc.AssertEvents(t, evs...), should.BeTrue)
+			st := enqueueTxParamSetupReq(test.Context(), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength)
+			a.So(dev, should.Resemble, tc.ExpectedDevice)
+			a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, tc.State.QueuedEvents)
+			st.QueuedEvents = tc.State.QueuedEvents
+			a.So(st, should.Resemble, tc.State)
 		})
 	}
 }
 
 func TestHandleTxParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {
-		Name             string
-		Device, Expected *ttnpb.EndDevice
-		Events           []events.DefinitionDataClosure
-		Error            error
+		Name                        string
+		InputDevice, ExpectedDevice *ttnpb.EndDevice
+		Events                      []events.DefinitionDataClosure
+		Error                       error
 	}{
 		{
 			Name: "no request",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
 			Events: []events.DefinitionDataClosure{
@@ -227,7 +213,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 		},
 		{
 			Name: "EIRP 26, dwell time both",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_TxParamSetupReq{
@@ -238,7 +224,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 					},
 				},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						MaxEIRP:           26,
@@ -256,14 +242,14 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			dev := deepcopy.Copy(tc.InputDevice).(*ttnpb.EndDevice)
 
 			evs, err := handleTxParamSetupAns(test.Context(), dev)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			a.So(dev, should.Resemble, tc.Expected)
+			a.So(dev, should.Resemble, tc.ExpectedDevice)
 			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}

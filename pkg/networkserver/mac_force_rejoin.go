@@ -17,16 +17,17 @@ package networkserver
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 var evtEnqueueForceRejoinRequest = defineEnqueueMACRequestEvent("force_rejoin", "force rejoin")()
 
-func enqueueForceRejoinReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
-	var pld *ttnpb.MACCommand_ForceRejoinReq
-	if pld != nil {
-		events.Publish(evtEnqueueForceRejoinRequest(ctx, dev.EndDeviceIdentifiers, pld))
+func enqueueForceRejoinReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
+	// TODO: Support rejoins. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
+	_ = evtEnqueueForceRejoinRequest
+	return macCommandEnqueueState{
+		MaxDownLen: maxDownLen,
+		MaxUpLen:   maxUpLen,
+		Ok:         true,
 	}
-	return maxDownLen, maxUpLen, true
 }

@@ -765,20 +765,6 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 			return
 		}
 
-		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-			return a.So(ev, should.ResembleEvent, EvtEnqueueDevStatusRequest(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
-				ttnpb.EndDeviceIdentifiers{
-					DeviceID:               devID,
-					ApplicationIdentifiers: appID,
-					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					DevAddr:                &devAddr,
-				}, nil))
-		}), should.BeTrue) {
-			t.Error("DevStatus enqueue event assertion failed")
-			return
-		}
-
 		a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
 			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
@@ -860,6 +846,17 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 				Response: &ttnpb.ScheduleDownlinkResponse{},
 			},
 		), should.BeTrue)
+
+		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtEnqueueDevStatusRequest(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevAddr:                &devAddr,
+				}, nil))
+		}), should.BeTrue)
 	})
 }
 

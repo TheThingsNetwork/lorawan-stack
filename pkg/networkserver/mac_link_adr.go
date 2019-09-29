@@ -20,6 +20,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -29,7 +30,7 @@ var (
 	evtReceiveLinkADRReject  = defineReceiveMACRejectEvent("link_adr", "link ADR")()
 )
 
-func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) (uint16, uint16, bool, error) {
+func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) (macCommandEnqueueState, error) {
 	needsMask := len(dev.MACState.CurrentParameters.Channels) > len(dev.MACState.DesiredParameters.Channels)
 	for i := 0; !needsMask && i < len(dev.MACState.CurrentParameters.Channels); i++ {
 		needsMask = dev.MACState.CurrentParameters.Channels[i].EnableUplink != dev.MACState.DesiredParameters.Channels[i].EnableUplink
@@ -38,16 +39,26 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		dev.MACState.DesiredParameters.ADRDataRateIndex == dev.MACState.CurrentParameters.ADRDataRateIndex &&
 		dev.MACState.DesiredParameters.ADRNbTrans == dev.MACState.CurrentParameters.ADRNbTrans &&
 		dev.MACState.DesiredParameters.ADRTxPowerIndex == dev.MACState.CurrentParameters.ADRTxPowerIndex {
-		return maxDownLen, maxUpLen, true, nil
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}, nil
 	}
 
 	_, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
-		return maxDownLen, maxUpLen, false, err
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+		}, err
 	}
 
 	if len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {
-		return maxDownLen, maxUpLen, false, errCorruptedMACState
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+		}, errCorruptedMACState
 	}
 
 	desiredChs := make([]bool, phy.MaxUplinkChannels)
@@ -56,17 +67,23 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	}
 	desiredMasks, err := phy.GenerateChMasks(desiredChs)
 	if err != nil {
-		return maxDownLen, maxUpLen, false, err
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+		}, err
 	}
 	if len(desiredMasks) > math.MaxUint16 {
 		// Something is really wrong.
-		return maxDownLen, maxUpLen, false, errCorruptedMACState
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+		}, errCorruptedMACState
 	}
 
-	var ok bool
-	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+	var st macCommandEnqueueState
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		if int(nDown) < len(desiredMasks) {
-			return nil, 0, false
+			return nil, 0, nil, false
 		}
 
 		uplinksNeeded := uint16(1)
@@ -74,23 +91,31 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 			uplinksNeeded = uint16(len(desiredMasks))
 		}
 		if nUp < uplinksNeeded {
-			return nil, 0, false
+			return nil, 0, nil, false
 		}
+		evs := make([]events.DefinitionDataClosure, 0, len(desiredMasks))
 		cmds := make([]*ttnpb.MACCommand, 0, len(desiredMasks))
 		for i, m := range desiredMasks {
-			pld := &ttnpb.MACCommand_LinkADRReq{
+			req := &ttnpb.MACCommand_LinkADRReq{
 				DataRateIndex:      dev.MACState.DesiredParameters.ADRDataRateIndex,
 				NbTrans:            dev.MACState.DesiredParameters.ADRNbTrans,
 				TxPowerIndex:       dev.MACState.DesiredParameters.ADRTxPowerIndex,
 				ChannelMaskControl: uint32(m.Cntl),
 				ChannelMask:        desiredMasks[i].Mask[:],
 			}
-			cmds = append(cmds, pld.MACCommand())
-			events.Publish(evtEnqueueLinkADRRequest(ctx, dev.EndDeviceIdentifiers, pld))
+			cmds = append(cmds, req.MACCommand())
+			evs = append(evs, evtEnqueueLinkADRRequest.BindData(req))
+			log.FromContext(ctx).WithFields(log.Fields(
+				"data_rate_index", req.DataRateIndex,
+				"nb_trans", req.NbTrans,
+				"tx_power_index", req.TxPowerIndex,
+				"channel_mask_control", req.ChannelMaskControl,
+				"channel_mask", req.ChannelMask,
+			)).Debug("Enqueued LinkADRReq")
 		}
-		return cmds, uplinksNeeded, true
+		return cmds, uplinksNeeded, evs, true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok, nil
+	return st, nil
 }
 
 func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) ([]events.DefinitionDataClosure, error) {

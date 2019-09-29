@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -53,29 +54,43 @@ func deviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSetting
 	return DefaultStatusTimePeriodicity
 }
 
-func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings) (uint16, uint16, bool) {
+func enqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings) macCommandEnqueueState {
 	cp := deviceStatusCountPeriodicity(dev, defaults)
 	tp := deviceStatusTimePeriodicity(dev, defaults)
 
 	if cp == 0 && tp == 0 {
-		return maxDownLen, maxUpLen, true
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}
 	}
 	if dev.LastDevStatusReceivedAt != nil &&
 		(cp == 0 || dev.MACState.LastDevStatusFCntUp+cp > dev.Session.LastFCntUp) &&
 		(tp == 0 || dev.LastDevStatusReceivedAt.Add(tp).After(time.Now())) {
-		return maxDownLen, maxUpLen, true
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}
 	}
 
-	var ok bool
-	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_DEV_STATUS, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+	var st macCommandEnqueueState
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DEV_STATUS, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		if nDown < 1 || nUp < 1 {
-			return nil, 0, false
+			return nil, 0, nil, false
 		}
-
-		events.Publish(evtEnqueueDevStatusRequest(ctx, dev.EndDeviceIdentifiers, nil))
-		return []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}, 1, true
+		log.FromContext(ctx).Debug("Enqueued DevStatusReq")
+		return []*ttnpb.MACCommand{
+				ttnpb.CID_DEV_STATUS.MACCommand(),
+			},
+			1,
+			[]events.DefinitionDataClosure{
+				evtEnqueueDevStatusRequest.BindData(nil),
+			},
+			true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok
+	return st
 }
 
 func handleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DevStatusAns, fCntUp uint32, recvAt time.Time) ([]events.DefinitionDataClosure, error) {

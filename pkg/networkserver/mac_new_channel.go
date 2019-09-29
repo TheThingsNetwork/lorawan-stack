@@ -28,10 +28,11 @@ var (
 	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")()
 )
 
-func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) (uint16, uint16, bool) {
-	var ok bool
-	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
+	var st macCommandEnqueueState
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		var cmds []*ttnpb.MACCommand
+		var evs []events.DefinitionDataClosure
 		for i, ch := range dev.MACState.DesiredParameters.Channels {
 			if i < len(dev.MACState.CurrentParameters.Channels) &&
 				ch.UplinkFrequency == dev.MACState.CurrentParameters.Channels[i].UplinkFrequency &&
@@ -40,30 +41,29 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 				continue
 			}
 			if nDown < 1 || nUp < 1 {
-				return cmds, uint16(len(cmds)), false
+				return cmds, uint16(len(cmds)), nil, false
 			}
 			nDown--
 			nUp--
 
-			pld := &ttnpb.MACCommand_NewChannelReq{
+			req := &ttnpb.MACCommand_NewChannelReq{
 				ChannelIndex:     uint32(i),
 				Frequency:        ch.UplinkFrequency,
 				MinDataRateIndex: ch.MinDataRateIndex,
 				MaxDataRateIndex: ch.MaxDataRateIndex,
 			}
 			log.FromContext(ctx).WithFields(log.Fields(
-				"index", pld.ChannelIndex,
-				"frequency", pld.Frequency,
-				"min_data_rate_index", pld.MinDataRateIndex,
-				"max_data_rate_index", pld.MaxDataRateIndex,
+				"index", req.ChannelIndex,
+				"frequency", req.Frequency,
+				"min_data_rate_index", req.MinDataRateIndex,
+				"max_data_rate_index", req.MaxDataRateIndex,
 			)).Debug("Enqueued NewChannelReq")
-			cmds = append(cmds, pld.MACCommand())
-
-			events.Publish(evtEnqueueNewChannelRequest(ctx, dev.EndDeviceIdentifiers, pld))
+			cmds = append(cmds, req.MACCommand())
+			evs = append(evs, evtEnqueueNewChannelRequest.BindData(req))
 		}
-		return cmds, uint16(len(cmds)), true
+		return cmds, uint16(len(cmds)), nil, true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok
+	return st
 }
 
 func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_NewChannelAns) ([]events.DefinitionDataClosure, error) {

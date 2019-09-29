@@ -16,22 +16,34 @@ package networkserver
 
 import (
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+type macCommandEnqueueState struct {
+	MaxDownLen, MaxUpLen uint16
+	QueuedEvents         []events.DefinitionDataClosure
+	Ok                   bool
+}
 
 // enqueueMACCommand appends commands returned by f to cmds.
 // Arguments to f represent the amount of downlink and uplink messages respectively with CID cid which fit in byte limits maxDownLen and maxUpLen.
 // f returns a slice downlink commands to append to cmds, amount of uplinks to expect and bool indicating whether all commands fit.
 // enqueueMACCommand returns the resulting downlink MAC command slice, new value for maxDownLen, maxUpLen and bool indicating whether all commands fit.
-func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint16, f func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, uint16, uint16, bool) {
+func enqueueMACCommand(cid ttnpb.MACCommandIdentifier, maxDownLen, maxUpLen uint16, f func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool), cmds ...*ttnpb.MACCommand) ([]*ttnpb.MACCommand, macCommandEnqueueState) {
 	desc := lorawan.DefaultMACCommands[cid]
 	maxDown := maxDownLen / (1 + desc.DownlinkLength)
 	maxUp := maxUpLen / (1 + desc.UplinkLength)
-	enq, nUp, ok := f(maxDown, maxUp)
+	enq, nUp, evs, ok := f(maxDown, maxUp)
 	if len(enq) > int(maxDown) || nUp > maxUp {
 		panic("invalid amount of MAC commands enqueued")
 	}
-	return append(cmds, enq...), maxDownLen - uint16(len(enq))*(1+desc.DownlinkLength), maxUpLen - nUp*(1+desc.UplinkLength), ok
+	return append(cmds, enq...), macCommandEnqueueState{
+		MaxDownLen:   maxDownLen - uint16(len(enq))*(1+desc.DownlinkLength),
+		MaxUpLen:     maxUpLen - nUp*(1+desc.UplinkLength),
+		QueuedEvents: evs,
+		Ok:           ok,
+	}
 }
 
 // handleMACResponse searches for first command in cmds with CID equal to cid and calls f with found value as argument.

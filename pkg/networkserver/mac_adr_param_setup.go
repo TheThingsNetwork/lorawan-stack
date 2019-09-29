@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -27,7 +28,7 @@ var (
 	evtReceiveADRParamSetupAnswer  = defineReceiveMACAnswerEvent("adr_param_setup", "ADR parameter setup")()
 )
 
-func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) (uint16, uint16, bool, error) {
+func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) (macCommandEnqueueState, error) {
 	var (
 		currentLimit, desiredLimit ttnpb.ADRAckLimitExponent
 		currentDelay, desiredDelay ttnpb.ADRAckDelayExponent
@@ -39,7 +40,10 @@ func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 		dev.MACState.DesiredParameters.ADRAckDelayExponent == nil {
 		_, phy, err := getDeviceBandVersion(dev, fps)
 		if err != nil {
-			return maxDownLen, maxUpLen, false, err
+			return macCommandEnqueueState{
+				MaxDownLen: maxDownLen,
+				MaxUpLen:   maxUpLen,
+			}, err
 		}
 		currentLimit, currentDelay = phy.ADRAckLimit, phy.ADRAckDelay
 		desiredLimit, desiredDelay = currentLimit, currentDelay
@@ -60,23 +64,37 @@ func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 	}
 
 	if currentLimit == desiredLimit && currentDelay == desiredDelay {
-		return maxDownLen, maxUpLen, true, nil
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}, nil
 	}
 
-	var ok bool
-	dev.MACState.PendingRequests, maxDownLen, maxUpLen, ok = enqueueMACCommand(ttnpb.CID_ADR_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, bool) {
+	var st macCommandEnqueueState
+	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_ADR_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		if nDown < 1 || nUp < 1 {
-			return nil, 0, false
+			return nil, 0, nil, false
 		}
 
 		req := &ttnpb.MACCommand_ADRParamSetupReq{
 			ADRAckLimitExponent: desiredLimit,
 			ADRAckDelayExponent: desiredDelay,
 		}
-		events.Publish(evtEnqueueADRParamSetupRequest(ctx, dev.EndDeviceIdentifiers, req))
-		return []*ttnpb.MACCommand{req.MACCommand()}, 1, true
+		log.FromContext(ctx).WithFields(log.Fields(
+			"ack_limit_exponent", req.ADRAckLimitExponent,
+			"ack_delay_exponent", req.ADRAckDelayExponent,
+		)).Debug("Enqueued ADRParamSetupReq")
+		return []*ttnpb.MACCommand{
+				req.MACCommand(),
+			},
+			1,
+			[]events.DefinitionDataClosure{
+				evtEnqueueADRParamSetupRequest.BindData(req),
+			},
+			true
 	}, dev.MACState.PendingRequests...)
-	return maxDownLen, maxUpLen, ok, nil
+	return st, nil
 }
 
 func handleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
