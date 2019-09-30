@@ -61,14 +61,14 @@ class CreateForm extends React.Component {
   }
 
   render() {
-    const { rights, onCreateFailure, universalRights } = this.props
+    const { rights, onCreateFailure, pseudoRights } = this.props
     const { modal } = this.state
 
     const modalProps = modal ? modal : {}
     const modalVisible = Boolean(modal)
     const initialValues = {
       name: '',
-      rights: [],
+      rights: [...pseudoRights],
     }
 
     return (
