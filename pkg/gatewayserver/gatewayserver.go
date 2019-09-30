@@ -497,14 +497,20 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					if handler == nil {
 						break
 					}
-					gtwUp := &ttnpb.GatewayUp{
-						UplinkMessages: []*ttnpb.UplinkMessage{msg},
-					}
-					if err := handler.HandleUp(ctx, conn.Gateway().GatewayIdentifiers, ids, gtwUp); err != nil {
+					if err := handler.HandleUplink(ctx, conn.Gateway().GatewayIdentifiers, ids, msg); err != nil {
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
 						break
 					}
 					registerForwardUplink(ctx, conn.Gateway(), msg, item.host.name)
+				case *ttnpb.GatewayStatus:
+					registerReceiveStatus(ctx, conn.Gateway(), msg)
+					for _, handler := range gs.upstreamHandlers {
+						if err := handler.HandleStatus(ctx, conn.Gateway().GatewayIdentifiers, msg); err != nil {
+							registerForwardStatus(ctx, conn.Gateway(), msg, item.host.name)
+						} else {
+							registerDropStatus(ctx, conn.Gateway(), msg, item.host.name, err)
+						}
+					}
 				}
 			}
 		}
@@ -548,8 +554,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			val = msg
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
-			registerReceiveStatus(ctx, conn.Gateway(), msg)
-			continue
+			val = msg
 		case msg := <-conn.TxAck():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
 			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
@@ -582,6 +587,8 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					switch msg := val.(type) {
 					case *ttnpb.UplinkMessage:
 						registerFailUplink(ctx, conn.Gateway(), msg, host.name)
+					case *ttnpb.GatewayStatus:
+						registerFailStatus(ctx, conn.Gateway(), msg, host.name)
 					}
 				}
 			}

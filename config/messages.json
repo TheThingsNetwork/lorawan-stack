@@ -6371,6 +6371,33 @@
       "file": "observability.go"
     }
   },
+  "event:gs.status.drop": {
+    "translations": {
+      "en": "drop gateway status"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.status.fail": {
+    "translations": {
+      "en": "fail to handle gateway status"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.status.forward": {
+    "translations": {
+      "en": "forward gateway status"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
   "event:gs.status.receive": {
     "translations": {
       "en": "receive gateway status"

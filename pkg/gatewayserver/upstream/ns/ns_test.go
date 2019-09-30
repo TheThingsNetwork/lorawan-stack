@@ -87,12 +87,14 @@ func TestNSHandler(t *testing.T) {
 					}}},
 				},
 			},
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				DeviceID: "test-device",
+			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			gtwUp := &ttnpb.GatewayUp{UplinkMessages: []*ttnpb.UplinkMessage{tc.UplinkMessage}}
-			err := h.HandleUp(ctx, gtwIds, tc.EndDeviceIdentifiers, gtwUp)
+			err := h.HandleUplink(ctx, gtwIds, tc.EndDeviceIdentifiers, tc.UplinkMessage)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Error sending upstream message: %v", err)
 			}
