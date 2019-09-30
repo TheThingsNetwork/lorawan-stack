@@ -3,4 +3,4 @@
 package version
 
 // TTN Version
-var TTN = "v3.1.2-dev"
+var TTN = "v3.2.0-dev"
