@@ -27,7 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestMicrochip(t *testing.T) {
+func TestMicrochipATECC608AMAHTNT(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 

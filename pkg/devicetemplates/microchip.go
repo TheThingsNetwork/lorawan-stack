@@ -57,11 +57,6 @@ pno8+2vVTkQDhcinNrgoPLQORzV5/l/b4z4=
 -----END CERTIFICATE-----`),
 }
 
-// microchipATECC608AMAHTNT is a Microchip ATECC608A-MAHTN-T device provisioner.
-type microchipATECC608AMAHTNT struct {
-	keys map[string]interface{}
-}
-
 type microchipEntry struct {
 	jose.JSONWebSignature
 }
@@ -75,17 +70,22 @@ func (m *microchipEntry) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+var (
+	errMicrochipData      = errors.DefineInvalidArgument("microchip_data", "invalid Microchip data")
+	errMicrochipPublicKey = errors.DefineInvalidArgument("microchip_public_key", "unknown Microchip public key ID `{id}`")
+)
+
+// microchipATECC608AMAHTNT is a Microchip ATECC608A-MAHTN-T device provisioner.
+type microchipATECC608AMAHTNT struct {
+	keys map[string]interface{}
+}
+
 func (m *microchipATECC608AMAHTNT) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
 		Name:        "Microchip ATECC608A-MAHTN-T Manifest File",
 		Description: "JSON manifest file received through Microchip Purchasing & Client Services.",
 	}
 }
-
-var (
-	errMicrochipData      = errors.DefineInvalidArgument("microchip_data", "invalid Microchip data")
-	errMicrochipPublicKey = errors.DefineInvalidArgument("microchip_public_key", "unknown Microchip public key ID `{id}`")
-)
 
 // Convert decodes the given manifest data.
 // The input data is an array of JWS (JSON Web Signatures).
