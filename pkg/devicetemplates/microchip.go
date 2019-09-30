@@ -72,6 +72,8 @@ pkMG4zpov9FCoj4G340idEadm7mVbAd5GOB9
 -----END CERTIFICATE-----`),
 }
 
+var joinEUI = types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}
+
 type microchipEntry struct {
 	jose.JSONWebSignature
 }
@@ -140,11 +142,18 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 		}
 		ch <- &ttnpb.EndDeviceTemplate{
 			EndDevice: ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					JoinEUI: &joinEUI,
+				},
 				ProvisionerID:    provisioning.Microchip,
 				ProvisioningData: s,
 			},
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"provisioner_id", "provisioning_data"},
+				Paths: []string{
+					"ids.join_eui",
+					"provisioner_id",
+					"provisioning_data",
+				},
 			},
 			MappingKey: s.Fields["uniqueId"].GetStringValue(),
 		}
@@ -235,13 +244,20 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID: strings.ToLower(fmt.Sprintf("eui-%s", devEUI)),
+					JoinEUI:  &joinEUI,
 					DevEUI:   &devEUI,
 				},
 				ProvisionerID:    provisioning.Microchip,
 				ProvisioningData: s,
 			},
 			FieldMask: pbtypes.FieldMask{
-				Paths: []string{"ids.device_id", "ids.dev_eui", "provisioner_id", "provisioning_data"},
+				Paths: []string{
+					"ids.device_id",
+					"ids.dev_eui",
+					"ids.join_eui",
+					"provisioner_id",
+					"provisioning_data",
+				},
 			},
 			MappingKey: s.Fields["uniqueId"].GetStringValue(),
 		}
