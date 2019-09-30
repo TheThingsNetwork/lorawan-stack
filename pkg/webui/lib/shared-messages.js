@@ -51,6 +51,7 @@ export default defineMessages({
   collaboratorId: 'Collaborator ID',
   collaboratorModalWarning: 'Are you sure you want to remove {collaboratorId} as a collaborator?',
   collaboratorRemove: 'Collaborator Remove',
+  collaborator: 'Collaborator',
   collaborators: 'Collaborators',
   collaboratorUpdateSuccess: 'Successfully updated collaborator rights',
   componentApplicationServer: 'Application Server',
