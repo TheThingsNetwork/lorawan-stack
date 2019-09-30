@@ -76,23 +76,23 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	}
 }
 
-// HandleUp implements upstream.Handler.
-func (h *Handler) HandleUp(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUp) error {
-	if (ids == ttnpb.EndDeviceIdentifiers{}) {
-		return nil
-	}
+// HandleUplink implements upstream.Handler.
+func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) error {
 	nsConn, err := h.c.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
 	if err != nil {
 		return errNotFound.WithCause(err).WithAttributes("ids", ids)
 	}
 	client := ttnpb.NewGsNsClient(nsConn)
-	for _, up := range msg.UplinkMessages {
-		if h.hostname == "cluster" {
-			_, err := client.HandleUplink(ctx, up, h.c.WithClusterAuth())
-			if err != nil {
-				return err
-			}
+	if h.hostname == "cluster" {
+		_, err := client.HandleUplink(ctx, msg, h.c.WithClusterAuth())
+		if err != nil {
+			return err
 		}
 	}
+	return nil
+}
+
+// HandleStatus implements upstream.Handler.
+func (h *Handler) HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error {
 	return nil
 }

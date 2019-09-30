@@ -497,21 +497,15 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					if handler == nil {
 						break
 					}
-					gtwUp := &ttnpb.GatewayUp{
-						UplinkMessages: []*ttnpb.UplinkMessage{msg},
-					}
-					if err := handler.HandleUp(ctx, conn.Gateway().GatewayIdentifiers, ids, gtwUp); err != nil {
+					if err := handler.HandleUplink(ctx, conn.Gateway().GatewayIdentifiers, ids, msg); err != nil {
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
 						break
 					}
 					registerForwardUplink(ctx, conn.Gateway(), msg, item.host.name)
 				case *ttnpb.GatewayStatus:
 					registerReceiveStatus(ctx, conn.Gateway(), msg)
-					gtwUp := &ttnpb.GatewayUp{
-						GatewayStatus: msg,
-					}
 					for _, handler := range gs.upstreamHandlers {
-						if err := handler.HandleUp(ctx, conn.Gateway().GatewayIdentifiers, ttnpb.EndDeviceIdentifiers{}, gtwUp); err != nil {
+						if err := handler.HandleStatus(ctx, conn.Gateway().GatewayIdentifiers, msg); err != nil {
 							registerForwardStatus(ctx, conn.Gateway(), msg, item.host.name)
 						} else {
 							registerDropStatus(ctx, conn.Gateway(), msg, item.host.name, err)

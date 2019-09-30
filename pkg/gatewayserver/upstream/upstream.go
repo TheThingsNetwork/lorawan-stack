@@ -32,6 +32,8 @@ type Handler interface {
 	Setup() error
 	// ConnectGateway informs the upstream handler that a particular gateway is connected to the front end.
 	ConnectGateway(context.Context, ttnpb.GatewayIdentifiers, *io.Connection) error
-	// HandleUp handles upstream messages.
-	HandleUp(context.Context, ttnpb.GatewayIdentifiers, ttnpb.EndDeviceIdentifiers, *ttnpb.GatewayUp) error
+	// HandleUp handles ttnpb.UplinkMessage.
+	HandleUplink(context.Context, ttnpb.GatewayIdentifiers, ttnpb.EndDeviceIdentifiers, *ttnpb.UplinkMessage) error
+	// HandleStatus handles ttnpb.GatewayStatus.
+	HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error
 }
