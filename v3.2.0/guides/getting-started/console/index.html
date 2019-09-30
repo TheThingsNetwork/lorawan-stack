@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Console - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.58.1" />
+<link href="https://thethingsstack.io/v3.2.0index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.2.0/guides/getting-started/console/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.0/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.0/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.0/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.0/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.2.0</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.2.0/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.2.0/guides/">Guides</a></li>
+<li><a href="/v3.2.0/concepts/">Concepts</a></li>
+<li><a href="/v3.2.0/components/">Components</a></li>
+<li><a href="/v3.2.0/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Console</h1>
+
+<!-- TODO: Add figure styling to theme (https://github.com/TheThingsNetwork/lorawan-stack/issues/250) -->
+
+<style>figure { border: 1px solid #ddd; }</style>
+
+<h2 id="login">Login</h2>
+
+<p>The Console needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running, open <code>https://thethings.example.com</code> (replace with the URL of your deployment) in your browser.</p>
+
+<figure>
+    <img src="front.png"
+         alt="Front page"/> 
+</figure>
+
+
+<p>You are now on the Console landing page. Click <strong>Login with your The Things Stack Account</strong> in order to reach the login page.</p>
+
+<figure>
+    <img src="login.png"
+         alt="Login"/> 
+</figure>
+
+
+<p>After entering your credentials and logging in, you will reach the Console overview page. You can now fully use the capabilities of the Console.</p>
+
+<figure>
+    <img src="overview.png"
+         alt="Overview"/> 
+</figure>
+
+
+<h2 id="create-gateway">Create gateway</h2>
+
+<p>Go to <strong>Gateways</strong> in the top menu, and click <strong>+ Add Gateway</strong> to reach the gateway registration page. Fill the gateway ID, gateway EUI (if your gateway has an EUI) and frequency plan. The other fields are optional. Click <strong>Create Gateway</strong> to create the gateway.</p>
+
+<figure>
+    <img src="gateway-creation.png"
+         alt="Gateway creation"/> 
+</figure>
+
+
+<p>Your gateway will be created and you will be redirected to the gateway overview page of your newly created gateway.</p>
+
+<figure>
+    <img src="gateway-overview.png"
+         alt="Gateway overview"/> 
+</figure>
+
+
+<p>You can now connect your gateway to The Things Stack.</p>
+
+<h2 id="create-application">Create application</h2>
+
+<p>Go to <strong>Applications</strong> in the top menu, and click <strong>+ Add Application</strong> to reach the application registration page. Fill the application ID. The other fields are optional. Click <strong>Create Application</strong> to create the application.</p>
+
+<figure>
+    <img src="application-creation.png"
+         alt="Application creation"/> 
+</figure>
+
+
+<p>Your application will be created and you will be redirected to the application overview page of your newly created application.</p>
+
+<figure>
+    <img src="application-overview.png"
+         alt="Application overview"/> 
+</figure>
+
+
+<p>Devices are created within applications.</p>
+
+<h3 id="link-application">Link application</h3>
+
+<p>In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server by going to <strong>API keys</strong> in the left menu of your application, and then clicking <strong>+ Add API Key</strong>.</p>
+
+<p>In the API Key creation screen, enter a name for your linking API key and select the <strong>Link as Application to a Network Server</strong> right, then press <strong>Create API Key</strong>.</p>
+
+<figure>
+    <img src="api-key-creation.png"
+         alt="Application API Key creation"/> 
+</figure>
+
+
+<p>You will see a screen that shows your newly created API Key. You now can copy it in your clipboard by pressing the clipboard button. After saving the key in a safe place, press <strong>I have copied the key</strong>. You will not be able to see this key again in the future, but if you lose it, you can create a new one to replace it.</p>
+
+<figure>
+    <img src="api-key-created.png"
+         alt="Application API Key created"/> 
+</figure>
+
+
+<p>Now go to <strong>Link</strong> in the left menu of the application and enter the API key you&rsquo;ve just created. You can leave the Network Server address empty. Press <strong>Save Changes</strong> to save the link settings.</p>
+
+<figure>
+    <img src="application-link-creation.png"
+         alt="Application link creation"/> 
+</figure>
+
+
+<p>You can now see the status of the linking process appear in the right part of your screen. This also shows the statistics of the link between the Application Server and the Network Server.</p>
+
+<p>Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.</p>
+
+<h2 id="create-end-device">Create end device</h2>
+
+<p>Go to <strong>Devices</strong> in the left menu and click on <strong>+ Add Device</strong> to reach the end device registration page. Fill the device ID, the LoRaWAN MAC and PHY versions and the frequency plan used by the device.</p>
+
+<figure>
+    <img src="device-creation-1.png"
+         alt="Creating a new device"/> 
+</figure>
+
+
+<h3 id="over-the-air-activation-otaa-device">Over-the-air-activation (OTAA) device</h3>
+
+<p>After filling the fields in the &ldquo;General Settings&rdquo; section, scroll to the lower part of the device registration page and make sure that &ldquo;Over The Air Activation (OTAA)&rdquo; is selected. Fill the Join EUI (App EUI in LoRaWAN versions before 1.1), the Device EUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press <strong>Create Device</strong> to create the device.</p>
+
+<figure>
+    <img src="device-creation-otaa.png"
+         alt="Creating an OTAA device"/> 
+</figure>
+
+
+<p>You&rsquo;ll now reach the device overview page for your device. The end device should now be able to join the private network.</p>
+
+<figure>
+    <img src="device-otaa-created.png"
+         alt="OTAA device overview"/> 
+</figure>
+
+
+<h3 id="activation-by-personalization-abp-device">Activation by personalization (ABP device)</h3>
+
+<p>After filling the fields in the &ldquo;General Settings&rdquo; section, scroll to the lower part of the device registration page and make sure that &ldquo;Activation By Personalization (ABP)&rdquo; is selected. Fill the Device Address, the FNwkSIntKey (NwkSKey in LoRaWAN versions before 1.1) and the AppSKey. The other key fields are only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press <strong>Create Device</strong> to create the device.</p>
+
+<figure>
+    <img src="device-creation-abp.png"
+         alt="Creating an ABP device"/> 
+</figure>
+
+
+<p>You&rsquo;ll now reach the device overview page for your device. The end device should now be able to communicate with the private network.</p>
+
+<figure>
+    <img src="device-abp-created.png"
+         alt="ABP device overview"/> 
+</figure>
+
+
+<h2 id="working-with-data">Working with data</h2>
+
+<p>With your The Things Stack setup, a gateway connected and a device registered on your network, it&rsquo;s time to start working with data.</p>
+
+<p>Learn how to work with the <a href="/v3.2.0/guides/getting-started/mqtt/">builtin MQTT server</a> and <a href="/v3.2.0/guides/getting-started/webhooks/">HTTP webhooks</a>.</p>
+<div class="edit-meta">
+Last updated on 26 Aug 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/console/_index.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.2.0/guides/getting-started/webhooks/" title="HTTP Webhooks"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - HTTP Webhooks</a>
+<a class="nav nav-next" href="/v3.2.0/guides/getting-started/cli/" title="Command-line Interface">Next - Command-line Interface <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.2.0">Home</a></li>
+
+<li class="parent"><a href="/v3.2.0/guides/">Guides</a>
+<ul class="sub-menu">
+
+<li class="parent"><a href="/v3.2.0/guides/getting-started/">Getting Started</a>
+<ul class="sub-menu">
+<li class=""><a href="/v3.2.0/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class="parent active"><a href="/v3.2.0/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.2.0/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/components/">Components</a>
+</li>
+
+<li class=""><a href="/v3.2.0/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/v3.2.0/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

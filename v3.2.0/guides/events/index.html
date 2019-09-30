@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Working with Events - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.58.1" />
+<link href="https://thethingsstack.io/v3.2.0index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.2.0/guides/events/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.0/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.0/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.0/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.0/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.2.0</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.2.0/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.2.0/guides/">Guides</a></li>
+<li><a href="/v3.2.0/concepts/">Concepts</a></li>
+<li><a href="/v3.2.0/components/">Components</a></li>
+<li><a href="/v3.2.0/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Working with Events</h1>
+
+<p>The Things Stack generates lots of events that allow you to get insight in what is going on. You can subscribe to application, gateway, end device events, as well as to user, organization and OAuth client events.</p>
+
+<h2 id="subscribe-with-cli">Subscribe with CLI</h2>
+
+<p>To follow your gateway <code>gtw1</code> and application <code>app1</code> events at the same time:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli events subscribe --gateway-id gtw1 --application-id app1
+</code></pre>
+
+<h2 id="subscribe-with-http">Subscribe with HTTP</h2>
+
+<p>You can get streaming events with <code>curl</code>. For this, you need an API key for the entities you want to watch, for example:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli user api-key create \
+  --user-id admin \
+  --right-application-all \
+  --right-gateway-all
+</code></pre>
+
+<p>With the created API key:</p>
+
+<pre><code>$ curl https://thethings.example.com/api/v3/events \
+  -X POST \
+  -H 'Authorization: Bearer NNSXS.BR55PTYILPPVXY..' \
+  --data '{&quot;identifiers&quot;:[{&quot;application_ids&quot;:{&quot;application_id&quot;:&quot;app1&quot;}},{&quot;gateway_ids&quot;:{&quot;gateway_id&quot;:&quot;gtw1&quot;}}]}'
+</code></pre>
+
+<blockquote>
+<p>Note: The created API key for events is highly privileged; do not use it if you don&rsquo;t need it for events.</p>
+</blockquote>
+
+<h2 id="example-join-flow">Example: join flow</h2>
+
+<p>These are the events of a typical join flow:</p>
+
+<pre><code class="language-js">{
+  &quot;name&quot;: &quot;gs.up.receive&quot;, // Gateway Server received an uplink message from a device.
+  &quot;time&quot;: &quot;2019-04-04T09:54:34.786220Z&quot;,
+  &quot;identifiers&quot;: [
+    {
+      &quot;gateway_ids&quot;: {
+        &quot;gateway_id&quot;: &quot;multitech&quot;,
+        &quot;eui&quot;: &quot;00800000A0000DB4&quot;
+      }
+    }
+  ],
+  &quot;correlation_ids&quot;: [
+    &quot;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&quot;,
+    &quot;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&quot;
+  ]
+}
+{
+  &quot;name&quot;: &quot;js.join.accept&quot;, // Join Server accepted the join-accept.
+  &quot;time&quot;: &quot;2019-04-04T09:54:34.806812Z&quot;,
+  &quot;identifiers&quot;: [
+    {
+      &quot;device_ids&quot;: {
+        &quot;device_id&quot;: &quot;dev1&quot;,
+        &quot;application_ids&quot;: {
+          &quot;application_id&quot;: &quot;app1&quot;
+        },
+        &quot;dev_eui&quot;: &quot;4200000000000000&quot;,
+        &quot;join_eui&quot;: &quot;4200000000000000&quot;
+      }
+    }
+  ],
+  &quot;correlation_ids&quot;: [
+    &quot;rpc:/ttn.lorawan.v3.NsJs/HandleJoin:01D7KWB0NCTDY835V5N3CYWBZK&quot;
+  ]
+}
+{
+  &quot;name&quot;: &quot;ns.up.join.forward&quot;, // Network Server forwarded the join-accept and it got accepted.
+  &quot;time&quot;: &quot;2019-04-04T09:54:34.808132Z&quot;,
+  &quot;identifiers&quot;: [
+    {
+      &quot;device_ids&quot;: {
+        &quot;device_id&quot;: &quot;dev1&quot;,
+        &quot;application_ids&quot;: {
+          &quot;application_id&quot;: &quot;app1&quot;
+        },
+        &quot;dev_eui&quot;: &quot;4200000000000000&quot;,
+        &quot;join_eui&quot;: &quot;4200000000000000&quot;
+      }
+    }
+  ],
+  &quot;correlation_ids&quot;: [
+    &quot;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&quot;,
+    &quot;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&quot;,
+    &quot;ns:uplink:01D7KWB0N5C1T8TE2HAVBJN5Y4&quot;,
+    &quot;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7KWB0N5G2N5C0AFXT4YMF8R&quot;
+  ]
+}
+{
+  &quot;name&quot;: &quot;ns.up.merge_metadata&quot;, // Network Server merged metadata of incoming uplink messages.
+  &quot;time&quot;: &quot;2019-04-04T09:54:34.991332Z&quot;,
+  &quot;identifiers&quot;: [
+    {
+      &quot;device_ids&quot;: {
+        &quot;device_id&quot;: &quot;dev1&quot;,
+        &quot;application_ids&quot;: {
+          &quot;application_id&quot;: &quot;app1&quot;
+        },
+        &quot;dev_eui&quot;: &quot;4200000000000000&quot;,
+        &quot;join_eui&quot;: &quot;4200000000000000&quot;
+      }
+    }
+  ],
+  &quot;data&quot;: {
+    &quot;@type&quot;: &quot;type.googleapis.com/google.protobuf.Value&quot;,
+    &quot;value&quot;: 1 // There was 1 gateway that received the join-request.
+  },
+  &quot;correlation_ids&quot;: [
+    // Here you find the correlation IDs of all gs.up.receive events that were merged.
+    &quot;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&quot;,
+    &quot;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&quot;,
+    &quot;ns:uplink:01D7KWB0N5C1T8TE2HAVBJN5Y4&quot;,
+    &quot;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7KWB0N5G2N5C0AFXT4YMF8R&quot;
+  ]
+}
+{
+  &quot;name&quot;: &quot;as.up.join.receive&quot;, // Application Server receives the join-accept.
+  &quot;time&quot;: &quot;2019-04-04T09:54:35.005090Z&quot;,
+  &quot;identifiers&quot;: [
+    {
+      &quot;device_ids&quot;: {
+        &quot;device_id&quot;: &quot;dev1&quot;,
+        &quot;application_ids&quot;: {
+          &quot;application_id&quot;: &quot;app1&quot;
+        },
+        &quot;dev_eui&quot;: &quot;4200000000000000&quot;,
+        &quot;join_eui&quot;: &quot;4200000000000000&quot;,
+        &quot;dev_addr&quot;: &quot;0063ECE2&quot;
+      }
+    }
+  ],
+  &quot;correlation_ids&quot;: [
+    &quot;as:up:01D7KWB0VX1D7G3RKFN9HDA39Q&quot;,
+    &quot;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&quot;,
+    &quot;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&quot;,
+    &quot;ns:uplink:01D7KWB0N5C1T8TE2HAVBJN5Y4&quot;,
+    &quot;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7KWB0N5G2N5C0AFXT4YMF8R&quot;
+  ]
+}
+{
+  &quot;name&quot;: &quot;as.up.join.forward&quot;, // Application Server forwards the join-accept to an application (CLI, MQTT, webhooks, etc).
+  &quot;time&quot;: &quot;2019-04-04T09:54:35.010243Z&quot;,
+  &quot;identifiers&quot;: [
+    {
+      &quot;device_ids&quot;: {
+        &quot;device_id&quot;: &quot;dev1&quot;,
+        &quot;application_ids&quot;: {
+          &quot;application_id&quot;: &quot;app1&quot;
+        },
+        &quot;dev_eui&quot;: &quot;4200000000000000&quot;,
+        &quot;join_eui&quot;: &quot;4200000000000000&quot;,
+        &quot;dev_addr&quot;: &quot;0063ECE2&quot;
+      }
+    }
+  ],
+  &quot;correlation_ids&quot;: [
+    &quot;as:up:01D7KWB0VX1D7G3RKFN9HDA39Q&quot;,
+    &quot;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&quot;,
+    &quot;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&quot;,
+    &quot;ns:uplink:01D7KWB0N5C1T8TE2HAVBJN5Y4&quot;,
+    &quot;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7KWB0N5G2N5C0AFXT4YMF8R&quot;
+  ]
+}
+{
+  &quot;name&quot;: &quot;gs.down.send&quot;, // Gateway Server sent the join-accept to the gateway.
+  &quot;time&quot;: &quot;2019-04-04T09:54:35.046147Z&quot;,
+  &quot;identifiers&quot;: [
+    {
+      &quot;gateway_ids&quot;: {
+        &quot;gateway_id&quot;: &quot;multitech&quot;,
+        &quot;eui&quot;: &quot;00800000A0000DB4&quot;
+      }
+    }
+  ],
+  &quot;correlation_ids&quot;: [
+    &quot;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&quot;,
+    &quot;rpc:/ttn.lorawan.v3.NsGs/ScheduleDownlink:01D7KWB0W84AJ1P5A3AQV6R4J7&quot;
+  ]
+}
+{
+  &quot;name&quot;: &quot;gs.up.forward&quot;, // Gateway Server forwarded join-request to the Network Server.
+  &quot;time&quot;: &quot;2019-04-04T09:54:35.991226Z&quot;,
+  &quot;identifiers&quot;: [
+    {
+      &quot;gateway_ids&quot;: {
+        &quot;gateway_id&quot;: &quot;multitech&quot;,
+        &quot;eui&quot;: &quot;00800000A0000DB4&quot;
+      }
+    }
+  ],
+  &quot;correlation_ids&quot;: [
+    &quot;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&quot;,
+    &quot;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&quot;
+  ]
+}
+</code></pre>
+<div class="edit-meta">
+Last updated on 26 Aug 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/events/_index.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.2.0/guides/getting-started/webhooks/" title="HTTP Webhooks"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - HTTP Webhooks</a>
+<a class="nav nav-next" href="/v3.2.0/guides/downlink-queue-ops/" title="Downlink Queue Operations">Next - Downlink Queue Operations <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.2.0">Home</a></li>
+
+<li class="parent"><a href="/v3.2.0/guides/">Guides</a>
+<ul class="sub-menu">
+
+<li class=""><a href="/v3.2.0/guides/getting-started/">Getting Started</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class="parent active"><a href="/v3.2.0/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.2.0/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/components/">Components</a>
+</li>
+
+<li class=""><a href="/v3.2.0/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/v3.2.0/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

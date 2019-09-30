@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Overriding Templates - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.58.1" />
+<link href="https://thethingsstack.io/v3.2.0index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.2.0/reference/email-templates/overriding/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.0/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.0/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.0/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.0/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.2.0</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.2.0/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.2.0/guides/">Guides</a></li>
+<li><a href="/v3.2.0/concepts/">Concepts</a></li>
+<li><a href="/v3.2.0/components/">Components</a></li>
+<li><a href="/v3.2.0/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Overriding Templates</h1>
+
+<blockquote>
+<p>Note: We recommend getting familiar with the <a href="https://golang.org/pkg/html/template/">html/template</a> template format first.</p>
+</blockquote>
+
+<h2 id="template-components">Template components</h2>
+
+<p>An email template override has three components:</p>
+
+<ol>
+<li>The subject file, which contains the subject of the email and is named <code>&lt;identifier&gt;.subject.txt</code>.</li>
+<li>The text contents file, which contains the contents of the email in text format and is named <code>&lt;identifier&gt;.txt</code>.</li>
+<li>The HTML contents file, which contains the contents of the email in HTML format and is named <code>&lt;identifier&gt;.html</code>.</li>
+</ol>
+
+<h2 id="creating-the-overrides">Creating the overrides</h2>
+
+<p>In order to override a template, one must provide all three files as part of the email templates repository and then provide them as part of the configuration.</p>
+
+<p>Let&rsquo;s consider that we want to override the email that a user receives once they register, the email validation email, which has the identifier <code>validate</code>. We need to create the following files:</p>
+
+<ul>
+<li><p><code>validate.subject.txt</code></p>
+
+<pre><code class="language-text">Please confirm your email address for {{.Network.Name}}
+</code></pre></li>
+
+<li><p><code>validate.txt</code></p>
+
+<pre><code class="language-text">Please confirm your email address for {{.Network.Name}}.
+Your email address will be used as contact for {{.Entity.Type}} &quot;{{.Entity.ID}}&quot;. 
+
+Reference: {{.ID}}
+Confirmation Token: {{.Token}}
+</code></pre></li>
+
+<li><p><code>validate.html</code></p>
+
+<pre><code class="language-html">Please confirm your email address for {{.Network.Name}}. &lt;br&gt; 
+Your email address will be used as contact for {{.Entity.Type}} &quot;{{.Entity.ID}}&quot;. &lt;br&gt; &lt;br&gt; 
+
+Reference: {{.ID}} &lt;br&gt; 
+Confirmation Token: {{.Token}}
+</code></pre></li>
+</ul>
+
+<h2 id="providing-the-overrides-to-the-stack">Providing the overrides to the stack</h2>
+
+<p>Once you have written your overrides, you can provide them to the stack either through an remote URL, or through the local file system.</p>
+
+<h3 id="fetching-from-a-remote-url">Fetching from a remote URL</h3>
+
+<p>In order to allow The Things Stack to access remote files, you must only provide the URL to the root folder that contains the files. Consider that you need to provide the The Things Stack access to a file called <code>validate.txt</code>, which you have uploaded on your host at <code>http://www.example.org/emails/validate.txt</code>. Then the URL that you provide to the email templates configuration is <code>http://www.example.org/emails/</code>.</p>
+
+<h3 id="fetching-from-a-local-directory">Fetching from a local directory</h3>
+
+<p>In order to allow the The Things Stack to access files which are hosted in your own file system, you must provide the path to the root folder that contains the files. Consider that you need to provide the The Things Stack access to a file called <code>validate.txt</code>, which is available on your file system in the <code>/srv/emails/validate.txt</code>. Then the path that you need to provide to the email templates configuration is <code>/srv/emails/</code>.</p>
+
+<h3 id="example-yaml-configuration">Example YAML configuration</h3>
+
+<pre><code class="language-yaml">is:
+  email:
+    templates:
+      # Specify only one source for the files.
+      directory: &quot;/path/to/the/template/files&quot;
+      url: &quot;http://www.example.com/emails&quot;
+</code></pre>
+<div class="edit-meta">
+Last updated on 4 Sep 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/email-templates/overriding.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.2.0/reference/email-templates/available/" title="Available Templates"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - Available Templates</a>
+<a class="nav nav-next" href="/v3.2.0/reference/email-templates/available/" title="Available Templates">Next - Available Templates <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.2.0">Home</a></li>
+
+<li class=""><a href="/v3.2.0/guides/">Guides</a>
+<ul class="">
+
+<li class=""><a href="/v3.2.0/guides/getting-started/">Getting Started</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.2.0/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.2.0/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.2.0/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.0/components/">Components</a>
+</li>
+
+<li class="parent"><a href="/v3.2.0/reference/">Reference</a>
+<ul class="sub-menu">
+
+<li class=""><a href="/v3.2.0/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.0/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.2.0/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class="parent"><a href="/v3.2.0/reference/email-templates/">Email Templates</a>
+<ul class="sub-menu">
+<li class=""><a href="/v3.2.0/reference/email-templates/available/">Available Templates</a></li>
+<li class="active"><a href="/v3.2.0/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>
