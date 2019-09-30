@@ -18,11 +18,13 @@ import (
 	"bufio"
 	"context"
 	"encoding/hex"
+	"fmt"
 	stdio "io"
 	"os"
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	qrcodegen "github.com/skip2/go-qrcode"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
@@ -30,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/qrcode"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -86,6 +89,8 @@ var (
 	errInvalidPHYVerson             = errors.DefineInvalidArgument("phy_version", "LoRaWAN PHY version is invalid")
 	errNoEndDeviceEUI               = errors.DefineInvalidArgument("no_end_device_eui", "no end device EUIs set")
 	errNoEndDeviceID                = errors.DefineInvalidArgument("no_end_device_id", "no end device ID set")
+	errQRCodeFormat                 = errors.DefineInvalidArgument("qr_code_format", "invalid QR code format")
+	errNoQRCodeTarget               = errors.DefineInvalidArgument("no_qr_code_target", "no QR code target specified")
 )
 
 func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttnpb.EndDeviceIdentifiers, error) {
@@ -825,6 +830,80 @@ values will be stored in the Join Server.`,
 			return io.Write(os.Stdout, config.OutputFormat, ids)
 		},
 	}
+	endDevicesGenerateQRCommand = &cobra.Command{
+		Use:     "generate-qr [application-id] [device-id]",
+		Aliases: []string{"genqr"},
+		Short:   "Generate an end device QR code (EXPERIMENTAL)",
+		Long:    `Generate an end device QR code (EXPERIMENTAL)`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			isPaths := []string{"join_server_address"}
+			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
+			dev, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: *devID,
+				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
+			})
+			if err != nil {
+				return err
+			}
+
+			_, _, jsMismatch := compareServerAddressesEndDevice(dev, config)
+			if jsMismatch {
+				return errAddressMismatchEndDevice
+			}
+
+			jsPaths := []string{"ids", "claim_authentication_code"}
+			jsDev, err := getEndDevice(dev.EndDeviceIdentifiers, nil, nil, jsPaths, true)
+			if err != nil {
+				return err
+			}
+
+			var data qrcode.EndDeviceData
+			switch format, _ := cmd.Flags().GetString("format"); strings.ToLower(format) {
+			case "tr005draft2":
+				data = &qrcode.LoRaAllianceTR005Draft2{}
+			default:
+				return errQRCodeFormat
+			}
+			if err := data.Encode(jsDev); err != nil {
+				return err
+			}
+
+			buf, err := data.MarshalText()
+			if err != nil {
+				return err
+			}
+			qr, err := qrcodegen.New(string(buf), qrcodegen.Medium)
+			if err != nil {
+				return err
+			}
+
+			file, _ := cmd.Flags().GetString("file")
+			print, _ := cmd.Flags().GetBool("print")
+			if file == "" && !print {
+				return errNoQRCodeTarget
+			}
+			if file != "" {
+				size, _ := cmd.Flags().GetInt("size")
+				if err := qr.WriteFile(size, file); err != nil {
+					return err
+				}
+			}
+			if print {
+				fmt.Println(qr.ToSmallString(false))
+			}
+
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -894,6 +973,12 @@ func init() {
 	endDevicesClaimCommand.Flags().String("target-application-server-id", "", "")
 	endDevicesClaimCommand.Flags().Bool("invalidate-authentication-code", true, "invalidate the claim authentication code to block subsequent claiming attempts")
 	endDevicesCommand.AddCommand(endDevicesClaimCommand)
+	endDevicesGenerateQRCommand.Flags().AddFlagSet(endDeviceIDFlags())
+	endDevicesGenerateQRCommand.Flags().String("format", "tr005draft2", "format (tr005draft2)")
+	endDevicesGenerateQRCommand.Flags().Int("size", 300, "")
+	endDevicesGenerateQRCommand.Flags().String("file", "", "file to write QR code in PNG format")
+	endDevicesGenerateQRCommand.Flags().Bool("print", false, "print QR code as text")
+	endDevicesCommand.AddCommand(endDevicesGenerateQRCommand)
 
 	endDevicesCommand.AddCommand(applicationsDownlinkCommand)
 
@@ -904,7 +989,7 @@ func init() {
 	endDeviceTemplatesExecuteCommand.Flags().AddFlagSet(setEndDeviceFlags)
 }
 
-var errAddressMismatchEndDevice = errors.DefineAborted("end_device_server_address_mismatch", "network/application/join server address mismatch")
+var errAddressMismatchEndDevice = errors.DefineAborted("end_device_server_address_mismatch", "Network/Application/Join Server address mismatch")
 
 func compareServerAddressesEndDevice(device *ttnpb.EndDevice, config *Config) (nsMismatch, asMismatch, jsMismatch bool) {
 	nsHost, asHost, jsHost := getHost(config.NetworkServerGRPCAddress), getHost(config.ApplicationServerGRPCAddress), getHost(config.JoinServerGRPCAddress)
