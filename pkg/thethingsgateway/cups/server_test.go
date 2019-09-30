@@ -24,8 +24,8 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -149,7 +149,7 @@ func TestServer(t *testing.T) {
 				tt.StoreSetup(store)
 			}
 
-			s := NewServer(component.MustNew(test.GetLogger(t), &component.Config{}), append([]Option{
+			s := NewServer(componenttest.NewComponent(t, &component.Config{}), append([]Option{
 				WithRegistry(store),
 				WithDefaultFirmwareURL(testFirmwarePath),
 				WithDefaultUpdateChannel(testUpdateChannel),

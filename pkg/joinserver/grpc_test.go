@@ -19,6 +19,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -82,11 +83,11 @@ func TestGetJoinEUIPrefixes(t *testing.T) {
 			a := assertions.New(t)
 
 			js := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					JoinEUIPrefixes: tc.JoinEUIPrefixes,
 				})).(*JoinServer)
-			test.Must(nil, js.Start())
+			componenttest.StartComponent(t, js.Component)
 			defer js.Close()
 
 			resp, err := ttnpb.NewJsClient(js.LoopbackConn()).GetJoinEUIPrefixes(test.Context(), ttnpb.Empty)

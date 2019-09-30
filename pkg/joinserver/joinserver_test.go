@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -70,7 +71,7 @@ func TestHandleJoin(t *testing.T) {
 	devReg := &redis.DeviceRegistry{Redis: redisClient}
 	keyReg := &redis.KeyRegistry{Redis: redisClient}
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{})
+	c := componenttest.NewComponent(t, &component.Config{})
 	js := test.Must(New(
 		c,
 		&Config{
@@ -79,7 +80,7 @@ func TestHandleJoin(t *testing.T) {
 			JoinEUIPrefixes: joinEUIPrefixes,
 		},
 	)).(*JoinServer)
-	test.Must(nil, c.Start())
+	componenttest.StartComponent(t, c)
 
 	{
 		ctx := clusterauth.NewContext(ctx, nil)
@@ -1628,7 +1629,7 @@ func TestHandleJoin(t *testing.T) {
 			devReg := &redis.DeviceRegistry{Redis: redisClient}
 			keyReg := &redis.KeyRegistry{Redis: redisClient}
 
-			c := component.MustNew(test.GetLogger(t), &component.Config{
+			c := componenttest.NewComponent(t, &component.Config{
 				ServiceBase: config.ServiceBase{
 					KeyVault: config.KeyVault{
 						Static: tc.KeyVault,
@@ -1643,7 +1644,7 @@ func TestHandleJoin(t *testing.T) {
 					JoinEUIPrefixes: joinEUIPrefixes,
 				},
 			)).(*JoinServer)
-			test.Must(nil, c.Start())
+			componenttest.StartComponent(t, c)
 
 			pb := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
@@ -1928,7 +1929,7 @@ func TestGetNwkSKeys(t *testing.T) {
 			a := assertions.New(t)
 			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
 
-			c := component.MustNew(test.GetLogger(t), &component.Config{})
+			c := componenttest.NewComponent(t, &component.Config{})
 			js := test.Must(New(
 				c,
 				&Config{
@@ -1936,7 +1937,7 @@ func TestGetNwkSKeys(t *testing.T) {
 					Devices: &MockDeviceRegistry{},
 				},
 			)).(*JoinServer)
-			test.Must(nil, c.Start())
+			componenttest.StartComponent(t, c)
 			res, err := js.GetNwkSKeys(ctx, tc.KeyRequest)
 
 			if tc.ErrorAssertion != nil {
@@ -2192,7 +2193,7 @@ func TestGetAppSKey(t *testing.T) {
 			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
 
 			js := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Keys:    &MockKeyRegistry{GetByIDFunc: tc.GetKeyByID},
 					Devices: &MockDeviceRegistry{GetByEUIFunc: tc.GetDeviceByEUI},
@@ -2279,7 +2280,7 @@ func TestGetHomeNetID(t *testing.T) {
 			ctx := test.ContextWithT(tc.ContextFunc(ctx), t)
 
 			js := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						GetByEUIFunc: tc.GetByEUI,

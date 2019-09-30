@@ -26,6 +26,7 @@ import (
 	. "go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -212,7 +213,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			var getCalls uint64
 
 			as := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{
+				componenttest.NewComponent(t, &component.Config{
 					ServiceBase: config.ServiceBase{
 						KeyVault: config.KeyVault{
 							Static: registeredKEKs,
@@ -238,7 +239,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			as.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, as.Start())
+			componenttest.StartComponent(t, as.Component)
 			defer as.Close()
 
 			ctx := as.FillContext(test.Context())
@@ -436,7 +437,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 			var setCalls uint64
 
-			as := test.Must(New(component.MustNew(test.GetLogger(t), &component.Config{}),
+			as := test.Must(New(componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					LinkMode: "explicit",
 					Devices: &MockDeviceRegistry{
@@ -456,7 +457,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			as.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, as.Start())
+			componenttest.StartComponent(t, as.Component)
 			defer as.Close()
 
 			ctx := as.FillContext(test.Context())
@@ -594,7 +595,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 			var setCalls uint64
 
-			as := test.Must(New(component.MustNew(test.GetLogger(t), &component.Config{}),
+			as := test.Must(New(componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					LinkMode: "explicit",
 					Devices: &MockDeviceRegistry{
@@ -614,7 +615,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			as.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, as.Start())
+			componenttest.StartComponent(t, as.Component)
 			defer as.Close()
 
 			ctx := as.FillContext(test.Context())

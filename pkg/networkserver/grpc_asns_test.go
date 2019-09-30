@@ -25,6 +25,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
@@ -714,7 +715,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			var addCalls, setByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -742,7 +743,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, ns.Start())
+			componenttest.StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
@@ -1393,7 +1394,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			var addCalls, setByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -1421,8 +1422,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, ns.Start())
-			defer ns.Close()
+			componenttest.StartComponent(t, ns.Component)
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
 
@@ -1572,7 +1572,7 @@ func TestDownlinkQueueList(t *testing.T) {
 			var getByIDCalls uint64
 
 			ns := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
@@ -1596,7 +1596,7 @@ func TestDownlinkQueueList(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, ns.Start())
+			componenttest.StartComponent(t, ns.Component)
 			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)

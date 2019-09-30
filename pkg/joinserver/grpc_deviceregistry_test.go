@@ -25,6 +25,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
@@ -296,7 +297,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			var getByIDCalls uint64
 
 			js := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
@@ -317,7 +318,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			js.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, js.Start())
+			componenttest.StartComponent(t, js.Component)
 			defer js.Close()
 
 			ctx := js.FillContext(test.Context())
@@ -628,7 +629,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			var setByIDCalls uint64
 
 			js := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -649,7 +650,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			js.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, js.Start())
+			componenttest.StartComponent(t, js.Component)
 			defer js.Close()
 
 			ctx := js.FillContext(test.Context())
@@ -837,7 +838,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			var setByIDCalls uint64
 
 			js := test.Must(New(
-				component.MustNew(test.GetLogger(t), &component.Config{}),
+				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -858,7 +859,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			js.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			test.Must(nil, js.Start())
+			componenttest.StartComponent(t, js.Component)
 			defer js.Close()
 
 			ctx := js.FillContext(test.Context())

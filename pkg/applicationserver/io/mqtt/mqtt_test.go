@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
 	. "go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -58,7 +59,7 @@ func TestAuthentication(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -69,7 +70,7 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
-	test.Must(nil, c.Start())
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
@@ -131,7 +132,7 @@ func TestTraffic(t *testing.T) {
 	is, isAddr := startMockIS(ctx)
 	is.add(ctx, registeredApplicationID, registeredApplicationKey)
 
-	c := component.MustNew(test.GetLogger(t), &component.Config{
+	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
@@ -142,7 +143,7 @@ func TestTraffic(t *testing.T) {
 			},
 		},
 	})
-	test.Must(nil, c.Start())
+	componenttest.StartComponent(t, c)
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)

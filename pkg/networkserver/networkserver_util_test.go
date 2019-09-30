@@ -26,6 +26,7 @@ import (
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -1203,9 +1204,8 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplicati
 		closeFuncs = append(closeFuncs, closeM)
 	}
 
-	if err := ns.Start(); err != nil {
-		t.Fatalf("Failed to start Network Server: %s", err)
-	}
+	componenttest.StartComponent(t, ns.Component)
+
 	return ns, ctx, env, func() {
 		cancel()
 		for _, f := range closeFuncs {
