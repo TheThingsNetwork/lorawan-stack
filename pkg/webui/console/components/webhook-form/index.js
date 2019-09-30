@@ -36,17 +36,8 @@ const pathPlaceholder = '/path/to/webhook'
 
 const m = defineMessages({
   idPlaceholder: 'my-new-webhook',
-  messageTypes: 'Message types',
   messageInfo:
     'For each enabled message type, you can set an optional path that will be appended to the base URL.',
-  uplinkMessage: 'Uplink Message',
-  joinAccept: 'Join Accept',
-  downlinkAck: 'Downlink Ack',
-  downlinkNack: 'Downlink Nack',
-  downlinkSent: 'Downlink Sent',
-  downlinkFailed: 'Downlink Failed',
-  downlinkQueued: 'Downlink Queued',
-  locationSolved: 'Location Solved',
   deleteWebhook: 'Delete Webhook',
   modalWarning:
     'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone!',
@@ -160,61 +151,61 @@ export default class WebhookForm extends Component {
           component={Input}
           required
         />
-        <Message component="h4" content={m.messageTypes} />
+        <Message component="h4" content={sharedMessages.messageTypes} />
         <Notification info={m.messageInfo} small />
         <Form.Field
           name="uplink_message"
           type="toggled-input"
-          title={m.uplinkMessage}
+          title={sharedMessages.uplinkMessage}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
         <Form.Field
           name="join_accept"
           type="toggled-input"
-          title={m.joinAccept}
+          title={sharedMessages.joinAccept}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
         <Form.Field
           name="downlink_ack"
           type="toggled-input"
-          title={m.downlinkAck}
+          title={sharedMessages.downlinkAck}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
         <Form.Field
           name="downlink_nack"
           type="toggled-input"
-          title={m.downlinkNack}
+          title={sharedMessages.downlinkNack}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
         <Form.Field
           name="downlink_sent"
           type="toggled-input"
-          title={m.downlinkSent}
+          title={sharedMessages.downlinkSent}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
         <Form.Field
           name="downlink_failed"
           type="toggled-input"
-          title={m.downlinkFailed}
+          title={sharedMessages.downlinkFailed}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
         <Form.Field
           name="downlink_queued"
           type="toggled-input"
-          title={m.downlinkQueued}
+          title={sharedMessages.downlinkQueued}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
         <Form.Field
           name="location_solved"
           type="toggled-input"
-          title={m.locationSolved}
+          title={sharedMessages.locationSolved}
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />

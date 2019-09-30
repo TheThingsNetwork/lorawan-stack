@@ -95,6 +95,34 @@ PropTypes.application = PropTypes.shape({
   updated_at: PropTypes.string.isRequired,
 })
 
+PropTypes.pubsub = PropTypes.shape({
+  ids: PropTypes.shape({
+    pub_sub_id: PropTypes.string.isRequired,
+    application_ids: PropTypes.shape({
+      application_id: PropTypes.string,
+    }),
+  }).isRequired,
+  created_at: PropTypes.string.isRequired,
+  updated_at: PropTypes.string.isRequired,
+  format: PropTypes.string,
+  base_topic: PropTypes.string,
+  nats: PropTypes.shape({
+    server_url: PropTypes.string,
+  }),
+  mqtt: PropTypes.shape({
+    server_url: PropTypes.string,
+    client_id: PropTypes.string,
+    username: PropTypes.string,
+    password: PropTypes.string,
+    subscribe_qos: PropTypes.string,
+    publish_qos: PropTypes.string,
+    use_tls: PropTypes.bool,
+    tls_ca: PropTypes.string,
+    tls_client_cert: PropTypes.string,
+    tls_client_key: PropTypes.string,
+  }),
+})
+
 PropTypes.user = PropTypes.shape({
   ids: PropTypes.shape({
     user_id: PropTypes.string.isRequired,

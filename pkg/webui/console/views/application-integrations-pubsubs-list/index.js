@@ -15,14 +15,14 @@
 import React, { Component } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import WebhooksTable from '../../containers/webhooks-table'
+import PubsubsTable from '../../containers/pubsubs-table'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-export default class ApplicationIntegrationsList extends Component {
+export default class ApplicationPubsubsList extends Component {
   render() {
     const { appId } = this.props.match.params
 
@@ -31,7 +31,7 @@ export default class ApplicationIntegrationsList extends Component {
         <Row>
           <IntlHelmet title={sharedMessages.integrations} />
           <Col>
-            <WebhooksTable pageSize={PAGE_SIZES.REGULAR} appId={appId} />
+            <PubsubsTable pageSize={PAGE_SIZES.REGULAR} appId={appId} />
           </Col>
         </Row>
       </Container>

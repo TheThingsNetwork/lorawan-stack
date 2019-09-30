@@ -19,36 +19,38 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { replace } from 'connected-react-router'
 
+import PropTypes from '../../../lib/prop-types'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
-import WebhookForm from '../../components/webhook-form'
+import PubsubForm from '../../components/pubsub-form'
 import toast from '../../../components/toast'
 import diff from '../../../lib/diff'
 import sharedMessages from '../../../lib/shared-messages'
 import withRequest from '../../../lib/components/with-request'
 
 import {
-  selectSelectedWebhook,
-  selectWebhookFetching,
-  selectWebhookError,
-} from '../../store/selectors/webhook'
+  selectSelectedPubsub,
+  selectPubsubFetching,
+  selectPubsubError,
+} from '../../store/selectors/pubsub'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { getWebhook } from '../../store/actions/webhook'
+import { getPubsub } from '../../store/actions/pubsub'
 
 import api from '../../api'
 
 const m = defineMessages({
-  editWebhook: 'Edit Webhook',
-  updateSuccess: 'Successfully updated webhook',
-  deleteSuccess: 'Successfully deleted webhook',
+  editPubsub: 'Edit PubSub',
+  updateSuccess: 'Successfully updated PubSub',
+  deleteSuccess: 'Successfully deleted PubSub',
 })
 
-const webhookEntitySelector = [
-  'base_url',
+const pubsubEntitySelector = [
+  'base_topic',
   'format',
-  'headers',
+  'provider.nats',
+  'provider.mqtt',
   'uplink_message',
   'join_accept',
   'downlink_ack',
@@ -62,50 +64,54 @@ const webhookEntitySelector = [
 @connect(
   state => ({
     appId: selectSelectedApplicationId(state),
-    webhook: selectSelectedWebhook(state),
-    fetching: selectWebhookFetching(state),
-    error: selectWebhookError(state),
+    pubsub: selectSelectedPubsub(state),
+    fetching: selectPubsubFetching(state),
+    error: selectPubsubError(state),
   }),
   function(dispatch, { match }) {
-    const { appId, webhookId } = match.params
+    const { appId, pubsubId } = match.params
     return {
-      getWebhook: () => dispatch(getWebhook(appId, webhookId, webhookEntitySelector)),
-      navigateToList: () => dispatch(replace(`/applications/${appId}/integrations`)),
+      getPubsub: () => dispatch(getPubsub(appId, pubsubId, pubsubEntitySelector)),
+      navigateToList: () => dispatch(replace(`/applications/${appId}/integrations/pubsubs`)),
     }
   },
 )
-@withRequest(
-  ({ getWebhook }) => getWebhook(),
-  ({ fetching, webhook }) => fetching || !Boolean(webhook),
-)
+@withRequest(({ getPubsub }) => getPubsub(), ({ fetching, pubsub }) => fetching || !Boolean(pubsub))
 @withBreadcrumb('apps.single.integrations.edit', function(props) {
   const {
     appId,
     match: {
-      params: { webhookId },
+      params: { pubsubId },
     },
   } = props
   return (
     <Breadcrumb
-      path={`/applications/${appId}/integrations/${webhookId}`}
+      path={`/applications/${appId}/integrations/${pubsubId}`}
       icon="general_settings"
       content={sharedMessages.edit}
     />
   )
 })
 @bind
-export default class ApplicationIntegrationEdit extends Component {
-  async handleSubmit(webhook) {
+export default class ApplicationPubsubEdit extends Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    match: PropTypes.match.isRequired,
+    navigateToList: PropTypes.func.isRequired,
+    pubsub: PropTypes.pubsub.isRequired,
+  }
+
+  async handleSubmit(pubsub) {
     const {
       appId,
       match: {
-        params: { webhookId },
+        params: { pubsubId },
       },
-      webhook: originalWebhook,
+      pubsub: originalPubsub,
     } = this.props
-    const patch = diff(originalWebhook, webhook, ['ids'])
+    const patch = diff(originalPubsub, pubsub, ['ids'])
 
-    await api.application.webhooks.update(appId, webhookId, patch)
+    await api.application.pubsubs.update(appId, pubsubId, patch)
   }
 
   handleSubmitSuccess() {
@@ -119,11 +125,11 @@ export default class ApplicationIntegrationEdit extends Component {
     const {
       appId,
       match: {
-        params: { webhookId },
+        params: { pubsubId },
       },
     } = this.props
 
-    await api.application.webhooks.delete(appId, webhookId)
+    await api.application.pubsubs.delete(appId, pubsubId)
   }
 
   async handleDeleteSuccess() {
@@ -138,22 +144,22 @@ export default class ApplicationIntegrationEdit extends Component {
   }
 
   render() {
-    const { webhook, appId } = this.props
+    const { pubsub, appId } = this.props
 
     return (
       <Container>
         <Row>
           <Col>
-            <IntlHelmet title={m.editWebhook} />
-            <Message component="h2" content={sharedMessages.editWebhook} />
+            <IntlHelmet title={m.editPubsub} />
+            <Message component="h2" content={m.editPubsub} />
           </Col>
         </Row>
         <Row>
           <Col lg={8} md={12}>
-            <WebhookForm
+            <PubsubForm
               update
               appId={appId}
-              initialWebhookValue={webhook}
+              initialPubsubValue={pubsub}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
               onDelete={this.handleDelete}
