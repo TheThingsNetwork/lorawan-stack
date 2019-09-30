@@ -128,13 +128,13 @@ export default class CollaboratorForm extends Component {
   }
 
   computeInitialValues() {
-    const { collaborator } = this.props
+    const { collaborator, pseudoRights } = this.props
 
     if (!collaborator) {
       return {
         collaborator_id: '',
         collaborator_type: 'user',
-        rights: [],
+        rights: [...pseudoRights],
       }
     }
 
