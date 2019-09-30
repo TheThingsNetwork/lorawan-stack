@@ -92,7 +92,7 @@ class EditForm extends React.Component {
   }
 
   render() {
-    const { rights, apiKey, onEditFailure, universalRights } = this.props
+    const { rights, apiKey, onEditFailure, pseudoRights } = this.props
     const { error } = this.state
 
     const initialValues = {
@@ -126,7 +126,7 @@ class EditForm extends React.Component {
           required
           component={RightsGroup}
           rights={rights}
-          universalRight={universalRights[0]}
+          pseudoRight={pseudoRights[0]}
         />
         <SubmitBar>
           <FormSubmit component={SubmitButton} message={sharedMessages.saveChanges} />
@@ -162,7 +162,7 @@ EditForm.propTypes = {
   /**
    * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL'
    */
-  universalRights: PropTypes.arrayOf(PropTypes.string),
+  pseudoRights: PropTypes.arrayOf(PropTypes.string),
   /**
    * Called on form submission.
    * Receives the updated key object as an argument.
@@ -201,7 +201,7 @@ EditForm.defaultProps = {
   onEditFailure: () => null,
   onDeleteSuccess: () => null,
   onDeleteFailure: () => null,
-  universalRights: [],
+  pseudoRights: [],
 }
 
 export default EditForm

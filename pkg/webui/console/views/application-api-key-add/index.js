@@ -30,7 +30,7 @@ import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
-  selectApplicationUniversalRights,
+  selectApplicationPseudoRights,
   selectApplicationRightsError,
   selectApplicationRightsFetching,
 } from '../../store/selectors/applications'
@@ -43,7 +43,7 @@ import api from '../../api'
     fetching: selectApplicationRightsFetching(state),
     error: selectApplicationRightsError(state),
     rights: selectApplicationRights(state),
-    universalRights: selectApplicationUniversalRights(state),
+    pseudoRights: selectApplicationPseudoRights(state),
   }),
   dispatch => ({
     getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
@@ -79,7 +79,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
   }
 
   render() {
-    const { rights, universalRights } = this.props
+    const { rights, pseudoRights } = this.props
 
     return (
       <Container>
@@ -93,7 +93,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
           <Col lg={8} md={12}>
             <ApiKeyCreateForm
               rights={rights}
-              universalRights={universalRights}
+              pseudoRights={pseudoRights}
               onCreate={this.createApplicationKey}
               onCreateSuccess={this.handleApprove}
             />

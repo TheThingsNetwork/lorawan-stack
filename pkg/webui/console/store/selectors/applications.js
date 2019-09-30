@@ -31,7 +31,7 @@ import {
   createEventsErrorSelector,
   createEventsStatusSelector,
 } from './events'
-import { createRightsSelector, createUniversalRightsSelector } from './rights'
+import { createRightsSelector, createPseudoRightsSelector } from './rights'
 import {
   createUserCollaboratorSelector,
   createOrganizationCollaboratorSelector,
@@ -74,7 +74,7 @@ export const selectApplicationEventsStatus = createEventsStatusSelector(ENTITY)
 
 // Rights
 export const selectApplicationRights = createRightsSelector(ENTITY)
-export const selectApplicationUniversalRights = createUniversalRightsSelector(ENTITY)
+export const selectApplicationPseudoRights = createPseudoRightsSelector(ENTITY)
 export const selectApplicationRightsError = createErrorSelector(GET_APPS_RIGHTS_LIST_BASE)
 export const selectApplicationRightsFetching = createFetchingSelector(GET_APPS_RIGHTS_LIST_BASE)
 

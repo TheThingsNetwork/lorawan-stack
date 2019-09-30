@@ -30,7 +30,7 @@ import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
-  selectApplicationUniversalRights,
+  selectApplicationPseudoRights,
   selectApplicationRightsFetching,
   selectApplicationRightsError,
 } from '../../store/selectors/applications'
@@ -43,7 +43,7 @@ import api from '../../api'
       appId: selectSelectedApplicationId(state),
       collaborators: state.collaborators.applications.collaborators,
       rights: selectApplicationRights(state),
-      universalRights: selectApplicationUniversalRights(state),
+      pseudoRights: selectApplicationPseudoRights(state),
       fetching: selectApplicationRightsFetching(state),
       error: selectApplicationRightsError(state),
     }
@@ -87,7 +87,7 @@ export default class ApplicationCollaboratorAdd extends React.Component {
   }
 
   render() {
-    const { rights, universalRights, redirectToList } = this.props
+    const { rights, pseudoRights, redirectToList } = this.props
 
     return (
       <Container>
@@ -103,7 +103,7 @@ export default class ApplicationCollaboratorAdd extends React.Component {
               error={this.state.error}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={redirectToList}
-              universalRights={universalRights}
+              pseudoRights={pseudoRights}
               rights={rights}
             />
           </Col>

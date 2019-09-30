@@ -146,7 +146,7 @@ export default class CollaboratorForm extends Component {
   }
 
   render() {
-    const { collaborator, rights, universalRights, error: passedError, update } = this.props
+    const { collaborator, rights, pseudoRights, error: passedError, update } = this.props
 
     const { error: submitError } = this.state
 
@@ -190,8 +190,7 @@ export default class CollaboratorForm extends Component {
           strict
           component={RightsGroup}
           rights={rights}
-          universalRight={universalRights[0]}
-          disabled={hasRightAll}
+          pseudoRight={pseudoRights[0]}
         />
         <SubmitBar>
           <Form.Submit

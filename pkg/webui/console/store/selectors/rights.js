@@ -23,7 +23,7 @@ export const createRightsSelector = entity =>
     return store.rights.filter(right => !right.endsWith('_ALL'))
   }
 
-export const createUniversalRightsSelector = entity =>
+export const createPseudoRightsSelector = entity =>
   function(state) {
     const store = selectRightsStore(state, entity)
 
