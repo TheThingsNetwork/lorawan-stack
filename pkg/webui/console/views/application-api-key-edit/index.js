@@ -30,7 +30,7 @@ import { getApplicationApiKey, getApplicationsRightsList } from '../../store/act
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
-  selectApplicationUniversalRights,
+  selectApplicationPseudoRights,
   selectApplicationRightsError,
   selectApplicationRightsFetching,
   selectApplicationApiKey,
@@ -54,7 +54,7 @@ import api from '../../api'
       appId: selectSelectedApplicationId(state),
       apiKey: selectApplicationApiKey(state),
       rights: selectApplicationRights(state),
-      universalRights: selectApplicationUniversalRights(state),
+      pseudoRights: selectApplicationPseudoRights(state),
       fetching: keyFetching || rightsFetching,
       error: keyError || rightsError,
     }
@@ -98,7 +98,7 @@ export default class ApplicationApiKeyEdit extends React.Component {
   }
 
   render() {
-    const { apiKey, rights, universalRights } = this.props
+    const { apiKey, rights, pseudoRights } = this.props
 
     return (
       <Container>
@@ -112,7 +112,7 @@ export default class ApplicationApiKeyEdit extends React.Component {
           <Col lg={8} md={12}>
             <ApiKeyEditForm
               rights={rights}
-              universalRights={universalRights}
+              pseudoRights={pseudoRights}
               apiKey={apiKey}
               onEdit={this.editApplicationKey}
               onDelete={this.deleteApplicationKey}

@@ -31,7 +31,7 @@ const m = defineMessages({
   selectAll: 'Select All',
   outOfOwnScopeRights:
     'This {entityType} has more rights than you have. These rights can not be modified.',
-  outOfOwnScopeUniversalRight:
+  outOfOwnScopePseudoRight:
     "This {entityType} has a wildcard right that you don't have. The {entityType} can therefore only be removed entirely.",
   grantType: 'Grant type',
   allCurrentAndFutureRights: 'Grant all current and future rights',
@@ -39,45 +39,44 @@ const m = defineMessages({
 })
 
 const computeProps = function(props) {
-  const { value, universalRight: grantableUniversalRight, rights: grantableRights } = props
+  const { value, pseudoRight: grantablePseudoRight, rights: grantableRights } = props
 
-  // Extract the universal right from own rights or granted rights
-  const derivedUniversalRight =
-    grantableUniversalRight || value.find(right => right !== RIGHT_ALL && right.endsWith('_ALL'))
+  // Extract the pseudo right from own rights or granted rights
+  const derivedPseudoRight =
+    grantablePseudoRight || value.find(right => right !== RIGHT_ALL && right.endsWith('_ALL'))
 
   // Filter out rights that the entity has but may not be granted by the user
-  const outOfOwnScopeRights = !Boolean(grantableUniversalRight)
+  const outOfOwnScopeRights = !Boolean(grantablePseudoRight)
     ? value.filter(right => !grantableRights.includes(right))
     : []
 
   // Extract all rights by combining granted and grantable rights
   const derivedRights = [...grantableRights, ...outOfOwnScopeRights].sort()
 
-  // Store whether out of scope universal rights are present
-  const hasOutOfOwnScopeUniversalRight =
+  // Store whether out of scope pseudo rights are present
+  const hasOutOfOwnScopePseudoRight =
     outOfOwnScopeRights.filter(right => right.endsWith('_ALL')).length !== 0
 
   // Store granted individual rights
-  const grantedIndividualRights = value.filter(right => right !== derivedUniversalRight)
+  const grantedIndividualRights = value.filter(right => right !== derivedPseudoRight)
 
   // Store out of own scope individual rights
-  const outOfOwnScopeIndividualRights = !Boolean(grantableUniversalRight)
+  const outOfOwnScopeIndividualRights = !Boolean(grantablePseudoRight)
     ? grantedIndividualRights.filter(right => !grantableRights.includes(right))
     : []
 
-  // Determine whether a universal right is granted
-  const hasUniversalRightGranted =
-    value.includes(RIGHT_ALL) || value.includes(derivedUniversalRight)
+  // Determine whether a pseudo right is granted
+  const hasPseudoRightGranted = value.includes(RIGHT_ALL) || value.includes(derivedPseudoRight)
 
   // Determine the current grant type
-  const grantType = hasUniversalRightGranted ? 'universal' : 'individual'
+  const grantType = hasPseudoRightGranted ? 'pseudo' : 'individual'
 
   return {
     outOfOwnScopeIndividualRights,
-    hasOutOfOwnScopeUniversalRight,
-    derivedUniversalRight,
+    hasOutOfOwnScopePseudoRight,
+    derivedPseudoRight,
     derivedRights,
-    hasUniversalRightGranted,
+    hasPseudoRightGranted,
     grantType,
     ...props,
   }
@@ -92,8 +91,8 @@ class RightsGroup extends React.Component {
     className: PropTypes.string,
     /** The rights derived from the granted and grantable rights **/
     derivedRights: PropTypes.rights.isRequired,
-    /** The universal right derived from the current entity or user **/
-    derivedUniversalRight: PropTypes.string,
+    /** The pseudo right derived from the current entity or user **/
+    derivedPseudoRight: PropTypes.string,
     /** A flag indicating whether the whole component should be disabled **/
     disabled: PropTypes.bool,
     /** The message depicting the type of entity this component is setting the
@@ -101,11 +100,11 @@ class RightsGroup extends React.Component {
      */
     entityTypeMessage: PropTypes.message.isRequired,
     /** The right grant type **/
-    grantType: PropTypes.oneOf(['universal', 'individual']).isRequired,
-    /** Whether the entity has a universal right that the current use does not have **/
-    hasOutOfOwnScopeUniversalRight: PropTypes.bool.isRequired,
-    /** Whether the entity has a universal right granted **/
-    hasUniversalRightGranted: PropTypes.bool.isRequired,
+    grantType: PropTypes.oneOf(['pseudo', 'individual']).isRequired,
+    /** Whether the entity has a pseudo right that the current use does not have **/
+    hasOutOfOwnScopePseudoRight: PropTypes.bool.isRequired,
+    /** Whether the entity has a pseudo right granted **/
+    hasPseudoRightGranted: PropTypes.bool.isRequired,
     /** The intl object provided by injectIntl of react-intl, used to translate
      * messages
      */
@@ -118,8 +117,8 @@ class RightsGroup extends React.Component {
     onChange: PropTypes.func,
     /** A list of rights that are outside the scope of the current user **/
     outOfOwnScopeIndividualRights: PropTypes.rights.isRequired,
-    /** The universal right literal comprising all other rights */
-    universalRight: PropTypes.string,
+    /** The pseudo right literal comprising all other rights */
+    pseudoRight: PropTypes.string,
     /** The rights value */
     value: PropTypes.rights.isRequired,
   }
@@ -129,8 +128,8 @@ class RightsGroup extends React.Component {
     disabled: false,
     onBlur: () => null,
     onChange: () => null,
-    universalRight: undefined,
-    derivedUniversalRight: undefined,
+    pseudoRight: undefined,
+    derivedPseudoRight: undefined,
   }
 
   state = {
@@ -139,11 +138,11 @@ class RightsGroup extends React.Component {
 
   static getDerivedStateFromProps(props, state) {
     const { individualRightValue: oldIndividualRightValue } = state
-    const { value, hasUniversalRightGranted } = props
+    const { value, hasPseudoRightGranted } = props
 
     // Store the individual right values when the grant type is changed to
-    // universal right
-    const individualRightValue = !hasUniversalRightGranted ? value : oldIndividualRightValue
+    // pseudo right
+    const individualRightValue = !hasPseudoRightGranted ? value : oldIndividualRightValue
 
     return { individualRightValue }
   }
@@ -173,11 +172,11 @@ class RightsGroup extends React.Component {
   }
 
   handleGrantTypeChange(val) {
-    const { onChange, universalRight } = this.props
+    const { onChange, pseudoRight } = this.props
     const { individualRightValue } = this.state
 
-    if (val === 'universal') {
-      onChange([universalRight])
+    if (val === 'pseudo') {
+      onChange([pseudoRight])
     } else {
       onChange(individualRightValue)
     }
@@ -191,9 +190,9 @@ class RightsGroup extends React.Component {
       entityTypeMessage,
       onBlur,
       outOfOwnScopeIndividualRights,
-      hasOutOfOwnScopeUniversalRight,
+      hasOutOfOwnScopePseudoRight,
       grantType,
-      derivedUniversalRight,
+      derivedPseudoRight,
       derivedRights,
     } = this.props
     const { individualRightValue } = this.state
@@ -204,7 +203,7 @@ class RightsGroup extends React.Component {
     const allSelected = selectedCheckboxesCount === totalCheckboxesCount
     const indeterminate =
       selectedCheckboxesCount !== 0 && selectedCheckboxesCount !== totalCheckboxesCount
-    const allDisabled = grantType === 'universal' || disabled || hasOutOfOwnScopeUniversalRight
+    const allDisabled = grantType === 'pseudo' || disabled || hasOutOfOwnScopePseudoRight
 
     // Marshal rights to key/value for checkbox group
     const rightsValues = derivedRights.reduce(function(acc, right) {
@@ -225,10 +224,10 @@ class RightsGroup extends React.Component {
 
     return (
       <div className={className}>
-        {hasOutOfOwnScopeUniversalRight && (
+        {hasOutOfOwnScopePseudoRight && (
           <Notification
             small
-            warning={m.outOfOwnScopeUniversalRight}
+            warning={m.outOfOwnScopePseudoRight}
             messageValues={{ entityType: intl.formatMessage(entityTypeMessage).toLowerCase() }}
           />
         )}
@@ -237,15 +236,15 @@ class RightsGroup extends React.Component {
           name="grant_type"
           value={grantType}
           onChange={this.handleGrantTypeChange}
-          disabled={!Boolean(derivedUniversalRight)}
+          disabled={!Boolean(derivedPseudoRight)}
         >
-          <Radio label={m.allCurrentAndFutureRights} value="universal" />
+          <Radio label={m.allCurrentAndFutureRights} value="pseudo" />
           <Radio label={m.selectIndividualRights} value="individual" />
         </Radio.Group>
         <Checkbox
           className={classnames(style.selectAll, style.rightLabel)}
-          name={derivedUniversalRight || 'select-all'}
-          label={derivedUniversalRight ? { id: `enum:${derivedUniversalRight}` } : m.selectAll}
+          name={derivedPseudoRight || 'select-all'}
+          label={derivedPseudoRight ? { id: `enum:${derivedPseudoRight}` } : m.selectAll}
           onChange={this.handleChangeAll}
           indeterminate={indeterminate}
           value={allSelected}
