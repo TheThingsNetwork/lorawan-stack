@@ -22,17 +22,16 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import { withEnv } from '../../../lib/components/env'
 import DeviceDataForm from '../../components/device-data-form'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { getDeviceId } from '../../../lib/selectors/id'
+import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import PropTypes from '../../../lib/prop-types'
 import api from '../../api'
 
 import style from './device-add.styl'
 
-@withEnv
 @withBreadcrumb('devices.add', function(props) {
   const { appId } = props.match.params
   return (
@@ -44,21 +43,23 @@ import style from './device-add.styl'
   )
 })
 @connect(
-  function(state) {
-    return {
-      appId: selectSelectedApplicationId(state),
-    }
-  },
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    asConfig: selectAsConfig(),
+    nsConfig: selectNsConfig(),
+    jsConfig: selectJsConfig(),
+  }),
   dispatch => ({
     redirectToList: (appId, deviceId) =>
       dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
   }),
 )
-@bind
 export default class DeviceAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
-    env: PropTypes.env.isRequired,
+    asConfig: PropTypes.stackComponent.isRequired,
+    jsConfig: PropTypes.stackComponent.isRequired,
+    nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
   }
 
@@ -66,16 +67,17 @@ export default class DeviceAdd extends Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(values) {
     const { appId } = this.props
     const { activation_mode, ...device } = values
 
     return api.device.create(appId, device, {
       abp: values.activation_mode === 'abp',
-      withRootKeys: true,
     })
   }
 
+  @bind
   handleSubmitSuccess(device) {
     const { appId, redirectToList } = this.props
     const deviceId = getDeviceId(device)
@@ -85,14 +87,12 @@ export default class DeviceAdd extends Component {
 
   render() {
     const { error } = this.state
-    const {
-      env: { config },
-    } = this.props
+    const { asConfig, nsConfig, jsConfig } = this.props
 
     const initialValues = {
-      network_server_address: config.ns.enabled ? new URL(config.ns.base_url).hostname : '',
-      application_server_address: config.as.enabled ? new URL(config.as.base_url).hostname : '',
-      join_server_address: config.js.enabled ? new URL(config.js.base_url).hostname : '',
+      network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
+      application_server_address: asConfig.enabled ? new URL(asConfig.base_url).hostname : '',
+      join_server_address: jsConfig.enabled ? new URL(jsConfig.base_url).hostname : '',
     }
 
     return (
@@ -110,6 +110,7 @@ export default class DeviceAdd extends Component {
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
               initialValues={initialValues}
+              jsConfig={jsConfig}
             />
           </Col>
         </Row>

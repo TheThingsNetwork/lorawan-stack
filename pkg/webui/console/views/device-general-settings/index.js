@@ -32,15 +32,15 @@ import { updateDevice } from '../../store/actions/device'
 import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/device'
+import { selectJsConfig } from '../../../lib/selectors/env'
 
 @connect(
-  function(state) {
-    return {
-      device: selectSelectedDevice(state),
-      devId: selectSelectedDeviceId(state),
-      appId: selectSelectedApplicationId(state),
-    }
-  },
+  state => ({
+    device: selectSelectedDevice(state),
+    devId: selectSelectedDeviceId(state),
+    appId: selectSelectedApplicationId(state),
+    jsConfig: selectJsConfig(),
+  }),
   dispatch => ({
     ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
     onDeleteSuccess: appId => dispatch(replace(`/applications/${appId}/devices`)),
@@ -62,11 +62,11 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/select
     />
   )
 })
-@bind
 export default class DeviceGeneralSettings extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     device: PropTypes.device.isRequired,
+    jsConfig: PropTypes.stackComponent.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     updateDevice: PropTypes.func.isRequired,
   }
@@ -75,6 +75,7 @@ export default class DeviceGeneralSettings extends React.Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(values) {
     const { device, appId, updateDevice } = this.props
     const { activation_mode, ...updatedDevice } = values
@@ -87,6 +88,7 @@ export default class DeviceGeneralSettings extends React.Component {
     return updateDevice(appId, deviceId, changed)
   }
 
+  @bind
   async handleDelete() {
     const { appId, device } = this.props
     const {
@@ -97,7 +99,7 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   render() {
-    const { device, onDeleteSuccess } = this.props
+    const { device: initialValues, onDeleteSuccess, jsConfig } = this.props
     const { error } = this.state
 
     return (
@@ -110,7 +112,8 @@ export default class DeviceGeneralSettings extends React.Component {
               onSubmit={this.handleSubmit}
               onDelete={this.handleDelete}
               onDeleteSuccess={onDeleteSuccess}
-              initialValues={device}
+              initialValues={initialValues}
+              jsConfig={jsConfig}
               update
             />
           </Col>

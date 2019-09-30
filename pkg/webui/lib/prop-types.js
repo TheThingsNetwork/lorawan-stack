@@ -101,6 +101,11 @@ PropTypes.user = PropTypes.shape({
   }).isRequired,
 })
 
+PropTypes.stackComponent = PropTypes.shape({
+  enabled: PropTypes.bool.isRequired,
+  base_url: PropTypes.string.isRequired,
+})
+
 PropTypes.env = PropTypes.shape({
   appRoot: PropTypes.string.isRequired,
   assetsRoot: PropTypes.string.isRequired,
@@ -110,26 +115,11 @@ PropTypes.env = PropTypes.shape({
   pageData: PropTypes.shape({}),
   config: PropTypes.shape({
     language: PropTypes.string,
-    is: PropTypes.shape({
-      enabled: PropTypes.bool.isRequired,
-      base_url: PropTypes.string.isRequired,
-    }),
-    as: PropTypes.shape({
-      enabled: PropTypes.bool.isRequired,
-      base_url: PropTypes.string.isRequired,
-    }),
-    ns: PropTypes.shape({
-      enabled: PropTypes.bool.isRequired,
-      base_url: PropTypes.string.isRequired,
-    }),
-    js: PropTypes.shape({
-      enabled: PropTypes.bool.isRequired,
-      base_url: PropTypes.string.isRequired,
-    }),
-    gs: PropTypes.shape({
-      enabled: PropTypes.bool.isRequired,
-      base_url: PropTypes.string.isRequired,
-    }),
+    is: PropTypes.stackComponent,
+    as: PropTypes.stackComponent,
+    ns: PropTypes.stackComponent,
+    js: PropTypes.stackComponent,
+    gs: PropTypes.stackComponent,
   }).isRequired,
 })
 
