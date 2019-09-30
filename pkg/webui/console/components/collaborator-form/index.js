@@ -189,7 +189,7 @@ export default class CollaboratorForm extends Component {
         <SubmitBar>
           <Form.Submit
             component={SubmitButton}
-            message={update ? sharedMessages.saveChanges : sharedMessages.collaboratorAdd}
+            message={update ? sharedMessages.saveChanges : sharedMessages.addCollaborator}
           />
           {update && (
             <ModalButton
