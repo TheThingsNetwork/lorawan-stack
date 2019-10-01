@@ -82,7 +82,9 @@ export default class GatewayAdd extends React.Component {
   render() {
     const { error } = this.state
     const {
-      env: { config },
+      env: {
+        config: { stack },
+      },
     } = this.props
 
     const initialValues = {
@@ -90,7 +92,7 @@ export default class GatewayAdd extends React.Component {
         gateway_id: undefined,
       },
       enforce_duty_cycle: true,
-      gateway_server_address: config.gs.enabled ? new URL(config.gs.base_url).hostname : '',
+      gateway_server_address: stack.gs.enabled ? new URL(stack.gs.base_url).hostname : '',
       frequency_plan_id: undefined,
     }
 

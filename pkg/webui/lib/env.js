@@ -18,11 +18,13 @@ const env = {
   appRoot: envSelector.selectApplicationRootPath(),
   assetsRoot: envSelector.selectAssetsRootPath(),
   config: {
-    as: envSelector.selectAsConfig(),
-    gs: envSelector.selectGsConfig(),
-    is: envSelector.selectIsConfig(),
-    js: envSelector.selectJsConfig(),
-    ns: envSelector.selectNsConfig(),
+    stack: {
+      as: envSelector.selectAsConfig(),
+      gs: envSelector.selectGsConfig(),
+      is: envSelector.selectIsConfig(),
+      js: envSelector.selectJsConfig(),
+      ns: envSelector.selectNsConfig(),
+    },
     language: envSelector.selectLanguageConfig(),
     supportLink: envSelector.selectSupportLinkConfig(),
   },

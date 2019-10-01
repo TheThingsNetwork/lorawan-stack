@@ -113,7 +113,9 @@ export default class Overview extends React.Component {
   }
 
   render() {
-    const { config } = this.props.env
+    const {
+      config: { stack: stackConfig },
+    } = this.props.env
     const { fetching, applicationCount, gatewayCount, userId } = this.props
 
     if (fetching || applicationCount === undefined || gatewayCount === undefined) {
@@ -179,11 +181,11 @@ export default class Overview extends React.Component {
           <Col sm={8}>
             <Message className={style.componentStatus} content={m.componentStatus} component="h3" />
             <div className={style.componentCards}>
-              {Object.keys(config).map(function(componentKey) {
+              {Object.keys(stackConfig).map(function(componentKey) {
                 if (componentKey === 'language') {
                   return null
                 }
-                const component = config[componentKey]
+                const component = stackConfig[componentKey]
                 const name = componentMap[componentKey]
                 const host = new URL(component.base_url).host
                 return (
