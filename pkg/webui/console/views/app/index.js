@@ -22,6 +22,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
 import ErrorView from '../../../lib/components/error-view'
 import dev from '../../../lib/dev'
+import PropTypes from '../../../lib/prop-types'
 
 import SideNavigation from '../../../components/navigation/side'
 import Header from '../../containers/header'
@@ -33,10 +34,24 @@ import FullViewError from '../error'
 import style from './app.styl'
 
 @withEnv
+@(Component => (dev ? hot(Component) : Component))
 class ConsoleApp extends React.Component {
+  static propTypes = {
+    env: PropTypes.env.isRequired,
+    history: PropTypes.shape({
+      push: PropTypes.func,
+      replace: PropTypes.func,
+    }).isRequired,
+  }
+
   render() {
     const {
-      env: { siteTitle, pageData, siteName },
+      env: {
+        siteTitle,
+        pageData,
+        siteName,
+        config: { supportLink },
+      },
       history,
     } = this.props
 
@@ -70,7 +85,7 @@ class ConsoleApp extends React.Component {
                 </Switch>
               </div>
             </main>
-            <Footer className={style.footer} />
+            <Footer className={style.footer} supportLink={supportLink} />
           </div>
         </ErrorView>
       </ConnectedRouter>
@@ -78,6 +93,4 @@ class ConsoleApp extends React.Component {
   }
 }
 
-const ExportedApp = dev ? hot(ConsoleApp) : ConsoleApp
-
-export default ExportedApp
+export default ConsoleApp
