@@ -36,7 +36,12 @@ import style from './app.styl'
 class ConsoleApp extends React.Component {
   render() {
     const {
-      env: { siteTitle, pageData, siteName },
+      env: {
+        siteTitle,
+        pageData,
+        siteName,
+        config: { supportLink },
+      },
       history,
     } = this.props
 
@@ -70,7 +75,7 @@ class ConsoleApp extends React.Component {
                 </Switch>
               </div>
             </main>
-            <Footer className={style.footer} />
+            <Footer className={style.footer} supportLink={supportLink} />
           </div>
         </ErrorView>
       </ConnectedRouter>
