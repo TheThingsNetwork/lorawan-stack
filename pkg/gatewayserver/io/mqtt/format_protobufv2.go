@@ -24,7 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
+	"go.thethings.network/lorawan-stack/pkg/util/datarate"
 )
 
 // eirpDelta is the delta between EIRP and ERP.
@@ -133,7 +133,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		}
 		var drIndex ttnpb.DataRateIndex
 		var found bool
-		loraDr, err := udp.ParseLoRaDataRate(lorawanMetadata.DataRate)
+		loraDr, err := datarate.ParseLoRaDataRate(lorawanMetadata.DataRate)
 		if err != nil {
 			return nil, err
 		}
