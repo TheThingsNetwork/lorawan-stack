@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationpackages_test
+package packages_test
 
 import (
 	"context"

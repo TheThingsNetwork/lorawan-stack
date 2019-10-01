@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationpackages
+package packages
 
 import (
 	"context"
@@ -43,7 +43,7 @@ type Server interface {
 
 // New returns an application packages server wrapping the given registries.
 func New(ctx context.Context, io io.Server, registry Registry) (Server, error) {
-	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/applicationpackages")
+	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages")
 	s := &server{
 		ctx:      ctx,
 		io:       io,
@@ -63,10 +63,10 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 			EndDeviceIdentifiers: msg.EndDeviceIdentifiers,
 			FPort:                up.UplinkMessage.FPort,
 		}, []string{
+			"data",
 			"ids.end_device_ids",
 			"ids.f_port",
 			"package_name",
-			"data",
 		})
 		if errors.IsNotFound(err) {
 			return nil
@@ -81,15 +81,9 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	return nil
 }
 
-// Roles returns the union of the roles of the registered application packages.
+// Roles implements the rpcserver.Registerer interface.
 func (s *server) Roles() []ttnpb.ClusterRole {
-	var roles []ttnpb.ClusterRole
-	for _, subsystem := range s.handlers {
-		if r := subsystem.Roles(); len(r) > 0 {
-			roles = append(roles, r...)
-		}
-	}
-	return roles
+	return nil
 }
 
 // RegisterServices registers the services of the registered application packages.

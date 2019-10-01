@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationpackages
+package packages
 
 import (
 	"context"
@@ -29,8 +29,8 @@ func appendImplicitAssociationsGetPaths(paths ...string) []string {
 	), paths...)
 }
 
-// GetPackages implements ttnpb.ApplicationPackageRegistryServer.
-func (s *server) GetPackages(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationPackages, error) {
+// List implements ttnpb.ApplicationPackageRegistryServer.
+func (s *server) List(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationPackages, error) {
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_INFO); err != nil {
 		return nil, err
 	}
@@ -41,16 +41,17 @@ func (s *server) GetPackages(ctx context.Context, ids *ttnpb.EndDeviceIdentifier
 	return &packages, nil
 }
 
-// Get implements ttnpb.ApplicationPackageRegistryServer.
-func (s *server) Get(ctx context.Context, req *ttnpb.GetApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociation, error) {
+// GetAssociation implements ttnpb.ApplicationPackageRegistryServer.
+func (s *server) GetAssociation(ctx context.Context, req *ttnpb.GetApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociation, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
 	return s.registry.Get(ctx, req.ApplicationPackageAssociationIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...))
 }
 
-// List implements tnpb.ApplicationPackageRegistryServer.
-func (s *server) List(ctx context.Context, req *ttnpb.ListApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociations, error) {
+// ListAssociations implements tnpb.ApplicationPackageRegistryServer.
+// TODO: Support pagination.
+func (s *server) ListAssociations(ctx context.Context, req *ttnpb.ListApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociations, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
@@ -63,8 +64,8 @@ func (s *server) List(ctx context.Context, req *ttnpb.ListApplicationPackageAsso
 	}, nil
 }
 
-// Set implements ttnpb.ApplicationPackageRegistryServer.
-func (s *server) Set(ctx context.Context, req *ttnpb.SetApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociation, error) {
+// SetAssociation implements ttnpb.ApplicationPackageRegistryServer.
+func (s *server) SetAssociation(ctx context.Context, req *ttnpb.SetApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociation, error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers,
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
@@ -85,8 +86,8 @@ func (s *server) Set(ctx context.Context, req *ttnpb.SetApplicationPackageAssoci
 	)
 }
 
-// Delete implements ttnpb.ApplicationPackageRegistryServer.
-func (s *server) Delete(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers) (*pbtypes.Empty, error) {
+// DeleteAssociation implements ttnpb.ApplicationPackageRegistryServer.
+func (s *server) DeleteAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers,
 		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,

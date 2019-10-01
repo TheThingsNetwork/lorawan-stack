@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationpackages_test
+package packages_test
 
 import (
 	"context"
@@ -23,9 +23,9 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/applicationpackages"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/applicationpackages/redis"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/redis"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -99,7 +99,7 @@ func TestAuthentication(t *testing.T) {
 	defer flush()
 	defer redisClient.Close()
 	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}
-	srv, err := applicationpackages.New(ctx, as, apRegistry)
+	srv, err := packages.New(ctx, as, apRegistry)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -144,7 +144,7 @@ func TestAuthentication(t *testing.T) {
 				AllowInsecure: true,
 			})
 
-			_, err := client.GetPackages(ctx, &tc.ID, creds)
+			_, err := client.List(ctx, &tc.ID, creds)
 			if tc.OK && err != nil && !a.So(errors.IsCanceled(err), should.BeTrue) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
@@ -180,15 +180,15 @@ func TestAssociations(t *testing.T) {
 	apRegistry := &redis.ApplicationPackagesRegistry{Redis: redisClient}
 
 	handleUpCh := make(chan *handleUpRequest, 4)
-	applicationPackageFactory = applicationpackages.CreateApplicationPackage(
-		func(server io.Server, registry applicationpackages.Registry) applicationpackages.ApplicationPackageHandler {
+	applicationPackageFactory = packages.CreateApplicationPackage(
+		func(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
 			a.So(server, should.Equal, as)
 			a.So(registry, should.Equal, apRegistry)
 			return createMockPackageHandler(handleUpCh)
 		},
 	)
 
-	srv, err := applicationpackages.New(ctx, as, apRegistry)
+	srv, err := packages.New(ctx, as, apRegistry)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -210,7 +210,7 @@ func TestAssociations(t *testing.T) {
 	// Check that the test package is registered.
 	t.Run("AvailablePackages", func(t *testing.T) {
 		a := assertions.New(t)
-		res, err := client.GetPackages(ctx, &registeredDeviceID, creds)
+		res, err := client.List(ctx, &registeredDeviceID, creds)
 		a.So(err, should.BeNil)
 		a.So(res, should.NotBeNil)
 		a.So(res.Packages, should.Resemble, []*ttnpb.ApplicationPackage{
@@ -226,13 +226,13 @@ func TestAssociations(t *testing.T) {
 	// https://github.com/TheThingsNetwork/lorawan-stack/issues/1328
 	t.Run("AssociationsNotFound", func(t *testing.T) {
 		a := assertions.New(t)
-		_, err = client.Get(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
+		_, err = client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
 			ApplicationPackageAssociationIdentifiers: registeredAssociationID,
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
-		res, err := client.List(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
+		res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
 			EndDeviceIdentifiers: registeredDeviceID,
 		}, creds)
 		a.So(err, should.BeNil)
@@ -257,7 +257,7 @@ func TestAssociations(t *testing.T) {
 	// Create the association with the test package.
 	t.Run("Create", func(t *testing.T) {
 		a := assertions.New(t)
-		res, err := client.Set(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
+		res, err := client.SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
 			ApplicationPackageAssociation: association,
 			FieldMask: types.FieldMask{
 				Paths: []string{
@@ -275,7 +275,7 @@ func TestAssociations(t *testing.T) {
 	// Check that the association is available.
 	t.Run("AssociationsFound", func(t *testing.T) {
 		a := assertions.New(t)
-		res1, err := client.Get(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
+		res1, err := client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
 			ApplicationPackageAssociationIdentifiers: registeredAssociationID,
 			FieldMask: types.FieldMask{
 				Paths: []string{
@@ -287,7 +287,7 @@ func TestAssociations(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(res1, should.Resemble, &association)
 
-		res2, err := client.List(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
+		res2, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
 			EndDeviceIdentifiers: registeredDeviceID,
 			FieldMask: types.FieldMask{
 				Paths: []string{
@@ -356,16 +356,16 @@ func TestAssociations(t *testing.T) {
 	t.Run("Deletion", func(t *testing.T) {
 		a := assertions.New(t)
 
-		_, err := client.Delete(ctx, &registeredAssociationID, creds)
+		_, err := client.DeleteAssociation(ctx, &registeredAssociationID, creds)
 		a.So(err, should.BeNil)
 
-		_, err = client.Get(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
+		_, err = client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
 			ApplicationPackageAssociationIdentifiers: registeredAssociationID,
 		}, creds)
 		a.So(err, should.NotBeNil)
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
-		res, err := client.List(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
+		res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
 			EndDeviceIdentifiers: registeredDeviceID,
 		}, creds)
 		a.So(err, should.BeNil)
@@ -383,7 +383,7 @@ func TestAssociations(t *testing.T) {
 	})
 }
 
-var applicationPackageFactory = func(io.Server, applicationpackages.Registry) applicationpackages.ApplicationPackageHandler {
+var applicationPackageFactory = func(io.Server, packages.Registry) packages.ApplicationPackageHandler {
 	return &mockPackageHandler{}
 }
 
@@ -392,8 +392,8 @@ func init() {
 		Name:         "test-package",
 		DefaultFPort: 123,
 	}
-	applicationpackages.RegisterPackage(p, applicationpackages.CreateApplicationPackage(
-		func(server io.Server, registry applicationpackages.Registry) applicationpackages.ApplicationPackageHandler {
+	packages.RegisterPackage(p, packages.CreateApplicationPackage(
+		func(server io.Server, registry packages.Registry) packages.ApplicationPackageHandler {
 			return applicationPackageFactory(server, registry)
 		},
 	))

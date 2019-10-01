@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/applicationpackages"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/component"
@@ -59,7 +59,7 @@ type Config struct {
 	MQTT                config.MQTT               `name:"mqtt" description:"MQTT configuration"`
 	Webhooks            WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
 	PubSub              PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
-	ApplicationPackages ApplicationPackagesConfig `name:"applicationpackages" description:"Application packages configuration"`
+	ApplicationPackages ApplicationPackagesConfig `name:"application-packages" description:"Application packages configuration"`
 	Interop             InteropConfig             `name:"interop" description:"Interop client configuration"`
 }
 
@@ -99,7 +99,7 @@ type PubSubConfig struct {
 
 // ApplicationPackagesConfig contains application packages associations configuration.
 type ApplicationPackagesConfig struct {
-	Registry applicationpackages.Registry `name:"-"`
+	Registry packages.Registry `name:"-"`
 }
 
 // NewWebhooks returns a new web.Webhooks based on the configuration.
@@ -149,9 +149,9 @@ func (c PubSubConfig) NewPubSub(comp *component.Component, server io.Server) (*p
 
 // NewApplicationPackages returns a new applications packages frontend based on the configuration.
 // If the registry is nil, it returns nil.
-func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, server io.Server) (applicationpackages.Server, error) {
+func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, server io.Server) (packages.Server, error) {
 	if c.Registry == nil {
 		return nil, nil
 	}
-	return applicationpackages.New(ctx, server, c.Registry)
+	return packages.New(ctx, server, c.Registry)
 }

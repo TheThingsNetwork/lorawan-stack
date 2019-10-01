@@ -12,20 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package applicationpackages
+package packages
 
 import (
 	"context"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
 // ApplicationPackageHandler handles upstream traffic from the Application Server.
 type ApplicationPackageHandler interface {
-	rpcserver.Registerer
+	RegisterServices(s *grpc.Server)
+	RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn)
 	HandleUp(context.Context, *ttnpb.ApplicationPackageAssociation, *ttnpb.ApplicationUp) error
 }
 
