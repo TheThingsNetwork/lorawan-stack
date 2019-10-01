@@ -38,4 +38,6 @@ export const selectAsConfig = () => selectApplicationConfig().as
 
 export const selectLanguageConfig = () => selectApplicationConfig().language
 
+export const selectSupportLinkConfig = () => selectApplicationConfig().support_link
+
 export const selectPageData = () => configSelector().PAGE_DATA
