@@ -66,6 +66,8 @@ enum Right {
   RIGHT_APPLICATION_SETTINGS_API_KEYS = 17;
   // The right to view and edit application collaborators.
   RIGHT_APPLICATION_SETTINGS_COLLABORATORS = 18;
+  // The right to view and edit application packages and associations.
+  RIGHT_APPLICATION_SETTINGS_PACKAGES = 56;
   // The right to delete application.
   RIGHT_APPLICATION_DELETE = 19;
   // The right to view devices in application.

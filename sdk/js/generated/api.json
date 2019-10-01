@@ -22505,6 +22505,11 @@
               "description": "The right to view and edit application collaborators."
             },
             {
+              "name": "RIGHT_APPLICATION_SETTINGS_PACKAGES",
+              "number": "56",
+              "description": "The right to view and edit application packages and associations."
+            },
+            {
               "name": "RIGHT_APPLICATION_DELETE",
               "number": "19",
               "description": "The right to delete application."
