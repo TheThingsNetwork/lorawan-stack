@@ -19,14 +19,16 @@ import { Link } from 'react-router-dom'
 import PropTypes from '../../lib/prop-types'
 
 import Message from '../../lib/components/message'
+import Button from '../../components/button'
 
 import style from './footer.styl'
 
 const m = defineMessages({
   footer: "You are the network. Let's build this thing together.",
+  getSupport: 'Get Support',
 })
 
-const Footer = function({ className, links = [] }) {
+const Footer = function({ className, links, supportLink }) {
   return (
     <footer className={classnames(className, style.footer)}>
       <div>
@@ -44,12 +46,22 @@ const Footer = function({ className, links = [] }) {
           </Link>
         ))}
         <span className={style.version}>v{process.env.VERSION}</span>
+        {supportLink && (
+          <Button.AnchorLink
+            message={m.getSupport}
+            icon="contact_support"
+            href={supportLink}
+            target="_blank"
+          />
+        )}
       </div>
     </footer>
   )
 }
 
 Footer.propTypes = {
+  /** The classname to be applied to the footer */
+  className: PropTypes.string,
   /**
    * A list of links to be displayed in the footer component
    * @param {(string|Object)} title - The title of the link
@@ -61,6 +73,14 @@ Footer.propTypes = {
       link: PropTypes.string.isRequired,
     }),
   ),
+  /** Optional link for a support button */
+  supportLink: PropTypes.string,
+}
+
+Footer.defaultProps = {
+  className: undefined,
+  links: [],
+  supportLink: undefined,
 }
 
 export default Footer

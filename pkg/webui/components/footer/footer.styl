@@ -16,7 +16,8 @@
   border-normal('top')
   display: flex
   justify-content: space-between
-  padding: $cs.s
+  align-items: center
+  padding: $cs.xs
   color: $tc-subtle-gray
   flex: none
   +media-query($bp.s)
@@ -34,4 +35,6 @@
     color: $tc-deep-gray
 
 .version
-  margin-left: $ls.xxs
+  margin-left: $cs.xs
+  &:not(:last-child)
+    margin-right: $cs.xs
