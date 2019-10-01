@@ -61,14 +61,14 @@ class CreateForm extends React.Component {
   }
 
   render() {
-    const { rights, onCreateFailure, universalRights } = this.props
+    const { rights, onCreateFailure, pseudoRights } = this.props
     const { modal } = this.state
 
     const modalProps = modal ? modal : {}
     const modalVisible = Boolean(modal)
     const initialValues = {
       name: '',
-      rights: [],
+      rights: [...pseudoRights],
     }
 
     return (
@@ -90,7 +90,8 @@ class CreateForm extends React.Component {
             required
             component={RightsGroup}
             rights={rights}
-            universalRight={universalRights[0]}
+            pseudoRight={pseudoRights[0]}
+            entityTypeMessage={sharedMessages.apiKey}
           />
           <SubmitBar>
             <FormSubmit component={SubmitButton} message={sharedMessages.createApiKey} />
@@ -107,7 +108,7 @@ CreateForm.propTypes = {
   /**
    * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL'
    */
-  universalRights: PropTypes.arrayOf(PropTypes.string),
+  pseudoRights: PropTypes.arrayOf(PropTypes.string),
   /**
    * Called after successful creation of the API key.
    * Receives the key object as an argument.
@@ -129,7 +130,7 @@ CreateForm.defaultProps = {
   rights: [],
   onCreateSuccess: () => null,
   onCreateFailure: () => null,
-  universalRights: [],
+  pseudoRights: [],
 }
 
 export default CreateForm

@@ -34,7 +34,7 @@ import {
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
-  selectApplicationUniversalRights,
+  selectApplicationPseudoRights,
   selectApplicationRightsFetching,
   selectApplicationRightsError,
   selectApplicationUserCollaborator,
@@ -65,7 +65,7 @@ import api from '../../api'
       collaborator,
       appId,
       rights: selectApplicationRights(state),
-      universalRights: selectApplicationUniversalRights(state),
+      pseudoRights: selectApplicationPseudoRights(state),
       fetching,
       error,
     }
@@ -152,7 +152,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   render() {
-    const { collaborator, rights, universalRights, redirectToList } = this.props
+    const { collaborator, rights, pseudoRights, redirectToList } = this.props
 
     return (
       <Container>
@@ -178,7 +178,7 @@ export default class ApplicationCollaboratorEdit extends React.Component {
               onDelete={this.handleDelete}
               onDeleteSuccess={redirectToList}
               collaborator={collaborator}
-              universalRights={universalRights}
+              pseudoRights={pseudoRights}
               rights={rights}
               update
             />

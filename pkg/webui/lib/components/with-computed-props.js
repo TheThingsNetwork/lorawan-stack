@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.select-all
-  margin-bottom: $cs.s
+import React from 'react'
 
-.group
-  border-normal('left')
-  padding-left: $ls.xxs
-
-.right-label
-  span::first-letter
-    text-transform: uppercase
-
-.grant-type
-  margin-bottom: $cs.s
+/**
+ * `withComputedProps` is a HOC that can be used to pass-in props that are
+ * derived from the other props of the components. This is useful to ensure that
+ * expensive prop computations only need to be done once upon prop changes.
+ * @param {Function} computeProps - The function that returns the computed props.
+ * @returns {Function} - An instance of the `computeProps` HOC.
+ */
+export default computeProps => Component =>
+  class withComputedProps extends React.Component {
+    render() {
+      return <Component {...computeProps(this.props)} />
+    }
+  }

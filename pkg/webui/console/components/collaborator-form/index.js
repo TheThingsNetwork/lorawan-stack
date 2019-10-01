@@ -15,12 +15,10 @@
 import React, { Component } from 'react'
 import * as Yup from 'yup'
 import bind from 'autobind-decorator'
-import { defineMessages } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 import { id as collaboratorIdRegexp } from '../../lib/regexp'
-import { RIGHT_ALL } from '../../lib/rights'
 
 import Form from '../../../components/form'
 import Input from '../../../components/input'
@@ -31,7 +29,6 @@ import Message from '../../../lib/components/message'
 import toast from '../../../components/toast'
 import ModalButton from '../../../components/button/modal-button'
 import RightsGroup from '../../components/rights-group'
-import Notification from '../../../components/notification'
 
 const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()
@@ -41,10 +38,6 @@ const validationSchema = Yup.object().shape({
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 
-const m = defineMessages({
-  cannotModifyRightAll: 'This user possesses universal admin rights that cannot be modified.',
-})
-
 @bind
 export default class CollaboratorForm extends Component {
   static defaultProps = {
@@ -52,22 +45,25 @@ export default class CollaboratorForm extends Component {
     onSubmitFailure: () => null,
     onDelete: () => null,
     onDeleteSuccess: () => null,
-    oneleteFailure: () => null,
-    rights: [],
-    universalRights: [],
+    onDeleteFailure: () => null,
+    pseudoRights: [],
+    error: '',
+    collaborator: undefined,
+    update: false,
   }
 
   static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-    onSubmitSuccess: PropTypes.func,
-    onSubmitFailure: PropTypes.func,
-    onDelete: PropTypes.func,
-    onDeleteSuccess: PropTypes.func,
-    onDeleteFailure: PropTypes.func,
-    rights: PropTypes.array,
-    initialFormValues: PropTypes.object,
+    collaborator: PropTypes.collaborator,
     error: PropTypes.error,
-    universalRights: PropTypes.array,
+    onDelete: PropTypes.func,
+    onDeleteFailure: PropTypes.func,
+    onDeleteSuccess: PropTypes.func,
+    onSubmit: PropTypes.func.isRequired,
+    onSubmitFailure: PropTypes.func,
+    onSubmitSuccess: PropTypes.func,
+    rights: PropTypes.rights.isRequired,
+    pseudoRights: PropTypes.rights,
+    update: PropTypes.bool,
   }
 
   state = {
@@ -103,7 +99,7 @@ export default class CollaboratorForm extends Component {
   }
 
   async handleDelete() {
-    const { collaborator, onDelete, onDeleteSuccess } = this.props
+    const { collaborator, onDelete, onDeleteSuccess, onDeleteFailure } = this.props
     const collaborator_type = collaborator.isUser ? 'user' : 'organization'
 
     const collaborator_ids = {
@@ -124,17 +120,18 @@ export default class CollaboratorForm extends Component {
       onDeleteSuccess()
     } catch (error) {
       this.setState({ error })
+      onDeleteFailure(error)
     }
   }
 
   computeInitialValues() {
-    const { collaborator } = this.props
+    const { collaborator, pseudoRights } = this.props
 
     if (!collaborator) {
       return {
         collaborator_id: '',
         collaborator_type: 'user',
-        rights: [],
+        rights: [...pseudoRights],
       }
     }
 
@@ -146,13 +143,11 @@ export default class CollaboratorForm extends Component {
   }
 
   render() {
-    const { collaborator, rights, universalRights, error: passedError, update } = this.props
+    const { collaborator, rights, pseudoRights, error: passedError, update } = this.props
 
     const { error: submitError } = this.state
 
     const error = passedError || submitError
-
-    const hasRightAll = Boolean(collaborator && collaborator.rights.includes(RIGHT_ALL))
 
     return (
       <Form
@@ -182,23 +177,21 @@ export default class CollaboratorForm extends Component {
           <Radio label={sharedMessages.user} value="user" />
           <Radio label={sharedMessages.organization} value="organization" />
         </Form.Field>
-        {hasRightAll && <Notification small info={m.cannotModifyRightAll} />}
         <Form.Field
           name="rights"
           title={sharedMessages.rights}
           required
-          strict
           component={RightsGroup}
           rights={rights}
-          universalRight={universalRights[0]}
-          disabled={hasRightAll}
+          pseudoRight={pseudoRights[0]}
+          entityTypeMessage={sharedMessages.collaborator}
         />
         <SubmitBar>
           <Form.Submit
             component={SubmitButton}
-            message={update ? sharedMessages.saveChanges : sharedMessages.collaboratorAdd}
+            message={update ? sharedMessages.saveChanges : sharedMessages.addCollaborator}
           />
-          {update && !hasRightAll && (
+          {update && (
             <ModalButton
               type="button"
               icon="delete"
