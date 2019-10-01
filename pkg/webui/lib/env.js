@@ -17,7 +17,15 @@ import * as envSelector from './selectors/env'
 const env = {
   appRoot: envSelector.selectApplicationRootPath(),
   assetsRoot: envSelector.selectAssetsRootPath(),
-  config: envSelector.selectApplicationConfig(),
+  config: {
+    as: envSelector.selectAsConfig(),
+    gs: envSelector.selectGsConfig(),
+    is: envSelector.selectIsConfig(),
+    js: envSelector.selectJsConfig(),
+    ns: envSelector.selectNsConfig(),
+    language: envSelector.selectLanguageConfig(),
+    supportLink: envSelector.selectSupportLinkConfig(),
+  },
   pageData: envSelector.selectPageData(),
   siteName: envSelector.selectApplicationSiteName(),
   siteTitle: envSelector.selectApplicationSiteTitle(),
