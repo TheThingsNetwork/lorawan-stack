@@ -1680,7 +1680,7 @@ type NetworkCryptoServiceClient interface {
 	EncryptJoinAccept(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
 	EncryptRejoinAccept(ctx context.Context, in *CryptoServicePayloadRequest, opts ...grpc.CallOption) (*CryptoServicePayloadResponse, error)
 	DeriveNwkSKeys(ctx context.Context, in *DeriveSessionKeysRequest, opts ...grpc.CallOption) (*NwkSKeysResponse, error)
-	// Get the NwkKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.
+	// Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
 	GetNwkKey(ctx context.Context, in *GetRootKeysRequest, opts ...grpc.CallOption) (*KeyEnvelope, error)
 }
 
@@ -1753,7 +1753,7 @@ type NetworkCryptoServiceServer interface {
 	EncryptJoinAccept(context.Context, *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error)
 	EncryptRejoinAccept(context.Context, *CryptoServicePayloadRequest) (*CryptoServicePayloadResponse, error)
 	DeriveNwkSKeys(context.Context, *DeriveSessionKeysRequest) (*NwkSKeysResponse, error)
-	// Get the NwkKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.
+	// Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
 	GetNwkKey(context.Context, *GetRootKeysRequest) (*KeyEnvelope, error)
 }
 
@@ -1930,7 +1930,7 @@ var _NetworkCryptoService_serviceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationCryptoServiceClient interface {
 	DeriveAppSKey(ctx context.Context, in *DeriveSessionKeysRequest, opts ...grpc.CallOption) (*AppSKeyResponse, error)
-	// Get the AppKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.
+	// Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
 	GetAppKey(ctx context.Context, in *GetRootKeysRequest, opts ...grpc.CallOption) (*KeyEnvelope, error)
 }
 
@@ -1963,7 +1963,7 @@ func (c *applicationCryptoServiceClient) GetAppKey(ctx context.Context, in *GetR
 // ApplicationCryptoServiceServer is the server API for ApplicationCryptoService service.
 type ApplicationCryptoServiceServer interface {
 	DeriveAppSKey(context.Context, *DeriveSessionKeysRequest) (*AppSKeyResponse, error)
-	// Get the AppKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.
+	// Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
 	GetAppKey(context.Context, *GetRootKeysRequest) (*KeyEnvelope, error)
 }
 

@@ -104,14 +104,14 @@ service NetworkCryptoService {
   rpc EncryptJoinAccept(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
   rpc EncryptRejoinAccept(CryptoServicePayloadRequest) returns (CryptoServicePayloadResponse);
   rpc DeriveNwkSKeys(DeriveSessionKeysRequest) returns (NwkSKeysResponse);
-  // Get the NwkKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.
+  // Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
   rpc GetNwkKey(GetRootKeysRequest) returns (KeyEnvelope);
 }
 
 // Service for application layer cryptographic operations.
 service ApplicationCryptoService {
   rpc DeriveAppSKey(DeriveSessionKeysRequest) returns (AppSKeyResponse);
-  // Get the AppKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.
+  // Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
   rpc GetAppKey(GetRootKeysRequest) returns (KeyEnvelope);
 }
 

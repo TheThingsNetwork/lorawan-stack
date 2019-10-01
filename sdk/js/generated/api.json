@@ -12689,7 +12689,7 @@
             },
             {
               "name": "GetAppKey",
-              "description": "Get the AppKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.",
+              "description": "Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.",
               "requestType": "GetRootKeysRequest",
               "requestLongType": "GetRootKeysRequest",
               "requestFullType": "ttn.lorawan.v3.GetRootKeysRequest",
@@ -12923,7 +12923,7 @@
             },
             {
               "name": "GetNwkKey",
-              "description": "Get the NwkKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed.",
+              "description": "Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.",
               "requestType": "GetRootKeysRequest",
               "requestLongType": "GetRootKeysRequest",
               "requestFullType": "ttn.lorawan.v3.GetRootKeysRequest",

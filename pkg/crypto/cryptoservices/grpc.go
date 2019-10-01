@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
@@ -130,16 +131,23 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 	return res, nil
 }
 
-func (s *networkRPCClient) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+func (s *networkRPCClient) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error) {
 	key, err := s.Client.GetNwkKey(ctx, &ttnpb.GetRootKeysRequest{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	}, s.callOpts...)
 	if err != nil {
-		return types.AES128Key{}, err
+		if errors.IsFailedPrecondition(err) {
+			return nil, nil
+		}
+		return nil, err
 	}
-	return cryptoutil.UnwrapAES128Key(*key, s.KeyVault)
+	plain, err := cryptoutil.UnwrapAES128Key(*key, s.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	return &plain, err
 }
 
 type applicationRPCClient struct {
@@ -173,14 +181,21 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 	return cryptoutil.UnwrapAES128Key(res.AppSKey, s.KeyVault)
 }
 
-func (s *applicationRPCClient) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+func (s *applicationRPCClient) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error) {
 	key, err := s.Client.GetAppKey(ctx, &ttnpb.GetRootKeysRequest{
 		EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 		ProvisionerID:        dev.ProvisionerID,
 		ProvisioningData:     dev.ProvisioningData,
 	}, s.callOpts...)
 	if err != nil {
-		return types.AES128Key{}, err
+		if errors.IsFailedPrecondition(err) {
+			return nil, nil
+		}
+		return nil, err
 	}
-	return cryptoutil.UnwrapAES128Key(*key, s.KeyVault)
+	plain, err := cryptoutil.UnwrapAES128Key(*key, s.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	return &plain, err
 }

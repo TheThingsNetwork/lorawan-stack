@@ -290,7 +290,7 @@ func TestCryptoServices(t *testing.T) {
 				a := assertions.New(t)
 				key, err := svc.GetNwkKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
 				a.So(err, should.BeNil)
-				a.So(key, should.Resemble, types.AES128Key{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1})
+				a.So(key, should.Resemble, &types.AES128Key{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1})
 			})
 		})
 	}
@@ -352,7 +352,7 @@ func TestCryptoServices(t *testing.T) {
 				a := assertions.New(t)
 				key, err := svc.GetAppKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
 				a.So(err, should.BeNil)
-				a.So(key, should.Resemble, types.AES128Key{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2})
+				a.So(key, should.Resemble, &types.AES128Key{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2})
 			})
 		})
 	}
@@ -447,7 +447,7 @@ func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRoot
 	if err != nil {
 		return nil, err
 	}
-	env, err := cryptoutil.WrapAES128Key(nwkKey, "", s.KeyVault)
+	env, err := cryptoutil.WrapAES128Key(*nwkKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
@@ -483,7 +483,7 @@ func (s *mockApplicationRPCServer) GetAppKey(ctx context.Context, req *ttnpb.Get
 	if err != nil {
 		return nil, err
 	}
-	env, err := cryptoutil.WrapAES128Key(appKey, "", s.KeyVault)
+	env, err := cryptoutil.WrapAES128Key(*appKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}

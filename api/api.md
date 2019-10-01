@@ -3180,7 +3180,7 @@ Service for application layer cryptographic operations.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `DeriveAppSKey` | [`DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [`AppSKeyResponse`](#ttn.lorawan.v3.AppSKeyResponse) |  |
-| `GetAppKey` | [`GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest) | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) | Get the AppKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed. |
+| `GetAppKey` | [`GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest) | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) | Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed. |
 
 ### <a name="ttn.lorawan.v3.AsJs">Service `AsJs`</a>
 
@@ -3234,7 +3234,7 @@ Service for network layer cryptographic operations.
 | `EncryptJoinAccept` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
 | `EncryptRejoinAccept` | [`CryptoServicePayloadRequest`](#ttn.lorawan.v3.CryptoServicePayloadRequest) | [`CryptoServicePayloadResponse`](#ttn.lorawan.v3.CryptoServicePayloadResponse) |  |
 | `DeriveNwkSKeys` | [`DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest) | [`NwkSKeysResponse`](#ttn.lorawan.v3.NwkSKeysResponse) |  |
-| `GetNwkKey` | [`GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest) | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) | Get the NwkKey. Crypto Servers may return status code UNIMPLEMENTED when root keys are not exposed. |
+| `GetNwkKey` | [`GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest) | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) | Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed. |
 
 ### <a name="ttn.lorawan.v3.NsJs">Service `NsJs`</a>
 
