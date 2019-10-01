@@ -23,11 +23,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/provisioning"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestMicrochip(t *testing.T) {
+func TestMicrochipATECC608AMAHTNT(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
@@ -51,6 +52,41 @@ func TestMicrochip(t *testing.T) {
 		t.FailNow()
 	}
 
+	a.So(entry.EndDevice.JoinEUI, should.Resemble, &types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00})
 	a.So(entry.EndDevice.ProvisionerID, should.Equal, provisioning.Microchip)
 	a.So(entry.MappingKey, should.Equal, "01237a005b08bcc527")
+}
+
+func TestMicrochipATECC608ATNGLORA(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	data := []byte(`[{
+    "payload": "eyJ2ZXJzaW9uIjoxLCJtb2RlbCI6IkFURUNDNjA4QSIsInBhcnROdW1iZXIiOiJBVEVDQzYwOEEtTUFIVDMiLCJtYW51ZmFjdHVyZXIiOnsib3JnYW5pemF0aW9uTmFtZSI6Ik1pY3JvY2hpcCBUZWNobm9sb2d5IEluYyIsIm9yZ2FuaXphdGlvbmFsVW5pdE5hbWUiOiJTZWN1cmUgUHJvZHVjdHMgR3JvdXAifSwicHJvdmlzaW9uZXIiOnsib3JnYW5pemF0aW9uTmFtZSI6Ik1pY3JvY2hpcCBUZWNobm9sb2d5IEluYyIsIm9yZ2FuaXphdGlvbmFsVW5pdE5hbWUiOiJTZWN1cmUgUHJvZHVjdHMgR3JvdXAifSwiZGlzdHJpYnV0b3IiOnsib3JnYW5pemF0aW9uTmFtZSI6Ik1pY3JvY2hpcCBUZWNobm9sb2d5IEluYyIsIm9yZ2FuaXphdGlvbmFsVW5pdE5hbWUiOiJNaWNyb2NoaXAgRGlyZWN0In0sImdyb3VwSWQiOiJVbmtub3duIiwicHJvdmlzaW9uaW5nVGltZXN0YW1wIjoiMjAxOS0wOS0yMFQxNjoxODo0NS4zOTBaIiwidW5pcXVlSWQiOiIwMTIzOGViZTIwMDgwYmQ1MjciLCJwdWJsaWNLZXlTZXQiOnsia2V5cyI6W3sia2lkIjoiMSIsImt0eSI6IkVDIiwiY3J2IjoiUC0yNTYiLCJ4IjoiQ0xqaDVQd05FOUl1c0NOLXlRWm4tRldBUlBiZGV6LUNEVy1DVEpELVNIYyIsInkiOiItaEZ6dl9ZQ0dsWG1hNUJfc3pudENzWVB0NTE3eHhNZTJwZU9PSDc5bk5vIiwieDVjIjpbIk1JSUNCakNDQWF5Z0F3SUJBZ0lRVVVPdDFqT3hJckVwK25QOW83VUNpekFLQmdncWhrak9QUVFEQWpCUE1TRXdId1lEVlFRS0RCaE5hV055YjJOb2FYQWdWR1ZqYUc1dmJHOW5lU0JKYm1NeEtqQW9CZ05WQkFNTUlVTnllWEIwYnlCQmRYUm9aVzUwYVdOaGRHbHZiaUJUYVdkdVpYSWdSall3TVRBZ0Z3MHhPVEE1TWpBeE5qQXdNREJhR0E4eU1EUTNNRGt5TURFMk1EQXdNRm93VnpFaE1COEdBMVVFQ2d3WVRXbGpjbTlqYUdsd0lGUmxZMmh1YjJ4dloza2dTVzVqTVRJd01BWURWUVFERENrd01USXpPRVZDUlRJd01EZ3dRa1ExTWpjZ01EQXdORUV6TVRBd01ERkdSamxFUVNCQlZFVkRRekJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCQWk0NGVUOERSUFNMckFqZnNrR1ovaFZnRVQyM1hzL2dnMXZna3lRL2toMytoRnp2L1lDR2xYbWE1Qi9zem50Q3NZUHQ1MTd4eE1lMnBlT09INzluTnFqWURCZU1Bd0dBMVVkRXdFQi93UUNNQUF3RGdZRFZSMFBBUUgvQkFRREFnT0lNQjBHQTFVZERnUVdCQlJpVUVNMnEwM3NLZTUvdnJxNXQyUTF5RW0xZnpBZkJnTlZIU01FR0RBV2dCVHhNeW0wZzhmdDFtNUIyUkNYTEN6NEdhM0s2REFLQmdncWhrak9QUVFEQWdOSUFEQkZBaUVBL0MxVnhFcGdEMGtxSFFCV1p4NUowNlVzeElHMDMySjZDaHlWU3VnbWdEUUNJRjJXR2tzSjhTenQ3ZmJzUEtlRWFFUnNxQ1hubDYwaFp1b1hkVkZkVDJyMiIsIk1JSUNCRENDQWFxZ0F3SUJBZ0lRYXNhMWxLbXc0dVhuYWhHUDV3QmRBREFLQmdncWhrak9QUVFEQWpCUE1TRXdId1lEVlFRS0RCaE5hV055YjJOb2FYQWdWR1ZqYUc1dmJHOW5lU0JKYm1NeEtqQW9CZ05WQkFNTUlVTnllWEIwYnlCQmRYUm9aVzUwYVdOaGRHbHZiaUJTYjI5MElFTkJJREF3TWpBZ0Z3MHhPREV5TVRReE9UQXdNREJhR0E4eU1EUTVNVEl4TkRFNU1EQXdNRm93VHpFaE1COEdBMVVFQ2d3WVRXbGpjbTlqYUdsd0lGUmxZMmh1YjJ4dloza2dTVzVqTVNvd0tBWURWUVFERENGRGNubHdkRzhnUVhWMGFHVnVkR2xqWVhScGIyNGdVMmxuYm1WeUlFWTJNREV3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVRXOUM1UU1OT09lSjVGSDJFNUx4anR6TVY5UG1zSy9UekdYcEJrMFZvTWM4bElWZlpCU1lIcVJIekF6aEVheUU0QXptS2Q4Z2xiRmxXWGEzV0VoTjdDbzJZd1pEQU9CZ05WSFE4QkFmOEVCQU1DQVlZd0VnWURWUjBUQVFIL0JBZ3dCZ0VCL3dJQkFEQWRCZ05WSFE0RUZnUVU4VE1wdElQSDdkWnVRZGtRbHl3cytCbXR5dWd3SHdZRFZSMGpCQmd3Rm9BVWV1MTliY2EzZUoyeU9BR2w2RXFNc0tRT0tvd3dDZ1lJS29aSXpqMEVBd0lEU0FBd1JRSWhBT2J5NDdqY3oyR09kNzNDT0M1Y0FyazZ5QjQ0cndoSXlhUGxyRDBEU1NhVUFpQmpFNURpMzF4K3NEcWNxb0dPY2hTYTJiZXJxeENLWlNXckUxMVFneGYwSXc9PSJdfV19LCJtb2RlbEluZm8iOnsicHVibGljRGF0YSI6W3siem9uZSI6ImRhdGEiLCJzbG90Ijo5LCJvZmZzZXQiOjAsImRhdGEiOiJjTFBWZnRBQUFBQUFBQUFBQUFBQUFKa0ltUW1aQ3BrTG1ReVpEWmtPbVEtWkVKa1JtUktaRTVrVW1SV1pGcGtYbVJpWkdaa2FtUnVaSEprZG1SNlpINWtnbVNHWklwa2oifV19fQ",
+    "protected": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6IjhWZUtHZHlVMmQ4d2V2Nl9Wek5KT0JPdi1jQSIsIng1dCNTMjU2IjoiVTlUS213NGYzaUc1Nk9HUjhZVl9OY3hsazBEbEcwRnlMOWFEbHdmYnYxQSJ9",
+    "header": {
+      "uniqueId": "01238ebe20080bd527"
+    },
+    "signature": "ZFhl07osmnG8pB0AIOVqvmDtmYdNytq6WBK5zH1GcN0nu7VkkM1k4hbowUEfyTDZKlam3LvdPLcKM13Z6oEifQ"
+  }]`)
+
+	converter := GetConverter("microchip-atecc608a-tnglora")
+	if !a.So(converter, should.NotBeNil) {
+		t.FailNow()
+	}
+
+	ch := make(chan *ttnpb.EndDeviceTemplate, 1)
+	err := converter.Convert(ctx, bytes.NewReader(data), ch)
+	a.So(err, should.BeNil)
+
+	entry, ok := <-ch
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+
+	a.So(entry.EndDevice.DeviceID, should.Equal, "eui-0004a310001ff9da")
+	a.So(entry.EndDevice.JoinEUI, should.Resemble, &types.EUI64{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x00, 0x00})
+	a.So(entry.EndDevice.DevEUI, should.Resemble, &types.EUI64{0x00, 0x04, 0xA3, 0x10, 0x00, 0x1F, 0xF9, 0xDA})
+	a.So(entry.EndDevice.ProvisionerID, should.Equal, provisioning.Microchip)
+	a.So(entry.MappingKey, should.Equal, "01238ebe20080bd527")
 }
