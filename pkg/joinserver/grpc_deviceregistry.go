@@ -93,11 +93,11 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if networkCryptoService != nil {
-				if nwkKey, err := networkCryptoService.GetNwkKey(ctx, dev); err == nil {
+				if nwkKey, err := networkCryptoService.GetNwkKey(ctx, dev); err == nil && nwkKey != nil {
 					dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
-						Key: &nwkKey,
+						Key: nwkKey,
 					}
-				} else {
+				} else if err != nil {
 					return nil, err
 				}
 			}
@@ -114,11 +114,11 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth())
 			}
 			if applicationCryptoService != nil {
-				if appKey, err := applicationCryptoService.GetAppKey(ctx, dev); err == nil {
+				if appKey, err := applicationCryptoService.GetAppKey(ctx, dev); err == nil && appKey != nil {
 					dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
-						Key: &appKey,
+						Key: appKey,
 					}
-				} else {
+				} else if err != nil {
 					return nil, err
 				}
 			}

@@ -38,18 +38,18 @@ func NewMemory(nwkKey, appKey *types.AES128Key) NetworkApplication {
 
 var errNoNwkKey = errors.DefineCorruption("no_nwk_key", "no NwkKey specified")
 
-func (d *mem) getNwkKey(version ttnpb.MACVersion) (types.AES128Key, error) {
+func (d *mem) getNwkKey(version ttnpb.MACVersion) (*types.AES128Key, error) {
 	switch {
 	case version.Compare(ttnpb.MAC_V1_1) >= 0:
 		if d.nwkKey == nil {
-			return types.AES128Key{}, errNoNwkKey
+			return nil, errNoNwkKey
 		}
-		return *d.nwkKey, nil
+		return d.nwkKey, nil
 	default:
 		if d.appKey == nil {
-			return types.AES128Key{}, errNoAppKey
+			return nil, errNoAppKey
 		}
-		return *d.appKey, nil
+		return d.appKey, nil
 	}
 }
 
@@ -58,7 +58,10 @@ func (d *mem) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDevice, version 
 	if err != nil {
 		return
 	}
-	return crypto.ComputeJoinRequestMIC(key, payload)
+	if key == nil {
+		return [4]byte{}, errNoNwkKey
+	}
+	return crypto.ComputeJoinRequestMIC(*key, payload)
 }
 
 var (
@@ -77,12 +80,15 @@ func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version t
 	if err != nil {
 		return [4]byte{}, err
 	}
+	if key == nil {
+		return [4]byte{}, errNoNwkKey
+	}
 	switch {
 	case version.Compare(ttnpb.MAC_V1_1) >= 0:
-		jsIntKey := crypto.DeriveJSIntKey(key, *dev.DevEUI)
+		jsIntKey := crypto.DeriveJSIntKey(*key, *dev.DevEUI)
 		return crypto.ComputeJoinAcceptMIC(jsIntKey, joinReqType, *dev.JoinEUI, dn, payload)
 	default:
-		return crypto.ComputeLegacyJoinAcceptMIC(key, payload)
+		return crypto.ComputeLegacyJoinAcceptMIC(*key, payload)
 	}
 }
 
@@ -91,7 +97,10 @@ func (d *mem) EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, versi
 	if err != nil {
 		return nil, err
 	}
-	return crypto.EncryptJoinAccept(key, payload)
+	if key == nil {
+		return nil, errNoNwkKey
+	}
+	return crypto.EncryptJoinAccept(*key, payload)
 }
 
 func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
@@ -139,11 +148,11 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 	}
 }
 
-func (d *mem) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+func (d *mem) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error) {
 	if d.nwkKey == nil {
-		return types.AES128Key{}, errNoNwkKey
+		return nil, errNoNwkKey
 	}
-	return *d.nwkKey, nil
+	return d.nwkKey, nil
 }
 
 var errNoAppKey = errors.DefineCorruption("no_app_key", "no AppKey specified")
@@ -167,9 +176,9 @@ func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version t
 	}
 }
 
-func (d *mem) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error) {
+func (d *mem) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error) {
 	if d.appKey == nil {
-		return types.AES128Key{}, errNoAppKey
+		return nil, errNoAppKey
 	}
-	return *d.appKey, nil
+	return d.appKey, nil
 }

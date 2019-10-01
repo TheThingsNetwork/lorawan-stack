@@ -35,13 +35,17 @@ type Network interface {
 	EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error)
 	EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error)
 	DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error)
-	GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error)
+	// GetNwkKey returns the NwkKey of the given end device.
+	// If the implementation does not expose root keys, this method returns nil, nil.
+	GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error)
 }
 
 // Application performs application layer cryptographic operations.
 type Application interface {
 	DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error)
-	GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (types.AES128Key, error)
+	// GetAppKey returns the AppKey of the given end device.
+	// If the implementation does not expose root keys, this method returns nil, nil.
+	GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error)
 }
 
 // NetworkApplication is an interface that combines Network and Application.
