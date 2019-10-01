@@ -39,7 +39,9 @@ var DefaultIdentityServerConfig = identityserver.Config{
 				JSFiles:       []string{"oauth.js"},
 			},
 			FrontendConfig: oauth.FrontendConfig{
-				IS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+				StackConfig: oauth.StackConfig{
+					IS: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+				},
 			},
 		},
 	},

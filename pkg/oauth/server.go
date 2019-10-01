@@ -66,10 +66,15 @@ type UIConfig struct {
 	FrontendConfig     `name:",squash"`
 }
 
+// StackConfig is the configuration of the stack components.
+type StackConfig struct {
+	IS webui.APIConfig `json:"is" name:"is"`
+}
+
 // FrontendConfig is the configuration for the OAuth frontend.
 type FrontendConfig struct {
-	Language string          `json:"language" name:"-"`
-	IS       webui.APIConfig `json:"is" name:"is"`
+	Language    string `json:"language" name:"-"`
+	StackConfig `json:"stack_config" name:",squash"`
 }
 
 // Config is the configuration for the OAuth server.

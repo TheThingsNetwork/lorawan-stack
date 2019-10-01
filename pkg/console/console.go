@@ -33,15 +33,20 @@ type UIConfig struct {
 	FrontendConfig     `name:",squash"`
 }
 
+// StackConfig is the configuration of the stack components.
+type StackConfig struct {
+	IS webui.APIConfig `json:"is" name:"is"`
+	GS webui.APIConfig `json:"gs" name:"gs"`
+	NS webui.APIConfig `json:"ns" name:"ns"`
+	AS webui.APIConfig `json:"as" name:"as"`
+	JS webui.APIConfig `json:"js" name:"js"`
+}
+
 // FrontendConfig is the configuration for the Console frontend.
 type FrontendConfig struct {
-	Language    string          `json:"language" name:"-"`
-	SupportLink string          `json:"support_link" name:"support-link" description:"The URI that the support button will point to"`
-	IS          webui.APIConfig `json:"is" name:"is"`
-	GS          webui.APIConfig `json:"gs" name:"gs"`
-	NS          webui.APIConfig `json:"ns" name:"ns"`
-	AS          webui.APIConfig `json:"as" name:"as"`
-	JS          webui.APIConfig `json:"js" name:"js"`
+	Language    string `json:"language" name:"-"`
+	SupportLink string `json:"support_link" name:"support-link" description:"The URI that the support button will point to"`
+	StackConfig `json:"stack_config" name:",squash"`
 }
 
 // Config is the configuration for the Console.
