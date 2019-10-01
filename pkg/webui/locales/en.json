@@ -13,6 +13,7 @@
   "components.file-input.index.tooBig": "The selected file is too large.",
   "components.file-input.index.remove": "Remove",
   "components.footer.index.footer": "You are the network. Let's build this thing together.",
+  "components.footer.index.getSupport": "Get Support",
   "components.key-value-map.entry.deleteEntry": "Delete Entry",
   "components.key-value-map.index.addEntry": "Add entry",
   "components.location-form.index.deleteWarning": "Are you sure you want to delete this location entry?",
