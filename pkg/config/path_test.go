@@ -32,6 +32,7 @@ type configWithoutPath struct{}
 func TestConfigPathHome(t *testing.T) {
 	a := assertions.New(t)
 
+	os.Unsetenv("PWD")
 	os.Setenv("HOME", "/home/johndoe")
 	os.Unsetenv("XDG_CONFIG_HOME")
 	os.Unsetenv("TEST_CONFIG")
@@ -56,7 +57,8 @@ func TestConfigPathHome(t *testing.T) {
 func TestConfigPathXDGHome(t *testing.T) {
 	a := assertions.New(t)
 
-	os.Setenv("HOME", "/home/johndoe")
+	os.Unsetenv("PWD")
+	os.Unsetenv("HOME")
 	os.Setenv("XDG_CONFIG_HOME", "/home/johndoe/.config")
 	os.Unsetenv("TEST_CONFIG")
 
@@ -133,7 +135,8 @@ func TestConfigPathEnv(t *testing.T) {
 func TestConfigPathCliFlag(t *testing.T) {
 	a := assertions.New(t)
 
-	os.Setenv("HOME", "/home/johndoe")
+	os.Unsetenv("PWD")
+	os.Unsetenv("HOME")
 	os.Setenv("XDG_CONFIG_HOME", "/home/johndoe/.config")
 	os.Unsetenv("TEST_CONFIG")
 
@@ -157,6 +160,7 @@ func TestConfigPathCliFlag(t *testing.T) {
 func TestConfigPathDefine(t *testing.T) {
 	a := assertions.New(t)
 
+	os.Setenv("PWD", "/home/johndoe")
 	os.Setenv("HOME", "/home/johndoe")
 	os.Setenv("XDG_CONFIG_HOME", "/home/johndoe/.config")
 	os.Unsetenv("TEST_CONFIG")
@@ -170,7 +174,7 @@ func TestConfigPathDefine(t *testing.T) {
 
 	f := config.Flags().Lookup("config")
 	a.So(f, should.NotBeNil)
-	a.So(f.DefValue, should.Resemble, "[$XDG_CONFIG_HOME/test/test.yml]")
+	a.So(f.DefValue, should.Resemble, "[$PWD/.test.yml,$HOME/.test.yml,$XDG_CONFIG_HOME/test/test.yml]")
 }
 
 func TestDataDirHome(t *testing.T) {

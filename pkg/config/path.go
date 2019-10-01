@@ -43,21 +43,22 @@ func WithConfigFileFlag(flag string) Option {
 		var envPaths []string
 		var paths []string
 
+		// check PWD
 		if pwd := os.Getenv("PWD"); pwd != "" {
-			envPaths = []string{path.Join("$PWD", dotfile)}
-			paths = []string{path.Join(pwd, dotfile)}
+			envPaths = append(envPaths, path.Join("$PWD", dotfile))
+			paths = append(paths, path.Join(pwd, dotfile))
 		}
 
 		// check HOME
 		if home := os.Getenv("HOME"); home != "" {
-			envPaths = []string{path.Join("$HOME", dotfile)}
-			paths = []string{path.Join(home, dotfile)}
+			envPaths = append(envPaths, path.Join("$HOME", dotfile))
+			paths = append(paths, path.Join(home, dotfile))
 		}
 
 		// check XDG_CONFIG_HOME
 		if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
-			envPaths = []string{path.Join("$XDG_CONFIG_HOME", m.name, file)}
-			paths = []string{path.Join(xdg, m.name, file)}
+			envPaths = append(envPaths, path.Join("$XDG_CONFIG_HOME", m.name, file))
+			paths = append(paths, path.Join(xdg, m.name, file))
 		}
 
 		m.defaultPaths = paths
