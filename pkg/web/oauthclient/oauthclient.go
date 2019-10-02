@@ -93,8 +93,8 @@ func (oc *OAuthClient) oauth(c echo.Context) *oauth2.Config {
 	config := oc.configFromContext(c.Request().Context())
 
 	authorizeURL := config.AuthorizeURL
-	redirectURL := fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(oc.config.RootURL, "/"))
-	if oauthRootURL, err := url.Parse(oc.config.RootURL); err == nil {
+	redirectURL := fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(config.RootURL, "/"))
+	if oauthRootURL, err := url.Parse(config.RootURL); err == nil {
 		rootURL := (&url.URL{Scheme: oauthRootURL.Scheme, Host: oauthRootURL.Host}).String()
 		if strings.HasPrefix(authorizeURL, rootURL) {
 			authorizeURL = strings.TrimPrefix(authorizeURL, rootURL)
