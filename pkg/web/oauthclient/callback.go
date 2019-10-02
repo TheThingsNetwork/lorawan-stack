@@ -69,5 +69,6 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusFound, oc.config.RootURL+stateCookie.Next)
+	config := oc.configFromContext(c.Request().Context())
+	return c.Redirect(http.StatusFound, config.RootURL+stateCookie.Next)
 }
