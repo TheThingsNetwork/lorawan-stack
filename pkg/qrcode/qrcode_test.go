@@ -18,8 +18,10 @@ import (
 	"strconv"
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/pkg/qrcode"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -54,4 +56,44 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 			a.So(authCode, should.Resemble, tc.ExpectedAuthenticationCode)
 		})
 	}
+}
+
+type mock struct {
+}
+
+func (mock) Validate() error                { return nil }
+func (*mock) Encode(*ttnpb.EndDevice) error { return nil }
+func (mock) MarshalText() ([]byte, error)   { return nil, nil }
+func (*mock) UnmarshalText([]byte) error    { return nil }
+
+type mockFormat struct {
+}
+
+func (mockFormat) Format() *ttnpb.QRCodeFormat {
+	return &ttnpb.QRCodeFormat{
+		Name: "test",
+		FieldMask: pbtypes.FieldMask{
+			Paths: []string{"ids"},
+		},
+	}
+}
+
+func (mockFormat) New() EndDeviceData {
+	return new(mock)
+}
+
+func TestQRCodeFormats(t *testing.T) {
+	a := assertions.New(t)
+
+	a.So(GetEndDeviceFormat("mock"), should.BeNil)
+
+	RegisterEndDeviceFormat("mock", new(mockFormat))
+	f := GetEndDeviceFormat("mock")
+	if !a.So(f, should.NotBeNil) {
+		t.FailNow()
+	}
+	a.So(f.Format().Name, should.Equal, "test")
+
+	fs := GetEndDeviceFormats()
+	a.So(fs["mock"], should.Equal, f)
 }
