@@ -17,20 +17,20 @@ import TTN from 'ttn-lw'
 
 import token from '../lib/access-token'
 import getCookieValue from '../../lib/cookie'
-import { selectApplicationConfig, selectApplicationRootPath } from '../../lib/selectors/env'
+import { selectStackConfig, selectApplicationRootPath } from '../../lib/selectors/env'
 
-const config = selectApplicationConfig()
+const stackConfig = selectStackConfig()
 const appRoot = selectApplicationRootPath()
 
 const stack = {
-  is: config.is.enabled ? config.is.base_url : undefined,
-  gs: config.gs.enabled ? config.gs.base_url : undefined,
-  ns: config.ns.enabled ? config.ns.base_url : undefined,
-  as: config.as.enabled ? config.as.base_url : undefined,
-  js: config.js.enabled ? config.js.base_url : undefined,
+  is: stackConfig.is.enabled ? stackConfig.is.base_url : undefined,
+  gs: stackConfig.gs.enabled ? stackConfig.gs.base_url : undefined,
+  ns: stackConfig.ns.enabled ? stackConfig.ns.base_url : undefined,
+  as: stackConfig.as.enabled ? stackConfig.as.base_url : undefined,
+  js: stackConfig.js.enabled ? stackConfig.js.base_url : undefined,
 }
 
-const isBaseUrl = config.is.base_url
+const isBaseUrl = stackConfig.is.base_url
 
 const ttnClient = new TTN(token, {
   stackConfig: stack,

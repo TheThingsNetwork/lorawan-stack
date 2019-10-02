@@ -15,11 +15,11 @@
 import axios from 'axios'
 
 import getCookieValue from '../../lib/cookie'
-import { selectApplicationRootPath, selectApplicationConfig } from '../../lib/selectors/env'
+import { selectApplicationRootPath, selectStackConfig } from '../../lib/selectors/env'
 
 const appRoot = selectApplicationRootPath()
-const config = selectApplicationConfig()
-const isBaseUrl = config.is.base_url
+const stackConfig = selectStackConfig()
+const isBaseUrl = stackConfig.is.base_url
 
 const csrf = getCookieValue('_csrf')
 const instance = axios.create({

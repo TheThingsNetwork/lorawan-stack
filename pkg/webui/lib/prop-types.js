@@ -145,12 +145,14 @@ PropTypes.env = PropTypes.shape({
   pageData: PropTypes.shape({}),
   config: PropTypes.shape({
     language: PropTypes.string,
-    support_link: PropTypes.string,
-    is: PropTypes.stackComponent,
-    as: PropTypes.stackComponent,
-    ns: PropTypes.stackComponent,
-    js: PropTypes.stackComponent,
-    gs: PropTypes.stackComponent,
+    supportLink: PropTypes.string,
+    stack: PropTypes.shape({
+      is: PropTypes.stackComponent,
+      as: PropTypes.stackComponent,
+      ns: PropTypes.stackComponent,
+      js: PropTypes.stackComponent,
+      gs: PropTypes.stackComponent,
+    }),
   }).isRequired,
 })
 

@@ -26,15 +26,17 @@ export const selectApplicationSiteTitle = () => configSelector().SITE_TITLE
 
 export const selectApplicationSiteSubTitle = () => configSelector().SITE_SUB_TITLE
 
-export const selectGsConfig = () => selectApplicationConfig().gs
+export const selectStackConfig = () => selectApplicationConfig().stack_config
 
-export const selectIsConfig = () => selectApplicationConfig().is
+export const selectGsConfig = () => selectStackConfig().gs
 
-export const selectNsConfig = () => selectApplicationConfig().ns
+export const selectIsConfig = () => selectStackConfig().is
 
-export const selectJsConfig = () => selectApplicationConfig().js
+export const selectNsConfig = () => selectStackConfig().ns
 
-export const selectAsConfig = () => selectApplicationConfig().as
+export const selectJsConfig = () => selectStackConfig().js
+
+export const selectAsConfig = () => selectStackConfig().as
 
 export const selectLanguageConfig = () => selectApplicationConfig().language
 
