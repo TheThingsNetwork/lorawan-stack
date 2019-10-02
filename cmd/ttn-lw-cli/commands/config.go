@@ -45,6 +45,7 @@ type Config struct {
 	JoinServerGRPCAddress              string `name:"join-server-grpc-address" description:"Join Server address"`
 	DeviceTemplateConverterGRPCAddress string `name:"device-template-converter-grpc-address" description:"Device Template Converter address"`
 	DeviceClaimingServerGRPCAddress    string `name:"device-claiming-server-grpc-address" description:"Device Claiming Server address"`
+	QRCodeGeneratorGRPCAddress         string `name:"qr-code-generator-grpc-address" description:"QR Code Generator address"`
 	Insecure                           bool   `name:"insecure" description:"Connect without TLS"`
 	CA                                 string `name:"ca" description:"CA certificate file"`
 }
@@ -91,6 +92,7 @@ var DefaultConfig = Config{
 	JoinServerGRPCAddress:              clusterGRPCAddress,
 	DeviceTemplateConverterGRPCAddress: clusterGRPCAddress,
 	DeviceClaimingServerGRPCAddress:    clusterGRPCAddress,
+	QRCodeGeneratorGRPCAddress:         clusterGRPCAddress,
 }
 
 var configCommand = commands.Config(mgr)
