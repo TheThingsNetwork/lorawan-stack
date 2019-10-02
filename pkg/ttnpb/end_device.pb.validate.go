@@ -3005,6 +3005,38 @@ func (m *EndDeviceTemplateFormat) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "file_extensions":
+
+			if len(m.GetFileExtensions()) > 100 {
+				return EndDeviceTemplateFormatValidationError{
+					field:  "file_extensions",
+					reason: "value must contain no more than 100 item(s)",
+				}
+			}
+
+			_EndDeviceTemplateFormat_FileExtensions_Unique := make(map[string]struct{}, len(m.GetFileExtensions()))
+
+			for idx, item := range m.GetFileExtensions() {
+				_, _ = idx, item
+
+				if _, exists := _EndDeviceTemplateFormat_FileExtensions_Unique[item]; exists {
+					return EndDeviceTemplateFormatValidationError{
+						field:  fmt.Sprintf("file_extensions[%v]", idx),
+						reason: "repeated value must contain unique items",
+					}
+				} else {
+					_EndDeviceTemplateFormat_FileExtensions_Unique[item] = struct{}{}
+				}
+
+				if !_EndDeviceTemplateFormat_FileExtensions_Pattern.MatchString(item) {
+					return EndDeviceTemplateFormatValidationError{
+						field:  fmt.Sprintf("file_extensions[%v]", idx),
+						reason: "value does not match regex pattern \"^(?:\\\\.[a-z0-9]{1,16}){1,2}$\"",
+					}
+				}
+
+			}
+
 		default:
 			return EndDeviceTemplateFormatValidationError{
 				field:  name,
@@ -3070,6 +3102,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = EndDeviceTemplateFormatValidationError{}
+
+var _EndDeviceTemplateFormat_FileExtensions_Pattern = regexp.MustCompile("^(?:\\.[a-z0-9]{1,16}){1,2}$")
 
 // ValidateFields checks the field values on EndDeviceTemplateFormats with the
 // rules defined in the proto definition for this message. If any rules are

@@ -6534,6 +6534,32 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "file_extensions",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 100
+                  },
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.string.pattern",
+                    "value": "^(?:\\.[a-z0-9]{1,16}){1,2}$"
+                  }
+                ]
+              }
             }
           ]
         },

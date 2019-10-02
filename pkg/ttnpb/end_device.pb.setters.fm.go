@@ -2155,6 +2155,15 @@ func (dst *EndDeviceTemplateFormat) SetFields(src *EndDeviceTemplateFormat, path
 				var zero string
 				dst.Description = zero
 			}
+		case "file_extensions":
+			if len(subs) > 0 {
+				return fmt.Errorf("'file_extensions' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FileExtensions = src.FileExtensions
+			} else {
+				dst.FileExtensions = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
