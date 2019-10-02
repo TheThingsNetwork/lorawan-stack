@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/pkg/qrcodegenerator"
 )
 
 // Config for the ttn-lw-stack binary.
@@ -46,6 +47,7 @@ type Config struct {
 	Console          console.Config                    `name:"console"`
 	GCS              gatewayconfigurationserver.Config `name:"gcs"`
 	DTC              devicetemplateconverter.Config    `name:"dtc"`
+	QRG              qrcodegenerator.Config            `name:"qrg"`
 }
 
 // DefaultConfig contains the default config for the ttn-lw-stack binary.

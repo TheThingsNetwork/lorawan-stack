@@ -39,6 +39,7 @@ import (
 	jsredis "go.thethings.network/lorawan-stack/pkg/joinserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
 	nsredis "go.thethings.network/lorawan-stack/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/pkg/qrcodegenerator"
 	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/web"
 )
@@ -61,6 +62,7 @@ var (
 				Console                    bool
 				GatewayConfigurationServer bool
 				DeviceTemplateConverter    bool
+				QRCodeGenerator            bool
 			}
 			startDefault := len(args) == 0
 			for _, arg := range args {
@@ -68,23 +70,29 @@ var (
 				case "is", "identityserver":
 					start.IdentityServer = true
 					start.DeviceTemplateConverter = true
+					start.QRCodeGenerator = true
 				case "gs", "gatewayserver":
 					start.GatewayServer = true
 				case "ns", "networkserver":
 					start.NetworkServer = true
 					start.DeviceTemplateConverter = true
+					start.QRCodeGenerator = true
 				case "as", "applicationserver":
 					start.ApplicationServer = true
 					start.DeviceTemplateConverter = true
+					start.QRCodeGenerator = true
 				case "js", "joinserver":
 					start.JoinServer = true
 					start.DeviceTemplateConverter = true
+					start.QRCodeGenerator = true
 				case "console":
 					start.Console = true
 				case "gcs":
 					start.GatewayConfigurationServer = true
 				case "dtc":
 					start.DeviceTemplateConverter = true
+				case "qrg":
+					start.QRCodeGenerator = true
 				case "all":
 					start.IdentityServer = true
 					start.GatewayServer = true
@@ -94,6 +102,7 @@ var (
 					start.Console = true
 					start.GatewayConfigurationServer = true
 					start.DeviceTemplateConverter = true
+					start.QRCodeGenerator = true
 				default:
 					return errUnknownComponent.WithAttributes("component", arg)
 				}
@@ -235,6 +244,15 @@ var (
 					return shared.ErrInitializeDeviceTemplateConverter.WithCause(err)
 				}
 				_ = dtc
+			}
+
+			if start.QRCodeGenerator || startDefault {
+				logger.Info("Setting up QR Code Generator")
+				qrg, err := qrcodegenerator.New(c, &config.QRG)
+				if err != nil {
+					return shared.ErrInitializeQRCodeGenerator.WithCause(err)
+				}
+				_ = qrg
 			}
 
 			if rootRedirect != nil {
