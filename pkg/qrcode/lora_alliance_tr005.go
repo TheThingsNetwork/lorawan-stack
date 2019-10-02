@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -146,4 +147,29 @@ func (m *LoRaAllianceTR005Draft2) UnmarshalText(text []byte) error {
 // AuthenticatedEndDeviceIdentifiers implements the AuthenticatedEndDeviceIdentifiers interface.
 func (m *LoRaAllianceTR005Draft2) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string) {
 	return m.JoinEUI, m.DevEUI, m.DeviceValidationCode
+}
+
+type loRaAllianceTR005Draft2Format struct {
+}
+
+func (loRaAllianceTR005Draft2Format) Format() *ttnpb.QRCodeFormat {
+	return &ttnpb.QRCodeFormat{
+		Name:        "LoRa Alliance TR005 Draft 2",
+		Description: "Standard QR code format defined by LoRa Alliance.",
+		FieldMask: pbtypes.FieldMask{
+			Paths: []string{
+				"claim_authentication_code.value",
+				"ids.dev_eui",
+				"ids.join_eui",
+			},
+		},
+	}
+}
+
+func (loRaAllianceTR005Draft2Format) New() EndDeviceData {
+	return new(LoRaAllianceTR005Draft2)
+}
+
+func init() {
+	RegisterEndDeviceFormat("tr005draft2", new(loRaAllianceTR005Draft2Format))
 }
