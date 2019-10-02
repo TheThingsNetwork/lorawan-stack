@@ -8454,6 +8454,11 @@
               "name": "GATEWAY_CONFIGURATION_SERVER",
               "number": "10",
               "description": ""
+            },
+            {
+              "name": "QR_CODE_GENERATOR",
+              "number": "11",
+              "description": ""
             }
           ]
         },
@@ -21266,6 +21271,371 @@
         }
       ],
       "services": []
+    },
+    {
+      "name": "lorawan-stack/api/qrcodegenerator.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GenerateEndDeviceQRCodeRequest",
+          "longName": "GenerateEndDeviceQRCodeRequest",
+          "fullName": "ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "format_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "end_device",
+              "description": "",
+              "label": "",
+              "type": "EndDevice",
+              "longType": "EndDevice",
+              "fullType": "ttn.lorawan.v3.EndDevice",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "image",
+              "description": "",
+              "label": "",
+              "type": "Image",
+              "longType": "GenerateEndDeviceQRCodeRequest.Image",
+              "fullType": "ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Image",
+          "longName": "GenerateEndDeviceQRCodeRequest.Image",
+          "fullName": "ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "image_size",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GenerateQRCodeResponse",
+          "longName": "GenerateQRCodeResponse",
+          "fullName": "ttn.lorawan.v3.GenerateQRCodeResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "text",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "image",
+              "description": "QR code in PNG format, if requested.",
+              "label": "",
+              "type": "Picture",
+              "longType": "Picture",
+              "fullType": "ttn.lorawan.v3.Picture",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetQRCodeFormatRequest",
+          "longName": "GetQRCodeFormatRequest",
+          "fullName": "ttn.lorawan.v3.GetQRCodeFormatRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "format_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "QRCodeFormat",
+          "longName": "QRCodeFormat",
+          "fullName": "ttn.lorawan.v3.QRCodeFormat",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 200
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "The entity fields required to generate the QR code.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QRCodeFormats",
+          "longName": "QRCodeFormats",
+          "fullName": "ttn.lorawan.v3.QRCodeFormats",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "formats",
+              "description": "",
+              "label": "repeated",
+              "type": "FormatsEntry",
+              "longType": "QRCodeFormats.FormatsEntry",
+              "fullType": "ttn.lorawan.v3.QRCodeFormats.FormatsEntry",
+              "ismap": true,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "map.keys.string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormatsEntry",
+          "longName": "QRCodeFormats.FormatsEntry",
+          "fullName": "ttn.lorawan.v3.QRCodeFormats.FormatsEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "QRCodeFormat",
+              "longType": "QRCodeFormat",
+              "fullType": "ttn.lorawan.v3.QRCodeFormat",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "EndDeviceQRCodeGenerator",
+          "longName": "EndDeviceQRCodeGenerator",
+          "fullName": "ttn.lorawan.v3.EndDeviceQRCodeGenerator",
+          "description": "",
+          "methods": [
+            {
+              "name": "GetFormat",
+              "description": "Return the QR code format.",
+              "requestType": "GetQRCodeFormatRequest",
+              "requestLongType": "GetQRCodeFormatRequest",
+              "requestFullType": "ttn.lorawan.v3.GetQRCodeFormatRequest",
+              "requestStreaming": false,
+              "responseType": "QRCodeFormat",
+              "responseLongType": "QRCodeFormat",
+              "responseFullType": "ttn.lorawan.v3.QRCodeFormat",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/qr-codes/end-devices/formats/{format_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ListFormats",
+              "description": "Returns the supported formats.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "QRCodeFormats",
+              "responseLongType": "QRCodeFormats",
+              "responseFullType": "ttn.lorawan.v3.QRCodeFormats",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/qr-codes/end-devices/formats"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Generate",
+              "description": "Generates a QR code.",
+              "requestType": "GenerateEndDeviceQRCodeRequest",
+              "requestLongType": "GenerateEndDeviceQRCodeRequest",
+              "requestFullType": "ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest",
+              "requestStreaming": false,
+              "responseType": "GenerateQRCodeResponse",
+              "responseLongType": "GenerateQRCodeResponse",
+              "responseFullType": "ttn.lorawan.v3.GenerateQRCodeResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/qr-codes/end-devices",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "lorawan-stack/api/regional.proto",

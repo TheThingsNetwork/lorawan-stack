@@ -368,6 +368,19 @@
 - [File `lorawan-stack/api/organization_services.proto`](#lorawan-stack/api/organization_services.proto)
   - [Service `OrganizationAccess`](#ttn.lorawan.v3.OrganizationAccess)
   - [Service `OrganizationRegistry`](#ttn.lorawan.v3.OrganizationRegistry)
+- [File `lorawan-stack/api/picture.proto`](#lorawan-stack/api/picture.proto)
+  - [Message `Picture`](#ttn.lorawan.v3.Picture)
+  - [Message `Picture.Embedded`](#ttn.lorawan.v3.Picture.Embedded)
+  - [Message `Picture.SizesEntry`](#ttn.lorawan.v3.Picture.SizesEntry)
+- [File `lorawan-stack/api/qrcodegenerator.proto`](#lorawan-stack/api/qrcodegenerator.proto)
+  - [Message `GenerateEndDeviceQRCodeRequest`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest)
+  - [Message `GenerateEndDeviceQRCodeRequest.Image`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image)
+  - [Message `GenerateQRCodeResponse`](#ttn.lorawan.v3.GenerateQRCodeResponse)
+  - [Message `GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest)
+  - [Message `QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat)
+  - [Message `QRCodeFormats`](#ttn.lorawan.v3.QRCodeFormats)
+  - [Message `QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry)
+  - [Service `EndDeviceQRCodeGenerator`](#ttn.lorawan.v3.EndDeviceQRCodeGenerator)
 - [File `lorawan-stack/api/regional.proto`](#lorawan-stack/api/regional.proto)
   - [Message `ConcentratorConfig`](#ttn.lorawan.v3.ConcentratorConfig)
   - [Message `ConcentratorConfig.Channel`](#ttn.lorawan.v3.ConcentratorConfig.Channel)
@@ -401,9 +414,6 @@
   - [Message `ListInvitationsRequest`](#ttn.lorawan.v3.ListInvitationsRequest)
   - [Message `ListUserAPIKeysRequest`](#ttn.lorawan.v3.ListUserAPIKeysRequest)
   - [Message `ListUserSessionsRequest`](#ttn.lorawan.v3.ListUserSessionsRequest)
-  - [Message `Picture`](#ttn.lorawan.v3.Picture)
-  - [Message `Picture.Embedded`](#ttn.lorawan.v3.Picture.Embedded)
-  - [Message `Picture.SizesEntry`](#ttn.lorawan.v3.Picture.SizesEntry)
   - [Message `SendInvitationRequest`](#ttn.lorawan.v3.SendInvitationRequest)
   - [Message `UpdateUserAPIKeyRequest`](#ttn.lorawan.v3.UpdateUserAPIKeyRequest)
   - [Message `UpdateUserPasswordRequest`](#ttn.lorawan.v3.UpdateUserPasswordRequest)
@@ -2195,6 +2205,7 @@ Power state of the device.
 | `DEVICE_TEMPLATE_CONVERTER` | 8 |  |
 | `DEVICE_CLAIMING_SERVER` | 9 |  |
 | `GATEWAY_CONFIGURATION_SERVER` | 10 |  |
+| `QR_CODE_GENERATOR` | 11 |  |
 
 ### <a name="ttn.lorawan.v3.DownlinkPathConstraint">Enum `DownlinkPathConstraint`</a>
 
@@ -5216,8 +5227,6 @@ where the user or organization is collaborator on.
 | `Update` | `PUT` | `/api/v3/organizations/{organization.ids.organization_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/organizations/{organization_id}` |  |
 
-<<<<<<< HEAD
-=======
 ## <a name="lorawan-stack/api/picture.proto">File `lorawan-stack/api/picture.proto`</a>
 
 ### <a name="ttn.lorawan.v3.Picture">Message `Picture`</a>
@@ -5341,11 +5350,10 @@ where the user or organization is collaborator on.
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
-| `GetFormat` | `GET` | `/api/v3/qrcodes/end-devices/formats/{format_id}` |  |
-| `ListFormats` | `GET` | `/api/v3/qrcodes/end-devices/formats` |  |
-| `Generate` | `POST` | `/api/v3/qrcodes/end-devices` | `*` |
+| `GetFormat` | `GET` | `/api/v3/qr-codes/end-devices/formats/{format_id}` |  |
+| `ListFormats` | `GET` | `/api/v3/qr-codes/end-devices/formats` |  |
+| `Generate` | `POST` | `/api/v3/qr-codes/end-devices` | `*` |
 
->>>>>>> 1b2dbd3a8... fixup! api: Promote Picture to its own file
 ## <a name="lorawan-stack/api/regional.proto">File `lorawan-stack/api/regional.proto`</a>
 
 ### <a name="ttn.lorawan.v3.ConcentratorConfig">Message `ConcentratorConfig`</a>
@@ -5760,33 +5768,6 @@ This service is not implemented on all deployments.
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
-
-### <a name="ttn.lorawan.v3.Picture">Message `Picture`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `embedded` | [`Picture.Embedded`](#ttn.lorawan.v3.Picture.Embedded) |  | Embedded picture, always maximum 128px in size. Omitted if there are external URLs available (in sizes). |
-| `sizes` | [`Picture.SizesEntry`](#ttn.lorawan.v3.Picture.SizesEntry) | repeated | URLs of the picture for different sizes, if available on a CDN. |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `sizes` | <p>`map.values.string.uri_ref`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.Picture.Embedded">Message `Picture.Embedded`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `mime_type` | [`string`](#string) |  | MIME type of the picture. |
-| `data` | [`bytes`](#bytes) |  | Picture data. A data URI can be constructed as follows: `data:<mime_type>;base64,<data>`. |
-
-### <a name="ttn.lorawan.v3.Picture.SizesEntry">Message `Picture.SizesEntry`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [`uint32`](#uint32) |  |  |
-| `value` | [`string`](#string) |  |  |
 
 ### <a name="ttn.lorawan.v3.SendInvitationRequest">Message `SendInvitationRequest`</a>
 

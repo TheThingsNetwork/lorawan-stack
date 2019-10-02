@@ -1,0 +1,92 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/picture.proto";
+
+package ttn.lorawan.v3;
+
+option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+
+message QRCodeFormat {
+  option (gogoproto.populate) = false;
+
+  string name = 1 [(validate.rules).string.max_len = 100];
+  string description = 2 [(validate.rules).string.max_len = 200];
+  // The entity fields required to generate the QR code.
+  google.protobuf.FieldMask field_mask = 3 [(gogoproto.nullable) = false];
+}
+
+message QRCodeFormats {
+  option (gogoproto.populate) = false;
+
+  map<string, QRCodeFormat> formats = 1 [(validate.rules).map.keys.string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+}
+
+message GetQRCodeFormatRequest {
+  option (gogoproto.populate) = false;
+
+  string format_id = 1 [(gogoproto.customname) = "FormatID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+}
+
+message GenerateEndDeviceQRCodeRequest {
+  option (gogoproto.populate) = false;
+
+  string format_id = 1 [(gogoproto.customname) = "FormatID", (validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$", max_len: 36}];
+  EndDevice end_device = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+
+  message Image {
+    uint32 image_size = 1 [(validate.rules).uint32.gte = 10, (validate.rules).uint32.lte = 1000];
+  }
+  Image image = 3;
+}
+
+message GenerateQRCodeResponse {
+  option (gogoproto.populate) = false;
+
+  string text = 1;
+  // QR code in PNG format, if requested.
+  Picture image = 2;
+}
+
+service EndDeviceQRCodeGenerator {
+  // Return the QR code format.
+  rpc GetFormat(GetQRCodeFormatRequest) returns (QRCodeFormat) {
+    option (google.api.http) = {
+      get: "/qr-codes/end-devices/formats/{format_id}"
+    };
+  };
+
+  // Returns the supported formats.
+  rpc ListFormats(google.protobuf.Empty) returns (QRCodeFormats) {
+    option (google.api.http) = {
+      get: "/qr-codes/end-devices/formats"
+    };
+  };
+
+  // Generates a QR code.
+  rpc Generate(GenerateEndDeviceQRCodeRequest) returns (GenerateQRCodeResponse) {
+    option (google.api.http) = {
+      post: "/qr-codes/end-devices",
+      body: "*"
+    };
+  };
+}
