@@ -99,8 +99,9 @@ type microchipATECC608AMAHTNT struct {
 
 func (m *microchipATECC608AMAHTNT) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
-		Name:        "Microchip ATECC608A-MAHTN-T Manifest File",
-		Description: "JSON manifest file received through Microchip Purchasing & Client Services.",
+		Name:           "Microchip ATECC608A-MAHTN-T Manifest File",
+		Description:    "JSON manifest file received through Microchip Purchasing & Client Services.",
+		FileExtensions: []string{".json"},
 	}
 }
 
@@ -168,8 +169,9 @@ type microchipATECC608TNGLORA struct {
 
 func (m *microchipATECC608TNGLORA) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
-		Name:        "Microchip ATECC608A-TNGLORA Manifest File",
-		Description: "JSON manifest file received through Microchip Purchasing & Client Services.",
+		Name:           "Microchip ATECC608A-TNGLORA Manifest File",
+		Description:    "JSON manifest file received through Microchip Purchasing & Client Services.",
+		FileExtensions: []string{".json"},
 	}
 }
 
