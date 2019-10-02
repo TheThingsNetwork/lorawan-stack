@@ -1142,6 +1142,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_qr_code_generator": {
+    "translations": {
+      "en": "could not initialize QR Code Generator"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:antenna_index": {
     "translations": {
       "en": "index of antenna to update out of bounds"
@@ -5352,6 +5361,15 @@
     "description": {
       "package": "pkg/qrcode",
       "file": "qrcode.go"
+    }
+  },
+  "error:pkg/qrcodegenerator:format_not_found": {
+    "translations": {
+      "en": "format `{id}` not found"
+    },
+    "description": {
+      "package": "pkg/qrcodegenerator",
+      "file": "qrcodegenerator.go"
     }
   },
   "error:pkg/redis:not_found": {
