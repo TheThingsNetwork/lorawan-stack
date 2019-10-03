@@ -98,10 +98,11 @@ Releasing a new version consists of the following steps:
 
 1. Bumping the version
 2. Writing the version files
-3. Creating the version bump commit
-4. Creating the version tag
-5. Building the release and pushing to package managers (this is done by CI)
-6. Edit the release notes
+3. Updating the `SECURITY.md` file with the supported versions.
+4. Creating the version bump commit
+5. Creating the version tag
+6. Building the release and pushing to package managers (this is done by CI)
+7. Editing the release notes
 
 Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
 
