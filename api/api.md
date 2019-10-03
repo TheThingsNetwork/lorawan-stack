@@ -1814,6 +1814,7 @@ Authentication code for end devices.
 | ----- | ---- | ----- | ----------- |
 | `name` | [`string`](#string) |  |  |
 | `description` | [`string`](#string) |  |  |
+| `file_extensions` | [`string`](#string) | repeated |  |
 
 #### Field Rules
 
@@ -1821,6 +1822,7 @@ Authentication code for end devices.
 | ----- | ----------- |
 | `name` | <p>`string.max_len`: `100`</p> |
 | `description` | <p>`string.max_len`: `200`</p> |
+| `file_extensions` | <p>`repeated.max_items`: `100`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.string.pattern`: `^(?:\.[a-z0-9]{1,16}){1,2}$`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceTemplateFormats">Message `EndDeviceTemplateFormats`</a>
 

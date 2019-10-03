@@ -549,6 +549,7 @@ message EndDeviceTemplate {
 message EndDeviceTemplateFormat {
   string name = 1 [(validate.rules).string.max_len = 100];
   string description = 2 [(validate.rules).string.max_len = 200];
+  repeated string file_extensions = 3 [(validate.rules).repeated = {max_items: 100, unique: true, items: {string: {pattern: "^(?:\\.[a-z0-9]{1,16}){1,2}$"}}}];
 }
 
 message EndDeviceTemplateFormats {

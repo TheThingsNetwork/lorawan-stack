@@ -8367,6 +8367,12 @@
         },
         "description": {
           "type": "string"
+        },
+        "file_extensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

@@ -3479,11 +3479,13 @@ var EndDeviceTemplateFieldPathsTopLevel = []string{
 }
 var EndDeviceTemplateFormatFieldPathsNested = []string{
 	"description",
+	"file_extensions",
 	"name",
 }
 
 var EndDeviceTemplateFormatFieldPathsTopLevel = []string{
 	"description",
+	"file_extensions",
 	"name",
 }
 var EndDeviceTemplateFormatsFieldPathsNested = []string{
