@@ -15,9 +15,11 @@
 package smtp
 
 import (
-	"os"
+	"net"
+	"sync"
 	"testing"
 
+	"github.com/chrj/smtpd"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -28,10 +30,29 @@ import (
 func TestSMTP(t *testing.T) {
 	a := assertions.New(t)
 
-	smtpAddress := os.Getenv("SMTP_ADDRESS")
-	if smtpAddress == "" {
-		t.Skip("No SMTP server configured, skipping test")
+	lis, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		t.Fatal(err)
 	}
+	defer lis.Close()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	var received smtpd.Envelope
+
+	server := &smtpd.Server{
+		Hostname: "example.com",
+		Handler: func(_ smtpd.Peer, env smtpd.Envelope) error {
+			received = env
+			wg.Done()
+			return nil
+		},
+	}
+
+	go server.Serve(lis)
+
+	smtpAddress := lis.Addr().String()
 
 	ctx := test.Context()
 	ctx = log.NewContext(ctx, test.GetLogger(t))
@@ -43,21 +64,32 @@ func TestSMTP(t *testing.T) {
 			SenderAddress: "unit@test.local",
 		},
 		Config{
-			Address:  smtpAddress,
-			Username: os.Getenv("SMTP_USERNAME"),
-			Password: os.Getenv("SMTP_PASSWORD"),
+			Address: smtpAddress,
 		},
 	)
 	a.So(err, should.BeNil)
 
-	err = smtp.Send(&email.Message{
+	email := &email.Message{
 		TemplateName:     "test",
 		RecipientName:    "John Doe",
 		RecipientAddress: "john.doe@example.com",
 		Subject:          "Testing SMTP",
 		HTMLBody:         "<h1>Testing SMTP</h1><p>We are testing SMTP</p>",
 		TextBody:         "****************\nTesting SMTP\n****************\n\nWe are testing SMTP",
-	})
+	}
+
+	err = smtp.Send(email)
 
 	a.So(err, should.BeNil)
+
+	wg.Wait()
+
+	a.So(received.Sender, should.Equal, "unit@test.local")
+	a.So(received.Recipients, should.Contain, email.RecipientAddress)
+
+	dataString := string(received.Data)
+
+	a.So(dataString, should.ContainSubstring, email.Subject)
+	a.So(dataString, should.ContainSubstring, email.HTMLBody)
+	a.So(dataString, should.ContainSubstring, email.TextBody)
 }

@@ -15,6 +15,10 @@
 package email_test
 
 import (
+	"testing"
+
+	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 )
@@ -69,7 +73,30 @@ func (welcome welcomeEmail) DefaultTemplates() (subject, html, text string) {
 	return welcomeSubject, welcomeHTML, welcomeText
 }
 
-func ExampleTemplateRegistry() {
+func TestEmail(t *testing.T) {
+	a := assertions.New(t)
+
+	registry := email.NewTemplateRegistry(fetch.FromFilesystem("testdata"), "header.html", "footer.html", "header.txt", "footer.txt")
+
+	data := welcomeEmail{}
+	data.User.Name = "John Doe"
+	data.User.Email = "john.doe@example.com"
+	data.Network.Name = "The Things Network"
+	data.Network.IdentityServerURL = "https://id.thethings.network"
+
+	message, err := registry.Render(data)
+	a.So(err, should.BeNil)
+	if a.So(message, should.NotBeNil) {
+		a.So(message.Subject, should.Equal, "Welcome to The Things Network")
+		a.So(message.HTMLBody, should.ContainSubstring, `<div class="header">`)
+		a.So(message.HTMLBody, should.ContainSubstring, "Welcome to The Things Network, John Doe!")
+		a.So(message.HTMLBody, should.ContainSubstring, `<div class="footer">`)
+		a.So(message.TextBody, should.ContainSubstring, "==================")
+		a.So(message.TextBody, should.ContainSubstring, "Welcome to The Things Network, John Doe!")
+	}
+}
+
+func Example() {
 	// The email sender can be Sendgrid, SMTP, ...
 	var sender email.Sender
 

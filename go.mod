@@ -58,6 +58,7 @@ require (
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb // indirect
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/certifi/gocertifi v0.0.0-20190905060710-a5e0173ced67 // indirect
+	github.com/chrj/smtpd v0.1.2
 	github.com/client9/misspell v0.3.4
 	github.com/disintegration/imaging v1.6.1
 	github.com/dlclark/regexp2 v1.2.0 // indirect
