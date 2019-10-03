@@ -1,0 +1,2 @@
+{{.Network.Name}}
+{{ strings.Repeat "=" (len .Network.Name) }}
