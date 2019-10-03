@@ -33,7 +33,7 @@ type TemplateRegistry struct {
 func NewTemplateRegistry(fetcher fetch.Interface, includes ...string) *TemplateRegistry {
 	r := &TemplateRegistry{
 		fetcher: fetcher,
-		shared:  template.New(""),
+		shared:  template.New("").Funcs(defaultFuncs),
 	}
 	for _, include := range includes {
 		data, err := fetcher.File(include)
