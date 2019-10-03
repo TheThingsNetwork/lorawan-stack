@@ -71,7 +71,7 @@ export default class CollaboratorsTable extends Component {
         entity="collaborators"
         headers={headers}
         getItemPathPrefix={this.getCollaboratorPathPrefix}
-        addMessage={sharedMessages.collaboratorAdd}
+        addMessage={sharedMessages.addCollaborator}
         tableTitle={<Message content={sharedMessages.collaborators} />}
         {...this.props}
       />
