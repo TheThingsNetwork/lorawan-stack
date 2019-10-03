@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -25,7 +26,7 @@ import (
 func TestHash(t *testing.T) {
 	a := assertions.New(t)
 
-	ctx := test.Context()
+	ctx := NewContextWithHashValidator(test.Context(), pbkdf2.Default())
 
 	plain := "secret"
 
