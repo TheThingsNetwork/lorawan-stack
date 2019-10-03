@@ -31,12 +31,10 @@ func TestContext(t *testing.T) {
 
 	a.So(FromContext(ctx), should.NotBeNil)
 	a.So(FromContext(ctx), should.Equal, Noop)
-	a.So(func() { Must(FromContext(ctx)) }, should.NotPanic)
 
 	ctx = NewContext(ctx, logger)
 
 	a.So(FromContext(ctx), should.Equal, logger)
-	a.So(func() { Must(FromContext(ctx)) }, should.NotPanic)
 
 	t.Run("NewContextWithField", func(t *testing.T) {
 		a := assertions.New(t)
