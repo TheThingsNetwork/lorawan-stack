@@ -25,8 +25,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestJSONUpstream(t *testing.T) {
-	formatter := formatters.JSON
+func TestProtobufUpstream(t *testing.T) {
+	formatter := formatters.Protobuf
 
 	for i, tc := range []struct {
 		Message *ttnpb.ApplicationUp
@@ -58,7 +58,6 @@ func TestJSONUpstream(t *testing.T) {
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"uplink_message":{"session_key_id":"ESIzRA==","f_port":42,"f_cnt":42,"frm_payload":"AQID","decoded_payload":{"test_key":42},"settings":{"data_rate":{}}}}`,
 		},
 		{
 			Message: &ttnpb.ApplicationUp{
@@ -75,22 +74,25 @@ func TestJSONUpstream(t *testing.T) {
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"ESIzRA=="}}`,
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			buf, err := formatter.FromUp(tc.Message)
+			actual, err := formatter.FromUp(tc.Message)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			a.So(string(buf), should.Equal, tc.Result)
+			expected, err := tc.Message.Marshal()
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(actual, should.Resemble, expected)
 		})
 	}
 }
 
-func TestJSONDownstream(t *testing.T) {
-	formatter := formatters.JSON
+func TestProtobufDownstream(t *testing.T) {
+	formatter := formatters.Protobuf
 
 	t.Run("Downlinks", func(t *testing.T) {
 		for i, tc := range []struct {
@@ -105,7 +107,6 @@ func TestJSONDownstream(t *testing.T) {
 				},
 			},
 			{
-				Input: []byte(`{"downlinks":[{"f_port":42,"frm_payload":"AQEB","confirmed":true},{"f_port":42,"frm_payload":"AgIC","confirmed":true}]}`),
 				Items: &ttnpb.ApplicationDownlinks{
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
@@ -124,7 +125,14 @@ func TestJSONDownstream(t *testing.T) {
 		} {
 			t.Run(strconv.Itoa(i), func(t *testing.T) {
 				a := assertions.New(t)
-				res, err := formatter.ToDownlinks(tc.Input)
+				input := tc.Input
+				if input == nil {
+					var err error
+					if input, err = tc.Items.Marshal(); !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+				}
+				res, err := formatter.ToDownlinks(input)
 				if tc.ErrorAssertion != nil && !tc.ErrorAssertion(t, err) || tc.ErrorAssertion == nil && !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
@@ -146,7 +154,6 @@ func TestJSONDownstream(t *testing.T) {
 				},
 			},
 			{
-				Input: []byte(`{"end_device_ids":{"application_ids":{"application_id":"foo-app"},"device_id":"foo-device"},"downlinks":[{"f_port":42,"frm_payload":"AQEB","confirmed":true},{"f_port":42,"frm_payload":"AgIC","confirmed":true}]}}`),
 				Request: &ttnpb.DownlinkQueueRequest{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
@@ -171,7 +178,14 @@ func TestJSONDownstream(t *testing.T) {
 		} {
 			t.Run(strconv.Itoa(i), func(t *testing.T) {
 				a := assertions.New(t)
-				res, err := formatter.ToDownlinkQueueRequest(tc.Input)
+				input := tc.Input
+				if input == nil {
+					var err error
+					if input, err = tc.Request.Marshal(); !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
+				}
+				res, err := formatter.ToDownlinkQueueRequest(input)
 				if tc.ErrorAssertion != nil && !tc.ErrorAssertion(t, err) || tc.ErrorAssertion == nil && !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
