@@ -16,7 +16,6 @@ package auth
 
 import (
 	"context"
-	"crypto/subtle"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/pbkdf2"
@@ -99,9 +98,4 @@ func Validate(hashed, plain string) (bool, error) {
 	}
 
 	return false, errUnknownHashingMethod.WithAttributes("method", typ)
-}
-
-// Equals safely checks whether or not the hashes are the same.
-func Equals(a, b string) bool {
-	return subtle.ConstantTimeEq(int32(len(a)), int32(len(b))) == 1 && subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
 }

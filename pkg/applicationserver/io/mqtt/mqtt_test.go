@@ -204,6 +204,16 @@ func TestTraffic(t *testing.T) {
 				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceID),
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: registeredDeviceID,
+					Up: &ttnpb.ApplicationUp_JoinAccept{
+						JoinAccept: &ttnpb.ApplicationJoinAccept{SessionKeyID: []byte{0x1, 0x1, 0x1}},
+					},
+				},
+				OK: true,
+			},
+			{
+				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceID),
+				Message: &ttnpb.ApplicationUp{
+					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FRMPayload: []byte{0x3, 0x3, 0x3}},
 					},

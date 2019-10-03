@@ -347,3 +347,61 @@ func TestTraffic(t *testing.T) {
 		}
 	})
 }
+
+type mockMQTTConfigProvider struct {
+	config.MQTT
+}
+
+func (p mockMQTTConfigProvider) GetMQTTConfig(context.Context) (*config.MQTT, error) {
+	return &p.MQTT, nil
+}
+
+func TestMQTTConfig(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	is, isAddr := startMockIS(ctx)
+	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	as := mock.NewServer(c)
+	srv := New(as, WithMQTTConfigProvider(&mockMQTTConfigProvider{
+		MQTT: config.MQTT{
+			PublicAddress:    "example.com:1883",
+			PublicTLSAddress: "example.com:8883",
+		},
+	}))
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+	client := ttnpb.NewAppAsClient(c.LoopbackConn())
+
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     registeredApplicationKey,
+		AllowInsecure: true,
+	})
+
+	info, err := client.GetMQTTConnectionInfo(ctx, &registeredApplicationID, creds)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(info, should.Resemble, &ttnpb.MQTTConnectionInfo{
+		Username:         registeredApplicationUID,
+		PublicAddress:    "example.com:1883",
+		PublicTLSAddress: "example.com:8883",
+	})
+}

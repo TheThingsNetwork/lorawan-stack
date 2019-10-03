@@ -46,8 +46,8 @@ func WithMQTTConfigProvider(provider config.MQTTConfigProvider) Option {
 	})
 }
 
-// WithMQTTv2ConfigProvider sets the MQTT v2 configuration provider for the gRPC frontend.
-func WithMQTTv2ConfigProvider(provider config.MQTTConfigProvider) Option {
+// WithMQTTV2ConfigProvider sets the MQTT v2 configuration provider for the gRPC frontend.
+func WithMQTTV2ConfigProvider(provider config.MQTTConfigProvider) Option {
 	return optionFunc(func(i *impl) {
 		i.mqttv2ConfigProvider = provider
 	})
@@ -74,21 +74,21 @@ func (*impl) SupportsDownlinkClaim() bool { return false }
 var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_uid}`")
 
 // LinkGateway links the gateway to the Gateway Server.
-func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) (err error) {
+func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	ctx := log.NewContextWithField(link.Context(), "namespace", "gatewayserver/io/grpc")
 
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
+	ctx, ids, err := s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
-		return
+		return err
 	}
 	if err = ids.ValidateContext(ctx); err != nil {
-		return
+		return err
 	}
 	if err = rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
-		return
+		return err
 	}
 
 	if peer, ok := peer.FromContext(ctx); ok {
