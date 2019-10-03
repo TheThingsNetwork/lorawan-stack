@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package crypto
+package crypto_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	. "go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestKeyDerivation(t *testing.T) {
 	a := assertions.New(t)
-
-	a.So(reverse([]byte{1, 2, 3, 4}), should.Resemble, []byte{4, 3, 2, 1})
 
 	key := types.AES128Key{0xBE, 0xC4, 0x99, 0xC6, 0x9E, 0x9C, 0x93, 0x9E, 0x41, 0x3B, 0x66, 0x39, 0x61, 0x63, 0x6C, 0x61}
 	dn := types.DevNonce{0x73, 0x69}

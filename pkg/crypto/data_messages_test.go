@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package crypto
+package crypto_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	. "go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -25,8 +26,8 @@ import (
 func TestUplinkDownlinkEncryption(t *testing.T) {
 	a := assertions.New(t)
 
-	var key = types.AES128Key{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	var addr = types.DevAddr{1, 2, 3, 4}
+	key := types.AES128Key{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	addr := types.DevAddr{1, 2, 3, 4}
 
 	var res []byte
 
@@ -44,8 +45,8 @@ func TestUplinkDownlinkEncryption(t *testing.T) {
 func TestUplinkDownlinkMIC(t *testing.T) {
 	a := assertions.New(t)
 
-	var key = types.AES128Key{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	var addr = types.DevAddr{1, 2, 3, 4}
+	key := types.AES128Key{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	addr := types.DevAddr{1, 2, 3, 4}
 	payloadWithoutMIC := []byte{
 		0x40,                   // Unconfirmed Uplink
 		0x04, 0x03, 0x02, 0x01, // DevAddr 01020304
