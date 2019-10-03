@@ -213,47 +213,6 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 	return nil
 }
 
-func (dst *Picture) SetFields(src *Picture, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "embedded":
-			if len(subs) > 0 {
-				newDst := dst.Embedded
-				if newDst == nil {
-					newDst = &Picture_Embedded{}
-					dst.Embedded = newDst
-				}
-				var newSrc *Picture_Embedded
-				if src != nil {
-					newSrc = src.Embedded
-				}
-				if err := newDst.SetFields(newSrc, subs...); err != nil {
-					return err
-				}
-			} else {
-				if src != nil {
-					dst.Embedded = src.Embedded
-				} else {
-					dst.Embedded = nil
-				}
-			}
-		case "sizes":
-			if len(subs) > 0 {
-				return fmt.Errorf("'sizes' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Sizes = src.Sizes
-			} else {
-				dst.Sizes = nil
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
 func (dst *Users) SetFields(src *Users, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {
@@ -1023,36 +982,6 @@ func (dst *ListUserSessionsRequest) SetFields(src *ListUserSessionsRequest, path
 			} else {
 				var zero uint32
 				dst.Page = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *Picture_Embedded) SetFields(src *Picture_Embedded, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		switch name {
-		case "mime_type":
-			if len(subs) > 0 {
-				return fmt.Errorf("'mime_type' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.MimeType = src.MimeType
-			} else {
-				var zero string
-				dst.MimeType = zero
-			}
-		case "data":
-			if len(subs) > 0 {
-				return fmt.Errorf("'data' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Data = src.Data
-			} else {
-				dst.Data = nil
 			}
 
 		default:

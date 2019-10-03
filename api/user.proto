@@ -23,6 +23,7 @@ import "lorawan-stack/api/client.proto";
 import "lorawan-stack/api/contact_info.proto";
 import "lorawan-stack/api/enums.proto";
 import "lorawan-stack/api/identifiers.proto";
+import "lorawan-stack/api/picture.proto";
 import "lorawan-stack/api/rights.proto";
 
 package ttn.lorawan.v3;
@@ -63,23 +64,6 @@ message User {
   google.protobuf.Timestamp temporary_password_expires_at = 17 [(gogoproto.stdtime) = true];
 
   Picture profile_picture = 18;
-}
-
-message Picture {
-  message Embedded {
-    // MIME type of the picture.
-    string mime_type = 1;
-    // Picture data. A data URI can be constructed as follows:
-    // `data:<mime_type>;base64,<data>`.
-    bytes data = 2;
-  }
-
-  // Embedded picture, always maximum 128px in size.
-  // Omitted if there are external URLs available (in sizes).
-  Embedded embedded = 1;
-
-  // URLs of the picture for different sizes, if available on a CDN.
-  map<uint32,string> sizes = 2 [(validate.rules).map.values.string.uri_ref = true];
 }
 
 message Users {

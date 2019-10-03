@@ -49,17 +49,6 @@ var UserFieldPathsTopLevel = []string{
 	"temporary_password_expires_at",
 	"updated_at",
 }
-var PictureFieldPathsNested = []string{
-	"embedded",
-	"embedded.data",
-	"embedded.mime_type",
-	"sizes",
-}
-
-var PictureFieldPathsTopLevel = []string{
-	"embedded",
-	"sizes",
-}
 var UsersFieldPathsNested = []string{
 	"users",
 }
@@ -320,13 +309,4 @@ var ListUserSessionsRequestFieldPathsTopLevel = []string{
 	"order",
 	"page",
 	"user_ids",
-}
-var Picture_EmbeddedFieldPathsNested = []string{
-	"data",
-	"mime_type",
-}
-
-var Picture_EmbeddedFieldPathsTopLevel = []string{
-	"data",
-	"mime_type",
 }

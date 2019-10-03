@@ -5216,6 +5216,136 @@ where the user or organization is collaborator on.
 | `Update` | `PUT` | `/api/v3/organizations/{organization.ids.organization_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/organizations/{organization_id}` |  |
 
+<<<<<<< HEAD
+=======
+## <a name="lorawan-stack/api/picture.proto">File `lorawan-stack/api/picture.proto`</a>
+
+### <a name="ttn.lorawan.v3.Picture">Message `Picture`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `embedded` | [`Picture.Embedded`](#ttn.lorawan.v3.Picture.Embedded) |  | Embedded picture. Omitted if there are external URLs available (in sizes). |
+| `sizes` | [`Picture.SizesEntry`](#ttn.lorawan.v3.Picture.SizesEntry) | repeated | URLs of the picture for different sizes, if available on a CDN. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `sizes` | <p>`map.values.string.uri_ref`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.Picture.Embedded">Message `Picture.Embedded`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mime_type` | [`string`](#string) |  | MIME type of the picture. |
+| `data` | [`bytes`](#bytes) |  | Picture data. A data URI can be constructed as follows: `data:<mime_type>;base64,<data>`. |
+
+### <a name="ttn.lorawan.v3.Picture.SizesEntry">Message `Picture.SizesEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`uint32`](#uint32) |  |  |
+| `value` | [`string`](#string) |  |  |
+
+## <a name="lorawan-stack/api/qrcodegenerator.proto">File `lorawan-stack/api/qrcodegenerator.proto`</a>
+
+### <a name="ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest">Message `GenerateEndDeviceQRCodeRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  |  |
+| `end_device` | [`EndDevice`](#ttn.lorawan.v3.EndDevice) |  |  |
+| `image` | [`GenerateEndDeviceQRCodeRequest.Image`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `end_device` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image">Message `GenerateEndDeviceQRCodeRequest.Image`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `image_size` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `image_size` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.GenerateQRCodeResponse">Message `GenerateQRCodeResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `text` | [`string`](#string) |  |  |
+| `image` | [`Picture`](#ttn.lorawan.v3.Picture) |  | QR code in PNG format, if requested. |
+
+### <a name="ttn.lorawan.v3.GetQRCodeFormatRequest">Message `GetQRCodeFormatRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.QRCodeFormat">Message `QRCodeFormat`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [`string`](#string) |  |  |
+| `description` | [`string`](#string) |  |  |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The entity fields required to generate the QR code. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `name` | <p>`string.max_len`: `100`</p> |
+| `description` | <p>`string.max_len`: `200`</p> |
+
+### <a name="ttn.lorawan.v3.QRCodeFormats">Message `QRCodeFormats`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `formats` | [`QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `formats` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.QRCodeFormats.FormatsEntry">Message `QRCodeFormats.FormatsEntry`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `key` | [`string`](#string) |  |  |
+| `value` | [`QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat) |  |  |
+
+### <a name="ttn.lorawan.v3.EndDeviceQRCodeGenerator">Service `EndDeviceQRCodeGenerator`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetFormat` | [`GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest) | [`QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat) | Return the QR code format. |
+| `ListFormats` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`QRCodeFormats`](#ttn.lorawan.v3.QRCodeFormats) | Returns the supported formats. |
+| `Generate` | [`GenerateEndDeviceQRCodeRequest`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest) | [`GenerateQRCodeResponse`](#ttn.lorawan.v3.GenerateQRCodeResponse) | Generates a QR code. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetFormat` | `GET` | `/api/v3/qrcodes/end-devices/formats/{format_id}` |  |
+| `ListFormats` | `GET` | `/api/v3/qrcodes/end-devices/formats` |  |
+| `Generate` | `POST` | `/api/v3/qrcodes/end-devices` | `*` |
+
+>>>>>>> 1b2dbd3a8... fixup! api: Promote Picture to its own file
 ## <a name="lorawan-stack/api/regional.proto">File `lorawan-stack/api/regional.proto`</a>
 
 ### <a name="ttn.lorawan.v3.ConcentratorConfig">Message `ConcentratorConfig`</a>

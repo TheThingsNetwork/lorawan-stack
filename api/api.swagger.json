@@ -9898,7 +9898,7 @@
       "properties": {
         "embedded": {
           "$ref": "#/definitions/PictureEmbedded",
-          "description": "Embedded picture, always maximum 128px in size.\nOmitted if there are external URLs available (in sizes)."
+          "description": "Embedded picture.\nOmitted if there are external URLs available (in sizes)."
         },
         "sizes": {
           "type": "object",

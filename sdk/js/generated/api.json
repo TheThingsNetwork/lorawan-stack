@@ -21153,6 +21153,121 @@
       ]
     },
     {
+      "name": "lorawan-stack/api/picture.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "Picture",
+          "longName": "Picture",
+          "fullName": "ttn.lorawan.v3.Picture",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "embedded",
+              "description": "Embedded picture.\nOmitted if there are external URLs available (in sizes).",
+              "label": "",
+              "type": "Embedded",
+              "longType": "Picture.Embedded",
+              "fullType": "ttn.lorawan.v3.Picture.Embedded",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "sizes",
+              "description": "URLs of the picture for different sizes, if available on a CDN.",
+              "label": "repeated",
+              "type": "SizesEntry",
+              "longType": "Picture.SizesEntry",
+              "fullType": "ttn.lorawan.v3.Picture.SizesEntry",
+              "ismap": true,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.values.string.uri_ref",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Embedded",
+          "longName": "Picture.Embedded",
+          "fullName": "ttn.lorawan.v3.Picture.Embedded",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mime_type",
+              "description": "MIME type of the picture.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "Picture data. A data URI can be constructed as follows:\n`data:\u003cmime_type\u003e;base64,\u003cdata\u003e`.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SizesEntry",
+          "longName": "Picture.SizesEntry",
+          "fullName": "ttn.lorawan.v3.Picture.SizesEntry",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "value",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "lorawan-stack/api/regional.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
@@ -22858,107 +22973,6 @@
               "type": "uint32",
               "longType": "uint32",
               "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "Picture",
-          "longName": "Picture",
-          "fullName": "ttn.lorawan.v3.Picture",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "embedded",
-              "description": "Embedded picture, always maximum 128px in size.\nOmitted if there are external URLs available (in sizes).",
-              "label": "",
-              "type": "Embedded",
-              "longType": "Picture.Embedded",
-              "fullType": "ttn.lorawan.v3.Picture.Embedded",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "sizes",
-              "description": "URLs of the picture for different sizes, if available on a CDN.",
-              "label": "repeated",
-              "type": "SizesEntry",
-              "longType": "Picture.SizesEntry",
-              "fullType": "ttn.lorawan.v3.Picture.SizesEntry",
-              "ismap": true,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "map.values.string.uri_ref",
-                    "value": true
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Embedded",
-          "longName": "Picture.Embedded",
-          "fullName": "ttn.lorawan.v3.Picture.Embedded",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "mime_type",
-              "description": "MIME type of the picture.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "data",
-              "description": "Picture data. A data URI can be constructed as follows:\n`data:\u003cmime_type\u003e;base64,\u003cdata\u003e`.",
-              "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
-              "ismap": false,
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "SizesEntry",
-          "longName": "Picture.SizesEntry",
-          "fullName": "ttn.lorawan.v3.Picture.SizesEntry",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "key",
-              "description": "",
-              "label": "",
-              "type": "uint32",
-              "longType": "uint32",
-              "fullType": "uint32",
-              "ismap": false,
-              "defaultValue": ""
-            },
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
               "ismap": false,
               "defaultValue": ""
             }
