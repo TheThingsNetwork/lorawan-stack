@@ -262,7 +262,7 @@ func (gs *GatewayServer) RegisterServices(s *grpc.Server) {
 				}
 				return &config.MQTT, nil
 			})),
-		iogrpc.WithMQTTv2ConfigProvider(
+		iogrpc.WithMQTTV2ConfigProvider(
 			config.MQTTConfigProviderFunc(func(ctx context.Context) (*config.MQTT, error) {
 				config, err := gs.GetConfig(ctx)
 				if err != nil {

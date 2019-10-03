@@ -446,3 +446,85 @@ func TestConcentratorConfig(t *testing.T) {
 	_, err := client.GetConcentratorConfig(ctx, ttnpb.Empty, creds)
 	a.So(err, should.BeNil)
 }
+
+type mockMQTTConfigProvider struct {
+	config.MQTT
+}
+
+func (p mockMQTTConfigProvider) GetMQTTConfig(context.Context) (*config.MQTT, error) {
+	return &p.MQTT, nil
+}
+
+func TestMQTTConfig(t *testing.T) {
+	a := assertions.New(t)
+
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	ctx, cancelCtx := context.WithCancel(ctx)
+	defer cancelCtx()
+
+	is, isAddr := mock.NewIS(ctx)
+	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":0",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: config.Cluster{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	gs := mock.NewServer(c)
+	srv := New(gs,
+		WithMQTTConfigProvider(&mockMQTTConfigProvider{
+			MQTT: config.MQTT{
+				PublicAddress:    "example.com:1883",
+				PublicTLSAddress: "example.com:8883",
+			},
+		}),
+		WithMQTTV2ConfigProvider(&mockMQTTConfigProvider{
+			MQTT: config.MQTT{
+				PublicAddress:    "v2.example.com:1883",
+				PublicTLSAddress: "v2.example.com:8883",
+			},
+		}),
+	)
+	c.RegisterGRPC(&mockRegisterer{ctx, srv})
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
+
+	ctx = rpcmetadata.MD{
+		ID: registeredGatewayID.GatewayID,
+	}.ToOutgoingContext(ctx)
+	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "Bearer",
+		AuthValue:     registeredGatewayKey,
+		AllowInsecure: true,
+	})
+
+	info, err := client.GetMQTTConnectionInfo(ctx, &registeredGatewayID, creds)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(info, should.Resemble, &ttnpb.MQTTConnectionInfo{
+		Username:         registeredGatewayUID,
+		PublicAddress:    "example.com:1883",
+		PublicTLSAddress: "example.com:8883",
+	})
+
+	infov2, err := client.GetMQTTV2ConnectionInfo(ctx, &registeredGatewayID, creds)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(infov2, should.Resemble, &ttnpb.MQTTConnectionInfo{
+		Username:         registeredGatewayUID,
+		PublicAddress:    "v2.example.com:1883",
+		PublicTLSAddress: "v2.example.com:8883",
+	})
+}
