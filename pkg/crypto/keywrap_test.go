@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package crypto
+package crypto_test
 
 import (
 	"encoding/hex"
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	. "go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestKEK(t *testing.T) {
 	a := assertions.New(t)
 
-	var table = []struct {
+	table := []struct {
 		plaintext  string
 		kek        string
 		ciphertext string
@@ -80,5 +81,4 @@ func TestKEK(t *testing.T) {
 
 	_, err = UnwrapKey(data, kek)
 	a.So(err, should.NotBeNil)
-
 }

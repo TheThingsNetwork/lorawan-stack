@@ -48,7 +48,7 @@ func WrapKey(plaintext, kek []byte) ([]byte, error) {
 		return nil, errInvalidKeyLength.WithAttributes("size", length)
 	}
 
-	var n = length / 8
+	n := length / 8
 	if n < 2 {
 		return nil, errInvalidKeyLength.WithAttributes("size", length)
 	}
@@ -59,10 +59,10 @@ func WrapKey(plaintext, kek []byte) ([]byte, error) {
 	}
 
 	// Set A to initial value
-	var a = iv
+	a := iv
 
 	// Fill R blocks
-	var r = make([][8]byte, n)
+	r := make([][8]byte, n)
 	for i := 0; i < n; i++ {
 		copy(r[i][:], plaintext[i*8:(i+1)*8])
 	}
@@ -96,7 +96,7 @@ func UnwrapKey(ciphertext, kek []byte) ([]byte, error) {
 		return nil, errInvalidKeyLength.WithAttributes("size", length)
 	}
 
-	var n = (length / 8) - 1
+	n := (length / 8) - 1
 	if n < 2 {
 		return nil, errInvalidKeyLength.WithAttributes("size", length)
 	}
@@ -111,7 +111,7 @@ func UnwrapKey(ciphertext, kek []byte) ([]byte, error) {
 	copy(a[:], ciphertext[:8])
 
 	// Fill R blocks
-	var r = make([][8]byte, n)
+	r := make([][8]byte, n)
 	for i := 0; i < n; i++ {
 		copy(r[i][:], ciphertext[(i+1)*8:(i+2)*8])
 	}

@@ -15,6 +15,7 @@
 package lorawan_test
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"testing"
@@ -815,6 +816,227 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(msg, should.Resemble, tc.Message)
+		})
+	}
+}
+
+func TestDeviceEIRPToFloat32(t *testing.T) {
+	for _, tc := range []struct {
+		Enum  ttnpb.DeviceEIRP
+		Float float32
+	}{
+		{Enum: ttnpb.DEVICE_EIRP_36, Float: 36},
+		{Enum: ttnpb.DEVICE_EIRP_33, Float: 33},
+		{Enum: ttnpb.DEVICE_EIRP_30, Float: 30},
+		{Enum: ttnpb.DEVICE_EIRP_29, Float: 29},
+		{Enum: ttnpb.DEVICE_EIRP_27, Float: 27},
+		{Enum: ttnpb.DEVICE_EIRP_26, Float: 26},
+		{Enum: ttnpb.DEVICE_EIRP_24, Float: 24},
+		{Enum: ttnpb.DEVICE_EIRP_21, Float: 21},
+		{Enum: ttnpb.DEVICE_EIRP_20, Float: 20},
+		{Enum: ttnpb.DEVICE_EIRP_18, Float: 18},
+		{Enum: ttnpb.DEVICE_EIRP_16, Float: 16},
+		{Enum: ttnpb.DEVICE_EIRP_14, Float: 14},
+		{Enum: ttnpb.DEVICE_EIRP_13, Float: 13},
+		{Enum: ttnpb.DEVICE_EIRP_12, Float: 12},
+		{Enum: ttnpb.DEVICE_EIRP_10, Float: 10},
+		{Enum: ttnpb.DEVICE_EIRP_8, Float: 8},
+	} {
+		t.Run(fmt.Sprintf("%v", tc.Float), func(t *testing.T) {
+			assertions.New(t).So(DeviceEIRPToFloat32(tc.Enum), should.Equal, tc.Float)
+		})
+	}
+}
+
+func TestFloat32ToDeviceEIRP(t *testing.T) {
+	for _, tc := range []struct {
+		Float float32
+		Enum  ttnpb.DeviceEIRP
+	}{
+		{Float: 38, Enum: ttnpb.DEVICE_EIRP_36},
+		{Float: 37, Enum: ttnpb.DEVICE_EIRP_36},
+		{Float: 36, Enum: ttnpb.DEVICE_EIRP_36},
+		{Float: 35, Enum: ttnpb.DEVICE_EIRP_33},
+		{Float: 33, Enum: ttnpb.DEVICE_EIRP_33},
+		{Float: 30, Enum: ttnpb.DEVICE_EIRP_30},
+		{Float: 29, Enum: ttnpb.DEVICE_EIRP_29},
+		{Float: 27, Enum: ttnpb.DEVICE_EIRP_27},
+		{Float: 26, Enum: ttnpb.DEVICE_EIRP_26},
+		{Float: 24, Enum: ttnpb.DEVICE_EIRP_24},
+		{Float: 23, Enum: ttnpb.DEVICE_EIRP_21},
+		{Float: 22, Enum: ttnpb.DEVICE_EIRP_21},
+		{Float: 21, Enum: ttnpb.DEVICE_EIRP_21},
+		{Float: 20, Enum: ttnpb.DEVICE_EIRP_20},
+		{Float: 19, Enum: ttnpb.DEVICE_EIRP_18},
+		{Float: 18, Enum: ttnpb.DEVICE_EIRP_18},
+		{Float: 17, Enum: ttnpb.DEVICE_EIRP_16},
+		{Float: 16, Enum: ttnpb.DEVICE_EIRP_16},
+		{Float: 15, Enum: ttnpb.DEVICE_EIRP_14},
+		{Float: 14, Enum: ttnpb.DEVICE_EIRP_14},
+		{Float: 13, Enum: ttnpb.DEVICE_EIRP_13},
+		{Float: 12, Enum: ttnpb.DEVICE_EIRP_12},
+		{Float: 11, Enum: ttnpb.DEVICE_EIRP_10},
+		{Float: 10, Enum: ttnpb.DEVICE_EIRP_10},
+		{Float: 9, Enum: ttnpb.DEVICE_EIRP_8},
+		{Float: 8, Enum: ttnpb.DEVICE_EIRP_8},
+		{Float: 7, Enum: ttnpb.DEVICE_EIRP_8},
+	} {
+		t.Run(fmt.Sprintf("%v", tc.Float), func(t *testing.T) {
+			assertions.New(t).So(Float32ToDeviceEIRP(tc.Float), should.Equal, tc.Enum)
+		})
+	}
+}
+
+func TestADRAckLimitExponentToUint32(t *testing.T) {
+	for _, tc := range []struct {
+		Enum ttnpb.ADRAckLimitExponent
+		Uint uint32
+	}{
+		{Enum: ttnpb.ADR_ACK_LIMIT_32768, Uint: 32768},
+		{Enum: ttnpb.ADR_ACK_LIMIT_16384, Uint: 16384},
+		{Enum: ttnpb.ADR_ACK_LIMIT_8192, Uint: 8192},
+		{Enum: ttnpb.ADR_ACK_LIMIT_4096, Uint: 4096},
+		{Enum: ttnpb.ADR_ACK_LIMIT_2048, Uint: 2048},
+		{Enum: ttnpb.ADR_ACK_LIMIT_1024, Uint: 1024},
+		{Enum: ttnpb.ADR_ACK_LIMIT_512, Uint: 512},
+		{Enum: ttnpb.ADR_ACK_LIMIT_256, Uint: 256},
+		{Enum: ttnpb.ADR_ACK_LIMIT_128, Uint: 128},
+		{Enum: ttnpb.ADR_ACK_LIMIT_64, Uint: 64},
+		{Enum: ttnpb.ADR_ACK_LIMIT_32, Uint: 32},
+		{Enum: ttnpb.ADR_ACK_LIMIT_16, Uint: 16},
+		{Enum: ttnpb.ADR_ACK_LIMIT_8, Uint: 8},
+		{Enum: ttnpb.ADR_ACK_LIMIT_4, Uint: 4},
+		{Enum: ttnpb.ADR_ACK_LIMIT_2, Uint: 2},
+		{Enum: ttnpb.ADR_ACK_LIMIT_1, Uint: 1},
+	} {
+		t.Run(fmt.Sprintf("%v", tc.Uint), func(t *testing.T) {
+			assertions.New(t).So(ADRAckLimitExponentToUint32(tc.Enum), should.Equal, tc.Uint)
+		})
+	}
+}
+
+func TestUint32ToADRAckLimitExponent(t *testing.T) {
+	for _, tc := range []struct {
+		Uint uint32
+		Enum ttnpb.ADRAckLimitExponent
+	}{
+		{Uint: 32769, Enum: ttnpb.ADR_ACK_LIMIT_32768},
+		{Uint: 32768, Enum: ttnpb.ADR_ACK_LIMIT_32768},
+		{Uint: 32767, Enum: ttnpb.ADR_ACK_LIMIT_16384},
+		{Uint: 16384, Enum: ttnpb.ADR_ACK_LIMIT_16384},
+		{Uint: 16383, Enum: ttnpb.ADR_ACK_LIMIT_8192},
+		{Uint: 8192, Enum: ttnpb.ADR_ACK_LIMIT_8192},
+		{Uint: 8191, Enum: ttnpb.ADR_ACK_LIMIT_4096},
+		{Uint: 4097, Enum: ttnpb.ADR_ACK_LIMIT_4096},
+		{Uint: 4096, Enum: ttnpb.ADR_ACK_LIMIT_4096},
+		{Uint: 4095, Enum: ttnpb.ADR_ACK_LIMIT_2048},
+		{Uint: 2049, Enum: ttnpb.ADR_ACK_LIMIT_2048},
+		{Uint: 2048, Enum: ttnpb.ADR_ACK_LIMIT_2048},
+		{Uint: 2047, Enum: ttnpb.ADR_ACK_LIMIT_1024},
+		{Uint: 1024, Enum: ttnpb.ADR_ACK_LIMIT_1024},
+		{Uint: 1023, Enum: ttnpb.ADR_ACK_LIMIT_512},
+		{Uint: 512, Enum: ttnpb.ADR_ACK_LIMIT_512},
+		{Uint: 511, Enum: ttnpb.ADR_ACK_LIMIT_256},
+		{Uint: 256, Enum: ttnpb.ADR_ACK_LIMIT_256},
+		{Uint: 255, Enum: ttnpb.ADR_ACK_LIMIT_128},
+		{Uint: 128, Enum: ttnpb.ADR_ACK_LIMIT_128},
+		{Uint: 127, Enum: ttnpb.ADR_ACK_LIMIT_64},
+		{Uint: 64, Enum: ttnpb.ADR_ACK_LIMIT_64},
+		{Uint: 63, Enum: ttnpb.ADR_ACK_LIMIT_32},
+		{Uint: 32, Enum: ttnpb.ADR_ACK_LIMIT_32},
+		{Uint: 31, Enum: ttnpb.ADR_ACK_LIMIT_16},
+		{Uint: 16, Enum: ttnpb.ADR_ACK_LIMIT_16},
+		{Uint: 15, Enum: ttnpb.ADR_ACK_LIMIT_8},
+		{Uint: 9, Enum: ttnpb.ADR_ACK_LIMIT_8},
+		{Uint: 8, Enum: ttnpb.ADR_ACK_LIMIT_8},
+		{Uint: 7, Enum: ttnpb.ADR_ACK_LIMIT_4},
+		{Uint: 6, Enum: ttnpb.ADR_ACK_LIMIT_4},
+		{Uint: 5, Enum: ttnpb.ADR_ACK_LIMIT_4},
+		{Uint: 4, Enum: ttnpb.ADR_ACK_LIMIT_4},
+		{Uint: 3, Enum: ttnpb.ADR_ACK_LIMIT_2},
+		{Uint: 2, Enum: ttnpb.ADR_ACK_LIMIT_2},
+		{Uint: 1, Enum: ttnpb.ADR_ACK_LIMIT_1},
+		{Uint: 0, Enum: ttnpb.ADR_ACK_LIMIT_1},
+	} {
+		t.Run(fmt.Sprintf("%v", tc.Uint), func(t *testing.T) {
+			assertions.New(t).So(Uint32ToADRAckLimitExponent(tc.Uint), should.Equal, tc.Enum)
+		})
+	}
+}
+
+func TestADRAckDelayExponentToUint32(t *testing.T) {
+	for _, tc := range []struct {
+		Enum ttnpb.ADRAckDelayExponent
+		Uint uint32
+	}{
+		{Enum: ttnpb.ADR_ACK_DELAY_32768, Uint: 32768},
+		{Enum: ttnpb.ADR_ACK_DELAY_16384, Uint: 16384},
+		{Enum: ttnpb.ADR_ACK_DELAY_8192, Uint: 8192},
+		{Enum: ttnpb.ADR_ACK_DELAY_4096, Uint: 4096},
+		{Enum: ttnpb.ADR_ACK_DELAY_2048, Uint: 2048},
+		{Enum: ttnpb.ADR_ACK_DELAY_1024, Uint: 1024},
+		{Enum: ttnpb.ADR_ACK_DELAY_512, Uint: 512},
+		{Enum: ttnpb.ADR_ACK_DELAY_256, Uint: 256},
+		{Enum: ttnpb.ADR_ACK_DELAY_128, Uint: 128},
+		{Enum: ttnpb.ADR_ACK_DELAY_64, Uint: 64},
+		{Enum: ttnpb.ADR_ACK_DELAY_32, Uint: 32},
+		{Enum: ttnpb.ADR_ACK_DELAY_16, Uint: 16},
+		{Enum: ttnpb.ADR_ACK_DELAY_8, Uint: 8},
+		{Enum: ttnpb.ADR_ACK_DELAY_4, Uint: 4},
+		{Enum: ttnpb.ADR_ACK_DELAY_2, Uint: 2},
+		{Enum: ttnpb.ADR_ACK_DELAY_1, Uint: 1},
+	} {
+		t.Run(fmt.Sprintf("%v", tc.Uint), func(t *testing.T) {
+			assertions.New(t).So(ADRAckDelayExponentToUint32(tc.Enum), should.Equal, tc.Uint)
+		})
+	}
+}
+
+func TestUint32ToADRAckDelayExponent(t *testing.T) {
+	for _, tc := range []struct {
+		Uint uint32
+		Enum ttnpb.ADRAckDelayExponent
+	}{
+		{Uint: 32769, Enum: ttnpb.ADR_ACK_DELAY_32768},
+		{Uint: 32768, Enum: ttnpb.ADR_ACK_DELAY_32768},
+		{Uint: 32767, Enum: ttnpb.ADR_ACK_DELAY_16384},
+		{Uint: 16384, Enum: ttnpb.ADR_ACK_DELAY_16384},
+		{Uint: 16383, Enum: ttnpb.ADR_ACK_DELAY_8192},
+		{Uint: 8192, Enum: ttnpb.ADR_ACK_DELAY_8192},
+		{Uint: 8191, Enum: ttnpb.ADR_ACK_DELAY_4096},
+		{Uint: 4097, Enum: ttnpb.ADR_ACK_DELAY_4096},
+		{Uint: 4096, Enum: ttnpb.ADR_ACK_DELAY_4096},
+		{Uint: 4095, Enum: ttnpb.ADR_ACK_DELAY_2048},
+		{Uint: 2049, Enum: ttnpb.ADR_ACK_DELAY_2048},
+		{Uint: 2048, Enum: ttnpb.ADR_ACK_DELAY_2048},
+		{Uint: 2047, Enum: ttnpb.ADR_ACK_DELAY_1024},
+		{Uint: 1024, Enum: ttnpb.ADR_ACK_DELAY_1024},
+		{Uint: 1023, Enum: ttnpb.ADR_ACK_DELAY_512},
+		{Uint: 512, Enum: ttnpb.ADR_ACK_DELAY_512},
+		{Uint: 511, Enum: ttnpb.ADR_ACK_DELAY_256},
+		{Uint: 256, Enum: ttnpb.ADR_ACK_DELAY_256},
+		{Uint: 255, Enum: ttnpb.ADR_ACK_DELAY_128},
+		{Uint: 128, Enum: ttnpb.ADR_ACK_DELAY_128},
+		{Uint: 127, Enum: ttnpb.ADR_ACK_DELAY_64},
+		{Uint: 64, Enum: ttnpb.ADR_ACK_DELAY_64},
+		{Uint: 63, Enum: ttnpb.ADR_ACK_DELAY_32},
+		{Uint: 32, Enum: ttnpb.ADR_ACK_DELAY_32},
+		{Uint: 31, Enum: ttnpb.ADR_ACK_DELAY_16},
+		{Uint: 16, Enum: ttnpb.ADR_ACK_DELAY_16},
+		{Uint: 15, Enum: ttnpb.ADR_ACK_DELAY_8},
+		{Uint: 9, Enum: ttnpb.ADR_ACK_DELAY_8},
+		{Uint: 8, Enum: ttnpb.ADR_ACK_DELAY_8},
+		{Uint: 7, Enum: ttnpb.ADR_ACK_DELAY_4},
+		{Uint: 6, Enum: ttnpb.ADR_ACK_DELAY_4},
+		{Uint: 5, Enum: ttnpb.ADR_ACK_DELAY_4},
+		{Uint: 4, Enum: ttnpb.ADR_ACK_DELAY_4},
+		{Uint: 3, Enum: ttnpb.ADR_ACK_DELAY_2},
+		{Uint: 2, Enum: ttnpb.ADR_ACK_DELAY_2},
+		{Uint: 1, Enum: ttnpb.ADR_ACK_DELAY_1},
+		{Uint: 0, Enum: ttnpb.ADR_ACK_DELAY_1},
+	} {
+		t.Run(fmt.Sprintf("%v", tc.Uint), func(t *testing.T) {
+			assertions.New(t).So(Uint32ToADRAckDelayExponent(tc.Uint), should.Equal, tc.Enum)
 		})
 	}
 }
