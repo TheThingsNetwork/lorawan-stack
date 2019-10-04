@@ -35,6 +35,12 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 			":1700": "",
 		},
 	},
+	MQTTV2: config.MQTT{
+		Listen:           ":1881",
+		ListenTLS:        ":8881",
+		PublicAddress:    fmt.Sprintf("%s:1881", shared.DefaultPublicHost),
+		PublicTLSAddress: fmt.Sprintf("%s:8881", shared.DefaultPublicHost),
+	},
 	MQTT: config.MQTT{
 		Listen:           ":1882",
 		ListenTLS:        ":8882",
