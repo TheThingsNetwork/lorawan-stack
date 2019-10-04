@@ -27,7 +27,7 @@ var DefaultGatewayConfigurationServerConfig = gatewayconfigurationserver.Config{
 
 func init() {
 	DefaultGatewayConfigurationServerConfig.TheThingsGateway.Default.UpdateChannel = "stable"
-	DefaultGatewayConfigurationServerConfig.TheThingsGateway.Default.MQTTServer = "mqtts://" + shared.DefaultPublicHost + gs.DefaultGatewayServerConfig.MQTT.ListenTLS
+	DefaultGatewayConfigurationServerConfig.TheThingsGateway.Default.MQTTServer = "mqtts://" + gs.DefaultGatewayServerConfig.MQTTV2.PublicTLSAddress
 	DefaultGatewayConfigurationServerConfig.TheThingsGateway.Default.FirmwareURL = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
 	DefaultGatewayConfigurationServerConfig.BasicStation.Default.LNSURI = "wss://" + shared.DefaultPublicHost + gs.DefaultGatewayServerConfig.BasicStation.ListenTLS
 }
