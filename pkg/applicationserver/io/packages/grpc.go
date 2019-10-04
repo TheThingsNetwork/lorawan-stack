@@ -16,10 +16,13 @@ package packages
 
 import (
 	"context"
+	"strconv"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 // appendImplicitAssociationsGetPaths appends implicit ttnpb.ApplicationPackageAssociation get paths to paths.
@@ -50,11 +53,17 @@ func (s *server) GetAssociation(ctx context.Context, req *ttnpb.GetApplicationPa
 }
 
 // ListAssociations implements tnpb.ApplicationPackageRegistryServer.
-// TODO: Support pagination.
-func (s *server) ListAssociations(ctx context.Context, req *ttnpb.ListApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociations, error) {
+func (s *server) ListAssociations(ctx context.Context, req *ttnpb.ListApplicationPackageAssociationRequest) (assoc *ttnpb.ApplicationPackageAssociations, err error) {
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
+	var total int64
+	ctx = s.registry.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
 	associations, err := s.registry.List(ctx, req.EndDeviceIdentifiers, appendImplicitAssociationsGetPaths(req.FieldMask.Paths...))
 	if err != nil {
 		return nil, err
@@ -96,4 +105,8 @@ func (s *server) DeleteAssociation(ctx context.Context, ids *ttnpb.ApplicationPa
 		return nil, err
 	}
 	return ttnpb.Empty, nil
+}
+
+func setTotalHeader(ctx context.Context, total int64) {
+	grpc.SetHeader(ctx, metadata.Pairs("x-total-count", strconv.FormatInt(total, 10)))
 }

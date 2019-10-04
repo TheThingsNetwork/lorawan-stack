@@ -381,6 +381,82 @@ func TestAssociations(t *testing.T) {
 			break
 		}
 	})
+
+	// Check if list pagination is correct.
+	t.Run("Pagination", func(t *testing.T) {
+		a := assertions.New(t)
+
+		for i := 1; i < 21; i++ {
+			association := ttnpb.ApplicationPackageAssociation{
+				ApplicationPackageAssociationIdentifiers: ttnpb.ApplicationPackageAssociationIdentifiers{
+					EndDeviceIdentifiers: registeredDeviceID,
+					FPort:                uint32(i),
+				},
+				PackageName: fmt.Sprintf("test-package-%v", i),
+			}
+			res, err := client.SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
+				ApplicationPackageAssociation: association,
+				FieldMask: types.FieldMask{
+					Paths: []string{
+						"package_name",
+					},
+				},
+			}, creds)
+			a.So(err, should.BeNil)
+			a.So(res, should.NotBeNil)
+		}
+
+		for _, tc := range []struct {
+			limit  uint32
+			page   uint32
+			length int
+		}{
+			{
+				limit:  10,
+				page:   0,
+				length: 10,
+			},
+			{
+				limit:  10,
+				page:   1,
+				length: 10,
+			},
+			{
+				limit:  10,
+				page:   2,
+				length: 10,
+			},
+			{
+				limit:  10,
+				page:   3,
+				length: 0,
+			},
+			{
+				limit:  0,
+				page:   0,
+				length: 20,
+			},
+		} {
+			t.Run(fmt.Sprintf("limit:%v_page:%v", tc.limit, tc.page),
+				func(t *testing.T) {
+					a := assertions.New(t)
+
+					res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
+						EndDeviceIdentifiers: registeredDeviceID,
+						Limit:                tc.limit,
+						Page:                 tc.page,
+						FieldMask: types.FieldMask{
+							Paths: []string{
+								"package_name",
+							},
+						},
+					}, creds)
+					a.So(err, should.BeNil)
+					a.So(res, should.NotBeNil)
+					a.So(res.Associations, should.HaveLength, tc.length)
+				})
+		}
+	})
 }
 
 var applicationPackageFactory = func(io.Server, packages.Registry) packages.ApplicationPackageHandler {

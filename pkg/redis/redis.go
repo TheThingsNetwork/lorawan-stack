@@ -175,10 +175,17 @@ func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error
 
 // FindProtos gets protos stored under keys in k.
 func FindProtos(r redis.Cmdable, k string, keyCmd func(string) string) *ProtosCmd {
+	return FindProtosPaginated(r, k, keyCmd, 0, 0)
+}
+
+// FindProtosPaginated gets the protos stored under keys in k with the given offset and count.
+func FindProtosPaginated(r redis.Cmdable, k string, keyCmd func(string) string, offset, count int64) *ProtosCmd {
 	return &ProtosCmd{
 		result: r.Sort(k, &redis.Sort{
-			Alpha: true,
-			Get:   []string{keyCmd("*")},
+			Alpha:  true,
+			Offset: offset,
+			Count:  count,
+			Get:    []string{keyCmd("*")},
 		}).Result,
 	}
 }

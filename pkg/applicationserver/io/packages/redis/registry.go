@@ -85,17 +85,29 @@ func (r ApplicationPackagesRegistry) Get(ctx context.Context, ids ttnpb.Applicat
 func (r ApplicationPackagesRegistry) List(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) ([]*ttnpb.ApplicationPackageAssociation, error) {
 	var pbs []*ttnpb.ApplicationPackageAssociation
 	devUID := unique.ID(ctx, ids)
-	err := ttnredis.FindProtos(r.Redis, r.devKey(devUID), r.makeAssociationKeyFunc(devUID)).Range(func() (proto.Message, func() (bool, error)) {
-		pb := &ttnpb.ApplicationPackageAssociation{}
-		return pb, func() (bool, error) {
-			pb, err := applyAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
-			if err != nil {
-				return false, err
+	devKey := r.devKey(devUID)
+	err := r.Redis.Watch(func(tx *redis.Tx) error {
+		tx.Pipelined(func(p redis.Pipeliner) error {
+			var offset, limit int64
+			if limit, offset = limitAndOffsetFromContext(ctx); limit != 0 {
+				if err := countTotal(ctx, devKey, p); err != nil {
+					return err
+				}
 			}
-			pbs = append(pbs, pb)
-			return true, nil
-		}
-	})
+			return ttnredis.FindProtosPaginated(r.Redis, devKey, r.makeAssociationKeyFunc(devUID), offset, limit).Range(func() (proto.Message, func() (bool, error)) {
+				pb := &ttnpb.ApplicationPackageAssociation{}
+				return pb, func() (bool, error) {
+					pb, err := applyAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
+					if err != nil {
+						return false, err
+					}
+					pbs = append(pbs, pb)
+					return true, nil
+				}
+			})
+		})
+		return nil
+	}, devKey)
 	if err != nil {
 		return nil, err
 	}
@@ -231,4 +243,9 @@ func (r ApplicationPackagesRegistry) Set(ctx context.Context, ids ttnpb.Applicat
 		return nil, err
 	}
 	return pb, nil
+}
+
+// WithPagination implements applicationpackages.AssociationRegistry.
+func (r ApplicationPackagesRegistry) WithPagination(ctx context.Context, limit, page uint32, total *int64) context.Context {
+	return WithPagination(ctx, int64(limit), int64(page), total)
 }
