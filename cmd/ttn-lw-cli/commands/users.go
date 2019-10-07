@@ -46,7 +46,7 @@ func getUserID(flagSet *pflag.FlagSet, args []string) *ttnpb.UserIdentifiers {
 	var userID string
 	if len(args) > 0 {
 		if len(args) > 1 {
-			logger.Warn("multiple IDs found in arguments, considering only the first")
+			logger.Warn("Multiple IDs found in arguments, considering only the first")
 		}
 		userID = args[0]
 	} else {

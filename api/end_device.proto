@@ -330,7 +330,7 @@ enum PowerState {
 message EndDeviceAuthenticationCode {
   option (gogoproto.populate) = false;
 
-  bytes value = 1 [(validate.rules).bytes = {min_len: 1, max_len: 8}];
+  string value = 1 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
   google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
 }

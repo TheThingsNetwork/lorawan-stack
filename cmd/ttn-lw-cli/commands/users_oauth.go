@@ -36,7 +36,7 @@ func getUserAndClientID(flagSet *pflag.FlagSet, args []string) (*ttnpb.UserIdent
 		userID = args[0]
 		clientID = args[1]
 	default:
-		logger.Warn("multiple IDs found in arguments, considering the first")
+		logger.Warn("Multiple IDs found in arguments, considering the first")
 		userID = args[0]
 		clientID = args[1]
 	}

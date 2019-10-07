@@ -53,7 +53,7 @@ func getApplicationWebhookID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appl
 		applicationID = args[0]
 		webhookID = args[1]
 	default:
-		logger.Warn("multiple IDs found in arguments, considering the first")
+		logger.Warn("Multiple IDs found in arguments, considering the first")
 		applicationID = args[0]
 		webhookID = args[1]
 	}

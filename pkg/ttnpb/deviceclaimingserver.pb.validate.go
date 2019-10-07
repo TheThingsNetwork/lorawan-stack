@@ -150,13 +150,18 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 
 				case "qr_code":
 
-					if l := len(m.GetQRCode()); l < 1 || l > 1024 {
+					if l := len(m.GetQRCode()); l < 0 || l > 1024 {
 						return ClaimEndDeviceRequestValidationError{
 							field:  "qr_code",
-							reason: "value length must be between 1 and 1024 bytes, inclusive",
+							reason: "value length must be between 0 and 1024 bytes, inclusive",
 						}
 					}
 
+				default:
+					return ClaimEndDeviceRequestValidationError{
+						field:  "source_device",
+						reason: "value is required",
+					}
 				}
 			}
 		default:
@@ -356,10 +361,10 @@ func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) ValidateFields(paths ..
 			// no validation rules for DevEUI
 		case "authentication_code":
 
-			if l := len(m.GetAuthenticationCode()); l < 1 || l > 8 {
+			if !_ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern.MatchString(m.GetAuthenticationCode()) {
 				return ClaimEndDeviceRequest_AuthenticatedIdentifiersValidationError{
 					field:  "authentication_code",
-					reason: "value length must be between 1 and 8 bytes, inclusive",
+					reason: "value does not match regex pattern \"^[A-Z0-9]{1,32}$\"",
 				}
 			}
 
@@ -432,3 +437,5 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ClaimEndDeviceRequest_AuthenticatedIdentifiersValidationError{}
+
+var _ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern = regexp.MustCompile("^[A-Z0-9]{1,32}$")

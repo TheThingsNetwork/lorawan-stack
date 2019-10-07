@@ -28,11 +28,12 @@ message ClaimEndDeviceRequest {
   message AuthenticatedIdentifiers {
     bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "JoinEUI"];
     bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.EUI64", (gogoproto.customname) = "DevEUI"];
-    bytes authentication_code = 3 [(validate.rules).bytes = {min_len: 1, max_len: 8}];
+    string authentication_code = 3 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
   }
   oneof source_device {
+    option (validate.required) = true;
     AuthenticatedIdentifiers authenticated_identifiers = 1 [(gogoproto.customname) = "AuthenticatedIdentifiers"];
-    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 1, max_len: 1024}, (gogoproto.customname) = "QRCode"];
+    bytes qr_code = 2 [(validate.rules).bytes = {min_len: 0, max_len: 1024}, (gogoproto.customname) = "QRCode"];
   }
 
   // Application identifiers of the target end device.

@@ -31,7 +31,7 @@ func getEmail(flagSet *pflag.FlagSet, args []string) string {
 	var email string
 	if len(args) > 0 {
 		if len(args) > 1 {
-			logger.Warn("multiple emails found in arguments, considering only the first")
+			logger.Warn("Multiple emails found in arguments, considering only the first")
 		}
 		email = args[0]
 	} else {

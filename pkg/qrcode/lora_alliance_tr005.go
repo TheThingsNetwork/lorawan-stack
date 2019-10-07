@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
@@ -27,11 +28,27 @@ import (
 type LoRaAllianceTR005Draft2 struct {
 	JoinEUI,
 	DevEUI types.EUI64
-	VendorID             [2]byte
-	ModelID              [2]byte
-	DeviceValidationCode []byte
+	VendorID [2]byte
+	ModelID  [2]byte
+	DeviceValidationCode,
 	SerialNumber,
 	Proprietary string
+}
+
+// Encode implements the Data interface.
+func (m *LoRaAllianceTR005Draft2) Encode(dev *ttnpb.EndDevice) error {
+	if dev.JoinEUI == nil {
+		return errNoJoinEUI
+	}
+	if dev.DevEUI == nil {
+		return errNoDevEUI
+	}
+	*m = LoRaAllianceTR005Draft2{
+		JoinEUI:              *dev.JoinEUI,
+		DevEUI:               *dev.DevEUI,
+		DeviceValidationCode: dev.GetClaimAuthenticationCode().GetValue(),
+	}
+	return nil
 }
 
 // validTR005ExtensionChars defines the QR code alphanumeric character set except :, % and space.
@@ -49,6 +66,7 @@ func (m LoRaAllianceTR005Draft2) validateExtensionChars(s string) error {
 // Validate implements the Data interface.
 func (m LoRaAllianceTR005Draft2) Validate() error {
 	for _, err := range []error{
+		m.validateExtensionChars(m.DeviceValidationCode),
 		m.validateExtensionChars(m.SerialNumber),
 		m.validateExtensionChars(m.Proprietary),
 	} {
@@ -65,8 +83,8 @@ func (m LoRaAllianceTR005Draft2) MarshalText() ([]byte, error) {
 		return nil, err
 	}
 	var ext string
-	if len(m.DeviceValidationCode) > 0 {
-		ext += fmt.Sprintf("%%V%X", m.DeviceValidationCode[:])
+	if m.DeviceValidationCode != "" {
+		ext += fmt.Sprintf("%%V%s", m.DeviceValidationCode)
 	}
 	if m.SerialNumber != "" {
 		ext += fmt.Sprintf("%%S%s", m.SerialNumber)
@@ -106,18 +124,15 @@ func (m *LoRaAllianceTR005Draft2) UnmarshalText(text []byte) error {
 		return err
 	}
 	if len(parts) == 7 {
-		for _, ext := range strings.Split(string(parts[6]), "%") {
+		exts := strings.ReplaceAll(string(parts[6]), "%25", "%")
+		for _, ext := range strings.Split(exts, "%") {
 			if len(ext) < 1 {
 				continue
 			}
 			val := ext[1:]
 			switch ext[0] {
 			case 'V':
-				if buf, err := hex.DecodeString(val); err == nil {
-					m.DeviceValidationCode = buf
-				} else {
-					return errFormat.WithCause(err)
-				}
+				m.DeviceValidationCode = val
 			case 'S':
 				m.SerialNumber = val
 			case 'P':
@@ -129,6 +144,6 @@ func (m *LoRaAllianceTR005Draft2) UnmarshalText(text []byte) error {
 }
 
 // AuthenticatedEndDeviceIdentifiers implements the AuthenticatedEndDeviceIdentifiers interface.
-func (m *LoRaAllianceTR005Draft2) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode []byte) {
+func (m *LoRaAllianceTR005Draft2) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string) {
 	return m.JoinEUI, m.DevEUI, m.DeviceValidationCode
 }

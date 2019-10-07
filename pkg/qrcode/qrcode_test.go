@@ -30,13 +30,13 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 		Data []byte
 		ExpectedJoinEUI,
 		ExpectedDevEUI types.EUI64
-		ExpectedAuthenticationCode []byte
+		ExpectedAuthenticationCode string
 	}{
 		{
 			Data:                       []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%V0102"),
 			ExpectedJoinEUI:            types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:             types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			ExpectedAuthenticationCode: []byte{0x01, 0x02},
+			ExpectedAuthenticationCode: "0102",
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {

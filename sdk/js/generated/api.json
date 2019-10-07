@@ -5140,7 +5140,7 @@
                 "validate.rules": [
                   {
                     "name": "bytes.min_len",
-                    "value": 1
+                    "value": 0
                   },
                   {
                     "name": "bytes.max_len",
@@ -5334,20 +5334,16 @@
               "name": "authentication_code",
               "description": "",
               "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "defaultValue": "",
               "options": {
                 "validate.rules": [
                   {
-                    "name": "bytes.min_len",
-                    "value": 1
-                  },
-                  {
-                    "name": "bytes.max_len",
-                    "value": 8
+                    "name": "string.pattern",
+                    "value": "^[A-Z0-9]{1,32}$"
                   }
                 ]
               }
@@ -6277,20 +6273,16 @@
               "name": "value",
               "description": "",
               "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "defaultValue": "",
               "options": {
                 "validate.rules": [
                   {
-                    "name": "bytes.min_len",
-                    "value": 1
-                  },
-                  {
-                    "name": "bytes.max_len",
-                    "value": 8
+                    "name": "string.pattern",
+                    "value": "^[A-Z0-9]{1,32}$"
                   }
                 ]
               }

@@ -310,7 +310,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
+					FrequencyPlanID:   "",
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0,
 					LoRaWANVersion:    ttnpb.MAC_V1_0,
 					SupportsJoin:      true,
@@ -330,7 +330,6 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 			},
-			SetByIDCalls: 1,
 		},
 
 		{

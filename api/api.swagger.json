@@ -5919,8 +5919,7 @@
           "format": "byte"
         },
         "authentication_code": {
-          "type": "string",
-          "format": "byte"
+          "type": "string"
         }
       }
     },
@@ -8305,8 +8304,7 @@
       "type": "object",
       "properties": {
         "value": {
-          "type": "string",
-          "format": "byte"
+          "type": "string"
         },
         "valid_from": {
           "type": "string",
