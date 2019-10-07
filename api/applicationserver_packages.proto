@@ -62,7 +62,7 @@ message ListApplicationPackageAssociationRequest {
   EndDeviceIdentifiers ids = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true, (validate.rules).message.required = true];
   // Limit the number of results per page.
   // Each page is ordered by the FPort.
-  uint32 limit = 2 [(validate.rules).uint32.lte = 10];
+  uint32 limit = 2 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 3;
   google.protobuf.FieldMask field_mask = 4 [(gogoproto.nullable) = false];

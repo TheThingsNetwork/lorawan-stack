@@ -726,10 +726,10 @@ func (m *ListApplicationPackageAssociationRequest) ValidateFields(paths ...strin
 
 		case "limit":
 
-			if m.GetLimit() > 10 {
+			if m.GetLimit() > 1000 {
 				return ListApplicationPackageAssociationRequestValidationError{
 					field:  "limit",
-					reason: "value must be less than or equal to 10",
+					reason: "value must be less than or equal to 1000",
 				}
 			}
 

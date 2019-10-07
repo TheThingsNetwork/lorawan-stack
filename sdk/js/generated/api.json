@@ -1944,7 +1944,7 @@
                 "validate.rules": [
                   {
                     "name": "uint32.lte",
-                    "value": 10
+                    "value": 1000
                   }
                 ]
               }
