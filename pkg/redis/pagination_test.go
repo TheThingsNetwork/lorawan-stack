@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package redis
+package redis_test
 
 import (
 	"fmt"
@@ -20,6 +20,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
@@ -62,16 +63,16 @@ func TestPagination(t *testing.T) {
 			func(t *testing.T) {
 				ctx := tc.md.ToIncomingContext(test.Context())
 
-				ctx = WithPagination(ctx, 0, 0, nil)
+				ctx = redis.NewContextWithPagination(ctx, 0, 0, nil)
 
-				limit, offset := limitAndOffsetFromContext(ctx)
+				limit, offset := redis.PaginationLimitAndOffsetFromContext(ctx)
 
 				a.So(limit, should.Equal, tc.limit)
 				a.So(offset, should.Equal, tc.offset)
 
-				ctx = WithPagination(test.Context(), int64(tc.md.Limit), int64(tc.md.Page), nil)
+				ctx = redis.NewContextWithPagination(test.Context(), int64(tc.md.Limit), int64(tc.md.Page), nil)
 
-				limit, offset = limitAndOffsetFromContext(ctx)
+				limit, offset = redis.PaginationLimitAndOffsetFromContext(ctx)
 
 				a.So(limit, should.Equal, tc.limit)
 				a.So(offset, should.Equal, tc.offset)
@@ -84,13 +85,13 @@ func TestPagination(t *testing.T) {
 		ctx := test.Context()
 		total := int64(10)
 
-		setTotal(ctx, total)
+		redis.SetPaginationTotal(ctx, total)
 		a.So(totalCount, should.BeZeroValue)
 
-		ctx = WithPagination(ctx, 5, 1, &totalCount)
+		ctx = redis.NewContextWithPagination(ctx, 5, 1, &totalCount)
 		a.So(totalCount, should.BeZeroValue)
 
-		setTotal(ctx, total)
+		redis.SetPaginationTotal(ctx, total)
 		a.So(totalCount, should.Equal, total)
 	})
 }

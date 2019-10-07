@@ -17,7 +17,6 @@ package redis
 import (
 	"context"
 
-	"github.com/go-redis/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 )
 
@@ -31,9 +30,8 @@ type paginationOptions struct {
 	total  *int64
 }
 
-// WithPagination instructs the store to paginate the results, and set the total
-// number of results into total.
-func WithPagination(ctx context.Context, limit, page int64, total *int64) context.Context {
+// NewContextWithPagination instructs the store to paginate the results.
+func NewContextWithPagination(ctx context.Context, limit, page int64, total *int64) context.Context {
 	md := rpcmetadata.FromIncomingContext(ctx)
 	if limit == 0 && md.Limit != 0 {
 		limit = int64(md.Limit)
@@ -51,24 +49,15 @@ func WithPagination(ctx context.Context, limit, page int64, total *int64) contex
 	})
 }
 
-// countTotal counts the total number of results (without limiting) and sets it
-// into the destination set by SetTotalCount.
-func countTotal(ctx context.Context, key string, p redis.Pipeliner) (err error) {
-	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok && opts.total != nil {
-		*opts.total, err = p.SCard(key).Result()
-	}
-	return
-}
-
-// setTotal sets the total number of results into the destination set by
-// SetTotalCount if not already set.
-func setTotal(ctx context.Context, total int64) {
+// SetPaginationTotal sets the total number of results inside the paginated context, if it was not set already.
+func SetPaginationTotal(ctx context.Context, total int64) {
 	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok && opts.total != nil && *opts.total == 0 {
 		*opts.total = total
 	}
 }
 
-func limitAndOffsetFromContext(ctx context.Context) (limit, offset int64) {
+// PaginationLimitAndOffsetFromContext returns the pagination limit and the offset if they are present.
+func PaginationLimitAndOffsetFromContext(ctx context.Context) (limit, offset int64) {
 	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok {
 		return opts.limit, opts.offset
 	}

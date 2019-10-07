@@ -407,24 +407,32 @@ func TestAssociations(t *testing.T) {
 		}
 
 		for _, tc := range []struct {
-			limit  uint32
-			page   uint32
-			length int
+			limit    uint32
+			page     uint32
+			portLow  uint32
+			portHigh uint32
+			length   int
 		}{
 			{
-				limit:  10,
-				page:   0,
-				length: 10,
+				limit:    10,
+				page:     0,
+				portLow:  1,
+				portHigh: 10,
+				length:   10,
 			},
 			{
-				limit:  10,
-				page:   1,
-				length: 10,
+				limit:    10,
+				page:     1,
+				portLow:  1,
+				portHigh: 10,
+				length:   10,
 			},
 			{
-				limit:  10,
-				page:   2,
-				length: 10,
+				limit:    10,
+				page:     2,
+				portLow:  11,
+				portHigh: 20,
+				length:   10,
 			},
 			{
 				limit:  10,
@@ -432,9 +440,11 @@ func TestAssociations(t *testing.T) {
 				length: 0,
 			},
 			{
-				limit:  0,
-				page:   0,
-				length: 20,
+				limit:    0,
+				page:     0,
+				portLow:  1,
+				portHigh: 20,
+				length:   20,
 			},
 		} {
 			t.Run(fmt.Sprintf("limit:%v_page:%v", tc.limit, tc.page),
@@ -454,6 +464,9 @@ func TestAssociations(t *testing.T) {
 					a.So(err, should.BeNil)
 					a.So(res, should.NotBeNil)
 					a.So(res.Associations, should.HaveLength, tc.length)
+					for _, association := range res.Associations {
+						a.So(association.FPort, should.BeBetweenOrEqual, tc.portLow, tc.portHigh)
+					}
 				})
 		}
 	})
