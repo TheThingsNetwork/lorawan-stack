@@ -15,6 +15,7 @@
 package io
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -109,16 +110,30 @@ type Decoder interface {
 }
 
 type jsonDecoder struct {
+	rd  *bufio.Reader
 	dec *json.Decoder
 }
 
 // NewJSONDecoder returns a new Decoder on top of r, and that uses the common JSON
 // format used in The Things Stack.
 func NewJSONDecoder(r io.Reader) Decoder {
-	return &jsonDecoder{dec: json.NewDecoder(r)}
+	rd := bufio.NewReader(r)
+	return &jsonDecoder{
+		rd:  rd,
+		dec: json.NewDecoder(rd),
+	}
 }
 
 func (r *jsonDecoder) Decode(data interface{}) (paths []string, err error) {
+	t, err := r.rd.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+	if t == '{' {
+		if err := r.rd.UnreadByte(); err != nil {
+			return nil, err
+		}
+	}
 	var obj json.RawMessage
 	if err = r.dec.Decode(&obj); err != nil {
 		return nil, err
@@ -132,6 +147,8 @@ func (r *jsonDecoder) Decode(data interface{}) (paths []string, err error) {
 	if err = jsonpb.TTN().NewDecoder(b).Decode(data); err != nil {
 		return nil, err
 	}
+	r.rd = bufio.NewReader(io.MultiReader(r.dec.Buffered(), r.rd))
+	r.dec = json.NewDecoder(r.rd)
 	return paths, nil
 }
 

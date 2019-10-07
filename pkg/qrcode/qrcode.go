@@ -17,6 +17,7 @@ package qrcode
 
 import (
 	"encoding"
+	"sync"
 
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -58,4 +59,42 @@ func Parse(data []byte) (Data, error) {
 		}
 	}
 	return nil, errFormat
+}
+
+// EndDeviceFormat is a end device QR code format.
+type EndDeviceFormat interface {
+	Format() *ttnpb.QRCodeFormat
+	New() EndDeviceData
+}
+
+var (
+	endDeviceFormats   = map[string]EndDeviceFormat{}
+	endDeviceFormatsMu sync.RWMutex
+)
+
+// GetEndDeviceFormats returns the registered end device QR code formats.
+func GetEndDeviceFormats() map[string]EndDeviceFormat {
+	res := make(map[string]EndDeviceFormat)
+	endDeviceFormatsMu.RLock()
+	for k, v := range endDeviceFormats {
+		res[k] = v
+	}
+	endDeviceFormatsMu.RUnlock()
+	return res
+}
+
+// GetEndDeviceFormat returns the converter by ID.
+func GetEndDeviceFormat(id string) EndDeviceFormat {
+	endDeviceFormatsMu.RLock()
+	res := endDeviceFormats[id]
+	endDeviceFormatsMu.RUnlock()
+	return res
+}
+
+// RegisterEndDeviceFormat registers the given end device QR code format.
+// Existing registrations with the same ID will be overwritten.
+func RegisterEndDeviceFormat(id string, f EndDeviceFormat) {
+	endDeviceFormatsMu.Lock()
+	endDeviceFormats[id] = f
+	endDeviceFormatsMu.Unlock()
 }

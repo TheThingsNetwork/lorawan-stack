@@ -274,7 +274,7 @@ This command takes end device templates from stdin.`,
 	}
 	endDeviceTemplatesListFormats = &cobra.Command{
 		Use:               "list-formats",
-		Aliases:           []string{"ls-formats", "listformats", "lsformats"},
+		Aliases:           []string{"ls-formats", "listformats", "lsformats", "lsfmts", "lsfmt"},
 		Short:             "List available end device template formats (EXPERIMENTAL)",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {

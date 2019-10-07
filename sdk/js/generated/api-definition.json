@@ -2651,6 +2651,41 @@
       ]
     }
   },
+  "EndDeviceQRCodeGenerator": {
+    "GetFormat": {
+      "file": "lorawan-stack/api/qrcodegenerator.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/qr-codes/end-devices/formats/{format_id}",
+          "parameters": [
+            "format_id"
+          ]
+        }
+      ]
+    },
+    "ListFormats": {
+      "file": "lorawan-stack/api/qrcodegenerator.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/qr-codes/end-devices/formats",
+          "parameters": []
+        }
+      ]
+    },
+    "Generate": {
+      "file": "lorawan-stack/api/qrcodegenerator.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/qr-codes/end-devices",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "EndDeviceRegistrySearch": {
     "SearchEndDevices": {
       "file": "lorawan-stack/api/search_services.proto",

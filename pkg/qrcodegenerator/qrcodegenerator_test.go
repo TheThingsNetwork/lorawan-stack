@@ -1,0 +1,39 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package qrcodegenerator_test
+
+import (
+	"testing"
+
+	"go.thethings.network/lorawan-stack/pkg/component"
+	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	. "go.thethings.network/lorawan-stack/pkg/qrcodegenerator"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
+)
+
+func TestQRCodeGenerator(t *testing.T) {
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	conf := &component.Config{}
+	c := componenttest.NewComponent(t, conf)
+
+	test.Must(New(c, &Config{}))
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_QR_CODE_GENERATOR)
+}

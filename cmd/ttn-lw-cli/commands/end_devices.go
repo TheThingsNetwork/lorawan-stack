@@ -18,13 +18,14 @@ import (
 	"bufio"
 	"context"
 	"encoding/hex"
-	"fmt"
 	stdio "io"
+	"io/ioutil"
+	"mime"
 	"os"
+	"path"
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	qrcodegen "github.com/skip2/go-qrcode"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/api"
@@ -32,7 +33,6 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/qrcode"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -830,79 +830,153 @@ values will be stored in the Join Server.`,
 			return io.Write(os.Stdout, config.OutputFormat, ids)
 		},
 	}
+	endDevicesListQRCodeFormatsCommand = &cobra.Command{
+		Use:     "list-qr-formats",
+		Aliases: []string{"ls-qr-formats", "listqrformats", "lsqrformats", "lsqrfmts", "lsqrfmt"},
+		Short:   "List QR code formats (EXPERIMENTAL)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			qrg, err := api.Dial(ctx, config.QRCodeGeneratorGRPCAddress)
+			if err != nil {
+				return err
+			}
+
+			res, err := ttnpb.NewEndDeviceQRCodeGeneratorClient(qrg).ListFormats(ctx, ttnpb.Empty)
+			if err != nil {
+				return err
+			}
+
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	endDevicesGenerateQRCommand = &cobra.Command{
 		Use:     "generate-qr [application-id] [device-id]",
 		Aliases: []string{"genqr"},
 		Short:   "Generate an end device QR code (EXPERIMENTAL)",
-		Long:    `Generate an end device QR code (EXPERIMENTAL)`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			devID, err := getEndDeviceID(cmd.Flags(), args, true)
+		Long: `Generate an end device QR code (EXPERIMENTAL)
+
+This command saves a QR code in PNG format in the given folder. The filename is
+the device ID.
+
+This command may take end device identifiers from stdin.`,
+		Example: `To generate a QR code for a single end device:
+  ttn-lw-cli end-devices generate-qr app1 dev1
+
+To generate a QR code for multiple end devices:
+  ttn-lw-cli end-devices list app1 \
+    | ttn-lw-cli end-devices generate-qr`,
+		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
+			var ids *ttnpb.EndDeviceIdentifiers
+			if inputDecoder != nil {
+				var dev ttnpb.EndDevice
+				if _, err := inputDecoder.Decode(&dev); err != nil {
+					return err
+				}
+				if dev.ApplicationID == "" {
+					return errNoApplicationID
+				}
+				if dev.DeviceID == "" {
+					return errNoEndDeviceID
+				}
+				ids = &dev.EndDeviceIdentifiers
+			} else {
+				var err error
+				ids, err = getEndDeviceID(cmd.Flags(), args, true)
+				if err != nil {
+					return err
+				}
+			}
+
+			formatID, _ := cmd.Flags().GetString("format-id")
+
+			qrg, err := api.Dial(ctx, config.QRCodeGeneratorGRPCAddress)
 			if err != nil {
 				return err
+			}
+			client := ttnpb.NewEndDeviceQRCodeGeneratorClient(qrg)
+			format, err := client.GetFormat(ctx, &ttnpb.GetQRCodeFormatRequest{
+				FormatID: formatID,
+			})
+			if err != nil {
+				return err
+			}
+
+			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceGetPaths(format.FieldMask.Paths...)
+
+			if len(nsPaths) > 0 {
+				isPaths = append(isPaths, "network_server_address")
+			}
+			if len(asPaths) > 0 {
+				isPaths = append(isPaths, "application_server_address")
+			}
+			if len(jsPaths) > 0 {
+				isPaths = append(isPaths, "join_server_address")
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-			isPaths := []string{"join_server_address"}
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
-			dev, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: *devID,
+			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: *ids,
 				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
 			}
 
-			_, _, jsMismatch := compareServerAddressesEndDevice(dev, config)
-			if jsMismatch {
+			nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(device, config)
+			if len(nsPaths) > 0 && nsMismatch {
+				return errAddressMismatchEndDevice
+			}
+			if len(asPaths) > 0 && asMismatch {
+				return errAddressMismatchEndDevice
+			}
+			if len(jsPaths) > 0 && jsMismatch {
 				return errAddressMismatchEndDevice
 			}
 
-			jsPaths := []string{"ids", "claim_authentication_code"}
-			jsDev, err := getEndDevice(dev.EndDeviceIdentifiers, nil, nil, jsPaths, true)
+			dev, err := getEndDevice(device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
+			if err != nil {
+				return err
+			}
+			device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...)
+
+			size, _ := cmd.Flags().GetUint32("size")
+			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
+				FormatID:  formatID,
+				EndDevice: *device,
+				Image: &ttnpb.GenerateEndDeviceQRCodeRequest_Image{
+					ImageSize: size,
+				},
+			})
 			if err != nil {
 				return err
 			}
 
-			var data qrcode.EndDeviceData
-			switch format, _ := cmd.Flags().GetString("format"); strings.ToLower(format) {
-			case "tr005draft2":
-				data = &qrcode.LoRaAllianceTR005Draft2{}
-			default:
-				return errQRCodeFormat
-			}
-			if err := data.Encode(jsDev); err != nil {
-				return err
-			}
-
-			buf, err := data.MarshalText()
-			if err != nil {
-				return err
-			}
-			qr, err := qrcodegen.New(string(buf), qrcodegen.Medium)
-			if err != nil {
-				return err
-			}
-
-			file, _ := cmd.Flags().GetString("file")
-			print, _ := cmd.Flags().GetBool("print")
-			if file == "" && !print {
-				return errNoQRCodeTarget
-			}
-			if file != "" {
-				size, _ := cmd.Flags().GetInt("size")
-				if err := qr.WriteFile(size, file); err != nil {
+			folder, _ := cmd.Flags().GetString("folder")
+			if folder == "" {
+				folder, err = os.Getwd()
+				if err != nil {
 					return err
 				}
 			}
-			if print {
-				fmt.Println(qr.ToSmallString(false))
+
+			var ext string
+			if exts, err := mime.ExtensionsByType(res.Image.Embedded.MimeType); err == nil && len(exts) > 0 {
+				ext = exts[0]
+			}
+			filename := path.Join(folder, device.DeviceID+ext)
+			if err := ioutil.WriteFile(filename, res.Image.Embedded.Data, 0644); err != nil {
+				return err
 			}
 
+			logger.WithFields(log.Fields(
+				"value", res.Text,
+				"filename", filename,
+			)).Info("Generated QR code")
 			return nil
-		},
+		}),
 	}
 )
 
@@ -973,11 +1047,11 @@ func init() {
 	endDevicesClaimCommand.Flags().String("target-application-server-id", "", "")
 	endDevicesClaimCommand.Flags().Bool("invalidate-authentication-code", true, "invalidate the claim authentication code to block subsequent claiming attempts")
 	endDevicesCommand.AddCommand(endDevicesClaimCommand)
+	endDevicesCommand.AddCommand(endDevicesListQRCodeFormatsCommand)
 	endDevicesGenerateQRCommand.Flags().AddFlagSet(endDeviceIDFlags())
-	endDevicesGenerateQRCommand.Flags().String("format", "tr005draft2", "format (tr005draft2)")
-	endDevicesGenerateQRCommand.Flags().Int("size", 300, "")
-	endDevicesGenerateQRCommand.Flags().String("file", "", "file to write QR code in PNG format")
-	endDevicesGenerateQRCommand.Flags().Bool("print", false, "print QR code as text")
+	endDevicesGenerateQRCommand.Flags().String("format-id", "", "")
+	endDevicesGenerateQRCommand.Flags().Uint32("size", 300, "size of the image in pixels")
+	endDevicesGenerateQRCommand.Flags().String("folder", "", "folder to write the QR code image to")
 	endDevicesCommand.AddCommand(endDevicesGenerateQRCommand)
 
 	endDevicesCommand.AddCommand(applicationsDownlinkCommand)
