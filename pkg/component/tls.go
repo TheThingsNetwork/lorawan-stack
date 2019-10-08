@@ -18,7 +18,14 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"io/ioutil"
+	"sync/atomic"
+	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/events/fs"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"golang.org/x/crypto/acme"
 )
 
@@ -50,31 +57,106 @@ func WithNextProtos(protos ...string) TLSConfigOption {
 	})
 }
 
+var (
+	errAmbiguousTLSConfig = errors.DefineFailedPrecondition("tls_config_ambiguous", "ambiguous TLS configuration")
+	errEmptyTLSConfig     = errors.DefineFailedPrecondition("tls_config_empty", "empty TLS configuration")
+)
+
 // GetTLSConfig gets the component's TLS config and applies the given options.
 func (c *Component) GetTLSConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
-	var conf *tls.Config
-	if c.acme != nil {
-		conf = &tls.Config{
-			GetCertificate: func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-				if hello.ServerName == "" {
-					hello.ServerName = c.config.TLS.ACME.DefaultHost
+	var (
+		logger = log.FromContext(ctx)
+		conf   = c.GetBaseConfig(ctx).TLS
+		res    *tls.Config
+	)
+	for _, src := range []struct {
+		Enable            bool
+		CertificateGetter func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error)
+	}{
+		{
+			Enable: conf.Certificate != "" && conf.Key != "",
+			CertificateGetter: func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+				var cv atomic.Value
+				loadCertificate := func() error {
+					cert, err := tls.LoadX509KeyPair(conf.Certificate, conf.Key)
+					if err != nil {
+						return err
+					}
+					cv.Store(&cert)
+					logger.Debug("Loaded TLS certificate")
+					return nil
 				}
-				return c.acme.GetCertificate(hello)
+				if err := loadCertificate(); err != nil {
+					return nil, err
+				}
+				debounce := make(chan struct{}, 1)
+				fs.Watch(conf.Certificate, events.HandlerFunc(func(evt events.Event) {
+					if evt.Name() != "fs.write" {
+						return
+					}
+					// We have to debounce this; OpenSSL typically causes a lot of write events.
+					select {
+					case debounce <- struct{}{}:
+						time.AfterFunc(5*time.Second, func() {
+							if err := loadCertificate(); err != nil {
+								logger.WithError(err).Error("Could not reload TLS certificate")
+								return
+							}
+							<-debounce
+						})
+					default:
+					}
+				}))
+				return func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+					return cv.Load().(*tls.Certificate), nil
+				}, nil
 			},
+		},
+		{
+			Enable: conf.ACME.Enable,
+			CertificateGetter: func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+				opts = append(opts, WithNextProtos(acme.ALPNProto))
+				return func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+					if hello.ServerName == "" {
+						hello.ServerName = conf.ACME.DefaultHost
+					}
+					return c.acme.GetCertificate(hello)
+				}, nil
+			},
+		},
+	} {
+		if !src.Enable {
+			continue
 		}
-		opts = append(opts, WithNextProtos(acme.ALPNProto))
-	} else {
-		var err error
-		conf, err = c.config.TLS.Config(ctx)
+		if res != nil {
+			return nil, errAmbiguousTLSConfig
+		}
+		fn, err := src.CertificateGetter()
 		if err != nil {
 			return nil, err
 		}
+		res = &tls.Config{
+			GetCertificate: fn,
+		}
 	}
-	conf.MinVersion = tls.VersionTLS12
-	conf.NextProtos = []string{"h2", "http/1.1"}
-	conf.PreferServerCipherSuites = true
+	if res == nil {
+		return nil, errEmptyTLSConfig
+	}
+
+	if conf.RootCA != "" {
+		pem, err := ioutil.ReadFile(conf.RootCA)
+		if err != nil {
+			return nil, err
+		}
+		res.RootCAs = x509.NewCertPool()
+		res.RootCAs.AppendCertsFromPEM(pem)
+	}
+	res.InsecureSkipVerify = conf.InsecureSkipVerify
+	res.MinVersion = tls.VersionTLS12
+	res.NextProtos = []string{"h2", "http/1.1"}
+	res.PreferServerCipherSuites = true
 	for _, opt := range opts {
-		opt.apply(conf)
+		opt.apply(res)
 	}
-	return conf, nil
+	return res, nil
 }
