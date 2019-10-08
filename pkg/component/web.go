@@ -53,6 +53,9 @@ func (c *Component) initWeb() error {
 		if err != nil {
 			return err
 		}
+		if httpsAddr.Port == 0 {
+			httpsAddr.Port = 443
+		}
 		webOptions = append(webOptions, web.WithRedirectToHTTPS(httpAddr.Port, httpsAddr.Port))
 		if httpAddr.Port != 80 && httpsAddr.Port != 443 {
 			webOptions = append(webOptions, web.WithRedirectToHTTPS(80, 443))
