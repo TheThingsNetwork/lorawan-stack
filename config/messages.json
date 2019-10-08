@@ -2285,18 +2285,9 @@
       "file": "eui.go"
     }
   },
-  "error:pkg/blob:missing_config": {
+  "error:pkg/blob:invalid_config": {
     "translations": {
-      "en": "missing blob store configuration"
-    },
-    "description": {
-      "package": "pkg/blob",
-      "file": "bucket.go"
-    }
-  },
-  "error:pkg/blob:unknown_provider": {
-    "translations": {
-      "en": "unknown blob store provider `{provider}`"
+      "en": "invalid blob store configuration"
     },
     "description": {
       "package": "pkg/blob",
@@ -2400,6 +2391,24 @@
     "description": {
       "package": "pkg/config",
       "file": "hooks.go"
+    }
+  },
+  "error:pkg/config:missing_blob_config": {
+    "translations": {
+      "en": "missing blob store configuration"
+    },
+    "description": {
+      "package": "pkg/config",
+      "file": "shared.go"
+    }
+  },
+  "error:pkg/config:unknown_blob_provider": {
+    "translations": {
+      "en": "unknown blob store provider `{provider}`"
+    },
+    "description": {
+      "package": "pkg/config",
+      "file": "shared.go"
     }
   },
   "error:pkg/crypto/cryptoservices:no_app_key": {
