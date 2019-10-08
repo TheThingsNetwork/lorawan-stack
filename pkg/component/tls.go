@@ -155,7 +155,6 @@ func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOpt
 		return nil, errEmptyTLSConfig
 	}
 	res.MinVersion = tls.VersionTLS12
-	res.NextProtos = []string{"h2", "http/1.1"}
 	res.PreferServerCipherSuites = true
 	for _, opt := range opts {
 		opt.apply(res)

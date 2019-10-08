@@ -197,7 +197,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	bsWebServer := basicstationlns.New(bsCtx, gs)
 	for _, endpoint := range []component.Endpoint{
 		component.NewTCPEndpoint(conf.BasicStation.Listen, "Basic Station"),
-		component.NewTLSEndpoint(conf.BasicStation.ListenTLS, "Basic Station"),
+		component.NewTLSEndpoint(conf.BasicStation.ListenTLS, "Basic Station", component.WithNextProtos("h2", "http/1.1")),
 	} {
 		if endpoint.Address() == "" {
 			continue

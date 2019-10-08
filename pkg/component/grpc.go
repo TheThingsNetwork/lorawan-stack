@@ -81,7 +81,7 @@ func (c *Component) serveGRPC(lis net.Listener) error {
 func (c *Component) grpcEndpoints() []Endpoint {
 	return []Endpoint{
 		NewTCPEndpoint(c.config.GRPC.Listen, "gRPC"),
-		NewTLSEndpoint(c.config.GRPC.ListenTLS, "gRPC"),
+		NewTLSEndpoint(c.config.GRPC.ListenTLS, "gRPC", WithNextProtos("h2", "http/1.1")),
 	}
 }
 
