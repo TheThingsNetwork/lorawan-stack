@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -65,7 +66,7 @@ func TestWrapAES128Key(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			env, err := cryptoutil.WrapAES128Key(tc.Key, tc.KEKLabel, v)
+			env, err := cryptoutil.WrapAES128Key(test.Context(), tc.Key, tc.KEKLabel, v)
 			a.So(err, should.BeNil)
 			a.So(env, should.Resemble, tc.Expected)
 		})
@@ -103,7 +104,7 @@ func TestWrapAES128Key(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			unwrapped, err := cryptoutil.UnwrapAES128Key(tc.Envelope, v)
+			unwrapped, err := cryptoutil.UnwrapAES128Key(test.Context(), tc.Envelope, v)
 			if tc.ExpectedError != nil {
 				a.So(tc.ExpectedError(err), should.BeTrue)
 				return

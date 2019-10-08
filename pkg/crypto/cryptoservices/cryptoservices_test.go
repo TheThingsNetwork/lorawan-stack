@@ -424,15 +424,15 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 		return nil, err
 	}
 	res := &ttnpb.NwkSKeysResponse{}
-	res.FNwkSIntKey, err = cryptoutil.WrapAES128Key(nwkSKeys.FNwkSIntKey, "", s.KeyVault)
+	res.FNwkSIntKey, err = cryptoutil.WrapAES128Key(ctx, nwkSKeys.FNwkSIntKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	res.SNwkSIntKey, err = cryptoutil.WrapAES128Key(nwkSKeys.SNwkSIntKey, "", s.KeyVault)
+	res.SNwkSIntKey, err = cryptoutil.WrapAES128Key(ctx, nwkSKeys.SNwkSIntKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
-	res.NwkSEncKey, err = cryptoutil.WrapAES128Key(nwkSKeys.NwkSEncKey, "", s.KeyVault)
+	res.NwkSEncKey, err = cryptoutil.WrapAES128Key(ctx, nwkSKeys.NwkSEncKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
@@ -447,7 +447,7 @@ func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRoot
 	if err != nil {
 		return nil, err
 	}
-	env, err := cryptoutil.WrapAES128Key(*nwkKey, "", s.KeyVault)
+	env, err := cryptoutil.WrapAES128Key(ctx, *nwkKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +468,7 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 	res := &ttnpb.AppSKeyResponse{}
-	res.AppSKey, err = cryptoutil.WrapAES128Key(appSKey, "", s.KeyVault)
+	res.AppSKey, err = cryptoutil.WrapAES128Key(ctx, appSKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
@@ -483,7 +483,7 @@ func (s *mockApplicationRPCServer) GetAppKey(ctx context.Context, req *ttnpb.Get
 	if err != nil {
 		return nil, err
 	}
-	env, err := cryptoutil.WrapAES128Key(*appKey, "", s.KeyVault)
+	env, err := cryptoutil.WrapAES128Key(ctx, *appKey, "", s.KeyVault)
 	if err != nil {
 		return nil, err
 	}

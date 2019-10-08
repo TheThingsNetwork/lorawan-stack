@@ -423,7 +423,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
 			return nil, genState, errUnknownNwkSEncKey
 		}
-		key, err := cryptoutil.UnwrapAES128Key(*dev.Session.NwkSEncKey, ns.KeyVault)
+		key, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.NwkSEncKey, ns.KeyVault)
 		if err != nil {
 			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, genState, err
@@ -482,7 +482,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
 		return nil, genState, errUnknownSNwkSIntKey
 	}
-	key, err := cryptoutil.UnwrapAES128Key(*dev.Session.SNwkSIntKey, ns.KeyVault)
+	key, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.SNwkSIntKey, ns.KeyVault)
 	if err != nil {
 		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
 		return nil, genState, err

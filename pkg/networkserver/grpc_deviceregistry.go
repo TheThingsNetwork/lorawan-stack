@@ -89,21 +89,21 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 			continue
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.f_nwk_s_int_key") && s.val.FNwkSIntKey != nil {
-			key, err := cryptoutil.UnwrapAES128Key(*s.val.FNwkSIntKey, ns.KeyVault)
+			key, err := cryptoutil.UnwrapAES128Key(ctx, *s.val.FNwkSIntKey, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
 			s.val.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: &key}
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.s_nwk_s_int_key") && s.val.SNwkSIntKey != nil {
-			key, err := cryptoutil.UnwrapAES128Key(*s.val.SNwkSIntKey, ns.KeyVault)
+			key, err := cryptoutil.UnwrapAES128Key(ctx, *s.val.SNwkSIntKey, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
 			s.val.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: &key}
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.nwk_s_enc_key") && s.val.NwkSEncKey != nil {
-			key, err := cryptoutil.UnwrapAES128Key(*s.val.NwkSEncKey, ns.KeyVault)
+			key, err := cryptoutil.UnwrapAES128Key(ctx, *s.val.NwkSEncKey, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}

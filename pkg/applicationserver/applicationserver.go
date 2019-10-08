@@ -422,7 +422,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 			return nil, errNoAppSKey
 		}
 		// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
-		appSKey, err := cryptoutil.UnwrapAES128Key(*session.AppSKey, as.KeyVault)
+		appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.AppSKey, as.KeyVault)
 		if err != nil {
 			return nil, err
 		}
@@ -690,7 +690,7 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	if dev.Session == nil || !bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID) || dev.Session.AppSKey == nil {
 		return errNoAppSKey
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
@@ -745,7 +745,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			}
 		}
 	}()
-	newAppSKey, err := cryptoutil.UnwrapAES128Key(*newSession.AppSKey, as.KeyVault)
+	newAppSKey, err := cryptoutil.UnwrapAES128Key(ctx, *newSession.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
@@ -769,7 +769,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			continue
 		}
 		// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
-		oldAppSKey, err := cryptoutil.UnwrapAES128Key(*oldSession.AppSKey, as.KeyVault)
+		oldAppSKey, err := cryptoutil.UnwrapAES128Key(ctx, *oldSession.AppSKey, as.KeyVault)
 		if err != nil {
 			logger.WithError(err).Warn("Drop downlink message; failed to unwrap AppSKey for decryption")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)

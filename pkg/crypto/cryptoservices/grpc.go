@@ -116,15 +116,15 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 		return NwkSKeys{}, err
 	}
 	var res NwkSKeys
-	res.FNwkSIntKey, err = cryptoutil.UnwrapAES128Key(keys.FNwkSIntKey, s.KeyVault)
+	res.FNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.FNwkSIntKey, s.KeyVault)
 	if err != nil {
 		return NwkSKeys{}, err
 	}
-	res.SNwkSIntKey, err = cryptoutil.UnwrapAES128Key(keys.SNwkSIntKey, s.KeyVault)
+	res.SNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.SNwkSIntKey, s.KeyVault)
 	if err != nil {
 		return NwkSKeys{}, err
 	}
-	res.NwkSEncKey, err = cryptoutil.UnwrapAES128Key(keys.NwkSEncKey, s.KeyVault)
+	res.NwkSEncKey, err = cryptoutil.UnwrapAES128Key(ctx, keys.NwkSEncKey, s.KeyVault)
 	if err != nil {
 		return NwkSKeys{}, err
 	}
@@ -143,7 +143,7 @@ func (s *networkRPCClient) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) 
 		}
 		return nil, err
 	}
-	plain, err := cryptoutil.UnwrapAES128Key(*key, s.KeyVault)
+	plain, err := cryptoutil.UnwrapAES128Key(ctx, *key, s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 	if err != nil {
 		return types.AES128Key{}, err
 	}
-	return cryptoutil.UnwrapAES128Key(res.AppSKey, s.KeyVault)
+	return cryptoutil.UnwrapAES128Key(ctx, res.AppSKey, s.KeyVault)
 }
 
 func (s *applicationRPCClient) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error) {
@@ -193,7 +193,7 @@ func (s *applicationRPCClient) GetAppKey(ctx context.Context, dev *ttnpb.EndDevi
 		}
 		return nil, err
 	}
-	plain, err := cryptoutil.UnwrapAES128Key(*key, s.KeyVault)
+	plain, err := cryptoutil.UnwrapAES128Key(ctx, *key, s.KeyVault)
 	if err != nil {
 		return nil, err
 	}
