@@ -63,8 +63,8 @@ var (
 	errTLSKeyVaultID      = errors.DefineFailedPrecondition("tls_key_vault_id", "invalid TLS key vault ID")
 )
 
-// GetTLSConfig gets the component's TLS config and applies the given options.
-func (c *Component) GetTLSConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
+// GetTLSServerConfig gets the component's server TLS config and applies the given options.
+func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
 	var (
 		logger = log.FromContext(ctx)
 		conf   = c.GetBaseConfig(ctx).TLS
@@ -154,7 +154,19 @@ func (c *Component) GetTLSConfig(ctx context.Context, opts ...TLSConfigOption) (
 	if res == nil {
 		return nil, errEmptyTLSConfig
 	}
+	res.MinVersion = tls.VersionTLS12
+	res.NextProtos = []string{"h2", "http/1.1"}
+	res.PreferServerCipherSuites = true
+	for _, opt := range opts {
+		opt.apply(res)
+	}
+	return res, nil
+}
 
+// GetTLSClientConfig gets the component's client TLS config and applies the given options.
+func (c *Component) GetTLSClientConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
+	conf := c.GetBaseConfig(ctx).TLS
+	res := &tls.Config{}
 	if conf.RootCA != "" {
 		pem, err := ioutil.ReadFile(conf.RootCA)
 		if err != nil {
@@ -165,8 +177,6 @@ func (c *Component) GetTLSConfig(ctx context.Context, opts ...TLSConfigOption) (
 	}
 	res.InsecureSkipVerify = conf.InsecureSkipVerify
 	res.MinVersion = tls.VersionTLS12
-	res.NextProtos = []string{"h2", "http/1.1"}
-	res.PreferServerCipherSuites = true
 	for _, opt := range opts {
 		opt.apply(res)
 	}
