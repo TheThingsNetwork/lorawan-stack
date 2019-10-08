@@ -167,6 +167,7 @@ func (c *Component) GetTLSClientConfig(ctx context.Context, opts ...TLSConfigOpt
 	conf := c.GetBaseConfig(ctx).TLS
 	res := &tls.Config{}
 	if conf.RootCA != "" {
+		// TODO: Cache file (https://github.com/TheThingsNetwork/lorawan-stack/issues/1432)
 		pem, err := ioutil.ReadFile(conf.RootCA)
 		if err != nil {
 			return nil, err
