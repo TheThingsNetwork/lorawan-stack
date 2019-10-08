@@ -113,10 +113,14 @@ func WithBaseConfigGetter(f func(ctx context.Context) config.ServiceBase) Option
 }
 
 // New returns a new component.
-func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
-	var err error
-
+func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err error) {
 	ctx, cancel := context.WithCancel(context.Background())
+	defer func() {
+		if err != nil {
+			cancel()
+		}
+	}()
+
 	ctx = log.NewContext(ctx, logger)
 
 	fps, err := config.FrequencyPlans.Store()
@@ -124,7 +128,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (*Component, error) {
 		return nil, err
 	}
 
-	c := &Component{
+	c = &Component{
 		ctx:                ctx,
 		cancelCtx:          cancel,
 		terminationSignals: make(chan os.Signal),
