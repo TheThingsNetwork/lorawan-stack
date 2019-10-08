@@ -334,15 +334,17 @@ func (c DeviceRepositoryConfig) Client(ctx context.Context, blobConf BlobConfig)
 
 // InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropClient struct {
-	Directory   string         `name:"directory" description:"Retrieve the interoperability client configuration from the filesystem"`
-	URL         string         `name:"url" description:"Retrieve the interoperability client configuration from a web server"`
-	Blob        BlobPathConfig `name:"blob" description:"Retrieve the interoperability client configuration from a blob"`
-	FallbackTLS *tls.Config    `name:"-"`
+	Directory string         `name:"directory" description:"Retrieve the interoperability client configuration from the filesystem"`
+	URL       string         `name:"url" description:"Retrieve the interoperability client configuration from a web server"`
+	Blob      BlobPathConfig `name:"blob" description:"Retrieve the interoperability client configuration from a blob"`
+
+	GetFallbackTLSConfig func(ctx context.Context) (*tls.Config, error) `name:"-"`
+	BlobConfig           BlobConfig                                     `name:"-"`
 }
 
 // IsZero returns whether conf is empty.
 func (c InteropClient) IsZero() bool {
-	return c == (InteropClient{})
+	return c.Directory == "" && c.URL == "" && c.Blob.IsZero() && c.GetFallbackTLSConfig == nil && c.BlobConfig == BlobConfig{}
 }
 
 // Fetcher returns fetch.Interface defined by conf.

@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/blob"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/picture"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -102,9 +102,9 @@ func TestStore(t *testing.T) {
 	a := assertions.New(t)
 
 	ctx := test.Context()
-	var blobConfig blob.Config
+	var blobConfig config.BlobConfig
 	blobConfig.Provider, blobConfig.Local.Directory = "local", "."
-	bucket, _ := blobConfig.GetBucket(ctx, "testdata")
+	bucket, _ := blobConfig.Bucket(ctx, "testdata")
 
 	pic, err := picture.Store(ctx, bucket, "picture", &ttnpb.Picture{
 		Sizes: map[uint32]string{
