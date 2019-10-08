@@ -60,6 +60,7 @@ func WithNextProtos(protos ...string) TLSConfigOption {
 var (
 	errAmbiguousTLSConfig = errors.DefineFailedPrecondition("tls_config_ambiguous", "ambiguous TLS configuration")
 	errEmptyTLSConfig     = errors.DefineFailedPrecondition("tls_config_empty", "empty TLS configuration")
+	errTLSKeyVaultID      = errors.DefineFailedPrecondition("tls_key_vault_id", "invalid TLS key vault ID")
 )
 
 // GetTLSConfig gets the component's TLS config and applies the given options.
@@ -121,6 +122,17 @@ func (c *Component) GetTLSConfig(ctx context.Context, opts ...TLSConfigOption) (
 						hello.ServerName = conf.ACME.DefaultHost
 					}
 					return c.acme.GetCertificate(hello)
+				}, nil
+			},
+		},
+		{
+			Enable: conf.KeyVault.Enable,
+			CertificateGetter: func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+				if conf.KeyVault.ID == "" {
+					return nil, errTLSKeyVaultID
+				}
+				return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+					return c.KeyVault.LoadCertificate(conf.KeyVault.ID)
 				}, nil
 			},
 		},

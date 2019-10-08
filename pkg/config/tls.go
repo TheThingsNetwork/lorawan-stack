@@ -33,6 +33,12 @@ func (a ACME) IsZero() bool {
 		len(a.Hosts) == 0
 }
 
+// TLSKeyVault defines configuration for loading a certificate from the key vault.
+type TLSKeyVault struct {
+	Enable bool   `name:"enable" description:"Enable loading the certificate from the key vault"`
+	ID     string `name:"id" description:"ID of the certificate"`
+}
+
 // TLS represents TLS configuration.
 type TLS struct {
 	RootCA             string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
@@ -42,6 +48,8 @@ type TLS struct {
 	Key         string `name:"key" description:"Location of TLS private key"`
 
 	ACME ACME `name:"acme"`
+
+	KeyVault TLSKeyVault `name:"key-vault"`
 }
 
 // IsZero returns whether the TLS configuration is empty.
