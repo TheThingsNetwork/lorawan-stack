@@ -3,7 +3,7 @@ go 1.13
 module go.thethings.network/lorawan-stack
 
 // Use our fork of grpc-gateway.
-replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.11.2-gogo
+replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.11.3-gogo
 
 // Use our fork of otto.
 replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
@@ -25,13 +25,13 @@ replace golang.org/x/crypto => golang.org/x/crypto v0.0.0-20190911031432-227b76d
 replace golang.org/x/image => golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a // indirect
 
 // Ensure only one version of golang.org/x/net is required.
-replace golang.org/x/net => golang.org/x/net v0.0.0-20190909003024-a7b16738d86b
+replace golang.org/x/net => golang.org/x/net v0.0.0-20191007182048-72f939374954
 
 // Ensure only one version of golang.org/x/oauth2 is required.
 replace golang.org/x/oauth2 => golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 
 // Ensure only one version of golang.org/x/sys is required.
-replace golang.org/x/sys => golang.org/x/sys v0.0.0-20190910064555-bbd175535a8b // indirect
+replace golang.org/x/sys => golang.org/x/sys v0.0.0-20191008102750-0b153f535cc8 // indirect
 
 // Ensure only one version of golang.org/x/tools is required.
 replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190911022129-16c5e0f7d110
@@ -145,16 +145,16 @@ require (
 	gocloud.dev/pubsub/natspubsub v0.16.0
 	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
 	golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a // indirect
-	golang.org/x/net v0.0.0-20190909003024-a7b16738d86b
+	golang.org/x/net v0.0.0-20191007182048-72f939374954
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
-	golang.org/x/sys v0.0.0-20190910064555-bbd175535a8b // indirect
+	golang.org/x/sys v0.0.0-20191008102750-0b153f535cc8 // indirect
 	golang.org/x/tools v0.0.0-20190911022129-16c5e0f7d110
 	golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7
 	google.golang.org/api v0.10.0
 	google.golang.org/appengine v1.6.2 // indirect
-	google.golang.org/genproto v0.0.0-20190905072037-92dd089d5514
-	google.golang.org/grpc v1.23.0
+	google.golang.org/genproto v0.0.0-20191007204434-a023cd5227bd
+	google.golang.org/grpc v1.24.0
 	// Do not upgrade go-sqlmock beyond v1.3.0 until https://github.com/heptiolabs/healthcheck/issues/23 is resolved
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/mail.v2 v2.3.1
