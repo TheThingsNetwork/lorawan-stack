@@ -16,14 +16,11 @@ package blob
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"gocloud.dev/blob"
 	"gocloud.dev/blob/fileblob"
@@ -33,30 +30,12 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-// Config of the blob store.
-type Config config.Blob
-
 var (
-	errUnknownProvider = errors.DefineInternal("unknown_provider", "unknown blob store provider `{provider}`")
-	errConfig          = errors.DefineInternal("missing_config", "missing blob store configuration")
+	errInvalidConfig = errors.DefineInvalidArgument("invalid_config", "invalid blob store configuration")
 )
 
-// GetBucket returns the requested blob bucket using the config.
-func (c Config) GetBucket(ctx context.Context, bucket string) (*blob.Bucket, error) {
-	switch c.Provider {
-	case "local":
-		return c.getLocal(ctx, bucket)
-	case "aws":
-		return c.getAWS(ctx, bucket)
-	case "gcp":
-		return c.getGCP(ctx, bucket)
-	default:
-		return nil, errUnknownProvider.WithAttributes("provider", c.Provider)
-	}
-}
-
-func (c Config) getLocal(_ context.Context, bucket string) (*blob.Bucket, error) {
-	bucketPath, err := filepath.Abs(filepath.Join(c.Local.Directory, bucket))
+func Local(_ context.Context, bucket, path string) (*blob.Bucket, error) {
+	bucketPath, err := filepath.Abs(filepath.Join(path, bucket))
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +43,7 @@ func (c Config) getLocal(_ context.Context, bucket string) (*blob.Bucket, error)
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(bucketPath, 0755)
 		if err != nil {
-			return nil, errConfig.WithCause(err)
+			return nil, errInvalidConfig.WithCause(err)
 		}
 	} else if err != nil {
 		return nil, err
@@ -72,45 +51,16 @@ func (c Config) getLocal(_ context.Context, bucket string) (*blob.Bucket, error)
 	return fileblob.OpenBucket(bucketPath, nil)
 }
 
-type awsCredentials Config
-
-func (c awsCredentials) Retrieve() (value credentials.Value, err error) {
-	value.ProviderName = "TTNConfigProvider"
-	value.AccessKeyID, value.SecretAccessKey = c.AWS.AccessKeyID, c.AWS.SecretAccessKey
-	if value.AccessKeyID == "" || value.SecretAccessKey == "" {
-		return value, errConfig
-	}
-	return value, nil
-}
-
-func (c awsCredentials) IsExpired() bool { return false }
-
-func (c Config) getAWS(ctx context.Context, bucket string) (*blob.Bucket, error) {
-	s, err := session.NewSession(&aws.Config{
-		Endpoint:    &c.AWS.Endpoint,
-		Region:      &c.AWS.Region,
-		Credentials: credentials.NewCredentials(awsCredentials(c)),
-	})
+func AWS(ctx context.Context, bucket string, conf *aws.Config) (*blob.Bucket, error) {
+	s, err := session.NewSession(conf)
 	if err != nil {
 		return nil, err
 	}
 	return s3blob.OpenBucket(ctx, s, bucket, nil)
 }
 
-func (c Config) getGCP(ctx context.Context, bucket string) (*blob.Bucket, error) {
-	var jsonData []byte
-	if c.GCP.Credentials != "" {
-		jsonData = []byte(c.GCP.Credentials)
-	} else if c.GCP.CredentialsFile != "" {
-		var err error
-		jsonData, err = ioutil.ReadFile(c.GCP.CredentialsFile)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, errConfig
-	}
-	creds, err := google.CredentialsFromJSON(ctx, jsonData, "https://www.googleapis.com/auth/cloud-platform")
+func GCP(ctx context.Context, bucket string, jsonCredentials []byte) (*blob.Bucket, error) {
+	creds, err := google.CredentialsFromJSON(ctx, jsonCredentials, "https://www.googleapis.com/auth/cloud-platform")
 	if err != nil {
 		return nil, err
 	}

@@ -101,6 +101,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver")
 
+	baseConf := c.GetBaseConfig(ctx)
+
 	var interopCl InteropClient
 	if !conf.Interop.IsZero() {
 		var fallbackTLS *tls.Config
@@ -111,13 +113,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			fallbackTLS = cTLS
 		}
 
-		interopCl, err = interop.NewClient(ctx, conf.Interop.InteropClient, fallbackTLS)
+		interopCl, err = interop.NewClient(ctx, conf.Interop.InteropClient, baseConf.Blob, fallbackTLS)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	drCl, err := c.GetBaseConfig(c.Context()).DeviceRepository.Client()
+	drCl, err := baseConf.DeviceRepository.Client(ctx, baseConf.Blob)
 	if err != nil {
 		return nil, err
 	}

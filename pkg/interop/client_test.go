@@ -1189,7 +1189,7 @@ paths:
 			conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
 			defer flush()
 
-			cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
+			cl, err := NewClient(ctx, conf, config.BlobConfig{}, tc.NewFallbackTLSConfig())
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}

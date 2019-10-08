@@ -123,10 +123,6 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 
 	ctx = log.NewContext(ctx, logger)
 
-	fps, err := config.FrequencyPlans.Store()
-	if err != nil {
-		return nil, err
-	}
 	keyVault, err := config.KeyVault.KeyVault()
 	if err != nil {
 		return nil, err
@@ -144,8 +140,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 
 		tcpListeners: make(map[string]*listener),
 
-		FrequencyPlans: fps,
-		KeyVault:       keyVault,
+		KeyVault: keyVault,
 	}
 
 	if config.Sentry.DSN != "" {
@@ -158,6 +153,13 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 	for _, opt := range opts {
 		opt(c)
 	}
+
+	fps, err := config.FrequencyPlans.Store(c.ctx, c.GetBaseConfig(c.ctx).Blob)
+	if err != nil {
+		return nil, err
+	}
+	c.FrequencyPlans = fps
+
 	if c.clusterNew == nil {
 		c.clusterNew = cluster.New
 	}

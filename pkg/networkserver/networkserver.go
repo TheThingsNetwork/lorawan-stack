@@ -179,7 +179,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			fallbackTLS = cTLS
 		}
 
-		interopCl, err = interop.NewClient(ctx, conf.Interop, fallbackTLS)
+		interopCl, err = interop.NewClient(ctx, conf.Interop, c.GetBaseConfig(ctx).Blob, fallbackTLS)
 		if err != nil {
 			return nil, err
 		}

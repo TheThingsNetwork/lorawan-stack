@@ -20,34 +20,35 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/blob"
-	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/pkg/config"
+	. "go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestBucket(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+
 	tmpDir, err := ioutil.TempDir("", "FetchTestBucket")
 	if err != nil {
 		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
 	defer os.RemoveAll(tmpDir)
 
-	config := blob.Config{Provider: "local"}
-	config.Local.Directory = tmpDir
-
-	a := assertions.New(t)
+	conf := config.BlobConfig{Provider: "local"}
+	conf.Local.Directory = tmpDir
 
 	filename := "file"
 	content := []byte("Hello world")
 
-	bucket, err := config.GetBucket(test.Context(), "bucket")
+	bucket, err := conf.Bucket(ctx, "bucket")
 	a.So(err, should.BeNil)
 
-	err = bucket.WriteAll(test.Context(), filename, content, nil)
+	err = bucket.WriteAll(ctx, filename, content, nil)
 	a.So(err, should.BeNil)
 
-	fetcher := fetch.FromBucket(bucket, "")
+	fetcher := FromBucket(ctx, bucket, "")
 
 	// Reading working file
 	{
