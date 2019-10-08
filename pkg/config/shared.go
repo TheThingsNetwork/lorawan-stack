@@ -156,12 +156,12 @@ type KeyVault struct {
 
 // KeyVault returns an initialized crypto.KeyVault based on the configuration.
 // The order of precedence is Static.
-func (v KeyVault) KeyVault() crypto.KeyVault {
+func (v KeyVault) KeyVault() (crypto.KeyVault, error) {
 	switch {
 	case v.Static != nil:
-		return cryptoutil.NewMemKeyVault(v.Static)
+		return cryptoutil.NewMemKeyVault(v.Static), nil
 	default:
-		return cryptoutil.NewMemKeyVault(map[string][]byte{})
+		return cryptoutil.NewMemKeyVault(map[string][]byte{}), nil
 	}
 }
 
