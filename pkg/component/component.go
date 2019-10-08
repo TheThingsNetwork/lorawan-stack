@@ -154,11 +154,11 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		opt(c)
 	}
 
-	fps, err := config.FrequencyPlans.Store(c.ctx, c.GetBaseConfig(c.ctx).Blob)
+	fpsFetcher, err := config.FrequencyPlans.Fetcher(ctx, c.GetBaseConfig(c.ctx).Blob)
 	if err != nil {
 		return nil, err
 	}
-	c.FrequencyPlans = fps
+	c.FrequencyPlans = frequencyplans.NewStore(fpsFetcher)
 
 	if c.clusterNew == nil {
 		c.clusterNew = cluster.New

@@ -25,10 +25,8 @@ import (
 	ttnblob "go.thethings.network/lorawan-stack/pkg/blob"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"gocloud.dev/blob"
 )
@@ -266,32 +264,26 @@ type FrequencyPlansConfig struct {
 	Blob      BlobPathConfig    `name:"blob" description:"Retrieve the frequency plans from a blob"`
 }
 
-// Store returns a frequencyplan.Store with a fetcher based on the configuration.
+// Fetcher returns a fetch.Interface based on the configuration.
 // The order of precedence is Static, Directory, URL and Blob.
 // If neither Static, Directory, URL nor a Blob is set, this method returns nil, nil.
-func (c FrequencyPlansConfig) Store(ctx context.Context, blobConf BlobConfig) (*frequencyplans.Store, error) {
-	var fetcher fetch.Interface
+func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
 	switch {
 	case c.Static != nil:
-		fetcher = fetch.NewMemFetcher(c.Static)
+		return fetch.NewMemFetcher(c.Static), nil
 	case c.Directory != "":
-		fetcher = fetch.FromFilesystem(c.Directory)
+		return fetch.FromFilesystem(c.Directory), nil
 	case c.URL != "":
-		var err error
-		fetcher, err = fetch.FromHTTP(c.URL, true)
-		if err != nil {
-			return nil, err
-		}
+		return fetch.FromHTTP(c.URL, true)
 	case !c.Blob.IsZero():
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err
 		}
-		fetcher = fetch.FromBucket(ctx, b, c.Blob.Path)
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
 	default:
 		return nil, nil
 	}
-	return frequencyplans.NewStore(fetcher), nil
 }
 
 // DeviceRepositoryConfig defines the source of the device repository.
@@ -302,34 +294,26 @@ type DeviceRepositoryConfig struct {
 	Blob      BlobPathConfig    `name:"blob" description:"Retrieve the device repository from a blob"`
 }
 
-// Client instantiates a new devicerepository.Client with a fetcher based on the configuration.
+// Fetcher returns a fetch.Interface based on the configuration.
 // The order of precedence is Static, Directory, URL and Blob.
 // If neither Static, Directory, URL nor a Blob is set, this method returns nil, nil.
-func (c DeviceRepositoryConfig) Client(ctx context.Context, blobConf BlobConfig) (*devicerepository.Client, error) {
-	var fetcher fetch.Interface
+func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
 	switch {
 	case c.Static != nil:
-		fetcher = fetch.NewMemFetcher(c.Static)
+		return fetch.NewMemFetcher(c.Static), nil
 	case c.Directory != "":
-		fetcher = fetch.FromFilesystem(c.Directory)
+		return fetch.FromFilesystem(c.Directory), nil
 	case c.URL != "":
-		var err error
-		fetcher, err = fetch.FromHTTP(c.URL, true)
-		if err != nil {
-			return nil, err
-		}
+		return fetch.FromHTTP(c.URL, true)
 	case !c.Blob.IsZero():
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err
 		}
-		fetcher = fetch.FromBucket(ctx, b, c.Blob.Path)
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
 	default:
 		return nil, nil
 	}
-	return &devicerepository.Client{
-		Fetcher: fetcher,
-	}, nil
 }
 
 // InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.

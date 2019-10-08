@@ -38,6 +38,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/interop"
@@ -117,7 +118,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		}
 	}
 
-	drCl, err := baseConf.DeviceRepository.Client(ctx, baseConf.Blob)
+	drFetcher, err := baseConf.DeviceRepository.Fetcher(ctx, baseConf.Blob)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +131,9 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
 		formatter: payloadFormatter{
-			repository: drCl,
+			repository: &devicerepository.Client{
+				Fetcher: drFetcher,
+			},
 			upFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadDecoder{
 				ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 				ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
