@@ -168,7 +168,7 @@ func (v KeyVault) KeyVault() (crypto.KeyVault, error) {
 		kv.ReplaceOldNew = []string{":", "_"}
 		return kv, nil
 	default:
-		return cryptoutil.NewMemKeyVault(map[string][]byte{}), nil
+		return cryptoutil.EmptyKeyVault, nil
 	}
 }
 
