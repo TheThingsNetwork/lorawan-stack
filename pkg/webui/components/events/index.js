@@ -99,11 +99,20 @@ class Events extends React.Component {
   }
 
   render() {
-    const { className, events, onClear, emitterId, limit, error } = this.props
+    const { className, events, onClear, emitterId, limit, error, onRestart } = this.props
     const { paused } = this.state
 
     if (error) {
-      return <Notification title={sharedMessages.eventsCannotShow} error={error} />
+      return (
+        <Notification
+          small
+          title={sharedMessages.eventsCannotShow}
+          error={error}
+          action={onRestart}
+          actionMessage={sharedMessages.restartStream}
+          buttonIcon="refresh"
+        />
+      )
     }
 
     let limitedEvents = events
@@ -135,10 +144,11 @@ class Events extends React.Component {
 }
 
 Events.propTypes = {
-  events: PropTypes.arrayOf(PropTypes.event),
   emitterId: PropTypes.string.isRequired,
-  onClear: PropTypes.func.isRequired,
+  events: PropTypes.arrayOf(PropTypes.event),
   limit: PropTypes.number,
+  onClear: PropTypes.func.isRequired,
+  onRestart: PropTypes.func.isRequired,
 }
 
 Events.defaultProps = {
