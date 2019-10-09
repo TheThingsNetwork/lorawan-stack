@@ -1156,6 +1156,16 @@
               "fullType": "ttn.lorawan.v3.MessagePayloadFormatters",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "tls",
+              "description": "Enable TLS for linking to the external Network Server.\nFor cluster-local Network Servers, the cluster's TLS setting is used.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

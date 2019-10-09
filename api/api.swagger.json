@@ -6988,6 +6988,11 @@
         },
         "default_formatters": {
           "$ref": "#/definitions/v3MessagePayloadFormatters"
+        },
+        "tls": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Enable TLS for linking to the external Network Server.\nFor cluster-local Network Servers, the cluster's TLS setting is used."
         }
       }
     },

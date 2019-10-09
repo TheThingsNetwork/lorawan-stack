@@ -37,6 +37,9 @@ message ApplicationLink {
   string network_server_address = 1 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   string api_key = 2 [(gogoproto.customname) = "APIKey", (validate.rules).string.min_len = 1];
   MessagePayloadFormatters default_formatters = 3;
+  // Enable TLS for linking to the external Network Server.
+  // For cluster-local Network Servers, the cluster's TLS setting is used.
+  bool tls = 4 [(gogoproto.customname) = "TLS"];
 }
 
 message GetApplicationLinkRequest {

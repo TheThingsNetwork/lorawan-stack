@@ -10,12 +10,14 @@ var ApplicationLinkFieldPathsNested = []string{
 	"default_formatters.up_formatter",
 	"default_formatters.up_formatter_parameter",
 	"network_server_address",
+	"tls",
 }
 
 var ApplicationLinkFieldPathsTopLevel = []string{
 	"api_key",
 	"default_formatters",
 	"network_server_address",
+	"tls",
 }
 var GetApplicationLinkRequestFieldPathsNested = []string{
 	"application_ids",
@@ -39,6 +41,7 @@ var SetApplicationLinkRequestFieldPathsNested = []string{
 	"link.default_formatters.up_formatter",
 	"link.default_formatters.up_formatter_parameter",
 	"link.network_server_address",
+	"link.tls",
 }
 
 var SetApplicationLinkRequestFieldPathsTopLevel = []string{

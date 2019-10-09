@@ -52,6 +52,16 @@ func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) err
 					dst.DefaultFormatters = nil
 				}
 			}
+		case "tls":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tls' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TLS = src.TLS
+			} else {
+				var zero bool
+				dst.TLS = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
