@@ -22,10 +22,12 @@ import deviceEntityMap from '../../../generated/device-entity-map.json'
  * @param {Object} paths - The requested paths (from the field mask) of the device
  * @param {string} direction - The direction, either 'set' or 'get'
  * @param {Object} base - An optional base value for the returned request tree
+ * @param {Object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree
  * @returns {Object} A request tree object, consisting of resulting paths for each
  * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
  */
-function splitPaths(paths = [], direction, base = {}) {
+function splitPaths(paths = [], direction, base = {}, components = ['is', 'ns', 'as', 'js']) {
   const result = base
   const retrieveIndex = direction === 'get' ? 0 : 1
 
@@ -39,13 +41,19 @@ function splitPaths(paths = [], direction, base = {}) {
 
     const definition = '_root' in subtree ? subtree._root[retrieveIndex] : subtree[retrieveIndex]
 
+    const map = function(requestTree, component, path) {
+      if (components.includes(component)) {
+        result[component] = !result[component] ? [path] : [...result[component], path]
+      }
+    }
+
     if (definition) {
       if (definition instanceof Array) {
         for (const component of definition) {
-          result[component] = !result[component] ? [path] : [...result[component], path]
+          map(result, component, path)
         }
       } else {
-        result[definition] = !result[definition] ? [path] : [...result[definition], path]
+        map(result, definition, path)
       }
     }
   }
@@ -55,21 +63,25 @@ function splitPaths(paths = [], direction, base = {}) {
 /** A wrapper function to obtain a request tree for writing values to a device
  * @param {Object} paths - The requested paths (from the field mask) of the device
  * @param {Object} base - An optional base value for the returned request tree
+ * @param {Object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree
  * @returns {Object} A request tree object, consisting of resulting paths for each
  * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
  */
-export function splitSetPaths(paths, base) {
-  return splitPaths(paths, 'set', base)
+export function splitSetPaths(paths, base, components) {
+  return splitPaths(paths, 'set', base, components)
 }
 
 /** A wrapper function to obtain a request tree for reading values to a device
  * @param {Object} paths - The requested paths (from the field mask) of the device
  * @param {Object} base - An optional base value for the returned request tree
+ * @param {Object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree
  * @returns {Object} A request tree object, consisting of resulting paths for each
  * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
  */
-export function splitGetPaths(paths, base) {
-  return splitPaths(paths, 'get', base)
+export function splitGetPaths(paths, base, components) {
+  return splitPaths(paths, 'get', base, components)
 }
 
 /** A wrapper function to obtain a request tree for reading values to a device
