@@ -2453,7 +2453,7 @@
     },
     "description": {
       "package": "pkg/crypto/cryptoutil",
-      "file": "keyvault_mem.go"
+      "file": "cryptoutil.go"
     }
   },
   "error:pkg/crypto/cryptoutil:invalid_length": {
@@ -2471,7 +2471,7 @@
     },
     "description": {
       "package": "pkg/crypto/cryptoutil",
-      "file": "keyvault_mem.go"
+      "file": "cryptoutil.go"
     }
   },
   "error:pkg/crypto:corrupt_key": {
