@@ -21,13 +21,29 @@ const { Widget } = Events
 
 class EventsSubscription extends React.Component {
   render() {
-    const { id, widget, events, onClear, toAllUrl, error } = this.props
+    const { id, widget, events, onClear, toAllUrl, onRestart, error } = this.props
 
     if (widget) {
-      return <Widget emitterId={id} events={events} toAllUrl={toAllUrl} error={error} />
+      return (
+        <Widget
+          emitterId={id}
+          events={events}
+          toAllUrl={toAllUrl}
+          onRestart={onRestart}
+          error={error}
+        />
+      )
     }
 
-    return <Events emitterId={id} events={events} onClear={onClear} error={error} />
+    return (
+      <Events
+        emitterId={id}
+        events={events}
+        onClear={onClear}
+        onRestart={onRestart}
+        error={error}
+      />
+    )
   }
 }
 
@@ -36,6 +52,7 @@ EventsSubscription.propTypes = {
   events: PropTypes.events,
   id: PropTypes.string.isRequired,
   onClear: PropTypes.func,
+  onRestart: PropTypes.func.isRequired,
   toAllUrl: PropTypes.string,
   widget: PropTypes.bool,
 }
