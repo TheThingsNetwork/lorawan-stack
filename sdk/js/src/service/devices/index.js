@@ -291,6 +291,14 @@ class Devices {
     return Marshaler.payloadListResponse('formats', result)
   }
 
+  convertTemplate(formatId, data) {
+    // This is a stream endpoint
+    return this._api.EndDeviceTemplateConverter.Convert(undefined, {
+      format_id: formatId,
+      data,
+    })
+  }
+
   // Events Stream
 
   async openStream(identifiers, tail, after) {
