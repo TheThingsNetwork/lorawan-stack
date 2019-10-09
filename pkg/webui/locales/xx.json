@@ -127,6 +127,8 @@
   "console.containers.collaborators-table.index.id": "Xxxx / Xxxxxxxxxxxx XX",
   "console.containers.dev-addr-input.dev-addr-input.generate": "Xxxxxxxx Xxxxxx Xxxxxxx",
   "console.containers.dev-addr-input.index.devAddrFetchingFailure": "Xxxxx xxx xxxxxxxx xxxxxx xxxxxxx",
+  "console.containers.device-template-format-select.index.title": "Xxxx Xxxxxx",
+  "console.containers.device-template-format-select.index.warning": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxx xxxxxxxx xxxxxxx",
   "console.containers.freq-plans-select.index.title": "Xxxxxxxxx Xxxx",
   "console.containers.freq-plans-select.index.warning": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxxxx xxxxx",
   "console.containers.join-eui-prefixes-input.index.prefixesFetchingFailure": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxxx",
