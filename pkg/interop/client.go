@@ -378,10 +378,18 @@ const InteropClientConfigurationName = "config.yaml"
 
 // NewClient return new interop client.
 // fallbackTLS is optional.
-func NewClient(ctx context.Context, conf config.InteropClient, fallbackTLS *tls.Config) (*Client, error) {
-	fetcher, err := conf.Fetcher()
+func NewClient(ctx context.Context, conf config.InteropClient) (*Client, error) {
+	var fallbackTLS *tls.Config
+	tlsConf, err := conf.GetFallbackTLSConfig(ctx)
 	if err != nil {
-		return nil, errUnknownConfig.WithCause(err)
+		log.FromContext(ctx).WithError(err).Warn("Could not get fallback TLS config for interoperability")
+	} else {
+		fallbackTLS = tlsConf
+	}
+
+	fetcher, err := conf.Fetcher(ctx, conf.BlobConfig)
+	if err != nil {
+		return nil, err
 	}
 	if fetcher == nil {
 		return nil, errUnknownConfig

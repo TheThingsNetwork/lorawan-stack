@@ -171,15 +171,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	var interopCl InteropClient
 	if !conf.Interop.IsZero() {
-		var fallbackTLS *tls.Config
-		cTLS, err := c.GetTLSClientConfig(ctx)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Could not get fallback TLS config for interoperability")
-		} else {
-			fallbackTLS = cTLS
+		interopConf := conf.Interop
+		interopConf.GetFallbackTLSConfig = func(ctx context.Context) (*tls.Config, error) {
+			return c.GetTLSClientConfig(ctx)
 		}
+		interopConf.BlobConfig = c.GetBaseConfig(ctx).Blob
 
-		interopCl, err = interop.NewClient(ctx, conf.Interop, fallbackTLS)
+		interopCl, err = interop.NewClient(ctx, interopConf)
 		if err != nil {
 			return nil, err
 		}

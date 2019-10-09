@@ -25,7 +25,6 @@ import (
 	"time"
 
 	ulid "github.com/oklog/ulid/v2"
-	ttnblob "go.thethings.network/lorawan-stack/pkg/blob"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/picture"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -83,7 +82,7 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 	}
 
 	// Store picture to bucket.
-	bucket, err := ttnblob.Config(is.Component.GetBaseConfig(ctx).Blob).GetBucket(ctx, is.configFromContext(ctx).ProfilePicture.Bucket)
+	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, is.configFromContext(ctx).ProfilePicture.Bucket)
 	if err != nil {
 		return err
 	}

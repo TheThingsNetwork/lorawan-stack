@@ -17,14 +17,18 @@ package config
 import (
 	"context"
 	"crypto/tls"
+	"io/ioutil"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	ttnblob "go.thethings.network/lorawan-stack/pkg/blob"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/pkg/devicerepository"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"gocloud.dev/blob"
 )
 
 // Base represents base component configuration.
@@ -165,6 +169,11 @@ func (v KeyVault) KeyVault() (crypto.KeyVault, error) {
 	}
 }
 
+var (
+	errUnknownBlobProvider = errors.DefineInvalidArgument("unknown_blob_provider", "unknown blob store provider `{provider}`")
+	errMissingBlobConfig   = errors.DefineInvalidArgument("missing_blob_config", "missing blob store configuration")
+)
+
 // BlobConfigLocal is the blob store configuration for the local filesystem provider.
 type BlobConfigLocal struct {
 	Directory string `name:"directory" description:"Local directory that holds the buckets"`
@@ -179,18 +188,72 @@ type BlobConfigAWS struct {
 	SessionToken    string `name:"session-token" description:"Session token"`
 }
 
+type blobConfigAWSCredentials BlobConfigAWS
+
+func (c blobConfigAWSCredentials) Retrieve() (credentials.Value, error) {
+	if c.AccessKeyID == "" || c.SecretAccessKey == "" {
+		return credentials.Value{}, errMissingBlobConfig
+	}
+	return credentials.Value{
+		ProviderName:    "TTNConfigProvider",
+		AccessKeyID:     c.AccessKeyID,
+		SecretAccessKey: c.SecretAccessKey,
+	}, nil
+}
+
+func (c blobConfigAWSCredentials) IsExpired() bool { return false }
+
 // BlobConfigGCP is the blob store configuration for the GCP provider.
 type BlobConfigGCP struct {
 	CredentialsFile string `name:"credentials-file" description:"Path to the GCP credentials JSON file"`
 	Credentials     string `name:"credentials" description:"JSON data of the GCP credentials, if not using JSON file"`
 }
 
-// Blob store configuration.
-type Blob struct {
+// BlobConfig is the blob store configuration.
+type BlobConfig struct {
 	Provider string          `name:"provider" description:"Blob store provider (local|aws|gcp)"`
 	Local    BlobConfigLocal `name:"local"`
 	AWS      BlobConfigAWS   `name:"aws"`
 	GCP      BlobConfigGCP   `name:"gcp"`
+}
+
+// Bucket returns the requested blob bucket using the config.
+func (c BlobConfig) Bucket(ctx context.Context, bucket string) (*blob.Bucket, error) {
+	switch c.Provider {
+	case "local":
+		return ttnblob.Local(ctx, bucket, c.Local.Directory)
+	case "aws":
+		return ttnblob.AWS(ctx, bucket, &aws.Config{
+			Endpoint:    &c.AWS.Endpoint,
+			Region:      &c.AWS.Region,
+			Credentials: credentials.NewCredentials(blobConfigAWSCredentials(c.AWS)),
+		})
+	case "gcp":
+		var jsonCreds []byte
+		if c.GCP.Credentials != "" {
+			jsonCreds = []byte(c.GCP.Credentials)
+		} else if c.GCP.CredentialsFile != "" {
+			var err error
+			jsonCreds, err = ioutil.ReadFile(c.GCP.CredentialsFile)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, errMissingBlobConfig
+		}
+		return ttnblob.GCP(ctx, bucket, jsonCreds)
+	default:
+		return nil, errUnknownBlobProvider.WithAttributes("provider", c.Provider)
+	}
+}
+
+type BlobPathConfig struct {
+	Bucket string `name:"bucket" description:"Bucket to use"`
+	Path   string `name:"path" description:"Path to use"`
+}
+
+func (c BlobPathConfig) IsZero() bool {
+	return c == BlobPathConfig{}
 }
 
 // FrequencyPlansConfig contains the source of the frequency plans.
@@ -198,28 +261,29 @@ type FrequencyPlansConfig struct {
 	Static    map[string][]byte `name:"-"`
 	Directory string            `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
 	URL       string            `name:"url" description:"Retrieve the frequency plans from a web server"`
+	Blob      BlobPathConfig    `name:"blob" description:"Retrieve the frequency plans from a blob"`
 }
 
-// Store returns a frequencyplan.Store fwith a fetcher based on the configuration.
-// The order of precedence is Static, Directory and URL.
-// If neither Static, Directory nor a URL is set, this method returns nil, nil.
-func (c FrequencyPlansConfig) Store() (*frequencyplans.Store, error) {
-	var fetcher fetch.Interface
+// Fetcher returns a fetch.Interface based on the configuration.
+// The order of precedence is Static, Directory, URL and Blob.
+// If neither Static, Directory, URL nor a Blob is set, this method returns nil, nil.
+func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
 	switch {
 	case c.Static != nil:
-		fetcher = fetch.NewMemFetcher(c.Static)
+		return fetch.NewMemFetcher(c.Static), nil
 	case c.Directory != "":
-		fetcher = fetch.FromFilesystem(c.Directory)
+		return fetch.FromFilesystem(c.Directory), nil
 	case c.URL != "":
-		var err error
-		fetcher, err = fetch.FromHTTP(c.URL, true)
+		return fetch.FromHTTP(c.URL, true)
+	case !c.Blob.IsZero():
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err
 		}
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
 	default:
 		return nil, nil
 	}
-	return frequencyplans.NewStore(fetcher), nil
 }
 
 // DeviceRepositoryConfig defines the source of the device repository.
@@ -227,51 +291,61 @@ type DeviceRepositoryConfig struct {
 	Static    map[string][]byte `name:"-"`
 	Directory string            `name:"directory" description:"Retrieve the device repository from the filesystem"`
 	URL       string            `name:"url" description:"Retrieve the device repository from a web server"`
+	Blob      BlobPathConfig    `name:"blob" description:"Retrieve the device repository from a blob"`
 }
 
-// Client instantiates a new devicerepository.Client with a fetcher based on the configuration.
-// The order of precedence is Static, Directory and URL.
-// If neither Static, Directory nor a URL is set, this method returns nil, nil.
-func (c DeviceRepositoryConfig) Client() (*devicerepository.Client, error) {
-	var fetcher fetch.Interface
+// Fetcher returns a fetch.Interface based on the configuration.
+// The order of precedence is Static, Directory, URL and Blob.
+// If neither Static, Directory, URL nor a Blob is set, this method returns nil, nil.
+func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
 	switch {
 	case c.Static != nil:
-		fetcher = fetch.NewMemFetcher(c.Static)
+		return fetch.NewMemFetcher(c.Static), nil
 	case c.Directory != "":
-		fetcher = fetch.FromFilesystem(c.Directory)
+		return fetch.FromFilesystem(c.Directory), nil
 	case c.URL != "":
-		var err error
-		fetcher, err = fetch.FromHTTP(c.URL, true)
+		return fetch.FromHTTP(c.URL, true)
+	case !c.Blob.IsZero():
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err
 		}
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
 	default:
 		return nil, nil
 	}
-	return &devicerepository.Client{
-		Fetcher: fetcher,
-	}, nil
 }
 
 // InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropClient struct {
-	Directory   string      `name:"directory" description:"Retrieve the interoperability client configuration from the filesystem"`
-	URL         string      `name:"url" description:"Retrieve the interoperability client configuration from a web server"`
-	FallbackTLS *tls.Config `name:"-"`
+	Directory string         `name:"directory" description:"Retrieve the interoperability client configuration from the filesystem"`
+	URL       string         `name:"url" description:"Retrieve the interoperability client configuration from a web server"`
+	Blob      BlobPathConfig `name:"blob" description:"Retrieve the interoperability client configuration from a blob"`
+
+	GetFallbackTLSConfig func(ctx context.Context) (*tls.Config, error) `name:"-"`
+	BlobConfig           BlobConfig                                     `name:"-"`
 }
 
 // IsZero returns whether conf is empty.
 func (c InteropClient) IsZero() bool {
-	return c == (InteropClient{})
+	return c.Directory == "" && c.URL == "" && c.Blob.IsZero() && c.GetFallbackTLSConfig == nil && c.BlobConfig == BlobConfig{}
 }
 
 // Fetcher returns fetch.Interface defined by conf.
-func (c InteropClient) Fetcher() (fetch.Interface, error) {
+// The order of precedence is Static, Directory, URL and Blob.
+// If neither Static, Directory, URL nor a Blob is set, this method returns nil, nil.
+func (c InteropClient) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
 	switch {
 	case c.Directory != "":
 		return fetch.FromFilesystem(c.Directory), nil
 	case c.URL != "":
 		return fetch.FromHTTP(c.URL, true)
+	case !c.Blob.IsZero():
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
 	default:
 		return nil, nil
 	}
@@ -288,7 +362,7 @@ type ServiceBase struct {
 	Interop          InteropServer          `name:"interop"`
 	TLS              TLS                    `name:"tls"`
 	Sentry           Sentry                 `name:"sentry"`
-	Blob             Blob                   `name:"blob"`
+	Blob             BlobConfig             `name:"blob"`
 	FrequencyPlans   FrequencyPlansConfig   `name:"frequency-plans" description:"Source of the frequency plans"`
 	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
 	Rights           Rights                 `name:"rights"`

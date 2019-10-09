@@ -15,6 +15,7 @@
 package interop_test
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -63,14 +64,13 @@ func TestGetAppSKey(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name                 string
-		NewServer            func(*testing.T) *httptest.Server
-		NewFallbackTLSConfig func() *tls.Config
-		NewClientConfig      func(fqdn string, port uint32) (config.InteropClient, func() error)
-		AsID                 string
-		Request              *ttnpb.SessionKeyRequest
-		ResponseAssertion    func(*testing.T, *ttnpb.AppSKeyResponse) bool
-		ErrorAssertion       func(*testing.T, error) bool
+		Name              string
+		NewServer         func(*testing.T) *httptest.Server
+		NewClientConfig   func(fqdn string, port uint32) (config.InteropClient, func() error)
+		AsID              string
+		Request           *ttnpb.SessionKeyRequest
+		ResponseAssertion func(*testing.T, *ttnpb.AppSKeyResponse) bool
+		ErrorAssertion    func(*testing.T, error) bool
 	}{
 		{
 			Name: "Backend Interfaces 1.0/UnknownDevEUI",
@@ -93,7 +93,6 @@ func TestGetAppSKey(t *testing.T) {
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
@@ -175,7 +174,8 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory: confDir,
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -211,7 +211,6 @@ paths:
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
@@ -293,7 +292,8 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory: confDir,
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -341,7 +341,6 @@ paths:
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
@@ -423,7 +422,8 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory: confDir,
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -476,7 +476,6 @@ paths:
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
@@ -558,7 +557,8 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory: confDir,
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -595,7 +595,7 @@ paths:
 			conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
 			defer flush()
 
-			cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
+			cl, err := NewClient(ctx, conf)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}
@@ -629,14 +629,13 @@ func TestHandleJoinRequest(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		Name                 string
-		NewServer            func(*testing.T) *httptest.Server
-		NewFallbackTLSConfig func() *tls.Config
-		NewClientConfig      func(fqdn string, port uint32) (config.InteropClient, func() error)
-		NetID                types.NetID
-		Request              *ttnpb.JoinRequest
-		ResponseAssertion    func(*testing.T, *ttnpb.JoinResponse) bool
-		ErrorAssertion       func(*testing.T, error) bool
+		Name              string
+		NewServer         func(*testing.T) *httptest.Server
+		NewClientConfig   func(fqdn string, port uint32) (config.InteropClient, func() error)
+		NetID             types.NetID
+		Request           *ttnpb.JoinRequest
+		ResponseAssertion func(*testing.T, *ttnpb.JoinResponse) bool
+		ErrorAssertion    func(*testing.T, error) bool
 	}{
 		{
 			Name: "Backend Interfaces 1.0/MICFailed",
@@ -659,7 +658,6 @@ func TestHandleJoinRequest(t *testing.T) {
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
@@ -741,7 +739,8 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory: confDir,
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -777,7 +776,6 @@ paths:
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
@@ -859,7 +857,8 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory: confDir,
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -913,7 +912,6 @@ paths:
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
@@ -995,7 +993,8 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory: confDir,
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -1062,7 +1061,6 @@ paths:
 					a.So(err, should.BeNil)
 				}))
 			},
-			NewFallbackTLSConfig: func() *tls.Config { return nil },
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
@@ -1144,7 +1142,8 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory: confDir,
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -1189,7 +1188,7 @@ paths:
 			conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
 			defer flush()
 
-			cl, err := NewClient(ctx, conf, tc.NewFallbackTLSConfig())
+			cl, err := NewClient(ctx, conf)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}

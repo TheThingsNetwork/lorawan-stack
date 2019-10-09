@@ -38,6 +38,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
+	"go.thethings.network/lorawan-stack/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/interop"
@@ -101,23 +102,23 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	ctx := log.NewContextWithField(c.Context(), "namespace", "applicationserver")
 
+	baseConf := c.GetBaseConfig(ctx)
+
 	var interopCl InteropClient
 	if !conf.Interop.IsZero() {
-		var fallbackTLS *tls.Config
-		cTLS, err := c.GetTLSClientConfig(ctx)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Could not get fallback TLS config for interoperability")
-		} else {
-			fallbackTLS = cTLS
+		interopConf := conf.Interop.InteropClient
+		interopConf.GetFallbackTLSConfig = func(ctx context.Context) (*tls.Config, error) {
+			return c.GetTLSClientConfig(ctx)
 		}
+		interopConf.BlobConfig = c.GetBaseConfig(ctx).Blob
 
-		interopCl, err = interop.NewClient(ctx, conf.Interop.InteropClient, fallbackTLS)
+		interopCl, err = interop.NewClient(ctx, interopConf)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	drCl, err := c.GetBaseConfig(c.Context()).DeviceRepository.Client()
+	drFetcher, err := baseConf.DeviceRepository.Fetcher(ctx, baseConf.Blob)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +131,9 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		linkRegistry:   conf.Links,
 		deviceRegistry: conf.Devices,
 		formatter: payloadFormatter{
-			repository: drCl,
+			repository: &devicerepository.Client{
+				Fetcher: drFetcher,
+			},
 			upFormatters: map[ttnpb.PayloadFormatter]messageprocessors.PayloadDecoder{
 				ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 				ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),

@@ -25,8 +25,9 @@ import (
 
 type bucketFetcher struct {
 	baseFetcher
-	bucket *blob.Bucket
-	root   string
+	context context.Context
+	bucket  *blob.Bucket
+	root    string
 }
 
 func (f *bucketFetcher) File(pathElements ...string) ([]byte, error) {
@@ -41,7 +42,7 @@ func (f *bucketFetcher) File(pathElements ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	content, err := f.bucket.ReadAll(context.TODO(), rp)
+	content, err := f.bucket.ReadAll(f.context, rp)
 	if err == nil {
 		f.observeLatency(time.Since(start))
 		return content, nil
@@ -54,13 +55,14 @@ func (f *bucketFetcher) File(pathElements ...string) ([]byte, error) {
 }
 
 // FromBucket returns an interface that fetches files from the given blob bucket.
-func FromBucket(bucket *blob.Bucket, root string) Interface {
+func FromBucket(ctx context.Context, bucket *blob.Bucket, root string) Interface {
 	root = path.Clean(root)
 	return &bucketFetcher{
 		baseFetcher: baseFetcher{
 			latency: fetchLatency.WithLabelValues("bucket", root),
 		},
-		bucket: bucket,
-		root:   root,
+		context: ctx,
+		bucket:  bucket,
+		root:    root,
 	}
 }

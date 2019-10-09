@@ -86,7 +86,7 @@ var DefaultEventsConfig = config.Events{
 }
 
 // DefaultBlobConfig is the default config for the blob store.
-var DefaultBlobConfig = config.Blob{
+var DefaultBlobConfig = config.BlobConfig{
 	Provider: "local",
 	Local: config.BlobConfigLocal{
 		Directory: "./public/blob",
