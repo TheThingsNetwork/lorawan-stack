@@ -283,6 +283,14 @@ class Devices {
     return result
   }
 
+  // End Device Template Converter
+
+  async listTemplateFormats() {
+    const result = await this._api.EndDeviceTemplateConverter.ListFormats()
+
+    return Marshaler.payloadListResponse('formats', result)
+  }
+
   // Events Stream
 
   async openStream(identifiers, tail, after) {
