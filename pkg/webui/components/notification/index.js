@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import Button from '../button'
 import Message from '../../lib/components/message'
 import ErrorMessage from '../../lib/components/error-message'
 import Icon from '../icon'
@@ -32,6 +33,9 @@ const Notification = function({
   message,
   success,
   messageValues = {},
+  action,
+  actionMessage,
+  buttonIcon,
 }) {
   const classname = classnames(style.notification, className, {
     [style.error]: error,
@@ -56,21 +60,35 @@ const Notification = function({
       <Icon className={style.icon} icon={icon} large={!small} />
       <div className={style.content}>
         {title && <Message className={style.title} content={title} component="h4" />}
-        <Component content={content} values={messageValues} />
+        <div>
+          <Component content={content} values={messageValues} />
+          {action && (
+            <Button naked secondary icon={buttonIcon} onClick={action} message={actionMessage} />
+          )}
+        </div>
       </div>
     </div>
   )
 }
 
 Notification.propTypes = {
+  action: PropTypes.func,
+  actionMessage: PropTypes.message,
+  buttonIcon: PropTypes.string,
+  error: PropTypes.error,
+  info: PropTypes.message,
   message: PropTypes.message,
   messageValues: PropTypes.object,
-  error: PropTypes.error,
-  warning: PropTypes.message,
-  info: PropTypes.message,
   small: PropTypes.bool,
-  title: PropTypes.message,
   success: PropTypes.message,
+  title: PropTypes.message,
+  warning: PropTypes.message,
+}
+
+Notification.defaultProps = {
+  action: () => null,
+  actionMessage: undefined,
+  buttonIcon: '',
 }
 
 export default Notification
