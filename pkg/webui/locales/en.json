@@ -372,6 +372,7 @@
   "lib.shared-messages.pubsubs": "PubSubs",
   "lib.shared-messages.refreshPage": "Refresh page",
   "lib.shared-messages.removeCollaborator": "Remove Collaborator",
+  "lib.shared-messages.restartStream": "Restart Stream",
   "lib.shared-messages.resume": "Resume",
   "lib.shared-messages.rights": "Rights",
   "lib.shared-messages.saveChanges": "Save Changes",
