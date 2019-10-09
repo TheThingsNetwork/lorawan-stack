@@ -24,6 +24,7 @@ import Tabs from '../../../components/tabs'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
 import withEnv from '../../../lib/components/env'
+import NotFoundRoute from '../../../lib/components/not-found-route'
 
 import DeviceOverview from '../device-overview'
 import DeviceData from '../device-data'
@@ -158,6 +159,7 @@ export default class Device extends React.Component {
           <Route exact path={`${basePath}/location`} component={DeviceLocation} />
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
+          <NotFoundRoute />
         </Switch>
       </React.Fragment>
     )

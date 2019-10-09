@@ -21,6 +21,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Tab from '../../../components/tabs'
+import NotFoundRoute from '../../../lib/components/not-found-route'
 
 import DeviceUplinkPayloadFormatters from '../../containers/device-payload-formatters/uplink'
 import DeviceDownlinkPayloadFormatters from '../../containers/device-payload-formatters/downlink'
@@ -79,6 +80,7 @@ export default class DevicePayloadFormatters extends Component {
               <Redirect exact from={url} to={`${url}/uplink`} />
               <Route exact path={`${url}/uplink`} component={DeviceUplinkPayloadFormatters} />
               <Route exact path={`${url}/downlink`} component={DeviceDownlinkPayloadFormatters} />
+              <NotFoundRoute />
             </Switch>
           </Col>
         </Row>
