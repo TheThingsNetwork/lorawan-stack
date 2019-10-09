@@ -104,7 +104,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	var interopCl InteropClient
 	if !conf.Interop.IsZero() {
 		var fallbackTLS *tls.Config
-		cTLS, err := c.GetTLSConfig(ctx)
+		cTLS, err := c.GetTLSClientConfig(ctx)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Could not get fallback TLS config for interoperability")
 		} else {

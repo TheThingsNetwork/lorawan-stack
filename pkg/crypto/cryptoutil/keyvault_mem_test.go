@@ -15,6 +15,7 @@
 package cryptoutil_test
 
 import (
+	"crypto/ecdsa"
 	"encoding/hex"
 	"testing"
 
@@ -32,28 +33,60 @@ func TestMemKeyVault(t *testing.T) {
 	ciphertext, _ := hex.DecodeString("1FA68B0A8112B447AEF34BD8FB5A7B829D3E862371D2CFE5")
 
 	v := cryptoutil.NewMemKeyVault(map[string][]byte{
-		"foo": kek,
+		"kek1": kek,
+		"cert1": []byte(`-----BEGIN CERTIFICATE-----
+MIIBfDCCASKgAwIBAgIBBDAKBggqhkjOPQQDAjAkMRAwDgYDVQQKEwdBY21lIENv
+MRAwDgYDVQQDEwdSb290IENBMCAXDTE5MDgwNzExMzYxOFoYDzIxMTkwNzE0MTEz
+NjE4WjAyMRAwDgYDVQQKEwdBY21lIENvMR4wHAYDVQQDDBVjbGllbnRfYXV0aF90
+ZXN0X2NlcnQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASN/fNk9eVz+yx5O3tj
+MXSjrV95e+T3wkXLL6z+PSDMzNSMSRrv5bNM8RGL24xCMRGezWpcb/0Mkt79DGLS
+vziEozUwMzAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwIwDAYD
+VR0TAQH/BAIwADAKBggqhkjOPQQDAgNIADBFAiEAylB8RCRTv3FJYonJkfKTVOMN
+cr7idt4xexCs+l8ALzMCIGBu4+S8YWGq9yQ4BL86Rcf7j7veXm57o6kjxU4F6V7x
+-----END CERTIFICATE-----
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIBVXljefOUPY++0sovcF0dboOLEJz4eZ9DoUE8o9Y7GHoAoGCCqGSM49
+AwEHoUQDQgAEjf3zZPXlc/sseTt7YzF0o61feXvk98JFyy+s/j0gzMzUjEka7+Wz
+TPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==
+-----END EC PRIVATE KEY-----
+`),
 	})
-
-	// Non-existing KEK.
-	{
-		_, err := v.Wrap(plaintext, "bar")
-		a.So(errors.IsNotFound(err), should.BeTrue)
-	}
-	{
-		_, err := v.Unwrap(ciphertext, "bar")
-		a.So(errors.IsNotFound(err), should.BeTrue)
-	}
 
 	// Existing KEK.
 	{
-		actual, err := v.Wrap(plaintext, "foo")
+		actual, err := v.Wrap(plaintext, "kek1")
 		a.So(err, should.BeNil)
 		a.So(actual, should.Resemble, ciphertext)
 	}
 	{
-		actual, err := v.Unwrap(ciphertext, "foo")
+		actual, err := v.Unwrap(ciphertext, "kek1")
 		a.So(err, should.BeNil)
 		a.So(actual, should.Resemble, plaintext)
+	}
+
+	// Non-existing KEK.
+	{
+		_, err := v.Wrap(plaintext, "kek2")
+		a.So(errors.IsNotFound(err), should.BeTrue)
+	}
+	{
+		_, err := v.Unwrap(ciphertext, "kek2")
+		a.So(errors.IsNotFound(err), should.BeTrue)
+	}
+
+	// Existing certificate.
+	{
+		cert, err := v.LoadCertificate("cert1")
+		a.So(err, should.BeNil)
+		if a.So(len(cert.Certificate), should.Equal, 1) {
+			a.So(len(cert.Certificate[0]), should.Equal, 384)
+		}
+		a.So(cert.PrivateKey, should.HaveSameTypeAs, &ecdsa.PrivateKey{})
+	}
+
+	// Non-existing certificate.
+	{
+		_, err := v.LoadCertificate("cert2")
+		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 }

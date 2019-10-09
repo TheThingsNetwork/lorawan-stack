@@ -49,7 +49,7 @@ func (l *listener) TLS(opts ...TLSConfigOption) (net.Listener, error) {
 	if l.tlsUsed {
 		return nil, errors.New("TLS listener already in use")
 	}
-	config, err := l.c.GetTLSConfig(l.c.Context(), opts...)
+	config, err := l.c.GetTLSServerConfig(l.c.Context(), opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -14,9 +14,14 @@
 
 package crypto
 
+import "crypto/tls"
+
 // KeyVault provides wrapping and unwrapping keys using KEK labels.
 type KeyVault interface {
+	ComponentKEKLabeler
+
 	Wrap(plaintext []byte, kekLabel string) ([]byte, error)
 	Unwrap(ciphertext []byte, kekLabel string) ([]byte, error)
-	ComponentKEKLabeler
+
+	LoadCertificate(id string) (*tls.Certificate, error)
 }

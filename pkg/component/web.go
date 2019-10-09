@@ -88,7 +88,7 @@ func (c *Component) serveWeb(lis net.Listener) error {
 func (c *Component) webEndpoints() []Endpoint {
 	return []Endpoint{
 		NewTCPEndpoint(c.config.HTTP.Listen, "Web"),
-		NewTLSEndpoint(c.config.HTTP.ListenTLS, "Web"),
+		NewTLSEndpoint(c.config.HTTP.ListenTLS, "Web", WithNextProtos("h2", "http/1.1")),
 	}
 }
 

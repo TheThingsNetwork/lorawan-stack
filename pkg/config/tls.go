@@ -14,20 +14,6 @@
 
 package config
 
-import (
-	"context"
-	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
-	"sync/atomic"
-	"time"
-
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/events/fs"
-	"go.thethings.network/lorawan-stack/pkg/log"
-)
-
 // ACME represents ACME configuration.
 type ACME struct {
 	Enable      bool     `name:"enable" description:"Enable automated certificate management (ACME)"`
@@ -47,13 +33,23 @@ func (a ACME) IsZero() bool {
 		len(a.Hosts) == 0
 }
 
+// TLSKeyVault defines configuration for loading a certificate from the key vault.
+type TLSKeyVault struct {
+	Enable bool   `name:"enable" description:"Enable loading the certificate from the key vault"`
+	ID     string `name:"id" description:"ID of the certificate"`
+}
+
 // TLS represents TLS configuration.
 type TLS struct {
 	RootCA             string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
 	InsecureSkipVerify bool   `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`
-	Certificate        string `name:"certificate" description:"Location of TLS certificate"`
-	Key                string `name:"key" description:"Location of TLS private key"`
-	ACME               ACME   `name:"acme"`
+
+	Certificate string `name:"certificate" description:"Location of TLS certificate"`
+	Key         string `name:"key" description:"Location of TLS private key"`
+
+	ACME ACME `name:"acme"`
+
+	KeyVault TLSKeyVault `name:"key-vault"`
 }
 
 // IsZero returns whether the TLS configuration is empty.
@@ -62,65 +58,4 @@ func (t TLS) IsZero() bool {
 		t.Certificate == "" &&
 		t.Key == "" &&
 		t.ACME.IsZero()
-}
-
-var errNoKeyPair = errors.DefineFailedPrecondition("no_key_pair", "no TLS key pair")
-
-// Config loads the key pair and returns the server TLS configuration.
-// Config watches the certificate file and reloads the key pair on changes.
-// NOTE: The configuration returned by Config cannot be used for client connections.
-func (t TLS) Config(ctx context.Context) (*tls.Config, error) {
-	logger := log.FromContext(ctx)
-	if t.Certificate == "" || t.Key == "" {
-		return nil, errNoKeyPair
-	}
-	var cv atomic.Value
-	loadCertificate := func() error {
-		cert, err := tls.LoadX509KeyPair(t.Certificate, t.Key)
-		if err != nil {
-			return err
-		}
-		cv.Store(&cert)
-		logger.Debug("Loaded TLS certificate")
-		return nil
-	}
-	if err := loadCertificate(); err != nil {
-		return nil, err
-	}
-	var rootCAs *x509.CertPool
-	if t.RootCA != "" {
-		pem, err := ioutil.ReadFile(t.RootCA)
-		if err != nil {
-			return nil, err
-		}
-		rootCAs = x509.NewCertPool()
-		rootCAs.AppendCertsFromPEM(pem)
-	}
-
-	debounce := make(chan struct{}, 1)
-	fs.Watch(t.Certificate, events.HandlerFunc(func(evt events.Event) {
-		if evt.Name() != "fs.write" {
-			return
-		}
-		// We have to debounce this; OpenSSL typically causes a lot of write events.
-		select {
-		case debounce <- struct{}{}:
-			time.AfterFunc(5*time.Second, func() {
-				if err := loadCertificate(); err != nil {
-					logger.WithError(err).Error("Could not reload TLS certificate")
-					return
-				}
-				<-debounce
-			})
-		default:
-		}
-	}))
-
-	return &tls.Config{
-		RootCAs:            rootCAs,
-		InsecureSkipVerify: t.InsecureSkipVerify,
-		GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			return cv.Load().(*tls.Certificate), nil
-		},
-	}, nil
 }
