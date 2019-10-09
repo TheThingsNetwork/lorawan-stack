@@ -310,7 +310,8 @@
         "default_formatters.down_formatter_parameter",
         "default_formatters.up_formatter",
         "default_formatters.up_formatter_parameter",
-        "network_server_address"
+        "network_server_address",
+        "tls"
       ]
     },
     "SetLink": {
@@ -332,7 +333,8 @@
         "default_formatters.down_formatter_parameter",
         "default_formatters.up_formatter",
         "default_formatters.up_formatter_parameter",
-        "network_server_address"
+        "network_server_address",
+        "tls"
       ]
     },
     "DeleteLink": {

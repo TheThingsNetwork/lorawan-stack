@@ -80,6 +80,8 @@ func (m *ApplicationLink) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "tls":
+			// no validation rules for TLS
 		default:
 			return ApplicationLinkValidationError{
 				field:  name,

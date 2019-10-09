@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func (as *ApplicationServer) linkAll(ctx context.Context) error {
@@ -114,8 +115,16 @@ var (
 func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error {
 	var allowInsecure bool
 	if link.NetworkServerAddress != "" {
-		options := rpcclient.DefaultDialOptions(ctx)
-		if allowInsecure = as.AllowInsecureForCredentials(); allowInsecure {
+		allowInsecure = as.AllowInsecureForCredentials()
+		var options []grpc.DialOption
+		options = append(options, rpcclient.DefaultDialOptions(ctx)...)
+		if link.TLS {
+			tlsConfig, err := as.GetTLSClientConfig(ctx)
+			if err != nil {
+				return err
+			}
+			options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+		} else {
 			options = append(options, grpc.WithInsecure())
 		}
 		conn, err := grpc.DialContext(ctx, link.NetworkServerAddress, options...)
