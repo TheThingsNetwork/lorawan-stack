@@ -253,12 +253,15 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		panic("uplink/downlink channel length is inconsistent")
 	}
 
+	// NOTE: FactoryPresetFrequencies does not indicate the data rate ranges allowed for channels.
+	// In the latest regional parameters spec(1.1b) the data rate ranges are DR0-DR5 for mandatory channels in all non-fixed channel plans,
+	// hence we assume the same range for predefined channels.
 	if len(dev.GetMACSettings().GetFactoryPresetFrequencies()) > 0 {
 		macState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(dev.MACSettings.FactoryPresetFrequencies))
 		for _, freq := range dev.MACSettings.FactoryPresetFrequencies {
 			macState.CurrentParameters.Channels = append(macState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
 				MinDataRateIndex:  0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_15,
+				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
 				UplinkFrequency:   freq,
 				DownlinkFrequency: freq,
 				EnableUplink:      true,
@@ -269,7 +272,7 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		for _, freq := range defaults.FactoryPresetFrequencies {
 			macState.CurrentParameters.Channels = append(macState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
 				MinDataRateIndex:  0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_15,
+				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
 				UplinkFrequency:   freq,
 				DownlinkFrequency: freq,
 				EnableUplink:      true,
