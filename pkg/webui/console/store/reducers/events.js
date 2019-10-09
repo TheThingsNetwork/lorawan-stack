@@ -50,6 +50,7 @@ const createNamedEventReducer = function(reducerName = '') {
       case START_EVENTS_SUCCESS:
         return {
           ...state,
+          error: undefined,
           status: CONNECTION_STATUS.CONNECTED,
         }
       case GET_EVENT_SUCCESS:
