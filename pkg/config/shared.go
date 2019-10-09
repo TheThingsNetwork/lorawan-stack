@@ -163,7 +163,10 @@ type KeyVault struct {
 func (v KeyVault) KeyVault() (crypto.KeyVault, error) {
 	switch {
 	case v.Static != nil:
-		return cryptoutil.NewMemKeyVault(v.Static), nil
+		kv := cryptoutil.NewMemKeyVault(v.Static)
+		kv.Separator = ":"
+		kv.ReplaceOldNew = []string{":", "_"}
+		return kv, nil
 	default:
 		return cryptoutil.NewMemKeyVault(map[string][]byte{}), nil
 	}

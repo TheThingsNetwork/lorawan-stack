@@ -23,9 +23,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-// ComponentPrefixKEKLabeler is a ComponentKEKLabeler that joins the component prefix, separator and host.
+// ComponentPrefixKEKLabeler is a ComponentKEKLabeler that joins the component prefix, separators and host.
 type ComponentPrefixKEKLabeler struct {
+	// Separator is the string to join parts.
 	Separator string
+	// ReplaceOldNew is a set of old and new string pairs to replace in parts.
+	ReplaceOldNew []string
 }
 
 func hostFromAddr(addr string) string {
@@ -42,7 +45,14 @@ func hostFromAddr(addr string) string {
 func (c ComponentPrefixKEKLabeler) join(parts ...string) string {
 	sep := c.Separator
 	if sep == "" {
-		sep = ":"
+		sep = "/"
+	}
+	if len(c.ReplaceOldNew) > 0 {
+		replacer := strings.NewReplacer(c.ReplaceOldNew...)
+		parts = append(parts[:0:0], parts...)
+		for i := range parts {
+			parts[i] = replacer.Replace(parts[i])
+		}
 	}
 	return strings.Join(parts, sep)
 }

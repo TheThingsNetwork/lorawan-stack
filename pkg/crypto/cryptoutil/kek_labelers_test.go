@@ -26,84 +26,83 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func netIDPtr(netID types.NetID) *types.NetID { return &netID }
-
 func TestComponentPrefixKEKLabeler(t *testing.T) {
 	for i, tc := range []struct {
-		Separator,
-		Addr string
-		Func     func(context.Context, ComponentPrefixKEKLabeler, string) string
-		Expected string
+		Separator     string
+		ReplaceOldNew []string
+		Addr          string
+		Func          func(context.Context, ComponentPrefixKEKLabeler, string) string
+		Expected      string
 	}{
 		{
-			Separator: "",
-			Addr:      "localhost",
+			Addr: "localhost",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
 				return labeler.NsKEKLabel(ctx, nil, "")
 			},
 			Expected: "ns",
 		},
 		{
-			Separator: "",
-			Addr:      "",
+			Addr: "",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
-				return labeler.NsKEKLabel(ctx, netIDPtr(types.NetID{0x00, 0x00, 0x42}), addr)
+				return labeler.NsKEKLabel(ctx, &types.NetID{0x00, 0x00, 0x42}, addr)
 			},
-			Expected: "ns:000042",
+			Expected: "ns/000042",
 		},
 		{
-			Separator: "",
-			Addr:      "localhost",
+			Addr: "localhost",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
 				return labeler.NsKEKLabel(ctx, nil, addr)
 			},
-			Expected: "ns:localhost",
+			Expected: "ns/localhost",
 		},
 		{
-			Separator: "",
-			Addr:      "localhost",
+			Addr: "localhost",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
-				return labeler.NsKEKLabel(ctx, netIDPtr(types.NetID{0x00, 0x00, 0x42}), addr)
+				return labeler.NsKEKLabel(ctx, &types.NetID{0x00, 0x00, 0x42}, addr)
 			},
-			Expected: "ns:000042:localhost",
+			Expected: "ns/000042/localhost",
 		},
 		{
-			Separator: "",
-			Addr:      "localhost",
+			Addr: "localhost",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
 				return labeler.AsKEKLabel(ctx, addr)
 			},
-			Expected: "as:localhost",
+			Expected: "as/localhost",
 		},
 		{
-			Separator: "",
-			Addr:      "localhost:1234",
+			Addr: "localhost:1234",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
-				return labeler.NsKEKLabel(ctx, netIDPtr(types.NetID{0x00, 0x00, 0x42}), addr)
+				return labeler.NsKEKLabel(ctx, &types.NetID{0x00, 0x00, 0x42}, addr)
 			},
-			Expected: "ns:000042:localhost",
+			Expected: "ns/000042/localhost",
 		},
 		{
-			Separator: "",
-			Addr:      "http://localhost",
+			Addr: "http://localhost",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
-				return labeler.NsKEKLabel(ctx, netIDPtr(types.NetID{0x00, 0x00, 0x42}), addr)
+				return labeler.NsKEKLabel(ctx, &types.NetID{0x00, 0x00, 0x42}, addr)
 			},
-			Expected: "ns:000042:localhost",
+			Expected: "ns/000042/localhost",
 		},
 		{
-			Separator: "",
-			Addr:      "http://localhost:1234",
+			Addr: "http://localhost:1234",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
-				return labeler.NsKEKLabel(ctx, netIDPtr(types.NetID{0x00, 0x00, 0x42}), addr)
+				return labeler.NsKEKLabel(ctx, &types.NetID{0x00, 0x00, 0x42}, addr)
 			},
-			Expected: "ns:000042:localhost",
+			Expected: "ns/000042/localhost",
+		},
+		{
+			ReplaceOldNew: []string{":", "_"},
+			Addr:          "http://[::1]:1234",
+			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
+				return labeler.NsKEKLabel(ctx, &types.NetID{0x00, 0x00, 0x42}, addr)
+			},
+			Expected: "ns/000042/__1",
 		},
 		{
 			Separator: "_",
 			Addr:      "http://localhost:1234",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
-				return labeler.NsKEKLabel(ctx, netIDPtr(types.NetID{0x00, 0x00, 0x42}), addr)
+				return labeler.NsKEKLabel(ctx, &types.NetID{0x00, 0x00, 0x42}, addr)
 			},
 			Expected: "ns_000042_localhost",
 		},
@@ -111,7 +110,8 @@ func TestComponentPrefixKEKLabeler(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 			labeler := ComponentPrefixKEKLabeler{
-				Separator: tc.Separator,
+				Separator:     tc.Separator,
+				ReplaceOldNew: tc.ReplaceOldNew,
 			}
 			label := tc.Func(test.Context(), labeler, tc.Addr)
 			a.So(label, should.Equal, tc.Expected)
