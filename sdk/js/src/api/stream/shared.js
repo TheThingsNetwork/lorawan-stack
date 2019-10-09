@@ -20,7 +20,7 @@ export const notify = function(listener, ...args) {
 
 export const EVENTS = Object.freeze({
   START: 'start',
-  EVENT: 'event',
+  CHUNK: 'chunk',
   ERROR: 'error',
   CLOSE: 'close',
 })

@@ -22,7 +22,7 @@ import 'web-streams-polyfill/dist/polyfill.js'
  *
  * @async
  * @param {Object} payload  - The body of the initial request.
- * @param {string} url - The stream endpoint, defaults to `/api/v3/events`.
+ * @param {string} url - The stream endpoint.
  *
  * @example
  * (async () => {
@@ -34,7 +34,7 @@ import 'web-streams-polyfill/dist/polyfill.js'
  *    // add listeners to the stream
  *    stream
  *      .on('start', () => console.log('conn opened'));
- *      .on('event', message => console.log('received event message', message));
+ *      .on('chunk', chunk => console.log('received chunk', chunk));
  *      .on('error', error => console.log(error));
  *      .on('close', () => console.log('conn closed'))
  *
@@ -90,7 +90,7 @@ export default async function(payload, url) {
 
       for (const line of parsed.trim().split('\n')) {
         const result = JSON.parse(line).result
-        notify(listeners[EVENTS.EVENT], result)
+        notify(listeners[EVENTS.CHUNK], result)
       }
 
       return reader.read().then(onChunk)
@@ -104,7 +104,7 @@ export default async function(payload, url) {
     on(eventName, callback) {
       if (listeners[eventName] === undefined) {
         throw new Error(
-          `${eventName} event is not supported. Should be one of: start, error, event or close`,
+          `${eventName} event is not supported. Should be one of: start, error, chunk or close`,
         )
       }
 
