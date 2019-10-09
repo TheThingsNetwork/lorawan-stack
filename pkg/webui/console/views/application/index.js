@@ -24,6 +24,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
 import { withEnv } from '../../../lib/components/env'
 import BreadcrumbView from '../../../lib/components/breadcrumb-view'
+import NotFoundRoute from '../../../lib/components/not-found-route'
 
 import ApplicationOverview from '../application-overview'
 import ApplicationGeneralSettings from '../application-general-settings'
@@ -185,6 +186,7 @@ export default class Application extends React.Component {
             path={`${match.path}/integrations/pubsubs`}
             component={ApplicationIntegrationsPubsubs}
           />
+          <NotFoundRoute />
         </Switch>
       </BreadcrumbView>
     )

@@ -25,6 +25,8 @@ import Spinner from '../../../components/spinner'
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import NotFoundRoute from '../../../lib/components/not-found-route'
+
 import ApplicationUplinkPayloadFormatters from '../../containers/application-payload-formatters/uplink'
 import ApplicationDownlinkPayloadFormatters from '../../containers/application-payload-formatters/downlink'
 
@@ -116,6 +118,7 @@ export default class ApplicationPayloadFormatters extends React.Component {
                 path={`${match.url}/downlink`}
                 component={ApplicationDownlinkPayloadFormatters}
               />
+              <NotFoundRoute />
             </Switch>
           </Col>
         </Row>
