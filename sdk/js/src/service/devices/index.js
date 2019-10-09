@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable no-invalid-this */
+/* eslint-disable no-invalid-this, no-await-in-loop */
 
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
 import Device from '../../entity/device'
+import { notify, EVENTS } from '../../api/stream/shared'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
@@ -297,6 +298,69 @@ class Devices {
       format_id: formatId,
       data,
     })
+  }
+
+  bulkCreate(applicationId, deviceOrDevices, components = ['is', 'ns', 'as', 'js']) {
+    const devices = !(deviceOrDevices instanceof Array) ? [deviceOrDevices] : deviceOrDevices
+    let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
+    let finishedCount = 0
+    let stopRequested = false
+
+    const runTasks = async function() {
+      for (const device of devices) {
+        if (stopRequested) {
+          notify(listeners[EVENTS.CLOSE])
+          listeners = null
+          break
+        }
+
+        try {
+          const {
+            field_mask: { paths },
+            end_device,
+          } = device
+
+          const requestTree = splitSetPaths(Marshaler.selectorToPaths(paths), undefined, components)
+
+          const result = await this._setDevice(
+            applicationId,
+            undefined,
+            end_device,
+            true,
+            requestTree,
+          )
+          notify(listeners[EVENTS.CHUNK], result)
+          finishedCount++
+          if (finishedCount === devices.length) {
+            notify(listeners[EVENTS.CLOSE])
+            listeners = null
+          }
+        } catch (error) {
+          notify(listeners[EVENTS.ERROR], error)
+          listeners = null
+          break
+        }
+      }
+    }
+
+    runTasks.bind(this)()
+
+    return {
+      on(eventName, callback) {
+        if (listeners[eventName] === undefined) {
+          throw new Error(
+            `${eventName} event is not supported. Should be one of: start, error, chunk or close`,
+          )
+        }
+
+        listeners[eventName] = callback
+
+        return this
+      },
+      abort() {
+        stopRequested = true
+      },
+    }
   }
 
   // Events Stream
