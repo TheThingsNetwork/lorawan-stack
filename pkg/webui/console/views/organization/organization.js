@@ -23,6 +23,7 @@ import { withEnv } from '../../../lib/components/env'
 import BreadcrumbView from '../../../lib/components/breadcrumb-view'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
+import NotFoundRoute from '../../../lib/components/not-found-route'
 
 import OrganizationOverview from '../organization-overview'
 import OrganizationData from '../organization-data'
@@ -82,6 +83,7 @@ class Organization extends React.Component {
           <Route exact path={`${match.path}`} component={OrganizationOverview} />
           <Route path={`${match.path}/data`} component={OrganizationData} />
           <Route path={`${match.path}/general-settings`} component={OrganizationGeneralSettings} />
+          <NotFoundRoute />
         </Switch>
       </BreadcrumbView>
     )
