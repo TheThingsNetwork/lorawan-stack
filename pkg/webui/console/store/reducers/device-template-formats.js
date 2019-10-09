@@ -18,7 +18,7 @@ const defaultState = {
   formats: undefined,
 }
 
-const pubsubs = function(state = defaultState, { type, payload }) {
+const deviceTemplateFormats = function(state = defaultState, { type, payload }) {
   switch (type) {
     case GET_DEVICE_TEMPLATE_FORMATS_SUCCESS:
       return {
@@ -30,4 +30,4 @@ const pubsubs = function(state = defaultState, { type, payload }) {
   }
 }
 
-export default pubsubs
+export default deviceTemplateFormats
