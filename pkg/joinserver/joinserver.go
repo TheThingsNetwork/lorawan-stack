@@ -176,8 +176,8 @@ func validateCallerByAddress(dn pkix.Name, addr string) error {
 
 // wrapKeyIfKEKExists wraps the given key with the KEK label.
 // If the configured key vault cannot find the KEK, the key is returned in the clear.
-func (js *JoinServer) wrapKeyIfKEKExists(key types.AES128Key, kekLabel string) (*ttnpb.KeyEnvelope, error) {
-	env, err := cryptoutil.WrapAES128Key(key, kekLabel, js.KeyVault)
+func (js *JoinServer) wrapKeyIfKEKExists(ctx context.Context, key types.AES128Key, kekLabel string) (*ttnpb.KeyEnvelope, error) {
+	env, err := cryptoutil.WrapAES128Key(ctx, key, kekLabel, js.KeyVault)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return &ttnpb.KeyEnvelope{
@@ -365,7 +365,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			var networkCryptoService cryptoservices.Network
 			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
 				// LoRaWAN 1.1 and higher use a NwkKey.
-				nwkKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.NwkKey, js.KeyVault)
+				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -376,7 +376,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 			var applicationCryptoService cryptoservices.Application
 			if dev.RootKeys != nil && dev.RootKeys.AppKey != nil {
-				appKey, err := cryptoutil.UnwrapAES128Key(*dev.RootKeys.AppKey, js.KeyVault)
+				appKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.RootKeys.AppKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -435,20 +435,20 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			sessionKeys := ttnpb.SessionKeys{
 				SessionKeyID: skID[:],
 			}
-			sessionKeys.FNwkSIntKey, err = js.wrapKeyIfKEKExists(nwkSKeys.FNwkSIntKey, nsKEKLabel)
+			sessionKeys.FNwkSIntKey, err = js.wrapKeyIfKEKExists(ctx, nwkSKeys.FNwkSIntKey, nsKEKLabel)
 			if err != nil {
 				return nil, nil, errWrapKey.WithCause(err)
 			}
-			sessionKeys.AppSKey, err = js.wrapKeyIfKEKExists(appSKey, asKEKLabel)
+			sessionKeys.AppSKey, err = js.wrapKeyIfKEKExists(ctx, appSKey, asKEKLabel)
 			if err != nil {
 				return nil, nil, errWrapKey.WithCause(err)
 			}
 			if req.SelectedMACVersion >= ttnpb.MAC_V1_1 {
-				sessionKeys.SNwkSIntKey, err = js.wrapKeyIfKEKExists(nwkSKeys.SNwkSIntKey, nsKEKLabel)
+				sessionKeys.SNwkSIntKey, err = js.wrapKeyIfKEKExists(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel)
 				if err != nil {
 					return nil, nil, errWrapKey.WithCause(err)
 				}
-				sessionKeys.NwkSEncKey, err = js.wrapKeyIfKEKExists(nwkSKeys.NwkSEncKey, nsKEKLabel)
+				sessionKeys.NwkSEncKey, err = js.wrapKeyIfKEKExists(ctx, nwkSKeys.NwkSEncKey, nsKEKLabel)
 				if err != nil {
 					return nil, nil, errWrapKey.WithCause(err)
 				}

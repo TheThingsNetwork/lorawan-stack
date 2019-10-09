@@ -22,6 +22,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -54,29 +55,29 @@ TPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==
 
 	// Existing KEK.
 	{
-		actual, err := v.Wrap(plaintext, "kek1")
+		actual, err := v.Wrap(test.Context(), plaintext, "kek1")
 		a.So(err, should.BeNil)
 		a.So(actual, should.Resemble, ciphertext)
 	}
 	{
-		actual, err := v.Unwrap(ciphertext, "kek1")
+		actual, err := v.Unwrap(test.Context(), ciphertext, "kek1")
 		a.So(err, should.BeNil)
 		a.So(actual, should.Resemble, plaintext)
 	}
 
 	// Non-existing KEK.
 	{
-		_, err := v.Wrap(plaintext, "kek2")
+		_, err := v.Wrap(test.Context(), plaintext, "kek2")
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 	{
-		_, err := v.Unwrap(ciphertext, "kek2")
+		_, err := v.Unwrap(test.Context(), ciphertext, "kek2")
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 
 	// Existing certificate.
 	{
-		cert, err := v.LoadCertificate("cert1")
+		cert, err := v.LoadCertificate(test.Context(), "cert1")
 		a.So(err, should.BeNil)
 		if a.So(len(cert.Certificate), should.Equal, 1) {
 			a.So(len(cert.Certificate[0]), should.Equal, 384)
@@ -86,7 +87,7 @@ TPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==
 
 	// Non-existing certificate.
 	{
-		_, err := v.LoadCertificate("cert2")
+		_, err := v.LoadCertificate(test.Context(), "cert2")
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 }

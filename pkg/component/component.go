@@ -127,6 +127,10 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 	if err != nil {
 		return nil, err
 	}
+	keyVault, err := config.KeyVault.KeyVault()
+	if err != nil {
+		return nil, err
+	}
 
 	c = &Component{
 		ctx:                ctx,
@@ -141,7 +145,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		tcpListeners: make(map[string]*listener),
 
 		FrequencyPlans: fps,
-		KeyVault:       config.KeyVault.KeyVault(),
+		KeyVault:       keyVault,
 	}
 
 	if config.Sentry.DSN != "" {

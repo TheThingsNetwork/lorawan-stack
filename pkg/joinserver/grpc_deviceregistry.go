@@ -84,7 +84,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key") {
 			var networkCryptoService cryptoservices.Network
 			if rootKeysEnc.GetNwkKey() != nil {
-				nwkKey, err := cryptoutil.UnwrapAES128Key(*rootKeysEnc.NwkKey, srv.JS.KeyVault)
+				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, *rootKeysEnc.NwkKey, srv.JS.KeyVault)
 				if err != nil {
 					return nil, err
 				}
@@ -105,7 +105,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.app_key") {
 			var applicationCryptoService cryptoservices.Application
 			if rootKeysEnc.GetAppKey() != nil {
-				appKey, err := cryptoutil.UnwrapAES128Key(*rootKeysEnc.AppKey, srv.JS.KeyVault)
+				appKey, err := cryptoutil.UnwrapAES128Key(ctx, *rootKeysEnc.AppKey, srv.JS.KeyVault)
 				if err != nil {
 					return nil, err
 				}

@@ -446,7 +446,7 @@ matchLoop:
 			logger.Warn("Device missing FNwkSIntKey in registry, skip")
 			continue
 		}
-		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(*session.FNwkSIntKey, ns.KeyVault)
+		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			logger.WithField("kek_label", session.FNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap FNwkSIntKey, skip")
 			continue
@@ -464,7 +464,7 @@ matchLoop:
 					logger.Warn("Device missing NwkSEncKey in registry, skip")
 					continue
 				}
-				key, err := cryptoutil.UnwrapAES128Key(*session.NwkSEncKey, ns.KeyVault)
+				key, err := cryptoutil.UnwrapAES128Key(ctx, *session.NwkSEncKey, ns.KeyVault)
 				if err != nil {
 					logger.WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
 					continue
@@ -631,7 +631,7 @@ matchLoop:
 			}
 
 			var sNwkSIntKey types.AES128Key
-			sNwkSIntKey, err = cryptoutil.UnwrapAES128Key(*match.Device.Session.SNwkSIntKey, ns.KeyVault)
+			sNwkSIntKey, err = cryptoutil.UnwrapAES128Key(ctx, *match.Device.Session.SNwkSIntKey, ns.KeyVault)
 			if err != nil {
 				logger.WithField("kek_label", match.Device.Session.SNwkSIntKey.KEKLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey, skip")
 				continue

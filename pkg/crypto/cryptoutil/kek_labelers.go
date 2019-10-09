@@ -39,12 +39,16 @@ func hostFromAddr(addr string) string {
 	return host
 }
 
-// NsKEKLabel returns a KEK label in the form `ns:netID:host` from the given NetID and address, where `:` is the default separator. Empty parts are omitted.
-func (c ComponentPrefixKEKLabeler) NsKEKLabel(ctx context.Context, netID *types.NetID, addr string) string {
+func (c ComponentPrefixKEKLabeler) join(parts ...string) string {
 	sep := c.Separator
 	if sep == "" {
 		sep = ":"
 	}
+	return strings.Join(parts, sep)
+}
+
+// NsKEKLabel returns a KEK label in the form `ns:netID:host` from the given NetID and address, where `:` is the default separator. Empty parts are omitted.
+func (c ComponentPrefixKEKLabeler) NsKEKLabel(ctx context.Context, netID *types.NetID, addr string) string {
 	parts := make([]string, 0, 3)
 	parts = append(parts, "ns")
 	if netID != nil {
@@ -53,19 +57,15 @@ func (c ComponentPrefixKEKLabeler) NsKEKLabel(ctx context.Context, netID *types.
 	if addr != "" {
 		parts = append(parts, hostFromAddr(addr))
 	}
-	return strings.Join(parts, sep)
+	return c.join(parts...)
 }
 
 // AsKEKLabel returns a KEK label in the form `as:host` from the given address, where `:` is the default separator. Empty parts are omitted.
 func (c ComponentPrefixKEKLabeler) AsKEKLabel(ctx context.Context, addr string) string {
-	sep := c.Separator
-	if sep == "" {
-		sep = ":"
-	}
 	parts := make([]string, 0, 2)
 	parts = append(parts, "as")
 	if addr != "" {
 		parts = append(parts, hostFromAddr(addr))
 	}
-	return strings.Join(parts, sep)
+	return c.join(parts...)
 }

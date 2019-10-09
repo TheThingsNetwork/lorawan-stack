@@ -16,6 +16,7 @@ package cryptoutil
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/pem"
 	"strings"
@@ -42,7 +43,7 @@ func NewMemKeyVault(m map[string][]byte) *MemKeyVault {
 var errKEKNotFound = errors.DefineNotFound("kek_not_found", "KEK with label `{label}` not found")
 
 // Wrap implements KeyVault.
-func (v MemKeyVault) Wrap(plaintext []byte, kekLabel string) ([]byte, error) {
+func (v MemKeyVault) Wrap(ctx context.Context, plaintext []byte, kekLabel string) ([]byte, error) {
 	kek, ok := v.m[kekLabel]
 	if !ok {
 		return nil, errKEKNotFound.WithAttributes("label", kekLabel)
@@ -51,7 +52,7 @@ func (v MemKeyVault) Wrap(plaintext []byte, kekLabel string) ([]byte, error) {
 }
 
 // Unwrap implements KeyVault.
-func (v MemKeyVault) Unwrap(ciphertext []byte, kekLabel string) ([]byte, error) {
+func (v MemKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error) {
 	kek, ok := v.m[kekLabel]
 	if !ok {
 		return nil, errKEKNotFound.WithAttributes("label", kekLabel)
@@ -62,7 +63,7 @@ func (v MemKeyVault) Unwrap(ciphertext []byte, kekLabel string) ([]byte, error) 
 var errCertificateNotFound = errors.DefineNotFound("certificate_not_found", "certificate with ID `{id}` not found")
 
 // LoadCertificate implements KeyVault.
-func (v MemKeyVault) LoadCertificate(id string) (*tls.Certificate, error) {
+func (v MemKeyVault) LoadCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
 	raw, ok := v.m[id]
 	if !ok {
 		return nil, errCertificateNotFound.WithAttributes("id", id)

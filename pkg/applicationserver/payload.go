@@ -50,7 +50,7 @@ func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.En
 			}
 		}
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(*session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.En
 	if dev.Session == nil || dev.Session.AppSKey == nil {
 		return errNoAppSKey
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(*dev.Session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
