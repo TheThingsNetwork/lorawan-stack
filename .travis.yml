@@ -137,7 +137,7 @@ after_success:
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
     snapcraft login --with snapcraft.login
     if [[ ! -z "$TRAVIS_TAG" && "$TRAVIS_TAG" =~ ^v3\.[0-9]+\.[0-9]+ ]]; then
-      GO111MODULE=on go run github.com/goreleaser/goreleaser --release-notes <(go run github.com/TheThingsIndustries/release-notes -owner TheThingsNetwork -repo lorawan-stack -id "release-notes" -head $(git rev-parse HEAD) | sort)
+      GO111MODULE=on go run github.com/goreleaser/goreleaser --release-notes <(printf "[Release notes](https://github.com/TheThingsNetwork/lorawan-stack/blob/${TRAVIS_TAG}/CHANGELOG.md#$(echo ${TRAVIS_TAG} | sed "s/v\([1-9]\+\)\.\([1-9]\+\)\.\([1-9]\+\)/\1\2\3---$(date +%Y-%m-%d)/"))")
     else
       GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot
       if [[ ! -z "$DOCKER_IMAGE_DEV" ]]; then
