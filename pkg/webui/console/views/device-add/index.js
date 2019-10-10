@@ -24,6 +24,7 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import DeviceDataForm from '../../components/device-data-form'
 import sharedMessages from '../../../lib/shared-messages'
+import Button from '../../../components/button'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { getDeviceId } from '../../../lib/selectors/id'
 import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
@@ -98,9 +99,12 @@ export default class DeviceAdd extends Component {
     return (
       <Container>
         <Row>
-          <Col>
+          <Col sm={6}>
             <IntlHelmet title={sharedMessages.addDevice} />
             <Message className={style.title} component="h2" content={sharedMessages.addDevice} />
+          </Col>
+          <Col className={style.bulkCreation} sm={6}>
+            <Button.Link message={sharedMessages.bulkCreation} icon="bulk_creation" to="add/bulk" />
           </Col>
         </Row>
         <Row>
