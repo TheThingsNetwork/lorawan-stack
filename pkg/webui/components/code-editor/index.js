@@ -31,6 +31,7 @@ class CodeEditor extends React.Component {
     super(props)
 
     this.state = { focus: false }
+    this.aceRef = React.createRef()
   }
 
   onFocus(evt) {
@@ -51,6 +52,15 @@ class CodeEditor extends React.Component {
         onBlur(evt)
       }
     })
+  }
+
+  componentDidUpdate({ value }) {
+    const { value: oldValue, scrollToBottom } = this.props
+
+    if (scrollToBottom && value !== oldValue) {
+      const row = this.aceRef.current.editor.session.getLength()
+      this.aceRef.current.editor.gotoLine(row)
+    }
   }
 
   render() {
@@ -117,6 +127,7 @@ class CodeEditor extends React.Component {
           onBlur={this.onBlur}
           editorProps={{ $blockScrolling: Infinity }}
           commands={commands}
+          ref={this.aceRef}
         />
       </div>
     )
@@ -141,6 +152,10 @@ CodeEditor.propTypes = {
   editorOptions: PropTypes.object,
   /** The height of the editor */
   height: PropTypes.string,
+  /** A flag indicating whether the editor should scroll to the bottom when the
+   * value has been updated, useful for logging use cases.
+   */
+  scrollToBottom: PropTypes.bool,
   /** A flag identifying whether  */
   showGutter: PropTypes.bool,
   /** Minimum lines of code allowed */
