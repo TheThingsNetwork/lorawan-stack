@@ -132,7 +132,7 @@ func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOpt
 					return nil, errTLSKeyVaultID
 				}
 				return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
-					return c.KeyVault.LoadCertificate(ctx, conf.KeyVault.ID)
+					return c.KeyVault.ExportCertificate(ctx, conf.KeyVault.ID)
 				}, nil
 			},
 		},
