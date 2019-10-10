@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
 // MemKeyVault is a KeyVault that uses secrets from memory.
@@ -39,8 +38,6 @@ func NewMemKeyVault(m map[string][]byte) *MemKeyVault {
 		m: m,
 	}
 }
-
-var errKEKNotFound = errors.DefineNotFound("kek_not_found", "KEK with label `{label}` not found")
 
 // Wrap implements KeyVault.
 func (v MemKeyVault) Wrap(ctx context.Context, plaintext []byte, kekLabel string) ([]byte, error) {
@@ -59,8 +56,6 @@ func (v MemKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel str
 	}
 	return crypto.UnwrapKey(ciphertext, kek)
 }
-
-var errCertificateNotFound = errors.DefineNotFound("certificate_not_found", "certificate with ID `{id}` not found")
 
 // LoadCertificate implements KeyVault.
 func (v MemKeyVault) LoadCertificate(ctx context.Context, id string) (*tls.Certificate, error) {

@@ -23,6 +23,11 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
+var (
+	errKEKNotFound         = errors.DefineNotFound("kek_not_found", "KEK with label `{label}` not found")
+	errCertificateNotFound = errors.DefineNotFound("certificate_not_found", "certificate with ID `{id}` not found")
+)
+
 // WrapAES128Key performs the RFC 3394 Wrap algorithm on the given key using the given key vault and KEK label.
 // If the KEK label is empty, the key will be returned in the clear.
 func WrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v crypto.KeyVault) (ttnpb.KeyEnvelope, error) {
