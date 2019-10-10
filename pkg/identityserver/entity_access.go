@@ -39,6 +39,9 @@ var (
 	errInvalidAuthorization     = errors.DefineUnauthenticated("invalid_authorization", "invalid authorization")
 	errTokenNotFound            = errors.DefineUnauthenticated("token_not_found", "access token not found")
 	errTokenExpired             = errors.DefineUnauthenticated("token_expired", "access token expired")
+	errUserRejected             = errors.DefineUnauthenticated("user_rejected", "user account was rejected")
+	errUserRequested            = errors.DefineUnauthenticated("user_requested", "user account approval is pending")
+	errUserSuspended            = errors.DefineUnauthenticated("user_suspended", "user account was suspended")
 	errOAuthClientRejected      = errors.DefinePermissionDenied("oauth_client_rejected", "OAuth client was rejected")
 	errOAuthClientSuspended     = errors.DefinePermissionDenied("oauth_client_suspended", "OAuth client was suspended")
 )
@@ -244,6 +247,36 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
 		return err
+	}
+
+	if userID := authInfo.GetEntityIdentifiers().GetUserIDs(); userID != nil {
+		err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+			user, err := store.GetUserStore(db).GetUser(ctx, userID, &types.FieldMask{Paths: []string{
+				"state",
+			}})
+			if err != nil {
+				return err
+			}
+
+			switch user.State {
+			case ttnpb.STATE_APPROVED:
+				return nil
+			case ttnpb.STATE_FLAGGED:
+				// Flagged users have the same authentication presence as approved users until proven guilty.
+				return nil
+			case ttnpb.STATE_REQUESTED:
+				return errUserRequested
+			case ttnpb.STATE_REJECTED:
+				return errUserRejected
+			case ttnpb.STATE_SUSPENDED:
+				return errUserSuspended
+			default:
+				panic(fmt.Sprintf("Unhandled user state: %s", user.State.String()))
+			}
+		})
+		if err != nil {
+			return err
+		}
 	}
 	if apiKey := authInfo.GetAPIKey(); apiKey != nil {
 		return nil
