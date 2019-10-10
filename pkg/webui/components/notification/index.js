@@ -17,9 +17,8 @@ import classnames from 'classnames'
 
 import Button from '../button'
 import Message from '../../lib/components/message'
-import ErrorMessage from '../../lib/components/error-message'
 import Icon from '../icon'
-
+import Details from './details'
 import PropTypes from '../../lib/prop-types'
 import style from './notification.styl'
 
@@ -36,6 +35,8 @@ const Notification = function({
   action,
   actionMessage,
   buttonIcon,
+  showDetails,
+  children,
 }) {
   const classname = classnames(style.notification, className, {
     [style.error]: error,
@@ -53,7 +54,7 @@ const Notification = function({
   }
 
   const content = message || error || warning || info || success
-  const Component = error ? ErrorMessage : Message
+  const Component = children
 
   return (
     <div className={classname}>
@@ -67,6 +68,7 @@ const Notification = function({
           )}
         </div>
       </div>
+      {showDetails && <Details className={style.details} details={error} />}
     </div>
   )
 }
@@ -75,6 +77,8 @@ Notification.propTypes = {
   action: PropTypes.func,
   actionMessage: PropTypes.message,
   buttonIcon: PropTypes.string,
+  showDetails: PropTypes.bool,
+  children: PropTypes.func,
   error: PropTypes.error,
   info: PropTypes.message,
   message: PropTypes.message,
@@ -88,7 +92,9 @@ Notification.propTypes = {
 Notification.defaultProps = {
   action: undefined,
   actionMessage: undefined,
+  children: Message,
   buttonIcon: '',
+  showDetails: false,
 }
 
 export default Notification
