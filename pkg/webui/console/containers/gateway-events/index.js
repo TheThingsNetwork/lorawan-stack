@@ -19,7 +19,7 @@ import bind from 'autobind-decorator'
 import PropTypes from '../../../lib/prop-types'
 import EventsSubscription from '../../containers/events-subscription'
 
-import { clearGatewayEventsStream } from '../../store/actions/gateways'
+import { clearGatewayEventsStream, startGatewayEventsStream } from '../../store/actions/gateways'
 
 import {
   selectGatewayEvents,
@@ -31,6 +31,7 @@ import {
   null,
   (dispatch, ownProps) => ({
     onClear: () => dispatch(clearGatewayEventsStream(ownProps.gtwId)),
+    onRestart: () => dispatch(startGatewayEventsStream(ownProps.gtwId)),
   }),
 )
 @bind
@@ -38,6 +39,7 @@ export default class GatewayEvents extends React.Component {
   static propTypes = {
     gtwId: PropTypes.string.isRequired,
     onClear: PropTypes.func.isRequired,
+    onRestart: PropTypes.func.isRequired,
     widget: PropTypes.bool,
   }
 
@@ -46,7 +48,7 @@ export default class GatewayEvents extends React.Component {
   }
 
   render() {
-    const { gtwId, widget, onClear } = this.props
+    const { gtwId, widget, onClear, onRestart } = this.props
 
     return (
       <EventsSubscription
@@ -55,6 +57,7 @@ export default class GatewayEvents extends React.Component {
         eventsSelector={selectGatewayEvents}
         statusSelector={selectGatewayEventsStatus}
         errorSelector={selectGatewayEventsError}
+        onRestart={onRestart}
         onClear={onClear}
         toAllUrl={`/gateways/${gtwId}/data`}
       />

@@ -46,7 +46,7 @@ class EventsWidget extends React.PureComponent {
   }
 
   render() {
-    const { className, events, toAllUrl, emitterId, limit, error } = this.props
+    const { className, events, toAllUrl, emitterId, limit, error, onRestart } = this.props
 
     let truncatedEvents = events
     if (events.length > limit) {
@@ -64,7 +64,14 @@ class EventsWidget extends React.PureComponent {
           )}
         </div>
         {error ? (
-          <Notification small title={sharedMessages.eventsCannotShow} error={error} />
+          <Notification
+            small
+            title={sharedMessages.eventsCannotShow}
+            error={error}
+            action={onRestart}
+            actionMessage={sharedMessages.restartStream}
+            buttonIcon="refresh"
+          />
         ) : (
           <List
             bordered
@@ -93,6 +100,7 @@ EventsWidget.propTypes = {
   events: PropTypes.events,
   /** The number of events to displayed in the widget. */
   limit: PropTypes.number,
+  onRestart: PropTypes.func.isRequired,
   /** A url to the page with full version of the events component. */
   toAllUrl: PropTypes.string.isRequired,
 }

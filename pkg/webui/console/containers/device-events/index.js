@@ -20,7 +20,7 @@ import PropTypes from '../../../lib/prop-types'
 import { getApplicationId, getDeviceId } from '../../../lib/selectors/id'
 import EventsSubscription from '../../containers/events-subscription'
 
-import { clearDeviceEventsStream } from '../../store/actions/device'
+import { clearDeviceEventsStream, startDeviceEventsStream } from '../../store/actions/device'
 
 import {
   selectDeviceEvents,
@@ -32,12 +32,13 @@ import {
   null,
   (dispatch, ownProps) => ({
     onClear: () => dispatch(clearDeviceEventsStream(ownProps.devIds)),
+    onRestart: () => dispatch(startDeviceEventsStream(ownProps.devIds)),
   }),
 )
 @bind
 class DeviceEvents extends React.Component {
   render() {
-    const { devIds, widget, onClear } = this.props
+    const { devIds, widget, onClear, onRestart } = this.props
 
     const devId = getDeviceId(devIds)
     const appId = getApplicationId(devIds)
@@ -50,6 +51,7 @@ class DeviceEvents extends React.Component {
         statusSelector={selectDeviceEventsStatus}
         errorSelector={selectDeviceEventsError}
         onClear={onClear}
+        onRestart={onRestart}
         toAllUrl={`/applications/${appId}/devices/${devId}/data`}
       />
     )
@@ -58,6 +60,8 @@ class DeviceEvents extends React.Component {
 
 DeviceEvents.propTypes = {
   devIds: PropTypes.object.isRequired,
+  onClear: PropTypes.func.isRequired,
+  onRestart: PropTypes.func.isRequired,
   widget: PropTypes.bool,
 }
 

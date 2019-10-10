@@ -163,6 +163,7 @@ export default defineMessages({
   pubsubs: 'PubSubs',
   refreshPage: 'Refresh page',
   removeCollaborator: 'Remove Collaborator',
+  restartStream: 'Restart Stream',
   resume: 'Resume',
   rights: 'Rights',
   saveChanges: 'Save Changes',
