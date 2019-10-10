@@ -20,6 +20,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import ErrorView from '../../../lib/components/error-view'
 import SubViewError from '../error/sub-view'
+import NotFoundRoute from '../../../lib/components/not-found-route'
 
 import GatewayCollaboratorsList from '../gateway-collaborators-list'
 import GatewayCollaboratorAdd from '../gateway-collaborator-add'
@@ -45,11 +46,12 @@ export default class GatewayCollaborators extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayCollaboratorsList} />
-          <Route path={`${match.path}/add`} component={GatewayCollaboratorAdd} />
+          <Route exact path={`${match.path}/add`} component={GatewayCollaboratorAdd} />
           <Route
             path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId`}
             component={GatewayCollaboratorEdit}
           />
+          <NotFoundRoute />
         </Switch>
       </ErrorView>
     )

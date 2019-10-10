@@ -32,7 +32,7 @@ export default class Devices extends React.Component {
     const { path } = this.props.match
     return (
       <Switch>
-        <Route path={`${path}/add`} component={DeviceAdd} />
+        <Route exact path={`${path}/add`} component={DeviceAdd} />
         <Route path={`${path}/:devId`} component={Device} />
         <Route path={`${path}`} component={DeviceList} />
       </Switch>

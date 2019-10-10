@@ -44,7 +44,7 @@ export default class GatewayApiKeys extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayApiKeysList} />
-          <Route path={`${match.path}/add`} component={GatewayApiKeyAdd} />
+          <Route exact path={`${match.path}/add`} component={GatewayApiKeyAdd} />
           <Route path={`${match.path}/:apiKeyId`} component={GatewayApiKeyEdit} />
         </Switch>
       </ErrorView>

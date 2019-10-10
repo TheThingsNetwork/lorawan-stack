@@ -45,7 +45,7 @@ export default class ApplicationPubsubs extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationPubsubsList} />
-          <Route path={`${match.path}/add`} component={ApplicationPubsubAdd} />
+          <Route exact path={`${match.path}/add`} component={ApplicationPubsubAdd} />
           <Route path={`${match.path}/:pubsubId`} component={ApplicationPubsubEdit} />
         </Switch>
       </ErrorView>

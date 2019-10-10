@@ -24,6 +24,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import withRequest from '../../../lib/components/with-request'
 import withEnv from '../../../lib/components/env'
 import BreadcrumbView from '../../../lib/components/breadcrumb-view'
+import NotFoundRoute from '../../../lib/components/not-found-route'
 
 import GatewayOverview from '../gateway-overview'
 import GatewayApiKeys from '../gateway-api-keys'
@@ -139,6 +140,7 @@ export default class Gateway extends React.Component {
           <Route path={`${match.path}/location`} component={GatewayLocation} />
           <Route path={`${match.path}/data`} component={GatewayData} />
           <Route path={`${match.path}/general-settings`} component={GatewayGeneralSettings} />
+          <NotFoundRoute />
         </Switch>
       </BreadcrumbView>
     )

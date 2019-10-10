@@ -44,7 +44,7 @@ export default class ApplicationAccess extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationApiKeysList} />
-          <Route path={`${match.path}/add`} component={ApplicationApiKeyAdd} />
+          <Route exact path={`${match.path}/add`} component={ApplicationApiKeyAdd} />
           <Route path={`${match.path}/:apiKeyId`} component={ApplicationApiKeyEdit} />
         </Switch>
       </ErrorView>

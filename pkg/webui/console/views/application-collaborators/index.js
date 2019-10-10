@@ -20,6 +20,7 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import ErrorView from '../../../lib/components/error-view'
 import SubViewError from '../error/sub-view'
+import NotFoundRoute from '../../../lib/components/not-found-route'
 
 import ApplicationCollaboratorsList from '../application-collaborators-list'
 import ApplicationCollaboratorAdd from '../application-collaborator-add'
@@ -45,11 +46,12 @@ export default class ApplicationCollaborators extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationCollaboratorsList} />
-          <Route path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
+          <Route exact path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
           <Route
             path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId`}
             component={ApplicationCollaboratorEdit}
           />
+          <NotFoundRoute />
         </Switch>
       </ErrorView>
     )
