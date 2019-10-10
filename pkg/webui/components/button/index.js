@@ -37,6 +37,7 @@ function assembleClassnames({
   className,
   error,
   raw,
+  disabled,
 }) {
   return classnames(style.button, className, {
     [style.danger]: danger,
@@ -49,6 +50,7 @@ function assembleClassnames({
     [style.error]: error && !busy,
     [style.large]: large,
     [style.raw]: raw,
+    [style.disabled]: disabled,
   })
 }
 
@@ -99,9 +101,18 @@ Button.defaultProps = {
 }
 
 Button.Link = function(props) {
+  const { disabled, titleMessage } = props
   const buttonClassNames = assembleClassnames(props)
   const { to } = props
-  return <Link className={buttonClassNames} to={to} children={buttonChildren(props)} />
+  return (
+    <Link
+      className={buttonClassNames}
+      to={to}
+      disabled={disabled}
+      title={titleMessage}
+      children={buttonChildren(props)}
+    />
+  )
 }
 Button.Link.displayName = 'Button.Link'
 
