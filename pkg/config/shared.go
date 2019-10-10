@@ -271,6 +271,7 @@ type FrequencyPlansConfig struct {
 // Fetcher returns a fetch.Interface based on the configuration.
 // If no configuration source is set, this method returns nil, nil.
 func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if c.ConfigSource == "" {
 		switch {
 		case c.Static != nil:
@@ -313,6 +314,7 @@ type DeviceRepositoryConfig struct {
 // Fetcher returns a fetch.Interface based on the configuration.
 // If no configuration source is set, this method returns nil, nil.
 func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if c.ConfigSource == "" {
 		switch {
 		case c.Static != nil:
@@ -367,6 +369,7 @@ func (c InteropClient) IsZero() bool {
 // Fetcher returns fetch.Interface defined by conf.
 // If no configuration source is set, this method returns nil, nil.
 func (c InteropClient) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if c.ConfigSource == "" {
 		switch {
 		case c.Directory != "":

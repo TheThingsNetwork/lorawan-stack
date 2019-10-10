@@ -65,6 +65,8 @@ var (
 // GetTLSServerConfig gets the component's server TLS config and applies the given options.
 func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
 	conf := c.GetBaseConfig(ctx).TLS
+
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if conf.Source == "" {
 		switch {
 		case conf.Certificate != "" && conf.Key != "":
