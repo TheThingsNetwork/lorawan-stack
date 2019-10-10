@@ -3914,6 +3914,33 @@
       "file": "entity_access.go"
     }
   },
+  "error:pkg/identityserver:user_rejected": {
+    "translations": {
+      "en": "user account was rejected"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:user_requested": {
+    "translations": {
+      "en": "user account approval is pending"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "entity_access.go"
+    }
+  },
+  "error:pkg/identityserver:user_suspended": {
+    "translations": {
+      "en": "user account was suspended"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "entity_access.go"
+    }
+  },
   "error:pkg/identityserver:user_update_admin_field": {
     "translations": {
       "en": "only admins can update the `{field}` field"
