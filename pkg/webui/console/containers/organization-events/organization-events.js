@@ -13,15 +13,23 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 
 import PropTypes from '../../../lib/prop-types'
 import EventsSubscription from '../../containers/events-subscription'
-
+import { startOrganizationEventsStream } from '../../store/actions/organizations'
+@connect(
+  null,
+  (dispatch, ownProps) => ({
+    onRestart: () => dispatch(startOrganizationEventsStream(ownProps.orgId)),
+  }),
+)
 export default class OrganizationEvents extends React.Component {
   static propTypes = {
     errorSelector: PropTypes.func.isRequired,
     eventsSelector: PropTypes.func.isRequired,
     onClear: PropTypes.func.isRequired,
+    onRestart: PropTypes.func.isRequired,
     orgId: PropTypes.string.isRequired,
     statusSelector: PropTypes.func.isRequired,
     widget: PropTypes.bool,
@@ -32,7 +40,15 @@ export default class OrganizationEvents extends React.Component {
   }
 
   render() {
-    const { orgId, widget, onClear, eventsSelector, errorSelector, statusSelector } = this.props
+    const {
+      orgId,
+      widget,
+      onClear,
+      eventsSelector,
+      errorSelector,
+      statusSelector,
+      onRestart,
+    } = this.props
 
     return (
       <EventsSubscription
@@ -42,6 +58,7 @@ export default class OrganizationEvents extends React.Component {
         statusSelector={statusSelector}
         errorSelector={errorSelector}
         onClear={onClear}
+        onRestart={onRestart}
         toAllUrl={`/organizations/${orgId}/data`}
       />
     )
