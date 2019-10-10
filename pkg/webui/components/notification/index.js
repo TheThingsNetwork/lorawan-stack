@@ -86,7 +86,7 @@ Notification.propTypes = {
 }
 
 Notification.defaultProps = {
-  action: () => null,
+  action: undefined,
   actionMessage: undefined,
   buttonIcon: '',
 }
