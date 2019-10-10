@@ -27,6 +27,8 @@ type KeyVault interface {
 	Wrap(ctx context.Context, plaintext []byte, kekLabel string) ([]byte, error)
 	Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error)
 
+	// GetCertificate gets the X.509 certificate of the given identifier.
 	GetCertificate(ctx context.Context, id string) (*x509.Certificate, error)
+	// ExportCertificate exports the X.509 certificate and private key of the given identifier.
 	ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error)
 }
