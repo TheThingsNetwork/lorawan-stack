@@ -75,9 +75,22 @@ TPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 
-	// Existing certificate.
+	// Get existing certificate.
 	{
-		cert, err := v.LoadCertificate(test.Context(), "cert1")
+		cert, err := v.GetCertificate(test.Context(), "cert1")
+		a.So(err, should.BeNil)
+		a.So(cert.Subject.CommonName, should.Equal, "client_auth_test_cert")
+	}
+
+	// Get non-existing certificate.
+	{
+		_, err := v.GetCertificate(test.Context(), "cert2")
+		a.So(errors.IsNotFound(err), should.BeTrue)
+	}
+
+	// Export existing certificate.
+	{
+		cert, err := v.ExportCertificate(test.Context(), "cert1")
 		a.So(err, should.BeNil)
 		if a.So(len(cert.Certificate), should.Equal, 1) {
 			a.So(len(cert.Certificate[0]), should.Equal, 384)
@@ -85,9 +98,9 @@ TPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==
 		a.So(cert.PrivateKey, should.HaveSameTypeAs, &ecdsa.PrivateKey{})
 	}
 
-	// Non-existing certificate.
+	// Export non-existing certificate.
 	{
-		_, err := v.LoadCertificate(test.Context(), "cert2")
+		_, err := v.ExportCertificate(test.Context(), "cert2")
 		a.So(errors.IsNotFound(err), should.BeTrue)
 	}
 }

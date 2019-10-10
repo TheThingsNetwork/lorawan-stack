@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/pem"
 	"strings"
 
@@ -32,7 +33,7 @@ type MemKeyVault struct {
 }
 
 // NewMemKeyVault returns a MemKeyVault.
-// For certificates,
+// Certificates keys can be appended as PEM block.
 func NewMemKeyVault(m map[string][]byte) *MemKeyVault {
 	return &MemKeyVault{
 		m: m,
@@ -57,8 +58,21 @@ func (v MemKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel str
 	return crypto.UnwrapKey(ciphertext, kek)
 }
 
-// LoadCertificate implements KeyVault.
-func (v MemKeyVault) LoadCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
+// GetCertificate implements KeyVault.
+func (v MemKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
+	raw, ok := v.m[id]
+	if !ok {
+		return nil, errCertificateNotFound.WithAttributes("id", id)
+	}
+	block, _ := pem.Decode(raw)
+	if block == nil || block.Type != "CERTIFICATE" {
+		return nil, errCertificateNotFound.WithAttributes("id", id)
+	}
+	return x509.ParseCertificate(block.Bytes)
+}
+
+// ExportCertificate implements KeyVault.
+func (v MemKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
 	raw, ok := v.m[id]
 	if !ok {
 		return nil, errCertificateNotFound.WithAttributes("id", id)
