@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const notify = function(listener, ...args) {
-  if (listener !== null) {
-    listener(...args)
-  }
-}
+import { createRequestActions } from './lib'
 
-export const EVENTS = Object.freeze({
-  START: 'start',
-  CHUNK: 'chunk',
-  ERROR: 'error',
-  CLOSE: 'close',
-})
+export const GET_DEVICE_TEMPLATE_FORMATS_BASE = 'GET_DEVICE_TEMPLATE_FORMATS'
+export const [
+  {
+    request: GET_DEVICE_TEMPLATE_FORMATS,
+    success: GET_DEVICE_TEMPLATE_FORMATS_SUCCESS,
+    failure: GET_DEVICE_TEMPLATE_FORMATS_FAILURE,
+  },
+  {
+    request: getDeviceTemplateFormats,
+    success: getDeviceTemplateFormatsSuccess,
+    failure: geteviceTemplateFormatsFailure,
+  },
+] = createRequestActions(GET_DEVICE_TEMPLATE_FORMATS_BASE)

@@ -85,7 +85,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
           channel = await onEventsStart([id])
 
           channel.on('start', () => dispatch(startEventsSuccess(id)))
-          channel.on('event', message => dispatch(getEventSuccess(id, message)))
+          channel.on('chunk', message => dispatch(getEventSuccess(id, message)))
           channel.on('error', error => dispatch(getEventFailure(id, error)))
           channel.on('close', () => dispatch(stopEvents(id)))
         } catch (error) {

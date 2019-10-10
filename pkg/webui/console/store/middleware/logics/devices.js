@@ -14,6 +14,7 @@
 
 import api from '../../../api'
 import * as devices from '../../actions/devices'
+import * as deviceTemplateFormats from '../../actions/device-template-formats'
 import createRequestLogic from './lib'
 
 const getDevicesListLogic = createRequestLogic({
@@ -30,4 +31,12 @@ const getDevicesListLogic = createRequestLogic({
   },
 })
 
-export default [getDevicesListLogic]
+const getDeviceTemplateFormatsLogic = createRequestLogic({
+  type: deviceTemplateFormats.GET_DEVICE_TEMPLATE_FORMATS,
+  async process() {
+    const { formats } = await api.deviceTemplates.listFormats()
+    return formats
+  },
+})
+
+export default [getDevicesListLogic, getDeviceTemplateFormatsLogic]

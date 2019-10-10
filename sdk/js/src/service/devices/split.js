@@ -22,10 +22,12 @@ import deviceEntityMap from '../../../generated/device-entity-map.json'
  * @param {Object} paths - The requested paths (from the field mask) of the device
  * @param {string} direction - The direction, either 'set' or 'get'
  * @param {Object} base - An optional base value for the returned request tree
+ * @param {Object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree
  * @returns {Object} A request tree object, consisting of resulting paths for each
  * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
  */
-function splitPaths(paths = [], direction, base = {}) {
+function splitPaths(paths = [], direction, base = {}, components = ['is', 'ns', 'as', 'js']) {
   const result = base
   const retrieveIndex = direction === 'get' ? 0 : 1
 
@@ -39,13 +41,19 @@ function splitPaths(paths = [], direction, base = {}) {
 
     const definition = '_root' in subtree ? subtree._root[retrieveIndex] : subtree[retrieveIndex]
 
+    const map = function(requestTree, component, path) {
+      if (components.includes(component)) {
+        result[component] = !result[component] ? [path] : [...result[component], path]
+      }
+    }
+
     if (definition) {
       if (definition instanceof Array) {
         for (const component of definition) {
-          result[component] = !result[component] ? [path] : [...result[component], path]
+          map(result, component, path)
         }
       } else {
-        result[definition] = !result[definition] ? [path] : [...result[definition], path]
+        map(result, definition, path)
       }
     }
   }
@@ -55,29 +63,35 @@ function splitPaths(paths = [], direction, base = {}) {
 /** A wrapper function to obtain a request tree for writing values to a device
  * @param {Object} paths - The requested paths (from the field mask) of the device
  * @param {Object} base - An optional base value for the returned request tree
+ * @param {Object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree
  * @returns {Object} A request tree object, consisting of resulting paths for each
  * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
  */
-export function splitSetPaths(paths, base) {
-  return splitPaths(paths, 'set', base)
+export function splitSetPaths(paths, base, components) {
+  return splitPaths(paths, 'set', base, components)
 }
 
 /** A wrapper function to obtain a request tree for reading values to a device
  * @param {Object} paths - The requested paths (from the field mask) of the device
  * @param {Object} base - An optional base value for the returned request tree
+ * @param {Object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree
  * @returns {Object} A request tree object, consisting of resulting paths for each
  * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
  */
-export function splitGetPaths(paths, base) {
-  return splitPaths(paths, 'get', base)
+export function splitGetPaths(paths, base, components) {
+  return splitPaths(paths, 'get', base, components)
 }
 
-/** A wrapper function to obtain a request tree for reading values to a device
+/** makeRequests will make the necessary api calls based on the request tree and
+ * other options
  * @param {Object} api - The Api object as passed to the service
  * @param {Object} stackConfig - The Things Stack config object
  * @param {boolean} ignoreDisabledComponents - A flag indicating whether queries
  * against disabled components should be ignored insread of throwing
- * @param {string} operation - The operation, an enum of 'set', 'get' and 'delete'
+ * @param {string} operation - The operation, an enum of 'create', 'set', 'get'
+ * and 'delete'
  * @param {string} requestTree - The request tree, as returned by the splitPaths
  * function
  * @param {Object} params - The parameters object to be passed to the requests
@@ -97,7 +111,8 @@ export async function makeRequests(
   payload,
   ignoreNotFound = false,
 ) {
-  const isSet = operation === 'set'
+  const isCreate = operation === 'create'
+  const isSet = operation === 'set' || isCreate
   const isDelete = operation === 'delete'
   const rpcFunction = isSet ? 'Set' : isDelete ? 'Delete' : 'Get'
 
@@ -136,9 +151,13 @@ export async function makeRequests(
 
   // Do a possible IS request first
   if (stackConfig.is && 'is' in requestTree) {
-    let func = isSet ? 'Update' : 'Get'
-    if (isDelete) {
+    let func
+    if (isSet) {
+      func = isCreate ? 'Create' : 'Update'
+    } else if (isDelete) {
       func = 'Delete'
+    } else {
+      func = 'Get'
     }
     isResult = await requestWrapper(
       api.EndDeviceRegistry[func],
@@ -151,6 +170,11 @@ export async function makeRequests(
     )
 
     isResult = Marshaler.payloadSingleResponse(isResult)
+  }
+
+  // Write the device id param based the id of the newly created device
+  if (isCreate && !('end_device.ids.device_id' in params.routeParams)) {
+    params.routeParams['end_device.ids.device_id'] = isResult.ids.device_id
   }
 
   // Compose an array of possible api calls to NS, AS, JS

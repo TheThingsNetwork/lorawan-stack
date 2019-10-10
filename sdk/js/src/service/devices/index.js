@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable no-invalid-this */
+/* eslint-disable no-invalid-this, no-await-in-loop */
 
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
 import Device from '../../entity/device'
+import { notify, EVENTS } from '../../api/stream/shared'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
@@ -44,7 +45,7 @@ class Devices {
     )
   }
 
-  async _setDevice(applicationId, deviceId, device, create = false) {
+  async _setDevice(applicationId, deviceId, device, create = false, requestTreeOverwrite) {
     const ids = device.ids
     const devId = deviceId || ('device_id' in ids && ids.device_id)
     const appId = applicationId || ('application_ids' in ids && ids.application_ids.application_id)
@@ -60,15 +61,6 @@ class Devices {
     if (!appId) {
       throw new Error('Missing application_id for device.')
     }
-
-    // Make sure to write at least the ids, in case of creation
-    const mergeBase = create
-      ? {
-          ns: [['ids']],
-          as: [['ids']],
-          js: [['ids']],
-        }
-      : {}
 
     const params = {
       routeParams: {
@@ -104,15 +96,19 @@ class Devices {
       return acc
     }, [])
 
-    const requestTree = splitSetPaths(paths, mergeBase)
-    const devicePayload = Marshaler.payload(device, 'end_device')
+    // Make sure to write at least the ids, in case of creation
+    const mergeBase = create
+      ? {
+          ns: [['ids']],
+          as: [['ids']],
+          js: [['ids']],
+        }
+      : {}
 
-    let isResult = {}
-    if (create) {
-      isResult = await this._api.EndDeviceRegistry.Create(params, devicePayload)
-      isResult = Marshaler.payloadSingleResponse(isResult)
-      delete requestTree.is
-    }
+    const requestTree = requestTreeOverwrite
+      ? requestTreeOverwrite
+      : splitSetPaths(paths, mergeBase)
+    const devicePayload = Marshaler.payload(device, 'end_device')
 
     // Retrieve join information if not present
     if (!create && !('supports_join' in device)) {
@@ -147,29 +143,24 @@ class Devices {
       }
     }
 
-    // Write the device id param based on either the id of the newly created
-    // device, or the passed id argument
-    params.routeParams['end_device.ids.device_id'] =
-      'data' in isResult ? isResult.ids.device_id : devId
-
     try {
       const setParts = await makeRequests(
         this._api,
         this._stackConfig,
         this._ignoreDisabledComponents,
-        'set',
+        create ? 'create' : 'set',
         requestTree,
         params,
         devicePayload,
       )
-      const result = mergeDevice(setParts, isResult)
+      const result = mergeDevice(setParts)
       return result
     } catch (err) {
       // Roll back changes
       if (create) {
         this._deleteDevice(appId, devId, Object.keys(requestTree))
       }
-      throw new Error(`Could not ${create ? 'create' : 'update'} device.`)
+      throw err
     }
   }
 
@@ -291,6 +282,85 @@ class Devices {
     const result = this._deleteDevice(applicationId, deviceId)
 
     return result
+  }
+
+  // End Device Template Converter
+
+  async listTemplateFormats() {
+    const result = await this._api.EndDeviceTemplateConverter.ListFormats()
+
+    return Marshaler.payloadListResponse('formats', result)
+  }
+
+  convertTemplate(formatId, data) {
+    // This is a stream endpoint
+    return this._api.EndDeviceTemplateConverter.Convert(undefined, {
+      format_id: formatId,
+      data,
+    })
+  }
+
+  bulkCreate(applicationId, deviceOrDevices, components = ['is', 'ns', 'as', 'js']) {
+    const devices = !(deviceOrDevices instanceof Array) ? [deviceOrDevices] : deviceOrDevices
+    let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
+    let finishedCount = 0
+    let stopRequested = false
+
+    const runTasks = async function() {
+      for (const device of devices) {
+        if (stopRequested) {
+          notify(listeners[EVENTS.CLOSE])
+          listeners = null
+          break
+        }
+
+        try {
+          const {
+            field_mask: { paths },
+            end_device,
+          } = device
+
+          const requestTree = splitSetPaths(Marshaler.selectorToPaths(paths), undefined, components)
+
+          const result = await this._setDevice(
+            applicationId,
+            undefined,
+            end_device,
+            true,
+            requestTree,
+          )
+          notify(listeners[EVENTS.CHUNK], result)
+          finishedCount++
+          if (finishedCount === devices.length) {
+            notify(listeners[EVENTS.CLOSE])
+            listeners = null
+          }
+        } catch (error) {
+          notify(listeners[EVENTS.ERROR], error)
+          listeners = null
+          break
+        }
+      }
+    }
+
+    runTasks.bind(this)()
+
+    return {
+      on(eventName, callback) {
+        if (listeners[eventName] === undefined) {
+          throw new Error(
+            `${eventName} event is not supported. Should be one of: start, error, chunk or close`,
+          )
+        }
+
+        listeners[eventName] = callback
+
+        return this
+      },
+      abort() {
+        stopRequested = true
+      },
+    }
   }
 
   // Events Stream

@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const notify = function(listener, ...args) {
-  if (listener !== null) {
-    listener(...args)
-  }
+import { GET_DEVICE_TEMPLATE_FORMATS_BASE } from '../actions/device-template-formats'
+import { createFetchingSelector } from './fetching'
+import { createErrorSelector } from './error'
+
+const selectDeviceTemplateFormatsStore = state => state.deviceTemplateFormats
+
+export const selectDeviceTemplateFormats = function(state) {
+  const store = selectDeviceTemplateFormatsStore(state)
+
+  return store.formats || {}
 }
 
-export const EVENTS = Object.freeze({
-  START: 'start',
-  CHUNK: 'chunk',
-  ERROR: 'error',
-  CLOSE: 'close',
-})
+export const selectDeviceTemplateFormatsError = createErrorSelector(
+  GET_DEVICE_TEMPLATE_FORMATS_BASE,
+)
+export const selectDeviceTemplateFormatsFetching = createFetchingSelector(
+  GET_DEVICE_TEMPLATE_FORMATS_BASE,
+)

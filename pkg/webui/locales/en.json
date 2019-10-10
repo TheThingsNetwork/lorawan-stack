@@ -127,6 +127,8 @@
   "console.containers.collaborators-table.index.id": "User / Organization ID",
   "console.containers.dev-addr-input.dev-addr-input.generate": "Generate Device Address",
   "console.containers.dev-addr-input.index.devAddrFetchingFailure": "Could not generate device address",
+  "console.containers.device-template-format-select.index.title": "File Format",
+  "console.containers.device-template-format-select.index.warning": "Could not retrieve the list of available device template formats",
   "console.containers.freq-plans-select.index.title": "Frequency Plan",
   "console.containers.freq-plans-select.index.warning": "Could not retrieve the list of available frequency plans",
   "console.containers.join-eui-prefixes-input.index.prefixesFetchingFailure": "Could not retrieve the list of available prefixes",

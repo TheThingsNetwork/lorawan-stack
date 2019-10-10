@@ -12,15 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const notify = function(listener, ...args) {
-  if (listener !== null) {
-    listener(...args)
+import { GET_DEVICE_TEMPLATE_FORMATS_SUCCESS } from '../actions/device-template-formats'
+
+const defaultState = {
+  formats: undefined,
+}
+
+const deviceTemplateFormats = function(state = defaultState, { type, payload }) {
+  switch (type) {
+    case GET_DEVICE_TEMPLATE_FORMATS_SUCCESS:
+      return {
+        ...state,
+        formats: payload,
+      }
+    default:
+      return state
   }
 }
 
-export const EVENTS = Object.freeze({
-  START: 'start',
-  CHUNK: 'chunk',
-  ERROR: 'error',
-  CLOSE: 'close',
-})
+export default deviceTemplateFormats
