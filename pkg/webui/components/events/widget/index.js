@@ -18,7 +18,7 @@ import { defineMessages } from 'react-intl'
 
 import Link from '../../link'
 import List from '../../list'
-import Notification from '../../notification'
+import ErrorNotification from '../../error-notification'
 import getEventComponentByName from '../../event/types'
 
 import Message from '../../../lib/components/message'
@@ -64,7 +64,7 @@ class EventsWidget extends React.PureComponent {
           )}
         </div>
         {error ? (
-          <Notification
+          <ErrorNotification
             small
             title={sharedMessages.eventsCannotShow}
             error={error}

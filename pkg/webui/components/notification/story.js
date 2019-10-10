@@ -16,6 +16,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 
 import Notification from '.'
+import ErrorNotification from '../error-notification'
 
 storiesOf('Notification', module)
   .add('Default', () => (
@@ -45,7 +46,7 @@ storiesOf('Notification', module)
   .add('Error', () => (
     <div>
       <Notification title="example message title" error="We got a problem here!" />
-      <Notification error="We got a problem here!" />
+      <ErrorNotification error="We got a problem here!" />
       <Notification title="example message title" error="We got a problem here!" small />
       <Notification error="We got a problem here!" small />
     </div>

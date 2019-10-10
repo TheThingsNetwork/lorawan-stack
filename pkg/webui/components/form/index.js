@@ -18,6 +18,7 @@ import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Notification from '../notification'
+import ErrorNotification from '../error-notification'
 import PropTypes from '../../lib/prop-types'
 import FormContext from './context'
 import FormField from './field'
@@ -64,7 +65,7 @@ class InnerForm extends React.PureComponent {
       <form className={className} onSubmit={handleSubmit}>
         {(formError || formInfo) && (
           <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
-            {formError && <Notification error={formError} small />}
+            {formError && <ErrorNotification error={formError} small />}
             {formInfo && <Notification info={formInfo} small />}
           </div>
         )}
