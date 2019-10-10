@@ -46,7 +46,7 @@ export default class GatewayCollaborators extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayCollaboratorsList} />
-          <Route path={`${match.path}/add`} component={GatewayCollaboratorAdd} />
+          <Route exact path={`${match.path}/add`} component={GatewayCollaboratorAdd} />
           <Route
             path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId`}
             component={GatewayCollaboratorEdit}

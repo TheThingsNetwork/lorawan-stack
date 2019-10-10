@@ -33,7 +33,7 @@ export default class Gateways extends React.Component {
     return (
       <Switch>
         <Route exact path={`${path}`} component={GatewaysList} />
-        <Route path={`${path}/add`} component={GatewayAdd} />
+        <Route exact path={`${path}/add`} component={GatewayAdd} />
         <Route path={`${path}/:gtwId`} component={Gateway} />
       </Switch>
     )

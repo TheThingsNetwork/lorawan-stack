@@ -32,7 +32,7 @@ export default class Applications extends React.Component {
     return (
       <Switch>
         <Route exact path={`${path}`} component={ApplicationsList} />
-        <Route path={`${path}/add`} component={ApplicationAdd} />
+        <Route exact path={`${path}/add`} component={ApplicationAdd} />
         <Route path={`${path}/:appId`} component={Application} />
       </Switch>
     )

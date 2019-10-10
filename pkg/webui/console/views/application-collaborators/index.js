@@ -46,7 +46,7 @@ export default class ApplicationCollaborators extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationCollaboratorsList} />
-          <Route path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
+          <Route exact path={`${match.path}/add`} component={ApplicationCollaboratorAdd} />
           <Route
             path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId`}
             component={ApplicationCollaboratorEdit}
