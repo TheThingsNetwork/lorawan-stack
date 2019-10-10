@@ -30,17 +30,17 @@ type emptyKeyVault struct {
 var EmptyKeyVault crypto.KeyVault = emptyKeyVault{}
 
 func (emptyKeyVault) Wrap(ctx context.Context, plaintext []byte, kekLabel string) ([]byte, error) {
-	return nil, errKEKNotFound
+	return nil, errKEKNotFound.WithAttributes("label", kekLabel)
 }
 
 func (emptyKeyVault) Unwrap(ctx context.Context, ciphertext []byte, kekLabel string) ([]byte, error) {
-	return nil, errKEKNotFound
+	return nil, errKEKNotFound.WithAttributes("label", kekLabel)
 }
 
 func (emptyKeyVault) GetCertificate(ctx context.Context, id string) (*x509.Certificate, error) {
-	return nil, errCertificateNotFound
+	return nil, errCertificateNotFound.WithAttributes("id", id)
 }
 
 func (emptyKeyVault) ExportCertificate(ctx context.Context, id string) (*tls.Certificate, error) {
-	return nil, errCertificateNotFound
+	return nil, errCertificateNotFound.WithAttributes("id", id)
 }

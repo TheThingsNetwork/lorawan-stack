@@ -35,14 +35,20 @@ func (a ACME) IsZero() bool {
 
 // TLSKeyVault defines configuration for loading a certificate from the key vault.
 type TLSKeyVault struct {
-	Enable bool   `name:"enable" description:"Enable loading the certificate from the key vault"`
-	ID     string `name:"id" description:"ID of the certificate"`
+	ID string `name:"id" description:"ID of the certificate"`
+}
+
+// IsZero returns whether the TLSKeyVault is empty.
+func (t TLSKeyVault) IsZero() bool {
+	return t.ID == ""
 }
 
 // TLS represents TLS configuration.
 type TLS struct {
 	RootCA             string `name:"root-ca" description:"Location of TLS root CA certificate (optional)"`
 	InsecureSkipVerify bool   `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`
+
+	Source string `name:"source" description:"Source of the TLS certificate (file, acme, key-vault)"`
 
 	Certificate string `name:"certificate" description:"Location of TLS certificate"`
 	Key         string `name:"key" description:"Location of TLS private key"`
@@ -54,8 +60,10 @@ type TLS struct {
 
 // IsZero returns whether the TLS configuration is empty.
 func (t TLS) IsZero() bool {
-	return t.RootCA == "" &&
+	return t.Source == "" &&
+		t.RootCA == "" &&
 		t.Certificate == "" &&
 		t.Key == "" &&
-		t.ACME.IsZero()
+		t.ACME.IsZero() &&
+		t.KeyVault.IsZero()
 }

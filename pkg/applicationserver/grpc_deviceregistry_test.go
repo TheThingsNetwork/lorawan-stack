@@ -216,7 +216,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				componenttest.NewComponent(t, &component.Config{
 					ServiceBase: config.ServiceBase{
 						KeyVault: config.KeyVault{
-							Static: registeredKEKs,
+							Provider: "static",
+							Static:   registeredKEKs,
 						},
 					},
 				}),

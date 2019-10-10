@@ -107,7 +107,9 @@ var DefaultRightsConfig = config.Rights{
 }
 
 // DefaultKeyVaultConfig is the default config for key vaults.
-var DefaultKeyVaultConfig = config.KeyVault{}
+var DefaultKeyVaultConfig = config.KeyVault{
+	Provider: "static",
+}
 
 // DefaultServiceBase is the default base config for a service.
 var DefaultServiceBase = config.ServiceBase{

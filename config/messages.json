@@ -2357,15 +2357,6 @@
       "file": "acme.go"
     }
   },
-  "error:pkg/component:tls_config_ambiguous": {
-    "translations": {
-      "en": "ambiguous TLS configuration"
-    },
-    "description": {
-      "package": "pkg/component",
-      "file": "tls.go"
-    }
-  },
   "error:pkg/component:tls_config_empty": {
     "translations": {
       "en": "empty TLS configuration"
