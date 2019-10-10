@@ -90,7 +90,7 @@ export default class ProgressBar extends PureComponent {
     const displayPercentage = Math.max(0, Math.min(100, percentage)).toFixed(percentageDecimals)
     let displayEstimation = null
 
-    if (showEstimation) {
+    if (showEstimation && percentage < 100) {
       const now = new Date(Date.now() + 1000)
       let eta = new Date(startTime + estimatedDuration)
       if (eta < now) {
