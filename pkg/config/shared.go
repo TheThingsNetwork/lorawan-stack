@@ -155,14 +155,14 @@ type Rights struct {
 
 // KeyVault represents configuration for key vaults.
 type KeyVault struct {
-	Static map[string][]byte `name:"static" description:"Static labeled key encryption keys"`
+	Provider string            `name:"provider" description:"Provider (static)"`
+	Static   map[string][]byte `name:"static"`
 }
 
 // KeyVault returns an initialized crypto.KeyVault based on the configuration.
-// The order of precedence is Static.
 func (v KeyVault) KeyVault() (crypto.KeyVault, error) {
-	switch {
-	case v.Static != nil:
+	switch v.Provider {
+	case "static":
 		kv := cryptoutil.NewMemKeyVault(v.Static)
 		kv.Separator = ":"
 		kv.ReplaceOldNew = []string{":", "_"}
@@ -214,7 +214,7 @@ type BlobConfigGCP struct {
 
 // BlobConfig is the blob store configuration.
 type BlobConfig struct {
-	Provider string          `name:"provider" description:"Blob store provider (local|aws|gcp)"`
+	Provider string          `name:"provider" description:"Blob store provider (local, aws, gcp)"`
 	Local    BlobConfigLocal `name:"local"`
 	AWS      BlobConfigAWS   `name:"aws"`
 	GCP      BlobConfigGCP   `name:"gcp"`
@@ -261,24 +261,37 @@ func (c BlobPathConfig) IsZero() bool {
 
 // FrequencyPlansConfig contains the source of the frequency plans.
 type FrequencyPlansConfig struct {
-	Static    map[string][]byte `name:"-"`
-	Directory string            `name:"directory" description:"Retrieve the frequency plans from the filesystem"`
-	URL       string            `name:"url" description:"Retrieve the frequency plans from a web server"`
-	Blob      BlobPathConfig    `name:"blob" description:"Retrieve the frequency plans from a blob"`
+	ConfigSource string            `name:"config-source" description:"Source of the frequency plans (static, directory, url, blob)"`
+	Static       map[string][]byte `name:"-"`
+	Directory    string            `name:"directory"`
+	URL          string            `name:"url"`
+	Blob         BlobPathConfig    `name:"blob"`
 }
 
 // Fetcher returns a fetch.Interface based on the configuration.
-// The order of precedence is Static, Directory, URL and Blob.
-// If neither Static, Directory, URL nor a Blob is set, this method returns nil, nil.
+// If no configuration source is set, this method returns nil, nil.
 func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
-	switch {
-	case c.Static != nil:
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
+	if c.ConfigSource == "" {
+		switch {
+		case c.Static != nil:
+			c.ConfigSource = "static"
+		case c.Directory != "":
+			c.ConfigSource = "directory"
+		case c.URL != "":
+			c.ConfigSource = "url"
+		case !c.Blob.IsZero():
+			c.ConfigSource = "blob"
+		}
+	}
+	switch c.ConfigSource {
+	case "static":
 		return fetch.NewMemFetcher(c.Static), nil
-	case c.Directory != "":
+	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
-	case c.URL != "":
+	case "url":
 		return fetch.FromHTTP(c.URL, true)
-	case !c.Blob.IsZero():
+	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err
@@ -291,24 +304,37 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) 
 
 // DeviceRepositoryConfig defines the source of the device repository.
 type DeviceRepositoryConfig struct {
-	Static    map[string][]byte `name:"-"`
-	Directory string            `name:"directory" description:"Retrieve the device repository from the filesystem"`
-	URL       string            `name:"url" description:"Retrieve the device repository from a web server"`
-	Blob      BlobPathConfig    `name:"blob" description:"Retrieve the device repository from a blob"`
+	ConfigSource string            `name:"config-source" description:"Source of the device repository (static, directory, url, blob)"`
+	Static       map[string][]byte `name:"-"`
+	Directory    string            `name:"directory"`
+	URL          string            `name:"url"`
+	Blob         BlobPathConfig    `name:"blob"`
 }
 
 // Fetcher returns a fetch.Interface based on the configuration.
-// The order of precedence is Static, Directory, URL and Blob.
-// If neither Static, Directory, URL nor a Blob is set, this method returns nil, nil.
+// If no configuration source is set, this method returns nil, nil.
 func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
-	switch {
-	case c.Static != nil:
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
+	if c.ConfigSource == "" {
+		switch {
+		case c.Static != nil:
+			c.ConfigSource = "static"
+		case c.Directory != "":
+			c.ConfigSource = "directory"
+		case c.URL != "":
+			c.ConfigSource = "url"
+		case !c.Blob.IsZero():
+			c.ConfigSource = "blob"
+		}
+	}
+	switch c.ConfigSource {
+	case "static":
 		return fetch.NewMemFetcher(c.Static), nil
-	case c.Directory != "":
+	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
-	case c.URL != "":
+	case "url":
 		return fetch.FromHTTP(c.URL, true)
-	case !c.Blob.IsZero():
+	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err
@@ -321,9 +347,10 @@ func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig
 
 // InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropClient struct {
-	Directory string         `name:"directory" description:"Retrieve the interoperability client configuration from the filesystem"`
-	URL       string         `name:"url" description:"Retrieve the interoperability client configuration from a web server"`
-	Blob      BlobPathConfig `name:"blob" description:"Retrieve the interoperability client configuration from a blob"`
+	ConfigSource string         `name:"config-source" description:"Source of the interoperability client configuration (directory, url, blob)"`
+	Directory    string         `name:"directory"`
+	URL          string         `name:"url"`
+	Blob         BlobPathConfig `name:"blob"`
 
 	GetFallbackTLSConfig func(ctx context.Context) (*tls.Config, error) `name:"-"`
 	BlobConfig           BlobConfig                                     `name:"-"`
@@ -331,19 +358,34 @@ type InteropClient struct {
 
 // IsZero returns whether conf is empty.
 func (c InteropClient) IsZero() bool {
-	return c.Directory == "" && c.URL == "" && c.Blob.IsZero() && c.GetFallbackTLSConfig == nil && c.BlobConfig == BlobConfig{}
+	return c.ConfigSource == "" &&
+		c.Directory == "" &&
+		c.URL == "" &&
+		c.Blob.IsZero() &&
+		c.GetFallbackTLSConfig == nil &&
+		c.BlobConfig == BlobConfig{}
 }
 
 // Fetcher returns fetch.Interface defined by conf.
-// The order of precedence is Static, Directory, URL and Blob.
-// If neither Static, Directory, URL nor a Blob is set, this method returns nil, nil.
+// If no configuration source is set, this method returns nil, nil.
 func (c InteropClient) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
-	switch {
-	case c.Directory != "":
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
+	if c.ConfigSource == "" {
+		switch {
+		case c.Directory != "":
+			c.ConfigSource = "directory"
+		case c.URL != "":
+			c.ConfigSource = "url"
+		case !c.Blob.IsZero():
+			c.ConfigSource = "blob"
+		}
+	}
+	switch c.ConfigSource {
+	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
-	case c.URL != "":
+	case "url":
 		return fetch.FromHTTP(c.URL, true)
-	case !c.Blob.IsZero():
+	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err

@@ -163,7 +163,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				componenttest.NewComponent(t, &component.Config{
 					ServiceBase: config.ServiceBase{
 						KeyVault: config.KeyVault{
-							Static: tc.KeyVault,
+							Provider: "static",
+							Static:   tc.KeyVault,
 						},
 					},
 				}),

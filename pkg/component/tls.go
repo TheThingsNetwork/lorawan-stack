@@ -58,104 +58,100 @@ func WithNextProtos(protos ...string) TLSConfigOption {
 }
 
 var (
-	errAmbiguousTLSConfig = errors.DefineFailedPrecondition("tls_config_ambiguous", "ambiguous TLS configuration")
-	errEmptyTLSConfig     = errors.DefineFailedPrecondition("tls_config_empty", "empty TLS configuration")
-	errTLSKeyVaultID      = errors.DefineFailedPrecondition("tls_key_vault_id", "invalid TLS key vault ID")
+	errEmptyTLSConfig = errors.DefineFailedPrecondition("tls_config_empty", "empty TLS configuration")
+	errTLSKeyVaultID  = errors.DefineFailedPrecondition("tls_key_vault_id", "invalid TLS key vault ID")
 )
 
 // GetTLSServerConfig gets the component's server TLS config and applies the given options.
 func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
-	var (
-		logger = log.FromContext(ctx)
-		conf   = c.GetBaseConfig(ctx).TLS
-		res    *tls.Config
-	)
-	for _, src := range []struct {
-		Enable            bool
-		CertificateGetter func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error)
-	}{
-		{
-			Enable: conf.Certificate != "" && conf.Key != "",
-			CertificateGetter: func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
-				var cv atomic.Value
-				loadCertificate := func() error {
-					cert, err := tls.LoadX509KeyPair(conf.Certificate, conf.Key)
-					if err != nil {
-						return err
-					}
-					cv.Store(&cert)
-					logger.Debug("Loaded TLS certificate")
-					return nil
-				}
-				if err := loadCertificate(); err != nil {
-					return nil, err
-				}
-				debounce := make(chan struct{}, 1)
-				fs.Watch(conf.Certificate, events.HandlerFunc(func(evt events.Event) {
-					if evt.Name() != "fs.write" {
-						return
-					}
-					// We have to debounce this; OpenSSL typically causes a lot of write events.
-					select {
-					case debounce <- struct{}{}:
-						time.AfterFunc(5*time.Second, func() {
-							if err := loadCertificate(); err != nil {
-								logger.WithError(err).Error("Could not reload TLS certificate")
-								return
-							}
-							<-debounce
-						})
-					default:
-					}
-				}))
-				return func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-					return cv.Load().(*tls.Certificate), nil
-				}, nil
-			},
-		},
-		{
-			Enable: conf.ACME.Enable,
-			CertificateGetter: func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
-				opts = append(opts, WithNextProtos(acme.ALPNProto))
-				return func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-					if hello.ServerName == "" {
-						hello.ServerName = conf.ACME.DefaultHost
-					}
-					return c.acme.GetCertificate(hello)
-				}, nil
-			},
-		},
-		{
-			Enable: conf.KeyVault.Enable,
-			CertificateGetter: func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
-				if conf.KeyVault.ID == "" {
-					return nil, errTLSKeyVaultID
-				}
-				return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
-					return c.KeyVault.ExportCertificate(ctx, conf.KeyVault.ID)
-				}, nil
-			},
-		},
-	} {
-		if !src.Enable {
-			continue
-		}
-		if res != nil {
-			return nil, errAmbiguousTLSConfig
-		}
-		fn, err := src.CertificateGetter()
-		if err != nil {
-			return nil, err
-		}
-		res = &tls.Config{
-			GetCertificate: fn,
+	conf := c.GetBaseConfig(ctx).TLS
+
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
+	if conf.Source == "" {
+		switch {
+		case conf.Certificate != "" && conf.Key != "":
+			conf.Source = "file"
+		case conf.ACME.Enable:
+			conf.Source = "acme"
+		case !conf.KeyVault.IsZero():
+			conf.Source = "key-vault"
 		}
 	}
-	if res == nil {
+
+	var (
+		logger            = log.FromContext(ctx)
+		certificateGetter func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error)
+	)
+	switch conf.Source {
+	case "file":
+		certificateGetter = func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+			var cv atomic.Value
+			loadCertificate := func() error {
+				cert, err := tls.LoadX509KeyPair(conf.Certificate, conf.Key)
+				if err != nil {
+					return err
+				}
+				cv.Store(&cert)
+				logger.Debug("Loaded TLS certificate")
+				return nil
+			}
+			if err := loadCertificate(); err != nil {
+				return nil, err
+			}
+			debounce := make(chan struct{}, 1)
+			fs.Watch(conf.Certificate, events.HandlerFunc(func(evt events.Event) {
+				if evt.Name() != "fs.write" {
+					return
+				}
+				// We have to debounce this; OpenSSL typically causes a lot of write events.
+				select {
+				case debounce <- struct{}{}:
+					time.AfterFunc(5*time.Second, func() {
+						if err := loadCertificate(); err != nil {
+							logger.WithError(err).Error("Could not reload TLS certificate")
+							return
+						}
+						<-debounce
+					})
+				default:
+				}
+			}))
+			return func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				return cv.Load().(*tls.Certificate), nil
+			}, nil
+		}
+	case "acme":
+		certificateGetter = func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+			opts = append(opts, WithNextProtos(acme.ALPNProto))
+			return func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				if hello.ServerName == "" {
+					hello.ServerName = conf.ACME.DefaultHost
+				}
+				return c.acme.GetCertificate(hello)
+			}, nil
+		}
+	case "key-vault":
+		certificateGetter = func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+			if conf.KeyVault.ID == "" {
+				return nil, errTLSKeyVaultID
+			}
+			return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+				return c.KeyVault.ExportCertificate(ctx, conf.KeyVault.ID)
+			}, nil
+		}
+	}
+	if certificateGetter == nil {
 		return nil, errEmptyTLSConfig
 	}
-	res.MinVersion = tls.VersionTLS12
-	res.PreferServerCipherSuites = true
+	fn, err := certificateGetter()
+	if err != nil {
+		return nil, err
+	}
+	res := &tls.Config{
+		GetCertificate:           fn,
+		MinVersion:               tls.VersionTLS12,
+		PreferServerCipherSuites: true,
+	}
 	for _, opt := range opts {
 		opt.apply(res)
 	}
