@@ -4,10 +4,8 @@
     <div class="card has-radius is-fullwidth">
       <div class="card-content">
         <h3 class="title is-size-5 is-uppercase"><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
-        <div class="content">
-          <p class="has-text-grey">
-            {{ .Summary | plainify }}
-          </p>
+        <div class="content has-text-grey">
+          {{ .Summary }}
         </div>
         <div class="buttons">
           <a href="{{ .Permalink }}" class="button is-primary is-outlined">Read</a>
