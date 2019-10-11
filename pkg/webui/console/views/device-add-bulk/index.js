@@ -24,6 +24,8 @@ import BulkDeviceCreator from '../../containers/device-bulk-creator'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
+import style from './device-add-bulk.styl'
+
 @connect(state => ({
   appId: selectSelectedApplicationId(state),
 }))
@@ -32,8 +34,8 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/add/bulk`}
-      icon="add"
-      content={sharedMessages.bulkCreation}
+      icon="bulk_creation"
+      content={sharedMessages.bulk}
     />
   )
 })
@@ -44,7 +46,11 @@ export default class DeviceAddBulk extends Component {
         <Row>
           <Col>
             <IntlHelmet title={sharedMessages.addDeviceBulk} />
-            <Message component="h2" content={sharedMessages.addDeviceBulk} />
+            <Message
+              className={style.title}
+              component="h2"
+              content={sharedMessages.addDeviceBulk}
+            />
           </Col>
         </Row>
         <Row>
