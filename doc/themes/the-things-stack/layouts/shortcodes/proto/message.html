@@ -1,0 +1,51 @@
+{{ $package := or (.Get "package") "ttn.lorawan.v3" }}{{ $message := .Get "message" }}
+{{- with index .Site.Data "api" $package "messages" $message -}}
+<h2 id="message:{{ .name }}">Message <code>{{ .name }}</code></h2>
+{{- with .comment }}
+<p>{{ . | markdownify }}</p>
+{{- end }}
+
+<dl>
+{{- range .fields }}
+  <dt>
+    <code>{{ .name }}</code>
+    (
+    {{- if and .map_key .map_value -}}
+    map of {{ partial "proto/field-type" .map_key }} to {{ partial "proto/field-type" .map_value }}
+    {{- else if .repeated -}}
+    repeated {{ partial "proto/field-type" .repeated }}
+    {{- else -}}
+    {{- partial "proto/field-type" . -}}
+    {{- end -}}
+    )
+  </dt>
+  <dd>
+    {{- range $rule, $value := .rules }}
+      <p><code>{{ $rule }}</code>{{ if not (eq $value true)}}: <code>{{ $value }}</code>{{ end }}</p>
+    {{- end }}
+    {{- if .repeated }}
+    {{- range $rule, $value := .repeated.rules }}
+      <p><code>{{ $rule }}</code>{{ if not (eq $value true)}}: <code>{{ $value }}</code>{{ end }}</p>
+    {{- end }}{{ end }}
+    {{- with .comment }}
+      <p>{{ . | markdownify }}</p>
+    {{- end }}
+  </dd>
+{{- end }}
+</dl>
+
+{{- range .oneofs }}
+  <p><code>{{ .name }}</code>: only one of {{ range $i, $name := .field_names }}{{ if gt $i 0 }}, {{ end }}<code>{{ $name }}</code>{{ end}} can be set.</p>
+{{- end }}
+
+<details><summary>Show object example</summary>
+<pre><code>{
+{{- range .fields }}
+  "{{ .name }}": {{ .default | jsonify }},
+{{- end }}
+}</code></pre>
+</details>
+
+{{- else -}}
+{{ errorf "message %s of package %s not found: %s" $message $package .Position }}
+{{- end }}

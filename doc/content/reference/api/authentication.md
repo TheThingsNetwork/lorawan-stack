@@ -1,7 +1,7 @@
 ---
 title: "Authentication"
 description: ""
-weight: 1
+weight: -1
 ---
 
 API calls can be authorized either by providing an **API key** or an **OAuth access token**.

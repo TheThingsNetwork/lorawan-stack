@@ -1,0 +1,944 @@
+ADRAckDelayExponent:
+  name: ADRAckDelayExponent
+  values:
+  - name: ADR_ACK_DELAY_1
+    value: 0
+  - name: ADR_ACK_DELAY_2
+    value: 1
+  - name: ADR_ACK_DELAY_4
+    value: 2
+  - name: ADR_ACK_DELAY_8
+    value: 3
+  - name: ADR_ACK_DELAY_16
+    value: 4
+  - name: ADR_ACK_DELAY_32
+    value: 5
+  - name: ADR_ACK_DELAY_64
+    value: 6
+  - name: ADR_ACK_DELAY_128
+    value: 7
+  - name: ADR_ACK_DELAY_256
+    value: 8
+  - name: ADR_ACK_DELAY_512
+    value: 9
+  - name: ADR_ACK_DELAY_1024
+    value: 10
+  - name: ADR_ACK_DELAY_2048
+    value: 11
+  - name: ADR_ACK_DELAY_4096
+    value: 12
+  - name: ADR_ACK_DELAY_8192
+    value: 13
+  - name: ADR_ACK_DELAY_16384
+    value: 14
+  - name: ADR_ACK_DELAY_32768
+    value: 15
+ADRAckLimitExponent:
+  name: ADRAckLimitExponent
+  values:
+  - name: ADR_ACK_LIMIT_1
+    value: 0
+  - name: ADR_ACK_LIMIT_2
+    value: 1
+  - name: ADR_ACK_LIMIT_4
+    value: 2
+  - name: ADR_ACK_LIMIT_8
+    value: 3
+  - name: ADR_ACK_LIMIT_16
+    value: 4
+  - name: ADR_ACK_LIMIT_32
+    value: 5
+  - name: ADR_ACK_LIMIT_64
+    value: 6
+  - name: ADR_ACK_LIMIT_128
+    value: 7
+  - name: ADR_ACK_LIMIT_256
+    value: 8
+  - name: ADR_ACK_LIMIT_512
+    value: 9
+  - name: ADR_ACK_LIMIT_1024
+    value: 10
+  - name: ADR_ACK_LIMIT_2048
+    value: 11
+  - name: ADR_ACK_LIMIT_4096
+    value: 12
+  - name: ADR_ACK_LIMIT_8192
+    value: 13
+  - name: ADR_ACK_LIMIT_16384
+    value: 14
+  - name: ADR_ACK_LIMIT_32768
+    value: 15
+AggregatedDutyCycle:
+  name: AggregatedDutyCycle
+  values:
+  - name: DUTY_CYCLE_1
+    value: 0
+  - name: DUTY_CYCLE_2
+    value: 1
+  - name: DUTY_CYCLE_4
+    value: 2
+  - name: DUTY_CYCLE_8
+    value: 3
+  - name: DUTY_CYCLE_16
+    value: 4
+  - name: DUTY_CYCLE_32
+    value: 5
+  - name: DUTY_CYCLE_64
+    value: 6
+  - name: DUTY_CYCLE_128
+    value: 7
+  - name: DUTY_CYCLE_256
+    value: 8
+  - name: DUTY_CYCLE_512
+    value: 9
+  - name: DUTY_CYCLE_1024
+    value: 10
+  - name: DUTY_CYCLE_2048
+    value: 11
+  - name: DUTY_CYCLE_4096
+    value: 12
+  - name: DUTY_CYCLE_8192
+    value: 13
+  - name: DUTY_CYCLE_16384
+    value: 14
+  - name: DUTY_CYCLE_32768
+    value: 15
+ApplicationPubSub.MQTTProvider.QoS:
+  name: ApplicationPubSub.MQTTProvider.QoS
+  values:
+  - name: AT_MOST_ONCE
+    value: 0
+  - name: AT_LEAST_ONCE
+    value: 1
+  - name: EXACTLY_ONCE
+    value: 2
+CFListType:
+  name: CFListType
+  values:
+  - name: FREQUENCIES
+    value: 0
+  - name: CHANNEL_MASKS
+    value: 1
+Class:
+  name: Class
+  values:
+  - name: CLASS_A
+    value: 0
+  - name: CLASS_B
+    value: 1
+  - name: CLASS_C
+    value: 2
+ClusterRole:
+  name: ClusterRole
+  values:
+  - name: NONE
+    value: 0
+  - name: ENTITY_REGISTRY
+    value: 1
+  - name: ACCESS
+    value: 2
+  - name: GATEWAY_SERVER
+    value: 3
+  - name: NETWORK_SERVER
+    value: 4
+  - name: APPLICATION_SERVER
+    value: 5
+  - name: JOIN_SERVER
+    value: 6
+  - name: CRYPTO_SERVER
+    value: 7
+  - name: DEVICE_TEMPLATE_CONVERTER
+    value: 8
+  - name: DEVICE_CLAIMING_SERVER
+    value: 9
+  - name: GATEWAY_CONFIGURATION_SERVER
+    value: 10
+  - name: QR_CODE_GENERATOR
+    value: 11
+ContactMethod:
+  name: ContactMethod
+  values:
+  - name: CONTACT_METHOD_OTHER
+    value: 0
+  - name: CONTACT_METHOD_EMAIL
+    value: 1
+  - name: CONTACT_METHOD_PHONE
+    value: 2
+ContactType:
+  name: ContactType
+  values:
+  - name: CONTACT_TYPE_OTHER
+    value: 0
+  - name: CONTACT_TYPE_ABUSE
+    value: 1
+  - name: CONTACT_TYPE_BILLING
+    value: 2
+  - name: CONTACT_TYPE_TECHNICAL
+    value: 3
+DataRateIndex:
+  name: DataRateIndex
+  values:
+  - name: DATA_RATE_0
+    value: 0
+  - name: DATA_RATE_1
+    value: 1
+  - name: DATA_RATE_2
+    value: 2
+  - name: DATA_RATE_3
+    value: 3
+  - name: DATA_RATE_4
+    value: 4
+  - name: DATA_RATE_5
+    value: 5
+  - name: DATA_RATE_6
+    value: 6
+  - name: DATA_RATE_7
+    value: 7
+  - name: DATA_RATE_8
+    value: 8
+  - name: DATA_RATE_9
+    value: 9
+  - name: DATA_RATE_10
+    value: 10
+  - name: DATA_RATE_11
+    value: 11
+  - name: DATA_RATE_12
+    value: 12
+  - name: DATA_RATE_13
+    value: 13
+  - name: DATA_RATE_14
+    value: 14
+  - name: DATA_RATE_15
+    value: 15
+DeviceEIRP:
+  name: DeviceEIRP
+  values:
+  - name: DEVICE_EIRP_8
+    value: 0
+  - name: DEVICE_EIRP_10
+    value: 1
+  - name: DEVICE_EIRP_12
+    value: 2
+  - name: DEVICE_EIRP_13
+    value: 3
+  - name: DEVICE_EIRP_14
+    value: 4
+  - name: DEVICE_EIRP_16
+    value: 5
+  - name: DEVICE_EIRP_18
+    value: 6
+  - name: DEVICE_EIRP_20
+    value: 7
+  - name: DEVICE_EIRP_21
+    value: 8
+  - name: DEVICE_EIRP_24
+    value: 9
+  - name: DEVICE_EIRP_26
+    value: 10
+  - name: DEVICE_EIRP_27
+    value: 11
+  - name: DEVICE_EIRP_29
+    value: 12
+  - name: DEVICE_EIRP_30
+    value: 13
+  - name: DEVICE_EIRP_33
+    value: 14
+  - name: DEVICE_EIRP_36
+    value: 15
+DownlinkPathConstraint:
+  name: DownlinkPathConstraint
+  values:
+  - name: DOWNLINK_PATH_CONSTRAINT_NONE
+    comment: |2
+       Indicates that the gateway can be selected for downlink without constraints by the Network Server.
+    value: 0
+  - name: DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER
+    comment: |2
+       Indicates that the gateway can be selected for downlink only if no other or better gateway can be selected.
+    value: 1
+  - name: DOWNLINK_PATH_CONSTRAINT_NEVER
+    comment: |2
+       Indicates that this gateway will never be selected for downlink, even if that results in no available downlink path.
+    value: 2
+GrantType:
+  name: GrantType
+  comment: |2
+     The OAuth2 flows an OAuth client can use to get an access token.
+  values:
+  - name: GRANT_AUTHORIZATION_CODE
+    comment: |2
+       Grant type used to exchange an authorization code for an access token.
+    value: 0
+  - name: GRANT_PASSWORD
+    comment: |2
+       Grant type used to exchange a user ID and password for an access token.
+    value: 1
+  - name: GRANT_REFRESH_TOKEN
+    comment: |2
+       Grant type used to exchange a refresh token for an access token.
+    value: 2
+LocationSource:
+  name: LocationSource
+  values:
+  - name: SOURCE_UNKNOWN
+    comment: |2
+       The source of the location is not known or not set.
+    value: 0
+  - name: SOURCE_GPS
+    comment: |2
+       The location is determined by GPS.
+    value: 1
+  - name: SOURCE_REGISTRY
+    comment: |2
+       The location is set in and updated from a registry.
+    value: 3
+  - name: SOURCE_IP_GEOLOCATION
+    comment: |2
+       The location is estimated with IP geolocation.
+    value: 4
+  - name: SOURCE_WIFI_RSSI_GEOLOCATION
+    comment: |2
+       The location is estimated with WiFi RSSI geolocation.
+    value: 5
+  - name: SOURCE_BT_RSSI_GEOLOCATION
+    comment: |2
+       The location is estimated with BT/BLE RSSI geolocation.
+    value: 6
+  - name: SOURCE_LORA_RSSI_GEOLOCATION
+    comment: |2
+       The location is estimated with LoRa RSSI geolocation.
+    value: 7
+  - name: SOURCE_LORA_TDOA_GEOLOCATION
+    comment: |2
+       The location is estimated with LoRa TDOA geolocation.
+    value: 8
+  - name: SOURCE_COMBINED_GEOLOCATION
+    comment: |2
+       The location is estimated by a combination of geolocation sources.
+    value: 9
+MACCommandIdentifier:
+  name: MACCommandIdentifier
+  values:
+  - name: CID_RFU_0
+    value: 0
+  - name: CID_RESET
+    value: 1
+  - name: CID_LINK_CHECK
+    value: 2
+  - name: CID_LINK_ADR
+    value: 3
+  - name: CID_DUTY_CYCLE
+    value: 4
+  - name: CID_RX_PARAM_SETUP
+    value: 5
+  - name: CID_DEV_STATUS
+    value: 6
+  - name: CID_NEW_CHANNEL
+    value: 7
+  - name: CID_RX_TIMING_SETUP
+    value: 8
+  - name: CID_TX_PARAM_SETUP
+    value: 9
+  - name: CID_DL_CHANNEL
+    value: 10
+  - name: CID_REKEY
+    value: 11
+  - name: CID_ADR_PARAM_SETUP
+    value: 12
+  - name: CID_DEVICE_TIME
+    value: 13
+  - name: CID_FORCE_REJOIN
+    value: 14
+  - name: CID_REJOIN_PARAM_SETUP
+    value: 15
+  - name: CID_PING_SLOT_INFO
+    value: 16
+  - name: CID_PING_SLOT_CHANNEL
+    value: 17
+  - name: CID_BEACON_TIMING
+    value: 18
+  - name: CID_BEACON_FREQ
+    value: 19
+  - name: CID_DEVICE_MODE
+    value: 32
+MACVersion:
+  name: MACVersion
+  values:
+  - name: MAC_UNKNOWN
+    value: 0
+  - name: MAC_V1_0
+    value: 1
+  - name: MAC_V1_0_1
+    value: 2
+  - name: MAC_V1_0_2
+    value: 3
+  - name: MAC_V1_1
+    value: 4
+  - name: MAC_V1_0_3
+    value: 5
+MType:
+  name: MType
+  values:
+  - name: JOIN_REQUEST
+    value: 0
+  - name: JOIN_ACCEPT
+    value: 1
+  - name: UNCONFIRMED_UP
+    value: 2
+  - name: UNCONFIRMED_DOWN
+    value: 3
+  - name: CONFIRMED_UP
+    value: 4
+  - name: CONFIRMED_DOWN
+    value: 5
+  - name: REJOIN_REQUEST
+    value: 6
+  - name: PROPRIETARY
+    value: 7
+Major:
+  name: Major
+  values:
+  - name: LORAWAN_R1
+    value: 0
+Minor:
+  name: Minor
+  values:
+  - name: MINOR_RFU_0
+    value: 0
+  - name: MINOR_1
+    value: 1
+  - name: MINOR_RFU_2
+    value: 2
+  - name: MINOR_RFU_3
+    value: 3
+  - name: MINOR_RFU_4
+    value: 4
+  - name: MINOR_RFU_5
+    value: 5
+  - name: MINOR_RFU_6
+    value: 6
+  - name: MINOR_RFU_7
+    value: 7
+  - name: MINOR_RFU_8
+    value: 8
+  - name: MINOR_RFU_9
+    value: 9
+  - name: MINOR_RFU_10
+    value: 10
+  - name: MINOR_RFU_11
+    value: 11
+  - name: MINOR_RFU_12
+    value: 12
+  - name: MINOR_RFU_13
+    value: 13
+  - name: MINOR_RFU_14
+    value: 14
+  - name: MINOR_RFU_15
+    value: 15
+PHYVersion:
+  name: PHYVersion
+  values:
+  - name: PHY_UNKNOWN
+    value: 0
+  - name: PHY_V1_0
+    value: 1
+  - name: PHY_V1_0_1
+    value: 2
+  - name: PHY_V1_0_2_REV_A
+    value: 3
+  - name: PHY_V1_0_2_REV_B
+    value: 4
+  - name: PHY_V1_1_REV_A
+    value: 5
+  - name: PHY_V1_1_REV_B
+    value: 6
+  - name: PHY_V1_0_3_REV_A
+    value: 7
+PayloadFormatter:
+  name: PayloadFormatter
+  values:
+  - name: FORMATTER_NONE
+    comment: |2
+       No payload formatter to work with raw payload only.
+    value: 0
+  - name: FORMATTER_REPOSITORY
+    comment: |2
+       Use payload formatter for the end device type from a repository.
+    value: 1
+  - name: FORMATTER_GRPC_SERVICE
+    comment: |2
+       gRPC service payload formatter. The parameter is the host:port of the service.
+    value: 2
+  - name: FORMATTER_JAVASCRIPT
+    comment: |2
+       Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.
+    value: 3
+  - name: FORMATTER_CAYENNELPP
+    comment: |2
+       CayenneLPP payload formatter.
+    value: 4
+PingSlotPeriod:
+  name: PingSlotPeriod
+  values:
+  - name: PING_EVERY_1S
+    value: 0
+  - name: PING_EVERY_2S
+    value: 1
+  - name: PING_EVERY_4S
+    value: 2
+  - name: PING_EVERY_8S
+    value: 3
+  - name: PING_EVERY_16S
+    value: 4
+  - name: PING_EVERY_32S
+    value: 5
+  - name: PING_EVERY_64S
+    value: 6
+  - name: PING_EVERY_128S
+    value: 7
+PowerState:
+  name: PowerState
+  comment: |2
+     Power state of the device.
+  values:
+  - name: POWER_UNKNOWN
+    value: 0
+  - name: POWER_BATTERY
+    value: 1
+  - name: POWER_EXTERNAL
+    value: 2
+RejoinCountExponent:
+  name: RejoinCountExponent
+  values:
+  - name: REJOIN_COUNT_16
+    value: 0
+  - name: REJOIN_COUNT_32
+    value: 1
+  - name: REJOIN_COUNT_64
+    value: 2
+  - name: REJOIN_COUNT_128
+    value: 3
+  - name: REJOIN_COUNT_256
+    value: 4
+  - name: REJOIN_COUNT_512
+    value: 5
+  - name: REJOIN_COUNT_1024
+    value: 6
+  - name: REJOIN_COUNT_2048
+    value: 7
+  - name: REJOIN_COUNT_4096
+    value: 8
+  - name: REJOIN_COUNT_8192
+    value: 9
+  - name: REJOIN_COUNT_16384
+    value: 10
+  - name: REJOIN_COUNT_32768
+    value: 11
+  - name: REJOIN_COUNT_65536
+    value: 12
+  - name: REJOIN_COUNT_131072
+    value: 13
+  - name: REJOIN_COUNT_262144
+    value: 14
+  - name: REJOIN_COUNT_524288
+    value: 15
+RejoinPeriodExponent:
+  name: RejoinPeriodExponent
+  values:
+  - name: REJOIN_PERIOD_0
+    value: 0
+  - name: REJOIN_PERIOD_1
+    value: 1
+  - name: REJOIN_PERIOD_2
+    value: 2
+  - name: REJOIN_PERIOD_3
+    value: 3
+  - name: REJOIN_PERIOD_4
+    value: 4
+  - name: REJOIN_PERIOD_5
+    value: 5
+  - name: REJOIN_PERIOD_6
+    value: 6
+  - name: REJOIN_PERIOD_7
+    value: 7
+RejoinTimeExponent:
+  name: RejoinTimeExponent
+  values:
+  - name: REJOIN_TIME_0
+    value: 0
+  - name: REJOIN_TIME_1
+    value: 1
+  - name: REJOIN_TIME_2
+    value: 2
+  - name: REJOIN_TIME_3
+    value: 3
+  - name: REJOIN_TIME_4
+    value: 4
+  - name: REJOIN_TIME_5
+    value: 5
+  - name: REJOIN_TIME_6
+    value: 6
+  - name: REJOIN_TIME_7
+    value: 7
+  - name: REJOIN_TIME_8
+    value: 8
+  - name: REJOIN_TIME_9
+    value: 9
+  - name: REJOIN_TIME_10
+    value: 10
+  - name: REJOIN_TIME_11
+    value: 11
+  - name: REJOIN_TIME_12
+    value: 12
+  - name: REJOIN_TIME_13
+    value: 13
+  - name: REJOIN_TIME_14
+    value: 14
+  - name: REJOIN_TIME_15
+    value: 15
+RejoinType:
+  name: RejoinType
+  values:
+  - name: CONTEXT
+    value: 0
+  - name: SESSION
+    value: 1
+  - name: KEYS
+    value: 2
+Right:
+  name: Right
+  comment: |2
+     Right is the enum that defines all the different rights to do something in the network.
+  values:
+  - name: right_invalid
+    value: 0
+  - name: RIGHT_USER_INFO
+    comment: |2
+       The right to view user information.
+    value: 1
+  - name: RIGHT_USER_SETTINGS_BASIC
+    comment: |2
+       The right to edit basic user settings.
+    value: 2
+  - name: RIGHT_USER_SETTINGS_API_KEYS
+    comment: |2
+       The right to view and edit user API keys.
+    value: 3
+  - name: RIGHT_USER_DELETE
+    comment: |2
+       The right to delete user account.
+    value: 4
+  - name: RIGHT_USER_AUTHORIZED_CLIENTS
+    comment: |2
+       The right to view and edit authorized OAuth clients of the user.
+    value: 5
+  - name: RIGHT_USER_APPLICATIONS_LIST
+    comment: |2
+       The right to list applications the user is a collaborator of.
+    value: 6
+  - name: RIGHT_USER_APPLICATIONS_CREATE
+    comment: |2
+       The right to create an application under the user account.
+    value: 7
+  - name: RIGHT_USER_GATEWAYS_LIST
+    comment: |2
+       The right to list gateways the user is a collaborator of.
+    value: 8
+  - name: RIGHT_USER_GATEWAYS_CREATE
+    comment: |2
+       The right to create a gateway under the account of the user.
+    value: 9
+  - name: RIGHT_USER_CLIENTS_LIST
+    comment: |2
+       The right to list OAuth clients the user is a collaborator of.
+    value: 10
+  - name: RIGHT_USER_CLIENTS_CREATE
+    comment: |2
+       The right to create an OAuth client under the account of the user.
+    value: 11
+  - name: RIGHT_USER_ORGANIZATIONS_LIST
+    comment: |2
+       The right to list organizations the user is a member of.
+    value: 12
+  - name: RIGHT_USER_ORGANIZATIONS_CREATE
+    comment: |2
+       The right to create an organization under the user account.
+    value: 13
+  - name: RIGHT_USER_ALL
+    comment: |2
+       The pseudo-right for all (current and future) user rights.
+    value: 14
+  - name: RIGHT_APPLICATION_INFO
+    comment: |2
+       The right to view application information.
+    value: 15
+  - name: RIGHT_APPLICATION_SETTINGS_BASIC
+    comment: |2
+       The right to edit basic application settings.
+    value: 16
+  - name: RIGHT_APPLICATION_SETTINGS_API_KEYS
+    comment: |2
+       The right to view and edit application API keys.
+    value: 17
+  - name: RIGHT_APPLICATION_SETTINGS_COLLABORATORS
+    comment: |2
+       The right to view and edit application collaborators.
+    value: 18
+  - name: RIGHT_APPLICATION_SETTINGS_PACKAGES
+    comment: |2
+       The right to view and edit application packages and associations.
+    value: 56
+  - name: RIGHT_APPLICATION_DELETE
+    comment: |2
+       The right to delete application.
+    value: 19
+  - name: RIGHT_APPLICATION_DEVICES_READ
+    comment: |2
+       The right to view devices in application.
+    value: 20
+  - name: RIGHT_APPLICATION_DEVICES_WRITE
+    comment: |2
+       The right to create devices in application.
+    value: 21
+  - name: RIGHT_APPLICATION_DEVICES_READ_KEYS
+    comment: |2
+       The right to view device keys in application.
+       Note that keys may not be stored in a way that supports viewing them.
+    value: 22
+  - name: RIGHT_APPLICATION_DEVICES_WRITE_KEYS
+    comment: |2
+       The right to edit device keys in application.
+    value: 23
+  - name: RIGHT_APPLICATION_TRAFFIC_READ
+    comment: |2
+       The right to read application traffic (uplink and downlink).
+    value: 24
+  - name: RIGHT_APPLICATION_TRAFFIC_UP_WRITE
+    comment: |2
+       The right to write uplink application traffic.
+    value: 25
+  - name: RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE
+    comment: |2
+       The right to write downlink application traffic.
+    value: 26
+  - name: RIGHT_APPLICATION_LINK
+    comment: |2
+       The right to link as Application to a Network Server for traffic exchange,
+       i.e. read uplink and write downlink (API keys only).
+       This right is typically only given to an Application Server.
+       This right implies RIGHT_APPLICATION_INFO.
+    value: 27
+  - name: RIGHT_APPLICATION_ALL
+    comment: |2
+       The pseudo-right for all (current and future) application rights.
+    value: 28
+  - name: RIGHT_CLIENT_ALL
+    comment: |2
+       The pseudo-right for all (current and future) OAuth client rights.
+    value: 29
+  - name: RIGHT_GATEWAY_INFO
+    comment: |2
+       The right to view gateway information.
+    value: 30
+  - name: RIGHT_GATEWAY_SETTINGS_BASIC
+    comment: |2
+       The right to edit basic gateway settings.
+    value: 31
+  - name: RIGHT_GATEWAY_SETTINGS_API_KEYS
+    comment: |2
+       The right to view and edit gateway API keys.
+    value: 32
+  - name: RIGHT_GATEWAY_SETTINGS_COLLABORATORS
+    comment: |2
+       The right to view and edit gateway collaborators.
+    value: 33
+  - name: RIGHT_GATEWAY_DELETE
+    comment: |2
+       The right to delete gateway.
+    value: 34
+  - name: RIGHT_GATEWAY_TRAFFIC_READ
+    comment: |2
+       The right to read gateway traffic.
+    value: 35
+  - name: RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE
+    comment: |2
+       The right to write downlink gateway traffic.
+    value: 36
+  - name: RIGHT_GATEWAY_LINK
+    comment: |2
+       The right to link as Gateway to a Gateway Server for traffic exchange,
+       i.e. write uplink and read downlink (API keys only)
+       This right is typically only given to a gateway.
+       This right implies RIGHT_GATEWAY_INFO.
+    value: 37
+  - name: RIGHT_GATEWAY_STATUS_READ
+    comment: |2
+       The right to view gateway status.
+    value: 38
+  - name: RIGHT_GATEWAY_LOCATION_READ
+    comment: |2
+       The right to view view gateway location.
+    value: 39
+  - name: RIGHT_GATEWAY_ALL
+    comment: |2
+       The pseudo-right for all (current and future) gateway rights.
+    value: 40
+  - name: RIGHT_ORGANIZATION_INFO
+    comment: |2
+       The right to view organization information.
+    value: 41
+  - name: RIGHT_ORGANIZATION_SETTINGS_BASIC
+    comment: |2
+       The right to edit basic organization settings.
+    value: 42
+  - name: RIGHT_ORGANIZATION_SETTINGS_API_KEYS
+    comment: |2
+       The right to view and edit organization API keys.
+    value: 43
+  - name: RIGHT_ORGANIZATION_SETTINGS_MEMBERS
+    comment: |2
+       The right to view and edit organization members.
+    value: 44
+  - name: RIGHT_ORGANIZATION_DELETE
+    comment: |2
+       The right to delete organization.
+    value: 45
+  - name: RIGHT_ORGANIZATION_APPLICATIONS_LIST
+    comment: |2
+       The right to list the applications the organization is a collaborator of.
+    value: 46
+  - name: RIGHT_ORGANIZATION_APPLICATIONS_CREATE
+    comment: |2
+       The right to create an application under the organization.
+    value: 47
+  - name: RIGHT_ORGANIZATION_GATEWAYS_LIST
+    comment: |2
+       The right to list the gateways the organization is a collaborator of.
+    value: 48
+  - name: RIGHT_ORGANIZATION_GATEWAYS_CREATE
+    comment: |2
+       The right to create a gateway under the organization.
+    value: 49
+  - name: RIGHT_ORGANIZATION_CLIENTS_LIST
+    comment: |2
+       The right to list the OAuth clients the organization is a collaborator of.
+    value: 50
+  - name: RIGHT_ORGANIZATION_CLIENTS_CREATE
+    comment: |2
+       The right to create an OAuth client under the organization.
+    value: 51
+  - name: RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR
+    comment: |2
+       The right to add the organization as a collaborator on an existing entity.
+    value: 52
+  - name: RIGHT_ORGANIZATION_ALL
+    comment: |2
+       The pseudo-right for all (current and future) organization rights.
+    value: 53
+  - name: RIGHT_SEND_INVITES
+    comment: |2
+       The right to send invites to new users.
+       Note that this is not prefixed with "USER_"; it is not a right on the user entity.
+    value: 54
+  - name: RIGHT_ALL
+    comment: |2
+       The pseudo-right for all (current and future) possible rights.
+    value: 55
+RxDelay:
+  name: RxDelay
+  values:
+  - name: RX_DELAY_0
+    value: 0
+  - name: RX_DELAY_1
+    value: 1
+  - name: RX_DELAY_2
+    value: 2
+  - name: RX_DELAY_3
+    value: 3
+  - name: RX_DELAY_4
+    value: 4
+  - name: RX_DELAY_5
+    value: 5
+  - name: RX_DELAY_6
+    value: 6
+  - name: RX_DELAY_7
+    value: 7
+  - name: RX_DELAY_8
+    value: 8
+  - name: RX_DELAY_9
+    value: 9
+  - name: RX_DELAY_10
+    value: 10
+  - name: RX_DELAY_11
+    value: 11
+  - name: RX_DELAY_12
+    value: 12
+  - name: RX_DELAY_13
+    value: 13
+  - name: RX_DELAY_14
+    value: 14
+  - name: RX_DELAY_15
+    value: 15
+State:
+  name: State
+  comment: |2
+     State enum defines states that an entity can be in.
+  values:
+  - name: STATE_REQUESTED
+    comment: |2
+       Denotes that the entity has been requested and is pending review by an admin.
+    value: 0
+  - name: STATE_APPROVED
+    comment: |2
+       Denotes that the entity has been reviewed and approved by an admin.
+    value: 1
+  - name: STATE_REJECTED
+    comment: |2
+       Denotes that the entity has been reviewed and rejected by an admin.
+    value: 2
+  - name: STATE_FLAGGED
+    comment: |2
+       Denotes that the entity has been flagged and is pending review by an admin.
+    value: 3
+  - name: STATE_SUSPENDED
+    comment: |2
+       Denotes that the entity has been reviewed and suspended by an admin.
+    value: 4
+TxAcknowledgment.Result:
+  name: TxAcknowledgment.Result
+  values:
+  - name: SUCCESS
+    value: 0
+  - name: UNKNOWN_ERROR
+    value: 1
+  - name: TOO_LATE
+    value: 2
+  - name: TOO_EARLY
+    value: 3
+  - name: COLLISION_PACKET
+    value: 4
+  - name: COLLISION_BEACON
+    value: 5
+  - name: TX_FREQ
+    value: 6
+  - name: TX_POWER
+    value: 7
+  - name: GPS_UNLOCKED
+    value: 8
+TxSchedulePriority:
+  name: TxSchedulePriority
+  values:
+  - name: LOWEST
+    value: 0
+  - name: LOW
+    value: 1
+  - name: BELOW_NORMAL
+    value: 2
+  - name: NORMAL
+    value: 3
+  - name: ABOVE_NORMAL
+    value: 4
+  - name: HIGH
+    value: 5
+  - name: HIGHEST
+    value: 6
