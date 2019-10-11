@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+{{ partial "head.html" . }}
+
+{{- $hasSidebar := false -}}
+{{ if eq .Kind "section" "page" -}}
+  {{ $hasSidebar = and (not (eq .CurrentSection .FirstSection)) -}}
+  {{ if not (eq .CurrentSection.Parent .FirstSection) -}}
+    {{ .Scratch.Set "section" .CurrentSection.Parent -}}
+  {{ end -}}
+{{ end }}
+
+<body>
+
+{{ partial "header.html" . }}
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      {{ if $hasSidebar }}
+      <div class="column is-one-third">
+        {{- block "sidebar" . }}{{- end }}
+      </div>
+      {{ end }}
+      <div class="column{{ if $hasSidebar }} is-two-thirds{{ end }}">
+        {{- block "main" . }}{{- end }}
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+{{ partial "footer.html" . }}
+
+</body>
+
+</html>

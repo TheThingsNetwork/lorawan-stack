@@ -64,7 +64,7 @@ const (
 	docVersionTemplateFilePath = docVersionFilePath + ".tmpl"
 )
 
-var packageJSONFilePaths = []string{"package.json", "sdk/js/package.json"}
+var packageJSONFilePaths = []string{"package.json", "sdk/js/package.json", "doc/themes/the-things-stack/package.json"}
 
 // Files writes the current version to files that contain version info and adds them to the Git index.
 func (Version) Files() error {

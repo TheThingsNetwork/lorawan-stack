@@ -1,0 +1,40 @@
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="{{ relURL "/" }}">
+        <img src="{{ "img/TTS-logo.svg" | relURL }}">
+      </a>
+      {{- $currentPage := . -}}
+      {{- range .Site.Menus.brand }}
+      <a class="navbar-item{{ if $currentPage.IsMenuCurrent "brand" . }} is-active{{ end }}" href="{{ .URL }}">{{ .Pre }}{{ .Name }}</a>
+      {{- end }}
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        {{- $currentPage := . -}}
+        {{- range .Site.Menus.main }}
+        <a class="navbar-item{{ if $currentPage.IsMenuCurrent "main" . }} is-active{{ end }}" href="{{ .URL }}">{{ .Pre }}{{ .Name }}</a>
+        {{- end }}
+      </div>
+      <div class="navbar-end">
+        {{- if .Site.Menus.right }}
+        {{- range .Site.Menus.right }}
+        <a class="navbar-item{{ if $currentPage.IsMenuCurrent "right" . }} is-active{{ end }}" href="{{ .URL }}">{{ .Pre }}{{ .Name }}</a>
+        {{- end }}
+        {{- end }}
+        {{- if .Site.Menus.buttons }}
+        <div class="navbar-item">
+          {{- range .Site.Menus.buttons }}
+          <a class="button is-primary{{ if $currentPage.IsMenuCurrent "buttons" . }} is-active{{ end }}" href="{{ .URL }}">{{ .Pre }}{{ .Name }}</a>
+          {{- end }}
+        </div>
+        {{- end }}
+      </div>
+    </div>
+  </div>
+</nav>

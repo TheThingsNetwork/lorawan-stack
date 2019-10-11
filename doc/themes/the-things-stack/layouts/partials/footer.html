@@ -1,0 +1,34 @@
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-half">
+        <h3 class="title is-6">The Things Stack</h3>
+        {{- $currentPage := . -}}
+        {{- range .Site.Menus.main }}
+        <p><a class="{{ if $currentPage.IsMenuCurrent "main" . }} is-active{{ end }}" href="{{ .URL }}">{{ .Name }}</a></p>
+        {{- end }}
+      </nav>
+      {{- if .Site.Menus.contributing }}
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        {{- $currentPage := . -}}
+        {{- range .Site.Menus.contributing }}
+        <p><a class="{{ if $currentPage.IsMenuCurrent "contributing" . }} is-active{{ end }}" href="{{ .URL }}">{{ .Name }}</a></p>
+        {{- end }}
+      </nav>
+      {{ end -}}
+      {{- if .Site.Menus.about_us }}
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        {{- $currentPage := . -}}
+        {{- range .Site.Menus.about_us }}
+        <p><a class="{{ if $currentPage.IsMenuCurrent "about_us" . }} is-active{{ end }}" href="{{ .URL }}">{{ .Name }}</a></p>
+        {{- end }}
+      </nav>
+      {{ end -}}
+    </div>
+  </div>
+</footer>
+
+{{- $script := resources.Get "js/theme.js" | resources.Minify | resources.Fingerprint }}
+<script src="{{ $script.Permalink }}" integrity="{{ $script.Data.Integrity }}"></script>
