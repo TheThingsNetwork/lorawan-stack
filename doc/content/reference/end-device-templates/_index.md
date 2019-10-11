@@ -1,7 +1,7 @@
 ---
 title: "End Device Templates"
 description: ""
-weight: 1
+weight: 2
 ---
 
 This is the reference for [End Device Templates]({{< ref "/concepts/end-device-templates" >}}).
