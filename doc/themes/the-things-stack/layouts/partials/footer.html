@@ -1,7 +1,7 @@
 <footer class="footer has-background-primary">
   <div class="container">
     <div class="columns">
-      <nav class="column is-half">
+      <nav class="column is-one-quarter">
         <h3 class="title is-6">The Things Stack</h3>
         {{- $currentPage := . -}}
         {{- range .Site.Menus.main }}
@@ -26,6 +26,10 @@
         {{- end }}
       </nav>
       {{ end -}}
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        {{ partial "file-info.html" . }}
+      </div>
     </div>
   </div>
 </footer>
