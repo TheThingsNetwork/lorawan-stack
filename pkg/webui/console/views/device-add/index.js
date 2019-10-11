@@ -25,8 +25,11 @@ import PropTypes from '../../../lib/prop-types'
 import DeviceAddSingle from '../device-add-single'
 import DeviceAddBulk from '../device-add-bulk'
 
+@connect(state => ({
+  appId: selectSelectedApplicationId(state),
+}))
 @withBreadcrumb('devices.add', function(props) {
-  const { appId } = props.match.params
+  const { appId } = props
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/add`}
