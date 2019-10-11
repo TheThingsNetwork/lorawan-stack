@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.2.1] - 2019-10-11
+
+### Added
+
 - `support-link` URI config to the Console to show a "Get Support" button.
 - Option to explicitly enable TLS for linking of an Application Server on an external Network Server.
 - Service to list QR code formats and generate QR codes in PNG format.
@@ -25,17 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enable the V2 MQTT gateway listener by default on ports 1881/8881.
 - Improve handling of API-Key and Collaborator rights in the console.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Fix bug with logout sometimes not working in the console.
 - Fix not respecting `RootCA` and `InsecureSkipVerify` TLS settings when ACME was configured for requesting TLS certificates.
 - Fix reading configuration from current, home and XDG directories.
-
-### Security
 
 ## [3.2.0] - 2019-09-30
 
