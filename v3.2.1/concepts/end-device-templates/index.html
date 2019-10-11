@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>End Device Templates - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.58.1" />
+<link href="https://thethingsstack.io/v3.2.1index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.2.1/concepts/end-device-templates/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.1/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.1/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.1/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.1/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.2.1</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.2.1/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.2.1/guides/">Guides</a></li>
+<li><a href="/v3.2.1/concepts/">Concepts</a></li>
+<li><a href="/v3.2.1/components/">Components</a></li>
+<li><a href="/v3.2.1/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>End Device Templates</h1>
+
+<h2 id="what-is-it">What is it?</h2>
+
+<p>End device templates define a device that is not created (yet). It can be used to create a device or many devices at once. Templates allows for using common values for many devices, such as a device profile.</p>
+
+<h2 id="who-is-it-for">Who is it for?</h2>
+
+<p>End device templates are primarily targeted at device makers and service providers who are managing and onboarding large amounts of devices.</p>
+
+<h3 id="typical-use-cases">Typical use cases</h3>
+
+<ol>
+<li>Create a batch of end devices with the same profile and incrementing <code>DevEUI</code> from a range</li>
+<li>Convert vendor-specific end device data, such as serial numbers and provisioning data, to a device template</li>
+<li>Migrate end devices from a different LoRaWAN server stack</li>
+</ol>
+
+<h2 id="how-does-it-work">How does it work?</h2>
+
+<p>End device templates can be used to quickly create large amounts of end devices with common settings. Templates can be created from existing devices or converted from an input file. By executing templates, you can create devices directly. See <a href="https://thethingsstack.io/v3.2.1/reference/end-device-templates/creating/">Creating Templates</a>, <a href="https://thethingsstack.io/v3.2.1/reference/end-device-templates/converting/">Converting Templates</a> and <a href="https://thethingsstack.io/v3.2.1/reference/end-device-templates/executing/">Executing Templates</a>.</p>
+
+<p>Templates can also be be mapped with other templates to combine fields. For example, you can convert root key provisioning data to device templates and map that with a template containing the device profile from a device repository. See <a href="https://thethingsstack.io/v3.2.1/reference/end-device-templates/mapping/">Mapping Templates</a>.</p>
+
+<p>Tooling supports assigning the LoRaWAN <code>JoinEUI</code> and <code>DevEUI</code> from a range automatically to create a template file that can be used in mapping or executing templates to bulk create devices. See <a href="https://thethingsstack.io/v3.2.1/reference/end-device-templates/assigning-euis/">Assigning EUIs</a>.</p>
+<div class="edit-meta">
+Last updated on 18 Jul 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/concepts/end-device-templates.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.2.1/concepts/" title="Concepts"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - Concepts</a>
+<a class="nav nav-next" href="/v3.2.1/concepts/email-templates/" title="Email Templates">Next - Email Templates <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.2.1">Home</a></li>
+
+<li class=""><a href="/v3.2.1/guides/">Guides</a>
+<ul class="">
+
+<li class=""><a href="/v3.2.1/guides/getting-started/">Getting Started</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/v3.2.1/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.2.1/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.2.1/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class="parent"><a href="/v3.2.1/concepts/">Concepts</a>
+<ul class="sub-menu">
+<li class="active"><a href="/v3.2.1/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.2.1/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/components/">Components</a>
+</li>
+
+<li class=""><a href="/v3.2.1/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/v3.2.1/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

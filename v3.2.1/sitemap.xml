@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/end-device-templates/</loc>
+    <lastmod>2019-07-18T14:28:52+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/installation/</loc>
+    <lastmod>2019-08-26T13:32:36+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/</loc>
+    <lastmod>2019-08-07T12:38:27+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/certificates/</loc>
+    <lastmod>2019-08-26T13:42:48+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/end-device-templates/creating/</loc>
+    <lastmod>2019-07-18T14:28:52+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/email-templates/</loc>
+    <lastmod>2019-08-15T14:53:06+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/</loc>
+    <lastmod>2019-07-23T12:59:42+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/email-templates/available/</loc>
+    <lastmod>2019-08-15T14:53:06+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/concepts/</loc>
+    <lastmod>2019-07-18T14:28:52+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/configuration/</loc>
+    <lastmod>2019-08-26T09:35:30+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/end-device-templates/converting/</loc>
+    <lastmod>2019-08-07T12:38:27+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/components/</loc>
+    <lastmod>2019-08-07T12:38:27+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/end-device-templates/executing/</loc>
+    <lastmod>2019-08-26T09:35:30+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/running-the-stack/</loc>
+    <lastmod>2019-08-26T09:35:30+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/end-device-templates/mapping/</loc>
+    <lastmod>2019-08-07T12:38:27+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/end-device-templates/assigning-euis/</loc>
+    <lastmod>2019-08-07T12:38:27+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/email-templates/overriding/</loc>
+    <lastmod>2019-09-04T22:53:01+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/reference/</loc>
+    <lastmod>2019-07-23T15:18:34+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/console/</loc>
+    <lastmod>2019-08-26T09:35:30+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/cli/</loc>
+    <lastmod>2019-08-07T12:38:27+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/concepts/end-device-templates/</loc>
+    <lastmod>2019-07-18T14:28:52+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/</loc>
+    <lastmod>2019-08-23T14:06:12+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/concepts/email-templates/</loc>
+    <lastmod>2019-08-15T14:53:06+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/mqtt/</loc>
+    <lastmod>2019-08-26T09:35:30+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/events/</loc>
+    <lastmod>2019-08-26T09:35:30+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/getting-started/webhooks/</loc>
+    <lastmod>2019-08-26T09:35:30+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/downlink-queue-ops/</loc>
+    <lastmod>2019-08-07T12:38:27+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/guides/class-c-multicast/</loc>
+    <lastmod>2019-08-07T12:38:27+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>https://thethingsstack.io/v3.2.1/tags/</loc>
+  </url>
+  
+</urlset>

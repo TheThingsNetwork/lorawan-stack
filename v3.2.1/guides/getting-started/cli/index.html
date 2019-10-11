@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Command-line Interface - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.58.1" />
+<link href="https://thethingsstack.io/v3.2.1index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.2.1/guides/getting-started/cli/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.1/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.1/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.1/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.1/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.2.1</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.2.1/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.2.1/guides/">Guides</a></li>
+<li><a href="/v3.2.1/concepts/">Concepts</a></li>
+<li><a href="/v3.2.1/components/">Components</a></li>
+<li><a href="/v3.2.1/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Command-line Interface</h1>
+
+<h2 id="login">Login</h2>
+
+<p>The CLI needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running in one terminal session, login with the following command:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli login
+</code></pre>
+
+<p>This will open the OAuth login page where you can login with your credentials. Once you logged in in the browser, return to the terminal session to proceed.</p>
+
+<p>If you run this command on a remote machine, pass <code>--callback=false</code> to get a link to login on your local machine.</p>
+
+<h2 id="create-gateway">Create gateway</h2>
+
+<p>First, list the available frequency plans:</p>
+
+<pre><code>$ ttn-lw-cli gateways list-frequency-plans
+</code></pre>
+
+<p>Then, create the first gateway with the chosen frequency plan:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli gateways create gtw1 \
+  --user-id admin \
+  --frequency-plan-id EU_863_870 \
+  --gateway-eui 00800000A00009EF \
+  --enforce-duty-cycle
+</code></pre>
+
+<p>This creates a gateway <code>gtw1</code> with user <code>admin</code> as collaborator, frequency plan <code>EU_863_870</code>, EUI <code>00800000A00009EF</code> and respecting duty-cycle limitations. You can now connect your gateway to The Things Stack.</p>
+
+<blockquote>
+<p>Note: The CLI returns the created and updated entities by default in JSON. This can be useful in scripts.</p>
+</blockquote>
+
+<h2 id="create-application">Create application</h2>
+
+<p>Create the first application:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli applications create app1 --user-id admin
+</code></pre>
+
+<p>This creates an application <code>app1</code> with the <code>admin</code> user as collaborator.</p>
+
+<p>Devices are created within applications.</p>
+
+<h3 id="link-application">Link application</h3>
+
+<p>In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli applications api-keys create \
+  --name link \
+  --application-id app1 \
+  --right-application-link
+</code></pre>
+
+<p>The CLI will return an API key such as <code>NNSXS.VEEBURF3KR77ZR...</code>. This API key has only link rights and can therefore only be used for linking.</p>
+
+<p>You can now link the Application Server to the Network Server:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli applications link set app1 --api-key NNSXS.VEEBURF3KR77ZR..
+</code></pre>
+
+<p>Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.</p>
+
+<h2 id="create-end-device">Create end device</h2>
+
+<p>First, list the available frequency plans and LoRaWAN versions:</p>
+
+<pre><code>$ ttn-lw-cli end-devices list-frequency-plans
+$ ttn-lw-cli end-devices create --help
+</code></pre>
+
+<h3 id="over-the-air-activation-otaa-device">Over-the-air-activation (OTAA) device</h3>
+
+<p>To create an end device using over-the-air-activation (OTAA):</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli end-devices create app1 dev1 \
+  --dev-eui 0004A30B001C0530 \
+  --app-eui 800000000000000C \
+  --frequency-plan-id EU_863_870 \
+  --root-keys.app-key.key 752BAEC23EAE7964AF27C325F4C23C9A \
+  --lorawan-version 1.0.3 \
+  --lorawan-phy-version 1.0.3-a
+</code></pre>
+
+<p>This will create a LoRaWAN 1.0.3 end device <code>dev1</code> in application <code>app1</code> with the <code>EU_863_870</code> frequency plan.</p>
+
+<p>The end device should now be able to join the private network.</p>
+
+<blockquote>
+<p>Note: The <code>AppEUI</code> is returned as <code>join_eui</code> (V3 uses LoRaWAN 1.1 terminology).</p>
+
+<p>Hint: You can also pass <code>--with-root-keys</code> to have root keys generated.</p>
+</blockquote>
+
+<h3 id="activation-by-personalization-abp-device">Activation by personalization (ABP device)</h3>
+
+<p>It is also possible to register an ABP activated device using the <code>--abp</code> flag as follows:</p>
+
+<pre><code class="language-bash">$ ttn-lw-cli end-devices create app1 dev2 \
+  --frequency-plan-id EU_863_870 \
+  --lorawan-version 1.0.3 \
+  --lorawan-phy-version 1.0.3-a \
+  --abp \
+  --session.dev-addr 00E4304D \
+  --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA \
+  --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255
+</code></pre>
+
+<blockquote>
+<p>Note: The <code>NwkSKey</code> is returned as <code>f_nwk_s_int_key</code> (The Things Stack uses LoRaWAN 1.1 terminology).</p>
+
+<p>Hint: You can also pass <code>--with-session</code> to have a session generated.</p>
+</blockquote>
+
+<h2 id="working-with-data">Working with data</h2>
+
+<p>With your The Things Stack setup, a gateway connected and a device registered on your network, it&rsquo;s time to start working with data.</p>
+
+<p>Learn how to work with the <a href="/v3.2.1/guides/getting-started/mqtt/">builtin MQTT server</a> and <a href="/v3.2.1/guides/getting-started/webhooks/">HTTP webhooks</a>.</p>
+<div class="edit-meta">
+Last updated on 7 Aug 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/cli/_index.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.2.1/guides/getting-started/console/" title="Console"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - Console</a>
+<a class="nav nav-next" href="/v3.2.1/guides/getting-started/mqtt/" title="MQTT Server">Next - MQTT Server <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.2.1">Home</a></li>
+
+<li class="parent"><a href="/v3.2.1/guides/">Guides</a>
+<ul class="sub-menu">
+
+<li class="parent"><a href="/v3.2.1/guides/getting-started/">Getting Started</a>
+<ul class="sub-menu">
+<li class=""><a href="/v3.2.1/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/v3.2.1/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.2.1/guides/getting-started/configuration/">Configuration</a></li>
+<li class=""><a href="/v3.2.1/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/console/">Console</a>
+</li>
+
+<li class="parent active"><a href="/v3.2.1/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.2.1/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/components/">Components</a>
+</li>
+
+<li class=""><a href="/v3.2.1/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/v3.2.1/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

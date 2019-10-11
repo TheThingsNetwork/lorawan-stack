@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Running The Things Stack - The Things Stack for LoRaWAN Documentation</title>
+<meta name="description" content="Documentation for The Things Stack for LoRaWAN">
+<meta name="generator" content="Hugo 0.58.1" />
+<link href="https://thethingsstack.io/v3.2.1index.xml" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://thethingsstack.io/v3.2.1/guides/getting-started/running-the-stack/">
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.1/css/theme.min.css">
+<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<link rel="stylesheet" href="https://thethingsstack.io/v3.2.1/css/chroma.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.1/js/functions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+<script src="https://thethingsstack.io/v3.2.1/js/jquery.backtothetop/jquery.backtothetop.min.js"></script></head>
+<body>
+<div class="container"><header>
+<h1>The Things Stack for LoRaWAN Documentation</h1>
+
+ <span class="version">Version v3.2.1</span>
+<a href="https://github.com/TheThingsNetwork/lorawan-stack" class="github"><i class="fab fa-github"></i></a>
+<p class="description">Documentation for The Things Stack for LoRaWAN</p>
+
+</header>
+<div class="menu">
+<nav>
+<ul>
+<li><a href="/v3.2.1/guides/getting-started/">Getting Started</a></li>
+<li><a href="/v3.2.1/guides/">Guides</a></li>
+<li><a href="/v3.2.1/concepts/">Concepts</a></li>
+<li><a href="/v3.2.1/components/">Components</a></li>
+<li><a href="/v3.2.1/reference/">Reference</a></li></ul>
+</nav>
+</div>
+<div class="content-container">
+<main><h1>Running The Things Stack</h1>
+
+<p>Now that all configuration is done, we&rsquo;re ready to initialize The Things Stack and start it. Open a terminal prompt in the same directory as your <code>docker-compose.yml</code> file.</p>
+
+<h2 id="initialization">Initialization</h2>
+
+<p>The first time The Things Stack is started, it requires some initialization. We&rsquo;ll start by pulling the Docker images:</p>
+
+<pre><code class="language-bash">$ docker-compose pull
+</code></pre>
+
+<p>Next, we need to initialize the database of the Identity Server:</p>
+
+<pre><code class="language-bash">$ docker-compose run --rm stack is-db init
+</code></pre>
+
+<p>We&rsquo;ll now create an initial <code>admin</code> user. Make sure to give it a good password.</p>
+
+<pre><code class="language-bash">$ docker-compose run --rm stack is-db create-admin-user \
+  --id admin \
+  --email your@email.com
+</code></pre>
+
+<p>Then we&rsquo;ll register the command-line interface as an OAuth client:</p>
+
+<pre><code class="language-bash">$ docker-compose run --rm stack is-db create-oauth-client \
+  --id cli \
+  --name &quot;Command Line Interface&quot; \
+  --owner admin \
+  --no-secret \
+  --redirect-uri 'local-callback' \
+  --redirect-uri 'code'
+</code></pre>
+
+<p>We do the same for the console. For <code>--secret</code>, make sure to enter the same value as you set for <code>TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET</code> in the <a href="/v3.2.1/guides/getting-started/configuration/">Configuration</a> step.</p>
+
+<pre><code class="language-bash">$ docker-compose run --rm stack is-db create-oauth-client \
+  --id console \
+  --name &quot;Console&quot; \
+  --owner admin \
+  --secret the secret you generated before \
+  --redirect-uri 'https://thethings.example.com/console/oauth/callback' \
+  --redirect-uri '/console/oauth/callback'
+</code></pre>
+
+<h2 id="running-the-things-stack">Running The Things Stack</h2>
+
+<p>Now it&rsquo;s time to start The Things Stack:</p>
+
+<pre><code class="language-bash">$ docker-compose up
+</code></pre>
+
+<p>This will start the stack and print logs to your terminal. You can also start the stack in detached mode by adding <code>-d</code> to the command above. In that case you can get logs with <a href="https://docs.docker.com/compose/reference/logs/"><code>docker-compose logs</code></a>.</p>
+
+<p>With The Things Stack up and running, it&rsquo;s time to connect gateways, create devices and work with streaming data. See <a href="/v3.2.1/guides/getting-started/console/">Console</a> or <a href="/v3.2.1/guides/getting-started/cli/">Command-line Interface</a> to proceed.</p>
+<div class="edit-meta">
+Last updated on 26 Aug 2019
+
+
+<br><a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/running-the-stack.md" class="edit-page"><i class="fas fa-pen-square"></i> Edit on GitHub</a></div><nav class="pagination"><a class="nav nav-prev" href="/v3.2.1/guides/getting-started/webhooks/" title="HTTP Webhooks"><i class="fas fa-arrow-left" aria-hidden="true"></i> Prev - HTTP Webhooks</a>
+<a class="nav nav-next" href="/v3.2.1/guides/getting-started/console/" title="Console">Next - Console <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+</nav><footer><p class="powered">Powered by <a href="https://gohugo.io">Hugo</a>. Theme by <a href="https://themes.gohugo.io/hugo-theme-techdoc/">TechDoc</a>. Designed by <a href="https://github.com/thingsym/hugo-theme-techdoc">Thingsym</a>.</p>
+</footer>
+</main><div class="sidebar">
+<nav>
+<ul>
+<li class=""><a href="https://thethingsstack.io/v3.2.1">Home</a></li>
+
+<li class="parent"><a href="/v3.2.1/guides/">Guides</a>
+<ul class="sub-menu">
+
+<li class="parent"><a href="/v3.2.1/guides/getting-started/">Getting Started</a>
+<ul class="sub-menu">
+<li class=""><a href="/v3.2.1/guides/getting-started/installation/">Installation</a></li>
+<li class=""><a href="/v3.2.1/guides/getting-started/certificates/">Certificates</a></li>
+<li class=""><a href="/v3.2.1/guides/getting-started/configuration/">Configuration</a></li>
+<li class="active"><a href="/v3.2.1/guides/getting-started/running-the-stack/">Running The Things Stack</a></li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/console/">Console</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/cli/">Command-line Interface</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/mqtt/">MQTT Server</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/getting-started/webhooks/">HTTP Webhooks</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/guides/events/">Working with Events</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/downlink-queue-ops/">Downlink Queue Operations</a>
+</li>
+
+<li class=""><a href="/v3.2.1/guides/class-c-multicast/">Class C and Multicast</a>
+</li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/concepts/">Concepts</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/concepts/end-device-templates/">End Device Templates</a></li>
+<li class=""><a href="/v3.2.1/concepts/email-templates/">Email Templates</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/components/">Components</a>
+</li>
+
+<li class=""><a href="/v3.2.1/reference/">Reference</a>
+<ul class="">
+
+<li class=""><a href="/v3.2.1/reference/end-device-templates/">End Device Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/reference/end-device-templates/creating/">Creating Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/executing/">Executing Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/mapping/">Mapping Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/end-device-templates/assigning-euis/">Assigning EUIs</a></li>
+</ul>
+  
+</li>
+
+<li class=""><a href="/v3.2.1/reference/email-templates/">Email Templates</a>
+<ul class="">
+<li class=""><a href="/v3.2.1/reference/email-templates/available/">Available Templates</a></li>
+<li class=""><a href="/v3.2.1/reference/email-templates/overriding/">Overriding Templates</a></li>
+</ul>
+  
+</li>
+</ul>
+  
+</li>
+</ul>
+</nav>
+
+
+<div class="sidebar-footer"></div>
+</div>
+</div><a href="#" id="backtothetop-fixed" class="backtothetop"
+ data-backtothetop-duration="600"
+ data-backtothetop-easing="easeOutQuart"
+ data-backtothetop-fixed-fadeIn="1000"
+ data-backtothetop-fixed-fadeOut="1000"
+ data-backtothetop-fixed-bottom="10"
+ data-backtothetop-fixed-right="20">
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

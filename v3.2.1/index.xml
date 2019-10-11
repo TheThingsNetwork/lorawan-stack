@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Overview on The Things Stack for LoRaWAN Documentation</title>
+    <link>https://thethingsstack.io/v3.2.1/</link>
+    <description>Recent content in Overview on The Things Stack for LoRaWAN Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="https://thethingsstack.io/v3.2.1/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Installation</title>
+      <link>https://thethingsstack.io/v3.2.1/guides/getting-started/installation/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/guides/getting-started/installation/</guid>
+      <description>Preparation Since we&amp;rsquo;re going to install The Things Stack using Docker and Docker Compose, follow the guides to install Docker and to install Docker Compose.
+Most releases contain an example docker-compose.yml file. You can also find this file in the Github repository of The Things Stack. In this guide we&amp;rsquo;ll use that example docker-compose.yml for our deployment.
+Command-line Interface (optional) Although the web interface of The Things Stack (the Console) currently has support for all basic features of The Things Stack, for some actions, you need to use the command-line interface (CLI).</description>
+    </item>
+    
+    <item>
+      <title>Certificates</title>
+      <link>https://thethingsstack.io/v3.2.1/guides/getting-started/certificates/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/guides/getting-started/certificates/</guid>
+      <description>Certificates The Things Stack will be configured with Transport Layer Security (TLS) and HTTPS. This requires a TLS certificate and a corresponding key. In this guide we&amp;rsquo;ll request a free, trusted certificate from Let&amp;rsquo;s Encrypt, but if you already have a certificate (cert.pem) and key (key.pem), you can also use those.
+Automatic Certificate Management (ACME) For automatic certificates, we&amp;rsquo;re going to need an acme directory where The Things Stack can store the certificate data:</description>
+    </item>
+    
+    <item>
+      <title>Creating Templates</title>
+      <link>https://thethingsstack.io/v3.2.1/reference/end-device-templates/creating/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/reference/end-device-templates/creating/</guid>
+      <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  You can create a device template from an existing device or extend an existing device template. You can also create a new template from scratch.
+Create from existing device You can use the end-device template create command to create a template from an existing device.
+ Note: By default, end-device template create strips the device&amp;rsquo;s application ID, device ID, JoinEUI, DevEUI and server addresses to create a generic template.</description>
+    </item>
+    
+    <item>
+      <title>Available Templates</title>
+      <link>https://thethingsstack.io/v3.2.1/reference/email-templates/available/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/reference/email-templates/available/</guid>
+      <description>The following email templates are currently used by The Things Stack:
+   Full Name Identifier Scope Additional fields     API Key changed api_key_changed Sent when the rights of an API Key have been changed. Identifiers and Rights   API Key created api_key_created Send when an API Key has been created. Identifiers and Rights   Collaborator changed collaborator_changed Sent when the rights of a collaborator have been changed.</description>
+    </item>
+    
+    <item>
+      <title>Configuration</title>
+      <link>https://thethingsstack.io/v3.2.1/guides/getting-started/configuration/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/guides/getting-started/configuration/</guid>
+      <description>The Things Stack can be started for development without passing any configuration. However, there are a number of things you need to configure for a production deployment. In this guide we&amp;rsquo;ll set environment variables in the docker-compose.yml file to configure The Things Stack as a private deployment on thethings.example.com.
+Databases We need to configure an SQL database, in this guide we&amp;rsquo;ll use a single instance of CockroachDB. Make sure to find a recent tag of the cockroachdb/cockroach image on Docker Hub and update it in the docker-compose.</description>
+    </item>
+    
+    <item>
+      <title>Converting Templates</title>
+      <link>https://thethingsstack.io/v3.2.1/reference/end-device-templates/converting/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/reference/end-device-templates/converting/</guid>
+      <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  You can convert data in various formats to device templates using formats supported by The Things Stack. Input formats can be vendor-specific information about devices or device data to migrate from another LoRaWAN server stack.
+Start with listing the supported formats:
+$ ttn-lw-cli end-device template list-formats  This gives the supported formats.</description>
+    </item>
+    
+    <item>
+      <title>Executing Templates</title>
+      <link>https://thethingsstack.io/v3.2.1/reference/end-device-templates/executing/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/reference/end-device-templates/executing/</guid>
+      <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  Once you created or converted a template, you can execute the template with the end-device templates execute command to obtain an end device that can be created.
+ The examples use a template that has been created as follows:
+$ ttn-lw-cli end-device template extend \ --lorawan-version 1.0.3 \ --lorawan-phy-version 1.0.3-a \ --frequency-plan-id US_902_928 &amp;gt; example.</description>
+    </item>
+    
+    <item>
+      <title>Running The Things Stack</title>
+      <link>https://thethingsstack.io/v3.2.1/guides/getting-started/running-the-stack/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/guides/getting-started/running-the-stack/</guid>
+      <description>Now that all configuration is done, we&amp;rsquo;re ready to initialize The Things Stack and start it. Open a terminal prompt in the same directory as your docker-compose.yml file.
+Initialization The first time The Things Stack is started, it requires some initialization. We&amp;rsquo;ll start by pulling the Docker images:
+$ docker-compose pull  Next, we need to initialize the database of the Identity Server:
+$ docker-compose run --rm stack is-db init  We&amp;rsquo;ll now create an initial admin user.</description>
+    </item>
+    
+    <item>
+      <title>Mapping Templates</title>
+      <link>https://thethingsstack.io/v3.2.1/reference/end-device-templates/mapping/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/reference/end-device-templates/mapping/</guid>
+      <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  You can use the end-device templates map command to map input templates with a mapping file to create new device templates. This allows for combining fields from different device template files.
+The matching from input to a mapping template is, in order, by mapping key (mapping_key), end device identifiers (ids.application_id and ids.</description>
+    </item>
+    
+    <item>
+      <title>Assigning EUIs</title>
+      <link>https://thethingsstack.io/v3.2.1/reference/end-device-templates/assigning-euis/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/reference/end-device-templates/assigning-euis/</guid>
+      <description>Command-line interface only The instructions below use the command-line interface (CLI). Learn how to install the CLI  You can use the end-device template assign-euis command to assign the JoinEUI and DevEUI to device templates. The DevEUI is assigned from the given start number. This personalizes the device templates.
+You can use the command in two different ways:
+ Pipe a number of device templates to assign EUIs to, for example the result of Mapping Templates or Converting Templates Pipe a generic device template, for example the result of Creating Templates, and pass the --count flag to generate a number of personalized device templates  Once the device templates are personalized with EUIs, you can set additional fields (see Creating Templates) or execute templates (see Executing Templates).</description>
+    </item>
+    
+    <item>
+      <title>Overriding Templates</title>
+      <link>https://thethingsstack.io/v3.2.1/reference/email-templates/overriding/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/reference/email-templates/overriding/</guid>
+      <description>Note: We recommend getting familiar with the html/template template format first.
+ Template components An email template override has three components:
+ The subject file, which contains the subject of the email and is named &amp;lt;identifier&amp;gt;.subject.txt. The text contents file, which contains the contents of the email in text format and is named &amp;lt;identifier&amp;gt;.txt. The HTML contents file, which contains the contents of the email in HTML format and is named &amp;lt;identifier&amp;gt;.</description>
+    </item>
+    
+    <item>
+      <title>End Device Templates</title>
+      <link>https://thethingsstack.io/v3.2.1/concepts/end-device-templates/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/concepts/end-device-templates/</guid>
+      <description>What is it? End device templates define a device that is not created (yet). It can be used to create a device or many devices at once. Templates allows for using common values for many devices, such as a device profile.
+Who is it for? End device templates are primarily targeted at device makers and service providers who are managing and onboarding large amounts of devices.
+Typical use cases  Create a batch of end devices with the same profile and incrementing DevEUI from a range Convert vendor-specific end device data, such as serial numbers and provisioning data, to a device template Migrate end devices from a different LoRaWAN server stack  How does it work?</description>
+    </item>
+    
+    <item>
+      <title>Email Templates</title>
+      <link>https://thethingsstack.io/v3.2.1/concepts/email-templates/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://thethingsstack.io/v3.2.1/concepts/email-templates/</guid>
+      <description>What is it? Email templates define the contents of the emails that The Things Stack sends to its users. They allow network operators to override the default contents of the emails with their own custom contents.
+Who is it for? Email templates are targeted at network operators that would like to customize the emails that The Things Stack sends to its users.
+Typical use cases  Adding additional styling to the default text-only emails that The Things Stack sends.</description>
+    </item>
+    
+  </channel>
+</rss>
