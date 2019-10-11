@@ -80,12 +80,25 @@ const deleteOrganizationLogic = createRequestLogic({
   },
 })
 
+const getOrganizationApiKeysLogic = createRequestLogic({
+  type: organizations.GET_ORG_API_KEYS_LIST,
+  async process({ getState, action }) {
+    const {
+      id: orgId,
+      params: { page, limit },
+    } = action.payload
+    const res = await api.organization.apiKeys.list(orgId, { limit, page })
+    return { ...res, id: orgId }
+  },
+})
+
 export default [
   getOrganizationLogic,
   getOrganizationsLogic,
   createOrganizationLogic,
   updateOrganizationLogic,
   deleteOrganizationLogic,
+  getOrganizationApiKeysLogic,
   ...createEventsConnectLogics(
     organizations.SHARED_NAME,
     'organizations',
