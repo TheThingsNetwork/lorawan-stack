@@ -94,7 +94,7 @@ func TestUplinkPacket(t *testing.T) {
 	a.So(uplink.RFCh, should.Equal, 0)
 	a.So(uplink.Stat, should.Equal, 1)
 	a.So(uplink.Modu, should.Equal, "LORA")
-	a.So(uplink.DatR, should.Resemble, datarate.DataRate{DataRate: ttnpb.DataRate{
+	a.So(uplink.DatR, should.Resemble, datarate.DR{DataRate: ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_LoRa{
 			LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
@@ -137,7 +137,7 @@ func TestDownlinkPacket(t *testing.T) {
 	a.So(tx.RFCh, should.Equal, 0)
 	a.So(tx.Powe, should.Equal, 14)
 	a.So(tx.Modu, should.Equal, "LORA")
-	a.So(tx.DatR, should.Resemble, datarate.DataRate{DataRate: ttnpb.DataRate{
+	a.So(tx.DatR, should.Resemble, datarate.DR{DataRate: ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_LoRa{
 			LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 11,

@@ -99,7 +99,7 @@ func TestToGatewayUp(t *testing.T) {
 					Freq: 868.0,
 					Chan: 2,
 					Modu: "LORA",
-					DatR: datarate.DataRate{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
+					DatR: datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
 					CodR: "4/7",
 					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 					Size: 19,
@@ -146,7 +146,7 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 						Freq: 868.0,
 						Chan: 2,
 						Modu: "LORA",
-						DatR: datarate.DataRate{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
+						DatR: datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
 						CodR: "4/7",
 						Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 						Size: 19,
@@ -348,7 +348,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	}
 	tx, err := udp.FromDownlinkMessage(msg)
 	a.So(err, should.BeNil)
-	a.So(tx.DatR, should.Resemble, datarate.DataRate{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{Bandwidth: 500000, SpreadingFactor: 10}}}})
+	a.So(tx.DatR, should.Resemble, datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{Bandwidth: 500000, SpreadingFactor: 10}}}})
 	a.So(tx.Tmst, should.Equal, 1886440700)
 	a.So(tx.NCRC, should.Equal, true)
 	a.So(tx.Data, should.Equal, "ffOO")

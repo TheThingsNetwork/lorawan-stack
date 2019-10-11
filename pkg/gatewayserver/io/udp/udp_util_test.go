@@ -67,7 +67,7 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 			Chan: uint8(up.RxMetadata[0].ChannelIndex),
 			Modu: modulation,
 			CodR: codr,
-			DatR: datarate.DataRate{
+			DatR: datarate.DR{
 				DataRate: up.Settings.DataRate,
 			},
 			Size: uint16(len(up.RawPayload)),

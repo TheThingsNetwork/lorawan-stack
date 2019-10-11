@@ -23,37 +23,37 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-// DataRate encodes a LoRa data rate or an FSK data rate, and implements marshalling and unmarshalling between JSON.
-type DataRate struct {
+// DR encodes a LoRa data rate or an FSK data rate, and implements marshalling and unmarshalling between JSON.
+type DR struct {
 	ttnpb.DataRate
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (d DataRate) MarshalJSON() ([]byte, error) {
-	if d.GetLoRa() != nil {
-		return []byte(strconv.Quote(d.String())), nil
+func (dr DR) MarshalJSON() ([]byte, error) {
+	if dr.GetLoRa() != nil {
+		return []byte(strconv.Quote(dr.String())), nil
 	}
-	if d.GetFSK() != nil {
-		return []byte(d.String()), nil
+	if dr.GetFSK() != nil {
+		return []byte(dr.String()), nil
 	}
 	return nil, nil
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (d *DataRate) UnmarshalJSON(data []byte) error {
+func (dr *DR) UnmarshalJSON(data []byte) error {
 	if len(data) >= 2 && data[0] == '"' && data[len(data)-1] == '"' {
-		dr, err := ParseLoRaDataRate(string(data[1 : len(data)-1]))
+		datarate, err := ParseLoRa(string(data[1 : len(data)-1]))
 		if err != nil {
 			return err
 		}
-		*d = dr
+		*dr = datarate
 		return nil
 	}
 	i, err := strconv.ParseUint(string(data), 10, 32)
 	if err != nil {
 		return err
 	}
-	*d = DataRate{
+	*dr = DR{
 		DataRate: ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_FSK{
 				FSK: &ttnpb.FSKDataRate{
@@ -72,35 +72,35 @@ var (
 )
 
 // String implements the Stringer interface.
-func (d DataRate) String() string {
-	if lora := d.GetLoRa(); lora != nil {
+func (dr DR) String() string {
+	if lora := dr.GetLoRa(); lora != nil {
 		return fmt.Sprintf("SF%dBW%v", lora.SpreadingFactor, float32(lora.Bandwidth)/1000)
 	}
-	if fsk := d.GetFSK(); fsk != nil {
+	if fsk := dr.GetFSK(); fsk != nil {
 		return fmt.Sprintf("%d", fsk.BitRate)
 	}
 	return ""
 }
 
-// ParseLoRaDataRate converts a string of format "SFxxBWxxx" to a LoRaDataRate.
-func ParseLoRaDataRate(dr string) (DataRate, error) {
+// ParseLoRa converts a string of format "SFxxBWxxx" to a LoRaDataRate.
+func ParseLoRa(dr string) (DR, error) {
 	matches := sfRegexp.FindStringSubmatch(dr)
 	if len(matches) != 2 {
-		return DataRate{}, errDataRate
+		return DR{}, errDataRate
 	}
 	sf, err := strconv.ParseUint(matches[1], 10, 64)
 	if err != nil {
-		return DataRate{}, errDataRate
+		return DR{}, errDataRate
 	}
 	matches = bwRegexp.FindStringSubmatch(dr)
 	if len(matches) != 2 {
-		return DataRate{}, errDataRate
+		return DR{}, errDataRate
 	}
 	bw, err := strconv.ParseFloat(matches[1], 64)
 	if err != nil {
-		return DataRate{}, errDataRate
+		return DR{}, errDataRate
 	}
-	return DataRate{
+	return DR{
 		DataRate: ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_LoRa{
 				LoRa: &ttnpb.LoRaDataRate{

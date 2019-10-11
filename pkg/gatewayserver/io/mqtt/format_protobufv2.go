@@ -133,7 +133,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		}
 		var drIndex ttnpb.DataRateIndex
 		var found bool
-		loraDr, err := datarate.ParseLoRaDataRate(lorawanMetadata.DataRate)
+		loraDr, err := datarate.ParseLoRa(lorawanMetadata.DataRate)
 		if err != nil {
 			return nil, err
 		}

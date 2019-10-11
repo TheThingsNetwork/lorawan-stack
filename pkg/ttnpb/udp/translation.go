@@ -287,7 +287,7 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 			Freq: float64(msg.Settings.Frequency) / 1000000,
 			Chan: uint8(msg.RxMetadata[0].ChannelIndex),
 			Modu: modulation,
-			DatR: datarate.DataRate{DataRate: msg.Settings.DataRate},
+			DatR: datarate.DR{DataRate: msg.Settings.DataRate},
 			CodR: codr,
 			Size: uint16(len(msg.RawPayload)),
 			Data: base64.StdEncoding.EncodeToString(msg.RawPayload),
