@@ -2,6 +2,7 @@
 title: "End Device Templates"
 description: ""
 weight: 10
+summary: End device templates define a device that is not created (yet). It can be used to create a device or many devices at once. Templates allows for using common values for many devices, such as a device profile.
 ---
 
 ## What is it?
