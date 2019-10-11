@@ -318,7 +318,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[Unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.0...HEAD
+[Unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.1...HEAD
+[3.2.1]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.0...v3.2.1
 [3.2.0]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.2...v3.2.0
 [3.1.2]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.1...v3.1.2
 [3.1.1]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.0...v3.1.1
