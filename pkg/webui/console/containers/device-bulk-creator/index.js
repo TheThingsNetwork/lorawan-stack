@@ -136,7 +136,7 @@ export default class DeviceBulkCreator extends Component {
         totalDevices: devices.length,
       })
       this.appendToLog('Creating devices…')
-      const createStream = api.device.bulkCreate(appId, devices, ['is', 'as', 'js'])
+      const createStream = api.device.bulkCreate(appId, devices)
 
       await new Promise(
         function(resolve, reject) {
