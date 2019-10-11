@@ -5543,15 +5543,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb/udp:data_rate": {
-    "translations": {
-      "en": "invalid data rate"
-    },
-    "description": {
-      "package": "pkg/ttnpb/udp",
-      "file": "data_rate.go"
-    }
-  },
   "error:pkg/ttnpb/udp:eui": {
     "translations": {
       "en": "failed to parse EUI"
@@ -5784,6 +5775,15 @@
     "description": {
       "package": "pkg/unique",
       "file": "unique.go"
+    }
+  },
+  "error:pkg/util/datarate:data_rate": {
+    "translations": {
+      "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/util/datarate",
+      "file": "data_rate.go"
     }
   },
   "error:pkg/validate:email": {
