@@ -34,6 +34,7 @@ const formatTitle = function(content, values, formatter) {
 const Link = function(props) {
   const {
     className,
+    disabled,
     title,
     titleValues,
     id,
@@ -50,7 +51,9 @@ const Link = function(props) {
   return (
     <RouterLink
       className={
-        className ? className : classnames(style.link, { [style.linkVisited]: showVisited })
+        className
+          ? classnames(className, { [style.disabled]: disabled })
+          : classnames(style.link, { [style.linkVisited]: showVisited, [style.disabled]: disabled })
       }
       id={id}
       title={formattedTitle}

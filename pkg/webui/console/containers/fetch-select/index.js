@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { connect as storeConnect } from 'react-redux'
+import bind from 'autobind-decorator'
 
 import PropTypes from '../../../lib/prop-types'
 import Field from '../../../components/form/field'
@@ -49,6 +50,7 @@ export default function({
       fetching: PropTypes.bool,
       menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
       name: PropTypes.string.isRequired,
+      onChange: PropTypes.func,
       options: PropTypes.arrayOf(
         PropTypes.shape({ value: PropTypes.string, label: PropTypes.message }),
       ),
@@ -62,6 +64,7 @@ export default function({
       menuPlacement: 'auto',
       error: undefined,
       fetching: false,
+      onChange: () => null,
       options: [],
       required: false,
       title: defaultTitle,
@@ -72,6 +75,13 @@ export default function({
       const { fetchOptions } = this.props
 
       fetchOptions()
+    }
+
+    @bind
+    handleChange(value) {
+      const { onChange, options } = this.props
+
+      onChange(options.find(e => e.value === value))
     }
 
     render() {
@@ -99,6 +109,7 @@ export default function({
           isLoading={fetching}
           warning={Boolean(error) ? warning : undefined}
           menuPlacement={menuPlacement}
+          onChange={this.handleChange}
         />
       )
     }

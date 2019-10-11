@@ -20,12 +20,13 @@ import PropTypes from '../../lib/prop-types'
 
 import style from './status.styl'
 
-const Status = function({ className, status, label, labelValues, children }) {
+const Status = function({ className, status, label, pulse, labelValues, children }) {
   const cls = classnames(style.status, {
     [style.statusGood]: status === 'good',
     [style.statusBad]: status === 'bad',
     [style.statusMediocre]: status === 'mediocre',
     [style.statusUnknown]: status === 'unknown',
+    [style[`${status}-pulse`]]: pulse,
   })
 
   let statusLabel = null
@@ -48,12 +49,18 @@ const Status = function({ className, status, label, labelValues, children }) {
 }
 
 Status.propTypes = {
-  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
+  className: PropTypes.string,
   label: PropTypes.message,
-  labelValues: PropTypes.object,
+  labelValues: PropTypes.shape({}),
+  pulse: PropTypes.bool,
+  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
 }
 
 Status.defaultProps = {
+  className: undefined,
+  pulse: true,
+  label: undefined,
+  labelValues: undefined,
   status: 'unknown',
 }
 

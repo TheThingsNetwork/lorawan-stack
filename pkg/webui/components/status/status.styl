@@ -36,26 +36,26 @@
   &-good
     background-color: $c-active-blue
 
-    &:after
-      animation: goodPulse 2s infinite
-
   &-bad
     background-color: $c-error
 
-    &:after
-      animation: badPulse 2s infinite
-
   &-mediocre
     background-color: $c-warning
-
-    &:after
-      animation: mediocrePulse 2s infinite
 
   &-unknown
     background-color: $c-icon-fill
 
   &-label
     padding-right: $cs.xs
+
+.good-pulse:after
+  animation: goodPulse 2s infinite
+
+.bad-pulse:after
+  animation: badPulse 2s infinite
+
+.mediocre-pulse:after
+  animation: mediocrePulse 2s infinite
 
 pulse-animation($color, $name)
   @keyframes $name

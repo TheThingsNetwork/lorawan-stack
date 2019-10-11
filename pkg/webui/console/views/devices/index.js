@@ -17,6 +17,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import DeviceList from '../device-list'
 import DeviceAdd from '../device-add'
+import DeviceAddBulk from '../device-add-bulk'
 import Device from '../device'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -32,6 +33,7 @@ export default class Devices extends React.Component {
     const { path } = this.props.match
     return (
       <Switch>
+        <Route exact path={`${path}/add/bulk`} component={DeviceAddBulk} />
         <Route exact path={`${path}/add`} component={DeviceAdd} />
         <Route path={`${path}/:devId`} component={Device} />
         <Route path={`${path}`} component={DeviceList} />

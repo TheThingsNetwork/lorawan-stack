@@ -93,4 +93,12 @@ storiesOf('Status', module)
       <Status label="Network Status" status="unknown" />
     </div>
   ))
+  .add('Without Pulse', () => (
+    <div>
+      <Status label="No Pulse" status="good" pulse={false} />
+      <Status label="No Pulse" status="bad" pulse={false} />
+      <Status label="No Pulse" status="mediocre" pulse={false} />
+      <Status label="No Pulse" status="unknown" pulse={false} />
+    </div>
+  ))
   .add('Toggle', () => <Toggle />)
