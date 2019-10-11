@@ -256,6 +256,42 @@ Adding translations of messages to other languages than English is a matter of a
 
 Translations of frontend messages are located in `pkg/webui/locales`.
 
+## Release notes
+We maintain a changelog at `CHANGELOG.md` using a format based on [Keep a Changelog].
+
+Any notes that we need to include in the Release Notes for the next release should be added under the `Unreleased` section.
+
+Please consult documentation at [Keep a Changelog] on how to write these notes.
+
+Some key points:
+
+- Notes are formatted as bullet points, written in imperative tense and finish with a dot (`.`).
+- There are six possible types of changes, always listed in following order:
+  - `Added` for new features.
+  - `Changed` for changes in existing functionality.
+  - `Deprecated` for soon-to-be removed features.
+  - `Removed` for now removed features.
+  - `Fixed` for any bug fixes.
+  - `Security` in case of vulnerabilities.
+
+As part of the release process `Unreleased` section is renamed to the released version. For example, if a version v3.2.1 is released on 2019-10-09, the `Unreleased` section should be renamed to `v3.2.1 - 2019-10-09`, empty change subsections removed and a new `Unreleased` section should be added above looking like this:
+
+```md
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+```
+
 ## <a name="security-issues"></a>Security Issues
 
 We do our utmost best to build secure systems, but we're human too, so we sometimes make mistakes. If you find any vulnerability in our systems, please contact us directly. We can be reached on Slack, by email and a number of other communication platforms.
@@ -268,3 +304,5 @@ Our email addresses follow the pattern `<firstname>@thethingsnetwork.org`.
 ## Legal
 
 The Things Stack for LoRaWAN is Apache 2.0 licensed.
+
+[Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
