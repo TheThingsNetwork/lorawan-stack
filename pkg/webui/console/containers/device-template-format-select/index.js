@@ -23,7 +23,7 @@ import {
 import { getDeviceTemplateFormats } from '../../store/actions/device-template-formats'
 
 const m = defineMessages({
-  title: 'File Format',
+  title: 'Format',
   warning: 'Could not retrieve the list of available device template formats',
 })
 

@@ -23,9 +23,11 @@ import FileInput from '../../../components/file-input'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import sharedMessages from '../../../lib/shared-messages'
+import Message from '../../../lib/components/message'
 
 const m = defineMessages({
-  importFile: 'Import file',
+  fileImport: 'File Import',
+  file: 'File',
   createDevices: 'Create Devices',
   selectAFile: 'Please select a template file',
 })
@@ -61,10 +63,11 @@ export default class DeviceBulkCreateForm extends Component {
         submitEnabledWhenInvalid
         initialValues={initialValues}
       >
+        <Message component="h4" content={m.fileImport} />
         <DeviceTemplateFormatSelect onChange={this.handleSelectChange} name="format_id" required />
         <Form.Field
           disabled={!formatSelected}
-          title={m.importFile}
+          title={m.file}
           accept={allowedFileExtensions}
           component={FileInput}
           name="data"

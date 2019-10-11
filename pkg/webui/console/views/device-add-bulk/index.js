@@ -14,6 +14,7 @@
 
 import React, { Component } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
+import { connect } from 'react-redux'
 
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -21,14 +22,20 @@ import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import BulkDeviceCreator from '../../containers/device-bulk-creator'
 import sharedMessages from '../../../lib/shared-messages'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
+import style from './device-add-bulk.styl'
+
+@connect(state => ({
+  appId: selectSelectedApplicationId(state),
+}))
 @withBreadcrumb('devices.add.bulk', function(props) {
-  const { appId } = props.match.params
+  const { appId } = props
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/add/bulk`}
-      icon="add"
-      content={sharedMessages.bulkCreation}
+      icon="bulk_creation"
+      content={sharedMessages.bulk}
     />
   )
 })
@@ -39,7 +46,11 @@ export default class DeviceAddBulk extends Component {
         <Row>
           <Col>
             <IntlHelmet title={sharedMessages.addDeviceBulk} />
-            <Message component="h2" content={sharedMessages.addDeviceBulk} />
+            <Message
+              className={style.title}
+              component="h2"
+              content={sharedMessages.addDeviceBulk}
+            />
           </Col>
         </Row>
         <Row>

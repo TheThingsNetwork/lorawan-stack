@@ -42,6 +42,7 @@ export default defineMessages({
   approve: 'Approve',
   appSKey: 'AppSKey',
   brand: 'Brand',
+  bulk: 'Bulk',
   bulkCreation: 'Bulk Creation',
   cancel: 'Cancel',
   changeLocation: 'Change location settings',
