@@ -96,13 +96,17 @@ This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcra
 
 Releasing a new version consists of the following steps:
 
-1. Bumping the version
-2. Writing the version files
-3. Updating the `SECURITY.md` file with the supported versions.
-4. Creating the version bump commit
-5. Creating the version tag
-6. Building the release and pushing to package managers (this is done by CI)
-7. Editing the release notes
+1. Updating the `CHANGELOG.md` file:
+  - Change the **Unreleased** section to the new version
+  - Check if we didn't forget anything important
+  - Remove empty subsections
+  - Update the list of links in the bottom of the file
+2. Bumping the version
+3. Writing the version files
+4. Updating the `SECURITY.md` file with the supported versions
+5. Creating the version bump commit
+6. Creating the version tag
+7. Building the release and pushing to package managers (this is done by CI)
 
 Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
 
@@ -119,7 +123,8 @@ These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5
 A typical release process is executed directly on the `master` branch and looks like this:
 
 ```sh
-mage version:bumpPatch version:files version:commitBump version:tag // bump, write files, commit and tag.
+git add CHANGELOG.md
+./mage version:bumpPatch version:files version:commitBump version:tag // bump, write files, commit and tag.
 git push origin $(mage version:current) // push the tag
 git push origin master // push the master branch
 ```
