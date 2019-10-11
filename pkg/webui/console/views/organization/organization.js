@@ -28,6 +28,7 @@ import NotFoundRoute from '../../../lib/components/not-found-route'
 import OrganizationOverview from '../organization-overview'
 import OrganizationData from '../organization-data'
 import OrganizationGeneralSettings from '../organization-general-settings'
+import OrganizationApiKeys from '../organization-api-keys'
 
 @withEnv
 @withSideNavigation(function(props) {
@@ -45,6 +46,12 @@ import OrganizationGeneralSettings from '../organization-general-settings'
         title: sharedMessages.data,
         path: `${matchedUrl}/data`,
         icon: 'data',
+      },
+      {
+        title: sharedMessages.apiKeys,
+        path: `${matchedUrl}/api-keys`,
+        icon: 'api_keys',
+        exact: false,
       },
       {
         title: sharedMessages.generalSettings,
@@ -83,6 +90,7 @@ class Organization extends React.Component {
           <Route exact path={`${match.path}`} component={OrganizationOverview} />
           <Route path={`${match.path}/data`} component={OrganizationData} />
           <Route path={`${match.path}/general-settings`} component={OrganizationGeneralSettings} />
+          <Route path={`${match.path}/api-keys`} component={OrganizationApiKeys} />
           <NotFoundRoute />
         </Switch>
       </BreadcrumbView>
