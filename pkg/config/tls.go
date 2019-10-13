@@ -17,7 +17,7 @@ package config
 // ACME represents ACME configuration.
 type ACME struct {
 	// TODO: Remove Enable (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
-	Enable      bool     `name:"enable" description:"Enable automated certificate management (ACME)"`
+	Enable      bool     `name:"enable" description:"Enable automated certificate management (ACME). This setting is deprecated; set the TLS config source to acme instead"`
 	Endpoint    string   `name:"endpoint" description:"ACME endpoint"`
 	Dir         string   `name:"dir" description:"Location of ACME storage directory"`
 	Email       string   `name:"email" description:"Email address to register with the ACME account"`
