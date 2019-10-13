@@ -82,7 +82,7 @@ TTN_LW_REDIS_ADDRESS=redis:6379
 Then we'll configure TLS with Let's Encrypt. Since we're deploying The Things Stack on `thethings.example.com`, we configure it to only request certificates for that host, and to also use it as the default host.
 
 ```
-TTN_LW_TLS_ACME_ENABLE=true
+TTN_LW_TLS_SOURCE=acme
 TTN_LW_TLS_ACME_DIR=/var/lib/acme
 TTN_LW_TLS_ACME_EMAIL=your@email.com
 TTN_LW_TLS_ACME_HOSTS=thethings.example.com
