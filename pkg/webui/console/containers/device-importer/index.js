@@ -21,7 +21,7 @@ import { defineMessages } from 'react-intl'
 import CodeEditor from '../../../components/code-editor'
 import ProgressBar from '../../../components/progress-bar'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import DeviceBulkCreateForm from '../../components/device-bulk-create-form'
+import DeviceImportForm from '../../components/device-import-form'
 import SubmitBar from '../../../components/submit-bar'
 import Button from '../../../components/button'
 import Notification from '../../../components/notification'
@@ -30,7 +30,7 @@ import PropTypes from '../../../lib/prop-types'
 import Message from '../../../lib/components/message'
 import Status from '../../../components/status'
 
-import style from './device-bulk-creator.styl'
+import style from './device-importer.styl'
 
 const m = defineMessages({
   proceed: 'Proceed',
@@ -72,7 +72,7 @@ const statusMap = {
     redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
   }),
 )
-export default class DeviceBulkCreator extends Component {
+export default class DeviceImporter extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     redirectToList: PropTypes.func.isRequired,
@@ -217,7 +217,7 @@ export default class DeviceBulkCreator extends Component {
       format_id: '',
       data: '',
     }
-    return <DeviceBulkCreateForm initialValues={initialValues} onSubmit={this.handleSubmit} />
+    return <DeviceImportForm initialValues={initialValues} onSubmit={this.handleSubmit} />
   }
 
   render() {

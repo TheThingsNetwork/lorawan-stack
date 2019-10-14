@@ -20,22 +20,22 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import BulkDeviceCreator from '../../containers/device-bulk-creator'
+import DeviceImporter from '../../containers/device-importer'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
-import style from './device-add-bulk.styl'
+import style from './device-import.styl'
 
 @connect(state => ({
   appId: selectSelectedApplicationId(state),
 }))
-@withBreadcrumb('devices.add.bulk', function(props) {
+@withBreadcrumb('devices.import', function(props) {
   const { appId } = props
   return (
     <Breadcrumb
-      path={`/applications/${appId}/devices/add/bulk`}
-      icon="bulk_creation"
-      content={sharedMessages.bulk}
+      path={`/applications/${appId}/devices/import`}
+      icon="import_devices"
+      content={sharedMessages.import}
     />
   )
 })
@@ -45,17 +45,17 @@ export default class DeviceAddBulk extends Component {
       <Container>
         <Row>
           <Col>
-            <IntlHelmet title={sharedMessages.addDeviceBulk} />
+            <IntlHelmet title={sharedMessages.importDevices} />
             <Message
               className={style.title}
               component="h2"
-              content={sharedMessages.addDeviceBulk}
+              content={sharedMessages.importDevices}
             />
           </Col>
         </Row>
         <Row>
           <Col lg={8} md={12}>
-            <BulkDeviceCreator />
+            <DeviceImporter />
           </Col>
         </Row>
       </Container>

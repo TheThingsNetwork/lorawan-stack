@@ -48,7 +48,7 @@ import style from './device-add-single.styl'
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/add`}
-      icon="bulk_creation"
+      icon="add"
       content={sharedMessages.add}
     />
   )

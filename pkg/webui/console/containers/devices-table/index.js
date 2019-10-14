@@ -78,8 +78,8 @@ class DevicesTable extends React.Component {
     return (
       <Button.Link
         className={style.importDevices}
-        message={sharedMessages.bulkCreation}
-        icon="bulk_creation"
+        message={sharedMessages.importDevices}
+        icon="import_devices"
         to={`/applications/${appId}/devices/import`}
         disabled={!canBulkCreate}
       />
