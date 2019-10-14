@@ -47,7 +47,6 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea
-	github.com/TheThingsIndustries/release-notes v0.1.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.0.0
 	github.com/alecthomas/chroma v0.6.6 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect

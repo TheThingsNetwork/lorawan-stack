@@ -84,8 +84,6 @@ github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea h1:Bw
 github.com/TheThingsIndustries/mystique v0.0.0-20190516134627-66efd81c68ea/go.mod h1:SdYf+XGL8wHUUJHd6LedTIWQRGfJqBqXEYFxwlCdLc8=
 github.com/TheThingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a h1:Esrtawy5ifRHjYx3I+Ub/QfbNB9u/doFFiji97iQw7g=
 github.com/TheThingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a/go.mod h1:JrbgJWsaj39gfbpauCv4gvYkYvIAJo0FdVoEhgfOtwE=
-github.com/TheThingsIndustries/release-notes v0.1.0 h1:u3L7G3HMpDbVRzeUEHGF9SzUcUMC/IbnD+GBGDzoGfc=
-github.com/TheThingsIndustries/release-notes v0.1.0/go.mod h1:16Upk2a9Ungf3gZLKhbkv78dVGd/RerkTtIjx6AXd7o=
 github.com/TheThingsNetwork/go-cayenne-lib v1.0.0 h1:be7h6E/69+qaYs1iwQ2xjGjSFPXzvU3q6AWBCWayG2Y=
 github.com/TheThingsNetwork/go-cayenne-lib v1.0.0/go.mod h1:Lkg0oDuFTF6WlZvyPV35WFHov5U9zPv2lLoAQ15NjrI=
 github.com/Unknwon/cae v0.0.0-20160715032808-c6aac99ea2ca/go.mod h1:IRSre9/SEhVuy972TVuJLyaPTS73+8Owhe0Y0l9NXHc=
@@ -670,8 +668,6 @@ github.com/russross/blackfriday v0.0.0-20180428102519-11635eb403ff/go.mod h1:JO/
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday v1.5.3-0.20190124082335-a477dd164691 h1:auJkuUc4uOuZNoH9jGLvqVaDLiuCOh/LY+Qw5NBFo4I=
 github.com/russross/blackfriday v1.5.3-0.20190124082335-a477dd164691/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
-github.com/russross/blackfriday/v2 v2.0.1 h1:lPqVAte+HuHNfhJ/0LC98ESWRz8afy9tM/0RK8m9o+Q=
-github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd h1:CmH9+J6ZSsIjUK3dcGsnCnO41eRBOnY12zwkn5qVwgc=
 github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd/go.mod h1:hPqNNc0+uJM6H+SuU8sEs5K5IQeKccPqeSjfgcKGgPk=
 github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca/go.mod h1:uugorj2VCxiV1x+LzaIdVa9b4S4qGAcH6cbhh4qVxOU=
@@ -688,8 +684,6 @@ github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAm
 github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24/go.mod h1:M+9NzErvs504Cn4c5DxATwIqPbtswREoFCre64PpcG4=
 github.com/shurcooL/httpfs v0.0.0-20190527155220-6a4d4a70508b/go.mod h1:ZY1cvUeJuFPAdZ/B6v7RHavJWZn2YPVFQ1OSXhCGOkg=
 github.com/shurcooL/sanitized_anchor_name v0.0.0-20160918041101-1dba4b3954bc/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
-github.com/shurcooL/sanitized_anchor_name v1.0.0 h1:PdmoCO6wvbs+7yrJyMORt4/BmY5IYyJwS/kOiWx8mHo=
-github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd/go.mod h1:TrYk7fJVaAttu97ZZKrO9UbRa8izdowaMIZcxYMbVaw=
 github.com/siddontang/go-snappy v0.0.0-20140704025258-d8f7bb82a96d/go.mod h1:vq0tzqLRu6TS7Id0wMo2N5QzJoKedVeovOpHjnykSzY=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
