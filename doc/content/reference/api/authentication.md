@@ -1,10 +1,14 @@
-# Authentication
+---
+title: "Authentication"
+description: ""
+weight: -1
+---
 
 API calls can be authorized either by providing an **API key** or an **OAuth access token**.
 
 - Usage with HTTP `Authorization` Header: `Bearer XXXXX`
 - Usage with gRPC [call credentials](https://grpc.io/docs/guides/auth.html#authentication-api) (in the `authorization` header): `Bearer XXXXX`
-- Usage with MQTT: Username: Gateway ID or Application ID, Password: `XXXXX`
+- Usage with MQTT: Password: `XXXXX`
 
 Here, `XXXXX` is either a valid **API key** or a valid **OAuth access token**.
 

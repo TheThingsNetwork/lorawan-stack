@@ -1,0 +1,8 @@
+<div class="is-clearfix">
+{{- with or (.Scratch.Get "previous") .NextInSection }}
+<a class="button is-pulled-left" href="{{ .RelPermalink }}">← {{ .LinkTitle }}</a>
+{{- end }}
+{{- with or (.Scratch.Get "next") .PrevInSection }}
+<a class="button is-pulled-right" href="{{ .RelPermalink }}">{{ .LinkTitle }} →</a>
+{{- end }}
+</div>

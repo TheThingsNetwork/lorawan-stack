@@ -4,6 +4,14 @@ description: ""
 weight: 40
 ---
 
+Class C end devices continuously listen for downlink messages. This allows applications to send messages to devices at any time, instead of having to wait for a Class A uplink. When combined with multicast groups, this allows applications to send immediate downlinks to many devices at the same time.
+
+This guide shows how to enable or disable Class C for an and device, and how to work with multicast groups.
+
+<!--more-->
+
+## Enabling and Disabling Class C
+
 In order to send Class C downlink messages to a single device, enable Class C support for the end device when creating or updating it with the `--supports-class-c` flag.
 
 For example, when enabling Class C for an existing device:

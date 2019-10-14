@@ -2,9 +2,6 @@
 title: "Getting Started"
 description: ""
 weight: 10
-menu:
-  main:
-    weight: 1
 ---
 
 This is a guide for setting up a private LoRaWAN network server using The Things Stack for LoRaWAN.

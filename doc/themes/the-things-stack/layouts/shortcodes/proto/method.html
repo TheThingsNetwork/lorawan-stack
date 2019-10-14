@@ -1,0 +1,20 @@
+{{ $package := or (.Get "package") "ttn.lorawan.v3" }}{{ $service := .Get "service" }}{{ $method := .Get "method" }}
+{{ with index .Site.Data "api" $package "services" $service "methods" $method -}}
+<h2>Method <code>{{ $service }}.{{ .name }}</code></h2>
+
+{{- with .comment }}
+<p>{{ . | markdownify }}</p>
+{{- end }}
+
+<p>
+  Request: {{ if not .input.package }}<a href="#message:{{ .input.name }}">{{ end }}<code>{{ with .input.package }}{{ . }}.{{end}}{{ .input.name }}</code>{{ if not .input.package }}</a>{{ end }}
+  <br>
+  Response: {{ if not .output.package }}<a href="#message:{{ .output.name }}">{{ end }}<code>{{ with .output.package }}{{ . }}.{{end}}{{ .output.name }}</code>{{ if not .output.package }}</a>{{ end }}
+</p>
+
+{{- range .http }}
+<p><code>{{ .method }}</code> <code>{{ .path }}</code></p>
+{{- end }}
+{{- else -}}
+{{ errorf "method %s of service %s of package %s not found: %s" $method $service $package .Position }}
+{{- end }}

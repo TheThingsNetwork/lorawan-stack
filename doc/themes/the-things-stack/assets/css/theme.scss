@@ -1,0 +1,182 @@
+@charset "utf-8";
+
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700&display=swap');
+
+@font-face {
+  font-family: 'LatoFallback';
+  src: url(../fonts/Lato-Regular.woff2) format('woff2'), url(../fonts/Lato-Regular.woff) format('woff'), url(../fonts/Lato-Regular.ttf) format('ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'LatoFallback';
+  src: url(../fonts/Lato-Bold.woff2) format('woff2'), url(../fonts/Lato-Bold.woff) format('woff'), url(../fonts/Lato-Bold.ttf) format('ttf');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Manrope";
+  src: url(../fonts/Manrope-Extrabold.woff2) format('woff2'), url(../fonts/Manrope-Extrabold.woff) format('woff'), url(../fonts/Manrope-Extrabold.otf) format('otf');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@import "bulma/sass/utilities/initial-variables.sass";
+
+$family-sans-serif: "Lato", "LatoFallback", $family-sans-serif;
+$title-family: "Manrope", $family-sans-serif;
+
+// Colors
+
+$blue: #2380ff;
+
+$code: $blue;
+$link-hover: darken($blue, 20%);
+$link: $blue;
+$primary: $blue;
+$title-color: $blue;
+$navbar-background-color: $white-bis;
+$navbar-item-color: $blue;
+$navbar-item-hover-background-color: $white-ter;
+$navbar-item-active-color: $blue;
+$navbar-item-active-background-color: $white-bis;
+
+$navbar-height: 4rem;
+
+$card-shadow: 0 10px 20px 0 rgba($black, 0.1);
+
+$table-head-cell-border-width: 0;
+$table-foot-cell-border-width: 0;
+
+@import "bulma/sass/utilities/functions.sass";
+@import "bulma/sass/utilities/derived-variables.sass";
+@import "bulma/sass/utilities/animations.sass";
+@import "bulma/sass/utilities/mixins.sass";
+@import "bulma/sass/utilities/controls.sass";
+
+@import "bulma/sass/base/_all";
+
+// @import "bulma/sass/elements/_all";
+// @import "bulma/sass/elements/box.sass";
+@import "bulma/sass/elements/button.sass";
+@import "bulma/sass/elements/container.sass";
+@import "bulma/sass/elements/content.sass";
+@import "bulma/sass/elements/icon.sass";
+// @import "bulma/sass/elements/image.sass";
+@import "bulma/sass/elements/notification.sass";
+// @import "bulma/sass/elements/progress.sass";
+@import "bulma/sass/elements/table.sass";
+// @import "bulma/sass/elements/tag.sass";
+@import "bulma/sass/elements/title.sass";
+
+@import "bulma/sass/elements/other.sass";
+
+// @import "bulma/sass/form/_all";
+// @import "bulma/sass/form/shared.sass";
+// @import "bulma/sass/form/input-textarea.sass";
+// @import "bulma/sass/form/checkbox-radio.sass";
+// @import "bulma/sass/form/select.sass";
+// @import "bulma/sass/form/file.sass";
+// @import "bulma/sass/form/tools.sass";
+
+// @import "bulma/sass/components/_all";
+// @import "bulma/sass/components/breadcrumb.sass";
+@import "bulma/sass/components/card.sass";
+// @import "bulma/sass/components/dropdown.sass";
+// @import "bulma/sass/components/level.sass";
+// @import "bulma/sass/components/list.sass";
+// @import "bulma/sass/components/media.sass";
+@import "bulma/sass/components/menu.sass";
+// @import "bulma/sass/components/message.sass";
+// @import "bulma/sass/components/modal.sass";
+@import "bulma/sass/components/navbar.sass";
+// @import "bulma/sass/components/pagination.sass";
+// @import "bulma/sass/components/panel.sass";
+// @import "bulma/sass/components/tabs.sass";
+
+// @import "bulma/sass/grid/_all";
+@import "bulma/sass/grid/columns.sass";
+// @import "bulma/sass/grid/tiles.sass";
+
+// @import "bulma/sass/layout/_all";
+@import "bulma/sass/layout/hero.sass";
+@import "bulma/sass/layout/section.sass";
+@import "bulma/sass/layout/footer.sass";
+
+.is-not-wrapped {
+  white-space: nowrap;
+}
+
+.card {
+  &.has-radius {
+    border-radius: $radius;
+  }
+  &.is-fullwidth {
+    width: 100%;
+  }
+}
+
+.hero {
+  &.has-radius {
+    border-radius: $radius;
+  }
+}
+
+.has-vertical-space {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+.columns.has-same-height .column {
+  display: flex;
+}
+
+.content {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $title-family;
+    color: $title-color;
+  }
+  figure {
+    box-shadow: $card-shadow;
+  }
+}
+
+.hero.is-primary {
+  background-image: url(../img/hero-bg.svg);
+  background-size: cover;
+}
+
+.footer.has-background-primary {
+  background-image: url(../img/footer-bg.svg);
+  background-size: cover;
+  .title {
+    color: $white;
+  }
+  a {
+    color: $white;
+    &:hover {
+      color: $white;
+      font-weight: bold;
+    }
+  }
+}
+
+.table.has-text-in-td-centered td {
+  text-align: center;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  main {
+    flex: 1;
+  }
+}
+
+html.has-navbar-fixed-top {
+  body {
+    min-height: calc(100vh - #{$navbar-height});
+  }
+}

@@ -1,0 +1,18 @@
+<div class="content">
+<p class="has-text-light is-size-7">
+  Last changed{{ with .GitInfo }} by {{ .AuthorName }}{{ end }} on {{ .Lastmod.Format "02 Jan 2006" }}.
+  <br>
+  {{ if .GitInfo -}}
+  {{- if .Site.Params.github_repository -}}
+    <a href="{{ .Site.Params.github_repository }}/commit/{{ .GitInfo.Hash }}">
+      {{ .GitInfo.Subject }}
+    </a>
+  {{- else -}}
+    {{ .GitInfo.Subject }}
+  {{- end }}{{ end }}
+</p>
+
+{{ if and .File .Site.Params.github_repository_edit -}}
+<a href="{{ .Site.Params.github_repository_edit }}/{{ .File.Path }}" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+{{- end }}
+</div>

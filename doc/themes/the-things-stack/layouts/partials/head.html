@@ -1,0 +1,28 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  {{ hugo.Generator }}
+  <title>{{ with .Title }}{{ . }} | {{ end }}{{ .Site.Title }}</title>
+  <link rel="canonical" href="{{ .Permalink }}" />
+  <link rel="icon" type="image/png" href="{{ "favicon.png" | relURL }}">
+  {{- $style := resources.Get "css/theme.scss" | resources.ToCSS (dict "includePaths" (slice "node_modules")) | resources.Minify | resources.Fingerprint }}
+  <link rel="stylesheet" href="{{ $style.Permalink }}" integrity="{{ $style.Data.Integrity }}">
+  {{- $scratch := newScratch }}
+  {{- $scratch.Set "description" (or .Description (.Param "description")) }}
+  {{- $scratch.Set "keywords" (delimit (or .Keywords (.Param "keywords")) ",") }}
+  <meta name="description" content="{{ $scratch.Get "description" }}">
+  <meta name="keywords" content="{{ $scratch.Get "keywords" }}">
+  <meta itemprop="name" content="{{ .Title }}">
+  <meta itemprop="description" content="{{ $scratch.Get "description" }}">
+  <meta itemprop="keywords" content="{{ $scratch.Get "keywords" }}">
+  <meta property="og:title" content="{{ .Title }}">
+  {{- with .Site.Params.title }}
+  <meta property="og:site_name" content="{{ . }}">
+  {{- end }}
+  <meta property="og:description" content="{{ $scratch.Get "description" }}">
+  <meta property="og:url" content="{{ .Permalink }}">
+  <meta name="twitter:title" content="{{ .Title }}" />
+  <meta name="twitter:description" content="{{ $scratch.Get "description" }}" />
+  <meta name="twitter:card" content="summary" />
+</head>

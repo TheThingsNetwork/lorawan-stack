@@ -1,0 +1,31 @@
+{{ $currentPage := . }}{{ $currentSection := or (.Scratch.Get "section") .CurrentSection }}
+
+<h2 class="title is-size-4">{{ $currentSection.Name }}</h2>
+
+<ul class="menu-list">
+{{- $sidebarMenuPageNumber := 0 }}
+{{- $sidebarMenuPages := slice $currentSection }}
+{{- if eq $currentPage $currentSection }}{{ $sidebarMenuPageNumber = (len $sidebarMenuPages) }}{{ end }}
+<a href="{{ $currentSection.Permalink }}" class="{{ if eq $currentPage $currentSection }}is-active{{ end }}">Overview</a>
+{{- range $currentSection.Pages.ByWeight }}
+<li>
+  {{- $sidebarMenuPages = $sidebarMenuPages | append . }}
+  {{- if eq $currentPage . }}{{ $sidebarMenuPageNumber = (len $sidebarMenuPages) }}{{ end }}
+  <a href="{{ .Permalink }}" class="{{ if eq $currentPage . }}is-active{{ end }}">{{ .Name }}</a>
+  {{- if .Pages }}
+  <ul class="menu-list">
+    {{- range .Pages.ByWeight }}
+    <li>
+      {{- $sidebarMenuPages = $sidebarMenuPages | append . }}
+      {{- if eq $currentPage . }}{{ $sidebarMenuPageNumber = (len $sidebarMenuPages) }}{{ end }}
+      <a href="{{ .Permalink }}" class="{{ if eq $currentPage . }}is-active{{ end }}">{{ .Name }}</a>
+    </li>
+    {{- end }}
+  </ul>
+  {{- end }}
+</li>
+{{- end }}
+</ul>
+
+{{ .Scratch.Set "previous" (index $sidebarMenuPages (add $sidebarMenuPageNumber -2 )) }}
+{{ .Scratch.Set "next" (index $sidebarMenuPages $sidebarMenuPageNumber) }}

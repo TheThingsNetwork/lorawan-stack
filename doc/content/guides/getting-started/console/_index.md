@@ -4,8 +4,6 @@ description: ""
 weight: 8
 ---
 
-<!-- TODO: Add figure styling to theme (https://github.com/TheThingsNetwork/lorawan-stack/issues/250) -->
-<style>figure { border: 1px solid #ddd; }</style>
 
 ## Login
 

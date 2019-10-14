@@ -1,17 +1,55 @@
-title = "The Things Stack for LoRaWAN Documentation"
+title = "The Things Stack for LoRaWAN"
 
 baseURL = "http://localhost/"
+
+disableKinds = [
+  "taxonomy",
+  "taxonomyTerm",
+  "RSS",
+  "sitemap",
+]
 
 enableGitInfo = true
 
 languageCode = "en-us"
 languageName = "English"
 
-theme = "hugo-theme-techdoc"
+theme = "the-things-stack"
 
 [params]
-  description = "Documentation for The Things Stack for LoRaWAN"
+  description = "The Things Stack for LoRaWAN"
+  keywords = []
   github_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
-  github_doc_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
-  source_url = "https://github.com/TheThingsNetwork/lorawan-stack/blob/master/"
-  version= "{{.CurrentVersion}}"
+  github_repository_edit = "https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content"
+  version = "{{.CurrentVersion}}"
+
+[menu]
+  [[menu.right]]
+    name = "GitHub"
+    url = "https://github.com/TheThingsNetwork/lorawan-stack"
+    weight = 1
+
+  [[menu.right]]
+    name = "Forum"
+    url = "https://www.thethingsnetwork.org/forum/c/network-and-routing/v3"
+    weight = 2
+
+  [[menu.contributing]]
+    name = "GitHub"
+    url = "https://github.com/TheThingsNetwork/lorawan-stack"
+    weight = 1
+
+  [[menu.contributing]]
+    name = "Forum"
+    url = "https://www.thethingsnetwork.org/forum/c/network-and-routing/v3"
+    weight = 2
+
+  [[menu.about_us]]
+    name = "The Things Network"
+    url = "https://www.thethingsnetwork.org"
+    weight = 1
+
+  [[menu.about_us]]
+    name = "The Things Industries"
+    url = "https://www.thethingsindustries.com"
+    weight = 2

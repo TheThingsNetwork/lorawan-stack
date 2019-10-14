@@ -15,6 +15,7 @@
 package ttnmage
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"path"
@@ -23,18 +24,41 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/magefile/mage/target"
 )
 
 // Docs namespace
 type Docs mg.Namespace
 
 func execHugo(args ...string) error {
-	return execGo("run", append([]string{"github.com/gohugoio/hugo", "-s", "./doc"}, args...)...)
+	return execGo("run", append([]string{"-tags", "extended", "github.com/gohugoio/hugo", "-s", "./doc"}, args...)...)
 }
 
-// Deps installs documentation dependencies.
-func (Docs) Deps() error {
-	return sh.RunV("git", "submodule", "update", "--init", "doc/themes/hugo-theme-techdoc")
+func (d Docs) yarn() (func(args ...string) error, error) {
+	if _, err := os.Stat(nodeBin("yarn")); os.IsNotExist(err) {
+		if err = installYarn(); err != nil {
+			return nil, err
+		}
+	}
+	return func(args ...string) error {
+		return sh.Run(nodeBin("yarn"), append([]string{fmt.Sprintf("--cwd=%s", filepath.Join("doc", "themes", "the-things-stack"))}, args...)...)
+	}, nil
+}
+
+// Deps installs the documentation dependencies.
+func (d Docs) Deps() error {
+	changed, err := target.Path("./doc/themes/the-things-stack/node_modules", "./doc/themes/the-things-stack/package.json", "./doc/themes/the-things-stack/yarn.lock")
+	if os.IsNotExist(err) || (err == nil && changed) {
+		if mg.Verbose() {
+			fmt.Println("Installing JS SDK dependencies")
+		}
+		yarn, err := d.yarn()
+		if err != nil {
+			return err
+		}
+		return yarn("install", "--no-progress", "--production=false")
+	}
+	return nil
 }
 
 const (

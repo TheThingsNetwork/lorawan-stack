@@ -1,0 +1,27 @@
+{{ $package := or (.Get "package") "ttn.lorawan.v3" }}{{ $enum := .Get "enum" }}
+{{ with index .Site.Data "api" $package "enums" $enum -}}
+<h2 id="enum:{{ .name }}">Enum <code>{{ .name }}</code></h2>
+{{- with .comment }}
+<p>{{ . | markdownify }}</p>
+{{- end }}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{- range .values }}
+    <tr>
+      <td><code>{{ .name }}</code></td>
+      <td><code>{{ .value }}</code></td>
+      <td> {{ .comment | markdownify }}</td>
+    </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- else -}}
+{{ errorf "enum %s of package %s not found: %s" $enum $package .Position }}
+{{- end }}
