@@ -21,9 +21,15 @@ import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import FetchTable from '../fetch-table'
 import DateTime from '../../../lib/components/date-time'
+import Button from '../../../components/button'
+import withRequest from '../../../lib/components/with-request'
 
 import { getDevicesList } from '../../../console/store/actions/devices'
+import { getDeviceTemplateFormats } from '../../store/actions/device-template-formats'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { selectDeviceTemplateFormats } from '../../store/selectors/device-template-formats'
+
+import style from './devices-table.styl'
 
 const headers = [
   {
@@ -43,11 +49,16 @@ const headers = [
   },
 ]
 
-@connect(function(state) {
-  return {
-    appId: selectSelectedApplicationId(state),
-  }
-})
+@connect(
+  function(state) {
+    return {
+      appId: selectSelectedApplicationId(state),
+      deviceTemplateFormats: selectDeviceTemplateFormats(state),
+    }
+  },
+  { getDeviceTemplateFormats },
+)
+@withRequest(({ getDeviceTemplateFormats }) => getDeviceTemplateFormats())
 @bind
 class DevicesTable extends React.Component {
   constructor(props) {
@@ -60,6 +71,21 @@ class DevicesTable extends React.Component {
     return devices
   }
 
+  get importButton() {
+    const { deviceTemplateFormats, appId } = this.props
+    const canBulkCreate = Object.keys(deviceTemplateFormats).length !== 0
+
+    return (
+      <Button.Link
+        className={style.importDevices}
+        message={sharedMessages.bulkCreation}
+        icon="bulk_creation"
+        to={`/applications/${appId}/devices/import`}
+        disabled={!canBulkCreate}
+      />
+    )
+  }
+
   render() {
     const { devicePathPrefix } = this.props
     return (
@@ -67,6 +93,7 @@ class DevicesTable extends React.Component {
         entity="devices"
         headers={headers}
         addMessage={sharedMessages.addDevice}
+        actionItems={this.importButton}
         tableTitle={<Message content={sharedMessages.devices} />}
         getItemsAction={this.getDevicesList}
         searchItemsAction={this.getDevicesList}
@@ -79,7 +106,9 @@ class DevicesTable extends React.Component {
 }
 
 DevicesTable.propTypes = {
-  devicePathPrefix: PropTypes.string,
+  appId: PropTypes.string.isRequired,
+  devicePathPrefix: PropTypes.string.isRequired,
+  deviceTemplateFormats: PropTypes.string.isRequired,
   totalCount: PropTypes.number,
 }
 

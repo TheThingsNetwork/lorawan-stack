@@ -16,7 +16,8 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import DeviceList from '../device-list'
-import DeviceAdd from '../device-add'
+import DeviceAdd from '../device-add-single'
+import DeviceAddBulk from '../device-add-bulk'
 import Device from '../device'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -33,6 +34,7 @@ export default class Devices extends React.Component {
     return (
       <Switch>
         <Route path={`${path}/add`} component={DeviceAdd} />
+        <Route path={`${path}/import`} component={DeviceAddBulk} />
         <Route path={`${path}/:devId`} component={Device} />
         <Route path={`${path}`} component={DeviceList} />
       </Switch>

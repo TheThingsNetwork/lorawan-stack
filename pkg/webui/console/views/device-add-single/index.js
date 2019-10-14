@@ -18,15 +18,13 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
+import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import DeviceDataForm from '../../components/device-data-form'
 import sharedMessages from '../../../lib/shared-messages'
-import Button from '../../../components/button'
-import withRequest from '../../../lib/components/with-request'
-import { getDeviceTemplateFormats } from '../../store/actions/device-template-formats'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectDeviceTemplateFormats } from '../../store/selectors/device-template-formats'
 import { getDeviceId } from '../../../lib/selectors/id'
 import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import PropTypes from '../../../lib/prop-types'
@@ -36,7 +34,6 @@ import style from './device-add-single.styl'
 @connect(
   state => ({
     appId: selectSelectedApplicationId(state),
-    deviceTemplateFormats: selectDeviceTemplateFormats(state),
     asConfig: selectAsConfig(),
     nsConfig: selectNsConfig(),
     jsConfig: selectJsConfig(),
@@ -44,15 +41,22 @@ import style from './device-add-single.styl'
   dispatch => ({
     redirectToList: (appId, deviceId) =>
       dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
-    getDeviceTemplateFormats: () => dispatch(getDeviceTemplateFormats()),
   }),
 )
-@withRequest(({ getDeviceTemplateFormats }) => getDeviceTemplateFormats())
+@withBreadcrumb('devices.add', function(props) {
+  const { appId } = props
+  return (
+    <Breadcrumb
+      path={`/applications/${appId}/devices/add`}
+      icon="bulk_creation"
+      content={sharedMessages.add}
+    />
+  )
+})
 export default class DeviceAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     asConfig: PropTypes.stackComponent.isRequired,
-    deviceTemplateFormats: PropTypes.shape({}).isRequired,
     jsConfig: PropTypes.stackComponent.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
@@ -82,8 +86,7 @@ export default class DeviceAdd extends Component {
 
   render() {
     const { error } = this.state
-    const { asConfig, nsConfig, jsConfig, deviceTemplateFormats } = this.props
-    const canBulkCreate = Object.keys(deviceTemplateFormats).length !== 0
+    const { asConfig, nsConfig, jsConfig } = this.props
 
     const initialValues = {
       network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
@@ -94,17 +97,9 @@ export default class DeviceAdd extends Component {
     return (
       <Container>
         <Row>
-          <Col sm={6}>
+          <Col sm={12}>
             <IntlHelmet title={sharedMessages.addDevice} />
             <Message className={style.title} component="h2" content={sharedMessages.addDevice} />
-          </Col>
-          <Col className={style.bulkCreation} sm={6}>
-            <Button.Link
-              message={sharedMessages.bulkCreation}
-              icon="bulk_creation"
-              to="add/bulk"
-              disabled={!canBulkCreate}
-            />
           </Col>
         </Row>
         <Row>

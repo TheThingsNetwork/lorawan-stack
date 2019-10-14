@@ -209,6 +209,7 @@ class FetchTable extends Component {
       handlesPagination,
       itemPathPrefix,
       pathname,
+      actionItems,
     } = this.props
     const { page, query, tab } = this.state
 
@@ -243,6 +244,7 @@ class FetchTable extends Component {
                 onChange={this.onQueryChange}
               />
             )}
+            {actionItems}
             <Button.Link
               className={style.addButton}
               message={addMessage}
