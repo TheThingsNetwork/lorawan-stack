@@ -32,6 +32,7 @@ import {
   createClearEventsActionType,
 } from './events'
 import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
+import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 
 export const SHARED_NAME = 'ORGANIZATION'
@@ -81,6 +82,16 @@ export const [
     failure: deleteORganizationFailure,
   },
 ] = createPaginationDeleteActions(SHARED_NAME, id => ({ id }))
+
+export const GET_ORG_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME)
+export const [
+  { request: GET_ORG_API_KEY, success: GET_ORG_API_KEY_SUCCESS, failure: GET_ORG_API_KEY_FAILURE },
+  {
+    request: getOrganizationApiKey,
+    success: getOrganizationApiKeySuccess,
+    failure: getOrganizationApiKeyFailure,
+  },
+] = createApiKeyRequestActions(SHARED_NAME)
 
 export const GET_ORG_API_KEYS_LIST_BASE = createGetApiKeysListActionType(SHARED_NAME)
 export const [
