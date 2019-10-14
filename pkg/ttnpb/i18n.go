@@ -117,6 +117,7 @@ func init() {
 	defineEnum(RIGHT_APPLICATION_SETTINGS_BASIC, "edit basic application settings")
 	defineEnum(RIGHT_APPLICATION_SETTINGS_API_KEYS, "view and edit application API keys")
 	defineEnum(RIGHT_APPLICATION_SETTINGS_COLLABORATORS, "view and edit application collaborators")
+	defineEnum(RIGHT_APPLICATION_SETTINGS_PACKAGES, "view and edit application packages and associations")
 	defineEnum(RIGHT_APPLICATION_DELETE, "delete application")
 	defineEnum(RIGHT_APPLICATION_DEVICES_READ, "view devices in application")
 	defineEnum(RIGHT_APPLICATION_DEVICES_WRITE, "create devices in application")

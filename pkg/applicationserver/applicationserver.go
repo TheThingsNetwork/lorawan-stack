@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
@@ -67,6 +68,7 @@ type ApplicationServer struct {
 	webhooks         web.Webhooks
 	webhookTemplates *web.TemplateStore
 	pubsub           *pubsub.PubSub
+	appPackages      packages.Server
 
 	links              sync.Map
 	linkErrors         sync.Map
@@ -200,8 +202,15 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
-	if as.pubsub, err = conf.PubSub.NewPubSub(c, as, conf.PubSub.Registry); err != nil {
+	if as.pubsub, err = conf.PubSub.NewPubSub(c, as); err != nil {
 		return nil, err
+	}
+
+	if as.appPackages, err = conf.ApplicationPackages.NewApplicationPackages(ctx, as); err != nil {
+		return nil, err
+	} else if as.appPackages != nil {
+		as.defaultSubscribers = append(as.defaultSubscribers, as.appPackages.NewSubscription())
+		c.RegisterGRPC(as.appPackages)
 	}
 
 	c.RegisterGRPC(as)

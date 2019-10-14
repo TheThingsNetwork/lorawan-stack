@@ -468,6 +468,122 @@
       ]
     }
   },
+  "ApplicationPackageRegistry": {
+    "List": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{application_ids.application_id}/devices/{device_id}/packages",
+          "parameters": [
+            "application_ids.application_id",
+            "device_id"
+          ]
+        }
+      ]
+    },
+    "GetAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}",
+          "parameters": [
+            "ids.end_device_ids.application_ids.application_id",
+            "ids.end_device_ids.device_id",
+            "ids.f_port"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.end_device_ids",
+        "ids.end_device_ids.application_ids",
+        "ids.end_device_ids.application_ids.application_id",
+        "ids.end_device_ids.dev_addr",
+        "ids.end_device_ids.dev_eui",
+        "ids.end_device_ids.device_id",
+        "ids.end_device_ids.join_eui",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
+      ]
+    },
+    "ListAssociations": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations",
+          "parameters": [
+            "ids.application_ids.application_id",
+            "ids.device_id"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.end_device_ids",
+        "ids.end_device_ids.application_ids",
+        "ids.end_device_ids.application_ids.application_id",
+        "ids.end_device_ids.dev_addr",
+        "ids.end_device_ids.dev_eui",
+        "ids.end_device_ids.device_id",
+        "ids.end_device_ids.join_eui",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
+      ]
+    },
+    "SetAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "put",
+          "pattern": "/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}",
+          "body": "*",
+          "parameters": [
+            "association.ids.end_device_ids.application_ids.application_id",
+            "association.ids.end_device_ids.device_id",
+            "association.ids.f_port"
+          ]
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "created_at",
+        "data",
+        "ids",
+        "ids.end_device_ids",
+        "ids.end_device_ids.application_ids",
+        "ids.end_device_ids.application_ids.application_id",
+        "ids.end_device_ids.dev_addr",
+        "ids.end_device_ids.dev_eui",
+        "ids.end_device_ids.device_id",
+        "ids.end_device_ids.join_eui",
+        "ids.f_port",
+        "package_name",
+        "updated_at"
+      ]
+    },
+    "DeleteAssociation": {
+      "file": "lorawan-stack/api/applicationserver_packages.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}",
+          "parameters": [
+            "end_device_ids.application_ids.application_id",
+            "end_device_ids.device_id",
+            "f_port"
+          ]
+        }
+      ]
+    }
+  },
   "ApplicationPubSubRegistry": {
     "GetFormats": {
       "file": "lorawan-stack/api/applicationserver_pubsub.proto",

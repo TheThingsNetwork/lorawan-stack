@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	asioapredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/redis"
 	asiopsredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
 	asiowebredis "go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
 	asredis "go.thethings.network/lorawan-stack/pkg/applicationserver/redis"
@@ -185,6 +186,10 @@ var (
 				config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{Redis: redis.New(&redis.Config{
 					Redis:     config.Redis,
 					Namespace: []string{"as", "io", "pubsub"},
+				})}
+				config.AS.ApplicationPackages.Registry = &asioapredis.ApplicationPackagesRegistry{Redis: redis.New(&redis.Config{
+					Redis:     config.Redis,
+					Namespace: []string{"as", "io", "applicationpackages"},
 				})}
 				if config.AS.Webhooks.Target != "" {
 					config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{Redis: redis.New(&redis.Config{
