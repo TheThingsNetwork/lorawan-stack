@@ -13,15 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- Deprecate the `tls.acme.enable` setting. To use ACME, set `tls.source` to `acme`.
-
 ### Removed
 
 ### Fixed
 
-- Fix giving priority to ACME settings to remain backward compatible with configuration for `v3.2.0` and older
-
 ### Security
+
+## [3.2.2] - 2019-10-14
+
+### Added
+
+- Initial API and CLI support for LoRaWAN application packages and application package associations.
+- New documentation design.
+- Support for ACME v2.
+
+### Deprecated
+
+- Deprecate the `tls.acme.enable` setting. To use ACME, set `tls.source` to `acme`.
+
+### Fixed
+
+- Fix giving priority to ACME settings to remain backward compatible with configuration for `v3.2.0` and older.
 
 ## [3.2.1] - 2019-10-11
 
@@ -322,7 +334,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[Unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.1...HEAD
+[Unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.2...HEAD
+[3.2.2]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.1...v3.2.2
 [3.2.1]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.0...v3.2.1
 [3.2.0]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.2...v3.2.0
 [3.1.2]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.1...v3.1.2
