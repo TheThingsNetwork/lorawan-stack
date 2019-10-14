@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.58.3" />
+  <title>Authentication | The Things Stack for LoRaWAN</title>
+  <link rel="canonical" href="https://thethingsstack.io/v3.2.2/reference/api/authentication/" />
+  <link rel="icon" type="image/png" href="/v3.2.2/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.2/css/theme.min.05e5f0bb7626dd7a8091d25b84ba7fa78c5e42932230faba442c546a93956d46.css" integrity="sha256-BeXwu3Ym3XqAkdJbhLp/p4xeQpMiMPq6RCxUapOVbUY=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Authentication">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Authentication">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.2/reference/api/authentication/">
+  <meta name="twitter:title" content="Authentication" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.2/">
+        <img src="/v3.2.2/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.2/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.2/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.2/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.2/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.2/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">API</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.2/reference/api/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.2/reference/api/authentication/" class="is-active">Authentication</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.2/reference/api/application/" class="">Application APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.2/reference/api/application_server/" class="">Application Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.2/reference/api/application_webhooks/" class="">Application Webhook APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.2/reference/api/application_pub_sub/" class="">Application Pub-Sub APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.2/reference/api/gateways/" class="">Gateway APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.2/reference/api/gateway_server/" class="">Gateway Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.2/reference/api/end_device/" class="">End Device APIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Authentication</h1>
+
+<div class="content">
+
+<p>API calls can be authorized either by providing an <strong>API key</strong> or an <strong>OAuth access token</strong>.</p>
+
+<ul>
+<li>Usage with HTTP <code>Authorization</code> Header: <code>Bearer XXXXX</code></li>
+<li>Usage with gRPC <a href="https://grpc.io/docs/guides/auth.html#authentication-api">call credentials</a> (in the <code>authorization</code> header): <code>Bearer XXXXX</code></li>
+<li>Usage with MQTT: Password: <code>XXXXX</code></li>
+</ul>
+
+<p>Here, <code>XXXXX</code> is either a valid <strong>API key</strong> or a valid <strong>OAuth access token</strong>.</p>
+
+<h2 id="api-keys">API keys</h2>
+
+<p>API keys are the simplest way of authorization. API keys do not expire, are revokable, and they are scoped to the entity they were generated from:</p>
+
+<ul>
+<li>User API keys</li>
+<li>Application API keys</li>
+<li>Gateway API keys</li>
+<li>Organization API keys</li>
+</ul>
+
+<h2 id="oauth-access-tokens">OAuth access tokens</h2>
+
+<p>The Things Network uses the <a href="https://oauth.net/">OAuth 2.0 protocol</a> for authentication and authorization.</p>
+
+<p>To use this method, you first need an <strong>OAuth client registration</strong>:</p>
+
+<ul>
+<li>The <strong>client ID</strong> uniquely identifies the OAuth client. Its restrictions are the same as for any other ID in TTN.</li>
+<li>The <strong>description</strong> is shown to the user when you request authorization.</li>
+<li>The <strong>scope</strong> indicates what actions your OAuth client is allowed to perform. This is shown to the user when you request authorization. You can select the actions your OAuth client needs on registration, a full list can also be found in our <a href="https://github.com/TheThingsNetwork/lorawan-stack/blob/master/api/rights.proto">source code</a>.</li>
+<li>The <strong>redirect URI</strong> is where the user is redirected after authorizing your OAuth client.</li>
+<li>The <strong>client secret</strong> is issued when your OAuth client Registration is accepted by a network admin.</li>
+</ul>
+
+<p>After your OAuth client Registration is accepted, you can <strong>request authorization</strong> by sending the user to the <strong>authorization URL</strong>:</p>
+
+<pre><code>https://&lt;HOSTNAME&gt;/oauth/authorize?client_id=&lt;CLIENT-ID&gt;&amp;redirect_uri=&lt;REDIRECT-URI&gt;&amp;state=&lt;STATE&gt;&amp;response_type=code
+</code></pre>
+
+<ul>
+<li>The <code>HOSTNAME</code> is the hostname of the Identity Server.</li>
+<li>The <code>client_id</code> is the <strong>client ID</strong> of your OAuth client.</li>
+<li>The <code>response_type</code> is always <code>code</code>.</li>
+<li>The <code>redirect_uri</code> must exactly match the <strong>redirect URI</strong> of your OAuth client registration if supplied.
+
+<ul>
+<li>We allow multiple <strong>redirect URIs</strong> in your OAuth client registration in the future, in which case the <code>REDIRECT-URI</code> must exactly match one of those.</li>
+</ul></li>
+<li>The optional <code>scope</code> is ignored by the Identity Server. All scopes defined in your OAuth client registration will be requested.</li>
+<li>The optional <code>state</code> can be used to mitigate CSRF attacks. It is recommended to supply this.</li>
+</ul>
+
+<p>The Identity Server will prompt the user with a view asking to authorize your OAuth client. They will see the <strong>client ID</strong>, <strong>description</strong>, requested <strong>scope</strong> and <strong>redirect URI</strong>. If they accept the authorization, they will be redirected to your <strong>redirect URI</strong> with an <strong>authorization code</strong>:</p>
+
+<pre><code>https://&lt;REDIRECT-URI&gt;/?code=&lt;AUTHORIZATION-CODE&gt;
+</code></pre>
+
+<p>Your OAuth client can exchange this <strong>authorization code</strong> for an <strong>OAuth access token</strong> by making a <code>POST</code> request to the <strong>token URL</strong>:</p>
+
+<pre><code>https://&lt;HOSTNAME&gt;/oauth/token
+</code></pre>
+
+<p>The request must use <strong>Basic Auth</strong> (<a href="https://tools.ietf.org/html/rfc7617">RFC7617</a>) with the <strong>client ID</strong> as username and the <strong>client secret</strong> as password.</p>
+
+<p>The <strong>authorization code</strong> is sent in the request payload:</p>
+
+<pre><code>{
+	&quot;code&quot;: &quot;&lt;AUTHORIZATION-CODE&gt;&quot;, 
+	&quot;grant_type&quot;: &quot;authorization_code&quot;
+}
+</code></pre>
+
+<p>The response contains the <strong>OAuth access token</strong> and an indication of when it expires. If the network admin gave your OAuth client the <strong>refresh token</strong> grant, the response also contains a <strong>refresh token</strong>.</p>
+
+<pre><code>{
+	&quot;access_token&quot;: &quot;XXXXX&quot;, 
+	&quot;token_type&quot;: &quot;bearer&quot;, 
+	&quot;expires_in&quot;: &quot;3600&quot;,
+	&quot;refresh_token&quot;: &quot;YYYYY&quot;
+}
+</code></pre>
+
+<p>You can now use the <strong>OAuth access token</strong> until it expires.</p>
+
+<p>If you have a <strong>refresh token</strong>, you can exchange this for a new <strong>OAuth access token</strong> after the old one expires by making another <code>POST</code> request to the <strong>token URL</strong>, similar to the exchange of the <strong>authorization code</strong> you did before:</p>
+
+<pre><code>https://&lt;HOSTNAME&gt;/oauth/token
+</code></pre>
+
+<p>The request must use <strong>Basic Auth</strong> (<a href="https://tools.ietf.org/html/rfc7617">RFC7617</a>) with the <strong>client ID</strong> as username and the <strong>client secret</strong> as password.</p>
+
+<p>The <strong>refresh token</strong> is sent in the request payload:</p>
+
+<pre><code>{
+	&quot;code&quot;: &quot;&lt;REFRESH-TOKEN&gt;&quot;, 
+	&quot;grant_type&quot;: &quot;refresh_token&quot;
+}
+</code></pre>
+
+<p>The response again contains the <strong>OAuth access token</strong> and an indication of when it expires. The response also contains a new <strong>refresh token</strong>.</p>
+
+<pre><code>{
+	&quot;access_token&quot;: &quot;XXXXX&quot;, 
+	&quot;token_type&quot;: &quot;bearer&quot;, 
+	&quot;expires_in&quot;: &quot;3600&quot;,
+	&quot;refresh_token&quot;: &quot;YYYYY&quot;
+}
+</code></pre>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.2/reference/api/">← API</a>
+<a class="button is-pulled-right" href="/v3.2.2/reference/api/application/">Application APIs →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.2/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.2/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.2/components/">Components</a></p>
+        <p><a class="" href="/v3.2.2/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 11 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/79929fdefde8349847eb69216a17666882c83c9a">
+      doc: Add first generated API reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/api/authentication.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.2/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
