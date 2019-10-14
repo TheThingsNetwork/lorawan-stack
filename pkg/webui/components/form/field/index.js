@@ -189,7 +189,6 @@ class FormField extends React.Component {
         horizontal,
         required,
         readOnly,
-        disabled: fieldDisabled,
       }),
     )
 

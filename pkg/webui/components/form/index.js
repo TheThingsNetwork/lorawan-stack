@@ -21,6 +21,7 @@ import Notification from '../notification'
 import PropTypes from '../../lib/prop-types'
 import FormContext from './context'
 import FormField from './field'
+import FormInfoField from './field/info'
 import FormSubmit from './submit'
 
 class InnerForm extends React.PureComponent {
@@ -162,6 +163,7 @@ Form.defaultProps = {
 }
 
 Form.Field = FormField
+Form.InfoField = FormInfoField
 Form.Submit = FormSubmit
 
 export default Form
