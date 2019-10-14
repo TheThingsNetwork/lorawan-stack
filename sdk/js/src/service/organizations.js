@@ -93,6 +93,14 @@ class Organizations {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  async getRightsById(organizationId) {
+    const result = await this._api.OrganizationAccess.ListRights({
+      routeParams: { organization_id: organizationId },
+    })
+
+    return Marshaler.unwrapRights(result)
+  }
+
   // Events Stream
 
   async openStream(identifiers, tail, after) {
