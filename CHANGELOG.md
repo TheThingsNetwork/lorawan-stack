@@ -13,9 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- Deprecate the `tls.acme.enable` setting. To use ACME, set `tls.source` to `acme`.
+
 ### Removed
 
 ### Fixed
+
+- Fix giving priority to ACME settings to remain backward compatible with configuration for `v3.2.0` and older
 
 ### Security
 

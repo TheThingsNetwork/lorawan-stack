@@ -69,10 +69,10 @@ func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOpt
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if conf.Source == "" {
 		switch {
-		case conf.Certificate != "" && conf.Key != "":
-			conf.Source = "file"
 		case conf.ACME.Enable:
 			conf.Source = "acme"
+		case conf.Certificate != "" && conf.Key != "":
+			conf.Source = "file"
 		case !conf.KeyVault.IsZero():
 			conf.Source = "key-vault"
 		}
