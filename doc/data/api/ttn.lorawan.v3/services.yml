@@ -1,0 +1,1790 @@
+AppAs:
+  name: AppAs
+  comment: |2
+     The AppAs service connects an application or integration to an Application Server.
+  methods:
+    Subscribe:
+      name: Subscribe
+      input:
+        name: ApplicationIdentifiers
+      output:
+        name: ApplicationUp
+        stream: true
+    DownlinkQueuePush:
+      name: DownlinkQueuePush
+      input:
+        name: DownlinkQueueRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: POST
+        path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push
+    DownlinkQueueReplace:
+      name: DownlinkQueueReplace
+      input:
+        name: DownlinkQueueRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: POST
+        path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace
+    DownlinkQueueList:
+      name: DownlinkQueueList
+      input:
+        name: EndDeviceIdentifiers
+      output:
+        name: ApplicationDownlinks
+      http:
+      - method: GET
+        path: /as/applications/{application_ids.application_id}/devices/{device_id}/down
+    GetMQTTConnectionInfo:
+      name: GetMQTTConnectionInfo
+      input:
+        name: ApplicationIdentifiers
+      output:
+        name: MQTTConnectionInfo
+      http:
+      - method: GET
+        path: /as/applications/{application_id}/mqtt-connection-info
+ApplicationAccess:
+  name: ApplicationAccess
+  methods:
+    ListRights:
+      name: ListRights
+      input:
+        name: ApplicationIdentifiers
+      output:
+        name: Rights
+      http:
+      - method: GET
+        path: /applications/{application_id}/rights
+    CreateAPIKey:
+      name: CreateAPIKey
+      input:
+        name: CreateApplicationAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: POST
+        path: /applications/{application_ids.application_id}/api-keys
+    ListAPIKeys:
+      name: ListAPIKeys
+      input:
+        name: ListApplicationAPIKeysRequest
+      output:
+        name: APIKeys
+      http:
+      - method: GET
+        path: /applications/{application_ids.application_id}/api-keys
+    GetAPIKey:
+      name: GetAPIKey
+      input:
+        name: GetApplicationAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: GET
+        path: /applications/{application_ids.application_id}/api-keys/{key_id}
+    UpdateAPIKey:
+      name: UpdateAPIKey
+      comment: |2
+         Update the rights of an existing application API key. To generate an API key,
+         the CreateAPIKey should be used. To delete an API key, update it
+         with zero rights. It is required for the caller to have all assigned or/and removed rights.
+      input:
+        name: UpdateApplicationAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: PUT
+        path: /applications/{application_ids.application_id}/api-keys/{api_key.id}
+    GetCollaborator:
+      name: GetCollaborator
+      comment: |2
+         Get the rights of a collaborator (member) of the application.
+         Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+      input:
+        name: GetApplicationCollaboratorRequest
+      output:
+        name: GetCollaboratorResponse
+      http:
+      - method: GET
+        path: /applications/{application_ids.application_id}/collaborator
+      - method: GET
+        path: /applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}
+      - method: GET
+        path: /applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}
+    SetCollaborator:
+      name: SetCollaborator
+      comment: |2
+         Set the rights of a collaborator (member) on the application. It is required for the caller to
+         have all assigned or/and removed rights.
+         Setting a collaborator without rights, removes them.
+      input:
+        name: SetApplicationCollaboratorRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: PUT
+        path: /applications/{application_ids.application_id}/collaborators
+    ListCollaborators:
+      name: ListCollaborators
+      input:
+        name: ListApplicationCollaboratorsRequest
+      output:
+        name: Collaborators
+      http:
+      - method: GET
+        path: /applications/{application_ids.application_id}/collaborators
+ApplicationCryptoService:
+  name: ApplicationCryptoService
+  comment: |2
+     Service for application layer cryptographic operations.
+  methods:
+    DeriveAppSKey:
+      name: DeriveAppSKey
+      input:
+        name: DeriveSessionKeysRequest
+      output:
+        name: AppSKeyResponse
+    GetAppKey:
+      name: GetAppKey
+      comment: |2
+         Get the AppKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
+      input:
+        name: GetRootKeysRequest
+      output:
+        name: KeyEnvelope
+ApplicationPackageRegistry:
+  name: ApplicationPackageRegistry
+  methods:
+    List:
+      name: List
+      comment: |2
+         List returns the available packages for the end device.
+      input:
+        name: EndDeviceIdentifiers
+      output:
+        name: ApplicationPackages
+      http:
+      - method: GET
+        path: /as/applications/{application_ids.application_id}/devices/{device_id}/packages
+    GetAssociation:
+      name: GetAssociation
+      comment: |2
+         Get returns the application package association registered on the FPort of the end device.
+      input:
+        name: GetApplicationPackageAssociationRequest
+      output:
+        name: ApplicationPackageAssociation
+      http:
+      - method: GET
+        path: /as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}
+    ListAssociations:
+      name: ListAssociations
+      comment: |2
+         ListAssociations returns all of the application package associations of the end device.
+      input:
+        name: ListApplicationPackageAssociationRequest
+      output:
+        name: ApplicationPackageAssociations
+      http:
+      - method: GET
+        path: /as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations
+    SetAssociation:
+      name: SetAssociation
+      comment: |2
+         SetAssociation updates or creates the application package association on the FPort of the end device.
+      input:
+        name: SetApplicationPackageAssociationRequest
+      output:
+        name: ApplicationPackageAssociation
+      http:
+      - method: PUT
+        path: /as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}
+    DeleteAssociation:
+      name: DeleteAssociation
+      comment: |2
+         DeleteAssociation removes the application package association on the FPort of the end device.
+      input:
+        name: ApplicationPackageAssociationIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}
+ApplicationPubSubRegistry:
+  name: ApplicationPubSubRegistry
+  methods:
+    GetFormats:
+      name: GetFormats
+      input:
+        package: google.protobuf
+        name: Empty
+      output:
+        name: ApplicationPubSubFormats
+      http:
+      - method: GET
+        path: /as/pubsub-formats
+    Get:
+      name: Get
+      input:
+        name: GetApplicationPubSubRequest
+      output:
+        name: ApplicationPubSub
+      http:
+      - method: GET
+        path: /as/pubsub/{ids.application_ids.application_id}/{ids.pub_sub_id}
+    List:
+      name: List
+      input:
+        name: ListApplicationPubSubsRequest
+      output:
+        name: ApplicationPubSubs
+      http:
+      - method: GET
+        path: /as/pubsub/{application_ids.application_id}
+    Set:
+      name: Set
+      input:
+        name: SetApplicationPubSubRequest
+      output:
+        name: ApplicationPubSub
+      http:
+      - method: PUT
+        path: /as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pub_sub_id}
+      - method: POST
+        path: /as/pubsub/{pubsub.ids.application_ids.application_id}
+    Delete:
+      name: Delete
+      input:
+        name: ApplicationPubSubIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /as/pubsub/{application_ids.application_id}/{pub_sub_id}
+ApplicationRegistry:
+  name: ApplicationRegistry
+  methods:
+    Create:
+      name: Create
+      comment: |2
+         Create a new application. This also sets the given organization or user as
+         first collaborator with all possible rights.
+      input:
+        name: CreateApplicationRequest
+      output:
+        name: Application
+      http:
+      - method: POST
+        path: /users/{collaborator.user_ids.user_id}/applications
+      - method: POST
+        path: /organizations/{collaborator.organization_ids.organization_id}/applications
+    Get:
+      name: Get
+      comment: |2
+         Get the application with the given identifiers, selecting the fields given
+         by the field mask. The method may return more or less fields, depending on
+         the rights of the caller.
+      input:
+        name: GetApplicationRequest
+      output:
+        name: Application
+      http:
+      - method: GET
+        path: /applications/{application_ids.application_id}
+    List:
+      name: List
+      comment: |2
+         List applications. See request message for details.
+      input:
+        name: ListApplicationsRequest
+      output:
+        name: Applications
+      http:
+      - method: GET
+        path: /applications
+      - method: GET
+        path: /users/{collaborator.user_ids.user_id}/applications
+      - method: GET
+        path: /organizations/{collaborator.organization_ids.organization_id}/applications
+    Update:
+      name: Update
+      input:
+        name: UpdateApplicationRequest
+      output:
+        name: Application
+      http:
+      - method: PUT
+        path: /applications/{application.ids.application_id}
+    Delete:
+      name: Delete
+      input:
+        name: ApplicationIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /applications/{application_id}
+ApplicationWebhookRegistry:
+  name: ApplicationWebhookRegistry
+  methods:
+    GetFormats:
+      name: GetFormats
+      input:
+        package: google.protobuf
+        name: Empty
+      output:
+        name: ApplicationWebhookFormats
+      http:
+      - method: GET
+        path: /as/webhook-formats
+    GetTemplate:
+      name: GetTemplate
+      input:
+        name: GetApplicationWebhookTemplateRequest
+      output:
+        name: ApplicationWebhookTemplate
+      http:
+      - method: GET
+        path: /as/webhook-templates/{ids.template_id}
+    ListTemplates:
+      name: ListTemplates
+      input:
+        name: ListApplicationWebhookTemplatesRequest
+      output:
+        name: ApplicationWebhookTemplates
+      http:
+      - method: GET
+        path: /as/webhook-templates
+    Get:
+      name: Get
+      input:
+        name: GetApplicationWebhookRequest
+      output:
+        name: ApplicationWebhook
+      http:
+      - method: GET
+        path: /as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}
+    List:
+      name: List
+      input:
+        name: ListApplicationWebhooksRequest
+      output:
+        name: ApplicationWebhooks
+      http:
+      - method: GET
+        path: /as/webhooks/{application_ids.application_id}
+    Set:
+      name: Set
+      input:
+        name: SetApplicationWebhookRequest
+      output:
+        name: ApplicationWebhook
+      http:
+      - method: PUT
+        path: /as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}
+      - method: POST
+        path: /as/webhooks/{webhook.ids.application_ids.application_id}
+    Delete:
+      name: Delete
+      input:
+        name: ApplicationWebhookIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /as/webhooks/{application_ids.application_id}/{webhook_id}
+As:
+  name: As
+  comment: |2
+     The As service manages the Application Server.
+  methods:
+    GetLink:
+      name: GetLink
+      input:
+        name: GetApplicationLinkRequest
+      output:
+        name: ApplicationLink
+      http:
+      - method: GET
+        path: /as/applications/{application_ids.application_id}/link
+    SetLink:
+      name: SetLink
+      comment: |2
+         Set a link configuration from the Application Server a Network Server.
+         This call returns immediately after setting the link configuration; it does not wait for a link to establish.
+         To get link statistics or errors, use the `GetLinkStats` call.
+      input:
+        name: SetApplicationLinkRequest
+      output:
+        name: ApplicationLink
+      http:
+      - method: PUT
+        path: /as/applications/{application_ids.application_id}/link
+    DeleteLink:
+      name: DeleteLink
+      input:
+        name: ApplicationIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /as/applications/{application_id}/link
+    GetLinkStats:
+      name: GetLinkStats
+      comment: |2
+         GetLinkStats returns the link statistics.
+         This call returns a NotFound error code if there is no link for the given application identifiers.
+         This call returns the error code of the link error if linking to a Network Server failed.
+      input:
+        name: ApplicationIdentifiers
+      output:
+        name: ApplicationLinkStats
+      http:
+      - method: GET
+        path: /as/applications/{application_id}/link/stats
+AsEndDeviceRegistry:
+  name: AsEndDeviceRegistry
+  comment: |2
+     The AsEndDeviceRegistry service allows clients to manage their end devices on the Application Server.
+  methods:
+    Get:
+      name: Get
+      comment: |2
+         Get returns the device that matches the given identifiers.
+         If there are multiple matches, an error will be returned.
+      input:
+        name: GetEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: GET
+        path: /as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}
+    Set:
+      name: Set
+      comment: |2
+         Set creates or updates the device.
+      input:
+        name: SetEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: PUT
+        path: /as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}
+      - method: POST
+        path: /as/applications/{end_device.ids.application_ids.application_id}/devices
+    Delete:
+      name: Delete
+      comment: |2
+         Delete deletes the device that matches the given identifiers.
+         If there are multiple matches, an error will be returned.
+      input:
+        name: EndDeviceIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /as/applications/{application_ids.application_id}/devices/{device_id}
+AsJs:
+  name: AsJs
+  comment: |2
+     The AsJs service connects an Application Server to a Join Server.
+  methods:
+    GetAppSKey:
+      name: GetAppSKey
+      input:
+        name: SessionKeyRequest
+      output:
+        name: AppSKeyResponse
+AsNs:
+  name: AsNs
+  comment: |2
+     The AsNs service connects an Application Server to a Network Server.
+  methods:
+    LinkApplication:
+      name: LinkApplication
+      input:
+        package: google.protobuf
+        name: Empty
+        stream: true
+      output:
+        name: ApplicationUp
+        stream: true
+    DownlinkQueueReplace:
+      name: DownlinkQueueReplace
+      input:
+        name: DownlinkQueueRequest
+      output:
+        package: google.protobuf
+        name: Empty
+    DownlinkQueuePush:
+      name: DownlinkQueuePush
+      input:
+        name: DownlinkQueueRequest
+      output:
+        package: google.protobuf
+        name: Empty
+    DownlinkQueueList:
+      name: DownlinkQueueList
+      input:
+        name: EndDeviceIdentifiers
+      output:
+        name: ApplicationDownlinks
+ClientAccess:
+  name: ClientAccess
+  methods:
+    ListRights:
+      name: ListRights
+      input:
+        name: ClientIdentifiers
+      output:
+        name: Rights
+      http:
+      - method: GET
+        path: /clients/{client_id}/rights
+    GetCollaborator:
+      name: GetCollaborator
+      comment: |2
+         Get the rights of a collaborator (member) of the client.
+         Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+      input:
+        name: GetClientCollaboratorRequest
+      output:
+        name: GetCollaboratorResponse
+      http:
+      - method: GET
+        path: /clients/{client_ids.client_id}/collaborator
+      - method: GET
+        path: /clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}
+      - method: GET
+        path: /clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}
+    SetCollaborator:
+      name: SetCollaborator
+      comment: |2
+         Set the rights of a collaborator (member) on the client. It is required for the caller to
+         have all assigned or/and removed rights.
+         Setting a collaborator without rights, removes them.
+      input:
+        name: SetClientCollaboratorRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: PUT
+        path: /clients/{client_ids.client_id}/collaborators
+    ListCollaborators:
+      name: ListCollaborators
+      input:
+        name: ListClientCollaboratorsRequest
+      output:
+        name: Collaborators
+      http:
+      - method: GET
+        path: /clients/{client_ids.client_id}/collaborators
+ClientRegistry:
+  name: ClientRegistry
+  methods:
+    Create:
+      name: Create
+      comment: |2
+         Create a new OAuth client. This also sets the given organization or user as
+         first collaborator with all possible rights.
+      input:
+        name: CreateClientRequest
+      output:
+        name: Client
+      http:
+      - method: POST
+        path: /users/{collaborator.user_ids.user_id}/clients
+      - method: POST
+        path: /organizations/{collaborator.organization_ids.organization_id}/clients
+    Get:
+      name: Get
+      comment: |2
+         Get the OAuth client with the given identifiers, selecting the fields given
+         by the field mask. The method may return more or less fields, depending on
+         the rights of the caller.
+      input:
+        name: GetClientRequest
+      output:
+        name: Client
+      http:
+      - method: GET
+        path: /clients/{client_ids.client_id}
+    List:
+      name: List
+      comment: |2
+         List OAuth clients. See request message for details.
+      input:
+        name: ListClientsRequest
+      output:
+        name: Clients
+      http:
+      - method: GET
+        path: /clients
+      - method: GET
+        path: /users/{collaborator.user_ids.user_id}/clients
+      - method: GET
+        path: /organizations/{collaborator.organization_ids.organization_id}/clients
+    Update:
+      name: Update
+      input:
+        name: UpdateClientRequest
+      output:
+        name: Client
+      http:
+      - method: PUT
+        path: /clients/{client.ids.client_id}
+    Delete:
+      name: Delete
+      input:
+        name: ClientIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /clients/{client_id}
+Configuration:
+  name: Configuration
+  methods:
+    ListFrequencyPlans:
+      name: ListFrequencyPlans
+      input:
+        name: ListFrequencyPlansRequest
+      output:
+        name: ListFrequencyPlansResponse
+      http:
+      - method: GET
+        path: /configuration/frequency-plans
+ContactInfoRegistry:
+  name: ContactInfoRegistry
+  methods:
+    RequestValidation:
+      name: RequestValidation
+      comment: |2
+         Request validation for the non-validated contact info for the given entity.
+      input:
+        name: EntityIdentifiers
+      output:
+        name: ContactInfoValidation
+      http:
+      - method: POST
+        path: /contact_info/validation
+    Validate:
+      name: Validate
+      comment: |2
+         Validate confirms a contact info validation.
+      input:
+        name: ContactInfoValidation
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: PATCH
+        path: /contact_info/validation
+DownlinkMessageProcessor:
+  name: DownlinkMessageProcessor
+  comment: |2
+     The DownlinkMessageProcessor service processes downlink messages.
+  methods:
+    Process:
+      name: Process
+      input:
+        name: ProcessDownlinkMessageRequest
+      output:
+        name: ApplicationDownlink
+EndDeviceClaimingServer:
+  name: EndDeviceClaimingServer
+  methods:
+    Claim:
+      name: Claim
+      comment: |2
+         Claims the end device by claim authentication code or QR code and transfers the device to the target application.
+      input:
+        name: ClaimEndDeviceRequest
+      output:
+        name: EndDeviceIdentifiers
+      http:
+      - method: POST
+        path: /edcs/claim
+    AuthorizeApplication:
+      name: AuthorizeApplication
+      input:
+        name: AuthorizeApplicationRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: POST
+        path: /edcs/applications/{application_ids.application_id}/authorize
+    UnauthorizeApplication:
+      name: UnauthorizeApplication
+      input:
+        name: ApplicationIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /edcs/applications/{application_id}/authorize
+EndDeviceQRCodeGenerator:
+  name: EndDeviceQRCodeGenerator
+  methods:
+    GetFormat:
+      name: GetFormat
+      comment: |2
+         Return the QR code format.
+      input:
+        name: GetQRCodeFormatRequest
+      output:
+        name: QRCodeFormat
+      http:
+      - method: GET
+        path: /qr-codes/end-devices/formats/{format_id}
+    ListFormats:
+      name: ListFormats
+      comment: |2
+         Returns the supported formats.
+      input:
+        package: google.protobuf
+        name: Empty
+      output:
+        name: QRCodeFormats
+      http:
+      - method: GET
+        path: /qr-codes/end-devices/formats
+    Generate:
+      name: Generate
+      comment: |2
+         Generates a QR code.
+      input:
+        name: GenerateEndDeviceQRCodeRequest
+      output:
+        name: GenerateQRCodeResponse
+      http:
+      - method: POST
+        path: /qr-codes/end-devices
+EndDeviceRegistry:
+  name: EndDeviceRegistry
+  methods:
+    Create:
+      name: Create
+      comment: |2
+         Create a new end device within an application.
+      input:
+        name: CreateEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: POST
+        path: /applications/{end_device.ids.application_ids.application_id}/devices
+    Get:
+      name: Get
+      comment: |2
+         Get the end device with the given identifiers, selecting the fields given
+         by the field mask.
+      input:
+        name: GetEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: GET
+        path: /applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}
+    GetIdentifiersForEUIs:
+      name: GetIdentifiersForEUIs
+      input:
+        name: GetEndDeviceIdentifiersForEUIsRequest
+      output:
+        name: EndDeviceIdentifiers
+    List:
+      name: List
+      comment: |2
+         List applications. See request message for details.
+      input:
+        name: ListEndDevicesRequest
+      output:
+        name: EndDevices
+      http:
+      - method: GET
+        path: /applications/{application_ids.application_id}/devices
+    Update:
+      name: Update
+      input:
+        name: UpdateEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: PUT
+        path: /applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}
+    Delete:
+      name: Delete
+      input:
+        name: EndDeviceIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /applications/{application_ids.application_id}/devices/{device_id}
+EndDeviceRegistrySearch:
+  name: EndDeviceRegistrySearch
+  comment: |2
+     The EndDeviceRegistrySearch service indexes devices in the EndDeviceRegistry
+     and enables searching for them.
+     This service is not implemented on all deployments.
+  methods:
+    SearchEndDevices:
+      name: SearchEndDevices
+      input:
+        name: SearchEndDevicesRequest
+      output:
+        name: EndDevices
+      http:
+      - method: GET
+        path: /search/applications/{application_ids.application_id}/devices
+EndDeviceTemplateConverter:
+  name: EndDeviceTemplateConverter
+  methods:
+    ListFormats:
+      name: ListFormats
+      comment: |2
+         Returns the configured formats to convert from.
+      input:
+        package: google.protobuf
+        name: Empty
+      output:
+        name: EndDeviceTemplateFormats
+      http:
+      - method: GET
+        path: /edtc/formats
+    Convert:
+      name: Convert
+      comment: |2
+         Converts the binary data to a stream of end device templates.
+      input:
+        name: ConvertEndDeviceTemplateRequest
+      output:
+        name: EndDeviceTemplate
+        stream: true
+      http:
+      - method: POST
+        path: /edtc/convert
+EntityAccess:
+  name: EntityAccess
+  methods:
+    AuthInfo:
+      name: AuthInfo
+      comment: |2
+         AuthInfo returns information about the authentication that is used on the request.
+      input:
+        package: google.protobuf
+        name: Empty
+      output:
+        name: AuthInfoResponse
+      http:
+      - method: GET
+        path: /auth_info
+EntityRegistrySearch:
+  name: EntityRegistrySearch
+  comment: |2
+     The EntityRegistrySearch service indexes entities in the various registries
+     and enables searching for them.
+     This service is not implemented on all deployments.
+  methods:
+    SearchApplications:
+      name: SearchApplications
+      input:
+        name: SearchEntitiesRequest
+      output:
+        name: Applications
+      http:
+      - method: GET
+        path: /search/applications
+    SearchClients:
+      name: SearchClients
+      input:
+        name: SearchEntitiesRequest
+      output:
+        name: Clients
+      http:
+      - method: GET
+        path: /search/clients
+    SearchGateways:
+      name: SearchGateways
+      input:
+        name: SearchEntitiesRequest
+      output:
+        name: Gateways
+      http:
+      - method: GET
+        path: /search/gateways
+    SearchOrganizations:
+      name: SearchOrganizations
+      input:
+        name: SearchEntitiesRequest
+      output:
+        name: Organizations
+      http:
+      - method: GET
+        path: /search/organizations
+    SearchUsers:
+      name: SearchUsers
+      input:
+        name: SearchEntitiesRequest
+      output:
+        name: Users
+      http:
+      - method: GET
+        path: /search/users
+Events:
+  name: Events
+  comment: |2
+     The Events service serves events from the cluster.
+  methods:
+    Stream:
+      name: Stream
+      comment: |2
+         Stream live events, optionally with a tail of historical events (depending on server support and retention policy).
+         Events may arrive out-of-order.
+      input:
+        name: StreamEventsRequest
+      output:
+        name: Event
+        stream: true
+      http:
+      - method: POST
+        path: /events
+GatewayAccess:
+  name: GatewayAccess
+  methods:
+    ListRights:
+      name: ListRights
+      input:
+        name: GatewayIdentifiers
+      output:
+        name: Rights
+      http:
+      - method: GET
+        path: /gateways/{gateway_id}/rights
+    CreateAPIKey:
+      name: CreateAPIKey
+      input:
+        name: CreateGatewayAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: POST
+        path: /gateways/{gateway_ids.gateway_id}/api-keys
+    ListAPIKeys:
+      name: ListAPIKeys
+      input:
+        name: ListGatewayAPIKeysRequest
+      output:
+        name: APIKeys
+      http:
+      - method: GET
+        path: /gateways/{gateway_ids.gateway_id}/api-keys
+    GetAPIKey:
+      name: GetAPIKey
+      input:
+        name: GetGatewayAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: GET
+        path: /gateways/{gateway_ids.gateway_id}/api-keys/{key_id}
+    UpdateAPIKey:
+      name: UpdateAPIKey
+      comment: |2
+         Update the rights of an existing gateway API key. To generate an API key,
+         the CreateAPIKey should be used. To delete an API key, update it
+         with zero rights. It is required for the caller to have all assigned or/and removed rights.
+      input:
+        name: UpdateGatewayAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: PUT
+        path: /gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}
+    GetCollaborator:
+      name: GetCollaborator
+      comment: |2
+         Get the rights of a collaborator (member) of the gateway.
+         Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+      input:
+        name: GetGatewayCollaboratorRequest
+      output:
+        name: GetCollaboratorResponse
+      http:
+      - method: GET
+        path: /gateways/{gateway_ids.gateway_id}/collaborator
+      - method: GET
+        path: /gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}
+      - method: GET
+        path: /gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}
+    SetCollaborator:
+      name: SetCollaborator
+      comment: |2
+         Set the rights of a collaborator (member) on the gateway. It is required for the caller to
+         have all assigned or/and removed rights.
+         Setting a collaborator without rights, removes them.
+      input:
+        name: SetGatewayCollaboratorRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: PUT
+        path: /gateways/{gateway_ids.gateway_id}/collaborators
+    ListCollaborators:
+      name: ListCollaborators
+      input:
+        name: ListGatewayCollaboratorsRequest
+      output:
+        name: Collaborators
+      http:
+      - method: GET
+        path: /gateways/{gateway_ids.gateway_id}/collaborators
+GatewayConfigurator:
+  name: GatewayConfigurator
+  methods:
+    PullConfiguration:
+      name: PullConfiguration
+      input:
+        name: PullGatewayConfigurationRequest
+      output:
+        name: Gateway
+        stream: true
+GatewayRegistry:
+  name: GatewayRegistry
+  methods:
+    Create:
+      name: Create
+      comment: |2
+         Create a new gateway. This also sets the given organization or user as
+         first collaborator with all possible rights.
+      input:
+        name: CreateGatewayRequest
+      output:
+        name: Gateway
+      http:
+      - method: POST
+        path: /users/{collaborator.user_ids.user_id}/gateways
+      - method: POST
+        path: /organizations/{collaborator.organization_ids.organization_id}/gateways
+    Get:
+      name: Get
+      comment: |2
+         Get the gateway with the given identifiers, selecting the fields given
+         by the field mask. The method may return more or less fields, depending on
+         the rights of the caller.
+      input:
+        name: GetGatewayRequest
+      output:
+        name: Gateway
+      http:
+      - method: GET
+        path: /gateways/{gateway_ids.gateway_id}
+    GetIdentifiersForEUI:
+      name: GetIdentifiersForEUI
+      input:
+        name: GetGatewayIdentifiersForEUIRequest
+      output:
+        name: GatewayIdentifiers
+    List:
+      name: List
+      comment: |2
+         List gateways. See request message for details.
+      input:
+        name: ListGatewaysRequest
+      output:
+        name: Gateways
+      http:
+      - method: GET
+        path: /gateways
+      - method: GET
+        path: /users/{collaborator.user_ids.user_id}/gateways
+      - method: GET
+        path: /organizations/{collaborator.organization_ids.organization_id}/gateways
+    Update:
+      name: Update
+      input:
+        name: UpdateGatewayRequest
+      output:
+        name: Gateway
+      http:
+      - method: PUT
+        path: /gateways/{gateway.ids.gateway_id}
+    Delete:
+      name: Delete
+      input:
+        name: GatewayIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /gateways/{gateway_id}
+Gs:
+  name: Gs
+  methods:
+    GetGatewayConnectionStats:
+      name: GetGatewayConnectionStats
+      comment: |2
+         Get statistics about the current gateway connection to the Gateway Server.
+         This is not persisted between reconnects.
+      input:
+        name: GatewayIdentifiers
+      output:
+        name: GatewayConnectionStats
+      http:
+      - method: GET
+        path: /gs/gateways/{gateway_id}/connection/stats
+GsNs:
+  name: GsNs
+  comment: |2
+     The GsNs service connects a Gateway Server to a Network Server.
+  methods:
+    HandleUplink:
+      name: HandleUplink
+      input:
+        name: UplinkMessage
+      output:
+        package: google.protobuf
+        name: Empty
+GtwGs:
+  name: GtwGs
+  comment: |2
+     The GtwGs service connects a gateway to a Gateway Server.
+  methods:
+    LinkGateway:
+      name: LinkGateway
+      comment: |2
+         Link the gateway to the Gateway Server.
+      input:
+        name: GatewayUp
+        stream: true
+      output:
+        name: GatewayDown
+        stream: true
+    GetConcentratorConfig:
+      name: GetConcentratorConfig
+      comment: |2
+         GetConcentratorConfig associated to the gateway.
+      input:
+        package: google.protobuf
+        name: Empty
+      output:
+        name: ConcentratorConfig
+    GetMQTTConnectionInfo:
+      name: GetMQTTConnectionInfo
+      comment: |2
+         Get the MQTT server address and the username for the gateway.
+      input:
+        name: GatewayIdentifiers
+      output:
+        name: MQTTConnectionInfo
+      http:
+      - method: GET
+        path: /gs/gateways/{gateway_id}/mqtt-connection-info
+    GetMQTTV2ConnectionInfo:
+      name: GetMQTTV2ConnectionInfo
+      comment: |2
+         Get the MQTTV2 server address and the username for the gateway.
+      input:
+        name: GatewayIdentifiers
+      output:
+        name: MQTTConnectionInfo
+      http:
+      - method: GET
+        path: /gs/gateways/{gateway_id}/mqttv2-connection-info
+Js:
+  name: Js
+  methods:
+    GetJoinEUIPrefixes:
+      name: GetJoinEUIPrefixes
+      input:
+        package: google.protobuf
+        name: Empty
+      output:
+        name: JoinEUIPrefixes
+      http:
+      - method: GET
+        path: /js/join_eui_prefixes
+JsEndDeviceRegistry:
+  name: JsEndDeviceRegistry
+  comment: |2
+     The JsEndDeviceRegistry service allows clients to manage their end devices on the Join Server.
+  methods:
+    Get:
+      name: Get
+      comment: |2
+         Get returns the device that matches the given identifiers.
+         If there are multiple matches, an error will be returned.
+      input:
+        name: GetEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: GET
+        path: /js/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}
+    Set:
+      name: Set
+      comment: |2
+         Set creates or updates the device.
+      input:
+        name: SetEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: PUT
+        path: /js/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}
+      - method: POST
+        path: /js/applications/{end_device.ids.application_ids.application_id}/devices
+    Provision:
+      name: Provision
+      comment: |2
+         This rpc is deprecated; use EndDeviceTemplateConverter service instead.
+         TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)
+      input:
+        name: ProvisionEndDevicesRequest
+      output:
+        name: EndDevice
+        stream: true
+      http:
+      - method: PUT
+        path: /js/applications/{application_ids.application_id}/provision-devices
+    Delete:
+      name: Delete
+      comment: |2
+         Delete deletes the device that matches the given identifiers.
+         If there are multiple matches, an error will be returned.
+      input:
+        name: EndDeviceIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /js/applications/{application_ids.application_id}/devices/{device_id}
+NetworkCryptoService:
+  name: NetworkCryptoService
+  comment: |2
+     Service for network layer cryptographic operations.
+  methods:
+    JoinRequestMIC:
+      name: JoinRequestMIC
+      input:
+        name: CryptoServicePayloadRequest
+      output:
+        name: CryptoServicePayloadResponse
+    JoinAcceptMIC:
+      name: JoinAcceptMIC
+      input:
+        name: JoinAcceptMICRequest
+      output:
+        name: CryptoServicePayloadResponse
+    EncryptJoinAccept:
+      name: EncryptJoinAccept
+      input:
+        name: CryptoServicePayloadRequest
+      output:
+        name: CryptoServicePayloadResponse
+    EncryptRejoinAccept:
+      name: EncryptRejoinAccept
+      input:
+        name: CryptoServicePayloadRequest
+      output:
+        name: CryptoServicePayloadResponse
+    DeriveNwkSKeys:
+      name: DeriveNwkSKeys
+      input:
+        name: DeriveSessionKeysRequest
+      output:
+        name: NwkSKeysResponse
+    GetNwkKey:
+      name: GetNwkKey
+      comment: |2
+         Get the NwkKey. Crypto Servers may return status code FAILED_PRECONDITION when root keys are not exposed.
+      input:
+        name: GetRootKeysRequest
+      output:
+        name: KeyEnvelope
+Ns:
+  name: Ns
+  methods:
+    GenerateDevAddr:
+      name: GenerateDevAddr
+      comment: |2
+         GenerateDevAddr requests a device address assignment from the Network Server.
+      input:
+        package: google.protobuf
+        name: Empty
+      output:
+        name: GenerateDevAddrResponse
+      http:
+      - method: GET
+        path: /ns/dev_addr
+NsEndDeviceRegistry:
+  name: NsEndDeviceRegistry
+  comment: |2
+     The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.
+  methods:
+    Get:
+      name: Get
+      comment: |2
+         Get returns the device that matches the given identifiers.
+         If there are multiple matches, an error will be returned.
+      input:
+        name: GetEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: GET
+        path: /ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}
+    Set:
+      name: Set
+      comment: |2
+         Set creates or updates the device.
+      input:
+        name: SetEndDeviceRequest
+      output:
+        name: EndDevice
+      http:
+      - method: PUT
+        path: /ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}
+      - method: POST
+        path: /ns/applications/{end_device.ids.application_ids.application_id}/devices
+    Delete:
+      name: Delete
+      comment: |2
+         Delete deletes the device that matches the given identifiers.
+         If there are multiple matches, an error will be returned.
+      input:
+        name: EndDeviceIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /ns/applications/{application_ids.application_id}/devices/{device_id}
+NsGs:
+  name: NsGs
+  comment: |2
+     The NsGs service connects a Network Server to a Gateway Server.
+  methods:
+    ScheduleDownlink:
+      name: ScheduleDownlink
+      comment: |2
+         ScheduleDownlink instructs the Gateway Server to schedule a downlink message.
+         The Gateway Server may refuse if there are any conflicts in the schedule or
+         if a duty cycle prevents the gateway from transmitting.
+      input:
+        name: DownlinkMessage
+      output:
+        name: ScheduleDownlinkResponse
+NsJs:
+  name: NsJs
+  comment: |2
+     The NsJs service connects a Network Server to a Join Server.
+  methods:
+    HandleJoin:
+      name: HandleJoin
+      input:
+        name: JoinRequest
+      output:
+        name: JoinResponse
+    GetNwkSKeys:
+      name: GetNwkSKeys
+      input:
+        name: SessionKeyRequest
+      output:
+        name: NwkSKeysResponse
+OAuthAuthorizationRegistry:
+  name: OAuthAuthorizationRegistry
+  methods:
+    List:
+      name: List
+      input:
+        name: ListOAuthClientAuthorizationsRequest
+      output:
+        name: OAuthClientAuthorizations
+      http:
+      - method: GET
+        path: /users/{user_ids.user_id}/authorizations
+    ListTokens:
+      name: ListTokens
+      input:
+        name: ListOAuthAccessTokensRequest
+      output:
+        name: OAuthAccessTokens
+      http:
+      - method: GET
+        path: /users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens
+    Delete:
+      name: Delete
+      input:
+        name: OAuthClientAuthorizationIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /users/{user_ids.user_id}/authorizations/{client_ids.client_id}
+    DeleteToken:
+      name: DeleteToken
+      input:
+        name: OAuthAccessTokenIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens/{id}
+OrganizationAccess:
+  name: OrganizationAccess
+  methods:
+    ListRights:
+      name: ListRights
+      input:
+        name: OrganizationIdentifiers
+      output:
+        name: Rights
+      http:
+      - method: GET
+        path: /organizations/{organization_id}/rights
+    CreateAPIKey:
+      name: CreateAPIKey
+      input:
+        name: CreateOrganizationAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: POST
+        path: /organizations/{organization_ids.organization_id}/api-keys
+    ListAPIKeys:
+      name: ListAPIKeys
+      input:
+        name: ListOrganizationAPIKeysRequest
+      output:
+        name: APIKeys
+      http:
+      - method: GET
+        path: /organizations/{organization_ids.organization_id}/api-keys
+    GetAPIKey:
+      name: GetAPIKey
+      input:
+        name: GetOrganizationAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: GET
+        path: /organizations/{organization_ids.organization_id}/api-keys/{key_id}
+    UpdateAPIKey:
+      name: UpdateAPIKey
+      comment: |2
+         Update the rights of an existing organization API key. To generate an API key,
+         the CreateAPIKey should be used. To delete an API key, update it
+         with zero rights. It is required for the caller to have all assigned or/and removed rights.
+      input:
+        name: UpdateOrganizationAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: PUT
+        path: /organizations/{organization_ids.organization_id}/api-keys/{api_key.id}
+    GetCollaborator:
+      name: GetCollaborator
+      comment: |2
+         Get the rights of a collaborator (member) of the organization.
+         Pseudo-rights in the response (such as the "_ALL" right) are not expanded.
+      input:
+        name: GetOrganizationCollaboratorRequest
+      output:
+        name: GetCollaboratorResponse
+      http:
+      - method: GET
+        path: /organizations/{organization_ids.organization_id}/collaborator
+      - method: GET
+        path: /organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}
+    SetCollaborator:
+      name: SetCollaborator
+      comment: |2
+         Set the rights of a collaborator (member) on the organization. It is required for the caller to
+         have all assigned or/and removed rights.
+         Setting a collaborator without rights, removes them.
+         Note that only users can collaborate (be member of) an organization.
+      input:
+        name: SetOrganizationCollaboratorRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: PUT
+        path: /organizations/{organization_ids.organization_id}/collaborators
+    ListCollaborators:
+      name: ListCollaborators
+      input:
+        name: ListOrganizationCollaboratorsRequest
+      output:
+        name: Collaborators
+      http:
+      - method: GET
+        path: /organizations/{organization_ids.organization_id}/collaborators
+OrganizationRegistry:
+  name: OrganizationRegistry
+  methods:
+    Create:
+      name: Create
+      comment: |2
+         Create a new organization. This also sets the given user as
+         first collaborator with all possible rights.
+      input:
+        name: CreateOrganizationRequest
+      output:
+        name: Organization
+      http:
+      - method: POST
+        path: /users/{collaborator.user_ids.user_id}/organizations
+    Get:
+      name: Get
+      comment: |2
+         Get the organization with the given identifiers, selecting the fields given
+         by the field mask. The method may return more or less fields, depending on
+         the rights of the caller.
+      input:
+        name: GetOrganizationRequest
+      output:
+        name: Organization
+      http:
+      - method: GET
+        path: /organizations/{organization_ids.organization_id}
+    List:
+      name: List
+      comment: |2
+         List organizations. See request message for details.
+      input:
+        name: ListOrganizationsRequest
+      output:
+        name: Organizations
+      http:
+      - method: GET
+        path: /organizations
+      - method: GET
+        path: /users/{collaborator.user_ids.user_id}/organizations
+    Update:
+      name: Update
+      input:
+        name: UpdateOrganizationRequest
+      output:
+        name: Organization
+      http:
+      - method: PUT
+        path: /organizations/{organization.ids.organization_id}
+    Delete:
+      name: Delete
+      input:
+        name: OrganizationIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /organizations/{organization_id}
+UplinkMessageProcessor:
+  name: UplinkMessageProcessor
+  comment: |2
+     The UplinkMessageProcessor service processes uplink messages.
+  methods:
+    Process:
+      name: Process
+      input:
+        name: ProcessUplinkMessageRequest
+      output:
+        name: ApplicationUplink
+UserAccess:
+  name: UserAccess
+  methods:
+    ListRights:
+      name: ListRights
+      input:
+        name: UserIdentifiers
+      output:
+        name: Rights
+      http:
+      - method: GET
+        path: /users/{user_id}/rights
+    CreateAPIKey:
+      name: CreateAPIKey
+      input:
+        name: CreateUserAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: POST
+        path: /users/{user_ids.user_id}/api-keys
+    ListAPIKeys:
+      name: ListAPIKeys
+      input:
+        name: ListUserAPIKeysRequest
+      output:
+        name: APIKeys
+      http:
+      - method: GET
+        path: /users/{user_ids.user_id}/api-keys
+    GetAPIKey:
+      name: GetAPIKey
+      input:
+        name: GetUserAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: GET
+        path: /users/{user_ids.user_id}/api-keys/{key_id}
+    UpdateAPIKey:
+      name: UpdateAPIKey
+      comment: |2
+         Update the rights of an existing user API key. To generate an API key,
+         the CreateAPIKey should be used. To delete an API key, update it
+         with zero rights. It is required for the caller to have all assigned or/and removed rights.
+      input:
+        name: UpdateUserAPIKeyRequest
+      output:
+        name: APIKey
+      http:
+      - method: PUT
+        path: /users/{user_ids.user_id}/api-keys/{api_key.id}
+UserInvitationRegistry:
+  name: UserInvitationRegistry
+  methods:
+    Send:
+      name: Send
+      input:
+        name: SendInvitationRequest
+      output:
+        name: Invitation
+      http:
+      - method: POST
+        path: /invitations
+    List:
+      name: List
+      input:
+        name: ListInvitationsRequest
+      output:
+        name: Invitations
+      http:
+      - method: GET
+        path: /invitations
+    Delete:
+      name: Delete
+      input:
+        name: DeleteInvitationRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /invitations
+UserRegistry:
+  name: UserRegistry
+  methods:
+    Create:
+      name: Create
+      comment: |2
+         Register a new user. This method may be restricted by network settings.
+      input:
+        name: CreateUserRequest
+      output:
+        name: User
+      http:
+      - method: POST
+        path: /users
+    Get:
+      name: Get
+      comment: |2
+         Get the user with the given identifiers, selecting the fields given by the
+         field mask. The method may return more or less fields, depending on the rights
+         of the caller.
+      input:
+        name: GetUserRequest
+      output:
+        name: User
+      http:
+      - method: GET
+        path: /users/{user_ids.user_id}
+    Update:
+      name: Update
+      input:
+        name: UpdateUserRequest
+      output:
+        name: User
+      http:
+      - method: PUT
+        path: /users/{user.ids.user_id}
+    CreateTemporaryPassword:
+      name: CreateTemporaryPassword
+      comment: |2
+         Create a temporary password that can be used for updating a forgotten password.
+         The generated password is sent to the user's email address.
+      input:
+        name: CreateTemporaryPasswordRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: POST
+        path: /users/{user_ids.user_id}/temporary_password
+    UpdatePassword:
+      name: UpdatePassword
+      input:
+        name: UpdateUserPasswordRequest
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: PUT
+        path: /users/{user_ids.user_id}/password
+    Delete:
+      name: Delete
+      input:
+        name: UserIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /users/{user_id}
+UserSessionRegistry:
+  name: UserSessionRegistry
+  methods:
+    List:
+      name: List
+      input:
+        name: ListUserSessionsRequest
+      output:
+        name: UserSessions
+      http:
+      - method: GET
+        path: /users/{user_ids.user_id}/sessions
+    Delete:
+      name: Delete
+      input:
+        name: UserSessionIdentifiers
+      output:
+        package: google.protobuf
+        name: Empty
+      http:
+      - method: DELETE
+        path: /users/{user_ids.user_id}/sessions/{session_id}
