@@ -163,11 +163,11 @@ brews:
       libexec.install doc
 
 s3:
-  - bucket: {{ or (index .Env "AWS_BUCKET") "the-things-stack-releases" }}
+  - bucket: '{{ or (index .Env "AWS_BUCKET") "the-things-stack-releases" }}'
     ids:
     - stack
     - cli
-    region: {{ or (index .Env "AWS_REGION") "eu-west-1" }}
+    region: '{{ or (index .Env "AWS_REGION") "eu-west-1" }}'
     folder: "{{ .Version }}"
 
 dockers:
