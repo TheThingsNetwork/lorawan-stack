@@ -218,7 +218,7 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 		if len(data.PublicKeySet.Keys) < 1 || len(data.PublicKeySet.Keys[0].X5C) < 1 {
 			return errMicrochipData
 		}
-		certBuf, err := base64.RawStdEncoding.DecodeString(data.PublicKeySet.Keys[0].X5C[0])
+		certBuf, err := base64.StdEncoding.DecodeString(data.PublicKeySet.Keys[0].X5C[0])
 		if err != nil {
 			return errMicrochipData.WithCause(err)
 		}
