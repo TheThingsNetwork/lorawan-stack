@@ -17,7 +17,6 @@ package messages
 import (
 	"bytes"
 	"encoding/binary"
-	"reflect"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -83,7 +82,7 @@ func getDataRateIndexFromDataRate(bandID string, DR ttnpb.DataRate) (int, error)
 		return 0, err
 	}
 	for i, dr := range band.DataRates {
-		if reflect.DeepEqual(dr.Rate, DR) {
+		if dr.Rate.Equal(DR) {
 			return i, nil
 		}
 	}

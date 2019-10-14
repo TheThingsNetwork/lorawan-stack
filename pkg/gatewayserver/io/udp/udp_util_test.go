@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/pkg/util/datarate"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -66,7 +67,7 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 			Chan: uint8(up.RxMetadata[0].ChannelIndex),
 			Modu: modulation,
 			CodR: codr,
-			DatR: encoding.DataRate{
+			DatR: datarate.DR{
 				DataRate: up.Settings.DataRate,
 			},
 			Size: uint16(len(up.RawPayload)),

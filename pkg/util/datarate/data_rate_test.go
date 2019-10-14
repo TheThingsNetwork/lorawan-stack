@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package udp_test
+package datarate_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
+	"go.thethings.network/lorawan-stack/pkg/util/datarate"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestDataRate(t *testing.T) {
 	a := assertions.New(t)
 
-	table := map[string]udp.DataRate{
+	table := map[string]datarate.DR{
 		`"SF7BW125"`: {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}},
 		`50000`:      {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{BitRate: 50000}}}},
 	}
@@ -36,13 +36,13 @@ func TestDataRate(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(string(enc), should.Equal, s)
 
-		var dec udp.DataRate
+		var dec datarate.DR
 		err = dec.UnmarshalJSON(enc)
 		a.So(err, should.BeNil)
 		a.So(dec, should.Resemble, dr)
 	}
 
-	var dr udp.DataRate
+	var dr datarate.DR
 	err := dr.UnmarshalJSON([]byte{})
 	a.So(err, should.NotBeNil)
 }
@@ -50,13 +50,13 @@ func TestDataRate(t *testing.T) {
 func TestValidLoRaDataRateParsing(t *testing.T) {
 	a := assertions.New(t)
 
-	table := map[string]udp.DataRate{
+	table := map[string]datarate.DR{
 		"SF6BW125":   {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 125000}}}},
 		"SF9BW500":   {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 500000}}}},
 		"SF5BW31.25": {DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 5, Bandwidth: 31250}}}},
 	}
 	for dr, expected := range table {
-		actual, err := udp.ParseLoRaDataRate(dr)
+		actual, err := datarate.ParseLoRa(dr)
 		a.So(err, should.BeNil)
 		a.So(actual, should.Resemble, expected)
 	}
@@ -70,7 +70,7 @@ func TestInvalidLoRaDataRateParsing(t *testing.T) {
 		"SF9B500",
 	}
 	for _, dr := range table {
-		_, err := udp.ParseLoRaDataRate(dr)
+		_, err := datarate.ParseLoRa(dr)
 		a.So(err, should.NotBeNil)
 	}
 }
@@ -78,7 +78,7 @@ func TestInvalidLoRaDataRateParsing(t *testing.T) {
 func TestStringer(t *testing.T) {
 	a := assertions.New(t)
 
-	table := map[udp.DataRate]string{
+	table := map[datarate.DR]string{
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 6, Bandwidth: 125000}}}}: "SF6BW125",
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 9, Bandwidth: 500000}}}}: "SF9BW500",
 		{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{SpreadingFactor: 5, Bandwidth: 31250}}}}:  "SF5BW31.25",
