@@ -164,7 +164,8 @@ brews:
 
 blobs:
   - provider: s3
-    bucket: '{{ or (index .Env "AWS_BUCKET") "the-things-stack-releases" }}'
+    # NOTE: GoReleaser documentation says that bucket is a template, but it's not.
+    bucket: the-things-stack-releases
     ids:
     - stack
     - cli
