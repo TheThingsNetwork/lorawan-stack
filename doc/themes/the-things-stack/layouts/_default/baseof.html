@@ -6,7 +6,7 @@
 
 {{- $hasSidebar := false -}}
 {{ if eq .Kind "section" "page" -}}
-  {{ $hasSidebar = and (not (eq .CurrentSection .FirstSection)) -}}
+  {{ $hasSidebar = and (not (eq .CurrentSection .FirstSection)) (not (eq . .FirstSection)) -}}
   {{ if not (eq .CurrentSection.Parent .FirstSection) -}}
     {{ .Scratch.Set "section" .CurrentSection.Parent -}}
   {{ end -}}
