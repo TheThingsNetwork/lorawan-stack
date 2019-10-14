@@ -25,8 +25,6 @@ code.gitea.io/gitea v1.10.0-dev.0.20190711052757-a0820e09fbf7 h1:mmavl3m1OmiTywS
 code.gitea.io/gitea v1.10.0-dev.0.20190711052757-a0820e09fbf7/go.mod h1:M4dnaQvrKfmOxBkO1b6dsaSM7IGbbuA9IzDMBkuKKWg=
 code.gitea.io/sdk/gitea v0.0.0-20190915142708-a6d0aab59332 h1:Q6/14pqIsOqCoMJHO4uTVM7Zsr5JtAbVoLcd+qzoVb0=
 code.gitea.io/sdk/gitea v0.0.0-20190915142708-a6d0aab59332/go.mod h1:OZwx6KJdiyILuHXx8zyITxTv6iSmmy4+Bim5uBIP4kY=
-code.gitea.io/sdk/gitea v0.0.0-20191013013401-e41e9ea72caa h1:KgpwNF1StxPXMfCD9M++jvCUPUqHPAbuvQn1q3sWtqw=
-code.gitea.io/sdk/gitea v0.0.0-20191013013401-e41e9ea72caa/go.mod h1:8IxkM1gyiwEjfO0m47bcmr3u3foR15+LoVub43hCHd0=
 contrib.go.opencensus.io/exporter/aws v0.0.0-20181029163544-2befc13012d0/go.mod h1:uu1P0UCM/6RbsMrgPa98ll8ZcHM858i/AD06a9aLRCA=
 contrib.go.opencensus.io/exporter/ocagent v0.4.12/go.mod h1:450APlNTSR6FrvC3CTRqYosuDstRB9un7SOx2k/9ckA=
 contrib.go.opencensus.io/exporter/ocagent v0.5.0 h1:TKXjQSRS0/cCDrP7KvkgU6SmILtF/yV2TOs/02K/WZQ=

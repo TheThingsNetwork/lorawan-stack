@@ -21,7 +21,6 @@ replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v13.1.0+inc
 require (
 	cloud.google.com/go v0.47.0 // indirect
 	cloud.google.com/go/storage v1.1.0 // indirect
-	code.gitea.io/sdk/gitea v0.0.0-20191013013401-e41e9ea72caa // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/Azure/azure-pipeline-go v0.2.2 // indirect
 	github.com/Azure/azure-sdk-for-go v34.1.0+incompatible // indirect
