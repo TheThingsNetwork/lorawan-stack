@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"golang.org/x/crypto/acme"
 )
 
 // DefaultBaseConfig is the default base component configuration.
@@ -36,7 +37,7 @@ var DefaultTLSConfig = config.TLS{
 	Certificate: "cert.pem",
 	Key:         "key.pem",
 	ACME: config.ACME{
-		Endpoint: "https://acme-v01.api.letsencrypt.org/directory",
+		Endpoint: acme.LetsEncryptURL,
 	},
 }
 
