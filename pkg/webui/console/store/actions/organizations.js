@@ -32,6 +32,7 @@ import {
   createClearEventsActionType,
 } from './events'
 import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
+import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 
 export const SHARED_NAME = 'ORGANIZATION'
 
@@ -94,6 +95,20 @@ export const [
     failure: getOrganizationApiKeysListFailure,
   },
 ] = createApiKeysRequestActions(SHARED_NAME)
+
+export const GET_ORGS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
+export const [
+  {
+    request: GET_ORGS_RIGHTS_LIST,
+    success: GET_ORGS_RIGHTS_LIST_SUCCESS,
+    failure: GET_ORGS_RIGHTS_LIST_FAILURE,
+  },
+  {
+    request: getOrganizationsRightsList,
+    success: getOrganizationsRightsListSuccess,
+    failure: getOrganizationsRightsListFailure,
+  },
+] = createGetRightsListRequestActions(SHARED_NAME)
 
 export const START_ORG_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_ORG_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)

@@ -79,6 +79,7 @@ export default history =>
     rights: combineReducers({
       applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
       gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
+      organizations: createNamedRightsReducer(ORGANIZATION_SHARED_NAME),
     }),
     collaborators: combineReducers({
       application: createNamedCollaboratorReducer(APPLICATION_SHARED_NAME),
