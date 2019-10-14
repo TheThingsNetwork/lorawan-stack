@@ -129,6 +129,15 @@ const getOrganizationCollaboratorsLogic = createRequestLogic({
   },
 })
 
+const getOrganizationsRightsLogic = createRequestLogic({
+  type: organizations.GET_ORGS_RIGHTS_LIST,
+  async process({ action }) {
+    const { id } = action.payload
+    const result = await api.rights.organizations(id)
+    return result.rights.sort()
+  },
+})
+
 export default [
   getOrganizationLogic,
   getOrganizationsLogic,
@@ -139,6 +148,7 @@ export default [
   getOrganizationApiKeyLogic,
   getOrganizationsRightsLogic,
   getOrganizationCollaboratorsLogic,
+  getOrganizationsRightsLogic,
   ...createEventsConnectLogics(
     organizations.SHARED_NAME,
     'organizations',
