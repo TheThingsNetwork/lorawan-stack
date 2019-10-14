@@ -24,6 +24,7 @@ import PropTypes from '../../../lib/prop-types'
 import SubViewError from '../error/sub-view'
 import OrganizationApiKeysList from '../organization-api-keys-list'
 import OrganizationApiKeyAdd from '../organization-api-key-add'
+import OrganizationApiKeyEdit from '../organization-api-key-edit'
 
 @withBreadcrumb('org.single.api-keys', function(props) {
   const { match } = props
@@ -49,6 +50,7 @@ class OrganizationApiKeys extends React.Component {
         <Switch>
           <Route exact path={`${match.path}`} component={OrganizationApiKeysList} />
           <Route exact path={`${match.path}/add`} component={OrganizationApiKeyAdd} />
+          <Route path={`${match.path}/:apiKeyId`} component={OrganizationApiKeyEdit} />
         </Switch>
       </ErrorView>
     )

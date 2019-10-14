@@ -193,6 +193,11 @@ PropTypes.collaborator = PropTypes.shape({
   rights: PropTypes.rights,
 })
 
+PropTypes.apiKey = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  rights: PropTypes.rights,
+})
+
 PropTypes.rights = PropTypes.arrayOf(PropTypes.string)
 
 export default PropTypes
