@@ -25,11 +25,15 @@ import SubmitButton from '../../../components/submit-button'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 
+import style from './device-import-form.styl'
+
 const m = defineMessages({
   fileImport: 'File Import',
   file: 'File',
+  formatInfo: 'Format Information',
   createDevices: 'Create Devices',
   selectAFile: 'Please select a template file',
+  fileInfoPlaceholder: 'Please select a template format',
 })
 
 const validationSchema = Yup.object({
@@ -40,6 +44,7 @@ const validationSchema = Yup.object({
 export default class DeviceBulkCreateForm extends Component {
   state = {
     allowedFileExtensions: undefined,
+    formatDescription: undefined,
     formatSelected: false,
   }
 
@@ -49,12 +54,15 @@ export default class DeviceBulkCreateForm extends Component {
     if (value && value.fileExtensions && value.fileExtensions instanceof Array) {
       newState.allowedFileExtensions = value.fileExtensions.join(',')
     }
+    if (value && value.description) {
+      newState.formatDescription = value.description
+    }
     this.setState(newState)
   }
 
   render() {
     const { initialValues, error, onSubmit } = this.props
-    const { allowedFileExtensions, formatSelected } = this.state
+    const { allowedFileExtensions, formatSelected, formatDescription } = this.state
     return (
       <Form
         error={error}
@@ -65,6 +73,10 @@ export default class DeviceBulkCreateForm extends Component {
       >
         <Message component="h4" content={m.fileImport} />
         <DeviceTemplateFormatSelect onChange={this.handleSelectChange} name="format_id" required />
+        <Form.InfoField disabled={!formatSelected} title={m.formatInfo}>
+          {formatDescription ? formatDescription : <Message content={m.fileInfoPlaceholder} />}
+        </Form.InfoField>
+        <hr className={style.hRule} />
         <Form.Field
           disabled={!formatSelected}
           title={m.file}
