@@ -9322,7 +9322,15 @@
           "type": "string"
         },
         "frequency_plan_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Frequency plan ID of the gateway.\nThis equals the first element of the frequency_plan_ids field."
+        },
+        "frequency_plan_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Frequency plan IDs of the gateway.\nThe first element equals the frequency_plan_id field."
         },
         "antennas": {
           "type": "array",
