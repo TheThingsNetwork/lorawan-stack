@@ -141,6 +141,7 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 		if err != nil {
 			return errMicrochipData.WithCause(err)
 		}
+		sn := s.Fields["uniqueId"].GetStringValue()
 		ch <- &ttnpb.EndDeviceTemplate{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -148,17 +149,21 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 				},
 				ProvisionerID:    provisioning.Microchip,
 				ProvisioningData: s,
-				SupportsJoin:     true,
+				RootKeys: &ttnpb.RootKeys{
+					RootKeyID: sn,
+				},
+				SupportsJoin: true,
 			},
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{
 					"ids.join_eui",
 					"provisioner_id",
 					"provisioning_data",
+					"root_keys.root_key_id",
 					"supports_join",
 				},
 			},
-			MappingKey: s.Fields["uniqueId"].GetStringValue(),
+			MappingKey: sn,
 		}
 	}
 	return nil
@@ -244,6 +249,7 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 		if err != nil {
 			return errMicrochipData.WithCause(err)
 		}
+		sn := s.Fields["uniqueId"].GetStringValue()
 		ch <- &ttnpb.EndDeviceTemplate{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -253,7 +259,10 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 				},
 				ProvisionerID:    provisioning.Microchip,
 				ProvisioningData: s,
-				SupportsJoin:     true,
+				RootKeys: &ttnpb.RootKeys{
+					RootKeyID: sn,
+				},
+				SupportsJoin: true,
 			},
 			FieldMask: pbtypes.FieldMask{
 				Paths: []string{
@@ -262,10 +271,11 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 					"ids.join_eui",
 					"provisioner_id",
 					"provisioning_data",
+					"root_keys.root_key_id",
 					"supports_join",
 				},
 			},
-			MappingKey: s.Fields["uniqueId"].GetStringValue(),
+			MappingKey: sn,
 		}
 	}
 	return nil
