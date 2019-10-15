@@ -20,6 +20,7 @@ import bind from 'autobind-decorator'
 import Form from '../../../components/form'
 import DeviceTemplateFormatSelect from '../../containers/device-template-format-select'
 import FileInput from '../../../components/file-input'
+import Checkbox from '../../../components/checkbox'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import sharedMessages from '../../../lib/shared-messages'
@@ -34,6 +35,7 @@ const m = defineMessages({
   createDevices: 'Create Devices',
   selectAFile: 'Please select a template file',
   fileInfoPlaceholder: 'Please select a template format',
+  claimAuthCode: 'Set claim authentication code',
 })
 
 const validationSchema = Yup.object({
@@ -84,6 +86,12 @@ export default class DeviceBulkCreateForm extends Component {
           component={FileInput}
           name="data"
           required
+        />
+        <Form.Field
+          disabled={!formatSelected}
+          title={m.claimAuthCode}
+          component={Checkbox}
+          name="set_claim_auth_code"
         />
         <SubmitBar>
           <Form.Submit component={SubmitButton} message={m.createDevices} />

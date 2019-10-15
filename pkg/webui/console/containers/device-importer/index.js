@@ -29,6 +29,7 @@ import api from '../../api'
 import PropTypes from '../../../lib/prop-types'
 import Message from '../../../lib/components/message'
 import Status from '../../../components/status'
+import randomByteString from '../../lib/random-bytes'
 
 import style from './device-importer.styl'
 
@@ -107,7 +108,7 @@ export default class DeviceImporter extends Component {
   @bind
   async handleSubmit(values) {
     const { appId } = this.props
-    const { format_id, data } = values
+    const { format_id, data, set_claim_auth_code } = values
 
     try {
       // Start template conversion
@@ -129,6 +130,15 @@ export default class DeviceImporter extends Component {
           templateStream.on('close', () => resolve(chunks))
         }.bind(this),
       )
+
+      // Apply default values
+      for (const deviceAndFieldMask of devices) {
+        const { end_device: device, field_mask } = deviceAndFieldMask
+        if (set_claim_auth_code) {
+          device.claim_authentication_code = { value: randomByteString(4 * 2) }
+          field_mask.paths.push('claim_authentication_code')
+        }
+      }
 
       // Start batch device creation
       this.setState({
@@ -216,6 +226,7 @@ export default class DeviceImporter extends Component {
     const initialValues = {
       format_id: '',
       data: '',
+      set_claim_auth_code: false,
     }
     return <DeviceImportForm initialValues={initialValues} onSubmit={this.handleSubmit} />
   }
