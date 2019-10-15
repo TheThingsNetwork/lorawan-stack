@@ -63,11 +63,10 @@ export default class DeviceBulkCreateForm extends Component {
   }
 
   render() {
-    const { initialValues, error, onSubmit } = this.props
+    const { initialValues, onSubmit } = this.props
     const { allowedFileExtensions, formatSelected, formatDescription } = this.state
     return (
       <Form
-        error={error}
         onSubmit={onSubmit}
         validationSchema={validationSchema}
         submitEnabledWhenInvalid

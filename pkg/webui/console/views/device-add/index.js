@@ -62,10 +62,6 @@ export default class DeviceAdd extends Component {
     redirectToList: PropTypes.func.isRequired,
   }
 
-  state = {
-    error: '',
-  }
-
   @bind
   async handleSubmit(values) {
     const { appId } = this.props
@@ -85,7 +81,6 @@ export default class DeviceAdd extends Component {
   }
 
   render() {
-    const { error } = this.state
     const { asConfig, nsConfig, jsConfig } = this.props
 
     const initialValues = {
@@ -105,7 +100,6 @@ export default class DeviceAdd extends Component {
         <Row>
           <Col className={style.form} lg={8} md={12}>
             <DeviceDataForm
-              error={error}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
               initialValues={initialValues}
