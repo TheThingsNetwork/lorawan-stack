@@ -35,6 +35,7 @@ const m = defineMessages({
   sessionInfo: 'Session Information',
   latestData: 'Latest Data',
   rootKeys: 'Root Keys',
+  keysNotExposed: 'Keys are not exposed',
 })
 
 @connect(function({ device }, props) {
@@ -105,12 +106,21 @@ class DeviceOverview extends React.Component {
 
       // Add root keys, if available
       if (Object.keys(root_keys).length > 0) {
-        activationInfoData.items.push({
+        const infoEntry = {
           key: m.rootKeyId,
           value: root_keys.root_key_id,
           type: 'code',
           sensitive: false,
-          subItems: [
+        }
+        if (!Boolean(root_keys.app_key) && !Boolean(root_keys.nwk_key)) {
+          infoEntry.subItems = [
+            {
+              key: m.rootKeys,
+              value: <Message content={m.keysNotExposed} />,
+            },
+          ]
+        } else {
+          infoEntry.subItems = [
             {
               key: sharedMessages.appKey,
               value: root_keys.app_key.key,
@@ -125,8 +135,9 @@ class DeviceOverview extends React.Component {
                   sensitive: true,
                 }
               : { key: sharedMessages.nwkKey, value: undefined }),
-          ],
-        })
+          ]
+        }
+        activationInfoData.items.push(infoEntry)
       } else {
         activationInfoData.items.push({
           key: m.rootKeys,
