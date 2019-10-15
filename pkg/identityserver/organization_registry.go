@@ -167,16 +167,18 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 		if err != nil {
 			return err
 		}
-		for i, org := range orgs.Organizations {
-			if rights.RequireOrganization(ctx, org.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO) != nil {
-				orgs.Organizations[i] = org.PublicSafe()
-			}
-		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	for i, org := range orgs.Organizations {
+		if rights.RequireOrganization(ctx, org.OrganizationIdentifiers, ttnpb.RIGHT_ORGANIZATION_INFO) != nil {
+			orgs.Organizations[i] = org.PublicSafe()
+		}
+	}
+
 	return orgs, nil
 }
 
