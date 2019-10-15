@@ -25,6 +25,7 @@ import PropTypes from '../../../lib/prop-types'
 
 import SubViewError from '../error/sub-view'
 import OrganizationCollaboratorsList from '../organization-collaborators-list'
+import OrganizationCollaboratorAdd from '../organization-collaborator-add'
 
 @withBreadcrumb('orgs.single.collaborators', function(props) {
   const { match } = props
@@ -50,6 +51,7 @@ class OrganizationCollaborators extends React.Component {
       <ErrorView ErrorComponent={SubViewError}>
         <Switch>
           <Route exact path={`${match.path}`} component={OrganizationCollaboratorsList} />
+          <Route exact path={`${match.path}/add`} component={OrganizationCollaboratorAdd} />
           <NotFoundRoute />
         </Switch>
       </ErrorView>
