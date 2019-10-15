@@ -21,6 +21,7 @@ import { defineMessages } from 'react-intl'
 import CodeEditor from '../../../components/code-editor'
 import ProgressBar from '../../../components/progress-bar'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import DeviceImportForm from '../../components/device-import-form'
 import SubmitBar from '../../../components/submit-bar'
 import Button from '../../../components/button'
@@ -62,6 +63,9 @@ const statusMap = {
 @connect(
   state => ({
     appId: selectSelectedApplicationId(state),
+    asConfig: selectAsConfig(),
+    nsConfig: selectNsConfig(),
+    jsConfig: selectJsConfig(),
   }),
   dispatch => ({
     redirectToList: appId => dispatch(push(`/applications/${appId}/devices`)),
@@ -76,6 +80,9 @@ const statusMap = {
 export default class DeviceImporter extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    asConfig: PropTypes.stackComponent.isRequired,
+    jsConfig: PropTypes.stackComponent.isRequired,
+    nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
   }
 
@@ -107,7 +114,7 @@ export default class DeviceImporter extends Component {
 
   @bind
   async handleSubmit(values) {
-    const { appId } = this.props
+    const { appId, jsConfig, nsConfig, asConfig } = this.props
     const { format_id, data, set_claim_auth_code } = values
 
     try {
@@ -137,6 +144,18 @@ export default class DeviceImporter extends Component {
         if (set_claim_auth_code) {
           device.claim_authentication_code = { value: randomByteString(4 * 2) }
           field_mask.paths.push('claim_authentication_code')
+        }
+        if (device.supports_join && !device.join_server_address && jsConfig.enabled) {
+          device.join_server_address = new URL(jsConfig.base_url).hostname
+          field_mask.paths.push('join_server_address')
+        }
+        if (!device.application_server_address && asConfig.enabled) {
+          device.network_server_address = new URL(nsConfig.base_url).hostname
+          field_mask.paths.push('application_server_address')
+        }
+        if (!device.network_server_address && nsConfig.enabled) {
+          device.application_server_address = new URL(asConfig.base_url).hostname
+          field_mask.paths.push('network_server_address')
         }
       }
 
