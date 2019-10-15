@@ -28,7 +28,7 @@ const (
 	endorsedField                       = "endorsed"
 	enforceDutyCycleField               = "enforce_duty_cycle"
 	firmwareVersionField                = "version_ids.firmware_version"
-	frequencyPlanIDField                = "frequency_plan_id"
+	frequencyPlanIDsField               = "frequency_plan_ids"
 	gatewayServerAddressField           = "gateway_server_address"
 	grantsField                         = "grants"
 	hardwareVersionField                = "version_ids.hardware_version"
