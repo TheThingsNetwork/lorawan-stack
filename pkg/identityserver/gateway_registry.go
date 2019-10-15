@@ -188,16 +188,18 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		if err != nil {
 			return err
 		}
-		for i, gtw := range gtws.Gateways {
-			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO) != nil {
-				gtws.Gateways[i] = gtw.PublicSafe()
-			}
-		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	for i, gtw := range gtws.Gateways {
+		if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO) != nil {
+			gtws.Gateways[i] = gtw.PublicSafe()
+		}
+	}
+
 	return gtws, nil
 }
 
