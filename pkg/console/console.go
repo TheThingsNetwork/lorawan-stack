@@ -119,9 +119,10 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 		console.config.Mount,
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
-				c.Set("template_data", console.config.UI.TemplateData)
-				frontendConfig := console.config.UI.FrontendConfig
-				frontendConfig.Language = console.config.UI.TemplateData.Language
+				config := console.configFromContext(c.Request().Context())
+				c.Set("template_data", config.UI.TemplateData)
+				frontendConfig := config.UI.FrontendConfig
+				frontendConfig.Language = config.UI.TemplateData.Language
 				c.Set("app_config", struct {
 					FrontendConfig
 				}{
