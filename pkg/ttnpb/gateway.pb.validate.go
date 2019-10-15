@@ -714,6 +714,20 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "frequency_plan_ids":
+
+			for idx, item := range m.GetFrequencyPlanIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 64 {
+					return GatewayValidationError{
+						field:  fmt.Sprintf("frequency_plan_ids[%v]", idx),
+						reason: "value length must be at most 64 runes",
+					}
+				}
+
+			}
+
 		case "antennas":
 
 			for idx, item := range m.Antennas {

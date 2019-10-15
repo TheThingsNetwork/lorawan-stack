@@ -9842,7 +9842,7 @@
             },
             {
               "name": "frequency_plan_id",
-              "description": "",
+              "description": "Frequency plan ID of the gateway.\nThis equals the first element of the frequency_plan_ids field.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -9853,6 +9853,24 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
+                    "value": 64
+                  }
+                ]
+              }
+            },
+            {
+              "name": "frequency_plan_ids",
+              "description": "Frequency plan IDs of the gateway.\nThe first element equals the frequency_plan_id field.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
                     "value": 64
                   }
                 ]

@@ -2493,7 +2493,8 @@ Gateway is the message that defines a gateway on the network.
 | `gateway_server_address` | [`string`](#string) |  | The address of the Gateway Server to connect to. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `auto_update` | [`bool`](#bool) |  |  |
 | `update_channel` | [`string`](#string) |  |  |
-| `frequency_plan_id` | [`string`](#string) |  |  |
+| `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the gateway. This equals the first element of the frequency_plan_ids field. |
+| `frequency_plan_ids` | [`string`](#string) | repeated | Frequency plan IDs of the gateway. The first element equals the frequency_plan_id field. |
 | `antennas` | [`GatewayAntenna`](#ttn.lorawan.v3.GatewayAntenna) | repeated |  |
 | `status_public` | [`bool`](#bool) |  | The status of this gateway may be publicly displayed. |
 | `location_public` | [`bool`](#bool) |  | The location of this gateway may be publicly displayed. |
@@ -2513,6 +2514,7 @@ Gateway is the message that defines a gateway on the network.
 | `version_ids` | <p>`message.required`: `true`</p> |
 | `gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
+| `frequency_plan_ids` | <p>`repeated.items.string.max_len`: `64`</p> |
 | `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.Gateway.AttributesEntry">Message `Gateway.AttributesEntry`</a>
