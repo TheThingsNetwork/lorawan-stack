@@ -39,11 +39,23 @@
     "dev_addr": [["as", "ns"], "read_only"],
     "keys": {
       "_root": [["as", "ns"], "read_only"],
-      "app_s_key": { "_root": ["as", "read_only"], "key": ["as", "read_only"] },
+      "app_s_key": {
+        "_root": ["as", "read_only"],
+        "key": ["as", "read_only"]
+      },
       "session_key_id": [["as", "ns"], "read_only"],
-      "f_nwk_s_int_key": { "_root": ["ns", "read_only"], "key": ["ns", "read_only"] },
-      "nwk_s_enc_key": { "_root": ["ns", "read_only"], "key": ["ns", "read_only"] },
-      "s_nwk_s_int_key": { "_root": ["ns", "read_only"], "key": ["ns", "read_only"] }
+      "f_nwk_s_int_key": {
+        "_root": ["ns", "read_only"],
+        "key": ["ns", "read_only"]
+      },
+      "nwk_s_enc_key": {
+        "_root": ["ns", "read_only"],
+        "key": ["ns", "read_only"]
+      },
+      "s_nwk_s_int_key": {
+        "_root": ["ns", "read_only"],
+        "key": ["ns", "read_only"]
+      }
     },
     "last_a_f_cnt_down": ["as", "read_only"],
     "last_conf_f_cnt_down": ["ns", "read_only"],
@@ -55,11 +67,23 @@
     "dev_addr": [["as", "ns"], ["as", "ns"]],
     "keys": {
       "_root": [["as", "ns"], "read_only"],
-      "app_s_key": { "_root": ["as", "as"], "key": ["as", "as"] },
+      "app_s_key": {
+        "_root": ["as", "as"],
+        "key": ["as", "as"]
+      },
       "session_key_id": [["as", "ns"], ["as", "ns"]],
-      "f_nwk_s_int_key": { "_root": ["ns", "ns"], "key": ["ns", "ns"] },
-      "nwk_s_enc_key": { "_root": ["ns", "ns"], "key": ["ns", "ns"] },
-      "s_nwk_s_int_key": { "_root": ["ns", "ns"], "key": ["ns", "ns"] }
+      "f_nwk_s_int_key": {
+        "_root": ["ns", "ns"],
+        "key": ["ns", "ns"]
+      },
+      "nwk_s_enc_key": {
+        "_root": ["ns", "ns"],
+        "key": ["ns", "ns"]
+      },
+      "s_nwk_s_int_key": {
+        "_root": ["ns", "ns"],
+        "key": ["ns", "ns"]
+      }
     },
     "last_a_f_cnt_down": ["as", "as"],
     "last_conf_f_cnt_down": ["ns", "ns"],
@@ -78,18 +102,39 @@
     "class_b_timeout": ["ns", "ns"],
     "class_c_timeout": ["ns", "ns"],
     "desired_rx1_data_rate_offset": ["ns", "ns"],
-    "desired_rx1_delay": { "_root": ["ns", "ns"], "value": ["ns", "ns"] },
-    "desired_rx2_data_rate_index": { "_root": ["ns", "ns"], "value": ["ns", "ns"] },
+    "desired_rx1_delay": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "desired_rx2_data_rate_index": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
     "desired_rx2_frequency": ["ns", "ns"],
     "factory_preset_frequencies": ["ns", "ns"],
-    "max_duty_cycle": { "_root": ["ns", "ns"], "value": ["ns", "ns"] },
-    "ping_slot_data_rate_index": { "_root": ["ns", "ns"], "value": ["ns", "ns"] },
+    "max_duty_cycle": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "ping_slot_data_rate_index": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
     "ping_slot_frequency": ["ns", "ns"],
-    "ping_slot_periodicity": { "_root": ["ns", "ns"], "value": ["ns", "ns"] },
+    "ping_slot_periodicity": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
     "resets_f_cnt": ["ns", "ns"],
     "rx1_data_rate_offset": ["ns", "ns"],
-    "rx1_delay": { "_root": ["ns", "ns"], "value": ["ns", "ns"] },
-    "rx2_data_rate_index": { "_root": ["ns", "ns"], "value": ["ns", "ns"] },
+    "rx1_delay": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
+    "rx2_data_rate_index": {
+      "_root": ["ns", "ns"],
+      "value": ["ns", "ns"]
+    },
     "rx2_frequency": ["ns", "ns"],
     "status_count_periodicity": ["ns", "ns"],
     "status_time_periodicity": ["ns", "ns"],
@@ -255,10 +300,22 @@
       "_root": ["ns", "read_only"],
       "keys": {
         "_root": ["ns", "read_only"],
-        "app_s_key": { "_root": ["ns", "read_only"], "key": ["ns", "read_only"] },
-        "f_nwk_s_int_key": { "_root": ["ns", "read_only"], "key": ["ns", "read_only"] },
-        "nwk_s_enc_key": { "_root": ["ns", "read_only"], "key": ["ns", "read_only"] },
-        "s_nwk_s_int_key": { "_root": ["ns", "read_only"], "key": ["ns", "read_only"] },
+        "app_s_key": {
+          "_root": ["ns", "read_only"],
+          "key": ["ns", "read_only"]
+        },
+        "f_nwk_s_int_key": {
+          "_root": ["ns", "read_only"],
+          "key": ["ns", "read_only"]
+        },
+        "nwk_s_enc_key": {
+          "_root": ["ns", "read_only"],
+          "key": ["ns", "read_only"]
+        },
+        "s_nwk_s_int_key": {
+          "_root": ["ns", "read_only"],
+          "key": ["ns", "read_only"]
+        },
         "session_key_id": ["ns", "read_only"]
       },
       "payload": ["ns", "read_only"],
@@ -363,6 +420,7 @@
   "supports_class_b": ["ns", "ns"],
   "supports_class_c": ["ns", "ns"],
   "supports_join": ["ns", "ns"],
+  "claim_authentication_code": ["js", "js"],
   "last_dev_nonce": ["js", "js"],
   "last_join_nonce": ["js", "js"],
   "last_rj_count_0": ["js", "js"],
@@ -373,8 +431,14 @@
   "resets_join_nonces": ["js", "js"],
   "root_keys": {
     "_root": ["js", "js"],
-    "app_key": { "_root": ["js", "js"], "key": ["js", "js"] },
-    "nwk_key": { "_root": ["js", "js"], "key": ["js", "js"] },
+    "app_key": {
+      "_root": ["js", "js"],
+      "key": ["js", "js"]
+    },
+    "nwk_key": {
+      "_root": ["js", "js"],
+      "key": ["js", "js"]
+    },
     "root_key_id": ["js", "js"]
   },
   "used_dev_nonces": ["js", "js"]
