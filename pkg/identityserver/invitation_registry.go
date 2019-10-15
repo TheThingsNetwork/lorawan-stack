@@ -21,9 +21,12 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -59,7 +62,16 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 		return nil, err
 	}
 	events.Publish(evtCreateInvitation(ctx, nil, invitation))
-	// TODO: Send invitation email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
+	err = is.SendEmail(ctx, func(data emails.Data) email.MessageData {
+		data.User.Email = in.Email
+		return &emails.Invitation{
+			Data:            data,
+			InvitationToken: invitation.Token,
+		}
+	})
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Could not send invitation email")
+	}
 	return invitation, nil
 }
 
