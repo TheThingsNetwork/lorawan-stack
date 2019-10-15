@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Emails when the state of a user or OAuth client changes.
 - Option to generate claim authentication codes for devices automatically.
 
 ### Changed
