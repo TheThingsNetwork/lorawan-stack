@@ -25,6 +25,7 @@ import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
+import PropTypes from '../../../lib/prop-types'
 
 import style from './device-import-form.styl'
 
@@ -44,6 +45,15 @@ const validationSchema = Yup.object({
 })
 
 export default class DeviceBulkCreateForm extends Component {
+  static propTypes = {
+    initialValues: PropTypes.shape({
+      format_id: PropTypes.string,
+      data: PropTypes.string,
+      set_claim_auth_code: PropTypes.bool,
+    }).isRequired,
+    onSubmit: PropTypes.func.isRequired,
+  }
+
   state = {
     allowedFileExtensions: undefined,
     formatDescription: undefined,
