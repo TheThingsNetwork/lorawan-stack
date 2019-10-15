@@ -422,6 +422,15 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				var zero string
 				dst.FrequencyPlanID = zero
 			}
+		case "frequency_plan_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'frequency_plan_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FrequencyPlanIDs = src.FrequencyPlanIDs
+			} else {
+				dst.FrequencyPlanIDs = nil
+			}
 		case "antennas":
 			if len(subs) > 0 {
 				return fmt.Errorf("'antennas' has no subfields, but %s were specified", subs)
