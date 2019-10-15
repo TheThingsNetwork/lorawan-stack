@@ -27,9 +27,14 @@ var (
 	evtReceivePingSlotChannelAnswer  = defineReceiveMACAcceptEvent("ping_slot_channel", "ping slot channel")()
 )
 
+func needsPingSlotChannelReq(dev *ttnpb.EndDevice) bool {
+	return dev.MACState != nil &&
+		(dev.MACState.DesiredParameters.PingSlotDataRateIndex != dev.MACState.CurrentParameters.PingSlotDataRateIndex ||
+			dev.MACState.DesiredParameters.PingSlotFrequency != dev.MACState.CurrentParameters.PingSlotFrequency)
+}
+
 func enqueuePingSlotChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if dev.MACState.DesiredParameters.PingSlotDataRateIndex == dev.MACState.CurrentParameters.PingSlotDataRateIndex &&
-		dev.MACState.DesiredParameters.PingSlotFrequency == dev.MACState.CurrentParameters.PingSlotFrequency {
+	if !needsPingSlotChannelReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

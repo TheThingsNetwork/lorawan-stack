@@ -28,6 +28,7 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -174,11 +175,16 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(nil)
@@ -232,14 +238,21 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -307,14 +320,21 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -342,6 +362,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -395,7 +417,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				})
 				a.So(replace, should.BeTrue)
-				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
+				a.So([]time.Time{start, at.Add(NSScheduleWindow()), time.Now()}, should.BeChronological)
 				return nil
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -403,14 +425,21 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -438,6 +467,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -503,6 +534,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -574,6 +607,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -601,6 +636,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -657,6 +694,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -684,6 +723,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -733,6 +774,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)
+			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -839,11 +881,16 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 
@@ -898,14 +945,21 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -973,14 +1027,21 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -1008,6 +1069,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"queued_application_downlinks",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -1068,14 +1131,21 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -1108,6 +1178,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"queued_application_downlinks",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -1178,14 +1250,21 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -1262,14 +1341,21 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -1342,14 +1428,21 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"multicast",
 					"pending_mac_state",
 					"pending_session",
 					"queued_application_downlinks",
+					"recent_uplinks",
 					"session",
 				})
 				dev, sets, err := f(&ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
@@ -1412,6 +1505,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
 				})).(*NetworkServer)
+			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -1423,6 +1517,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return test.ContextWithT(ctx, t)
 			})
 			componenttest.StartComponent(t, ns.Component)
+			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
 

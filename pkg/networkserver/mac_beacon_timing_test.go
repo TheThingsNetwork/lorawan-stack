@@ -25,6 +25,50 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsBeaconTimingReq(t *testing.T) {
+	type TestCase struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Needs       bool
+	}
+	var tcs []TestCase
+
+	tcs = append(tcs,
+		TestCase{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+	)
+	ForEachClass(func(makeClassName func(parts ...string) string, class ttnpb.Class) {
+		// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
+		tcs = append(tcs,
+			TestCase{
+				Name: makeClassName("empty parameters"),
+				InputDevice: &ttnpb.EndDevice{
+					MACState: &ttnpb.MACState{
+						DeviceClass: class,
+					},
+				},
+			},
+		)
+	})
+
+	for _, tc := range tcs {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsBeaconTimingReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleBeaconTimingReq(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string

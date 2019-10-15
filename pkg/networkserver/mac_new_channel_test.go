@@ -25,6 +25,210 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsNewChannelReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Needs       bool
+	}{
+		{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+		{
+			Name: "current(channels:[(123,1-5),(124,1-3),(128,2-4)]),desired(channels:[(123,1-5),(124,1-3),(128,2-4)])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:  123,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_5,
+							},
+							{
+								UplinkFrequency:  124,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+							{
+								UplinkFrequency:  128,
+								MinDataRateIndex: ttnpb.DATA_RATE_2,
+								MaxDataRateIndex: ttnpb.DATA_RATE_4,
+							},
+						},
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:  123,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_5,
+							},
+							{
+								UplinkFrequency:  124,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+							{
+								UplinkFrequency:  128,
+								MinDataRateIndex: ttnpb.DATA_RATE_2,
+								MaxDataRateIndex: ttnpb.DATA_RATE_4,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// TODO: Disable channels using NewChannelReq. (https://github.com/TheThingsNetwork/lorawan-stack/issues/1499)
+			Name: "current(channels:[(123,1-5),(124,1-3),(128,2-4)]),desired(channels:[(123,1-5),(124,1-3)])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:  123,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_5,
+							},
+							{
+								UplinkFrequency:  124,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+							{
+								UplinkFrequency:  128,
+								MinDataRateIndex: ttnpb.DATA_RATE_2,
+								MaxDataRateIndex: ttnpb.DATA_RATE_4,
+							},
+						},
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:  123,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_5,
+							},
+							{
+								UplinkFrequency:  124,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "current(channels:[(123,1-5),(124,1-3),(128,2-4)]),desired(channels:[(123,1-5),(124,1-3),(128,2-3)])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:  123,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_5,
+							},
+							{
+								UplinkFrequency:  124,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+							{
+								UplinkFrequency:  128,
+								MinDataRateIndex: ttnpb.DATA_RATE_2,
+								MaxDataRateIndex: ttnpb.DATA_RATE_4,
+							},
+						},
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:  123,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_5,
+							},
+							{
+								UplinkFrequency:  124,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+							{
+								UplinkFrequency:  128,
+								MinDataRateIndex: ttnpb.DATA_RATE_2,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+						},
+					},
+				},
+			},
+			Needs: true,
+		},
+		{
+			Name: "current(channels:[(123,1-5),(124,1-3),(128,2-4)]),desired(channels:[(123,1-5),(124,1-3),(127,2-4)])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:  123,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_5,
+							},
+							{
+								UplinkFrequency:  124,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+							{
+								UplinkFrequency:  128,
+								MinDataRateIndex: ttnpb.DATA_RATE_2,
+								MaxDataRateIndex: ttnpb.DATA_RATE_4,
+							},
+						},
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								UplinkFrequency:  123,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_5,
+							},
+							{
+								UplinkFrequency:  124,
+								MinDataRateIndex: ttnpb.DATA_RATE_1,
+								MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							},
+							{
+								UplinkFrequency:  127,
+								MinDataRateIndex: ttnpb.DATA_RATE_2,
+								MaxDataRateIndex: ttnpb.DATA_RATE_4,
+							},
+						},
+					},
+				},
+			},
+			Needs: true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsNewChannelReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleNewChannelAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string

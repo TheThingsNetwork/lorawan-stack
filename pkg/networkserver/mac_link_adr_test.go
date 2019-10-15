@@ -26,6 +26,140 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsLinkADRReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Needs       bool
+	}{
+		{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+		{
+			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[]),desired(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  3,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  3,
+					},
+				},
+			},
+		},
+		{
+			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[on,on,off]),desired(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[on,on,off])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  3,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{EnableUplink: true},
+							{EnableUplink: true},
+							{},
+						},
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  3,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{EnableUplink: true},
+							{EnableUplink: true},
+							{},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[]),desired(data-rate-index:1,nb-trans:2,tx-power-index:4,channels:[])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  3,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  4,
+					},
+				},
+			},
+			Needs: true,
+		},
+		{
+			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[]),desired(data-rate-index:1,nb-trans:3,tx-power-index:3,channels:[])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  3,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       3,
+						ADRTxPowerIndex:  3,
+					},
+				},
+			},
+			Needs: true,
+		},
+		{
+			Name: "current(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[on,on,on]),desired(data-rate-index:1,nb-trans:2,tx-power-index:3,channels:[off,on,off])",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  3,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{EnableUplink: true},
+							{EnableUplink: true},
+							{EnableUplink: true},
+						},
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						ADRDataRateIndex: ttnpb.DATA_RATE_1,
+						ADRNbTrans:       2,
+						ADRTxPowerIndex:  3,
+						Channels: []*ttnpb.MACParameters_Channel{
+							{},
+							{EnableUplink: true},
+							{},
+						},
+					},
+				},
+			},
+			Needs: true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsLinkADRReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleLinkADRAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string

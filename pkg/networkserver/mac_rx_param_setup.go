@@ -28,10 +28,15 @@ var (
 	evtReceiveRxParamSetupReject  = defineReceiveMACRejectEvent("rx_param_setup", "Rx parameter setup")()
 )
 
+func needsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
+	return dev.MACState != nil &&
+		(dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset ||
+			dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
+			dev.MACState.DesiredParameters.Rx2Frequency != dev.MACState.CurrentParameters.Rx2Frequency)
+}
+
 func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if dev.MACState.DesiredParameters.Rx2Frequency == dev.MACState.CurrentParameters.Rx2Frequency &&
-		dev.MACState.DesiredParameters.Rx2DataRateIndex == dev.MACState.CurrentParameters.Rx2DataRateIndex &&
-		dev.MACState.DesiredParameters.Rx1DataRateOffset == dev.MACState.CurrentParameters.Rx1DataRateOffset {
+	if !needsRxParamSetupReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
@@ -45,14 +50,14 @@ func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 			return nil, 0, nil, false
 		}
 		req := &ttnpb.MACCommand_RxParamSetupReq{
-			Rx2Frequency:      dev.MACState.DesiredParameters.Rx2Frequency,
-			Rx2DataRateIndex:  dev.MACState.DesiredParameters.Rx2DataRateIndex,
 			Rx1DataRateOffset: dev.MACState.DesiredParameters.Rx1DataRateOffset,
+			Rx2DataRateIndex:  dev.MACState.DesiredParameters.Rx2DataRateIndex,
+			Rx2Frequency:      dev.MACState.DesiredParameters.Rx2Frequency,
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
-			"rx2_frequency", req.Rx2Frequency,
-			"rx2_data_rate_index", req.Rx2DataRateIndex,
 			"rx1_data_rate_offset", req.Rx1DataRateOffset,
+			"rx2_data_rate_index", req.Rx2DataRateIndex,
+			"rx2_frequency", req.Rx2Frequency,
 		)).Debug("Enqueued RxParamSetupReq")
 		return []*ttnpb.MACCommand{
 				req.MACCommand(),

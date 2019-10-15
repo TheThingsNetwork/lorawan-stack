@@ -21,6 +21,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -292,6 +293,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
 					logger:              dev.logger,
+					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
 					ChannelIndex:        1,
 					DataRateIndex:       ttnpb.DATA_RATE_2,
 					DeferredMACHandlers: dev.DeferredMACHandlers,
@@ -317,9 +319,10 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"session",
 					},
 				}
+
 				if !a.So([]time.Time{start, dev.Device.Session.StartedAt, time.Now()}, should.BeChronological) ||
 					!a.So(dev.DeferredMACHandlers, should.HaveLength, 1) ||
-					!a.So(dev, should.Resemble, expectedDev) {
+					!a.So(dev, should.HaveEmptyDiff, expectedDev) {
 					return false
 				}
 
@@ -336,7 +339,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				expectedDev.Device.MACState.QueuedResponses = []*ttnpb.MACCommand{
 					linkCheckAns,
 				}
-				return a.So(dev, should.Resemble, expectedDev)
+				return a.So(dev, should.HaveEmptyDiff, expectedDev)
 			},
 			ErrorAssertion: func(ctx context.Context, err error) bool {
 				return assertions.New(test.MustTFromContext(ctx)).So(err, should.BeNil)
@@ -403,6 +406,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
 					logger:              dev.logger,
+					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
 					ChannelIndex:        1,
 					DataRateIndex:       ttnpb.DATA_RATE_2,
 					DeferredMACHandlers: dev.DeferredMACHandlers,
@@ -433,7 +437,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				}
 				if !a.So([]time.Time{start, dev.Device.Session.StartedAt, time.Now()}, should.BeChronological) ||
 					!a.So(dev.DeferredMACHandlers, should.HaveLength, 1) ||
-					!a.So(dev, should.Resemble, expectedDev) {
+					!a.So(dev, should.HaveEmptyDiff, expectedDev) {
 					return false
 				}
 
@@ -450,7 +454,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				expectedDev.Device.MACState.QueuedResponses = []*ttnpb.MACCommand{
 					linkCheckAns,
 				}
-				return a.So(dev, should.Resemble, expectedDev)
+				return a.So(dev, should.HaveEmptyDiff, expectedDev)
 			},
 			ErrorAssertion: func(ctx context.Context, err error) bool {
 				return assertions.New(test.MustTFromContext(ctx)).So(err, should.BeNil)
@@ -512,6 +516,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
 					logger:              dev.logger,
+					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
 					ChannelIndex:        1,
 					DataRateIndex:       ttnpb.DATA_RATE_2,
 					DeferredMACHandlers: dev.DeferredMACHandlers,
@@ -538,7 +543,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				}
 				if !a.So([]time.Time{start, dev.Device.Session.StartedAt, time.Now()}, should.BeChronological) ||
 					!a.So(dev.DeferredMACHandlers, should.HaveLength, 1) ||
-					!a.So(dev, should.Resemble, expectedDev) {
+					!a.So(dev, should.HaveEmptyDiff, expectedDev) {
 					return false
 				}
 
@@ -555,7 +560,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				expectedDev.Device.MACState.QueuedResponses = []*ttnpb.MACCommand{
 					linkCheckAns,
 				}
-				return a.So(dev, should.Resemble, expectedDev)
+				return a.So(dev, should.HaveEmptyDiff, expectedDev)
 			},
 			ErrorAssertion: func(ctx context.Context, err error) bool {
 				return assertions.New(test.MustTFromContext(ctx)).So(err, should.BeNil)
@@ -622,6 +627,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
 					logger:              dev.logger,
+					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
 					ChannelIndex:        1,
 					DataRateIndex:       ttnpb.DATA_RATE_2,
 					DeferredMACHandlers: dev.DeferredMACHandlers,
@@ -649,7 +655,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 				}
 				if !a.So(dev.DeferredMACHandlers, should.HaveLength, 1) ||
-					!a.So(dev, should.Resemble, expectedDev) {
+					!a.So(dev, should.HaveEmptyDiff, expectedDev) {
 					return false
 				}
 
@@ -666,7 +672,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				expectedDev.Device.MACState.QueuedResponses = []*ttnpb.MACCommand{
 					linkCheckAns,
 				}
-				return a.So(dev, should.Resemble, expectedDev)
+				return a.So(dev, should.HaveEmptyDiff, expectedDev)
 			},
 			ErrorAssertion: func(ctx context.Context, err error) bool {
 				return assertions.New(test.MustTFromContext(ctx)).So(err, should.BeNil)

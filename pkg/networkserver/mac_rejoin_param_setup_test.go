@@ -25,6 +25,94 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsRejoinParamSetupReq(t *testing.T) {
+	type TestCase struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Needs       bool
+	}
+	var tcs []TestCase
+
+	tcs = append(tcs,
+		TestCase{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+	)
+	for _, conf := range []struct {
+		Suffix                               string
+		CurrentParameters, DesiredParameters ttnpb.MACParameters
+		Needs                                bool
+	}{
+		{
+			Suffix: "current(count:128,time:10),desired(count:128,time:10)",
+			CurrentParameters: ttnpb.MACParameters{
+				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
+				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
+				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+			},
+		},
+		{
+			Suffix: "current(count:128,time:10),desired(count:128,time:12)",
+			CurrentParameters: ttnpb.MACParameters{
+				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
+				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
+				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_12,
+			},
+			Needs: true,
+		},
+		{
+			Suffix: "current(count:128,time:10),desired(count:256,time:10)",
+			CurrentParameters: ttnpb.MACParameters{
+				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
+				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_256,
+				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+			},
+			Needs: true,
+		},
+	} {
+		ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
+			tcs = append(tcs,
+				TestCase{
+					Name: makeMACName(conf.Suffix),
+					InputDevice: &ttnpb.EndDevice{
+						MACState: &ttnpb.MACState{
+							LoRaWANVersion:    macVersion,
+							CurrentParameters: conf.CurrentParameters,
+							DesiredParameters: conf.DesiredParameters,
+						},
+					},
+					Needs: conf.Needs && macVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+				},
+			)
+		})
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsRejoinParamSetupReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleRejoinParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string

@@ -136,7 +136,7 @@ func validateQueuedApplicationDownlinks(dev *ttnpb.EndDevice) error {
 				return errNoPath
 			}
 		}
-		if absTime := down.GetClassBC().GetAbsoluteTime(); absTime != nil && absTime.Before(time.Now()) {
+		if absTime := down.GetClassBC().GetAbsoluteTime(); absTime != nil && absTime.Before(timeNow()) {
 			return errExpiredDownlink
 		}
 		if len(down.FRMPayload) > 250 {
@@ -168,15 +168,25 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, req.EndDeviceIdentifiers))
 
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
-		[]string{
-			"mac_state",
-			"multicast",
-			"pending_mac_state",
-			"pending_session",
-			"queued_application_downlinks",
-			"session",
-		},
+	gets := []string{
+		"mac_state",
+		"multicast",
+		"pending_mac_state",
+		"pending_session",
+		"queued_application_downlinks",
+		"session",
+	}
+	if len(req.Downlinks) > 0 {
+		gets = append(gets,
+			"frequency_plan_id",
+			"last_dev_status_received_at",
+			"lorawan_phy_version",
+			"mac_settings",
+			"recent_uplinks",
+		)
+	}
+
+	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, gets,
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
@@ -194,14 +204,28 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	}
 
 	logger = logger.WithField("queue_length", len(dev.QueuedApplicationDownlinks))
-	if dev.MACState != nil {
-		logger = logger.WithField("device_class", dev.MACState.DeviceClass)
-	}
 	logger.Debug("Replaced application downlink queue")
-	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.QueuedApplicationDownlinks) > 0 {
-		startAt := time.Now().UTC()
-		logger.WithField("start_at", startAt).Debug("Add downlink task with application downlink pending")
-		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, startAt, true)
+
+	if len(dev.QueuedApplicationDownlinks) == 0 || dev.MACState == nil {
+		return ttnpb.Empty, nil
+	}
+
+	var downAt time.Time
+	_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to determine device band")
+		downAt = timeNow().UTC()
+	} else {
+		var ok bool
+		downAt, ok = nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+		if !ok {
+			return ttnpb.Empty, nil
+		}
+	}
+	downAt = downAt.Add(-nsScheduleWindow)
+	log.FromContext(ctx).WithField("start_at", downAt).Debug("Add downlink task after downlink queue replace")
+	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
+		log.FromContext(ctx).WithError(err).Error("Failed to add downlink task after downlink queue replace")
 	}
 	return ttnpb.Empty, nil
 }
@@ -216,11 +240,16 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 
 	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
 		[]string{
+			"frequency_plan_id",
+			"last_dev_status_received_at",
+			"lorawan_phy_version",
+			"mac_settings",
 			"mac_state",
 			"multicast",
 			"pending_mac_state",
 			"pending_session",
 			"queued_application_downlinks",
+			"recent_uplinks",
 			"session",
 		},
 		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -240,14 +269,28 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	}
 
 	logger = logger.WithField("queue_length", len(dev.QueuedApplicationDownlinks))
-	if dev.MACState != nil {
-		logger = logger.WithField("device_class", dev.MACState.DeviceClass)
-	}
 	logger.Debug("Pushed application downlink to queue")
-	if dev.MACState != nil && dev.MACState.DeviceClass != ttnpb.CLASS_A {
-		startAt := time.Now().UTC()
-		logger.WithField("start_at", startAt).Debug("Add downlink task with application downlink pending")
-		return ttnpb.Empty, ns.downlinkTasks.Add(ctx, req.EndDeviceIdentifiers, startAt, true)
+
+	if len(dev.QueuedApplicationDownlinks) == 0 || dev.MACState == nil {
+		return ttnpb.Empty, nil
+	}
+
+	var downAt time.Time
+	_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to determine device band")
+		downAt = timeNow().UTC()
+	} else {
+		var ok bool
+		downAt, ok = nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+		if !ok {
+			return ttnpb.Empty, nil
+		}
+	}
+	downAt = downAt.Add(-nsScheduleWindow)
+	log.FromContext(ctx).WithField("start_at", downAt).Debug("Add downlink task after downlink queue push")
+	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
+		log.FromContext(ctx).WithError(err).Error("Failed to add downlink task after downlink queue push")
 	}
 	return ttnpb.Empty, nil
 }

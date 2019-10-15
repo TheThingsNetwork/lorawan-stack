@@ -25,6 +25,60 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsRxTimingSetupReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Defaults    ttnpb.MACSettings
+		Needs       bool
+	}{
+		{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+		{
+			Name: "current(delay:1),desired(delay:1)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_1,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_1,
+					},
+				},
+			},
+		},
+		{
+			Name: "current(delay:1),desired(delay:5)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_1,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_5,
+					},
+				},
+			},
+			Needs: true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsRxTimingSetupReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleRxTimingSetupAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string

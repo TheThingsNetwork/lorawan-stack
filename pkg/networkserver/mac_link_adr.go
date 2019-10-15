@@ -18,6 +18,7 @@ import (
 	"context"
 	"math"
 
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -30,28 +31,35 @@ var (
 	evtReceiveLinkADRReject  = defineReceiveMACRejectEvent("link_adr", "link ADR")()
 )
 
-func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, fps *frequencyplans.Store) (macCommandEnqueueState, error) {
-	needsMask := len(dev.MACState.CurrentParameters.Channels) > len(dev.MACState.DesiredParameters.Channels)
-	for i := 0; !needsMask && i < len(dev.MACState.CurrentParameters.Channels); i++ {
-		needsMask = dev.MACState.CurrentParameters.Channels[i].EnableUplink != dev.MACState.DesiredParameters.Channels[i].EnableUplink
+func needsLinkADRReq(dev *ttnpb.EndDevice) bool {
+	if dev.MACState == nil {
+		return false
 	}
-	if !needsMask &&
-		dev.MACState.DesiredParameters.ADRDataRateIndex == dev.MACState.CurrentParameters.ADRDataRateIndex &&
-		dev.MACState.DesiredParameters.ADRNbTrans == dev.MACState.CurrentParameters.ADRNbTrans &&
-		dev.MACState.DesiredParameters.ADRTxPowerIndex == dev.MACState.CurrentParameters.ADRTxPowerIndex {
+	if dev.MACState.DesiredParameters.ADRDataRateIndex != dev.MACState.CurrentParameters.ADRDataRateIndex ||
+		dev.MACState.DesiredParameters.ADRNbTrans != dev.MACState.CurrentParameters.ADRNbTrans ||
+		dev.MACState.DesiredParameters.ADRTxPowerIndex != dev.MACState.CurrentParameters.ADRTxPowerIndex {
+		return true
+	}
+	for i := 0; i < len(dev.MACState.CurrentParameters.Channels); i++ {
+		switch {
+		case i >= len(dev.MACState.DesiredParameters.Channels):
+			if dev.MACState.CurrentParameters.Channels[i].EnableUplink {
+				return true
+			}
+		case dev.MACState.CurrentParameters.Channels[i].EnableUplink != dev.MACState.DesiredParameters.Channels[i].EnableUplink:
+			return true
+		}
+	}
+	return false
+}
+
+func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy band.Band) (macCommandEnqueueState, error) {
+	if !needsLinkADRReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
 			Ok:         true,
 		}, nil
-	}
-
-	_, phy, err := getDeviceBandVersion(dev, fps)
-	if err != nil {
-		return macCommandEnqueueState{
-			MaxDownLen: maxDownLen,
-			MaxUpLen:   maxUpLen,
-		}, err
 	}
 
 	if len(dev.MACState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {

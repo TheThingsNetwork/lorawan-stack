@@ -28,7 +28,30 @@ var (
 	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")()
 )
 
+func needsNewChannelReq(dev *ttnpb.EndDevice) bool {
+	if dev.MACState == nil {
+		return false
+	}
+	for i, ch := range dev.MACState.DesiredParameters.Channels {
+		if i >= len(dev.MACState.CurrentParameters.Channels) ||
+			ch.UplinkFrequency != dev.MACState.CurrentParameters.Channels[i].UplinkFrequency ||
+			ch.MinDataRateIndex != dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex ||
+			ch.MaxDataRateIndex != dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex {
+			return true
+		}
+	}
+	return false
+}
+
 func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
+	if !needsLinkADRReq(dev) {
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}
+	}
+
 	var st macCommandEnqueueState
 	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		var cmds []*ttnpb.MACCommand

@@ -28,7 +28,27 @@ var (
 	evtReceiveDLChannelReject  = defineReceiveMACRejectEvent("dl_channel", "downlink Rx1 channel frequency modification")()
 )
 
+func needsDLChannelReq(dev *ttnpb.EndDevice) bool {
+	if dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+		return false
+	}
+	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
+		if dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency != dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
+			return true
+		}
+	}
+	return false
+}
+
 func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
+	if !needsDLChannelReq(dev) {
+		return macCommandEnqueueState{
+			MaxDownLen: maxDownLen,
+			MaxUpLen:   maxUpLen,
+			Ok:         true,
+		}
+	}
+
 	var st macCommandEnqueueState
 	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DL_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		var cmds []*ttnpb.MACCommand

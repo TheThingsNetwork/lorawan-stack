@@ -16,7 +16,6 @@ package networkserver
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -169,24 +168,29 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	gets := req.FieldMask.Paths
-	var setsMACState bool
-	for _, p := range req.FieldMask.Paths {
-		if p == "mac_state" {
-			setsMACState = true
-			break
-		}
-		if strings.HasPrefix(p, "mac_state.") {
-			setsMACState = true
-			gets = append(gets,
-				"mac_state",
-				"queued_application_downlinks",
-			)
-			break
-		}
+	var needsDownlinkCheck bool
+	if ttnpb.HasAnyField([]string{
+		"frequency_plan_id",
+		"lorawan_phy_version",
+		"mac_settings",
+		"mac_state",
+		"session",
+	}, req.FieldMask.Paths...) {
+		gets = append(gets,
+			"frequency_plan_id",
+			"last_dev_status_received_at",
+			"lorawan_phy_version",
+			"mac_settings",
+			"mac_state",
+			"multicast",
+			"queued_application_downlinks",
+			"recent_uplinks",
+			"session",
+		)
+		needsDownlinkCheck = true
 	}
 
 	var evt events.Event
-	var addDownlinkTask bool
 	dev, err := ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		sets := req.FieldMask.Paths
 		if ttnpb.HasAnyField(sets, "version_ids") {
@@ -208,12 +212,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
 				sets = append(sets, "ids.dev_addr")
 			}
-			addDownlinkTask = setsMACState &&
-				(ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.device_class") && req.EndDevice.MACState.DeviceClass != ttnpb.CLASS_A ||
-					dev.GetMACState().GetDeviceClass() != ttnpb.CLASS_A) &&
-				(len(dev.QueuedApplicationDownlinks) > 0 ||
-					!dev.MACState.CurrentParameters.Equal(dev.MACState.DesiredParameters))
-
 			return &req.EndDevice, sets, nil
 		}
 
@@ -321,7 +319,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if ttnpb.HasAnyField(sets, "session.started_at") && req.EndDevice.GetSession().GetStartedAt().IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "session.tarted_at")
 		} else if !ttnpb.HasAnyField(sets, "session.started_at") {
-			req.EndDevice.Session.StartedAt = time.Now().UTC()
+			req.EndDevice.Session.StartedAt = timeNow().UTC()
 			sets = append(sets, "session.started_at")
 		}
 
@@ -340,12 +338,27 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if evt != nil {
 		events.Publish(evt)
 	}
-	if addDownlinkTask {
-		startAt := time.Now().UTC()
-		log.FromContext(ctx).WithField("start_at", startAt).Debug("Add downlink task")
-		if err = ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to add downlink task for device after set")
+
+	if !needsDownlinkCheck {
+		return dev, nil
+	}
+
+	var downAt time.Time
+	_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to determine device band")
+		downAt = timeNow().UTC()
+	} else {
+		var ok bool
+		downAt, ok = nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+		if !ok {
+			return dev, nil
 		}
+	}
+	downAt = downAt.Add(-nsScheduleWindow)
+	log.FromContext(ctx).WithField("start_at", downAt).Debug("Add downlink task after device set")
+	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
+		log.FromContext(ctx).WithError(err).Error("Failed to add downlink task after device set")
 	}
 	return dev, nil
 }

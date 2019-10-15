@@ -16,6 +16,8 @@ package networkserver
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -24,6 +26,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
@@ -68,8 +71,45 @@ func init() {
 	nsScheduleWindow = time.Hour // Ensure downlink tasks are added quickly
 }
 
+var timeNowMu sync.RWMutex
+
+func SetTimeNow(f func() time.Time) func() {
+	timeNowMu.Lock()
+	old := timeNow
+	timeNow = f
+	return func() {
+		timeNow = old
+		timeNowMu.Unlock()
+	}
+}
+
+type MockClock time.Time
+
+// Set sets clock to time t and returns old clock time.
+func (m *MockClock) Set(t time.Time) time.Time {
+	old := time.Time(*m)
+	*m = MockClock(t)
+	return old
+}
+
+// Add adds d to clock and returns current clock time.
+func (m *MockClock) Add(d time.Duration) time.Time {
+	t := time.Time(*m).Add(d)
+	*m = MockClock(t)
+	return t
+}
+
+// Now returns current clock time.
+func (m *MockClock) Now() time.Time {
+	return time.Time(*m)
+}
+
 func NSScheduleWindow() time.Duration {
 	return nsScheduleWindow
+}
+
+func GSScheduleWindow() time.Duration {
+	return gsScheduleWindow
 }
 
 // CopyEndDevice returns a deep copy of ttnpb.EndDevice pb.
@@ -1229,5 +1269,56 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplicati
 		default:
 			close(eventsPublishCh)
 		}
+	}
+}
+
+func ForEachBand(t *testing.T, f func(makeName func(parts ...string) string, phy band.Band)) {
+	for phyID, phy := range band.All {
+		for _, phyVer := range phy.Versions() {
+			phy, err := phy.Version(phyVer)
+			if err != nil {
+				t.Errorf("Failed to convert %s band to %s version", phyID, phyVer)
+				continue
+			}
+			f(func(parts ...string) string {
+				return fmt.Sprintf("%s/PHY:%s/%s", phyID, phyVer.String(), strings.Join(parts, "/"))
+			}, phy)
+		}
+	}
+}
+
+func ForEachMACVersion(f func(makeName func(parts ...string) string, macVersion ttnpb.MACVersion)) {
+	for _, macVersion := range []ttnpb.MACVersion{
+		ttnpb.MAC_V1_0,
+		ttnpb.MAC_V1_0_1,
+		ttnpb.MAC_V1_0_2,
+		ttnpb.MAC_V1_0_3,
+		ttnpb.MAC_V1_1,
+	} {
+		f(func(parts ...string) string {
+			return fmt.Sprintf("MAC:%s/%s", macVersion.String(), strings.Join(parts, "/"))
+		}, macVersion)
+	}
+}
+
+func ForEachBandMACVersion(t *testing.T, f func(makeName func(parts ...string) string, phy band.Band, macVersion ttnpb.MACVersion)) {
+	ForEachBand(t, func(makeBandName func(...string) string, phy band.Band) {
+		ForEachMACVersion(func(makeMACName func(...string) string, macVersion ttnpb.MACVersion) {
+			f(func(parts ...string) string {
+				return makeBandName(makeMACName(parts...))
+			}, phy, macVersion)
+		})
+	})
+}
+
+func ForEachClass(f func(makeName func(parts ...string) string, class ttnpb.Class)) {
+	for _, class := range []ttnpb.Class{
+		ttnpb.CLASS_A,
+		ttnpb.CLASS_B,
+		ttnpb.CLASS_C,
+	} {
+		f(func(parts ...string) string {
+			return fmt.Sprintf("Class:%s/%s", class.String(), strings.Join(parts, "/"))
+		}, class)
 	}
 }

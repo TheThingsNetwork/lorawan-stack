@@ -18,6 +18,7 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -29,14 +30,28 @@ var (
 	evtReceiveTxParamSetupAnswer  = defineReceiveMACAnswerEvent("tx_param_setup", "Tx parameter setup")()
 )
 
-func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if dev.MACState.DesiredParameters.MaxEIRP == dev.MACState.CurrentParameters.MaxEIRP &&
-		(dev.MACState.DesiredParameters.UplinkDwellTime == nil ||
-			dev.MACState.CurrentParameters.UplinkDwellTime != nil &&
-				dev.MACState.DesiredParameters.UplinkDwellTime.Value == dev.MACState.CurrentParameters.UplinkDwellTime.Value) &&
-		(dev.MACState.DesiredParameters.DownlinkDwellTime == nil ||
-			dev.MACState.CurrentParameters.DownlinkDwellTime != nil &&
-				dev.MACState.DesiredParameters.DownlinkDwellTime.Value == dev.MACState.CurrentParameters.DownlinkDwellTime.Value) {
+func needsTxParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
+	if !phy.TxParamSetupReqSupport || dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+		return false
+	}
+	if dev.MACState.DesiredParameters.MaxEIRP != dev.MACState.CurrentParameters.MaxEIRP {
+		return true
+	}
+	if dev.MACState.DesiredParameters.UplinkDwellTime != nil &&
+		(dev.MACState.CurrentParameters.UplinkDwellTime == nil ||
+			dev.MACState.DesiredParameters.UplinkDwellTime.Value != dev.MACState.CurrentParameters.UplinkDwellTime.Value) {
+		return true
+	}
+	if dev.MACState.DesiredParameters.DownlinkDwellTime != nil &&
+		(dev.MACState.CurrentParameters.DownlinkDwellTime == nil ||
+			dev.MACState.DesiredParameters.DownlinkDwellTime.Value != dev.MACState.CurrentParameters.DownlinkDwellTime.Value) {
+		return true
+	}
+	return false
+}
+
+func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy band.Band) macCommandEnqueueState {
+	if !needsTxParamSetupReq(dev, phy) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

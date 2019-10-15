@@ -19,11 +19,166 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
+
+func TestNeedsADRParamSetupReq(t *testing.T) {
+	type TestCase struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Band        band.Band
+		Needs       bool
+	}
+	var tcs []TestCase
+
+	ForEachBand(t, func(makeBandName func(parts ...string) string, phy band.Band) {
+		tcs = append(tcs,
+			TestCase{
+				Name:        makeBandName("no MAC state"),
+				InputDevice: &ttnpb.EndDevice{},
+				Band:        phy,
+			},
+		)
+		for _, conf := range []struct {
+			Suffix                               string
+			CurrentParameters, DesiredParameters ttnpb.MACParameters
+			Needs                                bool
+		}{
+			{
+				Suffix: "current(limit:nil,delay:nil),desired(limit:nil,delay:nil)",
+			},
+			{
+				Suffix: "current(limit:32768,delay:1024),desired(limit:32768,delay:1024)",
+				CurrentParameters: ttnpb.MACParameters{
+					ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
+						Value: ttnpb.ADR_ACK_LIMIT_32768,
+					},
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_1024,
+					},
+				},
+				DesiredParameters: ttnpb.MACParameters{
+					ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
+						Value: ttnpb.ADR_ACK_LIMIT_32768,
+					},
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_1024,
+					},
+				},
+			},
+			{
+				Suffix: "current(limit:32768,delay:1024),desired(limit:nil,delay:nil)",
+				CurrentParameters: ttnpb.MACParameters{
+					ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
+						Value: ttnpb.ADR_ACK_LIMIT_32768,
+					},
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_1024,
+					},
+				},
+			},
+			{
+				Suffix: "current(limit:nil,delay:1024),desired(limit:32768,delay:1024)",
+				CurrentParameters: ttnpb.MACParameters{
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_1024,
+					},
+				},
+				DesiredParameters: ttnpb.MACParameters{
+					ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
+						Value: ttnpb.ADR_ACK_LIMIT_32768,
+					},
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_1024,
+					},
+				},
+				Needs: phy.ADRAckLimit != ttnpb.ADR_ACK_LIMIT_32768,
+			},
+			{
+				Suffix: "current(limit:nil,delay:nil),desired(limit:32768,delay:1024)",
+				DesiredParameters: ttnpb.MACParameters{
+					ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
+						Value: ttnpb.ADR_ACK_LIMIT_32768,
+					},
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_1024,
+					},
+				},
+				Needs: phy.ADRAckLimit != ttnpb.ADR_ACK_LIMIT_32768 || phy.ADRAckDelay != ttnpb.ADR_ACK_DELAY_1024,
+			},
+			{
+				Suffix: "current(limit:32768,delay:nil),desired(limit:nil,delay:1024)",
+				CurrentParameters: ttnpb.MACParameters{
+					ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
+						Value: ttnpb.ADR_ACK_LIMIT_32768,
+					},
+				},
+				DesiredParameters: ttnpb.MACParameters{
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_1024,
+					},
+				},
+				Needs: phy.ADRAckDelay != ttnpb.ADR_ACK_DELAY_1024,
+			},
+			{
+				Suffix: "current(limit:32768,delay:1024),desired(limit:32768,delay:2048)",
+				CurrentParameters: ttnpb.MACParameters{
+					ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
+						Value: ttnpb.ADR_ACK_LIMIT_32768,
+					},
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_1024,
+					},
+				},
+				DesiredParameters: ttnpb.MACParameters{
+					ADRAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
+						Value: ttnpb.ADR_ACK_LIMIT_32768,
+					},
+					ADRAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
+						Value: ttnpb.ADR_ACK_DELAY_2048,
+					},
+				},
+				Needs: true,
+			},
+		} {
+			ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
+				tcs = append(tcs,
+					TestCase{
+						Name: makeBandName(makeMACName(conf.Suffix)),
+						InputDevice: &ttnpb.EndDevice{
+							MACState: &ttnpb.MACState{
+								LoRaWANVersion:    macVersion,
+								CurrentParameters: conf.CurrentParameters,
+								DesiredParameters: conf.DesiredParameters,
+							},
+						},
+						Band:  phy,
+						Needs: conf.Needs && macVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+					},
+				)
+			})
+		}
+	})
+
+	for _, tc := range tcs {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsADRParamSetupReq(dev, tc.Band)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
 
 func TestHandleADRParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {

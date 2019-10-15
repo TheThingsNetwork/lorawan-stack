@@ -54,18 +54,19 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 	return func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
 		ch := make(chan time.Time, 1)
 
+		now := timeNow()
 		if up.ReceivedAt.IsZero() {
-			up.ReceivedAt = time.Now()
+			up.ReceivedAt = now
 		}
 
 		end := up.ReceivedAt.Add(d)
-		if end.Before(time.Now()) {
+		if end.Before(now) {
 			ch <- end
 			return ch
 		}
 
 		go func() {
-			time.Sleep(time.Until(up.ReceivedAt.Add(d)))
+			time.Sleep(timeUntil(up.ReceivedAt.Add(d)))
 			ch <- end
 		}()
 		return ch

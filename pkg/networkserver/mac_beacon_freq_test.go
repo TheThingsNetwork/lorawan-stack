@@ -25,6 +25,78 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsBeaconFreqReq(t *testing.T) {
+	type TestCase struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Needs       bool
+	}
+	var tcs []TestCase
+
+	tcs = append(tcs,
+		TestCase{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+	)
+	ForEachClass(func(makeClassName func(parts ...string) string, class ttnpb.Class) {
+		for _, conf := range []struct {
+			Suffix                               string
+			CurrentParameters, DesiredParameters ttnpb.MACParameters
+			Needs                                bool
+		}{
+			{
+				Suffix: "current(frequency:42),desired(frequency:42)",
+				CurrentParameters: ttnpb.MACParameters{
+					BeaconFrequency: 42,
+				},
+				DesiredParameters: ttnpb.MACParameters{
+					BeaconFrequency: 42,
+				},
+			},
+			{
+				Suffix: "current(frequency:24),desired(frequency:42)",
+				CurrentParameters: ttnpb.MACParameters{
+					BeaconFrequency: 24,
+				},
+				DesiredParameters: ttnpb.MACParameters{
+					BeaconFrequency: 42,
+				},
+				Needs: true,
+			},
+		} {
+			tcs = append(tcs,
+				TestCase{
+					Name: makeClassName(conf.Suffix),
+					InputDevice: &ttnpb.EndDevice{
+						MACState: &ttnpb.MACState{
+							DeviceClass:       class,
+							CurrentParameters: conf.CurrentParameters,
+							DesiredParameters: conf.DesiredParameters,
+						},
+					},
+					Needs: conf.Needs && class == ttnpb.CLASS_B,
+				},
+			)
+		}
+	})
+
+	for _, tc := range tcs {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsBeaconFreqReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleBeaconFreqAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
