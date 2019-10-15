@@ -194,6 +194,7 @@
   "console.views.device-overview.index.sessionInfo": "Xxxxxxx Xxxxxxxxxxx",
   "console.views.device-overview.index.latestData": "Xxxxxx Xxxx",
   "console.views.device-overview.index.rootKeys": "Xxxx Xxxx",
+  "console.views.device-overview.index.keysNotExposed": "Xxxx xxx xxx xxxxxxx",
   "console.views.gateway-add.index.createGateway": "Xxxxxx Xxxxxxx",
   "console.views.gateway-data.index.gtwData": "Xxxxxxx Xxxx",
   "console.views.gateway-general-settings.index.updateSuccess": "Xxxxxxxxxxxx xxxxxxx xxxxxxx",
