@@ -76,6 +76,7 @@
   "console.components.device-import-form.index.selectAFile": "Xxxxxx xxxxxx x xxxxxxxx xxxx",
   "console.components.device-import-form.index.fileInfoPlaceholder": "Xxxxxx xxxxxx x xxxxxxxx xxxxxx",
   "console.components.device-import-form.index.claimAuthCode": "Xxx xxxxx xxxxxxxxxxxxxx xxxx",
+  "console.components.device-import-form.index.targetedComponents": "Xxxxxxxx Xxxxxxxxxx",
   "console.components.gateway-data-form.index.enforced": "Xxxxxxxx",
   "console.components.gateway-data-form.index.dutyCycle": "Xxxx Xxxxx",
   "console.components.gateway-data-form.index.gatewayIdPlaceholder": "xx-xxx-xxxxxxx",

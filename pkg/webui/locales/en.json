@@ -76,6 +76,7 @@
   "console.components.device-import-form.index.selectAFile": "Please select a template file",
   "console.components.device-import-form.index.fileInfoPlaceholder": "Please select a template format",
   "console.components.device-import-form.index.claimAuthCode": "Set claim authentication code",
+  "console.components.device-import-form.index.targetedComponents": "Targeted Components",
   "console.components.gateway-data-form.index.enforced": "Enforced",
   "console.components.gateway-data-form.index.dutyCycle": "Duty Cycle",
   "console.components.gateway-data-form.index.gatewayIdPlaceholder": "my-new-gateway",
