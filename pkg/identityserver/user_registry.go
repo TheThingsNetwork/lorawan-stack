@@ -390,7 +390,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
 		err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
 			data.SetEntity(req.EntityIdentifiers())
-			return &emails.EntityStateChanged{Data: data, State: usr.State.String()}
+			return &emails.EntityStateChanged{Data: data, State: strings.ToLower(strings.TrimPrefix(usr.State.String(), "STATE_"))}
 		})
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Could not send state change notification email")
