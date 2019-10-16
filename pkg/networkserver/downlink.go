@@ -111,21 +111,6 @@ func (s generateDownlinkState) appendApplicationUplinks(ups []*ttnpb.Application
 	}
 }
 
-func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Time {
-	if dev.GetMACState().GetLastConfirmedDownlinkAt() == nil {
-		return time.Time{}
-	}
-	if dev.GetMACState().GetRxWindowsAvailable() {
-		return time.Time{}
-	}
-	if len(dev.RecentUplinks) > 0 {
-		if dev.RecentUplinks[len(dev.RecentUplinks)-1].ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
-			return time.Time{}
-		}
-	}
-	return dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, defaults))
-}
-
 // generateDownlink attempts to generate a downlink.
 // generateDownlink returns the generated downlink, application uplinks associated with the generation and error, if any.
 // generateDownlink may mutate the device in order to record the downlink generated.

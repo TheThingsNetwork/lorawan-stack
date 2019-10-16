@@ -151,6 +151,21 @@ func nextClassADataDownlinkSlot(dev *ttnpb.EndDevice) (time.Time, bool) {
 	}
 }
 
+func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Time {
+	if dev.GetMACState().GetLastConfirmedDownlinkAt() == nil {
+		return time.Time{}
+	}
+	if dev.GetMACState().GetRxWindowsAvailable() {
+		return time.Time{}
+	}
+	if len(dev.RecentUplinks) > 0 {
+		if dev.RecentUplinks[len(dev.RecentUplinks)-1].ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
+			return time.Time{}
+		}
+	}
+	return dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, defaults))
+}
+
 // nextDataDownlinkAt returns the time.Time when the downlink should be scheduled on the Gateway Server
 // and whether or not there is a data downlink to schedule.
 func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings) (time.Time, bool) {
