@@ -20,16 +20,23 @@ import bind from 'autobind-decorator'
 import Form from '../../../components/form'
 import DeviceTemplateFormatSelect from '../../containers/device-template-format-select'
 import FileInput from '../../../components/file-input'
+import Checkbox from '../../../components/checkbox'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
+import PropTypes from '../../../lib/prop-types'
+
+import style from './device-import-form.styl'
 
 const m = defineMessages({
   fileImport: 'File Import',
   file: 'File',
+  formatInfo: 'Format Information',
   createDevices: 'Create Devices',
   selectAFile: 'Please select a template file',
+  fileInfoPlaceholder: 'Please select a template format',
+  claimAuthCode: 'Set claim authentication code',
 })
 
 const validationSchema = Yup.object({
@@ -38,8 +45,18 @@ const validationSchema = Yup.object({
 })
 
 export default class DeviceBulkCreateForm extends Component {
+  static propTypes = {
+    initialValues: PropTypes.shape({
+      format_id: PropTypes.string,
+      data: PropTypes.string,
+      set_claim_auth_code: PropTypes.bool,
+    }).isRequired,
+    onSubmit: PropTypes.func.isRequired,
+  }
+
   state = {
     allowedFileExtensions: undefined,
+    formatDescription: undefined,
     formatSelected: false,
   }
 
@@ -49,15 +66,17 @@ export default class DeviceBulkCreateForm extends Component {
     if (value && value.fileExtensions && value.fileExtensions instanceof Array) {
       newState.allowedFileExtensions = value.fileExtensions.join(',')
     }
+    if (value && value.description) {
+      newState.formatDescription = value.description
+    }
     this.setState(newState)
   }
 
   render() {
-    const { initialValues, error, onSubmit } = this.props
-    const { allowedFileExtensions, formatSelected } = this.state
+    const { initialValues, onSubmit } = this.props
+    const { allowedFileExtensions, formatSelected, formatDescription } = this.state
     return (
       <Form
-        error={error}
         onSubmit={onSubmit}
         validationSchema={validationSchema}
         submitEnabledWhenInvalid
@@ -65,6 +84,10 @@ export default class DeviceBulkCreateForm extends Component {
       >
         <Message component="h4" content={m.fileImport} />
         <DeviceTemplateFormatSelect onChange={this.handleSelectChange} name="format_id" required />
+        <Form.InfoField disabled={!formatSelected} title={m.formatInfo}>
+          {formatDescription ? formatDescription : <Message content={m.fileInfoPlaceholder} />}
+        </Form.InfoField>
+        <hr className={style.hRule} />
         <Form.Field
           disabled={!formatSelected}
           title={m.file}
@@ -72,6 +95,12 @@ export default class DeviceBulkCreateForm extends Component {
           component={FileInput}
           name="data"
           required
+        />
+        <Form.Field
+          disabled={!formatSelected}
+          title={m.claimAuthCode}
+          component={Checkbox}
+          name="set_claim_auth_code"
         />
         <SubmitBar>
           <Form.Submit component={SubmitButton} message={m.createDevices} />

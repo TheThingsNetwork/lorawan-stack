@@ -44,7 +44,7 @@ const hardcoded = {
   event_update: 'edit',
   uplink: 'arrow_drop_up',
   downlink: 'arrow_drop_down',
-  bulk_creation: 'playlist_add',
+  import_devices: 'playlist_add',
 }
 
 const Icon = function({

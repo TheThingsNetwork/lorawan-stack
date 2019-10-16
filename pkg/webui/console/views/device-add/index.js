@@ -13,21 +13,36 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
+import { Container, Col, Row } from 'react-grid-system'
+import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
-import { Switch, Route } from 'react-router'
+import { push } from 'connected-react-router'
 
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import Message from '../../../lib/components/message'
+import IntlHelmet from '../../../lib/components/intl-helmet'
+import DeviceDataForm from '../../components/device-data-form'
 import sharedMessages from '../../../lib/shared-messages'
-import NotFoundRoute from '../../../lib/components/not-found-route'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { getDeviceId } from '../../../lib/selectors/id'
+import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import PropTypes from '../../../lib/prop-types'
-import DeviceAddSingle from '../device-add-single'
-import DeviceAddBulk from '../device-add-bulk'
+import api from '../../api'
+import style from './device-add-single.styl'
 
-@connect(state => ({
-  appId: selectSelectedApplicationId(state),
-}))
+@connect(
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    asConfig: selectAsConfig(),
+    nsConfig: selectNsConfig(),
+    jsConfig: selectJsConfig(),
+  }),
+  dispatch => ({
+    redirectToList: (appId, deviceId) =>
+      dispatch(push(`/applications/${appId}/devices/${deviceId}`)),
+  }),
+)
 @withBreadcrumb('devices.add', function(props) {
   const { appId } = props
   return (
@@ -41,18 +56,58 @@ import DeviceAddBulk from '../device-add-bulk'
 export default class DeviceAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    asConfig: PropTypes.stackComponent.isRequired,
+    jsConfig: PropTypes.stackComponent.isRequired,
+    nsConfig: PropTypes.stackComponent.isRequired,
+    redirectToList: PropTypes.func.isRequired,
+  }
+
+  @bind
+  async handleSubmit(values) {
+    const { appId } = this.props
+    const { activation_mode, ...device } = values
+
+    return api.device.create(appId, device, {
+      abp: values.activation_mode === 'abp',
+    })
+  }
+
+  @bind
+  handleSubmitSuccess(device) {
+    const { appId, redirectToList } = this.props
+    const deviceId = getDeviceId(device)
+
+    redirectToList(appId, deviceId)
   }
 
   render() {
-    const { appId } = this.props
-    const basePath = `/applications/${appId}/devices/add`
+    const { asConfig, nsConfig, jsConfig } = this.props
+
+    const initialValues = {
+      network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
+      application_server_address: asConfig.enabled ? new URL(asConfig.base_url).hostname : '',
+      join_server_address: jsConfig.enabled ? new URL(jsConfig.base_url).hostname : '',
+    }
 
     return (
-      <Switch>
-        <Route exact path={basePath} component={DeviceAddSingle} />
-        <Route exact path={`${basePath}/bulk`} component={DeviceAddBulk} />
-        <NotFoundRoute />
-      </Switch>
+      <Container>
+        <Row>
+          <Col sm={12}>
+            <IntlHelmet title={sharedMessages.addDevice} />
+            <Message className={style.title} component="h2" content={sharedMessages.addDevice} />
+          </Col>
+        </Row>
+        <Row>
+          <Col className={style.form} lg={8} md={12}>
+            <DeviceDataForm
+              onSubmit={this.handleSubmit}
+              onSubmitSuccess={this.handleSubmitSuccess}
+              initialValues={initialValues}
+              jsConfig={jsConfig}
+            />
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }

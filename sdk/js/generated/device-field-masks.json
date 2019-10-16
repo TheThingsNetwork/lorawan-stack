@@ -450,6 +450,7 @@
   "js": {
     "get": [
       "application_server_address",
+      "claim_authentication_code",
       "ids",
       "ids.application_ids",
       "ids.application_ids.application_id",
@@ -476,6 +477,7 @@
     ],
     "set": [
       "application_server_address",
+      "claim_authentication_code",
       "ids",
       "ids.application_ids",
       "ids.application_ids.application_id",

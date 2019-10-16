@@ -12,32 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.filters
-  display: flex
-  justify-content: space-between
-  align-items: center
+.title
+  text-margin-top($ls.m)
+  text-margin-bottom($ls.m)
 
-  &.top-rule
-    border-normal('bottom')
-
-  &-left
-    flex-basis: auto
-
-  &-right
-    flex: 1
-    display: flex
-    justify-content: flex-end
-    align-items: center
-    max-width: 26rem
-    min-height: 3.8rem
-
-.page
-  margin-top: $ls.s
-
-.tabs
-  margin: 0
-
-.table-title
-  h4()
-  padding-left: $cs.m
-  color: $tc-subtle-gray
+.form
+  +media-query($bp.s)
+    order: 2
+    text-margin-bottom($ls.m)

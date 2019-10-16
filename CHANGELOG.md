@@ -9,13 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Option to generate claim authentication codes for devices automatically.
+
 ### Changed
+
+- Rename "bulk device creation" to "import devices"
+- Move device import button to the end device tables (and adapt routing accordingly).
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Fix issues with device bulk creation in Join Server.
+- Fix device import not setting component hosts automatically.
 
 ### Security
 
@@ -168,7 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix incorrect error message in `ttn-lw-cli users oauth` commands.
 - Fix propagation of warning headers in API responses.
 - Fix relative time display in the Console.
-- Fix relative time display in the Console for  IE11, Edge and Safari.
+- Fix relative time display in the Console for IE11, Edge and Safari.
 - Fix unable to change LoRaWAN MAC and PHY version.
 - Resolve flickering display issue in the overview pages of entities in the console.
 
@@ -255,7 +263,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for getting automatic Let's Encrypt certificates. Add the new config flags `--tls.acme.enable`, `--tls.acme.dir=/path/to/storage`, `--tls.acme.hosts=example.com`, `--tls.acme.email=you@example.com` flags (or their env/config equivalent) to make it work. The `/path/to/storage` dir needs to be `chown`ed to `886:886`. See also `docker-compose.yml`.
-- `GetApplicationAPIKey`,  `GetGatewayAPIKey`,  `GetOrganizationAPIKey`,  `GetUserAPIKey` RPCs and related messages.
+- `GetApplicationAPIKey`, `GetGatewayAPIKey`, `GetOrganizationAPIKey`, `GetUserAPIKey` RPCs and related messages.
 - "General Settings" view for end devices.
 - `--credentials-id` flag to CLI that allows users to be logged in with mulitple credentials and switch between them.
 - A check to the Identity Server that prevents users from deleting applications that still contain end devices.
@@ -329,19 +337,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix `dev_addr` not being present in upstream messages.
 
-
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[Unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.2...HEAD
-[3.2.2]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.1...v3.2.2
-[3.2.1]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.0...v3.2.1
-[3.2.0]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.2...v3.2.0
-[3.1.2]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.1...v3.1.2
-[3.1.1]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.0...v3.1.1
-[3.1.0]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.4...v3.1.0
-[3.0.4]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.3...v3.0.4
-[3.0.3]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.2...v3.0.3
-[3.0.2]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.1...v3.0.2
-[3.0.1]:      https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.0...v3.0.1
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.2...HEAD
+[3.2.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.1...v3.2.2
+[3.2.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.0...v3.2.1
+[3.2.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.2...v3.2.0
+[3.1.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.1...v3.1.2
+[3.1.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.0...v3.1.1
+[3.1.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.4...v3.1.0
+[3.0.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.3...v3.0.4
+[3.0.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.2...v3.0.3
+[3.0.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.1...v3.0.2
+[3.0.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.0.0...v3.0.1

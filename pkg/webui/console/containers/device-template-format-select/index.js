@@ -30,7 +30,8 @@ const m = defineMessages({
 const formatOptions = formats =>
   Object.keys(formats).map(key => ({
     value: key,
-    label: `${formats[key].name} (${formats[key].description})`,
+    label: formats[key].name,
+    description: formats[key].description,
     fileExtensions: formats[key].file_extensions,
   }))
 
