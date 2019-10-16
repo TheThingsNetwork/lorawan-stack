@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import originalPropTypes from 'prop-types'
+import { components } from '../constants/components'
 
 const PropTypes = { ...originalPropTypes }
 
@@ -194,5 +195,8 @@ PropTypes.collaborator = PropTypes.shape({
 })
 
 PropTypes.rights = PropTypes.arrayOf(PropTypes.string)
+
+PropTypes.component = PropTypes.oneOf(components)
+PropTypes.components = PropTypes.arrayOf(PropTypes.component)
 
 export default PropTypes
