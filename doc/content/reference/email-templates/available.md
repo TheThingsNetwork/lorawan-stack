@@ -14,6 +14,7 @@ Collaborator changed | `collaborator_changed` | Sent when the rights of a collab
 Password changed | `password_changed` | Sent when the the password of a user has been changed.
 Temporary password | `temporary_password` | Sent when a temporary password has been requested for an user. | `TemporaryPassword`
 Email validation | `validate` | Sent when a user is added as a collaborator of an entity, in order to validate their email. | `ID` and `Token`
+Entity State Changed | `entity_state_changed` | Sent when the approval state of an entity changed. | `State`
 
 The following fields can be used inside all of the email templates:
 
