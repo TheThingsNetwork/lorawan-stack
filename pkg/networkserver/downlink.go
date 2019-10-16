@@ -115,6 +115,14 @@ func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSetti
 	if dev.GetMACState().GetLastConfirmedDownlinkAt() == nil {
 		return time.Time{}
 	}
+	if dev.GetMACState().GetRxWindowsAvailable() {
+		return time.Time{}
+	}
+	if len(dev.RecentUplinks) > 0 {
+		if dev.RecentUplinks[len(dev.RecentUplinks)-1].ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
+			return time.Time{}
+		}
+	}
 	return dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, defaults))
 }
 
