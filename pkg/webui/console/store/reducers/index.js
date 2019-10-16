@@ -87,6 +87,7 @@ export default history =>
       applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),
       gateway: createNamedCollaboratorReducer(GATEWAY_SHARED_NAME),
       gateways: createNamedCollaboratorsReducer(GATEWAY_SHARED_NAME),
+      organization: createNamedCollaboratorReducer(ORGANIZATION_SHARED_NAME),
       organizations: createNamedCollaboratorsReducer(ORGANIZATION_SHARED_NAME),
     }),
     events: combineReducers({

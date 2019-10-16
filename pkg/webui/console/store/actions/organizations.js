@@ -37,6 +37,8 @@ import createGetRightsListRequestActions, { createGetRightsListActionType } from
 import {
   createGetCollaboratorsListRequestActions,
   createGetCollaboratorsListActionType,
+  createGetCollaboratorRequestActions,
+  createGetCollaboratorActionType,
 } from './collaborators'
 
 export const SHARED_NAME = 'ORGANIZATION'
@@ -124,6 +126,20 @@ export const [
     failure: deleteORganizationFailure,
   },
 ] = createPaginationDeleteActions(SHARED_NAME, id => ({ id }))
+
+export const GET_ORG_COLLABORATOR_BASE = createGetCollaboratorActionType(SHARED_NAME)
+export const [
+  {
+    request: GET_ORG_COLLABORATOR,
+    success: GET_ORG_COLLABORATOR_SUCCESS,
+    failure: GET_ORG_COLLABORATOR_FAILURE,
+  },
+  {
+    request: getOrganizationCollaborator,
+    success: getOrganizationCollaboratorSuccess,
+    failure: getOrganizationCollaboratorFailure,
+  },
+] = createGetCollaboratorRequestActions(SHARED_NAME)
 
 export const GET_ORG_COLLABORATORS_LIST_BASE = createGetCollaboratorsListActionType(SHARED_NAME)
 export const [

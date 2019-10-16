@@ -17,6 +17,7 @@ import {
   GET_ORG_BASE,
   GET_ORGS_RIGHTS_LIST_BASE,
   GET_ORG_API_KEY_BASE,
+  GET_ORG_COLLABORATOR_BASE,
 } from '../actions/organizations'
 import {
   createPaginationIdsSelectorByEntity,
@@ -31,6 +32,10 @@ import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
 import { createApiKeySelector } from './api-key'
+import {
+  createUserCollaboratorSelector,
+  createOrganizationCollaboratorSelector,
+} from './collaborators'
 
 const ENTITY = 'organizations'
 const ENTITY_SINGLE = 'organization'
@@ -73,3 +78,13 @@ export const selectOrganizationApiKeyError = createErrorSelector(GET_ORG_API_KEY
 export const selectOrganizationEvents = createEventsSelector(ENTITY)
 export const selectOrganizationEventsError = createEventsErrorSelector(ENTITY)
 export const selectOrganizationEventsStatus = createEventsStatusSelector(ENTITY)
+
+// Collaborators
+export const selectOrganizationUserCollaborator = createUserCollaboratorSelector(ENTITY_SINGLE)
+export const selectOrganizationOrganizationCollaborator = createOrganizationCollaboratorSelector(
+  ENTITY_SINGLE,
+)
+export const selectOrganizationCollaboratorFetching = createFetchingSelector(
+  GET_ORG_COLLABORATOR_BASE,
+)
+export const selectOrganizationCollaboratorError = createErrorSelector(GET_ORG_COLLABORATOR_BASE)
