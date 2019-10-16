@@ -61,12 +61,23 @@ const statusMap = {
 }
 
 @connect(
-  state => ({
-    appId: selectSelectedApplicationId(state),
-    asConfig: selectAsConfig(),
-    nsConfig: selectNsConfig(),
-    jsConfig: selectJsConfig(),
-  }),
+  function(state) {
+    const asConfig = selectAsConfig()
+    const nsConfig = selectNsConfig()
+    const jsConfig = selectJsConfig()
+    const availableComponents = ['is']
+    if (nsConfig.enabled) availableComponents.push('ns')
+    if (jsConfig.enabled) availableComponents.push('js')
+    if (asConfig.enabled) availableComponents.push('as')
+
+    return {
+      appId: selectSelectedApplicationId(state),
+      nsConfig,
+      jsConfig,
+      asConfig,
+      availableComponents,
+    }
+  },
   dispatch => ({
     redirectToList: appId => dispatch(push(`/applications/${appId}/devices`)),
   }),
@@ -81,6 +92,7 @@ export default class DeviceImporter extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     asConfig: PropTypes.stackComponent.isRequired,
+    availableComponents: PropTypes.components.isRequired,
     jsConfig: PropTypes.stackComponent.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
@@ -115,7 +127,8 @@ export default class DeviceImporter extends Component {
   @bind
   async handleSubmit(values) {
     const { appId, jsConfig, nsConfig, asConfig } = this.props
-    const { format_id, data, set_claim_auth_code } = values
+    const { format_id, data, set_claim_auth_code, components } = values
+    const componentArray = Object.keys(components).filter(c => components[c])
 
     try {
       // Start template conversion
@@ -165,7 +178,7 @@ export default class DeviceImporter extends Component {
         totalDevices: devices.length,
       })
       this.appendToLog('Creating devices…')
-      const createStream = api.device.bulkCreate(appId, devices)
+      const createStream = api.device.bulkCreate(appId, devices, componentArray)
 
       await new Promise(
         function(resolve, reject) {
@@ -242,12 +255,20 @@ export default class DeviceImporter extends Component {
   }
 
   get form() {
+    const { availableComponents } = this.props
     const initialValues = {
       format_id: '',
       data: '',
       set_claim_auth_code: false,
+      components: availableComponents.reduce((o, c) => ({ ...o, [c]: true }), {}),
     }
-    return <DeviceImportForm initialValues={initialValues} onSubmit={this.handleSubmit} />
+    return (
+      <DeviceImportForm
+        components={availableComponents}
+        initialValues={initialValues}
+        onSubmit={this.handleSubmit}
+      />
+    )
   }
 
   render() {
