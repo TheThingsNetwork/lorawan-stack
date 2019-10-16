@@ -8,6 +8,7 @@ The following email templates are currently used by The Things Stack:
 
 Full Name | Identifier | Scope | Additional fields
 ----------|------------|-------|------------------
+Invitation | `invitation` | Sent when inviting new users to the network. | `InvitationToken`
 API Key changed | `api_key_changed` | Sent when the rights of an API Key have been changed. | `Identifiers` and `Rights`
 API Key created | `api_key_created` | Send when an API Key has been created. | `Identifiers` and `Rights`
 Collaborator changed | `collaborator_changed` | Sent when the rights of a collaborator have been changed. | `Collaborator`
