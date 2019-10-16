@@ -20,6 +20,7 @@ import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import { replace, push } from 'connected-react-router'
 import * as Yup from 'yup'
+import queryString from 'query-string'
 
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
@@ -119,9 +120,11 @@ export default class CreateAccount extends React.PureComponent {
   async handleSubmit(values, { setSubmitting, setErrors }) {
     try {
       const { user_id, ...rest } = values
+      const { invitation_token = '' } = queryString.parse(location.search)
       const { push } = this.props
       const result = await api.users.register({
         user: { ids: { user_id }, ...rest },
+        invitation_token,
       })
 
       push('/login', {

@@ -161,12 +161,15 @@ var (
 				}
 			}
 
+			invitationToken, _ := cmd.Flags().GetString("invitation-token")
+
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Create(ctx, &ttnpb.CreateUserRequest{
-				User: user,
+				User:            user,
+				InvitationToken: invitationToken,
 			})
 			if err != nil {
 				return err
@@ -336,6 +339,7 @@ func init() {
 	usersCreateCommand.Flags().AddFlagSet(attributesFlags())
 	usersCreateCommand.Flags().AddFlagSet(profilePictureFlags)
 	usersCreateCommand.Flags().Lookup("state").DefValue = ttnpb.STATE_APPROVED.String()
+	usersCreateCommand.Flags().String("invitation-token", "", "")
 	usersCommand.AddCommand(usersCreateCommand)
 	usersUpdateCommand.Flags().AddFlagSet(userIDFlags())
 	usersUpdateCommand.Flags().AddFlagSet(setUserFlags)
