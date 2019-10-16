@@ -386,8 +386,16 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	events.Publish(evtUpdateUser(ctx, req.UserIdentifiers, req.FieldMask.Paths))
 
 	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
-	// - If user state changed (approved, rejected, flagged, suspended)
 	// - If primary email address changed
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "state") {
+		err = is.SendUserEmail(ctx, &req.UserIdentifiers, func(data emails.Data) email.MessageData {
+			data.SetEntity(req.EntityIdentifiers())
+			return &emails.EntityStateChanged{Data: data, State: strings.ToLower(strings.TrimPrefix(usr.State.String(), "STATE_"))}
+		})
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Could not send state change notification email")
+		}
+	}
 
 	return usr, nil
 }
