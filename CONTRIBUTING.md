@@ -244,8 +244,8 @@ In the API, the enum descriptions, error messages and event descriptions availab
 
 These messages are then collected in the `config/messages.json` file, which will be processed in the frontend build process, but may also be used by other (native) user interfaces. When you define new enums, errors or events or when you change them, the messages need to be updated into the `config/messages.json` file.
 
-```sh
-./mage go:messages
+```bash
+$ ./mage go:messages
 ```
 
 If you forget to do so, this will cause a CI failure.

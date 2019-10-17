@@ -31,7 +31,7 @@ $ ttn-lw-cli user api-key create \
 
 With the created API key:
 
-```
+```bash
 $ curl https://thethings.example.com/api/v3/events \
   -X POST \
   -H 'Authorization: Bearer NNSXS.BR55PTYILPPVXY..' \

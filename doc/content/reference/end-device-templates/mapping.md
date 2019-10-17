@@ -21,7 +21,7 @@ This example shows creating a generic device profile that is mapped with provisi
 
 First, create a mapping file with a device profile:
 
-```
+```bash
 $ ttn-lw-cli end-device template extend \
   --frequency-plan-id EU_863_870 \
   --lorawan-version 1.0.3 \

@@ -3,7 +3,7 @@ This is the official SDK for the The Things Stack for LoRaWAN.
 
 ## Installation
 
-```
+```bash
 $ yarn add ttn
 ```
 
@@ -40,16 +40,16 @@ await secondApp.save()
 
 ## Development
 ### Building
-```
+```bash
 $ yarn run build
 ```
 This will transpile the source to `/dist`
 ### Watching Changes
-```
+```bash
 $ yarn run watch
 ```
 ### Testing
-```
+```bash
 $ yarn run jest
 ```
 
