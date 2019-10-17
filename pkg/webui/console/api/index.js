@@ -189,6 +189,7 @@ export default {
   rights: {
     applications: ttnClient.Applications.getRightsById.bind(ttnClient.Applications),
     gateways: ttnClient.Gateways.getRightsById.bind(ttnClient.Gateways),
+    organizations: ttnClient.Organizations.getRightsById.bind(ttnClient.Organizations),
   },
   configuration: {
     listNsFrequencyPlans: ttnClient.Configuration.listNsFrequencyPlans.bind(
@@ -215,5 +216,12 @@ export default {
     eventsSubscribe: ttnClient.Organizations.openStream.bind(ttnClient.Organizations),
     delete: ttnClient.Organizations.deleteById.bind(ttnClient.Organizations),
     update: ttnClient.Organizations.updateById.bind(ttnClient.Organizations),
+    apiKeys: {
+      get: ttnClient.Organizations.ApiKeys.getById.bind(ttnClient.Organizations.ApiKeys),
+      list: ttnClient.Organizations.ApiKeys.getAll.bind(ttnClient.Organizations.ApiKeys),
+      update: ttnClient.Organizations.ApiKeys.updateById.bind(ttnClient.Organizations.ApiKeys),
+      delete: ttnClient.Organizations.ApiKeys.deleteById.bind(ttnClient.Organizations.ApiKeys),
+      create: ttnClient.Organizations.ApiKeys.create.bind(ttnClient.Organizations.ApiKeys),
+    },
   },
 }

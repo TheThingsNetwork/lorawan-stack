@@ -127,6 +127,7 @@ class EditForm extends React.Component {
           component={RightsGroup}
           rights={rights}
           pseudoRight={pseudoRights[0]}
+          entityTypeMessage={sharedMessages.apiKey}
         />
         <SubmitBar>
           <FormSubmit component={SubmitButton} message={sharedMessages.saveChanges} />

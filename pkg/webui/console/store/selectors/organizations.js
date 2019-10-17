@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_ORGS_LIST_BASE, GET_ORG_BASE } from '../actions/organizations'
+import {
+  GET_ORGS_LIST_BASE,
+  GET_ORG_BASE,
+  GET_ORGS_RIGHTS_LIST_BASE,
+  GET_ORG_API_KEY_BASE,
+} from '../actions/organizations'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -24,8 +29,11 @@ import {
 } from './events'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
+import { createRightsSelector, createPseudoRightsSelector } from './rights'
+import { createApiKeySelector } from './api-key'
 
 const ENTITY = 'organizations'
+const ENTITY_SINGLE = 'organization'
 
 // Organization
 export const selectOrganizationStore = state => state.organizations
@@ -49,6 +57,17 @@ export const selectOrganizations = state =>
 export const selectOrganizationsTotalCount = state => selectOrgsTotalCount(state)
 export const selectOrganizationsFetching = state => selectOrgsFetching(state)
 export const selectOrganizationsError = state => selectOrgsError(state)
+
+// Rights
+export const selectOrganizationRights = createRightsSelector(ENTITY)
+export const selectOrganizationPseudoRights = createPseudoRightsSelector(ENTITY)
+export const selectOrganizationRightsError = createErrorSelector(GET_ORGS_RIGHTS_LIST_BASE)
+export const selectOrganizationRightsFetching = createFetchingSelector(GET_ORGS_RIGHTS_LIST_BASE)
+
+// Api Keys
+export const selectOrganizationApiKey = createApiKeySelector(ENTITY_SINGLE)
+export const selectOrganizationApiKeyFetching = createFetchingSelector(GET_ORG_API_KEY_BASE)
+export const selectOrganizationApiKeyError = createErrorSelector(GET_ORG_API_KEY_BASE)
 
 // Events
 export const selectOrganizationEvents = createEventsSelector(ENTITY)

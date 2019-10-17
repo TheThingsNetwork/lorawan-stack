@@ -13,10 +13,20 @@
 // limitations under the License.
 
 import Marshaler from '../util/marshaler'
+import ApiKeys from './api-keys'
 
 class Organizations {
   constructor(api) {
     this._api = api
+
+    this.ApiKeys = new ApiKeys(api.OrganizationAccess, {
+      parentRoutes: {
+        get: 'organization_ids.organization_id',
+        list: 'organization_ids.organization_id',
+        create: 'organization_ids.organization_id',
+        update: 'organization_ids.organization_id',
+      },
+    })
   }
 
   // Retrieval
@@ -81,6 +91,14 @@ class Organizations {
     })
 
     return Marshaler.payloadSingleResponse(response)
+  }
+
+  async getRightsById(organizationId) {
+    const result = await this._api.OrganizationAccess.ListRights({
+      routeParams: { organization_id: organizationId },
+    })
+
+    return Marshaler.unwrapRights(result)
   }
 
   // Events Stream
