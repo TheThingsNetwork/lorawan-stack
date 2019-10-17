@@ -8,7 +8,9 @@ $ yarn add ttn
 ```
 
 ## Usage
+
 ### Basic Setup
+
 ```javascript
 import TTN from 'ttn'
 
@@ -21,6 +23,7 @@ const ttn = new TTN(token, {
 ```
 
 ### Creating Applications
+
 ```javascript
 const appData = {
   ids: {
@@ -39,19 +42,26 @@ await secondApp.save()
 ```
 
 ## Development
+
 ### Building
+
 ```bash
 $ yarn run build
 ```
 This will transpile the source to `/dist`
+
 ### Watching Changes
+
 ```bash
 $ yarn run watch
 ```
+
 ### Testing
+
 ```bash
 $ yarn run jest
 ```
 
 ## Examples
+
 There are some basic usage examples in `/src/examples`

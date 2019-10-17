@@ -257,6 +257,7 @@ Adding translations of messages to other languages than English is a matter of a
 Translations of frontend messages are located in `pkg/webui/locales`.
 
 ## Release notes
+
 We maintain a changelog at `CHANGELOG.md` using a format based on [Keep a Changelog].
 
 Any notes that we need to include in the Release Notes for the next release should be added under the `Unreleased` section.

@@ -189,23 +189,29 @@ $ ./mage proto:clean proto:all
 
 
 ## Frontend
+
 ### Introduction
+
 The Things Stack for LoRaWAN includes two frontend applications: the **Console** and **OAuth Provider**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `oauth` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
 
 #### Console
+
 The Console is the official management application of The Things Stack. It can be used to register applications, end devices or gateways, monitor network traffic, or configure network related options, among other things. The console uses an OAuth access token to communicate with The Things Stack.
 
 #### OAuth
+
 The OAuth app provides the necessary frontend for the OAuth provider of The Things Stack. It is used e.g. to display the authorization screen that users get prompted with when they want to authorize a third-party app to access The Things Stack.
 
 ### Building the frontend
 
 #### Prerequisites
+
 In order to build the frontend, you'll need the following:
 * Node JS, version 10.x (see [Development Environment](#development-environment))
 * NPM (node package manager), version >= 6.4.1 (⟶ `npm install -g npm` or `npm update npm -g` should give you the latest version)
 
 #### Build process
+
 You can control whether to build the frontend for production or development by setting the `$NODE_ENV` environment variable to either `development` or `production`. The frontend can then be built using:
 
 ```bash
@@ -230,7 +236,9 @@ The difference of a development build includes:
 After successfully running the build command, The Things Stack has all necessary files to run the Console and OAuth provider applications.
 
 ### Development
+
 #### Serving the frontend for development
+
 For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `mage js:build`, it can be served using:
 
 ```bash
@@ -255,6 +263,7 @@ TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 ```
 
 #### Testing
+
 For frontend testing, we use [`jest`](https://jestjs.io/en/). We currently don't enforce any coverage minimum, but consider testing for complex logic. We use both snapshot testing for React Components with [`enzyme`](https://airbnb.io/enzyme/) and plain `jest` testing for arbitrary logic.
 
 To run the frontend tests, use:
@@ -264,6 +273,7 @@ $ mage js:test
 ```
 
 ### Internationalization (i18n)
+
 The Things Stack for LoRaWAN employs i18n to provide usage experience in different languages. As such, also the frontend uses translatable messages. For this purpose we use [`react-intl`](https://github.com/yahoo/react-intl), which helps us greatly to define text messages used in the frontend.
 The workflow for defining messages is as follows:
 
@@ -281,10 +291,9 @@ $ mage js:translations
 The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and committed, any discrepancy in the locales file with the defined messages will lead to a CI failure.
 
 ### Frontend Folder Structure
-⟶ `pkg/webui`
 
 ```
-.
+./pkg/webui
 ├── assets            assets (eg. vectors, images) used by the frontend
 ├── components        react components shared throughout the frontend
 ├── console           root of the console application
