@@ -1,6 +1,6 @@
 {{ $package := or (.Get "package") "ttn.lorawan.v3" }}{{ $enum := .Get "enum" }}
 {{ with index .Site.Data "api" $package "enums" $enum -}}
-<h2 id="enum:{{ .name }}">Enum <code>{{ .name }}</code></h2>
+<h3 id="enum:{{ .name }}">Enum <code>{{ .name }}</code></h3>
 {{- with .comment }}
 <p>{{ . | markdownify }}</p>
 {{- end }}

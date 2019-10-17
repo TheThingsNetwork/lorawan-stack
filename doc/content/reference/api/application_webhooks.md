@@ -4,7 +4,7 @@ description: ""
 weight: 3
 ---
 
-# The `ApplicationWebhookRegistry` service
+## The `ApplicationWebhookRegistry` service
 
 {{< proto/method service="ApplicationWebhookRegistry" method="GetFormats" >}}
 
@@ -16,7 +16,7 @@ weight: 3
 
 {{< proto/method service="ApplicationWebhookRegistry" method="Delete" >}}
 
-# Messages
+## Messages
 
 {{< proto/message message="ApplicationWebhook" >}}
 

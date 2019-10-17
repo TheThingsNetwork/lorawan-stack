@@ -4,7 +4,7 @@ description: ""
 weight: 1
 ---
 
-# The `ApplicationRegistry` service
+## The `ApplicationRegistry` service
 
 {{< proto/method service="ApplicationRegistry" method="Create" >}}
 
@@ -16,7 +16,7 @@ weight: 1
 
 {{< proto/method service="ApplicationRegistry" method="Delete" >}}
 
-# The `ApplicationAccess` service
+## The `ApplicationAccess` service
 
 {{< proto/method service="ApplicationAccess" method="ListRights" >}}
 
@@ -34,7 +34,7 @@ weight: 1
 
 {{< proto/method service="ApplicationAccess" method="ListCollaborators" >}}
 
-# Messages
+## Messages
 
 {{< proto/message message="APIKey" >}}
 

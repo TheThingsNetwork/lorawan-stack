@@ -4,7 +4,7 @@ description: ""
 weight: 4
 ---
 
-# The `ApplicationPubSubRegistry` service
+## The `ApplicationPubSubRegistry` service
 
 {{< proto/method service="ApplicationPubSubRegistry" method="GetFormats" >}}
 
@@ -16,7 +16,7 @@ weight: 4
 
 {{< proto/method service="ApplicationPubSubRegistry" method="Delete" >}}
 
-# Messages
+## Messages
 
 {{< proto/message message="ApplicationPubSub" >}}
 
@@ -38,6 +38,6 @@ weight: 4
 
 {{< proto/message message="SetApplicationPubSubRequest" >}}
 
-# Enums
+## Enums
 
 {{< proto/enum enum="ApplicationPubSub.MQTTProvider.QoS" >}}

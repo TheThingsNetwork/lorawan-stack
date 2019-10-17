@@ -4,7 +4,7 @@ description: ""
 weight: 7
 ---
 
-# The `EndDeviceRegistry` service
+## The `EndDeviceRegistry` service
 
 {{< proto/method service="EndDeviceRegistry" method="Create" >}}
 
@@ -24,7 +24,7 @@ weight: 7
 
 {{< proto/method service="EndDeviceRegistry" method="Delete" >}}
 
-# The `JsEndDeviceRegistry` service
+## The `JsEndDeviceRegistry` service
 
 {{< proto/method service="JsEndDeviceRegistry" method="Set" >}}
 
@@ -36,7 +36,7 @@ weight: 7
 
 {{< proto/method service="JsEndDeviceRegistry" method="Delete" >}}
 
-# The `NsEndDeviceRegistry` service
+## The `NsEndDeviceRegistry` service
 
 {{< proto/method service="NsEndDeviceRegistry" method="Set" >}}
 
@@ -48,7 +48,7 @@ weight: 7
 
 {{< proto/method service="NsEndDeviceRegistry" method="Delete" >}}
 
-# The `AsEndDeviceRegistry` service
+## The `AsEndDeviceRegistry` service
 
 {{< proto/method service="AsEndDeviceRegistry" method="Set" >}}
 
@@ -60,7 +60,7 @@ weight: 7
 
 {{< proto/method service="AsEndDeviceRegistry" method="Delete" >}}
 
-# Messages
+## Messages
 
 {{< proto/message message="CreateEndDeviceRequest" >}}
 
@@ -98,7 +98,7 @@ weight: 7
 
 {{< proto/message message="UpdateEndDeviceRequest" >}}
 
-# Enums
+## Enums
 
 {{< proto/enum enum="MACVersion" >}}
 

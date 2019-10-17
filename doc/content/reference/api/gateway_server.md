@@ -4,11 +4,11 @@ description: ""
 weight: 6
 ---
 
-# The `Gs` service
+## The `Gs` service
 
 {{< proto/method service="Gs" method="GetGatewayConnectionStats" >}}
 
-# Messages
+## Messages
 
 {{< proto/message message="GatewayIdentifiers" >}}
 

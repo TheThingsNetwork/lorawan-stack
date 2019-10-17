@@ -1,6 +1,6 @@
 {{ $package := or (.Get "package") "ttn.lorawan.v3" }}{{ $message := .Get "message" }}
 {{- with index .Site.Data "api" $package "messages" $message -}}
-<h2 id="message:{{ .name }}">Message <code>{{ .name }}</code></h2>
+<h3 id="message:{{ .name }}">Message <code>{{ .name }}</code></h3>
 {{- with .comment }}
 <p>{{ . | markdownify }}</p>
 {{- end }}
