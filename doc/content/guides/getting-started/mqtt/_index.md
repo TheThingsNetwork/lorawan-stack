@@ -23,7 +23,7 @@ There are many MQTT clients available. Great clients are `mosquitto_pub` and `mo
 >Tip: when using `mosquitto_sub`, pass the `-d` flag to see the topics messages get published on. For example:
 >
 >```bash
-$ mosquitto_sub -h thethings.example.com -t '#' -u app1 -P 'NNSXS.VEEBURF3KR77ZR..' -d
+$ mosquitto_sub -h thethings.example.com -t "#" -u app1 -P "NNSXS.VEEBURF3KR77ZR.." -d
 ```
 
 ## Subscribing to upstream traffic
@@ -146,8 +146,8 @@ For example, to send an unconfirmed downlink message to the device `dev1` in app
 >
 >```bash
 $ mosquitto_pub -h thethings.example.com \
-  -t 'v3/app1/devices/dev1/down/push' \
-  -u app1 -P 'NNSXS.VEEBURF3KR77ZR..' \
+  -t "v3/app1/devices/dev1/down/push" \
+  -u app1 -P "NNSXS.VEEBURF3KR77ZR.." \
   -m '{"downlinks":[{"f_port": 15,"frm_payload":"vu8=","priority": "NORMAL"}]}' \
   -d`
 ```
