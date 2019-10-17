@@ -139,6 +139,12 @@ type CloudEvents struct {
 	SubscribeURL string `name:"subscribe-url" description:"URL for the subscription to receiving events"`
 }
 
+// Cache represents configuration for a caching system.
+type Cache struct {
+	Service string `name:"service" description:"Service used for caching (redis)"`
+	Redis   Redis  `name:"redis"`
+}
+
 // Events represents configuration for the events system.
 type Events struct {
 	Backend string      `name:"backend" description:"Backend to use for events (internal, redis, cloud)"`
@@ -400,6 +406,7 @@ func (c InteropClient) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.
 type ServiceBase struct {
 	Base             `name:",squash"`
 	Cluster          Cluster                `name:"cluster"`
+	Cache            Cache                  `name:"Cache"`
 	Redis            Redis                  `name:"redis"`
 	Events           Events                 `name:"events"`
 	GRPC             GRPC                   `name:"grpc"`
