@@ -45,7 +45,7 @@ Confirmation Token: {{.Token}}
 
 ## Providing the overrides to the stack
 
-Once you have written your overrides, you can provide them to the stack either through an remote URL, or through the local file system.
+Once you have written your overrides, you can provide them to the stack either through an remote URL, or through the local file system. For details on the configuration options, see the [Identity Server configuration reference]({{< relref "../configuration/identity-server.md#email-options" >}}).
 
 ### Fetching from a remote URL
 
@@ -54,14 +54,3 @@ In order to allow The Things Stack to access remote files, you must only provide
 ### Fetching from a local directory
 
 In order to allow the The Things Stack to access files which are hosted in your own file system, you must provide the path to the root folder that contains the files. Consider that you need to provide the The Things Stack access to a file called `validate.txt`, which is available on your file system in the `/srv/emails/validate.txt`. Then the path that you need to provide to the email templates configuration is `/srv/emails/`.
-
-### Example YAML configuration 
-
-```yaml
-is:
-  email:
-    templates:
-      # Specify only one source for the files.
-      directory: '/path/to/the/template/files'
-      url: 'http://www.example.com/emails'
-```
