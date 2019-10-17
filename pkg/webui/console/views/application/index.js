@@ -35,6 +35,7 @@ import ApplicationData from '../application-data'
 import ApplicationPayloadFormatters from '../application-payload-formatters'
 import ApplicationIntegrationsWebhooks from '../application-integrations-webhooks'
 import ApplicationIntegrationsPubsubs from '../application-integrations-pubsubs'
+import ApplicationIntegrationsMqtt from '../application-integrations-mqtt'
 
 import { getApplication, stopApplicationEventsStream } from '../../store/actions/applications'
 import {
@@ -115,6 +116,12 @@ import Devices from '../devices'
         exact: false,
         items: [
           {
+            title: sharedMessages.mqtt,
+            path: `${matchedUrl}/integrations/mqtt`,
+            icon: 'extension',
+            exact: false,
+          },
+          {
             title: sharedMessages.webhooks,
             path: `${matchedUrl}/integrations/webhooks`,
             icon: 'extension',
@@ -178,6 +185,7 @@ export default class Application extends React.Component {
             path={`${match.path}/payload-formatters`}
             component={ApplicationPayloadFormatters}
           />
+          <Route path={`${match.path}/integrations/mqtt`} component={ApplicationIntegrationsMqtt} />
           <Route
             path={`${match.path}/integrations/webhooks`}
             component={ApplicationIntegrationsWebhooks}
