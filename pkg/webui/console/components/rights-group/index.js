@@ -42,8 +42,12 @@ const computeProps = function(props) {
   const { value, pseudoRight: grantablePseudoRight, rights: grantableRights } = props
 
   // Extract the pseudo right from own rights or granted rights
-  const derivedPseudoRight =
-    grantablePseudoRight || value.find(right => right !== RIGHT_ALL && right.endsWith('_ALL'))
+  let derivedPseudoRight
+  if (grantablePseudoRight && !Array.isArray(grantablePseudoRight)) {
+    derivedPseudoRight = [grantablePseudoRight]
+  } else if (Boolean(grantablePseudoRight) && Array.isArray(grantablePseudoRight)) {
+    derivedPseudoRight = value.filter(right => right !== RIGHT_ALL && right.endsWith('_ALL'))
+  }
 
   // Filter out rights that the entity has but may not be granted by the user
   const outOfOwnScopeRights = !Boolean(grantablePseudoRight)
@@ -58,7 +62,7 @@ const computeProps = function(props) {
     outOfOwnScopeRights.filter(right => right.endsWith('_ALL')).length !== 0
 
   // Store granted individual rights
-  const grantedIndividualRights = value.filter(right => right !== derivedPseudoRight)
+  const grantedIndividualRights = value.filter(right => !derivedPseudoRight.includes(right))
 
   // Store out of own scope individual rights
   const outOfOwnScopeIndividualRights = !Boolean(grantablePseudoRight)
@@ -66,7 +70,9 @@ const computeProps = function(props) {
     : []
 
   // Determine whether a pseudo right is granted
-  const hasPseudoRightGranted = value.includes(RIGHT_ALL) || value.includes(derivedPseudoRight)
+  const hasPseudoRightGranted =
+    value.includes(RIGHT_ALL) ||
+    derivedPseudoRight.some(derivedRight => value.includes(derivedRight))
 
   // Determine the current grant type
   const grantType = hasPseudoRightGranted ? 'pseudo' : 'individual'
@@ -90,9 +96,9 @@ class RightsGroup extends React.Component {
     /** The class to be added to the container */
     className: PropTypes.string,
     /** The rights derived from the granted and grantable rights **/
-    derivedRights: PropTypes.rights.isRequired,
+    derivedPseudoRight: PropTypes.oneOfType(PropTypes.right, PropTypes.arrayOf(PropTypes.right)),
     /** The pseudo right derived from the current entity or user **/
-    derivedPseudoRight: PropTypes.string,
+    derivedRights: PropTypes.rights.isRequired,
     /** A flag indicating whether the whole component should be disabled **/
     disabled: PropTypes.bool,
     /** The message depicting the type of entity this component is setting the
@@ -205,6 +211,13 @@ class RightsGroup extends React.Component {
       selectedCheckboxesCount !== 0 && selectedCheckboxesCount !== totalCheckboxesCount
     const allDisabled = grantType === 'pseudo' || disabled || hasOutOfOwnScopePseudoRight
 
+    let selectAllName = 'select-all'
+    let selectAllTitle = m.selectAll
+    if (Boolean(derivedPseudoRight) && !Array.isArray(derivedPseudoRight)) {
+      selectAllName = derivedPseudoRight
+      selectAllTitle = { id: `enum:${derivedPseudoRight}` }
+    }
+
     // Marshal rights to key/value for checkbox group
     const rightsValues = derivedRights.reduce(function(acc, right) {
       acc[right] = allSelected || individualRightValue.includes(right)
@@ -243,8 +256,8 @@ class RightsGroup extends React.Component {
         </Radio.Group>
         <Checkbox
           className={classnames(style.selectAll, style.rightLabel)}
-          name={derivedPseudoRight || 'select-all'}
-          label={derivedPseudoRight ? { id: `enum:${derivedPseudoRight}` } : m.selectAll}
+          name={selectAllName}
+          label={selectAllTitle}
           onChange={this.handleChangeAll}
           indeterminate={indeterminate}
           value={allSelected}
