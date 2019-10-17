@@ -19,6 +19,9 @@ languageName = "English"
 
 theme = "the-things-stack"
 
+pygmentsCodeFences = true
+pygmentsUseClasses = true
+
 [params]
   description = "The Things Stack for LoRaWAN"
   keywords = []

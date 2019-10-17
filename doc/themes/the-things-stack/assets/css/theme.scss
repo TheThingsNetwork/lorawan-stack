@@ -180,3 +180,5 @@ html.has-navbar-fixed-top {
     min-height: calc(100vh - #{$navbar-height});
   }
 }
+
+@import "highlight.scss";
