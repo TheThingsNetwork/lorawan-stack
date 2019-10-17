@@ -723,7 +723,7 @@ func appendRecentUplink(recent []*ttnpb.UplinkMessage, up *ttnpb.UplinkMessage, 
 	return recent
 }
 
-var handleUplinkGetPaths = [...]string{
+var handleDataUplinkGetPaths = [...]string{
 	"frequency_plan_id",
 	"last_dev_status_received_at",
 	"lorawan_phy_version",
@@ -761,7 +761,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	logger.Debug("Match device")
 
 	var addrMatches []*ttnpb.EndDevice
-	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleUplinkGetPaths[:],
+	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleDataUplinkGetPaths[:],
 		func(dev *ttnpb.EndDevice) bool {
 			addrMatches = append(addrMatches, dev)
 			return true
@@ -808,7 +808,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 
 	var handleErr bool
-	stored, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleUplinkGetPaths[:],
+	stored, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during uplink handling, drop")
