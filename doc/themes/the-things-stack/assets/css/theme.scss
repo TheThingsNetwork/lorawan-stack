@@ -179,6 +179,12 @@ html.has-navbar-fixed-top {
   body {
     min-height: calc(100vh - #{$navbar-height});
   }
+  :target::before {
+    content: "";
+    display: block;
+    height: $navbar-height;
+    margin-top: -$navbar-height;
+  }
 }
 
 @import "highlight.scss";
