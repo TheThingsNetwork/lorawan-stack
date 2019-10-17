@@ -44,7 +44,7 @@ The Gateway Server exchanges with Network Servers over gRPC. It claims identifie
 
 The Gateway Server keeps track of all downlinks emitted and to be emitted by gateways connected to it. This allows the stack to do smarter scheduling. When the Network Server requests the Gateway Server to schedule a downlink message on a gateway, it checks the schedule to see if a downlink is possible:
 
-* **Downlink overlap**: If the emission of a downlink overlaps the emission of another downlink, the downlink is refused.
-* **Time off air**: Some frequency plans have time-off-air constraints, meaning a gateway must not emit for a certain period of time after emitting a downlink.
-* **Duty cycle**: Many countries have **duty cycle restrictions**, prohibiting a device for emitting for more than a certain percentage of time on a certain band.
-* **Dwell time**: Some countries, such as the United States, are subject to **dwell time regulations** - meaning the duration of a transmission can't exceed a certain limit.
+- **Downlink overlap**: If the emission of a downlink overlaps the emission of another downlink, the downlink is refused.
+- **Time off air**: Some frequency plans have time-off-air constraints, meaning a gateway must not emit for a certain period of time after emitting a downlink.
+- **Duty cycle**: Many countries have **duty cycle restrictions**, prohibiting a device for emitting for more than a certain percentage of time on a certain band.
+- **Dwell time**: Some countries, such as the United States, are subject to **dwell time regulations** - meaning the duration of a transmission can't exceed a certain limit.

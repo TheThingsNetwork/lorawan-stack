@@ -207,8 +207,9 @@ The OAuth app provides the necessary frontend for the OAuth provider of The Thin
 #### Prerequisites
 
 In order to build the frontend, you'll need the following:
-* Node JS, version 10.x (see [Development Environment](#development-environment))
-* NPM (node package manager), version >= 6.4.1 (⟶ `npm install -g npm` or `npm update npm -g` should give you the latest version)
+
+- Node JS, version 10.x (see [Development Environment](#development-environment))
+- NPM (node package manager), version >= 6.4.1 (⟶ `npm install -g npm` or `npm update npm -g` should give you the latest version)
 
 #### Build process
 
@@ -220,18 +221,18 @@ $ mage js:build
 
 This will initiate the following actions:
 
-* Install a version-fixed binary of `yarn`
-* Install JS SDK node dependencies via `yarn`
-* Build the JS SDK
-* Extract backend locale messages
-* Install frontend node dependencies via `yarn`
-* Build the frontend (using `webpack`) and output into `/public`
+- Install a version-fixed binary of `yarn`
+- Install JS SDK node dependencies via `yarn`
+- Build the JS SDK
+- Extract backend locale messages
+- Install frontend node dependencies via `yarn`
+- Build the frontend (using `webpack`) and output into `/public`
 
 The difference of a development build includes:
 
-* Including source maps
-* Using DLL bundle for modules to reduce build time
-* A couple of special build options to improve usage with `webpack-dev-server`
+- Including source maps
+- Using DLL bundle for modules to reduce build time
+- A couple of special build options to improve usage with `webpack-dev-server`
 
 After successfully running the build command, The Things Stack has all necessary files to run the Console and OAuth provider applications.
 
