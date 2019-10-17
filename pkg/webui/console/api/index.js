@@ -95,6 +95,9 @@ export default {
     create: ttnClient.Applications.create.bind(ttnClient.Applications),
     update: ttnClient.Applications.updateById.bind(ttnClient.Applications),
     eventsSubscribe: ttnClient.Applications.openStream.bind(ttnClient.Applications),
+    getMqttConnectionInfo: ttnClient.Applications.getMqttConnectionInfo.bind(
+      ttnClient.Applications,
+    ),
     apiKeys: {
       get: ttnClient.Applications.ApiKeys.getById.bind(ttnClient.Applications.ApiKeys),
       list: ttnClient.Applications.ApiKeys.getAll.bind(ttnClient.Applications.ApiKeys),
