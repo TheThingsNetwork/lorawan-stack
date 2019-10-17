@@ -20,7 +20,7 @@ If you run this command on a remote machine, pass `--callback=false` to get a li
 
 First, list the available frequency plans:
 
-```
+```bash
 $ ttn-lw-cli gateways list-frequency-plans
 ```
 
@@ -75,7 +75,7 @@ Your application is now linked. You can now use the builtin MQTT server and webh
 
 First, list the available frequency plans and LoRaWAN versions:
 
-```
+```bash
 $ ttn-lw-cli end-devices list-frequency-plans
 $ ttn-lw-cli end-devices create --help
 ```

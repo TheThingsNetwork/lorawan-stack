@@ -36,8 +36,8 @@ $ docker-compose run --rm stack is-db create-oauth-client \
   --name "Command Line Interface" \
   --owner admin \
   --no-secret \
-  --redirect-uri 'local-callback' \
-  --redirect-uri 'code'
+  --redirect-uri "local-callback" \
+  --redirect-uri "code"
 ```
 
 We do the same for the console. For `--secret`, make sure to enter the same value as you set for `TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET` in the [Configuration]({{< relref "configuration" >}}) step.
@@ -48,8 +48,8 @@ $ docker-compose run --rm stack is-db create-oauth-client \
   --name "Console" \
   --owner admin \
   --secret the secret you generated before \
-  --redirect-uri 'https://thethings.example.com/console/oauth/callback' \
-  --redirect-uri '/console/oauth/callback'
+  --redirect-uri "https://thethings.example.com/console/oauth/callback" \
+  --redirect-uri "/console/oauth/callback"
 ```
 
 ## Running The Things Stack

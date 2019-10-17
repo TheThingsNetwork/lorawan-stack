@@ -4,7 +4,7 @@ description: ""
 weight: 5
 ---
 
-# The `GatewayRegistry` service
+## The `GatewayRegistry` service
 
 {{< proto/method service="GatewayRegistry" method="Create" >}}
 
@@ -16,7 +16,7 @@ weight: 5
 
 {{< proto/method service="GatewayRegistry" method="Delete" >}}
 
-# The `GatewayAccess` service
+## The `GatewayAccess` service
 
 {{< proto/method service="GatewayAccess" method="ListRights" >}}
 
@@ -34,13 +34,13 @@ weight: 5
 
 {{< proto/method service="GatewayAccess" method="ListCollaborators" >}}
 
-# The `Configuration` service
+## The `Configuration` service
 
 The Gateway Server exposes the list of available frequency plans with the `Configuration` service.
 
 {{< proto/method service="Configuration" method="ListFrequencyPlans" >}}
 
-# Messages
+## Messages
 
 {{< proto/message message="APIKey" >}}
 
@@ -96,6 +96,6 @@ The Gateway Server exposes the list of available frequency plans with the `Confi
 
 {{< proto/message message="UserIdentifiers" >}}
 
-# Enums
+## Enums
 
 {{< proto/enum enum="DownlinkPathConstraint" >}}

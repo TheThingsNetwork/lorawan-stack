@@ -17,7 +17,7 @@ Email templates are targeted at network operators that would like to customize t
 
 1. Adding additional styling to the default text-only emails that The Things Stack sends.
 2. Translating the emails The Things Stack sends to its users (applies deployment-wide).
- 
+
 ## How does it work?
 
 Email templates override the default emails that The Things Stack sends by providing custom template files written in Go's [html/template](https://golang.org/pkg/html/template/) format. The templates are retrieved when The Things Stack sends the first email of a certain type, and then are cached until it is restarted. See [Available Templates]({{< ref "/reference/email-templates/available.md" >}}) and [Overriding Default Templates]({{< ref "/reference/email-templates/overriding.md" >}}).

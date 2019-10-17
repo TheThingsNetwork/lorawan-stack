@@ -4,22 +4,22 @@ The Things Stack components are primarily built in Go, while we use Node for web
 
 ## Development Environment
 
-The Things Network's development environment heavily relies on [`make`](https://www.gnu.org/software/make/). Under the hood, `make` calls other tools such as `git`, `go`, `yarn` etc. Recent versions are supported; Node v10.x and Go v1.12.x. Let's first make sure you have `go`, `node` and `yarn`:
+The Things Network's development environment heavily relies on [`make`](https://www.gnu.org/software/make/). Under the hood, `make` calls other tools such as `git`, `go`, `yarn` etc. Recent versions are supported; Node v12.x and Go v1.13.x. Let's first make sure you have `go`, `node` and `yarn`:
 
 On macOS using [Homebrew](https://brew.sh):
 
-```sh
-brew install go node yarn
+```bash
+$ brew install go node yarn
 ```
 
 On Ubuntu (or on Windows [using the Windows Subsystem for Linux](https://www.microsoft.com/nl-NL/store/p/ubuntu/9nblggh4msv6?rtc=1)):
 
-```sh
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-sudo apt-get install -y build-essential nodejs
+```bash
+$ curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+$ sudo apt-get install -y build-essential nodejs
 
-curl -sSL https://dl.google.com/go/go1.12.3.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
-sudo ln -s /usr/local/go/bin/* /usr/local/bin
+$ curl -sSL https://dl.google.com/go/go1.13.1.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
+$ sudo ln -s /usr/local/go/bin/* /usr/local/bin
 ```
 
 ### Cloning the repository
@@ -30,16 +30,16 @@ If you are unfamiliar with forking projects on GitHub or cloning them locally, p
 
 As most of the tasks will be managed by `make` and `mage` we will first initialize the tooling. You may want to run this commands from time to time:
 
-```sh
-make init
+```bash
+$ make init
 ```
 
 For convenience, you can initialize the development databases with some defaults.
 
 >Note: this requires [Docker Desktop](https://www.docker.com/products/docker-desktop).
 
-```sh
-make dev.stack.init
+```bash
+$ make dev.stack.init
 ```
 
 This starts a CockroachDB and Redis database in Docker containers, creates a database, migrates tables and creates a user `admin` with password `admin`.
@@ -49,12 +49,12 @@ This starts a CockroachDB and Redis database in Docker containers, creates a dat
 You can also use the following commands to start, stop and erase databases.
 
 ```bash
-make dev.databases.start # Starts all databases in a Docker container
-make dev.databases.stop  # Stops all databases
+$ make dev.databases.start # Starts all databases in a Docker container
+$ make dev.databases.stop  # Stops all databases
 
 # The contents of the databases will be saved in .dev/data.
 
-make dev.databases.erase # Stop all databases and erase storage.
+$ make dev.databases.erase # Stop all databases and erase storage.
 ```
 
 #### CockroachDB
@@ -71,8 +71,8 @@ You can use `make dev.databases.redis-cli` to enter a Redis-CLI shell.
 
 ### Testing
 
-```sh
-./mage go:test js:test jsSDK:test
+```bash
+$ ./mage go:test js:test jsSDK:test
 ```
 
 ### Building
@@ -110,23 +110,23 @@ Releasing a new version consists of the following steps:
 
 Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
 
-```
-version:bumpMajor      bumps a major version (from 3.4.5 -> 4.0.0).
-version:bumpMinor      bumps a minor version (from 3.4.5 -> 3.5.0).
-version:bumpPatch      bumps a patch version (from 3.4.5 -> 3.4.6).
-version:bumpRC         bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
-version:bumpRelease    bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
+```bash
+$ ./mage version:bumpMajor   # bumps a major version (from 3.4.5 -> 4.0.0).
+$ ./mage version:bumpMinor   # bumps a minor version (from 3.4.5 -> 3.5.0).
+$ ./mage version:bumpPatch   # bumps a patch version (from 3.4.5 -> 3.4.6).
+$ ./mage version:bumpRC      # bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
+$ ./mage version:bumpRelease # bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
 ```
 
 These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1). Apart from these bump commands, we have commands for writing version files (`version:files`), creating the bump commit (`version:commitBump`) and the version tag (`version:tag`).
 
 A typical release process is executed directly on the `master` branch and looks like this:
 
-```sh
-git add CHANGELOG.md
-./mage version:bumpPatch version:files version:commitBump version:tag // bump, write files, commit and tag.
-git push origin $(mage version:current) // push the tag
-git push origin master // push the master branch
+```bash
+$ git add CHANGELOG.md
+$ ./mage version:bumpPatch version:files version:commitBump version:tag // bump, write files, commit and tag.
+$ git push origin $(mage version:current) // push the tag
+$ git push origin master // push the master branch
 ```
 
 Note that you must have sufficient repository rights to push to `master`.
@@ -143,8 +143,8 @@ From the `.proto` files, we generate code using the `protoc` compiler. As we pla
 
 The actual commands for compilation are handled by our Makefile, so the only thing you have to execute, is:
 
-```sh
-./mage proto:clean proto:all
+```bash
+$ ./mage proto:clean proto:all
 ```
 
 #### Folder Structure
@@ -189,83 +189,92 @@ The actual commands for compilation are handled by our Makefile, so the only thi
 
 
 ## Frontend
+
 ### Introduction
+
 The Things Stack for LoRaWAN includes two frontend applications: the **Console** and **OAuth Provider**. Both applications use [React](https://reactjs.org/) as frontend framework. The `console` and `oauth` packages of the backend expose their respective web servers and handle all logic that cannot be done in the browser. Otherwise both applications are single page applications (SPA) that run entirely in the browser.
 
 #### Console
+
 The Console is the official management application of The Things Stack. It can be used to register applications, end devices or gateways, monitor network traffic, or configure network related options, among other things. The console uses an OAuth access token to communicate with The Things Stack.
 
 #### OAuth
+
 The OAuth app provides the necessary frontend for the OAuth provider of The Things Stack. It is used e.g. to display the authorization screen that users get prompted with when they want to authorize a third-party app to access The Things Stack.
 
 ### Building the frontend
 
 #### Prerequisites
+
 In order to build the frontend, you'll need the following:
-* Node JS, version 10.x (see [Development Environment](#development-environment))
-* NPM (node package manager), version >= 6.4.1 (⟶ `npm install -g npm` or `npm update npm -g` should give you the latest version)
+
+- Node JS, version 10.x (see [Development Environment](#development-environment))
+- NPM (node package manager), version >= 6.4.1 (⟶ `npm install -g npm` or `npm update npm -g` should give you the latest version)
 
 #### Build process
+
 You can control whether to build the frontend for production or development by setting the `$NODE_ENV` environment variable to either `development` or `production`. The frontend can then be built using:
 
-```sh
-mage js:build
+```bash
+$ mage js:build
 ```
 
 This will initiate the following actions:
 
-* Install a version-fixed binary of `yarn`
-* Install JS SDK node dependencies via `yarn`
-* Build the JS SDK
-* Extract backend locale messages
-* Install frontend node dependencies via `yarn`
-* Build the frontend (using `webpack`) and output into `/public`
+- Install a version-fixed binary of `yarn`
+- Install JS SDK node dependencies via `yarn`
+- Build the JS SDK
+- Extract backend locale messages
+- Install frontend node dependencies via `yarn`
+- Build the frontend (using `webpack`) and output into `/public`
 
 The difference of a development build includes:
 
-* Including source maps
-* Using DLL bundle for modules to reduce build time
-* A couple of special build options to improve usage with `webpack-dev-server`
+- Including source maps
+- Using DLL bundle for modules to reduce build time
+- A couple of special build options to improve usage with `webpack-dev-server`
 
 After successfully running the build command, The Things Stack has all necessary files to run the Console and OAuth provider applications.
 
 ### Development
+
 #### Serving the frontend for development
+
 For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `mage js:build`, it can be served using:
 
-```sh
-export NODE_ENV=development
-mage js:serve
+```bash
+$ export NODE_ENV=development
+$ mage js:serve
 ```
 
 The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically. 
 In order to set up The Things Stack to support running the frontend via `webpack-dev-server`, the following environment setup is needed:
 
-```
-NODE_ENV=development
-TTN_LW_LOG_LEVEL=debug
+```bash
+NODE_ENV="development"
+TTN_LW_LOG_LEVEL="debug"
 TTN_LW_IS_OAUTH_UI_JS_FILE="libs.bundle.js oauth.js"
 TTN_LW_CONSOLE_UI_JS_FILE="libs.bundle.js console.js"
-TTN_LW_CONSOLE_UI_CANONICAL_URL=http://localhost:8080/console
-TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=http://localhost:8080/oauth/authorize
-TTN_LW_CONSOLE_OAUTH_TOKEN_URL=http://localhost:8080/oauth/token
-TTN_LW_IS_OAUTH_UI_CANONICAL_URL=http://localhost:8080/oauth
-TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=http://localhost:8080/oauth.js
-TTN_LW_CONSOLE_UI_ASSETS_BASE_URL=http://localhost:8080/assets
+TTN_LW_CONSOLE_UI_CANONICAL_URL="http://localhost:8080/console"
+TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="http://localhost:8080/oauth/authorize"
+TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
+TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
+TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
+TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 ```
-*Note: We recommend using an environment switcher like [`direnv`](https://direnv.net/) to help you setting up environments for different tasks easily.*  
-All of the configuration options above can also be set using configuration files or runtime flags. For more info in this regard, [see this guide](https://github.com/TheThingsNetwork/lorawan-stack/blob/master/doc/config.md).
 
 #### Testing
+
 For frontend testing, we use [`jest`](https://jestjs.io/en/). We currently don't enforce any coverage minimum, but consider testing for complex logic. We use both snapshot testing for React Components with [`enzyme`](https://airbnb.io/enzyme/) and plain `jest` testing for arbitrary logic.
 
 To run the frontend tests, use:
 
-```sh
-mage js:test
+```bash
+$ mage js:test
 ```
 
 ### Internationalization (i18n)
+
 The Things Stack for LoRaWAN employs i18n to provide usage experience in different languages. As such, also the frontend uses translatable messages. For this purpose we use [`react-intl`](https://github.com/yahoo/react-intl), which helps us greatly to define text messages used in the frontend.
 The workflow for defining messages is as follows:
 
@@ -275,18 +284,17 @@ The workflow for defining messages is as follows:
 
 After adding messages this way, it needs to be added the locales file `pkg/webui/locales/*.js` by using:
 
-```sh
-mage js:translations
+```bash
+$ mage js:translations
 ```
 *Note: When using `mage js:serve`, this command will be run automatically after any change*
 
 The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and committed, any discrepancy in the locales file with the defined messages will lead to a CI failure.
 
 ### Frontend Folder Structure
-⟶ `pkg/webui`
 
 ```
-.
+./pkg/webui
 ├── assets            assets (eg. vectors, images) used by the frontend
 ├── components        react components shared throughout the frontend
 ├── console           root of the console application

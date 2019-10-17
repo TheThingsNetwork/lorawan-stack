@@ -22,7 +22,7 @@ weight: 2
 
 {{< proto/method service="AppAs" method="DownlinkQueueList" >}}
 
-# Messages
+## Messages
 
 {{< proto/message message="ApplicationDownlink" >}}
 
@@ -50,7 +50,7 @@ weight: 2
 
 {{< proto/message message="SetApplicationLinkRequest" >}}
 
-# Enums
+## Enums
 
 {{< proto/enum enum="PayloadFormatter" >}}
 

@@ -62,6 +62,6 @@ is:
   email:
     templates:
       # Specify only one source for the files.
-      directory: "/path/to/the/template/files"
-      url: "http://www.example.com/emails"
+      directory: '/path/to/the/template/files'
+      url: 'http://www.example.com/emails'
 ```

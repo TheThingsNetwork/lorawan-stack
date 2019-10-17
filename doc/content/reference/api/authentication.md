@@ -63,7 +63,7 @@ The request must use **Basic Auth** ([RFC7617](https://tools.ietf.org/html/rfc76
 
 The **authorization code** is sent in the request payload:
 
-```
+```json
 {
 	"code": "<AUTHORIZATION-CODE>", 
 	"grant_type": "authorization_code"
@@ -72,7 +72,7 @@ The **authorization code** is sent in the request payload:
 
 The response contains the **OAuth access token** and an indication of when it expires. If the network admin gave your OAuth client the **refresh token** grant, the response also contains a **refresh token**.
 
-```
+```json
 {
 	"access_token": "XXXXX", 
 	"token_type": "bearer", 
@@ -93,7 +93,7 @@ The request must use **Basic Auth** ([RFC7617](https://tools.ietf.org/html/rfc76
 
 The **refresh token** is sent in the request payload:
 
-```
+```json
 {
 	"code": "<REFRESH-TOKEN>", 
 	"grant_type": "refresh_token"
@@ -102,7 +102,7 @@ The **refresh token** is sent in the request payload:
 
 The response again contains the **OAuth access token** and an indication of when it expires. The response also contains a new **refresh token**.
 
-```
+```json
 {
 	"access_token": "XXXXX", 
 	"token_type": "bearer", 
