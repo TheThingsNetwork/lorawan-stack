@@ -78,10 +78,11 @@ func New(ctx context.Context, server io.Server, useWSSTrafficEndpoint bool) *ech
 
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 	s := &srv{
-		ctx:       ctx,
-		server:    server,
-		upgrader:  &websocket.Upgrader{},
-		webServer: webServer,
+		ctx:                   ctx,
+		server:                server,
+		upgrader:              &websocket.Upgrader{},
+		webServer:             webServer,
+		useWSSTrafficEndpoint: useWSSTrafficEndpoint,
 	}
 
 	webServer.GET("/router-info", s.handleDiscover)
