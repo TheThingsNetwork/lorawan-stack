@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for editing organization collaborators in the Console.
 - Support for listing organization collaborators in the Console.
 - Support for managing organization collaborators and rights in the JS SDK.
+- MQTT integrations page in the Console.
 
 ### Changed
 
