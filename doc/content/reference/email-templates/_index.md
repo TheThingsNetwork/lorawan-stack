@@ -1,7 +1,7 @@
 ---
 title: "Email Templates"
 description: ""
-weight: 3
+weight: 4
 ---
 
 This is the reference for [Email Templates]({{< ref "/concepts/email-templates" >}}).
