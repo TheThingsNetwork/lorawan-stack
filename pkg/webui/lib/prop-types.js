@@ -198,6 +198,7 @@ PropTypes.apiKey = PropTypes.shape({
   rights: PropTypes.rights,
 })
 
-PropTypes.rights = PropTypes.arrayOf(PropTypes.string)
+PropTypes.right = PropTypes.string
+PropTypes.rights = PropTypes.arrayOf(PropTypes.right)
 
 export default PropTypes

@@ -96,7 +96,7 @@ class RightsGroup extends React.Component {
     /** The class to be added to the container */
     className: PropTypes.string,
     /** The rights derived from the granted and grantable rights **/
-    derivedPseudoRight: PropTypes.oneOfType(PropTypes.right, PropTypes.arrayOf(PropTypes.right)),
+    derivedPseudoRight: PropTypes.oneOfType([PropTypes.right, PropTypes.rights]),
     /** The pseudo right derived from the current entity or user **/
     derivedRights: PropTypes.rights.isRequired,
     /** A flag indicating whether the whole component should be disabled **/

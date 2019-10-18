@@ -61,6 +61,18 @@ const headers = [
 @withRequest(({ getDeviceTemplateFormats }) => getDeviceTemplateFormats())
 @bind
 class DevicesTable extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    devicePathPrefix: PropTypes.string,
+    deviceTemplateFormats: PropTypes.shape({}).isRequired,
+    totalCount: PropTypes.number,
+  }
+
+  static defaultProps = {
+    devicePathPrefix: undefined,
+    totalCount: 0,
+  }
+
   constructor(props) {
     super(props)
 
@@ -103,17 +115,6 @@ class DevicesTable extends React.Component {
       />
     )
   }
-}
-
-DevicesTable.propTypes = {
-  appId: PropTypes.string.isRequired,
-  devicePathPrefix: PropTypes.string.isRequired,
-  deviceTemplateFormats: PropTypes.string.isRequired,
-  totalCount: PropTypes.number,
-}
-
-DevicesTable.defaultProps = {
-  totalCount: 0,
 }
 
 export default DevicesTable

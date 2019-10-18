@@ -37,6 +37,21 @@ import {
 )
 @bind
 class DeviceEvents extends React.Component {
+  static propTypes = {
+    devIds: PropTypes.shape({
+      device_id: PropTypes.string,
+      application_ids: PropTypes.shape({
+        application_id: PropTypes.string,
+      }),
+    }).isRequired,
+    onClear: PropTypes.func.isRequired,
+    onRestart: PropTypes.func.isRequired,
+    widget: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    widget: false,
+  }
   render() {
     const { devIds, widget, onClear, onRestart } = this.props
 
@@ -56,17 +71,6 @@ class DeviceEvents extends React.Component {
       />
     )
   }
-}
-
-DeviceEvents.propTypes = {
-  devIds: PropTypes.object.isRequired,
-  onClear: PropTypes.func.isRequired,
-  onRestart: PropTypes.func.isRequired,
-  widget: PropTypes.bool,
-}
-
-DeviceEvents.defaultProps = {
-  widget: false,
 }
 
 export default DeviceEvents
