@@ -42,7 +42,7 @@ const computeProps = function(props) {
   const { value, pseudoRight: grantablePseudoRight, rights: grantableRights } = props
 
   // Extract the pseudo right from own rights or granted rights
-  let derivedPseudoRight
+  let derivedPseudoRight = []
   if (grantablePseudoRight && !Array.isArray(grantablePseudoRight)) {
     derivedPseudoRight = [grantablePseudoRight]
   } else if (Boolean(grantablePseudoRight) && Array.isArray(grantablePseudoRight)) {

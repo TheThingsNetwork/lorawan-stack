@@ -223,5 +223,23 @@ export default {
       delete: ttnClient.Organizations.ApiKeys.deleteById.bind(ttnClient.Organizations.ApiKeys),
       create: ttnClient.Organizations.ApiKeys.create.bind(ttnClient.Organizations.ApiKeys),
     },
+    collaborators: {
+      getOrganization: ttnClient.Organizations.Collaborators.getByOrganizationId.bind(
+        ttnClient.Organizations.Collaborators,
+      ),
+      getUser: ttnClient.Organizations.Collaborators.getByUserId.bind(
+        ttnClient.Organizations.Collaborators,
+      ),
+      list: ttnClient.Organizations.Collaborators.getAll.bind(
+        ttnClient.Organizations.Collaborators,
+      ),
+      add: ttnClient.Organizations.Collaborators.add.bind(ttnClient.Organizations.Collaborators),
+      update: ttnClient.Organizations.Collaborators.update.bind(
+        ttnClient.Organizations.Collaborators,
+      ),
+      remove: ttnClient.Organizations.Collaborators.remove.bind(
+        ttnClient.Organizations.Collaborators,
+      ),
+    },
   },
 }

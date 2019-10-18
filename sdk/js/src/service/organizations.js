@@ -14,6 +14,7 @@
 
 import Marshaler from '../util/marshaler'
 import ApiKeys from './api-keys'
+import Collaborators from './collaborators'
 
 class Organizations {
   constructor(api) {
@@ -25,6 +26,13 @@ class Organizations {
         list: 'organization_ids.organization_id',
         create: 'organization_ids.organization_id',
         update: 'organization_ids.organization_id',
+      },
+    })
+    this.Collaborators = new Collaborators(api.OrganizationAccess, {
+      parentRoutes: {
+        get: 'organization_ids.organization_id',
+        list: 'organization_ids.organization_id',
+        set: 'organization_ids.organization_id',
       },
     })
   }

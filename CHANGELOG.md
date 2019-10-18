@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for editing organization API keys in the Console.
 - Support for listing organization API keys in the Console.
 - Support for managing organization API keys and rights in the JS SDK.
+- Support for removing organization collaborators in the Console.
+- Support for editing organization collaborators in the Console.
+- Support for listing organization collaborators in the Console.
+- Support for managing organization collaborators and rights in the JS SDK.
 
 ### Changed
 
