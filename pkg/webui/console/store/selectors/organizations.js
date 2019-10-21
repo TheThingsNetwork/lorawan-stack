@@ -15,6 +15,7 @@
 import {
   GET_ORGS_LIST_BASE,
   GET_ORG_BASE,
+  GET_ORG_COLLABORATORS_LIST_BASE,
   GET_ORGS_RIGHTS_LIST_BASE,
   GET_ORG_API_KEYS_LIST_BASE,
   GET_ORG_API_KEY_BASE,
@@ -38,6 +39,8 @@ import {
   createTotalCountSelector as createApiKeysTotalCountSelector,
 } from './api-keys'
 import {
+  createCollaboratorsSelector,
+  createTotalCountSelector as createCollaboratorsTotalCountSelector,
   createUserCollaboratorSelector,
   createOrganizationCollaboratorSelector,
 } from './collaborators'
@@ -88,6 +91,13 @@ export const selectOrganizationEventsError = createEventsErrorSelector(ENTITY)
 export const selectOrganizationEventsStatus = createEventsStatusSelector(ENTITY)
 
 // Collaborators
+export const selectOrganizationCollaborators = createCollaboratorsSelector(ENTITY)
+export const selectOrganizationCollaboratorsTotalCount = createCollaboratorsTotalCountSelector(
+  ENTITY,
+)
+export const selectOrganizationCollaboratorsFetching = createFetchingSelector(
+  GET_ORG_COLLABORATORS_LIST_BASE,
+)
 export const selectOrganizationUserCollaborator = createUserCollaboratorSelector(ENTITY_SINGLE)
 export const selectOrganizationOrganizationCollaborator = createOrganizationCollaboratorSelector(
   ENTITY_SINGLE,
