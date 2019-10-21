@@ -20,7 +20,6 @@ export const createApiKeysStoreSelector = entity => (state, props) =>
 export const createApiKeysSelector = entity =>
   function(state, props) {
     const store = selectApiKeysStore(state.apiKeys[entity], props)
-    console.log(store)
 
     return store.keys ? store.keys : []
   }
