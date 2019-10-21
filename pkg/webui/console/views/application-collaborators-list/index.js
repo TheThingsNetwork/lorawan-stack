@@ -29,7 +29,6 @@ import {
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-@bind
 export default class ApplicationCollaborators extends React.Component {
   constructor(props) {
     super(props)
@@ -39,6 +38,7 @@ export default class ApplicationCollaborators extends React.Component {
       getApplicationCollaboratorsList(appId, filters)
   }
 
+  @bind
   baseDataSelector(state) {
     const { appId } = this.props.match.params
     const id = { id: appId }
