@@ -22,7 +22,12 @@ import CollaboratorsTable from '../../containers/collaborators-table'
 import sharedMessages from '../../../lib/shared-messages'
 
 import { getGatewayCollaboratorsList } from '../../store/actions/gateways'
-import { selectSelectedGatewayId } from '../../store/selectors/gateways'
+import {
+  selectSelectedGatewayId,
+  selectGatewayCollaborators,
+  selectGatewayCollaboratorsTotalCount,
+  selectGatewayCollaboratorsFetching,
+} from '../../store/selectors/gateways'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
@@ -38,9 +43,15 @@ export default class GatewayCollaborators extends React.Component {
     this.getGatewayCollaboratorsList = filters => getGatewayCollaboratorsList(gtwId, filters)
   }
 
-  baseDataSelector({ collaborators }) {
+  baseDataSelector(state) {
     const { gtwId } = this.props
-    return collaborators.gateways[gtwId] || {}
+    const id = { id: gtwId }
+
+    return {
+      collaborators: selectGatewayCollaborators(state, id),
+      fetching: selectGatewayCollaboratorsFetching(state),
+      totalCount: selectGatewayCollaboratorsTotalCount(state, id),
+    }
   }
 
   render() {
