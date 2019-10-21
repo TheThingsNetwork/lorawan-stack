@@ -34,7 +34,6 @@ import PAGE_SIZES from '../../constants/page-sizes'
 @connect(state => ({
   gtwId: selectSelectedGatewayId(state),
 }))
-@bind
 export default class GatewayCollaborators extends React.Component {
   constructor(props) {
     super(props)
@@ -43,6 +42,7 @@ export default class GatewayCollaborators extends React.Component {
     this.getGatewayCollaboratorsList = filters => getGatewayCollaboratorsList(gtwId, filters)
   }
 
+  @bind
   baseDataSelector(state) {
     const { gtwId } = this.props
     const id = { id: gtwId }
