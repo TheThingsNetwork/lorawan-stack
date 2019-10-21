@@ -20,6 +20,7 @@ export const createApiKeysStoreSelector = entity => (state, props) =>
 export const createApiKeysSelector = entity =>
   function(state, props) {
     const store = selectApiKeysStore(state.apiKeys[entity], props)
+    console.log(store)
 
     return store.keys ? store.keys : []
   }
@@ -36,7 +37,7 @@ export const createApiKeySelector = function(entity) {
 
 export const createTotalCountSelector = entity =>
   function(state, props) {
-    const store = selectApiKeysStore(state.totalCount[entity], props)
+    const store = selectApiKeysStore(state.apiKeys[entity], props)
 
     return store.totalCount
   }
