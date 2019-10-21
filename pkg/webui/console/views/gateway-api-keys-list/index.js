@@ -19,6 +19,7 @@ import bind from 'autobind-decorator'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../containers/api-keys-table'
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 
 import { getGatewayApiKeysList } from '../../store/actions/gateways'
 import {
@@ -30,6 +31,10 @@ import {
 import PAGE_SIZES from '../../constants/page-sizes'
 
 export default class GatewayApiKeys extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
