@@ -29,7 +29,6 @@ import {
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-@bind
 export default class GatewayApiKeys extends React.Component {
   constructor(props) {
     super(props)
@@ -38,6 +37,7 @@ export default class GatewayApiKeys extends React.Component {
     this.getGatewayApiKeysList = filters => getGatewayApiKeysList(gtwId, filters)
   }
 
+  @bind
   baseDataSelector(state) {
     const { gtwId } = this.props.match.params
 
