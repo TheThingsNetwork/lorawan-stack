@@ -21,7 +21,11 @@ import ApiKeysTable from '../../containers/api-keys-table'
 import sharedMessages from '../../../lib/shared-messages'
 
 import { getGatewayApiKeysList } from '../../store/actions/gateways'
-import { selectGatewayApiKeysStore } from '../../store/selectors/gateways'
+import {
+  selectGatewayApiKeys,
+  selectGatewayApiKeysTotalCount,
+  selectGatewayApiKeysFetching,
+} from '../../store/selectors/gateways'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
@@ -32,6 +36,17 @@ export default class GatewayApiKeys extends React.Component {
 
     const { gtwId } = props.match.params
     this.getGatewayApiKeysList = filters => getGatewayApiKeysList(gtwId, filters)
+  }
+
+  baseDataSelector(state) {
+    const { gtwId } = this.props.match.params
+
+    const id = { id: gtwId }
+    return {
+      keys: selectGatewayApiKeys(state, id),
+      totalCount: selectGatewayApiKeysTotalCount(state, id),
+      fetching: selectGatewayApiKeysFetching(state),
+    }
   }
 
   render() {
@@ -45,7 +60,7 @@ export default class GatewayApiKeys extends React.Component {
             <ApiKeysTable
               entityId={gtwId}
               pageSize={PAGE_SIZES.REGULAR}
-              baseDataSelector={selectGatewayApiKeysStore}
+              baseDataSelector={this.baseDataSelector}
               getItemsAction={this.getGatewayApiKeysList}
             />
           </Col>
