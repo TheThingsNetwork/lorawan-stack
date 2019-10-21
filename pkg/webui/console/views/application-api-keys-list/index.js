@@ -20,6 +20,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../containers/api-keys-table'
 import { getApplicationApiKeysList } from '../../store/actions/applications'
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 
 import {
   selectApplicationApiKeys,
@@ -30,6 +31,10 @@ import {
 import PAGE_SIZES from '../../constants/page-sizes'
 
 export default class ApplicationApiKeys extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
