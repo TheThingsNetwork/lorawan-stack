@@ -21,6 +21,12 @@ import ApiKeysTable from '../../containers/api-keys-table'
 import { getApplicationApiKeysList } from '../../store/actions/applications'
 import sharedMessages from '../../../lib/shared-messages'
 
+import {
+  selectApplicationApiKeys,
+  selectApplicationApiKeysTotalCount,
+  selectApplicationApiKeysFetching,
+} from '../../store/selectors/applications'
+
 import PAGE_SIZES from '../../constants/page-sizes'
 
 @bind
@@ -32,9 +38,15 @@ export default class ApplicationApiKeys extends React.Component {
     this.getApplicationsApiKeysList = filters => getApplicationApiKeysList(appId, filters)
   }
 
-  baseDataSelector({ apiKeys }) {
+  baseDataSelector(state) {
     const { appId } = this.props.match.params
-    return apiKeys.applications[appId] || {}
+
+    const id = { id: appId }
+    return {
+      keys: selectApplicationApiKeys(state, id),
+      totalCount: selectApplicationApiKeysTotalCount(state, id),
+      fetching: selectApplicationApiKeysFetching(state),
+    }
   }
 
   render() {
