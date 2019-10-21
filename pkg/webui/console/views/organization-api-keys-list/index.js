@@ -22,6 +22,12 @@ import ApiKeysTable from '../../containers/api-keys-table'
 import { getOrganizationApiKeysList } from '../../store/actions/organizations'
 import PropTypes from '../../../lib/prop-types'
 
+import {
+  selectOrganizationApiKeys,
+  selectOrganizationApiKeysTotalCount,
+  selectOrganizationApiKeysFetching,
+} from '../../store/selectors/organizations'
+
 import PAGE_SIZES from '../../constants/page-sizes'
 
 class OrganizationApiKeysList extends React.Component {
@@ -37,9 +43,15 @@ class OrganizationApiKeysList extends React.Component {
   }
 
   @bind
-  baseDataSelector({ apiKeys }) {
+  baseDataSelector(state) {
     const { orgId } = this.props.match.params
-    return apiKeys.organizations[orgId] || {}
+
+    const id = { id: orgId }
+    return {
+      keys: selectOrganizationApiKeys(state, id),
+      totalCount: selectOrganizationApiKeysTotalCount(state, id),
+      fetching: selectOrganizationApiKeysFetching(state),
+    }
   }
 
   render() {
