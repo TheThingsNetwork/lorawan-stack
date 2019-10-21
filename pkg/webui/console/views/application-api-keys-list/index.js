@@ -29,7 +29,6 @@ import {
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-@bind
 export default class ApplicationApiKeys extends React.Component {
   constructor(props) {
     super(props)
@@ -38,6 +37,7 @@ export default class ApplicationApiKeys extends React.Component {
     this.getApplicationsApiKeysList = filters => getApplicationApiKeysList(appId, filters)
   }
 
+  @bind
   baseDataSelector(state) {
     const { appId } = this.props.match.params
 
