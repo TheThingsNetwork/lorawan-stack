@@ -54,18 +54,19 @@ var (
 )
 
 type srv struct {
-	ctx       context.Context
-	server    io.Server
-	webServer *echo.Echo
-	upgrader  *websocket.Upgrader
-	tokens    io.DownlinkTokens
+	ctx                  context.Context
+	server               io.Server
+	webServer            *echo.Echo
+	upgrader             *websocket.Upgrader
+	tokens               io.DownlinkTokens
+	useTrafficTLSAddress bool
 }
 
 func (*srv) Protocol() string            { return "basicstation" }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
-func New(ctx context.Context, server io.Server) *echo.Echo {
+func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool) *echo.Echo {
 	webServer := echo.New()
 	webServer.Logger = web.NewNoopLogger()
 	webServer.HTTPErrorHandler = errorHandler
@@ -77,10 +78,11 @@ func New(ctx context.Context, server io.Server) *echo.Echo {
 
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 	s := &srv{
-		ctx:       ctx,
-		server:    server,
-		upgrader:  &websocket.Upgrader{},
-		webServer: webServer,
+		ctx:                  ctx,
+		server:               server,
+		upgrader:             &websocket.Upgrader{},
+		webServer:            webServer,
+		useTrafficTLSAddress: useTrafficTLSAddress,
 	}
 
 	webServer.GET("/router-info", s.handleDiscover)
@@ -129,12 +131,12 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to fetch gateway")
-		writeDiscoverError(ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
+		writeDiscoverError(s.ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
 		return err
 	}
 
 	scheme := "ws"
-	if c.IsTLS() {
+	if c.IsTLS() || s.useTrafficTLSAddress {
 		scheme = "wss"
 	}
 
@@ -149,7 +151,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	data, err = json.Marshal(res)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to marshal response message")
-		writeDiscoverError(ctx, ws, "Router not provisioned")
+		writeDiscoverError(s.ctx, ws, "Router not provisioned")
 		return err
 	}
 	if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
