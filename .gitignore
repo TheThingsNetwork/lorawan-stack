@@ -110,3 +110,7 @@ key.pem
 
 # Release files
 /snapcraft.login
+
+# Default builds
+ttn-lw-stack
+ttn-lw-cli
