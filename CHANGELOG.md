@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Rename "bulk device creation" to "import devices"
 - Move device import button to the end device tables (and adapt routing accordingly).
+- Improve downlink performance.
 
 ### Deprecated
 
