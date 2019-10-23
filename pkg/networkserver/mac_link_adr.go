@@ -40,13 +40,13 @@ func deviceNeedsLinkADRReq(dev *ttnpb.EndDevice) bool {
 		dev.MACState.DesiredParameters.ADRTxPowerIndex != dev.MACState.CurrentParameters.ADRTxPowerIndex {
 		return true
 	}
-	for i := 0; i < len(dev.MACState.CurrentParameters.Channels); i++ {
+	for i, currentCh := range dev.MACState.CurrentParameters.Channels {
 		switch {
 		case i >= len(dev.MACState.DesiredParameters.Channels):
-			if dev.MACState.CurrentParameters.Channels[i].EnableUplink {
+			if currentCh.GetEnableUplink() {
 				return true
 			}
-		case dev.MACState.CurrentParameters.Channels[i].EnableUplink != dev.MACState.DesiredParameters.Channels[i].EnableUplink:
+		case currentCh.GetEnableUplink() != dev.MACState.DesiredParameters.Channels[i].GetEnableUplink():
 			return true
 		}
 	}
@@ -71,7 +71,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 
 	desiredChs := make([]bool, phy.MaxUplinkChannels)
 	for i, ch := range dev.MACState.DesiredParameters.Channels {
-		desiredChs[i] = ch.EnableUplink
+		desiredChs[i] = ch.GetEnableUplink()
 	}
 	desiredMasks, err := phy.GenerateChMasks(desiredChs)
 	if err != nil {

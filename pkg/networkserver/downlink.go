@@ -780,8 +780,7 @@ func txRequestFromUplink(phy band.Band, macState *ttnpb.MACState, rx1, rx2 bool,
 			return nil, err
 		}
 		if uint(rx1ChIdx) >= uint(len(macState.CurrentParameters.Channels)) ||
-			macState.CurrentParameters.Channels[int(rx1ChIdx)] == nil ||
-			macState.CurrentParameters.Channels[int(rx1ChIdx)].DownlinkFrequency == 0 {
+			macState.CurrentParameters.Channels[int(rx1ChIdx)].GetDownlinkFrequency() == 0 {
 			return nil, errCorruptedMACState
 		}
 		rx1DRIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())

@@ -15,9 +15,12 @@
 package networkserver
 
 import (
+	"fmt"
+	"math"
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -126,6 +129,230 @@ func TestNeedsDLChannelReq(t *testing.T) {
 				a.So(res, should.BeFalse)
 			}
 			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
+func TestEnqueueDLChannelReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name                                 string
+		CurrentParameters, DesiredParameters ttnpb.MACParameters
+		ExpectedRequests                     []*ttnpb.MACCommand_DLChannelReq
+	}{
+		{
+			Name: "no DLChannelReq necessary",
+			CurrentParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{
+						UplinkFrequency:   124,
+						DownlinkFrequency: 124,
+						MinDataRateIndex:  ttnpb.DATA_RATE_1,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_3,
+					},
+					nil,
+					{
+						UplinkFrequency:   123,
+						DownlinkFrequency: 123,
+						MinDataRateIndex:  ttnpb.DATA_RATE_1,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+					{
+						UplinkFrequency:   129,
+						DownlinkFrequency: 129,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_4,
+					},
+					{
+						UplinkFrequency:   130,
+						DownlinkFrequency: 131,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+				},
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					nil,
+					{
+						UplinkFrequency:   128,
+						DownlinkFrequency: 128,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_4,
+					},
+					{
+						UplinkFrequency:   123,
+						DownlinkFrequency: 123,
+						MinDataRateIndex:  ttnpb.DATA_RATE_1,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+					{
+						UplinkFrequency:   130,
+						DownlinkFrequency: 131,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+				},
+			},
+		},
+		{
+			Name: "4 DLChannelReq necessary",
+			CurrentParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{
+						UplinkFrequency:   124,
+						DownlinkFrequency: 124,
+						MinDataRateIndex:  ttnpb.DATA_RATE_1,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_3,
+					},
+					{
+						UplinkFrequency:   123,
+						DownlinkFrequency: 123,
+						MinDataRateIndex:  ttnpb.DATA_RATE_1,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+					{
+						UplinkFrequency:   129,
+						DownlinkFrequency: 129,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_4,
+					},
+					{
+						UplinkFrequency:   130,
+						DownlinkFrequency: 131,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+					{
+						UplinkFrequency:   130,
+						DownlinkFrequency: 134,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+				},
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{
+						UplinkFrequency:   124,
+						DownlinkFrequency: 128,
+						MinDataRateIndex:  ttnpb.DATA_RATE_1,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_3,
+					},
+					{
+						UplinkFrequency:   123,
+						DownlinkFrequency: 123,
+						MinDataRateIndex:  ttnpb.DATA_RATE_1,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+					{
+						UplinkFrequency:   129,
+						DownlinkFrequency: 100,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_4,
+					},
+					{
+						UplinkFrequency:   130,
+						DownlinkFrequency: 125,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+					{
+						UplinkFrequency:   130,
+						DownlinkFrequency: 140,
+						MinDataRateIndex:  ttnpb.DATA_RATE_2,
+						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+					},
+				},
+			},
+			ExpectedRequests: []*ttnpb.MACCommand_DLChannelReq{
+				{
+					Frequency: 128,
+				},
+				{
+					ChannelIndex: 2,
+					Frequency:    100,
+				},
+				{
+					ChannelIndex: 3,
+					Frequency:    125,
+				},
+				{
+					ChannelIndex: 4,
+					Frequency:    140,
+				},
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			downlinkLength := 1 + lorawan.DefaultMACCommands[ttnpb.CID_DL_CHANNEL].DownlinkLength
+			uplinkLength := 1 + lorawan.DefaultMACCommands[ttnpb.CID_DL_CHANNEL].UplinkLength
+
+			type TestConf struct {
+				MaxDownlinkLength, MaxUplinkLength uint16
+				ExpectedCount                      int
+			}
+			confs := []TestConf{
+				{},
+				{
+					MaxUplinkLength: math.MaxUint16,
+				},
+				{
+					MaxDownlinkLength: math.MaxUint16,
+				},
+				{
+					MaxDownlinkLength: math.MaxUint16,
+					MaxUplinkLength:   math.MaxUint16,
+					ExpectedCount:     len(tc.ExpectedRequests),
+				},
+			}
+			for i := range tc.ExpectedRequests {
+				for j := 0; j <= i; j++ {
+					confs = append(confs, TestConf{
+						MaxDownlinkLength: uint16(i+1) * downlinkLength,
+						MaxUplinkLength:   uint16(j+1) * uplinkLength,
+						ExpectedCount:     j + 1,
+					})
+				}
+			}
+
+			for _, conf := range confs {
+				for _, pendingReqs := range [][]*ttnpb.MACCommand{
+					nil,
+					{
+						{},
+					},
+				} {
+					t.Run(fmt.Sprintf("max_downlink_len:%d,max_uplink_len:%d,pending_requests:%d", conf.MaxDownlinkLength, conf.MaxUplinkLength, len(pendingReqs)), func(t *testing.T) {
+						a := assertions.New(t)
+
+						dev := &ttnpb.EndDevice{
+							MACState: &ttnpb.MACState{
+								LoRaWANVersion:    ttnpb.MAC_V1_0_2,
+								CurrentParameters: tc.CurrentParameters,
+								DesiredParameters: tc.DesiredParameters,
+								PendingRequests:   pendingReqs,
+							},
+						}
+						reqs := tc.ExpectedRequests[:conf.ExpectedCount]
+						expectedDev := CopyEndDevice(dev)
+						var expectedEvs []events.DefinitionDataClosure
+						for _, req := range reqs {
+							expectedDev.MACState.PendingRequests = append(expectedDev.MACState.PendingRequests, req.MACCommand())
+							expectedEvs = append(expectedEvs, evtEnqueueDLChannelRequest.BindData(req))
+						}
+
+						st := enqueueDLChannelReq(test.Context(), dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
+						a.So(dev, should.Resemble, expectedDev)
+						a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, expectedEvs)
+						a.So(st, should.Resemble, macCommandEnqueueState{
+							MaxDownLen:   conf.MaxDownlinkLength - uint16(conf.ExpectedCount)*downlinkLength,
+							MaxUpLen:     conf.MaxUplinkLength - uint16(conf.ExpectedCount)*uplinkLength,
+							Ok:           len(tc.ExpectedRequests) == conf.ExpectedCount,
+							QueuedEvents: st.QueuedEvents,
+						})
+					})
+				}
+			}
 		})
 	}
 }
