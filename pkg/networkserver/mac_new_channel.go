@@ -44,7 +44,7 @@ func needsNewChannelReq(dev *ttnpb.EndDevice) bool {
 }
 
 func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if !needsLinkADRReq(dev) {
+	if !needsNewChannelReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
