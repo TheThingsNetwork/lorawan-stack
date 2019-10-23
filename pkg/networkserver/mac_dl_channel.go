@@ -58,7 +58,7 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 				continue
 			}
 			if nDown < 1 || nUp < 1 {
-				return cmds, uint16(len(cmds)), nil, false
+				return cmds, uint16(len(cmds)), evs, false
 			}
 			nDown--
 			nUp--
