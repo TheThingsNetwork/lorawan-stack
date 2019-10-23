@@ -35,6 +35,7 @@ var (
 	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
 	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 	errProvisionerNotFound  = errors.DefineNotFound("provisioner_not_found", "provisioner `{id}` not found")
 )
 
@@ -114,6 +115,13 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 		return nil, err
 	}
 	return applyDeviceFieldMask(nil, pb, appendImplicitDeviceGetPaths(paths...)...)
+}
+
+func equalEUI64(x, y *types.EUI64) bool {
+	if x == nil || y == nil {
+		return x == y
+	}
+	return x.Equal(*y)
 }
 
 func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -214,15 +222,23 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 				return nil, errInvalidIdentifiers
 			}
 		} else {
-			if err := ttnpb.ProhibitFields(sets,
-				"ids.application_ids",
-				"ids.dev_eui",
-				"ids.device_id",
-				"ids.join_eui",
-				"provisioner_id",
-				"provisioning_data",
-			); err != nil {
-				return nil, errInvalidFieldmask.WithCause(err)
+			if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
+				return nil, errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
+			}
+			if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceID != stored.DeviceID {
+				return nil, errReadOnlyField.WithAttributes("field", "ids.device_id")
+			}
+			if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEUI, stored.JoinEUI) {
+				return nil, errReadOnlyField.WithAttributes("field", "ids.join_eui")
+			}
+			if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEUI, stored.DevEUI) {
+				return nil, errReadOnlyField.WithAttributes("field", "ids.dev_eui")
+			}
+			if ttnpb.HasAnyField(sets, "provisioner_id") && pb.ProvisionerID != stored.ProvisionerID {
+				return nil, errReadOnlyField.WithAttributes("field", "provisioner_id")
+			}
+			if ttnpb.HasAnyField(sets, "provisioning_data") && !pb.ProvisioningData.Equal(stored.ProvisioningData) {
+				return nil, errReadOnlyField.WithAttributes("field", "provisioning_data")
 			}
 			if err := cmd.ScanProto(updated); err != nil {
 				return nil, err

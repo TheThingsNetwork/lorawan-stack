@@ -31,6 +31,7 @@ import (
 var (
 	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errReadOnlyField      = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
 // appendImplicitAssociationGetPaths appends implicit ttnpb.ApplicationPackageAssociation get paths to paths.
@@ -215,12 +216,14 @@ func (r ApplicationPackagesRegistry) Set(ctx context.Context, ids ttnpb.Applicat
 					return errInvalidIdentifiers
 				}
 			} else {
-				if err := ttnpb.ProhibitFields(sets,
-					"ids.end_device_ids.application_ids",
-					"ids.end_device_ids.device_id",
-					"ids.f_port",
-				); err != nil {
-					return errInvalidFieldmask.WithCause(err)
+				if ttnpb.HasAnyField(sets, "ids.end_device_ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
+					return errReadOnlyField.WithAttributes("field", "ids.end_device_ids.application_ids.application_id")
+				}
+				if ttnpb.HasAnyField(sets, "ids.end_device_ids.device_id") && pb.DeviceID != stored.DeviceID {
+					return errReadOnlyField.WithAttributes("field", "ids.end_device_ids.device_id")
+				}
+				if ttnpb.HasAnyField(sets, "ids.f_port") && pb.FPort != stored.FPort {
+					return errReadOnlyField.WithAttributes("field", "ids.f_port")
 				}
 				if err := cmd.ScanProto(updated); err != nil {
 					return err

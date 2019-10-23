@@ -1592,6 +1592,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/redis:read_only_field": {
+    "translations": {
+      "en": "read-only field `{field}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages:package_already_registered": {
     "translations": {
       "en": "package `{name}` already registered"
@@ -1673,6 +1682,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/applicationserver/io/pubsub/redis:read_only_field": {
+    "translations": {
+      "en": "read-only field `{field}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/applicationserver/io/pubsub:already_configured": {
     "translations": {
       "en": "already configured to `{application_uid}` `{pub_sub_id}`"
@@ -1712,6 +1730,15 @@
   "error:pkg/applicationserver/io/web/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/applicationserver/io/web/redis:read_only_field": {
+    "translations": {
+      "en": "read-only field `{field}`"
     },
     "description": {
       "package": "pkg/applicationserver/io/web/redis",
@@ -1820,6 +1847,15 @@
   "error:pkg/applicationserver/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/applicationserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/applicationserver/redis:read_only_field": {
+    "translations": {
+      "en": "read-only field `{field}`"
     },
     "description": {
       "package": "pkg/applicationserver/redis",
@@ -4283,6 +4319,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/joinserver/redis:read_only_field": {
+    "translations": {
+      "en": "read-only field `{field}`"
+    },
+    "description": {
+      "package": "pkg/joinserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/joinserver:caller_not_authorized": {
     "translations": {
       "en": "caller `{name}` is not authorized for the entity"
@@ -4799,6 +4844,15 @@
   "error:pkg/networkserver/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:read_only_field": {
+    "translations": {
+      "en": "read-only field `{field}`"
     },
     "description": {
       "package": "pkg/networkserver/redis",
