@@ -65,6 +65,7 @@ class Devices {
     const params = {
       routeParams: {
         'end_device.ids.application_ids.application_id': appId,
+        ...(create ? {} : { 'end_device.ids.device_id': devId }),
       },
     }
 
