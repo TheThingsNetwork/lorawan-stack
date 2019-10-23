@@ -30,6 +30,7 @@ import (
 var (
 	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errReadOnlyField      = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
 // appendImplicitPubSubGetPaths appends implicit ttnpb.ApplicationPubSub get paths to paths.
@@ -224,11 +225,11 @@ func (r PubSubRegistry) Set(ctx context.Context, ids ttnpb.ApplicationPubSubIden
 					return errInvalidIdentifiers
 				}
 			} else {
-				if err := ttnpb.ProhibitFields(sets,
-					"ids.application_ids",
-					"ids.pub_sub_id",
-				); err != nil {
-					return errInvalidFieldmask.WithCause(err)
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
+					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
+				}
+				if ttnpb.HasAnyField(sets, "ids.pub_sub_id") && pb.PubSubID != stored.PubSubID {
+					return errReadOnlyField.WithAttributes("field", "ids.pub_sub_id")
 				}
 				if err := cmd.ScanProto(updated); err != nil {
 					return err

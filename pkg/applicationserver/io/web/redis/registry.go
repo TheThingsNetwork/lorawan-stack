@@ -29,6 +29,7 @@ import (
 var (
 	errInvalidFieldmask   = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
+	errReadOnlyField      = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
 // appendImplicitWebhookGetPaths appends implicit ttnpb.ApplicationWebhook get paths to paths.
@@ -175,11 +176,11 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 					return errInvalidIdentifiers
 				}
 			} else {
-				if err := ttnpb.ProhibitFields(sets,
-					"ids.application_ids",
-					"ids.webhook_id",
-				); err != nil {
-					return errInvalidFieldmask.WithCause(err)
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
+					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
+				}
+				if ttnpb.HasAnyField(sets, "ids.webhook_id") && pb.WebhookID != stored.WebhookID {
+					return errReadOnlyField.WithAttributes("field", "ids.webhook_id")
 				}
 				if err := cmd.ScanProto(updated); err != nil {
 					return err

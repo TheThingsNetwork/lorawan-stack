@@ -31,6 +31,7 @@ var (
 	errInvalidFieldmask     = errors.DefineInvalidArgument("invalid_fieldmask", "invalid fieldmask")
 	errInvalidIdentifiers   = errors.DefineInvalidArgument("invalid_identifiers", "invalid identifiers")
 	errDuplicateIdentifiers = errors.DefineAlreadyExists("duplicate_identifiers", "duplicate identifiers")
+	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
 // appendImplicitDeviceGetPaths appends implicit ttnpb.EndDevice get paths to paths.
@@ -75,6 +76,13 @@ func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		return nil, err
 	}
 	return applyDeviceFieldMask(nil, pb, appendImplicitDeviceGetPaths(paths...)...)
+}
+
+func equalEUI64(x, y *types.EUI64) bool {
+	if x == nil || y == nil {
+		return x == y
+	}
+	return x.Equal(*y)
 }
 
 // Set creates, updates or deletes the end device by its identifiers.
@@ -174,15 +182,18 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 					return errInvalidIdentifiers
 				}
 			} else {
-				if err := ttnpb.ProhibitFields(sets,
-					"ids.application_ids",
-					"ids.dev_eui",
-					"ids.device_id",
-					"ids.join_eui",
-				); err != nil {
-					return errInvalidFieldmask.WithCause(err)
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationID != stored.ApplicationID {
+					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
-
+				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceID != stored.DeviceID {
+					return errReadOnlyField.WithAttributes("field", "ids.device_id")
+				}
+				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEUI, stored.JoinEUI) {
+					return errReadOnlyField.WithAttributes("field", "ids.join_eui")
+				}
+				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEUI, stored.DevEUI) {
+					return errReadOnlyField.WithAttributes("field", "ids.dev_eui")
+				}
 				if err := cmd.ScanProto(updated); err != nil {
 					return err
 				}
