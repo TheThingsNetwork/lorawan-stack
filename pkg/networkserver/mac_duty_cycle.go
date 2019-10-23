@@ -27,13 +27,13 @@ var (
 	evtReceiveDutyCycleAnswer  = defineReceiveMACAnswerEvent("duty_cycle", "maximum aggregated transmit duty-cycle change")()
 )
 
-func needsDutyCycleReq(dev *ttnpb.EndDevice) bool {
+func deviceNeedsDutyCycleReq(dev *ttnpb.EndDevice) bool {
 	return dev.MACState != nil &&
 		dev.MACState.DesiredParameters.MaxDutyCycle != dev.MACState.CurrentParameters.MaxDutyCycle
 }
 
 func enqueueDutyCycleReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if !needsDutyCycleReq(dev) {
+	if !deviceNeedsDutyCycleReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

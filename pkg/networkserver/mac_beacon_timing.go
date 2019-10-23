@@ -21,14 +21,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func needsBeaconTimingReq(dev *ttnpb.EndDevice) bool {
+func deviceNeedsBeaconTimingReq(dev *ttnpb.EndDevice) bool {
 	return dev.MACState != nil &&
 		dev.MACState.DeviceClass == ttnpb.CLASS_B &&
 		false // TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 }
 
 func handleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
-	_ = needsBeaconTimingReq(dev)
+	_ = deviceNeedsBeaconTimingReq(dev)
 	// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 	// NOTE: This command is deprecated in LoRaWAN 1.1
 	return nil, nil

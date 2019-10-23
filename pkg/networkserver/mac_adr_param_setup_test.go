@@ -169,7 +169,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := needsADRParamSetupReq(dev, tc.Band)
+			res := deviceNeedsADRParamSetupReq(dev, tc.Band)
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {

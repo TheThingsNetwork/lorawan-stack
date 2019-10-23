@@ -86,7 +86,7 @@ func TestNeedsBeaconFreqReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := needsBeaconFreqReq(dev)
+			res := deviceNeedsBeaconFreqReq(dev)
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {

@@ -28,7 +28,7 @@ var (
 	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")()
 )
 
-func needsNewChannelReq(dev *ttnpb.EndDevice) bool {
+func deviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
 	if dev.MACState == nil {
 		return false
 	}
@@ -44,7 +44,7 @@ func needsNewChannelReq(dev *ttnpb.EndDevice) bool {
 }
 
 func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if !needsNewChannelReq(dev) {
+	if !deviceNeedsNewChannelReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

@@ -151,7 +151,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 
 			dev := CopyEndDevice(tc.InputDevice)
 			defaults := deepcopy.Copy(tc.Defaults).(ttnpb.MACSettings)
-			res := needsDevStatusReq(dev, now, tc.Defaults)
+			res := deviceNeedsDevStatusReq(dev, now, tc.Defaults)
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {

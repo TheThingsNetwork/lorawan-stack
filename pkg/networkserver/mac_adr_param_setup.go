@@ -28,7 +28,7 @@ var (
 	evtReceiveADRParamSetupAnswer  = defineReceiveMACAnswerEvent("adr_param_setup", "ADR parameter setup")()
 )
 
-func needsADRParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
+func deviceNeedsADRParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
 	if dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		return false
 	}
@@ -44,7 +44,7 @@ func needsADRParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
 }
 
 func enqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy band.Band) macCommandEnqueueState {
-	if !needsADRParamSetupReq(dev, phy) {
+	if !deviceNeedsADRParamSetupReq(dev, phy) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

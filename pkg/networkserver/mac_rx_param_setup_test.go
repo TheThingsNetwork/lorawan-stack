@@ -112,7 +112,7 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := needsRxParamSetupReq(dev)
+			res := deviceNeedsRxParamSetupReq(dev)
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {

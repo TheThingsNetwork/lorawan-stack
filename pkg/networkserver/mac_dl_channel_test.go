@@ -119,7 +119,7 @@ func TestNeedsDLChannelReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := needsDLChannelReq(dev)
+			res := deviceNeedsDLChannelReq(dev)
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {
