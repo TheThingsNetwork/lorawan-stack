@@ -1941,7 +1941,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state",
+						"mac_state.last_confirmed_downlink_at",
+						"mac_state.pending_application_downlink",
+						"mac_state.pending_requests",
+						"mac_state.queued_responses",
+						"mac_state.rx_windows_available",
 						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
@@ -2246,7 +2250,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.Resemble, []string{
-						"mac_state",
+						"mac_state.last_confirmed_downlink_at",
+						"mac_state.pending_application_downlink",
+						"mac_state.pending_requests",
+						"mac_state.queued_responses",
+						"mac_state.rx_windows_available",
 						"recent_downlinks",
 						"session",
 					})
@@ -2544,7 +2552,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state",
+						"mac_state.last_confirmed_downlink_at",
+						"mac_state.pending_application_downlink",
+						"mac_state.pending_requests",
+						"mac_state.queued_responses",
+						"mac_state.rx_windows_available",
 						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
@@ -2984,7 +2996,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state",
+						"mac_state.last_confirmed_downlink_at",
+						"mac_state.pending_application_downlink",
+						"mac_state.pending_requests",
+						"mac_state.queued_responses",
+						"mac_state.rx_windows_available",
 						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
@@ -3371,7 +3387,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state",
+						"mac_state.last_confirmed_downlink_at",
+						"mac_state.pending_application_downlink",
+						"mac_state.pending_requests",
+						"mac_state.queued_responses",
+						"mac_state.rx_windows_available",
 						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
@@ -3680,7 +3700,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"mac_state",
+						"mac_state.last_confirmed_downlink_at",
+						"mac_state.pending_application_downlink",
+						"mac_state.pending_requests",
+						"mac_state.queued_responses",
+						"mac_state.rx_windows_available",
 						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",

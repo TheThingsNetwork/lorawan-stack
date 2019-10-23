@@ -1033,7 +1033,11 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	recordDataDownlink(dev, genDown, genState, down, ns.defaultMACSettings)
 	return downlinkAttemptResult{
 		SetPaths: append(sets,
-			"mac_state",
+			"mac_state.last_confirmed_downlink_at",
+			"mac_state.pending_application_downlink",
+			"mac_state.pending_requests",
+			"mac_state.queued_responses",
+			"mac_state.rx_windows_available",
 			"recent_downlinks",
 			"session",
 		),
@@ -1372,7 +1376,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 				}
 				return dev, append(sets,
-					"mac_state",
+					"mac_state.last_confirmed_downlink_at",
+					"mac_state.pending_application_downlink",
+					"mac_state.pending_requests",
+					"mac_state.queued_responses",
+					"mac_state.rx_windows_available",
 					"recent_downlinks",
 					"session",
 				), nil
