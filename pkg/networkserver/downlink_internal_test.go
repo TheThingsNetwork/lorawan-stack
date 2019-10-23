@@ -3015,7 +3015,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second-nsScheduleWindow))
 				},
 					nil,
 				) {
@@ -3402,7 +3402,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second-nsScheduleWindow))
 				},
 					nil,
 				) {
@@ -3711,7 +3711,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second))
+						a.So(startAt, should.Resemble, setDevice.MACState.LastConfirmedDownlinkAt.Add(42*time.Second-nsScheduleWindow))
 				},
 					nil,
 				) {
@@ -3991,7 +3991,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So([]time.Time{start, startAt, time.Now().Add(downlinkRetryInterval)}, should.BeChronological)
+						a.So([]time.Time{start.Add(-nsScheduleWindow - gsScheduleWindow), startAt, time.Now().Add(downlinkRetryInterval)}, should.BeChronological)
 				},
 					nil,
 				) {
@@ -4030,7 +4030,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				start := time.Now()
+				start := time.Now().UTC()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -4059,7 +4061,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 					},
-					ReceivedAt: time.Now().Add(-time.Second),
+					ReceivedAt: start.Add(-time.Millisecond),
 					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
 					Settings: ttnpb.TxSettings{
 						DataRateIndex: ttnpb.DATA_RATE_0,
@@ -4067,7 +4069,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				}
 
-				absTime := time.Now().Add(10 * time.Second).UTC()
+				absTime := start.Add(10 * time.Second).UTC()
 
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -4147,6 +4149,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if !a.So(assertGetRxMetadataGatewayPeers(ctx, env.Cluster.GetPeer, peer124, peer3), should.BeTrue) {
 					return false
 				}
+
+				now := clock.Add(time.Millisecond)
 
 				lastDown, ok := assertScheduleRxMetadataGateways(
 					ctx,
@@ -4264,7 +4268,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So([]time.Time{start, startAt, time.Now().Add(downlinkRetryInterval)}, should.BeChronological)
+						a.So(startAt, should.Resemble, now.Add(downlinkRetryInterval-nsScheduleWindow).UTC())
 				},
 					nil,
 				) {
@@ -4432,7 +4436,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DeviceID:               devID,
 						}) &&
 						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, absTime.Add(-gsScheduleWindow))
+						a.So(startAt, should.Resemble, absTime.Add(-gsScheduleWindow-nsScheduleWindow))
 				},
 					nil,
 				) {
@@ -5903,7 +5907,7 @@ func TestGenerateDownlink(t *testing.T) {
 				return
 			}
 
-			genDown, genState, err := ns.generateDownlink(ctx, dev, phy, dev.MACState.DeviceClass, math.MaxUint16, math.MaxUint16)
+			genDown, genState, err := ns.generateDownlink(ctx, dev, phy, dev.MACState.DeviceClass, time.Now(), math.MaxUint16, math.MaxUint16)
 			if tc.Error != nil {
 				a.So(err, should.EqualErrorOrDefinition, tc.Error)
 				a.So(genDown, should.BeNil)

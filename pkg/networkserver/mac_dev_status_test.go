@@ -27,6 +27,142 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsDevStatusReq(t *testing.T) {
+	now := time.Now().UTC()
+	clock := MockClock(now)
+	defer SetTimeNow(clock.Now)()
+
+	for _, tc := range []struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Defaults    ttnpb.MACSettings
+		Needs       bool
+	}{
+		{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+		{
+			Name: "device-settings(count-periodicity:5,time-periodicity:nil),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:now,last-status-fcnt:1,last-fcnt:5",
+			InputDevice: &ttnpb.EndDevice{
+				LastDevStatusReceivedAt: &now,
+				MACSettings: &ttnpb.MACSettings{
+					StatusCountPeriodicity: &pbtypes.UInt32Value{
+						Value: 5,
+					},
+				},
+				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 1,
+				},
+				Session: &ttnpb.Session{
+					LastFCntUp: 5,
+				},
+			},
+		},
+		{
+			Name: "device-settings(count-periodicity:5,time-periodicity:nil),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:now,last-status-fcnt:1,last-fcnt:6",
+			InputDevice: &ttnpb.EndDevice{
+				LastDevStatusReceivedAt: &now,
+				MACSettings: &ttnpb.MACSettings{
+					StatusCountPeriodicity: &pbtypes.UInt32Value{
+						Value: 5,
+					},
+				},
+				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 1,
+				},
+				Session: &ttnpb.Session{
+					LastFCntUp: 6,
+				},
+			},
+			Needs: true,
+		},
+		{
+			Name: "device-settings(count-periodicity:1000,time-periodicity:1hr),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:now,last-status-fcnt:1,last-fcnt:2",
+			InputDevice: &ttnpb.EndDevice{
+				LastDevStatusReceivedAt: &now,
+				MACSettings: &ttnpb.MACSettings{
+					StatusCountPeriodicity: &pbtypes.UInt32Value{
+						Value: 1000,
+					},
+					StatusTimePeriodicity: DurationPtr(time.Hour),
+				},
+				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 1,
+				},
+				Session: &ttnpb.Session{
+					LastFCntUp: 2,
+				},
+			},
+		},
+		{
+			Name: "device-settings(count-periodicity:1000,time-periodicity:1hr),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:now-1hr,last-status-fcnt:1,last-fcnt:2",
+			InputDevice: &ttnpb.EndDevice{
+				LastDevStatusReceivedAt: TimePtr(now.Add(-time.Hour)),
+				MACSettings: &ttnpb.MACSettings{
+					StatusCountPeriodicity: &pbtypes.UInt32Value{
+						Value: 1000,
+					},
+					StatusTimePeriodicity: DurationPtr(time.Hour),
+				},
+				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 1,
+				},
+				Session: &ttnpb.Session{
+					LastFCntUp: 2,
+				},
+			},
+		},
+		{
+			Name: "device-settings(count-periodicity:1000,time-periodicity:1hr),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:now-1hr1ns,last-status-fcnt:1,last-fcnt:2",
+			InputDevice: &ttnpb.EndDevice{
+				LastDevStatusReceivedAt: TimePtr(now.Add(-time.Hour - time.Nanosecond)),
+				MACSettings: &ttnpb.MACSettings{
+					StatusCountPeriodicity: &pbtypes.UInt32Value{
+						Value: 1000,
+					},
+					StatusTimePeriodicity: DurationPtr(time.Hour),
+				},
+				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 1,
+				},
+				Session: &ttnpb.Session{
+					LastFCntUp: 2,
+				},
+			},
+			Needs: true,
+		},
+		{
+			Name: "device-settings(nil),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:now,last-status-fcnt:1,last-fcnt:1000",
+			InputDevice: &ttnpb.EndDevice{
+				LastDevStatusReceivedAt: &now,
+				MACState: &ttnpb.MACState{
+					LastDevStatusFCntUp: 1,
+				},
+				Session: &ttnpb.Session{
+					LastFCntUp: 1000,
+				},
+			},
+			Needs: 1000-1 >= DefaultStatusCountPeriodicity,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			defaults := deepcopy.Copy(tc.Defaults).(ttnpb.MACSettings)
+			res := needsDevStatusReq(dev, now, tc.Defaults)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+			a.So(defaults, should.Resemble, tc.Defaults)
+		})
+	}
+}
+
 func TestHandleDevStatusAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string
@@ -138,7 +274,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 			},
 		},
 		{
-			Name: "unknown power/margin -5",
+			Name: "nil power/margin -5",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 2,

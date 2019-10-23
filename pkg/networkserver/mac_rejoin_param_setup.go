@@ -27,8 +27,15 @@ var (
 	evtReceiveRejoinParamSetupAnswer  = defineReceiveMACAnswerEvent("rejoin_param_setup", "rejoin parameter setup")()
 )
 
+func needsRejoinParamSetupReq(dev *ttnpb.EndDevice) bool {
+	return dev.MACState != nil &&
+		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 &&
+		(dev.MACState.DesiredParameters.RejoinTimePeriodicity != dev.MACState.CurrentParameters.RejoinTimePeriodicity ||
+			dev.MACState.DesiredParameters.RejoinCountPeriodicity != dev.MACState.CurrentParameters.RejoinCountPeriodicity)
+}
+
 func enqueueRejoinParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if dev.MACState.DesiredParameters.RejoinTimePeriodicity == dev.MACState.CurrentParameters.RejoinTimePeriodicity {
+	if !needsRejoinParamSetupReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

@@ -130,6 +130,7 @@ func TestHandleUplink(t *testing.T) {
 		"multicast",
 		"pending_mac_state",
 		"pending_session",
+		"queued_application_downlinks",
 		"recent_downlinks",
 		"recent_uplinks",
 		"session",
@@ -2279,7 +2280,9 @@ func TestHandleUplink(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				start := time.Now()
+				start := time.Now().UTC()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				msg := makeLegacyDataUplink(34, false)
 
@@ -2297,7 +2300,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 					Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
 					CreatedAt: start,
-					UpdatedAt: time.Now(),
+					UpdatedAt: start,
 				}
 
 				var upCtx context.Context
@@ -2329,10 +2332,13 @@ func TestHandleUplink(t *testing.T) {
 					req.Response <- nil
 				}
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), start, duplicateCount)
+				now := clock.Add(time.Nanosecond)
+
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
-				var recentUp *ttnpb.UplinkMessage
+				now = clock.Add(time.Nanosecond)
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
@@ -2366,18 +2372,18 @@ func TestHandleUplink(t *testing.T) {
 					a.So(dev.PendingSession, should.BeNil)
 					a.So(dev.RecentADRUplinks, should.BeNil)
 					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeLegacyDataUplink(34, true)
-						expectedUp.CorrelationIDs = upCorrelationIDs
-						expectedUp.DeviceChannelIndex = 1
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
+					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
+						return false
 					}
+					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
+					expectedUp := makeLegacyDataUplink(34, true)
+					expectedUp.CorrelationIDs = upCorrelationIDs
+					expectedUp.DeviceChannelIndex = 1
+					expectedUp.ReceivedAt = start
+					expectedUp.RxMetadata = recentUp.RxMetadata
+					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
+					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2385,16 +2391,24 @@ func TestHandleUplink(t *testing.T) {
 							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 							MACState:             macState,
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								makeLegacyDataUplink(31, true),
-								makeLegacyDataUplink(32, true),
-								makeLegacyDataUplink(34, true),
-							},
-							Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
-							CreatedAt: start,
-							UpdatedAt: time.Now(),
+							RecentUplinks:        append(CopyUplinkMessages(rangeDevice.RecentUplinks...), recentUp),
+							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
+							CreatedAt:            start,
+							UpdatedAt:            now,
 						},
 					}
+					mds = recentUp.RxMetadata
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, start.Add(time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
+					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
@@ -2418,17 +2432,6 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
 					return false
 				}
 
@@ -2463,7 +2466,7 @@ func TestHandleUplink(t *testing.T) {
 								FPort:        fPort,
 								FCnt:         34,
 								FRMPayload:   makeDataUplinkFRMPayload(34),
-								RxMetadata:   recentUp.RxMetadata,
+								RxMetadata:   mds,
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_2,
 									DataRate: ttnpb.DataRate{
@@ -2491,7 +2494,9 @@ func TestHandleUplink(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				start := time.Now()
+				start := time.Now().UTC()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				msg := makeDataUplink(34, false)
 
@@ -2509,7 +2514,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 					Session:   makeSession(ttnpb.MAC_V1_1, devAddr, 32),
 					CreatedAt: start,
-					UpdatedAt: time.Now(),
+					UpdatedAt: start,
 				}
 
 				var upCtx context.Context
@@ -2541,10 +2546,13 @@ func TestHandleUplink(t *testing.T) {
 					req.Response <- nil
 				}
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(34), start, duplicateCount)
+				now := clock.Add(time.Nanosecond)
+
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
-				var recentUp *ttnpb.UplinkMessage
+				now = clock.Add(time.Nanosecond)
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
@@ -2578,18 +2586,18 @@ func TestHandleUplink(t *testing.T) {
 					a.So(dev.PendingSession, should.BeNil)
 					a.So(dev.RecentADRUplinks, should.BeNil)
 					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_1, devAddr, 34))
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeDataUplink(34, true)
-						expectedUp.CorrelationIDs = upCorrelationIDs
-						expectedUp.DeviceChannelIndex = 1
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
+					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
+						return false
 					}
+					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
+					expectedUp := makeDataUplink(34, true)
+					expectedUp.CorrelationIDs = upCorrelationIDs
+					expectedUp.DeviceChannelIndex = 1
+					expectedUp.ReceivedAt = start
+					expectedUp.RxMetadata = recentUp.RxMetadata
+					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
+					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2597,16 +2605,24 @@ func TestHandleUplink(t *testing.T) {
 							LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 							LoRaWANVersion:       ttnpb.MAC_V1_1,
 							MACState:             macState,
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								makeDataUplink(31, true),
-								makeDataUplink(32, true),
-								makeDataUplink(34, true),
-							},
-							Session:   makeSession(ttnpb.MAC_V1_1, devAddr, 34),
-							CreatedAt: start,
-							UpdatedAt: time.Now(),
+							RecentUplinks:        append(CopyUplinkMessages(rangeDevice.RecentUplinks...), recentUp),
+							Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 34),
+							CreatedAt:            start,
+							UpdatedAt:            now,
 						},
 					}
+					mds = recentUp.RxMetadata
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, start.Add(time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
+					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
@@ -2630,17 +2646,6 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
 					return false
 				}
 
@@ -2675,7 +2680,7 @@ func TestHandleUplink(t *testing.T) {
 								FPort:        fPort,
 								FCnt:         34,
 								FRMPayload:   makeDataUplinkFRMPayload(34),
-								RxMetadata:   recentUp.RxMetadata,
+								RxMetadata:   mds,
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_2,
 									DataRate: ttnpb.DataRate{
@@ -2703,7 +2708,9 @@ func TestHandleUplink(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				start := time.Now()
+				start := time.Now().UTC()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				msg := makeLegacyDataUplink(34, false)
 
@@ -2721,7 +2728,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 					Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
 					CreatedAt: start,
-					UpdatedAt: time.Now(),
+					UpdatedAt: start,
 				}
 
 				var upCtx context.Context
@@ -2753,10 +2760,13 @@ func TestHandleUplink(t *testing.T) {
 					req.Response <- nil
 				}
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), start, duplicateCount)
+				now := clock.Add(time.Nanosecond)
+
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
-				var recentUp *ttnpb.UplinkMessage
+				now = clock.Add(time.Nanosecond)
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
@@ -2792,18 +2802,18 @@ func TestHandleUplink(t *testing.T) {
 					a.So(dev.PendingSession, should.BeNil)
 					a.So(dev.RecentADRUplinks, should.BeNil)
 					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeLegacyDataUplink(34, true)
-						expectedUp.CorrelationIDs = upCorrelationIDs
-						expectedUp.DeviceChannelIndex = 1
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
+					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
+						return false
 					}
+					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
+					expectedUp := makeLegacyDataUplink(34, true)
+					expectedUp.CorrelationIDs = upCorrelationIDs
+					expectedUp.DeviceChannelIndex = 1
+					expectedUp.ReceivedAt = start
+					expectedUp.RxMetadata = recentUp.RxMetadata
+					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
+					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2811,16 +2821,24 @@ func TestHandleUplink(t *testing.T) {
 							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 							MACState:             macState,
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								makeLegacyDataUplink(31, true),
-								makeLegacyDataUplink(32, true),
-								makeLegacyDataUplink(34, true),
-							},
-							Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
-							CreatedAt: start,
-							UpdatedAt: time.Now(),
+							RecentUplinks:        append(CopyUplinkMessages(rangeDevice.RecentUplinks...), recentUp),
+							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
+							CreatedAt:            start,
+							UpdatedAt:            now,
 						},
 					}
+					mds = recentUp.RxMetadata
+				}
+
+				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
+						a.So(startAt, should.Resemble, start.Add(time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
+						a.So(replace, should.BeTrue)
+				},
+					nil,
+				), should.BeTrue) {
+					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
@@ -2844,17 +2862,6 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
 					return false
 				}
 
@@ -2889,7 +2896,7 @@ func TestHandleUplink(t *testing.T) {
 								FPort:        fPort,
 								FCnt:         34,
 								FRMPayload:   makeDataUplinkFRMPayload(34),
-								RxMetadata:   recentUp.RxMetadata,
+								RxMetadata:   mds,
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_2,
 									DataRate: ttnpb.DataRate{
@@ -2917,7 +2924,9 @@ func TestHandleUplink(t *testing.T) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
-				start := time.Now()
+				start := time.Now().UTC()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				msg := makeLegacyDataUplink(34, false)
 
@@ -2943,7 +2952,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 					Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
 					CreatedAt: start,
-					UpdatedAt: time.Now(),
+					UpdatedAt: start,
 				}
 
 				var upCtx context.Context
@@ -2975,10 +2984,13 @@ func TestHandleUplink(t *testing.T) {
 					req.Response <- nil
 				}
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), start, duplicateCount)
+				now := clock.Add(time.Nanosecond)
+
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
-				var recentUp *ttnpb.UplinkMessage
+				now = clock.Add(time.Nanosecond)
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
@@ -3009,18 +3021,18 @@ func TestHandleUplink(t *testing.T) {
 					a.So(dev.PendingSession, should.BeNil)
 					a.So(dev.RecentADRUplinks, should.BeNil)
 					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeLegacyDataUplink(34, true)
-						expectedUp.CorrelationIDs = upCorrelationIDs
-						expectedUp.DeviceChannelIndex = 1
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
+					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
+						return false
 					}
+					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
+					expectedUp := makeLegacyDataUplink(34, true)
+					expectedUp.CorrelationIDs = upCorrelationIDs
+					expectedUp.DeviceChannelIndex = 1
+					expectedUp.ReceivedAt = start
+					expectedUp.RxMetadata = recentUp.RxMetadata
+					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
+					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -3028,33 +3040,29 @@ func TestHandleUplink(t *testing.T) {
 							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 							MACState:             macState,
-							RecentUplinks: []*ttnpb.UplinkMessage{
-								makeLegacyDataUplink(31, true),
-								makeLegacyDataUplink(32, true),
-								makeLegacyDataUplink(34, true),
-								makeLegacyDataUplink(34, true),
-							},
-							Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
-							CreatedAt: start,
-							UpdatedAt: time.Now(),
+							RecentUplinks:        append(CopyUplinkMessages(rangeDevice.RecentUplinks...), recentUp),
+							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
+							CreatedAt:            start,
+							UpdatedAt:            now,
 						},
 					}
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
-				}), should.BeTrue) {
-					return false
+					mds = recentUp.RxMetadata
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(time.Second-NSScheduleWindow())) &&
+						a.So(startAt, should.Resemble, start.Add(time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
 				},
 					nil,
 				), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
+				}), should.BeTrue) {
 					return false
 				}
 

@@ -212,10 +212,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
+		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
 		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 		Request        *ttnpb.SetEndDeviceRequest
 		Device         *ttnpb.EndDevice
 		ErrorAssertion func(*testing.T, error) bool
+		AddCalls       uint64
 		SetByIDCalls   uint64
 	}{
 		{
@@ -230,6 +232,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 						},
 					},
 				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				err := errors.New("SetByIDFunc must not be called")
@@ -279,6 +286,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 						},
 					},
 				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -346,15 +358,29 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				})
 			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
 					"lorawan_phy_version",
 					"lorawan_version",
+					"mac_settings",
 					"mac_settings.adr_margin",
+					"mac_state",
+					"multicast",
+					"queued_application_downlinks",
+					"recent_uplinks",
+					"session",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
@@ -454,16 +480,30 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				})
 			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
 					"lorawan_phy_version",
 					"lorawan_version",
+					"mac_settings",
 					"mac_settings.supports_32_bit_f_cnt",
 					"mac_settings.use_adr",
+					"mac_state",
+					"multicast",
+					"queued_application_downlinks",
+					"recent_uplinks",
+					"session",
 					"session.dev_addr",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.last_f_cnt_up",
@@ -643,6 +683,11 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				})
 			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -659,6 +704,15 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.last_n_f_cnt_down",
 					"session.started_at",
 					"supports_join",
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
+					"mac_state",
+					"multicast",
+					"queued_application_downlinks",
+					"recent_uplinks",
+					"session",
 				})
 
 				dev, sets, err := f(nil)
@@ -822,16 +876,30 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				})
 			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
 					"lorawan_phy_version",
 					"lorawan_version",
+					"mac_settings",
 					"mac_settings.supports_32_bit_f_cnt",
 					"mac_settings.use_adr",
+					"mac_state",
+					"multicast",
+					"queued_application_downlinks",
+					"recent_uplinks",
+					"session",
 					"session.dev_addr",
 					"session.keys.f_nwk_s_int_key.key",
 					"session.last_f_cnt_up",
@@ -1008,14 +1076,26 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				})
 			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
 					"mac_state.desired_parameters.rx2_frequency",
+					"multicast",
 					"queued_application_downlinks",
+					"recent_uplinks",
+					"session",
 				})
 
 				dev, sets, err := f(&ttnpb.EndDevice{
@@ -1023,7 +1103,13 @@ func TestDeviceRegistrySet(t *testing.T) {
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: ttnpb.MACParameters{
+							Rx2Frequency: 868000000,
+						},
 						DesiredParameters: ttnpb.MACParameters{
 							Rx2Frequency: 868000000,
 						},
@@ -1046,7 +1132,23 @@ func TestDeviceRegistrySet(t *testing.T) {
 						},
 					},
 				})
-				return dev, nil
+				return &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					MACState: &ttnpb.MACState{
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: ttnpb.MACParameters{
+							Rx2Frequency: 868000000,
+						},
+						DesiredParameters: ttnpb.MACParameters{
+							Rx2Frequency: 123456789,
+						},
+					},
+				}, nil
 			},
 			Request: &ttnpb.SetEndDeviceRequest{
 				EndDevice: ttnpb.EndDevice{
@@ -1071,7 +1173,13 @@ func TestDeviceRegistrySet(t *testing.T) {
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: ttnpb.MACParameters{
+						Rx2Frequency: 868000000,
+					},
 					DesiredParameters: ttnpb.MACParameters{
 						Rx2Frequency: 123456789,
 					},
@@ -1083,7 +1191,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			var setByIDCalls uint64
+			var addCalls, setByIDCalls uint64
 
 			ns := test.Must(New(
 				componenttest.NewComponent(t, &component.Config{}),
@@ -1095,6 +1203,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 						},
 					},
 					DownlinkTasks: &MockDownlinkTaskQueue{
+						AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, at time.Time, replace bool) error {
+							atomic.AddUint64(&addCalls, 1)
+							return tc.AddFunc(ctx, ids, at, replace)
+						},
 						PopFunc: DownlinkTaskPopBlockFunc,
 					},
 					DeduplicationWindow: 42,
@@ -1118,13 +1230,14 @@ func TestDeviceRegistrySet(t *testing.T) {
 			req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
 
 			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(ctx, req)
-			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(dev, should.BeNil)
 			} else if a.So(err, should.BeNil) {
 				a.So(dev, should.Resemble, tc.Device)
 			}
 			a.So(req, should.Resemble, tc.Request)
+			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
+			a.So(addCalls, should.Equal, tc.AddCalls)
 		})
 	}
 }

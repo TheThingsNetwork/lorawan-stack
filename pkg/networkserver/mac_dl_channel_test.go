@@ -17,7 +17,6 @@ package networkserver
 import (
 	"testing"
 
-	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -25,30 +24,136 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsDLChannelReq(t *testing.T) {
+	type TestCase struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Needs       bool
+	}
+	var tcs []TestCase
+
+	tcs = append(tcs,
+		TestCase{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+	)
+	for _, conf := range []struct {
+		Suffix                               string
+		CurrentParameters, DesiredParameters ttnpb.MACParameters
+		Needs                                bool
+	}{
+		{
+			Suffix: "current([]),desired([])",
+		},
+		{
+			Suffix: "current([123,123,123]),desired([123,123,123])",
+			CurrentParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+				},
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+				},
+			},
+		},
+		{
+			Suffix: "current([123,123,123]),desired([123,123])",
+			CurrentParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+				},
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+				},
+			},
+		},
+		{
+			Suffix: "current([123,123,123]),desired([123,124])",
+			CurrentParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 123},
+				},
+			},
+			DesiredParameters: ttnpb.MACParameters{
+				Channels: []*ttnpb.MACParameters_Channel{
+					{DownlinkFrequency: 123},
+					{DownlinkFrequency: 124},
+				},
+			},
+			Needs: true,
+		},
+	} {
+		ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
+			tcs = append(tcs,
+				TestCase{
+					Name: makeMACName(conf.Suffix),
+					InputDevice: &ttnpb.EndDevice{
+						MACState: &ttnpb.MACState{
+							LoRaWANVersion:    macVersion,
+							CurrentParameters: conf.CurrentParameters,
+							DesiredParameters: conf.DesiredParameters,
+						},
+					},
+					Needs: conf.Needs && macVersion.Compare(ttnpb.MAC_V1_0_2) >= 0,
+				},
+			)
+		})
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsDLChannelReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleDLChannelAns(t *testing.T) {
 	for _, tc := range []struct {
-		Name             string
-		Device, Expected *ttnpb.EndDevice
-		Payload          *ttnpb.MACCommand_DLChannelAns
-		Error            error
-		Events           []events.DefinitionDataClosure
+		Name                        string
+		InputDevice, ExpectedDevice *ttnpb.EndDevice
+		Payload                     *ttnpb.MACCommand_DLChannelAns
+		Error                       error
+		Events                      []events.DefinitionDataClosure
 	}{
 		{
 			Name: "nil payload",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
 			Error: errNoPayload,
 		},
 		{
 			Name: "frequency ack/chanel index ack/no request",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
@@ -65,10 +170,10 @@ func TestHandleDLChannelAns(t *testing.T) {
 		},
 		{
 			Name: "frequency nack/channel index ack/no request",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
@@ -83,7 +188,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		},
 		{
 			Name: "frequency nack/channel index ack/valid request",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
@@ -105,7 +210,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 					},
 				},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
@@ -133,7 +238,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		},
 		{
 			Name: "frequency ack/channel index ack/no channel",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
@@ -143,7 +248,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 					},
 				},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
@@ -167,7 +272,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 		},
 		{
 			Name: "frequency ack/channel index ack/channel exists",
-			Device: &ttnpb.EndDevice{
+			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DLChannelReq{
@@ -189,7 +294,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 					},
 				},
 			},
-			Expected: &ttnpb.EndDevice{
+			ExpectedDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
@@ -221,14 +326,14 @@ func TestHandleDLChannelAns(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
+			dev := CopyEndDevice(tc.InputDevice)
 
 			evs, err := handleDLChannelAns(test.Context(), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
-			a.So(dev, should.Resemble, tc.Expected)
+			a.So(dev, should.Resemble, tc.ExpectedDevice)
 			a.So(evs, should.ResembleEventDefinitionDataClosures, tc.Events)
 		})
 	}

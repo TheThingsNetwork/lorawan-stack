@@ -25,6 +25,59 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsDutyCycleReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Needs       bool
+	}{
+		{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+		{
+			Name: "current(max-duty-cycle:1024),desired(max-duty-cycle:1024)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
+					},
+				},
+			},
+		},
+		{
+			Name: "current(max-duty-cycle:1024),desired(max-duty-cycle:2048)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
+					},
+				},
+			},
+			Needs: true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsDutyCycleReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleDutyCycleAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string

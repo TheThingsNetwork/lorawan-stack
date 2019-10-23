@@ -25,6 +25,104 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsRxParamSetupReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Defaults    ttnpb.MACSettings
+		Needs       bool
+	}{
+		{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+		{
+			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:1,data-rate-index:2,frequency:123)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1DataRateOffset: 1,
+						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2Frequency:      123,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Rx1DataRateOffset: 1,
+						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2Frequency:      123,
+					},
+				},
+			},
+		},
+		{
+			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:1,data-rate-index:3,frequency:123)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1DataRateOffset: 1,
+						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2Frequency:      123,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Rx1DataRateOffset: 1,
+						Rx2DataRateIndex:  ttnpb.DATA_RATE_3,
+						Rx2Frequency:      123,
+					},
+				},
+			},
+			Needs: true,
+		},
+		{
+			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:1,data-rate-index:2,frequency:124)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1DataRateOffset: 1,
+						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2Frequency:      123,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Rx1DataRateOffset: 1,
+						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2Frequency:      124,
+					},
+				},
+			},
+			Needs: true,
+		},
+		{
+			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:2,data-rate-index:2,frequency:123)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1DataRateOffset: 1,
+						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2Frequency:      123,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						Rx1DataRateOffset: 2,
+						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2Frequency:      123,
+					},
+				},
+			},
+			Needs: true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsRxParamSetupReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandleRxParamSetupAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string

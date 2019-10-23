@@ -25,6 +25,79 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func TestNeedsPingSlotChannelReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name        string
+		InputDevice *ttnpb.EndDevice
+		Needs       bool
+	}{
+		{
+			Name:        "no MAC state",
+			InputDevice: &ttnpb.EndDevice{},
+		},
+		{
+			Name: "current(data-rate-index:1,frequency:123),desired(data-rate-index:1,frequency:123)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
+						PingSlotFrequency:     123,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
+						PingSlotFrequency:     123,
+					},
+				},
+			},
+		},
+		{
+			Name: "current(data-rate-index:1,frequency:123),desired(data-rate-index:2,frequency:123)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
+						PingSlotFrequency:     123,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						PingSlotDataRateIndex: ttnpb.DATA_RATE_2,
+						PingSlotFrequency:     123,
+					},
+				},
+			},
+			Needs: true,
+		},
+		{
+			Name: "current(data-rate-index:1,frequency:123),desired(data-rate-index:1,frequency:124)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
+						PingSlotFrequency:     123,
+					},
+					DesiredParameters: ttnpb.MACParameters{
+						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
+						PingSlotFrequency:     124,
+					},
+				},
+			},
+			Needs: true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+			res := needsPingSlotChannelReq(dev)
+			if tc.Needs {
+				a.So(res, should.BeTrue)
+			} else {
+				a.So(res, should.BeFalse)
+			}
+			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
 func TestHandlePingSlotChannelAns(t *testing.T) {
 	for _, tc := range []struct {
 		Name             string

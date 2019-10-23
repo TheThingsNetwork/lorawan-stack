@@ -149,6 +149,7 @@ func makeDeferredMACHandler(dev *ttnpb.EndDevice, f macHandler) macHandler {
 
 type matchedDevice struct {
 	logger log.Interface
+	phy    band.Band
 
 	ChannelIndex             uint8
 	DataRateIndex            ttnpb.DataRateIndex
@@ -234,6 +235,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 			matches = append(matches, device{
 				matchedDevice: matchedDevice{
 					logger:        logger,
+					phy:           phy,
 					DataRateIndex: drIdx,
 					Device:        pendingDev,
 					FCnt:          pld.FCnt,
@@ -313,6 +315,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 			matches = append(matches, device{
 				matchedDevice: matchedDevice{
 					logger:        logger,
+					phy:           phy,
 					DataRateIndex: drIdx,
 					Device:        dev,
 					FCnt:          dev.Session.LastFCntUp,
@@ -349,6 +352,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 						"full_f_cnt_up", pld.FCnt,
 						"transmission", 1,
 					)),
+					phy:           phy,
 					DataRateIndex: drIdx,
 					Device:        dev,
 					FCnt:          pld.FCnt,
@@ -382,6 +386,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 							"f_cnt_reset", true,
 							"full_f_cnt_up", pld.FCnt,
 						)),
+						phy:           phy,
 						DataRateIndex: drIdx,
 						Device:        dev,
 						FCnt:          pld.FCnt,
@@ -413,6 +418,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 		matches = append(matches, device{
 			matchedDevice: matchedDevice{
 				logger:        logger,
+				phy:           phy,
 				DataRateIndex: drIdx,
 				Device:        dev,
 				FCnt:          fCnt,
@@ -717,7 +723,7 @@ func appendRecentUplink(recent []*ttnpb.UplinkMessage, up *ttnpb.UplinkMessage, 
 	return recent
 }
 
-var handleUplinkGetPaths = [...]string{
+var handleDataUplinkGetPaths = [...]string{
 	"frequency_plan_id",
 	"last_dev_status_received_at",
 	"lorawan_phy_version",
@@ -727,6 +733,7 @@ var handleUplinkGetPaths = [...]string{
 	"multicast",
 	"pending_mac_state",
 	"pending_session",
+	"queued_application_downlinks",
 	"recent_downlinks",
 	"recent_uplinks",
 	"session",
@@ -754,7 +761,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	logger.Debug("Match device")
 
 	var addrMatches []*ttnpb.EndDevice
-	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleUplinkGetPaths[:],
+	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleDataUplinkGetPaths[:],
 		func(dev *ttnpb.EndDevice) bool {
 			addrMatches = append(addrMatches, dev)
 			return true
@@ -801,7 +808,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 
 	var handleErr bool
-	stored, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleUplinkGetPaths[:],
+	stored, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
 		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during uplink handling, drop")
@@ -855,6 +862,17 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return err
 	}
 
+	downAt, ok := nextDataDownlinkAt(ctx, stored, matched.phy, ns.defaultMACSettings)
+	if !ok {
+		logger.Debug("No downlink to send or windows expired, avoid adding downlink task after data uplink")
+	} else {
+		downAt = downAt.Add(-nsScheduleWindow)
+		logger.WithField("start_at", downAt).Debug("Add downlink task after data uplink")
+		if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
+			logger.WithError(err).Error("Failed to add downlink task after data uplink")
+		}
+	}
+
 	if matched.NbTrans == 1 {
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
@@ -872,15 +890,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		registerForwardDataUplink(ctx, up)
 	}
 
-	if len(queuedEvents) > 0 {
-		for _, ev := range queuedEvents {
-			events.Publish(ev(ctx, stored.EndDeviceIdentifiers))
-		}
-	}
-
-	startAt := up.ReceivedAt.Add(stored.MACState.CurrentParameters.Rx1Delay.Duration() - nsScheduleWindow)
 	if len(queuedApplicationUplinks) > 0 {
-		doneCh := make(chan struct{})
 		go func() {
 			for _, asUp := range queuedApplicationUplinks {
 				logger.Debug("Send application uplink to Application Server")
@@ -891,22 +901,12 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					logger.Warn("Application Server not found, drop application uplink")
 				}
 			}
-			close(doneCh)
 		}()
-		select {
-		case <-doneCh:
-		case <-time.After(time.Until(startAt)):
+	}
+	if len(queuedEvents) > 0 {
+		for _, ev := range queuedEvents {
+			events.Publish(ev(ctx, stored.EndDeviceIdentifiers))
 		}
-	}
-
-	if up.ReceivedAt.Add(stored.MACState.CurrentParameters.Rx1Delay.Duration() + time.Second).Before(time.Now()) {
-		logger.Warn("Rx2 of uplink is expired, avoid adding downlink task for class A downlink")
-		return nil
-	}
-
-	logger.WithField("start_at", startAt).Debug("Add downlink task for class A downlink")
-	if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, startAt, true); err != nil {
-		logger.WithError(err).Error("Failed to add downlink task for class A downlink")
 	}
 	return nil
 }
@@ -1143,6 +1143,12 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 
+	startAt := up.ReceivedAt.Add(phy.JoinAcceptDelay1 - nsScheduleWindow)
+	logger.WithField("start_at", startAt).Debug("Add downlink task for join-accept")
+	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
+		logger.WithError(err).Error("Failed to add downlink task for join-accept")
+	}
+
 	go func() {
 		logger := logger.WithField(
 			"application_uid", unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers),
@@ -1170,16 +1176,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		}
 	}()
 
-	if up.ReceivedAt.Add(phy.JoinAcceptDelay2).Before(time.Now()) {
-		logger.Warn("Rx2 of join-request is expired, avoid adding downlink task for join-accept")
-		return nil
-	}
-
-	startAt := up.ReceivedAt.Add(phy.JoinAcceptDelay1 - nsScheduleWindow)
-	logger.WithField("start_at", startAt).Debug("Add downlink task for join-accept")
-	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
-		logger.WithError(err).Error("Failed to add downlink task for join-accept")
-	}
 	return nil
 }
 
@@ -1204,7 +1200,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		fmt.Sprintf("ns:uplink:%s", events.NewCorrelationID()),
 	)...)
 	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
-	up.ReceivedAt = time.Now().UTC()
+	up.ReceivedAt = timeNow().UTC()
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
