@@ -27,6 +27,13 @@ class Row extends React.Component {
     onClick(id)
   }
 
+  onKeyDown(evt) {
+    const { id, onClick } = this.props
+    if (evt.key === 'Enter') {
+      onClick(id)
+    }
+  }
+
   get clickListener() {
     const { body, clickable } = this.props
 
@@ -52,7 +59,12 @@ class Row extends React.Component {
     })
 
     return (
-      <tr className={rowClassNames} onClick={this.clickListener} tabIndex={this.tabIndex}>
+      <tr
+        className={rowClassNames}
+        onKeyDown={this.onKeyDown}
+        onClick={this.clickListener}
+        tabIndex={this.tabIndex}
+      >
         {children}
       </tr>
     )
