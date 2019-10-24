@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.2.3] - 2019-10-24
+
+### Added
+
 - Emails when the state of a user or OAuth client changes.
 - Option to generate claim authentication codes for devices automatically.
 - User invitations can now be sent and redeemed.
@@ -24,20 +38,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rename "bulk device creation" to "import devices"
+- Rename "bulk device creation" to "import devices".
 - Move device import button to the end device tables (and adapt routing accordingly).
 - Improve downlink performance.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
 - Fix issues with device bulk creation in Join Server.
 - Fix device import not setting component hosts automatically.
-
-### Security
+- Fix NewChannelReq scheduling condition.
+- Fix publishing events for generated MAC commands.
+- Fix saving changes to device general settings in the Console.
 
 ## [3.2.2] - 2019-10-14
 
@@ -353,7 +364,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.2...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.3...HEAD
+[3.2.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.2...v3.2.3
 [3.2.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.1...v3.2.2
 [3.2.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.1.2...v3.2.0
