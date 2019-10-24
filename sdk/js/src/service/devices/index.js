@@ -289,8 +289,9 @@ class Devices {
 
   async listTemplateFormats() {
     const result = await this._api.EndDeviceTemplateConverter.ListFormats()
+    const payload = Marshaler.payloadSingleResponse(result)
 
-    return Marshaler.payloadListResponse('formats', result)
+    return payload.formats
   }
 
   convertTemplate(formatId, data) {
