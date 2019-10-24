@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import originalPropTypes from 'prop-types'
+import { components } from '../constants/components'
 
 const PropTypes = { ...originalPropTypes }
 
@@ -200,5 +201,8 @@ PropTypes.apiKey = PropTypes.shape({
 
 PropTypes.right = PropTypes.string
 PropTypes.rights = PropTypes.arrayOf(PropTypes.right)
+
+PropTypes.component = PropTypes.oneOf(components)
+PropTypes.components = PropTypes.arrayOf(PropTypes.component)
 
 export default PropTypes

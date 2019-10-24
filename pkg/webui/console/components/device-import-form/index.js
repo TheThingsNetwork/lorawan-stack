@@ -26,6 +26,7 @@ import SubmitButton from '../../../components/submit-button'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
+import { dict as componentDict } from '../../../constants/components'
 
 import style from './device-import-form.styl'
 
@@ -37,15 +38,24 @@ const m = defineMessages({
   selectAFile: 'Please select a template file',
   fileInfoPlaceholder: 'Please select a template format',
   claimAuthCode: 'Set claim authentication code',
+  targetedComponents: 'Targeted Components',
 })
 
 const validationSchema = Yup.object({
   format_id: Yup.string().required(sharedMessages.validateRequired),
   data: Yup.string().required(m.selectAFile),
+  set_claim_auth_code: Yup.boolean(),
+  components: Yup.object({
+    is: Yup.boolean().required(),
+    as: Yup.boolean(),
+    js: Yup.boolean(),
+    ns: Yup.boolean(),
+  }).required(sharedMessages.validateRequired),
 })
 
 export default class DeviceBulkCreateForm extends Component {
   static propTypes = {
+    components: PropTypes.components.isRequired,
     initialValues: PropTypes.shape({
       format_id: PropTypes.string,
       data: PropTypes.string,
@@ -73,7 +83,7 @@ export default class DeviceBulkCreateForm extends Component {
   }
 
   render() {
-    const { initialValues, onSubmit } = this.props
+    const { initialValues, onSubmit, components } = this.props
     const { allowedFileExtensions, formatSelected, formatDescription } = this.state
     return (
       <Form
@@ -96,6 +106,23 @@ export default class DeviceBulkCreateForm extends Component {
           name="data"
           required
         />
+        <Form.Field
+          component={Checkbox.Group}
+          name="components"
+          title={m.targetedComponents}
+          required
+          horizontal={false}
+          disabled={!formatSelected}
+        >
+          {components.map(component => (
+            <Checkbox
+              disabled={component === 'is'}
+              key={component}
+              name={component}
+              label={componentDict[component]}
+            />
+          ))}
+        </Form.Field>
         <Form.Field
           disabled={!formatSelected}
           title={m.claimAuthCode}

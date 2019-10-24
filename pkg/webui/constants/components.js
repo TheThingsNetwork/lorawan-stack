@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.group
-  display: flex
-  flex-direction: row
-  flex-wrap: wrap
-
-  .group-checkbox:not(:last-child)
-    margin-right: $cs.m
-
-  &.horizontal
-    flex-direction: column
-
-    .group-checkbox:not(:last-child)
-      margin-bottom: $cs.s
+export const components = ['is', 'as', 'ns', 'gs', 'js', 'edtc']
+export const dict = {
+  is: 'Identity Server',
+  as: 'Application Server',
+  ns: 'Network Server',
+  gs: 'Gateway Server',
+  js: 'Join Server',
+  edtc: 'End Device Template Converter',
+}
