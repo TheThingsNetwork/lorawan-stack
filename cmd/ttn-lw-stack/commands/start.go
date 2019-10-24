@@ -48,7 +48,7 @@ import (
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
 
 var startCommand = &cobra.Command{
-	Use:   "start [is|gs|ns|as|js|console|gcs|dtc|all]... [flags]",
+	Use:   "start [is|gs|ns|as|js|console|gcs|dtc|qrg|all]... [flags]",
 	Short: "Start The Things Stack",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var start struct {
