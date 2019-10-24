@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.58.3" />
+  <title>Configuration | The Things Stack for LoRaWAN</title>
+  <link rel="canonical" href="https://thethingsstack.io/v3.2.3/guides/getting-started/configuration/" />
+  <link rel="icon" type="image/png" href="/v3.2.3/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.3/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Configuration">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Configuration">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.3/guides/getting-started/configuration/">
+  <meta name="twitter:title" content="Configuration" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.3/">
+        <img src="/v3.2.3/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.3/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.3/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.3/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.3/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.3/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Getting Started</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.3/guides/getting-started/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.3/guides/getting-started/installation/" class="">Installation</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.3/guides/getting-started/certificates/" class="">Certificates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.3/guides/getting-started/configuration/" class="is-active">Configuration</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.3/guides/getting-started/running-the-stack/" class="">Running The Things Stack</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.3/guides/getting-started/console/" class="">Console</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.3/guides/getting-started/cli/" class="">Command-line Interface</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.3/guides/getting-started/mqtt/" class="">MQTT Server</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.3/guides/getting-started/webhooks/" class="">HTTP Webhooks</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Configuration</h1>
+
+<div class="content">
+
+<p>The Things Stack can be started for development without passing any configuration. However, there are a number of things you need to configure for a production deployment. In this guide we&rsquo;ll set environment variables in the <code>docker-compose.yml</code> file to configure The Things Stack as a private deployment on <code>thethings.example.com</code>.</p>
+
+<h2 id="databases">Databases</h2>
+
+<p>We need to configure an SQL database, in this guide we&rsquo;ll use a single instance of <a href="https://www.cockroachlabs.com/">CockroachDB</a>. Make sure to find a recent tag of the <a href="https://hub.docker.com/r/cockroachdb/cockroach/tags">cockroachdb/cockroach image on Docker Hub</a> and update it in the <code>docker-compose.yml</code> file. Make sure that the <code>volumes</code> are set up correctly so that the database is persisted on your server&rsquo;s disk.</p>
+
+<p>The simplest configuration for CockroachDB will look like this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">cockroach<span class="p">:</span><span class="w">
+</span><span class="w">  </span>image<span class="p">:</span><span class="w"> </span><span class="s1">&#39;cockroachdb/cockroach:&lt;the tag&gt;&#39;</span><span class="w">
+</span><span class="w">  </span>command<span class="p">:</span><span class="w"> </span><span class="s1">&#39;start --http-port 26256 --insecure&#39;</span><span class="w">
+</span><span class="w">  </span>restart<span class="p">:</span><span class="w"> </span><span class="s1">&#39;unless-stopped&#39;</span><span class="w">
+</span><span class="w">  </span>volumes<span class="p">:</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;./data/cockroach:/cockroach/cockroach-data&#39;</span></code></pre></div>
+<p>Read the CockroachDB documentation for setting up a highly available cluster.</p>
+
+<p>We also need to configure <a href="https://redis.io/">Redis</a>, in this guide we&rsquo;ll use a single instance of Redis. Just as with the SQL database, find a recent tag of the <a href="https://hub.docker.com/_/redis?tab=tags">redis image on Docker Hub</a> and update it in the <code>docker-compose.yml</code> file. Again, make sure that the <code>volumes</code> are set up correctly so that the datastore is persisted on your server&rsquo;s disk.</p>
+
+<p>The simplest configuration for Redis will look like this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">redis<span class="p">:</span><span class="w">
+</span><span class="w">  </span>image<span class="p">:</span><span class="w"> </span><span class="s1">&#39;redis:&lt;the tag&gt;&#39;</span><span class="w">
+</span><span class="w">  </span>command<span class="p">:</span><span class="w"> </span><span class="s1">&#39;redis-server --appendonly yes&#39;</span><span class="w">
+</span><span class="w">  </span>restart<span class="p">:</span><span class="w"> </span><span class="s1">&#39;unless-stopped&#39;</span><span class="w">
+</span><span class="w">  </span>volumes<span class="p">:</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;./data/redis:/data&#39;</span></code></pre></div>
+<p>Read the Redis documentation for setting up a highly available cluster.</p>
+
+<h2 id="the-things-stack">The Things Stack</h2>
+
+<p>Before we go into the details of The Things Stack&rsquo;s configuration, we&rsquo;ll take a look at the basics. Below you see part the configuration of the <code>stack</code> service in the <code>docker-compose.yml</code> file. As with the databases, you need to find a recent tag of the <a href="https://hub.docker.com/r/thethingsnetwork/lorawan-stack/tags">thethingsnetwork/lorawan-stack image on Docker Hub</a> and update the <code>docker-compose.yml</code> file with that. We tell Docker Compose to start the container with <code>ttn-lw-stack start</code>, we indicate that it depends on CockroachDB and Redis, and we configure a volume for storing blobs (such as profile pictures).</p>
+
+<p>The <code>ports</code> section exposes The Things Stack&rsquo;s ports to the world. Port <code>80</code> and <code>443</code> are mapped to the internal HTTP and HTTPS ports. The other ports have a direct mapping. If you don&rsquo;t need support for gateways and applications that don&rsquo;t support TLS, you can remove ports starting with <code>188</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">stack<span class="p">:</span><span class="w">
+</span><span class="w">  </span>image<span class="p">:</span><span class="w"> </span><span class="s1">&#39;thethingsnetwork/lorawan-stack:&lt;the tag&gt;&#39;</span><span class="w">
+</span><span class="w">  </span>entrypoint<span class="p">:</span><span class="w"> </span><span class="s1">&#39;ttn-lw-stack&#39;</span><span class="w">
+</span><span class="w">  </span>command<span class="p">:</span><span class="w"> </span><span class="s1">&#39;start&#39;</span><span class="w">
+</span><span class="w">  </span>restart<span class="p">:</span><span class="w"> </span><span class="s1">&#39;unless-stopped&#39;</span><span class="w">
+</span><span class="w">  </span>depends_on<span class="p">:</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;cockroach&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;redis&#39;</span><span class="w">
+</span><span class="w">  </span>volumes<span class="p">:</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;./acme:/var/lib/acme&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;./data/blob:/srv/ttn-lorawan/public/blob&#39;</span><span class="w">
+</span><span class="w">  </span>ports<span class="p">:</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;80:1885&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;443:8885&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;1882:1882&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;8882:8882&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;1883:1883&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;8883:8883&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;1884:1884&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;8884:8884&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;1887:1887&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;8887:8887&#39;</span><span class="w">
+</span><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;1700:1700/udp&#39;</span><span class="w">
+</span><span class="w">  </span>env_file<span class="p">:</span><span class="w"> </span><span class="s1">&#39;.env&#39;</span></code></pre></div>
+<p>Next, we&rsquo;ll have a look at the configuration options for your private deployment. We&rsquo;ll set these options in the <code>.env</code> file that is referenced by the <code>env_file</code> option of the <code>stack</code> service in <code>docker-compose.yml</code>.</p>
+
+<p>First we&rsquo;ll make sure that The Things Stack uses the correct databases.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TTN_LW_IS_DATABASE_URI</span><span class="o">=</span><span class="s2">&#34;postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable&#34;</span>
+<span class="nv">TTN_LW_REDIS_ADDRESS</span><span class="o">=</span><span class="s2">&#34;redis:6379&#34;</span></code></pre></div>
+<p>Then we&rsquo;ll configure TLS with Let&rsquo;s Encrypt. Since we&rsquo;re deploying The Things Stack on <code>thethings.example.com</code>, we configure it to only request certificates for that host, and to also use it as the default host.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TTN_LW_TLS_SOURCE</span><span class="o">=</span><span class="s2">&#34;acme&#34;</span>
+<span class="nv">TTN_LW_TLS_ACME_DIR</span><span class="o">=</span><span class="s2">&#34;/var/lib/acme&#34;</span>
+<span class="nv">TTN_LW_TLS_ACME_EMAIL</span><span class="o">=</span><span class="s2">&#34;your@email.com&#34;</span>
+<span class="nv">TTN_LW_TLS_ACME_HOSTS</span><span class="o">=</span><span class="s2">&#34;thethings.example.com&#34;</span>
+<span class="nv">TTN_LW_TLS_ACME_DEFAULT_HOST</span><span class="o">=</span><span class="s2">&#34;thethings.example.com&#34;</span></code></pre></div>
+<p>Next, we&rsquo;ll configure the HTTP server with keys for encrypting and verifying cookies, and with passwords for endpoints that you may want to keep for internal use.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TTN_LW_HTTP_COOKIE_HASH_KEY</span><span class="o">=</span>...  <span class="c1"># generate 64 bytes (openssl rand -hex 64)</span>
+<span class="nv">TTN_LW_HTTP_COOKIE_BLOCK_KEY</span><span class="o">=</span>... <span class="c1"># generate 32 bytes (openssl rand -hex 32)</span>
+<span class="nv">TTN_LW_HTTP_METRICS_PASSWORD</span><span class="o">=</span>... <span class="c1"># choose a password</span>
+<span class="nv">TTN_LW_HTTP_PPROF_PASSWORD</span><span class="o">=</span>...   <span class="c1"># choose a password</span></code></pre></div>
+<p>The Things Stack sends emails to users, so we need to configure how those are sent.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TTN_LW_IS_EMAIL_SENDER_NAME</span><span class="o">=</span><span class="s2">&#34;The Things Stack&#34;</span>
+<span class="nv">TTN_LW_IS_EMAIL_SENDER_ADDRESS</span><span class="o">=</span><span class="s2">&#34;noreply@thethings.example.com&#34;</span>
+<span class="nv">TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/console&#34;</span>
+<span class="nv">TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/oauth&#34;</span></code></pre></div>
+<p>You can either use Sendgrid or an SMTP server. If you don&rsquo;t set up an email provider, The Things Stack will print emails to the server log.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TTN_LW_IS_EMAIL_PROVIDER</span><span class="o">=</span><span class="s2">&#34;sendgrid&#34;</span>
+<span class="nv">TTN_LW_IS_EMAIL_SENDGRID_API_KEY</span><span class="o">=</span>... <span class="c1"># enter Sendgrid API key</span></code></pre></div>
+<p>or</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TTN_LW_IS_EMAIL_PROVIDER</span><span class="o">=</span><span class="s2">&#34;smtp&#34;</span>
+<span class="nv">TTN_LW_IS_EMAIL_SMTP_ADDRESS</span><span class="o">=</span>...  <span class="c1"># enter mail server address</span>
+<span class="nv">TTN_LW_IS_EMAIL_SMTP_USERNAME</span><span class="o">=</span>... <span class="c1"># enter username</span>
+<span class="nv">TTN_LW_IS_EMAIL_SMTP_PASSWORD</span><span class="o">=</span>... <span class="c1"># enter password</span></code></pre></div>
+<p>Finally, we need to configure the Web UI to use <code>thethings.example.com</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TTN_LW_IS_OAUTH_UI_CANONICAL_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/oauth&#34;</span>
+<span class="nv">TTN_LW_IS_OAUTH_UI_IS_BASE_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/api/v3&#34;</span>
+
+<span class="nv">TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/oauth/authorize&#34;</span>
+<span class="nv">TTN_LW_CONSOLE_OAUTH_TOKEN_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/oauth/token&#34;</span>
+
+<span class="nv">TTN_LW_CONSOLE_UI_CANONICAL_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/console&#34;</span>
+<span class="nv">TTN_LW_CONSOLE_UI_AS_BASE_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/api/v3&#34;</span>
+<span class="nv">TTN_LW_CONSOLE_UI_GS_BASE_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/api/v3&#34;</span>
+<span class="nv">TTN_LW_CONSOLE_UI_IS_BASE_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/api/v3&#34;</span>
+<span class="nv">TTN_LW_CONSOLE_UI_JS_BASE_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/api/v3&#34;</span>
+<span class="nv">TTN_LW_CONSOLE_UI_NS_BASE_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/api/v3&#34;</span>
+
+<span class="nv">TTN_LW_CONSOLE_OAUTH_CLIENT_ID</span><span class="o">=</span><span class="s2">&#34;console&#34;</span>
+<span class="nv">TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET</span><span class="o">=</span>... <span class="c1"># choose or generate a secret</span></code></pre></div>
+<p>You will need the <code>TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET</code> again in a later step.</p>
+
+<h2 id="command-line-interface">Command-line interface</h2>
+
+<p>The command-line interface is configured to connect to <code>localhost</code> by default. In order to make it connect to <code>thethings.example.com</code>, you need to configure it with a configuration file. The recommended way to configure the CLI is with a <code>.ttn-lw-cli.yml</code> in your <code>$XDG_CONFIG_HOME</code> or <code>$HOME</code> directory. You can also put the config file in a different location, and pass it to the CLI as <code>-c path/to/config.yml</code>. Your config file should look like this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">oauth-server-address<span class="p">:</span><span class="w"> </span><span class="s1">&#39;https://thethings.example.com/oauth&#39;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span>identity-server-grpc-address<span class="p">:</span><span class="w"> </span><span class="s1">&#39;thethings.example.com:8884&#39;</span><span class="w">
+</span><span class="w"></span>gateway-server-grpc-address<span class="p">:</span><span class="w"> </span><span class="s1">&#39;thethings.example.com:8884&#39;</span><span class="w">
+</span><span class="w"></span>network-server-grpc-address<span class="p">:</span><span class="w"> </span><span class="s1">&#39;thethings.example.com:8884&#39;</span><span class="w">
+</span><span class="w"></span>application-server-grpc-address<span class="p">:</span><span class="w"> </span><span class="s1">&#39;thethings.example.com:8884&#39;</span><span class="w">
+</span><span class="w"></span>join-server-grpc-address<span class="p">:</span><span class="w"> </span><span class="s1">&#39;thethings.example.com:8884&#39;</span><span class="w">
+</span><span class="w"></span>device-template-converter-grpc-address<span class="p">:</span><span class="w"> </span><span class="s1">&#39;thethings.example.com:8884&#39;</span></code></pre></div></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.3/guides/getting-started/certificates/">← Certificates</a>
+<a class="button is-pulled-right" href="/v3.2.3/guides/getting-started/running-the-stack/">Running The Things Stack →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.3/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.3/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.3/components/">Components</a></p>
+        <p><a class="" href="/v3.2.3/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/234b9384e22fc18a7bb09851db4a34bd760ccb5a">
+      doc: Make code blocks consistent
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/configuration.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.3/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

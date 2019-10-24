@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.58.3" />
+  <title>Class C and Multicast | The Things Stack for LoRaWAN</title>
+  <link rel="canonical" href="https://thethingsstack.io/v3.2.3/guides/class-c-multicast/" />
+  <link rel="icon" type="image/png" href="/v3.2.3/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.3/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Class C and Multicast">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Class C and Multicast">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.3/guides/class-c-multicast/">
+  <meta name="twitter:title" content="Class C and Multicast" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.3/">
+        <img src="/v3.2.3/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.3/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.3/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.3/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.3/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.3/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Class C and Multicast</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.3/guides/class-c-multicast/" class="is-active">Overview</a>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Class C and Multicast</h1>
+
+<div class="content"><p>Class C end devices continuously listen for downlink messages. This allows applications to send messages to devices at any time, instead of having to wait for a Class A uplink. When combined with multicast groups, this allows applications to send immediate downlinks to many devices at the same time.</p>
+
+<p>This guide shows how to enable or disable Class C for an and device, and how to work with multicast groups.</p>
+
+<h2 id="enabling-and-disabling-class-c">Enabling and Disabling Class C</h2>
+
+<p>In order to send Class C downlink messages to a single device, enable Class C support for the end device when creating or updating it with the <code>--supports-class-c</code> flag.</p>
+
+<p>For example, when enabling Class C for an existing device:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-devices update app1 dev1 --supports-class-c</code></pre></div>
+<p>This will enable the Class C downlink scheduling of the device. That&rsquo;s it! Downlink messages are now scheduled as soon as possible.</p>
+
+<p>To disable Class C scheduling, reset with <code>--supports-class-c=false</code>.</p>
+
+<blockquote>
+<p>Note: Class C downlink scheduling starts when the end device confirms the session. This means that the device should send an uplink message after receiving the join-accept in order to enable Class C downlink scheduling.</p>
+</blockquote>
+
+<h2 id="class-c-message-settings">Class C message settings</h2>
+
+<p>The Things Stack supports optional settings for Class C downlink messages: the downlink path and the time to send the message.</p>
+
+<p>The downlink path is defined by one or more gateways IDs. The Network Server and Gateway Server schedules only on the specified gateways in the specified order. This is useful for multicast (where no downlink path is known because there is no uplink). A scheduling attempt on can fail when the gateway is not connected, if there is a scheduling conflict or if duty-cycle regulations prohibit transmission. See the <a href="#example">Example</a> below.</p>
+
+<p>The time to transmit is an absolute timestamp in ISO 8601 format to send the message. This requires gateways either with GPS lock, or gateways that use a protocol that provide round-trip times (RTT). See the <a href="#example">Example</a> below.</p>
+
+<h2 id="multicast-group">Multicast group</h2>
+
+<p>It is also possible to create a multicast group to send a Class C downlink message to a group of end devices. A multicast group is a virtual ABP device (i.e. shared session keys), does not support uplink, confirmed downlink nor MAC commands.</p>
+
+<p>When creating a device, you can specify in the Console and CLI whether it&rsquo;s a multicast group.</p>
+
+<p><details><summary>Show CLI example</summary></p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-devices create app1 mc1 <span class="se">\
+</span><span class="se"></span>  --frequency-plan-id EU_863_870 <span class="se">\
+</span><span class="se"></span>  --lorawan-version <span class="m">1</span>.0.3 <span class="se">\
+</span><span class="se"></span>  --lorawan-phy-version <span class="m">1</span>.0.3-b <span class="se">\
+</span><span class="se"></span>  --session.dev-addr 00E4304D <span class="se">\
+</span><span class="se"></span>  --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA <span class="se">\
+</span><span class="se"></span>  --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255 <span class="se">\
+</span><span class="se"></span>  --multicast</code></pre></div>
+<p></details></p>
+
+<blockquote>
+<p>Note: A multicast group cannot be converted to a normal unicast device or the other way around.</p>
+
+<p>Note: Since multicast does not support uplink, the Network Server does not know a downlink path. Therefore, you need to specify a downlink path when scheduling downlink message.</p>
+</blockquote>
+
+<h2 id="example">Example</h2>
+
+<div class="notification is-primary">
+  <h3 class="has-text-light">Command-line interface only</h3>
+  <p>The instructions below use the command-line interface (CLI).</p>
+  <div class="buttons">
+    <a class="button is-primary is-inverted is-outlined" href="https://thethingsstack.io/v3.2.3/guides/getting-started/installation/">Learn how to install the CLI</a>
+  </div>
+</div>
+
+
+<p>First, create a multicast group:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-devices create app1 mc1 <span class="se">\
+</span><span class="se"></span>  --frequency-plan-id EU_863_870 <span class="se">\
+</span><span class="se"></span>  --lorawan-version <span class="m">1</span>.0.3 <span class="se">\
+</span><span class="se"></span>  --lorawan-phy-version <span class="m">1</span>.0.3-b <span class="se">\
+</span><span class="se"></span>  --session.dev-addr 00E4304D <span class="se">\
+</span><span class="se"></span>  --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA <span class="se">\
+</span><span class="se"></span>  --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255 <span class="se">\
+</span><span class="se"></span>  --multicast</code></pre></div>
+<p>Then, schedule the following message to the <a href="/v3.2.3/guides/getting-started/mqtt/">MQTT server</a> or <a href="/v3.2.3/guides/getting-started/webhooks/">HTTP webhooks</a>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;downlinks&#34;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&#34;frm_payload&#34;</span><span class="p">:</span> <span class="s2">&#34;vu8=&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;f_port&#34;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+    <span class="nt">&#34;priority&#34;</span><span class="p">:</span> <span class="s2">&#34;NORMAL&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;class_b_c&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;gateways&#34;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;gateway_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;gateway_id&#34;</span><span class="p">:</span> <span class="s2">&#34;gtw1&#34;</span>
+          <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;gateway_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;gateway_id&#34;</span><span class="p">:</span> <span class="s2">&#34;gtw2&#34;</span>
+          <span class="p">},</span>
+        <span class="p">}</span>
+      <span class="p">],</span>
+      <span class="nt">&#34;absolute_time&#34;</span><span class="p">:</span> <span class="s2">&#34;2019-07-23T13:05:00Z&#34;</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span></code></pre></div></div>
+
+
+<div class="is-clearfix">
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.3/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.3/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.3/components/">Components</a></p>
+        <p><a class="" href="/v3.2.3/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 11 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/2ef55b78ce00baf704eff59c9604f970295a7c1d">
+      doc: Fix content of summaries
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/class-c-multicast/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.3/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
