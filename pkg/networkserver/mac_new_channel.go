@@ -28,7 +28,7 @@ var (
 	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")()
 )
 
-func needsNewChannelReq(dev *ttnpb.EndDevice) bool {
+func deviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
 	if dev.MACState == nil {
 		return false
 	}
@@ -44,7 +44,7 @@ func needsNewChannelReq(dev *ttnpb.EndDevice) bool {
 }
 
 func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if !needsLinkADRReq(dev) {
+	if !deviceNeedsNewChannelReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
@@ -64,7 +64,7 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 				continue
 			}
 			if nDown < 1 || nUp < 1 {
-				return cmds, uint16(len(cmds)), nil, false
+				return cmds, uint16(len(cmds)), evs, false
 			}
 			nDown--
 			nUp--
@@ -84,7 +84,7 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 			cmds = append(cmds, req.MACCommand())
 			evs = append(evs, evtEnqueueNewChannelRequest.BindData(req))
 		}
-		return cmds, uint16(len(cmds)), nil, true
+		return cmds, uint16(len(cmds)), evs, true
 	}, dev.MACState.PendingRequests...)
 	return st
 }

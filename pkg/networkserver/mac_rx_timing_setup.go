@@ -27,13 +27,13 @@ var (
 	evtReceiveRxTimingSetupAnswer  = defineReceiveMACAnswerEvent("rx_timing_setup", "Rx timing setup")()
 )
 
-func needsRxTimingSetupReq(dev *ttnpb.EndDevice) bool {
+func deviceNeedsRxTimingSetupReq(dev *ttnpb.EndDevice) bool {
 	return dev.MACState != nil &&
 		dev.MACState.DesiredParameters.Rx1Delay != dev.MACState.CurrentParameters.Rx1Delay
 }
 
 func enqueueRxTimingSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if !needsRxTimingSetupReq(dev) {
+	if !deviceNeedsRxTimingSetupReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

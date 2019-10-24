@@ -28,7 +28,7 @@ var (
 	evtReceiveRxParamSetupReject  = defineReceiveMACRejectEvent("rx_param_setup", "Rx parameter setup")()
 )
 
-func needsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
+func deviceNeedsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
 	return dev.MACState != nil &&
 		(dev.MACState.DesiredParameters.Rx1DataRateOffset != dev.MACState.CurrentParameters.Rx1DataRateOffset ||
 			dev.MACState.DesiredParameters.Rx2DataRateIndex != dev.MACState.CurrentParameters.Rx2DataRateIndex ||
@@ -36,7 +36,7 @@ func needsRxParamSetupReq(dev *ttnpb.EndDevice) bool {
 }
 
 func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if !needsRxParamSetupReq(dev) {
+	if !deviceNeedsRxParamSetupReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

@@ -218,7 +218,7 @@ func TestNeedsNewChannelReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := needsNewChannelReq(dev)
+			res := deviceNeedsNewChannelReq(dev)
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {

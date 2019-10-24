@@ -28,14 +28,14 @@ var (
 	evtReceiveBeaconFreqAccept  = defineReceiveMACAcceptEvent("beacon_freq", "beacon frequency change")()
 )
 
-func needsBeaconFreqReq(dev *ttnpb.EndDevice) bool {
+func deviceNeedsBeaconFreqReq(dev *ttnpb.EndDevice) bool {
 	return dev.MACState != nil &&
 		dev.MACState.DeviceClass == ttnpb.CLASS_B &&
 		dev.MACState.DesiredParameters.BeaconFrequency != dev.MACState.CurrentParameters.BeaconFrequency
 }
 
 func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16) macCommandEnqueueState {
-	if !needsBeaconFreqReq(dev) {
+	if !deviceNeedsBeaconFreqReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,

@@ -58,7 +58,7 @@ func TestNeedsBeaconTimingReq(t *testing.T) {
 			a := assertions.New(t)
 
 			dev := CopyEndDevice(tc.InputDevice)
-			res := needsBeaconTimingReq(dev)
+			res := deviceNeedsBeaconTimingReq(dev)
 			if tc.Needs {
 				a.So(res, should.BeTrue)
 			} else {

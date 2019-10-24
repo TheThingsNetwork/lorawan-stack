@@ -93,23 +93,23 @@ func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
 	return 0, errUplinkChannelNotFound.WithAttributes("frequency", freq)
 }
 
-func needsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
+func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
 	switch {
-	case needsADRParamSetupReq(dev, phy),
-		needsBeaconFreqReq(dev),
-		needsBeaconTimingReq(dev),
-		needsDLChannelReq(dev),
-		needsDutyCycleReq(dev),
-		needsLinkADRReq(dev),
-		needsNewChannelReq(dev),
-		needsPingSlotChannelReq(dev),
-		needsRejoinParamSetupReq(dev),
-		needsRxParamSetupReq(dev),
-		needsRxTimingSetupReq(dev),
-		needsTxParamSetupReq(dev, phy):
+	case deviceNeedsADRParamSetupReq(dev, phy),
+		deviceNeedsBeaconFreqReq(dev),
+		deviceNeedsBeaconTimingReq(dev),
+		deviceNeedsDLChannelReq(dev),
+		deviceNeedsDutyCycleReq(dev),
+		deviceNeedsLinkADRReq(dev),
+		deviceNeedsNewChannelReq(dev),
+		deviceNeedsPingSlotChannelReq(dev),
+		deviceNeedsRejoinParamSetupReq(dev),
+		deviceNeedsRxParamSetupReq(dev),
+		deviceNeedsRxTimingSetupReq(dev),
+		deviceNeedsTxParamSetupReq(dev, phy):
 		return true
 	}
-	statusAt, ok := needsDevStatusReqAt(dev, defaults)
+	statusAt, ok := deviceNeedsDevStatusReqAt(dev, defaults)
 	return ok && t.After(statusAt)
 }
 
@@ -132,7 +132,7 @@ func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time
 	if len(dev.QueuedApplicationDownlinks) > 0 && dev.QueuedApplicationDownlinks[0].GetClassBC() == nil {
 		return true
 	}
-	return needsMACRequestsAt(ctx, dev, t, phy, defaults)
+	return deviceNeedsMACRequestsAt(ctx, dev, t, phy, defaults)
 }
 
 func nextClassADataDownlinkSlot(dev *ttnpb.EndDevice) (time.Time, bool) {
@@ -187,7 +187,7 @@ func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band
 		if confirmedAt.Before(now) {
 			confirmedAt = now
 		}
-		if needsMACRequestsAt(ctx, dev, confirmedAt, phy, defaults) {
+		if deviceNeedsMACRequestsAt(ctx, dev, confirmedAt, phy, defaults) {
 			return confirmedAt, true
 		}
 		var absTime time.Time
@@ -199,14 +199,14 @@ func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band
 			absTime = classBC.AbsoluteTime.UTC()
 		}
 
-		statusAt, ok := needsDevStatusReqAt(dev, defaults)
+		statusAt, ok := deviceNeedsDevStatusReqAt(dev, defaults)
 		if !ok {
 			if absTime.IsZero() {
 				return time.Time{}, false
 			}
 			return absTime.Add(-gsScheduleWindow), true
 		}
-		// NOTE: statusAt is after confirmedAt, otherwise needsMACRequestsAt call above would evaluate to true.
+		// NOTE: statusAt is after confirmedAt, otherwise deviceNeedsMACRequestsAt call above would evaluate to true.
 		if statusAt.After(absTime) {
 			return absTime.Add(-gsScheduleWindow), true
 		}

@@ -30,7 +30,7 @@ var (
 	evtReceiveTxParamSetupAnswer  = defineReceiveMACAnswerEvent("tx_param_setup", "Tx parameter setup")()
 )
 
-func needsTxParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
+func deviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
 	if !phy.TxParamSetupReqSupport || dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
 		return false
 	}
@@ -51,7 +51,7 @@ func needsTxParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
 }
 
 func enqueueTxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy band.Band) macCommandEnqueueState {
-	if !needsTxParamSetupReq(dev, phy) {
+	if !deviceNeedsTxParamSetupReq(dev, phy) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
