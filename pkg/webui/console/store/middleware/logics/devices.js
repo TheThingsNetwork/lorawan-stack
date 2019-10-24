@@ -34,7 +34,7 @@ const getDevicesListLogic = createRequestLogic({
 const getDeviceTemplateFormatsLogic = createRequestLogic({
   type: deviceTemplateFormats.GET_DEVICE_TEMPLATE_FORMATS,
   async process() {
-    const { formats } = await api.deviceTemplates.listFormats()
+    const formats = await api.deviceTemplates.listFormats()
     return formats
   },
 })
