@@ -118,6 +118,15 @@ services:
       # - TTN_LW_AS_MQTT_PUBLIC_ADDRESS=thethings.example.com:1883
       # - TTN_LW_AS_MQTT_PUBLIC_TLS_ADDRESS=thethings.example.com:8883
 
+      # If Application Server enabled, Application Server interoperability configuration:
+      # If interoperability configuration repository is a directory on OS FS:
+      # - TTN_LW_AS_INTEROP_DIRECTORY=/path/to/interop/repository
+      # If interoperability configuration repository is a URL:
+      # - TTN_LW_AS_INTEROP_URL=https://thethings.example.com
+      # If interoperability configuration repository is a blob:
+      # - TTN_LW_AS_INTEROP_BLOB_PATH=/path/to/interop/directory
+      # - TTN_LW_AS_INTEROP_BLOB_BUCKET=enter bucket name
+
       # If Gateway Server enabled, defaults for "thethings.example.com":
       # - TTN_LW_GS_MQTT_PUBLIC_ADDRESS=thethings.example.com:1883
       # - TTN_LW_GS_MQTT_PUBLIC_TLS_ADDRESS=thethings.example.com:8883
@@ -127,6 +136,15 @@ services:
       # If Gateway Configuration Server enabled, defaults for "thethings.example.com":
       # - TTN_LW_GCS_BASIC_STATION_DEFAULT_LNS_URI=wss://thethings.example.com:8887
       # - TTN_LW_GCS_THE_THINGS_GATEWAY_DEFAULT_MQTT_SERVER=mqtts://thethings.example.com:8882
+
+      # If Network Server enabled, Network Server interoperability configuration:
+      # If interoperability configuration repository is a directory on OS FS:
+      # - TTN_LW_NS_INTEROP_DIRECTORY=/path/to/interop/repository
+      # If interoperability configuration repository is a URL:
+      # - TTN_LW_NS_INTEROP_URL=https://thethings.example.com
+      # If interoperability configuration repository is a blob:
+      # - TTN_LW_NS_INTEROP_BLOB_PATH=/path/to/interop/directory
+      # - TTN_LW_NS_INTEROP_BLOB_BUCKET=enter bucket name
 
       # Web UI configuration for "thethings.example.com":
       # - TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://thethings.example.com/oauth

@@ -374,7 +374,7 @@ func (conf tlsConfig) TLSConfig(fetcher fetch.Interface) (*tls.Config, error) {
 }
 
 // InteropClientConfigurationName represents the filename of interop client configuration.
-const InteropClientConfigurationName = "config.yaml"
+const InteropClientConfigurationName = "config.yml"
 
 // NewClient return new interop client.
 // fallbackTLS is optional.

@@ -96,9 +96,9 @@ func TestGetAppSKey(t *testing.T) {
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
-				js1Path := filepath.Join(confDir, "test-js-1.yaml")
-				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
-				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
 				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
@@ -214,9 +214,9 @@ paths:
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
-				js1Path := filepath.Join(confDir, "test-js-1.yaml")
-				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
-				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
 				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
@@ -344,9 +344,9 @@ paths:
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
-				js1Path := filepath.Join(confDir, "test-js-1.yaml")
-				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
-				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
 				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
@@ -479,9 +479,9 @@ paths:
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
-				js1Path := filepath.Join(confDir, "test-js-1.yaml")
-				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
-				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
 				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
@@ -661,9 +661,9 @@ func TestHandleJoinRequest(t *testing.T) {
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
-				js1Path := filepath.Join(confDir, "test-js-1.yaml")
-				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
-				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
 				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
@@ -779,9 +779,9 @@ paths:
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
-				js1Path := filepath.Join(confDir, "test-js-1.yaml")
-				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
-				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
 				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
@@ -915,9 +915,9 @@ paths:
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
-				js1Path := filepath.Join(confDir, "test-js-1.yaml")
-				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
-				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
 				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
@@ -1064,9 +1064,9 @@ paths:
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
 				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
-				js1Path := filepath.Join(confDir, "test-js-1.yaml")
-				js2Path := filepath.Join(confDir, "foo", "test-js-2.yaml")
-				js3Path := filepath.Join(confDir, "test-js-3.yaml")
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
 				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
