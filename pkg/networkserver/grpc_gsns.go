@@ -1077,6 +1077,12 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 				return errCorruptedMACState
 			}
 			for i, m := range req.CFList.ChMasks {
+				if m {
+					continue
+				}
+				if macState.CurrentParameters.Channels[i] == nil {
+					return errCorruptedMACState
+				}
 				macState.CurrentParameters.Channels[i].EnableUplink = m
 			}
 		}

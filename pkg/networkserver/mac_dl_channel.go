@@ -28,12 +28,22 @@ var (
 	evtReceiveDLChannelReject  = defineReceiveMACRejectEvent("dl_channel", "downlink Rx1 channel frequency modification")()
 )
 
+func channelNeedsDLChannelReq(desiredCh, currentCh *ttnpb.MACParameters_Channel) bool {
+	// NOTE: If channelNeedsNewChannelReq(desiredCh, currentCh), then
+	// NS will schedule NewChannelReq, which will, in turn, modify the downlink frequency, hence
+	// DLChannelReq should only be scheduled after a successful NewChannelAns is received.
+	return desiredCh != nil &&
+		currentCh != nil &&
+		desiredCh.DownlinkFrequency != currentCh.DownlinkFrequency &&
+		!channelNeedsNewChannelReq(desiredCh, currentCh)
+}
+
 func deviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
 	if dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
 		return false
 	}
 	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
-		if dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency != dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
+		if channelNeedsDLChannelReq(dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]) {
 			return true
 		}
 	}
@@ -54,7 +64,8 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 		var cmds []*ttnpb.MACCommand
 		var evs []events.DefinitionDataClosure
 		for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
-			if dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency == dev.MACState.CurrentParameters.Channels[i].DownlinkFrequency {
+			desiredCh, currentCh := dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]
+			if !channelNeedsDLChannelReq(desiredCh, currentCh) {
 				continue
 			}
 			if nDown < 1 || nUp < 1 {
@@ -65,7 +76,7 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 
 			req := &ttnpb.MACCommand_DLChannelReq{
 				ChannelIndex: uint32(i),
-				Frequency:    dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency,
+				Frequency:    desiredCh.DownlinkFrequency,
 			}
 			cmds = append(cmds, req.MACCommand())
 			evs = append(evs, evtEnqueueDLChannelRequest.BindData(req))

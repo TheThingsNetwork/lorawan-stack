@@ -28,15 +28,24 @@ var (
 	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")()
 )
 
+func channelNeedsNewChannelReq(desiredCh, currentCh *ttnpb.MACParameters_Channel) bool {
+	return (desiredCh != nil || currentCh != nil) &&
+		(desiredCh == nil ||
+			currentCh == nil ||
+			desiredCh.UplinkFrequency != currentCh.UplinkFrequency ||
+			desiredCh.MaxDataRateIndex != currentCh.MaxDataRateIndex ||
+			desiredCh.MinDataRateIndex != currentCh.MinDataRateIndex)
+}
+
 func deviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
 	if dev.MACState == nil {
 		return false
 	}
-	for i, ch := range dev.MACState.DesiredParameters.Channels {
-		if i >= len(dev.MACState.CurrentParameters.Channels) ||
-			ch.UplinkFrequency != dev.MACState.CurrentParameters.Channels[i].UplinkFrequency ||
-			ch.MinDataRateIndex != dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex ||
-			ch.MaxDataRateIndex != dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex {
+	if len(dev.MACState.DesiredParameters.Channels) != len(dev.MACState.CurrentParameters.Channels) {
+		return true
+	}
+	for i := range dev.MACState.DesiredParameters.Channels {
+		if channelNeedsNewChannelReq(dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]) {
 			return true
 		}
 	}
@@ -54,32 +63,42 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 
 	var st macCommandEnqueueState
 	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
+		var reqs []*ttnpb.MACCommand_NewChannelReq
+		for i := 0; i < len(dev.MACState.DesiredParameters.Channels) || i < len(dev.MACState.CurrentParameters.Channels); i++ {
+			if i >= len(dev.MACState.DesiredParameters.Channels) {
+				for j := range dev.MACState.CurrentParameters.Channels[i:] {
+					reqs = append(reqs, &ttnpb.MACCommand_NewChannelReq{
+						ChannelIndex: uint32(i + j),
+					})
+				}
+				break
+			}
+
+			desiredCh := dev.MACState.DesiredParameters.Channels[i]
+			if i >= len(dev.MACState.CurrentParameters.Channels) ||
+				channelNeedsNewChannelReq(desiredCh, dev.MACState.CurrentParameters.Channels[i]) {
+				reqs = append(reqs, &ttnpb.MACCommand_NewChannelReq{
+					ChannelIndex:     uint32(i),
+					Frequency:        desiredCh.GetUplinkFrequency(),
+					MinDataRateIndex: desiredCh.GetMinDataRateIndex(),
+					MaxDataRateIndex: desiredCh.GetMaxDataRateIndex(),
+				})
+			}
+		}
+
 		var cmds []*ttnpb.MACCommand
 		var evs []events.DefinitionDataClosure
-		for i, ch := range dev.MACState.DesiredParameters.Channels {
-			if i < len(dev.MACState.CurrentParameters.Channels) &&
-				ch.UplinkFrequency == dev.MACState.CurrentParameters.Channels[i].UplinkFrequency &&
-				ch.MinDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MinDataRateIndex &&
-				ch.MaxDataRateIndex == dev.MACState.CurrentParameters.Channels[i].MaxDataRateIndex {
-				continue
-			}
+		for _, req := range reqs {
 			if nDown < 1 || nUp < 1 {
 				return cmds, uint16(len(cmds)), evs, false
 			}
 			nDown--
 			nUp--
-
-			req := &ttnpb.MACCommand_NewChannelReq{
-				ChannelIndex:     uint32(i),
-				Frequency:        ch.UplinkFrequency,
-				MinDataRateIndex: ch.MinDataRateIndex,
-				MaxDataRateIndex: ch.MaxDataRateIndex,
-			}
 			log.FromContext(ctx).WithFields(log.Fields(
-				"index", req.ChannelIndex,
+				"channel_index", req.ChannelIndex,
 				"frequency", req.Frequency,
-				"min_data_rate_index", req.MinDataRateIndex,
 				"max_data_rate_index", req.MaxDataRateIndex,
+				"min_data_rate_index", req.MinDataRateIndex,
 			)).Debug("Enqueued NewChannelReq")
 			cmds = append(cmds, req.MACCommand())
 			evs = append(evs, evtEnqueueNewChannelRequest.BindData(req))
