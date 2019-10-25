@@ -370,10 +370,10 @@ type isOrganizationOrUserIdentifiers_Ids interface {
 }
 
 type OrganizationOrUserIdentifiers_OrganizationIDs struct {
-	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,proto3,oneof"`
+	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,1,opt,name=organization_ids,json=organizationIds,proto3,oneof" json:"organization_ids,omitempty"`
 }
 type OrganizationOrUserIdentifiers_UserIDs struct {
-	UserIDs *UserIdentifiers `protobuf:"bytes,2,opt,name=user_ids,json=userIds,proto3,oneof"`
+	UserIDs *UserIdentifiers `protobuf:"bytes,2,opt,name=user_ids,json=userIds,proto3,oneof" json:"user_ids,omitempty"`
 }
 
 func (*OrganizationOrUserIdentifiers_OrganizationIDs) isOrganizationOrUserIdentifiers_Ids() {}
@@ -462,22 +462,22 @@ type isEntityIdentifiers_Ids interface {
 }
 
 type EntityIdentifiers_ApplicationIDs struct {
-	ApplicationIDs *ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,oneof"`
+	ApplicationIDs *ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3,oneof" json:"application_ids,omitempty"`
 }
 type EntityIdentifiers_ClientIDs struct {
-	ClientIDs *ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3,oneof"`
+	ClientIDs *ClientIdentifiers `protobuf:"bytes,2,opt,name=client_ids,json=clientIds,proto3,oneof" json:"client_ids,omitempty"`
 }
 type EntityIdentifiers_DeviceIDs struct {
-	DeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=device_ids,json=deviceIds,proto3,oneof"`
+	DeviceIDs *EndDeviceIdentifiers `protobuf:"bytes,3,opt,name=device_ids,json=deviceIds,proto3,oneof" json:"device_ids,omitempty"`
 }
 type EntityIdentifiers_GatewayIDs struct {
-	GatewayIDs *GatewayIdentifiers `protobuf:"bytes,4,opt,name=gateway_ids,json=gatewayIds,proto3,oneof"`
+	GatewayIDs *GatewayIdentifiers `protobuf:"bytes,4,opt,name=gateway_ids,json=gatewayIds,proto3,oneof" json:"gateway_ids,omitempty"`
 }
 type EntityIdentifiers_OrganizationIDs struct {
-	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,5,opt,name=organization_ids,json=organizationIds,proto3,oneof"`
+	OrganizationIDs *OrganizationIdentifiers `protobuf:"bytes,5,opt,name=organization_ids,json=organizationIds,proto3,oneof" json:"organization_ids,omitempty"`
 }
 type EntityIdentifiers_UserIDs struct {
-	UserIDs *UserIdentifiers `protobuf:"bytes,6,opt,name=user_ids,json=userIds,proto3,oneof"`
+	UserIDs *UserIdentifiers `protobuf:"bytes,6,opt,name=user_ids,json=userIds,proto3,oneof" json:"user_ids,omitempty"`
 }
 
 func (*EntityIdentifiers_ApplicationIDs) isEntityIdentifiers_Ids()  {}
@@ -1424,7 +1424,8 @@ func (m *OrganizationOrUserIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, 
 }
 
 func (m *OrganizationOrUserIdentifiers_OrganizationIDs) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *OrganizationOrUserIdentifiers_OrganizationIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1444,7 +1445,8 @@ func (m *OrganizationOrUserIdentifiers_OrganizationIDs) MarshalToSizedBuffer(dAt
 	return len(dAtA) - i, nil
 }
 func (m *OrganizationOrUserIdentifiers_UserIDs) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *OrganizationOrUserIdentifiers_UserIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1496,7 +1498,8 @@ func (m *EntityIdentifiers) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 }
 
 func (m *EntityIdentifiers_ApplicationIDs) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *EntityIdentifiers_ApplicationIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1516,7 +1519,8 @@ func (m *EntityIdentifiers_ApplicationIDs) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_ClientIDs) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *EntityIdentifiers_ClientIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1536,7 +1540,8 @@ func (m *EntityIdentifiers_ClientIDs) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_DeviceIDs) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *EntityIdentifiers_DeviceIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1556,7 +1561,8 @@ func (m *EntityIdentifiers_DeviceIDs) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_GatewayIDs) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *EntityIdentifiers_GatewayIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1576,7 +1582,8 @@ func (m *EntityIdentifiers_GatewayIDs) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_OrganizationIDs) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *EntityIdentifiers_OrganizationIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1596,7 +1603,8 @@ func (m *EntityIdentifiers_OrganizationIDs) MarshalToSizedBuffer(dAtA []byte) (i
 	return len(dAtA) - i, nil
 }
 func (m *EntityIdentifiers_UserIDs) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *EntityIdentifiers_UserIDs) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3446,6 +3454,7 @@ func (m *CombinedIdentifiers) Unmarshal(dAtA []byte) error {
 func skipIdentifiers(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
+	depth := 0
 	for iNdEx < l {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
@@ -3477,10 +3486,8 @@ func skipIdentifiers(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			return iNdEx, nil
 		case 1:
 			iNdEx += 8
-			return iNdEx, nil
 		case 2:
 			var length int
 			for shift := uint(0); ; shift += 7 {
@@ -3501,55 +3508,30 @@ func skipIdentifiers(dAtA []byte) (n int, err error) {
 				return 0, ErrInvalidLengthIdentifiers
 			}
 			iNdEx += length
-			if iNdEx < 0 {
-				return 0, ErrInvalidLengthIdentifiers
-			}
-			return iNdEx, nil
 		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowIdentifiers
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipIdentifiers(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthIdentifiers
-				}
-			}
-			return iNdEx, nil
+			depth++
 		case 4:
-			return iNdEx, nil
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupIdentifiers
+			}
+			depth--
 		case 5:
 			iNdEx += 4
-			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthIdentifiers
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
 	}
-	panic("unreachable")
+	return 0, io.ErrUnexpectedEOF
 }
 
 var (
-	ErrInvalidLengthIdentifiers = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowIdentifiers   = fmt.Errorf("proto: integer overflow")
+	ErrInvalidLengthIdentifiers        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowIdentifiers          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupIdentifiers = fmt.Errorf("proto: unexpected end of group")
 )

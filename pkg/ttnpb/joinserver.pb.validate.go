@@ -975,6 +975,10 @@ func (m *ProvisionEndDevicesRequest) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "list":
+					w, ok := m.EndDevices.(*ProvisionEndDevicesRequest_List)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetList()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -987,6 +991,10 @@ func (m *ProvisionEndDevicesRequest) ValidateFields(paths ...string) error {
 					}
 
 				case "range":
+					w, ok := m.EndDevices.(*ProvisionEndDevicesRequest_Range)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRange()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -999,6 +1007,10 @@ func (m *ProvisionEndDevicesRequest) ValidateFields(paths ...string) error {
 					}
 
 				case "from_data":
+					w, ok := m.EndDevices.(*ProvisionEndDevicesRequest_FromData)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetFromData()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {

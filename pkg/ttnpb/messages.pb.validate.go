@@ -255,6 +255,12 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 			}
 
 		case "settings":
+			if m.Settings == nil {
+				return DownlinkMessageValidationError{
+					field:  "settings",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"request", "scheduled",
@@ -264,6 +270,10 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "request":
+					w, ok := m.Settings.(*DownlinkMessage_Request)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRequest()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -276,6 +286,10 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 					}
 
 				case "scheduled":
+					w, ok := m.Settings.(*DownlinkMessage_Scheduled)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetScheduled()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -287,11 +301,6 @@ func (m *DownlinkMessage) ValidateFields(paths ...string) error {
 						}
 					}
 
-				default:
-					return DownlinkMessageValidationError{
-						field:  "settings",
-						reason: "value is required",
-					}
 				}
 			}
 		default:
@@ -1391,6 +1400,12 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 			}
 
 		case "up":
+			if m.Up == nil {
+				return ApplicationUpValidationError{
+					field:  "up",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"uplink_message", "join_accept", "downlink_ack", "downlink_nack", "downlink_sent", "downlink_failed", "downlink_queued", "downlink_queue_invalidated", "location_solved",
@@ -1400,6 +1415,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "uplink_message":
+					w, ok := m.Up.(*ApplicationUp_UplinkMessage)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetUplinkMessage()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1412,6 +1431,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 					}
 
 				case "join_accept":
+					w, ok := m.Up.(*ApplicationUp_JoinAccept)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetJoinAccept()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1424,6 +1447,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 					}
 
 				case "downlink_ack":
+					w, ok := m.Up.(*ApplicationUp_DownlinkAck)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDownlinkAck()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1436,6 +1463,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 					}
 
 				case "downlink_nack":
+					w, ok := m.Up.(*ApplicationUp_DownlinkNack)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDownlinkNack()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1448,6 +1479,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 					}
 
 				case "downlink_sent":
+					w, ok := m.Up.(*ApplicationUp_DownlinkSent)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDownlinkSent()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1460,6 +1495,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 					}
 
 				case "downlink_failed":
+					w, ok := m.Up.(*ApplicationUp_DownlinkFailed)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDownlinkFailed()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1472,6 +1511,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 					}
 
 				case "downlink_queued":
+					w, ok := m.Up.(*ApplicationUp_DownlinkQueued)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDownlinkQueued()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1484,6 +1527,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 					}
 
 				case "downlink_queue_invalidated":
+					w, ok := m.Up.(*ApplicationUp_DownlinkQueueInvalidated)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDownlinkQueueInvalidated()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1496,6 +1543,10 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 					}
 
 				case "location_solved":
+					w, ok := m.Up.(*ApplicationUp_LocationSolved)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetLocationSolved()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1507,11 +1558,6 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 						}
 					}
 
-				default:
-					return ApplicationUpValidationError{
-						field:  "up",
-						reason: "value is required",
-					}
 				}
 			}
 		default:

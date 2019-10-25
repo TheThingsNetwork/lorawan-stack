@@ -86,10 +86,10 @@ type isAuthInfoResponse_AccessMethod interface {
 }
 
 type AuthInfoResponse_APIKey struct {
-	APIKey *AuthInfoResponse_APIKeyAccess `protobuf:"bytes,1,opt,name=api_key,json=apiKey,proto3,oneof"`
+	APIKey *AuthInfoResponse_APIKeyAccess `protobuf:"bytes,1,opt,name=api_key,json=apiKey,proto3,oneof" json:"api_key,omitempty"`
 }
 type AuthInfoResponse_OAuthAccessToken struct {
-	OAuthAccessToken *OAuthAccessToken `protobuf:"bytes,2,opt,name=oauth_access_token,json=oauthAccessToken,proto3,oneof"`
+	OAuthAccessToken *OAuthAccessToken `protobuf:"bytes,2,opt,name=oauth_access_token,json=oauthAccessToken,proto3,oneof" json:"oauth_access_token,omitempty"`
 }
 
 func (*AuthInfoResponse_APIKey) isAuthInfoResponse_AccessMethod()           {}
@@ -492,7 +492,8 @@ func (m *AuthInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 }
 
 func (m *AuthInfoResponse_APIKey) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *AuthInfoResponse_APIKey) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -512,7 +513,8 @@ func (m *AuthInfoResponse_APIKey) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 func (m *AuthInfoResponse_OAuthAccessToken) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *AuthInfoResponse_OAuthAccessToken) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1110,6 +1112,7 @@ func (m *AuthInfoResponse_APIKeyAccess) Unmarshal(dAtA []byte) error {
 func skipIdentityserver(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
+	depth := 0
 	for iNdEx < l {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
@@ -1141,10 +1144,8 @@ func skipIdentityserver(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			return iNdEx, nil
 		case 1:
 			iNdEx += 8
-			return iNdEx, nil
 		case 2:
 			var length int
 			for shift := uint(0); ; shift += 7 {
@@ -1165,55 +1166,30 @@ func skipIdentityserver(dAtA []byte) (n int, err error) {
 				return 0, ErrInvalidLengthIdentityserver
 			}
 			iNdEx += length
-			if iNdEx < 0 {
-				return 0, ErrInvalidLengthIdentityserver
-			}
-			return iNdEx, nil
 		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowIdentityserver
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipIdentityserver(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthIdentityserver
-				}
-			}
-			return iNdEx, nil
+			depth++
 		case 4:
-			return iNdEx, nil
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupIdentityserver
+			}
+			depth--
 		case 5:
 			iNdEx += 4
-			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthIdentityserver
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
 	}
-	panic("unreachable")
+	return 0, io.ErrUnexpectedEOF
 }
 
 var (
-	ErrInvalidLengthIdentityserver = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowIdentityserver   = fmt.Errorf("proto: integer overflow")
+	ErrInvalidLengthIdentityserver        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowIdentityserver          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupIdentityserver = fmt.Errorf("proto: unexpected end of group")
 )

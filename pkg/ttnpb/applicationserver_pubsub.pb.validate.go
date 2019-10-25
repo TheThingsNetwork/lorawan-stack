@@ -344,6 +344,12 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 			}
 
 		case "provider":
+			if m.Provider == nil {
+				return ApplicationPubSubValidationError{
+					field:  "provider",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"nats", "mqtt",
@@ -353,6 +359,10 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "nats":
+					w, ok := m.Provider.(*ApplicationPubSub_NATS)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetNATS()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -365,6 +375,10 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 					}
 
 				case "mqtt":
+					w, ok := m.Provider.(*ApplicationPubSub_MQTT)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetMQTT()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -376,11 +390,6 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 						}
 					}
 
-				default:
-					return ApplicationPubSubValidationError{
-						field:  "provider",
-						reason: "value is required",
-					}
 				}
 			}
 		default:

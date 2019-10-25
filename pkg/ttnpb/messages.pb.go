@@ -265,10 +265,10 @@ type isDownlinkMessage_Settings interface {
 }
 
 type DownlinkMessage_Request struct {
-	Request *TxRequest `protobuf:"bytes,4,opt,name=request,proto3,oneof"`
+	Request *TxRequest `protobuf:"bytes,4,opt,name=request,proto3,oneof" json:"request,omitempty"`
 }
 type DownlinkMessage_Scheduled struct {
-	Scheduled *TxSettings `protobuf:"bytes,5,opt,name=scheduled,proto3,oneof"`
+	Scheduled *TxSettings `protobuf:"bytes,5,opt,name=scheduled,proto3,oneof" json:"scheduled,omitempty"`
 }
 
 func (*DownlinkMessage_Request) isDownlinkMessage_Settings()   {}
@@ -984,31 +984,31 @@ type isApplicationUp_Up interface {
 }
 
 type ApplicationUp_UplinkMessage struct {
-	UplinkMessage *ApplicationUplink `protobuf:"bytes,3,opt,name=uplink_message,json=uplinkMessage,proto3,oneof"`
+	UplinkMessage *ApplicationUplink `protobuf:"bytes,3,opt,name=uplink_message,json=uplinkMessage,proto3,oneof" json:"uplink_message,omitempty"`
 }
 type ApplicationUp_JoinAccept struct {
-	JoinAccept *ApplicationJoinAccept `protobuf:"bytes,4,opt,name=join_accept,json=joinAccept,proto3,oneof"`
+	JoinAccept *ApplicationJoinAccept `protobuf:"bytes,4,opt,name=join_accept,json=joinAccept,proto3,oneof" json:"join_accept,omitempty"`
 }
 type ApplicationUp_DownlinkAck struct {
-	DownlinkAck *ApplicationDownlink `protobuf:"bytes,5,opt,name=downlink_ack,json=downlinkAck,proto3,oneof"`
+	DownlinkAck *ApplicationDownlink `protobuf:"bytes,5,opt,name=downlink_ack,json=downlinkAck,proto3,oneof" json:"downlink_ack,omitempty"`
 }
 type ApplicationUp_DownlinkNack struct {
-	DownlinkNack *ApplicationDownlink `protobuf:"bytes,6,opt,name=downlink_nack,json=downlinkNack,proto3,oneof"`
+	DownlinkNack *ApplicationDownlink `protobuf:"bytes,6,opt,name=downlink_nack,json=downlinkNack,proto3,oneof" json:"downlink_nack,omitempty"`
 }
 type ApplicationUp_DownlinkSent struct {
-	DownlinkSent *ApplicationDownlink `protobuf:"bytes,7,opt,name=downlink_sent,json=downlinkSent,proto3,oneof"`
+	DownlinkSent *ApplicationDownlink `protobuf:"bytes,7,opt,name=downlink_sent,json=downlinkSent,proto3,oneof" json:"downlink_sent,omitempty"`
 }
 type ApplicationUp_DownlinkFailed struct {
-	DownlinkFailed *ApplicationDownlinkFailed `protobuf:"bytes,8,opt,name=downlink_failed,json=downlinkFailed,proto3,oneof"`
+	DownlinkFailed *ApplicationDownlinkFailed `protobuf:"bytes,8,opt,name=downlink_failed,json=downlinkFailed,proto3,oneof" json:"downlink_failed,omitempty"`
 }
 type ApplicationUp_DownlinkQueued struct {
-	DownlinkQueued *ApplicationDownlink `protobuf:"bytes,9,opt,name=downlink_queued,json=downlinkQueued,proto3,oneof"`
+	DownlinkQueued *ApplicationDownlink `protobuf:"bytes,9,opt,name=downlink_queued,json=downlinkQueued,proto3,oneof" json:"downlink_queued,omitempty"`
 }
 type ApplicationUp_DownlinkQueueInvalidated struct {
-	DownlinkQueueInvalidated *ApplicationInvalidatedDownlinks `protobuf:"bytes,10,opt,name=downlink_queue_invalidated,json=downlinkQueueInvalidated,proto3,oneof"`
+	DownlinkQueueInvalidated *ApplicationInvalidatedDownlinks `protobuf:"bytes,10,opt,name=downlink_queue_invalidated,json=downlinkQueueInvalidated,proto3,oneof" json:"downlink_queue_invalidated,omitempty"`
 }
 type ApplicationUp_LocationSolved struct {
-	LocationSolved *ApplicationLocation `protobuf:"bytes,11,opt,name=location_solved,json=locationSolved,proto3,oneof"`
+	LocationSolved *ApplicationLocation `protobuf:"bytes,11,opt,name=location_solved,json=locationSolved,proto3,oneof" json:"location_solved,omitempty"`
 }
 
 func (*ApplicationUp_UplinkMessage) isApplicationUp_Up()            {}
@@ -2393,7 +2393,8 @@ func (m *DownlinkMessage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 }
 
 func (m *DownlinkMessage_Request) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *DownlinkMessage_Request) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -2413,7 +2414,8 @@ func (m *DownlinkMessage_Request) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 func (m *DownlinkMessage_Scheduled) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *DownlinkMessage_Scheduled) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3003,7 +3005,8 @@ func (m *ApplicationUp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 }
 
 func (m *ApplicationUp_UplinkMessage) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_UplinkMessage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3023,7 +3026,8 @@ func (m *ApplicationUp_UplinkMessage) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_JoinAccept) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_JoinAccept) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3043,7 +3047,8 @@ func (m *ApplicationUp_JoinAccept) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkAck) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_DownlinkAck) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3063,7 +3068,8 @@ func (m *ApplicationUp_DownlinkAck) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkNack) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_DownlinkNack) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3083,7 +3089,8 @@ func (m *ApplicationUp_DownlinkNack) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkSent) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_DownlinkSent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3103,7 +3110,8 @@ func (m *ApplicationUp_DownlinkSent) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkFailed) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_DownlinkFailed) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3123,7 +3131,8 @@ func (m *ApplicationUp_DownlinkFailed) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkQueued) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_DownlinkQueued) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3143,7 +3152,8 @@ func (m *ApplicationUp_DownlinkQueued) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_DownlinkQueueInvalidated) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_DownlinkQueueInvalidated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -3163,7 +3173,8 @@ func (m *ApplicationUp_DownlinkQueueInvalidated) MarshalToSizedBuffer(dAtA []byt
 	return len(dAtA) - i, nil
 }
 func (m *ApplicationUp_LocationSolved) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ApplicationUp_LocationSolved) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -7238,6 +7249,7 @@ func (m *DownlinkQueueRequest) Unmarshal(dAtA []byte) error {
 func skipMessages(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
+	depth := 0
 	for iNdEx < l {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
@@ -7269,10 +7281,8 @@ func skipMessages(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			return iNdEx, nil
 		case 1:
 			iNdEx += 8
-			return iNdEx, nil
 		case 2:
 			var length int
 			for shift := uint(0); ; shift += 7 {
@@ -7293,55 +7303,30 @@ func skipMessages(dAtA []byte) (n int, err error) {
 				return 0, ErrInvalidLengthMessages
 			}
 			iNdEx += length
-			if iNdEx < 0 {
-				return 0, ErrInvalidLengthMessages
-			}
-			return iNdEx, nil
 		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowMessages
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipMessages(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthMessages
-				}
-			}
-			return iNdEx, nil
+			depth++
 		case 4:
-			return iNdEx, nil
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupMessages
+			}
+			depth--
 		case 5:
 			iNdEx += 4
-			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthMessages
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
 	}
-	panic("unreachable")
+	return 0, io.ErrUnexpectedEOF
 }
 
 var (
-	ErrInvalidLengthMessages = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowMessages   = fmt.Errorf("proto: integer overflow")
+	ErrInvalidLengthMessages        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowMessages          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupMessages = fmt.Errorf("proto: unexpected end of group")
 )

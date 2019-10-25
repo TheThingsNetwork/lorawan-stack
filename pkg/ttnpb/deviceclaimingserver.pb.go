@@ -108,10 +108,10 @@ type isClaimEndDeviceRequest_SourceDevice interface {
 }
 
 type ClaimEndDeviceRequest_AuthenticatedIdentifiers_ struct {
-	AuthenticatedIdentifiers *ClaimEndDeviceRequest_AuthenticatedIdentifiers `protobuf:"bytes,1,opt,name=authenticated_identifiers,json=authenticatedIdentifiers,proto3,oneof"`
+	AuthenticatedIdentifiers *ClaimEndDeviceRequest_AuthenticatedIdentifiers `protobuf:"bytes,1,opt,name=authenticated_identifiers,json=authenticatedIdentifiers,proto3,oneof" json:"authenticated_identifiers,omitempty"`
 }
 type ClaimEndDeviceRequest_QRCode struct {
-	QRCode []byte `protobuf:"bytes,2,opt,name=qr_code,json=qrCode,proto3,oneof"`
+	QRCode []byte `protobuf:"bytes,2,opt,name=qr_code,json=qrCode,proto3,oneof" json:"qr_code,omitempty"`
 }
 
 func (*ClaimEndDeviceRequest_AuthenticatedIdentifiers_) isClaimEndDeviceRequest_SourceDevice() {}
@@ -823,7 +823,8 @@ func (m *ClaimEndDeviceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 }
 
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers_) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -843,7 +844,8 @@ func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers_) MarshalToSizedBuffer(d
 	return len(dAtA) - i, nil
 }
 func (m *ClaimEndDeviceRequest_QRCode) MarshalTo(dAtA []byte) (int, error) {
-	return m.MarshalToSizedBuffer(dAtA[:m.Size()])
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
 func (m *ClaimEndDeviceRequest_QRCode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
@@ -1940,6 +1942,7 @@ func (m *AuthorizeApplicationRequest) Unmarshal(dAtA []byte) error {
 func skipDeviceclaimingserver(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
+	depth := 0
 	for iNdEx < l {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
@@ -1971,10 +1974,8 @@ func skipDeviceclaimingserver(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			return iNdEx, nil
 		case 1:
 			iNdEx += 8
-			return iNdEx, nil
 		case 2:
 			var length int
 			for shift := uint(0); ; shift += 7 {
@@ -1995,55 +1996,30 @@ func skipDeviceclaimingserver(dAtA []byte) (n int, err error) {
 				return 0, ErrInvalidLengthDeviceclaimingserver
 			}
 			iNdEx += length
-			if iNdEx < 0 {
-				return 0, ErrInvalidLengthDeviceclaimingserver
-			}
-			return iNdEx, nil
 		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowDeviceclaimingserver
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipDeviceclaimingserver(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthDeviceclaimingserver
-				}
-			}
-			return iNdEx, nil
+			depth++
 		case 4:
-			return iNdEx, nil
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupDeviceclaimingserver
+			}
+			depth--
 		case 5:
 			iNdEx += 4
-			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthDeviceclaimingserver
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
 	}
-	panic("unreachable")
+	return 0, io.ErrUnexpectedEOF
 }
 
 var (
-	ErrInvalidLengthDeviceclaimingserver = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowDeviceclaimingserver   = fmt.Errorf("proto: integer overflow")
+	ErrInvalidLengthDeviceclaimingserver        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowDeviceclaimingserver          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupDeviceclaimingserver = fmt.Errorf("proto: unexpected end of group")
 )

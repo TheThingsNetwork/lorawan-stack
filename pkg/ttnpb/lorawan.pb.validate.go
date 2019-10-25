@@ -72,6 +72,12 @@ func (m *Message) ValidateFields(paths ...string) error {
 			}
 
 		case "Payload":
+			if m.Payload == nil {
+				return MessageValidationError{
+					field:  "Payload",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"mac_payload", "join_request_payload", "join_accept_payload", "rejoin_request_payload",
@@ -81,6 +87,10 @@ func (m *Message) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "mac_payload":
+					w, ok := m.Payload.(*Message_MACPayload)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetMACPayload()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -93,6 +103,10 @@ func (m *Message) ValidateFields(paths ...string) error {
 					}
 
 				case "join_request_payload":
+					w, ok := m.Payload.(*Message_JoinRequestPayload)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetJoinRequestPayload()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -105,6 +119,10 @@ func (m *Message) ValidateFields(paths ...string) error {
 					}
 
 				case "join_accept_payload":
+					w, ok := m.Payload.(*Message_JoinAcceptPayload)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetJoinAcceptPayload()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -117,6 +135,10 @@ func (m *Message) ValidateFields(paths ...string) error {
 					}
 
 				case "rejoin_request_payload":
+					w, ok := m.Payload.(*Message_RejoinRequestPayload)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRejoinRequestPayload()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -128,11 +150,6 @@ func (m *Message) ValidateFields(paths ...string) error {
 						}
 					}
 
-				default:
-					return MessageValidationError{
-						field:  "Payload",
-						reason: "value is required",
-					}
 				}
 			}
 		default:
@@ -1286,6 +1303,12 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "modulation":
+			if m.Modulation == nil {
+				return DataRateValidationError{
+					field:  "modulation",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"lora", "fsk",
@@ -1295,6 +1318,10 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "lora":
+					w, ok := m.Modulation.(*DataRate_LoRa)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetLoRa()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1307,6 +1334,10 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 					}
 
 				case "fsk":
+					w, ok := m.Modulation.(*DataRate_FSK)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetFSK()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1318,11 +1349,6 @@ func (m *DataRate) ValidateFields(paths ...string) error {
 						}
 					}
 
-				default:
-					return DataRateValidationError{
-						field:  "modulation",
-						reason: "value is required",
-					}
 				}
 			}
 		default:
@@ -1726,6 +1752,12 @@ func (m *DownlinkPath) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "path":
+			if m.Path == nil {
+				return DownlinkPathValidationError{
+					field:  "path",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"uplink_token", "fixed",
@@ -1735,8 +1767,16 @@ func (m *DownlinkPath) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "uplink_token":
+					w, ok := m.Path.(*DownlinkPath_UplinkToken)
+					if !ok || w == nil {
+						continue
+					}
 					// no validation rules for UplinkToken
 				case "fixed":
+					w, ok := m.Path.(*DownlinkPath_Fixed)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetFixed()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -1748,11 +1788,6 @@ func (m *DownlinkPath) ValidateFields(paths ...string) error {
 						}
 					}
 
-				default:
-					return DownlinkPathValidationError{
-						field:  "path",
-						reason: "value is required",
-					}
 				}
 			}
 		default:
@@ -2022,8 +2057,16 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "raw_payload":
+					w, ok := m.Payload.(*MACCommand_RawPayload)
+					if !ok || w == nil {
+						continue
+					}
 					// no validation rules for RawPayload
 				case "reset_ind":
+					w, ok := m.Payload.(*MACCommand_ResetInd_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetResetInd()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2036,6 +2079,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "reset_conf":
+					w, ok := m.Payload.(*MACCommand_ResetConf_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetResetConf()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2048,6 +2095,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "link_check_ans":
+					w, ok := m.Payload.(*MACCommand_LinkCheckAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetLinkCheckAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2060,6 +2111,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "link_adr_req":
+					w, ok := m.Payload.(*MACCommand_LinkADRReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetLinkADRReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2072,6 +2127,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "link_adr_ans":
+					w, ok := m.Payload.(*MACCommand_LinkADRAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetLinkADRAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2084,6 +2143,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "duty_cycle_req":
+					w, ok := m.Payload.(*MACCommand_DutyCycleReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDutyCycleReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2096,6 +2159,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "rx_param_setup_req":
+					w, ok := m.Payload.(*MACCommand_RxParamSetupReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRxParamSetupReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2108,6 +2175,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "rx_param_setup_ans":
+					w, ok := m.Payload.(*MACCommand_RxParamSetupAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRxParamSetupAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2120,6 +2191,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "dev_status_ans":
+					w, ok := m.Payload.(*MACCommand_DevStatusAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDevStatusAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2132,6 +2207,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "new_channel_req":
+					w, ok := m.Payload.(*MACCommand_NewChannelReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetNewChannelReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2144,6 +2223,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "new_channel_ans":
+					w, ok := m.Payload.(*MACCommand_NewChannelAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetNewChannelAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2156,6 +2239,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "dl_channel_req":
+					w, ok := m.Payload.(*MACCommand_DLChannelReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDLChannelReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2168,6 +2255,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "dl_channel_ans":
+					w, ok := m.Payload.(*MACCommand_DLChannelAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDLChannelAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2180,6 +2271,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "rx_timing_setup_req":
+					w, ok := m.Payload.(*MACCommand_RxTimingSetupReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRxTimingSetupReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2192,6 +2287,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "tx_param_setup_req":
+					w, ok := m.Payload.(*MACCommand_TxParamSetupReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetTxParamSetupReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2204,6 +2303,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "rekey_ind":
+					w, ok := m.Payload.(*MACCommand_RekeyInd_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRekeyInd()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2216,6 +2319,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "rekey_conf":
+					w, ok := m.Payload.(*MACCommand_RekeyConf_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRekeyConf()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2228,6 +2335,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "adr_param_setup_req":
+					w, ok := m.Payload.(*MACCommand_ADRParamSetupReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetADRParamSetupReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2240,6 +2351,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "device_time_ans":
+					w, ok := m.Payload.(*MACCommand_DeviceTimeAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDeviceTimeAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2252,6 +2367,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "force_rejoin_req":
+					w, ok := m.Payload.(*MACCommand_ForceRejoinReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetForceRejoinReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2264,6 +2383,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "rejoin_param_setup_req":
+					w, ok := m.Payload.(*MACCommand_RejoinParamSetupReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRejoinParamSetupReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2276,6 +2399,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "rejoin_param_setup_ans":
+					w, ok := m.Payload.(*MACCommand_RejoinParamSetupAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetRejoinParamSetupAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2288,6 +2415,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "ping_slot_info_req":
+					w, ok := m.Payload.(*MACCommand_PingSlotInfoReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetPingSlotInfoReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2300,6 +2431,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "ping_slot_channel_req":
+					w, ok := m.Payload.(*MACCommand_PingSlotChannelReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetPingSlotChannelReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2312,6 +2447,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "ping_slot_channel_ans":
+					w, ok := m.Payload.(*MACCommand_PingSlotChannelAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetPingSlotChannelAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2324,6 +2463,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "beacon_timing_ans":
+					w, ok := m.Payload.(*MACCommand_BeaconTimingAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetBeaconTimingAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2336,6 +2479,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "beacon_freq_req":
+					w, ok := m.Payload.(*MACCommand_BeaconFreqReq_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetBeaconFreqReq()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2348,6 +2495,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "beacon_freq_ans":
+					w, ok := m.Payload.(*MACCommand_BeaconFreqAns_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetBeaconFreqAns()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2360,6 +2511,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "device_mode_ind":
+					w, ok := m.Payload.(*MACCommand_DeviceModeInd_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDeviceModeInd()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -2372,6 +2527,10 @@ func (m *MACCommand) ValidateFields(paths ...string) error {
 					}
 
 				case "device_mode_conf":
+					w, ok := m.Payload.(*MACCommand_DeviceModeConf_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDeviceModeConf()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
