@@ -16,6 +16,7 @@ import {
   GET_ORGS_LIST_BASE,
   GET_ORG_BASE,
   GET_ORGS_RIGHTS_LIST_BASE,
+  GET_ORG_API_KEYS_LIST_BASE,
   GET_ORG_API_KEY_BASE,
   GET_ORG_COLLABORATOR_BASE,
 } from '../actions/organizations'
@@ -32,6 +33,10 @@ import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
 import { createApiKeySelector } from './api-key'
+import {
+  createApiKeysSelector,
+  createTotalCountSelector as createApiKeysTotalCountSelector,
+} from './api-keys'
 import {
   createUserCollaboratorSelector,
   createOrganizationCollaboratorSelector,
@@ -70,6 +75,9 @@ export const selectOrganizationRightsError = createErrorSelector(GET_ORGS_RIGHTS
 export const selectOrganizationRightsFetching = createFetchingSelector(GET_ORGS_RIGHTS_LIST_BASE)
 
 // Api Keys
+export const selectOrganizationApiKeys = createApiKeysSelector(ENTITY)
+export const selectOrganizationApiKeysTotalCount = createApiKeysTotalCountSelector(ENTITY)
+export const selectOrganizationApiKeysFetching = createFetchingSelector(GET_ORG_API_KEYS_LIST_BASE)
 export const selectOrganizationApiKey = createApiKeySelector(ENTITY_SINGLE)
 export const selectOrganizationApiKeyFetching = createFetchingSelector(GET_ORG_API_KEY_BASE)
 export const selectOrganizationApiKeyError = createErrorSelector(GET_ORG_API_KEY_BASE)

@@ -36,7 +36,10 @@ import {
   createUserCollaboratorSelector,
   createOrganizationCollaboratorSelector,
 } from './collaborators'
-import { createApiKeysSelector } from './api-keys'
+import {
+  createApiKeysSelector,
+  createTotalCountSelector as createApiKeysTotalCountSelector,
+} from './api-keys'
 import { createApiKeySelector } from './api-key'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
@@ -80,6 +83,7 @@ export const selectApplicationRightsFetching = createFetchingSelector(GET_APPS_R
 
 // Api Keys
 export const selectApplicationApiKeys = createApiKeysSelector(ENTITY)
+export const selectApplicationApiKeysTotalCount = createApiKeysTotalCountSelector(ENTITY)
 export const selectApplicationApiKeysError = createErrorSelector(GET_APP_API_KEYS_LIST_BASE)
 export const selectApplicationApiKeysFetching = createFetchingSelector(GET_APP_API_KEYS_LIST_BASE)
 export const selectApplicationApiKey = createApiKeySelector(ENTITY_SINGLE)

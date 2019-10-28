@@ -20,11 +20,21 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../containers/api-keys-table'
 import { getApplicationApiKeysList } from '../../store/actions/applications'
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
+
+import {
+  selectApplicationApiKeys,
+  selectApplicationApiKeysTotalCount,
+  selectApplicationApiKeysFetching,
+} from '../../store/selectors/applications'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-@bind
 export default class ApplicationApiKeys extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
@@ -32,9 +42,16 @@ export default class ApplicationApiKeys extends React.Component {
     this.getApplicationsApiKeysList = filters => getApplicationApiKeysList(appId, filters)
   }
 
-  baseDataSelector({ apiKeys }) {
+  @bind
+  baseDataSelector(state) {
     const { appId } = this.props.match.params
-    return apiKeys.applications[appId] || {}
+
+    const id = { id: appId }
+    return {
+      keys: selectApplicationApiKeys(state, id),
+      totalCount: selectApplicationApiKeysTotalCount(state, id),
+      fetching: selectApplicationApiKeysFetching(state),
+    }
   }
 
   render() {

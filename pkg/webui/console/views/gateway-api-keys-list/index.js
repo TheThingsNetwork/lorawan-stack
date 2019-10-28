@@ -19,19 +19,39 @@ import bind from 'autobind-decorator'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../containers/api-keys-table'
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 
 import { getGatewayApiKeysList } from '../../store/actions/gateways'
-import { selectGatewayApiKeysStore } from '../../store/selectors/gateways'
+import {
+  selectGatewayApiKeys,
+  selectGatewayApiKeysTotalCount,
+  selectGatewayApiKeysFetching,
+} from '../../store/selectors/gateways'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-@bind
 export default class GatewayApiKeys extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
     const { gtwId } = props.match.params
     this.getGatewayApiKeysList = filters => getGatewayApiKeysList(gtwId, filters)
+  }
+
+  @bind
+  baseDataSelector(state) {
+    const { gtwId } = this.props.match.params
+
+    const id = { id: gtwId }
+    return {
+      keys: selectGatewayApiKeys(state, id),
+      totalCount: selectGatewayApiKeysTotalCount(state, id),
+      fetching: selectGatewayApiKeysFetching(state),
+    }
   }
 
   render() {
@@ -45,7 +65,7 @@ export default class GatewayApiKeys extends React.Component {
             <ApiKeysTable
               entityId={gtwId}
               pageSize={PAGE_SIZES.REGULAR}
-              baseDataSelector={selectGatewayApiKeysStore}
+              baseDataSelector={this.baseDataSelector}
               getItemsAction={this.getGatewayApiKeysList}
             />
           </Col>
