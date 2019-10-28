@@ -30,6 +30,7 @@ import DevAddrInput from '../../containers/dev-addr-input'
 import JoinEUIPrefixesInput from '../../containers/join-eui-prefixes-input'
 
 import sharedMessages from '../../../lib/shared-messages'
+import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import errorMessages from '../../../lib/errors/error-messages'
 import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
@@ -87,7 +88,8 @@ class DeviceDataForm extends Component {
       resets_join_nonces: external_js ? false : resets_join_nonces,
     }))
 
-    const { initialValues, jsConfig } = this.props
+    const { initialValues } = this.props
+    const jsConfig = selectJsConfig()
     const { setValues, state } = this.formRef.current
 
     // Reset Join Server related entries if the device is provisined by
@@ -343,12 +345,19 @@ class DeviceDataForm extends Component {
       },
     }
 
+    const nsConfig = selectNsConfig()
+    const asConfig = selectAsConfig()
+    const jsConfig = selectJsConfig()
+    const joinServerAddress = jsConfig.enabled ? new URL(jsConfig.base_url).hostname : ''
+
     const formValues = {
+      network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
+      application_server_address: asConfig.enabled ? new URL(asConfig.base_url).hostname : '',
+      join_server_address: external_js ? undefined : joinServerAddress,
       ...emptyValues,
       ...initialValues,
       activation_mode: otaa ? 'otaa' : 'abp',
       external_js,
-      join_server_address: external_js ? undefined : initialValues.join_server_address,
     }
 
     return (
@@ -500,7 +509,6 @@ const initialValuesPropType = PropTypes.shape({
 
 DeviceDataForm.propTypes = {
   initialValues: initialValuesPropType,
-  jsConfig: PropTypes.stackComponent.isRequired,
   onDelete: PropTypes.func,
   onDeleteSuccess: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
