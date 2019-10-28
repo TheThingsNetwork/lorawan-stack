@@ -161,6 +161,14 @@ class Applications {
     return Marshaler.unwrapRights(result)
   }
 
+  async getMqttConnectionInfo(applicationId) {
+    const response = await this._api.AppAs.GetMQTTConnectionInfo({
+      routeParams: { application_id: applicationId },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
+
   // Events Stream
 
   async openStream(identifiers, tail, after) {
