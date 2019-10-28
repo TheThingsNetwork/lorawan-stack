@@ -18,13 +18,23 @@ import bind from 'autobind-decorator'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import CollaboratorsTable from '../../containers/collaborators-table'
-import { getApplicationCollaboratorsList } from '../../store/actions/applications'
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
+
+import { getApplicationCollaboratorsList } from '../../store/actions/applications'
+import {
+  selectApplicationCollaborators,
+  selectApplicationCollaboratorsTotalCount,
+  selectApplicationCollaboratorsFetching,
+} from '../../store/selectors/applications'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
-@bind
 export default class ApplicationCollaborators extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
@@ -33,9 +43,16 @@ export default class ApplicationCollaborators extends React.Component {
       getApplicationCollaboratorsList(appId, filters)
   }
 
-  baseDataSelector({ collaborators }) {
+  @bind
+  baseDataSelector(state) {
     const { appId } = this.props.match.params
-    return collaborators.applications[appId] || {}
+    const id = { id: appId }
+
+    return {
+      collaborators: selectApplicationCollaborators(state, id),
+      fetching: selectApplicationCollaboratorsFetching(state),
+      totalCount: selectApplicationCollaboratorsTotalCount(state, id),
+    }
   }
 
   render() {

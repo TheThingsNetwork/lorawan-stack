@@ -40,3 +40,17 @@ export const createOrganizationCollaboratorSelector = entity =>
       return collaborator
     }
   }
+
+export const createCollaboratorsSelector = entity =>
+  function(state, props) {
+    const store = selectCollaboratorsStore(state, entity)[props.id] || {}
+
+    return store.collaborators ? store.collaborators : []
+  }
+
+export const createTotalCountSelector = entity =>
+  function(state, props) {
+    const store = selectCollaboratorsStore(state, entity)[props.id] || {}
+
+    return store.totalCount
+  }

@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
-import bind from 'autobind-decorator'
 
 import CollaboratorsTable from '../../containers/collaborators-table'
 
@@ -27,17 +26,11 @@ import PAGE_SIZES from '../../constants/page-sizes'
 class OrganizationCollaboratorsList extends React.Component {
   static propTypes = {
     getOrganizationCollaboratorsList: PropTypes.func.isRequired,
-    orgId: PropTypes.string.isRequired,
-  }
-
-  @bind
-  baseDataSelector({ collaborators }) {
-    const { orgId } = this.props
-    return collaborators.organizations[orgId] || {}
+    selectTableData: PropTypes.func.isRequired,
   }
 
   render() {
-    const { getOrganizationCollaboratorsList } = this.props
+    const { getOrganizationCollaboratorsList, selectTableData } = this.props
 
     return (
       <Container>
@@ -46,7 +39,7 @@ class OrganizationCollaboratorsList extends React.Component {
           <Col>
             <CollaboratorsTable
               pageSize={PAGE_SIZES.REGULAR}
-              baseDataSelector={this.baseDataSelector}
+              baseDataSelector={selectTableData}
               getItemsAction={getOrganizationCollaboratorsList}
             />
           </Col>
