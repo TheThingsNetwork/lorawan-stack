@@ -146,17 +146,21 @@ class Devices {
     // Retrieve necessary EUIs in case of a join server query being necessary
     if ('js' in requestTree) {
       if (!create && (!ids || !ids.join_eui || !ids.dev_eui)) {
-        try {
-          const res = await this._getDevice(appId, devId, [['ids', 'join_eui'], ['ids', 'dev_eui']])
-          device.ids = {
-            ...device.ids,
-            join_eui: res.ids.join_eui,
-            dev_eui: res.ids.dev_eui,
-          }
-        } catch (err) {
+        const res = await this._getDevice(
+          appId,
+          devId,
+          [['ids', 'join_eui'], ['ids', 'dev_eui']],
+          true,
+        )
+        if (!res.ids || !res.ids.join_eui || !res.ids.dev_eui) {
           throw new Error(
             'Could not update Join Server data on a device without Join EUI or Dev EUI',
           )
+        }
+        device.ids = {
+          ...device.ids,
+          join_eui: res.ids.join_eui,
+          dev_eui: res.ids.dev_eui,
         }
       }
     }
