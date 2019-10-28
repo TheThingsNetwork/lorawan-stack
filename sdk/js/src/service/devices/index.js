@@ -109,15 +109,24 @@ class Devices {
     const requestTree = requestTreeOverwrite
       ? requestTreeOverwrite
       : splitSetPaths(paths, mergeBase)
-    const devicePayload = Marshaler.payload(device, 'end_device')
 
     // Retrieve join information if not present
     if (!create && !('supports_join' in device)) {
-      try {
-        const res = await this._getDevice(appId, devId, [['supports_join']])
-        device.supports_join = res.supports_join
-      } catch (err) {
-        throw new Error('Could not retrieve join information of the device')
+      const res = await this._getDevice(
+        appId,
+        devId,
+        [['supports_join'], ['join_server_address']],
+        true,
+      )
+      if ('supports_join' in res && res.supports_join) {
+        // The NS registry entry exists
+        device.supports_join = true
+      } else if (res.join_server_address) {
+        // The NS registry entry does not exist, but a join_server_address
+        // setting suggests that join is supported, so we add the path
+        // to the request tree to ensure that it will be set on creation
+        device.supports_join = true
+        requestTree.ns.push(['supports_join'])
       }
     }
 
