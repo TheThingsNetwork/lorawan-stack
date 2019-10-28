@@ -62,10 +62,18 @@ class Devices {
       throw new Error('Missing application_id for device.')
     }
 
+    // Ensure proper id object
+    if (!('ids' in device)) {
+      device.ids = { device_id: deviceId, application_ids: { application_id: applicationId } }
+    } else if (!device.ids.device_id) {
+      device.ids.device_id = deviceId
+    } else if (!device.ids.application_ids || !device.ids.application_ids.application_id) {
+      device.ids.application_ids = { application_id: applicationId }
+    }
+
     const params = {
       routeParams: {
         'end_device.ids.application_ids.application_id': appId,
-        ...(create ? {} : { 'end_device.ids.device_id': devId }),
       },
     }
 
@@ -152,6 +160,8 @@ class Devices {
         }
       }
     }
+
+    const devicePayload = Marshaler.payload(device, 'end_device')
 
     try {
       const setParts = await makeRequests(
