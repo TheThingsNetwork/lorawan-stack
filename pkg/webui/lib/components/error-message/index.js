@@ -18,15 +18,8 @@ import classnames from 'classnames'
 import Message from '../message'
 
 import PropTypes from '../../prop-types'
-import errorMessages from '../../errors/error-messages'
 
-import {
-  isBackend,
-  isTranslated,
-  getBackendErrorId,
-  getBackendErrorDefaultMessage,
-  getBackendErrorMessageAttributes,
-} from '../../errors/utils'
+import { toMessageProps } from '../../errors/utils'
 
 import style from './error-message.styl'
 
@@ -36,19 +29,8 @@ const ErrorMessage = function({ content, ...rest }) {
     ...rest,
   }
 
-  // Check if it is a error message and transform it to a intl message
-  if (isBackend(content)) {
-    props.content.id = getBackendErrorId(content)
-    props.content.defaultMessage = getBackendErrorDefaultMessage(content)
-    props.values = getBackendErrorMessageAttributes(content)
-    props.className = classnames(rest.className, style.message)
-  } else if (isTranslated(content)) {
-    // Fall back to normal message
-    props.content = content
-  } else {
-    // Fall back to generic error message
-    props.content = errorMessages.genericError
-  }
+  props = { ...props, ...toMessageProps(content) }
+  props.className = classnames(rest.className, style.message)
 
   return <Message {...props} />
 }
