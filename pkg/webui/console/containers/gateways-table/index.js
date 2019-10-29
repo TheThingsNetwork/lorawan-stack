@@ -56,7 +56,6 @@ const headers = [
   },
 ]
 
-@bind
 export default class GatewaysTable extends React.Component {
   constructor(props) {
     super(props)
@@ -65,6 +64,7 @@ export default class GatewaysTable extends React.Component {
       getGatewaysList(params, ['name', 'description', 'frequency_plan_id'])
   }
 
+  @bind
   baseDataSelector(state) {
     return {
       gateways: selectGateways(state),
