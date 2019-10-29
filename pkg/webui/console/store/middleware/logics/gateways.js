@@ -65,7 +65,7 @@ const getGatewaysLogic = createRequestLogic({
     const {
       params: { page, limit, query },
     } = action.payload
-    const { selectors } = action.meta
+    const { selectors, options } = action.meta
 
     const data = query
       ? await api.gateways.search(
@@ -79,21 +79,24 @@ const getGatewaysLogic = createRequestLogic({
         )
       : await api.gateways.list({ page, limit }, selectors)
 
-    const entities = await Promise.all(
-      data.gateways.map(gateway => {
-        const id = getGatewayId(gateway)
-        return api.gateway
-          .stats(id)
-          .then(() => ({ ...gateway, status: 'connected' }))
-          .catch(err => {
-            if (err && err.code === 5) {
-              return { ...gateway, status: 'disconnected' }
-            }
+    let entities = data.gateways
+    if (options.withStatus) {
+      entities = await Promise.all(
+        data.gateways.map(gateway => {
+          const id = getGatewayId(gateway)
+          return api.gateway
+            .stats(id)
+            .then(() => ({ ...gateway, status: 'connected' }))
+            .catch(err => {
+              if (err && err.code === 5) {
+                return { ...gateway, status: 'disconnected' }
+              }
 
-            return { ...gateway, status: 'unknown' }
-          })
-      }),
-    )
+              return { ...gateway, status: 'unknown' }
+            })
+        }),
+      )
+    }
 
     return {
       entities,

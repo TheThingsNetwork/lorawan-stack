@@ -75,7 +75,7 @@ export default class GatewaysTable extends React.Component {
     super(props)
 
     this.getGatewaysList = params =>
-      getGatewaysList(params, ['name', 'description', 'frequency_plan_id'])
+      getGatewaysList(params, ['name', 'description', 'frequency_plan_id'], { withStatus: true })
   }
 
   @bind
