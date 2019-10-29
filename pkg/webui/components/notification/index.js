@@ -17,21 +17,23 @@ import classnames from 'classnames'
 
 import Button from '../button'
 import Message from '../../lib/components/message'
-import ErrorMessage from '../../lib/components/error-message'
 import Icon from '../icon'
-
 import PropTypes from '../../lib/prop-types'
+import Details from './details'
+
 import style from './notification.styl'
 
 const Notification = function({
+  content,
   className,
   title,
   error,
   warning,
+  details,
   info,
   small,
-  message,
   success,
+  message,
   messageValues = {},
   action,
   actionMessage,
@@ -43,6 +45,7 @@ const Notification = function({
     [style.info]: info,
     [style.small]: small,
     [style.success]: success,
+    [style.withDetails]: Boolean(details),
   })
 
   let icon = 'info'
@@ -52,21 +55,28 @@ const Notification = function({
     icon = 'warning'
   }
 
-  const content = message || error || warning || info || success
-  const Component = error ? ErrorMessage : Message
-
   return (
     <div className={classname}>
-      <Icon className={style.icon} icon={icon} large={!small} />
-      <div className={style.content}>
-        {title && <Message className={style.title} content={title} component="h4" />}
-        <div>
-          <Component content={content} values={messageValues} />
-          {action && (
-            <Button naked secondary icon={buttonIcon} onClick={action} message={actionMessage} />
-          )}
+      <div className={style.container}>
+        <Icon className={style.icon} icon={icon} large={!small} />
+        <div className={style.content}>
+          {title && <Message className={style.title} content={title} component="h4" />}
+          <div>
+            <Message content={content} values={messageValues} />
+            {action && (
+              <Button
+                naked
+                secondary
+                icon={buttonIcon}
+                onClick={action}
+                message={actionMessage}
+                type="button"
+              />
+            )}
+          </div>
         </div>
       </div>
+      {Boolean(details) && <Details className={style.details} details={details} />}
     </div>
   )
 }
@@ -75,20 +85,32 @@ Notification.propTypes = {
   action: PropTypes.func,
   actionMessage: PropTypes.message,
   buttonIcon: PropTypes.string,
-  error: PropTypes.error,
-  info: PropTypes.message,
-  message: PropTypes.message,
+  content: PropTypes.oneOfType([PropTypes.message, PropTypes.error, PropTypes.string]),
+  details: PropTypes.error,
+  error: PropTypes.bool,
+  info: PropTypes.bool,
+  message: PropTypes.bool,
   messageValues: PropTypes.object,
   small: PropTypes.bool,
-  success: PropTypes.message,
+  success: PropTypes.bool,
   title: PropTypes.message,
-  warning: PropTypes.message,
+  warning: PropTypes.bool,
 }
 
 Notification.defaultProps = {
   action: undefined,
   actionMessage: undefined,
   buttonIcon: '',
+  content: undefined,
+  error: false,
+  info: false,
+  message: false,
+  small: false,
+  title: '',
+  warning: false,
+  success: false,
+  messageValues: undefined,
+  details: undefined,
 }
 
 export default Notification
