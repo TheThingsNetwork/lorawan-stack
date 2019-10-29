@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import errorMessages from '../errors/error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
 
 /**
@@ -120,6 +121,13 @@ export const isTranslated = error => isBackend() || (typeof error === 'object' &
 export const getBackendErrorId = error => error.message.split(' ')[0]
 
 /**
+ * Returns boolean which determines if error details should be displayed.
+ * @param {Object} error - The backend error object.
+ * @returns {Object} - Display error details or not.
+ */
+
+export const getBackendErrorDetails = error => (error.details[0].cause ? error : undefined)
+/**
  * Returns the default message of the error, used as fallback translation.
  * @param {Object} error - The backend error object.
  * @returns {string} The default message.
@@ -133,3 +141,30 @@ export const getBackendErrorDefaultMessage = error =>
  * @returns {string} The attributes or undefined.
  */
 export const getBackendErrorMessageAttributes = error => error.details[0].attributes
+
+/**
+ * Adapts the error object to props of message object, if possible.
+ * @param {Object} error - The backend error object.
+ * @returns {Object} Message props of the error object, or generic error object
+ */
+export const toMessageProps = function(error) {
+  let props
+  // Check if it is a error message and transform it to a intl message
+  if (isBackend(error)) {
+    props = {
+      content: {
+        id: getBackendErrorId(error),
+        defaultMessage: getBackendErrorDefaultMessage(error),
+      },
+      values: getBackendErrorMessageAttributes(error),
+    }
+  } else if (isTranslated(error)) {
+    // Fall back to normal message
+    props = { content: error }
+  } else {
+    // Fall back to generic error message
+    props = { content: errorMessages.genericError }
+  }
+
+  return props
+}
