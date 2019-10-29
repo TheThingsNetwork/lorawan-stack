@@ -35,11 +35,12 @@ type UIConfig struct {
 
 // StackConfig is the configuration of the stack components.
 type StackConfig struct {
-	IS webui.APIConfig `json:"is" name:"is"`
-	GS webui.APIConfig `json:"gs" name:"gs"`
-	NS webui.APIConfig `json:"ns" name:"ns"`
-	AS webui.APIConfig `json:"as" name:"as"`
-	JS webui.APIConfig `json:"js" name:"js"`
+	IS   webui.APIConfig `json:"is" name:"is"`
+	GS   webui.APIConfig `json:"gs" name:"gs"`
+	NS   webui.APIConfig `json:"ns" name:"ns"`
+	AS   webui.APIConfig `json:"as" name:"as"`
+	JS   webui.APIConfig `json:"js" name:"js"`
+	EDTC webui.APIConfig `json:"edtc" name:"edtc"`
 }
 
 // FrontendConfig is the configuration for the Console frontend.
