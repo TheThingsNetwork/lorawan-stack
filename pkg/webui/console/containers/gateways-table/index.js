@@ -18,6 +18,7 @@ import bind from 'autobind-decorator'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import FetchTable from '../fetch-table'
+import Status from '../../../components/status'
 
 import { getGatewaysList } from '../../../console/store/actions/gateways'
 import {
@@ -46,25 +47,38 @@ const headers = [
   {
     name: 'frequency_plan_id',
     displayName: sharedMessages.frequencyPlan,
-    width: 15,
+    width: 10,
   },
   {
-    name: 'antennasCount',
-    displayName: sharedMessages.antennas,
-    centered: true,
-    width: 10,
+    name: 'status',
+    width: 15,
+    displayName: sharedMessages.status,
+    render(status) {
+      let indicator = 'unknown'
+      let label = sharedMessages.unknown
+
+      if (status === 'connected') {
+        indicator = 'good'
+        label = sharedMessages.connected
+      } else if (status === 'disconnected') {
+        indicator = 'bad'
+        label = sharedMessages.disconnected
+      }
+
+      return <Status status={indicator} label={label} />
+    },
   },
 ]
 
-@bind
 export default class GatewaysTable extends React.Component {
   constructor(props) {
     super(props)
 
     this.getGatewaysList = params =>
-      getGatewaysList(params, ['name', 'description', 'frequency_plan_id'])
+      getGatewaysList(params, ['name', 'description', 'frequency_plan_id'], { withStatus: true })
   }
 
+  @bind
   baseDataSelector(state) {
     return {
       gateways: selectGateways(state),

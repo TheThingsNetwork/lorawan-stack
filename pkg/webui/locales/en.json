@@ -409,6 +409,7 @@
   "lib.shared-messages.secure": "Secure",
   "lib.shared-messages.settings": "Settings",
   "lib.shared-messages.sNtwkSIKey": "SNwkSIntKey",
+  "lib.shared-messages.status": "Status",
   "lib.shared-messages.takeMeBack": "Take me back",
   "lib.shared-messages.termsAndCondition": "Terms and Conditions",
   "lib.shared-messages.time": "Time",
