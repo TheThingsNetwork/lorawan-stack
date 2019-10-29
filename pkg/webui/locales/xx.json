@@ -1,5 +1,7 @@
 {
   "components.data-sheet.index.noData": "Xx xxxx xxxxxxxxx",
+  "components.error-notification.story.problem": "Xx xxx x xxxxxxx xxxx!",
+  "components.error-notification.story.lengthyProblem": "Xx xxx x xxxxxxx xxxx! Xxx xxx xxxxxxxxxxx xx xxxxx xxxxxxx xx xxxx, xxxxx xxx xxxxxxxxx xx x xxxxxxx.",
   "components.event.index.eventData": "Xxxxx Xxxx",
   "components.events.index.truncated": "Xxxxxx xxxx xxxx xxxxxxxxx",
   "components.events.index.showing": "Xxxxxxx xxx xxxxxxxxx xxxxxx",
@@ -23,6 +25,8 @@
   "components.location-form.index.deleteFailure": "Xxxxx xxx x xxxxxxx xxxxxxxx xxx xxxxxxxx",
   "components.location-form.index.deleteSuccess": "Xxx xxxxxxxx xxx xxxx xxxxxxx xxxxxxxxxxxx",
   "components.navigation.side.side.hideSidebar": "Xxxx Xxxxxxx",
+  "components.notification.details.index.showDetails": "Xxxx Xxxxxxx",
+  "components.notification.details.index.hideDetails": "Xxxx Xxxxxxx",
   "components.safe-inspector.index.copied": "Xxxxxx xx xxxxxxxxx!",
   "components.safe-inspector.index.toggleVisibility": "Xxxxxx xxxxxxxxxx",
   "components.safe-inspector.index.copyClipboard": "Xxxx xx xxxxxxxxx",
