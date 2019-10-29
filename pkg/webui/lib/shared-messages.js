@@ -174,6 +174,7 @@ export default defineMessages({
   secure: 'Secure',
   settings: 'Settings',
   sNtwkSIKey: 'SNwkSIntKey',
+  status: 'Status',
   takeMeBack: 'Take me back',
   termsAndCondition: 'Terms and Conditions',
   time: 'Time',
