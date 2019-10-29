@@ -19,6 +19,7 @@ import api from '../../../api'
 import * as gateways from '../../actions/gateways'
 import { selectGsConfig } from '../../../../lib/selectors/env'
 import { selectGatewayById, selectGatewayStatisticsIsFetching } from '../../selectors/gateways'
+import { getGatewayId } from '../../../../lib/selectors/id'
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
 
@@ -78,8 +79,24 @@ const getGatewaysLogic = createRequestLogic({
         )
       : await api.gateways.list({ page, limit }, selectors)
 
+    const entities = await Promise.all(
+      data.gateways.map(gateway => {
+        const id = getGatewayId(gateway)
+        return api.gateway
+          .stats(id)
+          .then(() => ({ ...gateway, status: 'connected' }))
+          .catch(err => {
+            if (err && err.code === 5) {
+              return { ...gateway, status: 'disconnected' }
+            }
+
+            return { ...gateway, status: 'unknown' }
+          })
+      }),
+    )
+
     return {
-      entities: data.gateways,
+      entities,
       totalCount: data.totalCount,
     }
   },
