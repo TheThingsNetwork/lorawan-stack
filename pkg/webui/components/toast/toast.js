@@ -33,11 +33,12 @@ const createToast = function() {
         className={style.notification}
         small
         title={title}
-        success={type === SUCCESS ? message : undefined}
-        info={type === INFO ? message : undefined}
-        error={type === ERROR ? message : undefined}
-        warning={type === WARNING ? message : undefined}
-        message={type === DEFAULT ? message : undefined}
+        content={message}
+        success={type === SUCCESS}
+        info={type === INFO}
+        error={type === ERROR}
+        warning={type === WARNING}
+        message={type === DEFAULT}
       />,
       {
         onClose: () => next(),

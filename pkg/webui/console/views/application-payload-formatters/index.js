@@ -96,7 +96,8 @@ export default class ApplicationPayloadFormatters extends React.Component {
       <Notification
         className={style.warningNotification}
         title={m.warningTitle}
-        warning={m.warningText}
+        warning
+        content={m.warningText}
         messageValues={{
           link: (
             <Link key="warnining-link" to={`/applications/${appId}/link`}>

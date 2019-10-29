@@ -240,7 +240,8 @@ class RightsGroup extends React.Component {
         {hasOutOfOwnScopePseudoRight && (
           <Notification
             small
-            warning={m.outOfOwnScopePseudoRight}
+            warning
+            content={m.outOfOwnScopePseudoRight}
             messageValues={{ entityType: intl.formatMessage(entityTypeMessage).toLowerCase() }}
           />
         )}
