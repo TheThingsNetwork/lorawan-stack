@@ -37,6 +37,9 @@ export default {
     async updatePassword(user_id, passwordData) {
       return axios.put(`${isBaseUrl}/users/${user_id}/password`, passwordData)
     },
+    async validateEmail(validationData) {
+      return axios.patch(`${isBaseUrl}/contact_info/validation`, validationData)
+    },
   },
   oauth: {
     login(credentials) {
