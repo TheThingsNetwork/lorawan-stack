@@ -17,14 +17,11 @@ package networkserver_test
 import (
 	"context"
 	"fmt"
-	"sync"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -211,10 +208,6 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 func TestDownlinkTaskQueues(t *testing.T) {
 	t.Parallel()
 
-	namespace := [...]string{
-		"networkserver_test",
-	}
-
 	for _, tc := range []struct {
 		Name string
 		New  func(t testing.TB) (q DownlinkTaskQueue, closeFn func() error)
@@ -222,48 +215,8 @@ func TestDownlinkTaskQueues(t *testing.T) {
 	}{
 		{
 			Name: "Redis",
-			New: func(t testing.TB) (DownlinkTaskQueue, func() error) {
-				a := assertions.New(t)
-
-				cl, flush := test.NewRedis(t, namespace[:]...)
-				q := redis.NewDownlinkTaskQueue(cl, 100, "testGroup", "testID")
-				err := q.Init()
-				a.So(err, should.BeNil)
-
-				ctx, cancel := context.WithCancel(test.Context())
-				wg := &sync.WaitGroup{}
-				wg.Add(1)
-				errCh := make(chan error, 1)
-				go func() {
-					wg.Done()
-					t.Log("Running Redis downlink task queue...")
-					err := q.Run(ctx)
-					errCh <- err
-					close(errCh)
-					t.Logf("Stopped Redis downlink task queue with error: %s", err)
-				}()
-				wg.Wait()
-				return q, func() error {
-					cancel()
-					// Unblock DispatchTasks in Run()
-					err := q.Add(ctx, *ttnpb.NewPopulatedEndDeviceIdentifiers(test.Randy, false), time.Unix(0, 0), false)
-					a.So(err, should.BeNil)
-
-					select {
-					case err := <-errCh:
-						if err != nil && err != context.Canceled {
-							t.Errorf("Failed to run queue: %s(cause: %s)", err, errors.Cause(err))
-						}
-
-					case <-time.After(Timeout):
-						t.Error("Timed out waiting for Run to return")
-					}
-
-					flush()
-					return cl.Close()
-				}
-			},
-			N: 8,
+			New:  NewRedisDownlinkTaskQueue,
+			N:    8,
 		},
 	} {
 		for i := 0; i < int(tc.N); i++ {

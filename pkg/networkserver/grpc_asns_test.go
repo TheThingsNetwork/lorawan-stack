@@ -16,7 +16,8 @@ package networkserver_test
 
 import (
 	"context"
-	"io"
+	"fmt"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -52,33 +53,208 @@ func TestLinkApplication(t *testing.T) {
 		ApplicationID: "link-application-app-2",
 	}
 
-	link1, link1EndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID1)
+	link1, link1EndEventClosure, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID1)
 	if !a.So(ok, should.BeTrue) {
 		t.Fatal("Failed to link application 1")
 	}
+	var link1SubscribeCtx context.Context
+	var link1SubscribeFunc func(context.Context, *ttnpb.ApplicationUp) error
+	var link1SubscribeRespCh chan<- error
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for ApplicationUplinks.Subscribe to be called")
 
-	link2, link2EndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID2)
+	case req := <-env.ApplicationUplinks.Subscribe:
+		a.So(req.Identifiers, should.Resemble, appID1)
+		if !a.So(req.Func, should.NotBeNil) {
+			t.Fatal("Subscribe callback function is nil")
+		}
+		link1SubscribeCtx = req.Context
+		link1SubscribeFunc = req.Func
+		link1SubscribeRespCh = req.Response
+	}
+
+	for i, link1Up := range []*ttnpb.ApplicationUp{
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev",
+			},
+			CorrelationIDs: []string{"correlation-id-1", "correlation-id-2"},
+			Up: &ttnpb.ApplicationUp_DownlinkFailed{
+				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev2",
+			},
+			CorrelationIDs: []string{"correlation-id-3", "correlation-id-4"},
+			Up: &ttnpb.ApplicationUp_LocationSolved{
+				LocationSolved: &ttnpb.ApplicationLocation{},
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("uplink %d", i), func(t *testing.T) {
+			a := assertions.New(t)
+
+			errCh := make(chan error)
+			go func(link1Up *ttnpb.ApplicationUp) {
+				errCh <- link1SubscribeFunc(ctx, link1Up)
+			}(link1Up)
+
+			var up *ttnpb.ApplicationUp
+			var err error
+			if !a.So(test.WaitContext(ctx, func() {
+				up, err = link1.Recv()
+			}), should.BeTrue) {
+				t.Fatal("Timed out while waiting for AS link receive to succeed")
+			}
+			if !a.So(err, should.BeNil) {
+				t.Fatal("AS link receive failed")
+			}
+			a.So(up, should.Resemble, link1Up)
+
+			if !a.So(test.WaitContext(ctx, func() {
+				err = link1.Send(ttnpb.Empty)
+			}), should.BeTrue) {
+				t.Fatal("Timed out while waiting for AS link send to succeed")
+			}
+			if !a.So(err, should.BeNil) {
+				t.Fatal("AS link send failed")
+			}
+
+			select {
+			case <-ctx.Done():
+				t.Fatal("Timed out while waiting for ApplicationUplinks.Subscribe callback to return")
+
+			case err := <-errCh:
+				a.So(err, should.BeNil)
+			}
+		})
+	}
+
+	link2, link2EndEventClosure, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID2)
 	if !a.So(ok, should.BeTrue) {
 		t.Fatal("Failed to link application 2")
 	}
+	var link2SubscribeCtx context.Context
+	var link2SubscribeRespCh chan<- error
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for ApplicationUplinks.Subscribe to be called")
 
-	newLink1, newLink1EndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID1, link1EndEvent(nil))
-	if !a.So(ok, should.BeTrue) {
-		t.Fatal("Failed to relink application 1")
+	case req := <-env.ApplicationUplinks.Subscribe:
+		a.So(req.Identifiers, should.Resemble, appID2)
+		if !a.So(req.Func, should.NotBeNil) {
+			t.Fatalf("Subscribe callback function is nil")
+		}
+		link2SubscribeCtx = req.Context
+		link2SubscribeRespCh = req.Response
 	}
 
+	select {
+	case <-link1SubscribeCtx.Done():
+		t.Fatal("ApplicationUplinks.Subscribe context is done too early")
+	default:
+	}
+
+	type linkApplicationResp struct {
+		Link            ttnpb.AsNs_LinkApplicationClient
+		EndEventClosure func(error) events.Event
+		Ok              bool
+	}
+	linkApplicationRespCh := make(chan linkApplicationResp, 1)
+	go func() {
+		newLink1, newLink1EndEventClosure, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID1, link1EndEventClosure(context.Canceled))
+		linkApplicationRespCh <- linkApplicationResp{
+			Link:            newLink1,
+			EndEventClosure: newLink1EndEventClosure,
+			Ok:              ok,
+		}
+	}()
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for ApplicationUplinks.Subscribe context to be done")
+
+	case <-link1SubscribeCtx.Done():
+		link1SubscribeRespCh <- link1SubscribeCtx.Err()
+		close(link1SubscribeRespCh)
+	}
 	up, err := link1.Recv()
 	if !a.So(up, should.BeNil) {
 		t.Fatalf("Received uplink on link 1: %v", up)
 	}
-	a.So(err, should.Resemble, io.EOF)
+	a.So(err, should.BeError)
 
-	a.So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
+	var newLink1 ttnpb.AsNs_LinkApplicationClient
+	var newLink1EndEventClosure func(error) events.Event
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for application 1 to relink")
+
+	case resp := <-linkApplicationRespCh:
+		if !a.So(resp.Ok, should.BeTrue) {
+			t.Fatal("Application 1 failed to relink")
+		}
+		newLink1 = resp.Link
+		newLink1EndEventClosure = resp.EndEventClosure
+	}
+
+	var newLink1SubscribeCtx context.Context
+	var newLink1SubscribeRespCh chan<- error
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for ApplicationUplinks.Subscribe to be called")
+
+	case req := <-env.ApplicationUplinks.Subscribe:
+		a.So(req.Identifiers, should.Resemble, appID1)
+		if !a.So(req.Func, should.NotBeNil) {
+			t.Fatalf("Subscribe callback function is nil")
+		}
+		newLink1SubscribeCtx = req.Context
+		newLink1SubscribeRespCh = req.Response
+	}
+
+	select {
+	case <-newLink1SubscribeCtx.Done():
+		t.Fatal("ApplicationUplinks.Subscribe context is done too early")
+
+	case <-link2SubscribeCtx.Done():
+		t.Fatal("ApplicationUplinks.Subscribe context is done too early")
+
+	default:
+	}
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		a.So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
+		wg.Done()
+	}()
+
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for ApplicationUplinks.Subscribe context to be done")
+
+	case <-newLink1SubscribeCtx.Done():
+		newLink1SubscribeRespCh <- link1SubscribeCtx.Err()
+	}
+
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for ApplicationUplinks.Subscribe context to be done")
+
+	case <-link2SubscribeCtx.Done():
+		link2SubscribeRespCh <- link1SubscribeCtx.Err()
+	}
 
 	if !a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 2, func(evs ...events.Event) bool {
 		return a.So(evs, should.HaveSameElements, []events.Event{
-			newLink1EndEvent(context.Canceled),
-			link2EndEvent(context.Canceled),
+			newLink1EndEventClosure(context.Canceled),
+			link2EndEventClosure(context.Canceled),
 		}, test.EventEqual)
 	}), should.BeTrue) {
 		t.Fatal("AS link end events assertion failed")
@@ -95,6 +271,10 @@ func TestLinkApplication(t *testing.T) {
 		t.Fatalf("Received uplink on link 2: %v", up)
 	}
 	a.So(err, should.BeError)
+
+	if !a.So(test.WaitContext(ctx, wg.Wait), should.BeTrue) {
+		t.Fatal("Timed out while waiting for Network Server to close")
+	}
 }
 
 func TestDownlinkQueueReplace(t *testing.T) {
@@ -1705,5 +1885,241 @@ func TestDownlinkQueueList(t *testing.T) {
 			a.So(req, should.Resemble, tc.Request)
 			a.So(getByIDCalls, should.Equal, tc.GetByIDCalls)
 		})
+	}
+}
+
+// handleApplicationUplinkQueueTest runs a test suite on q.
+func handleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
+	a := assertions.New(t)
+
+	ctx := test.ContextWithT(test.Context(), t)
+	ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+	defer cancel()
+
+	appID1 := ttnpb.ApplicationIdentifiers{
+		ApplicationID: "application-uplink-queue-app-1",
+	}
+
+	appID2 := ttnpb.ApplicationIdentifiers{
+		ApplicationID: "application-uplink-queue-app-2",
+	}
+
+	pbs := [...]*ttnpb.ApplicationUp{
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev",
+			},
+			CorrelationIDs: []string{"correlation-id-1", "correlation-id-2"},
+			Up: &ttnpb.ApplicationUp_DownlinkFailed{
+				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev2",
+			},
+			CorrelationIDs: []string{"correlation-id-3", "correlation-id-4"},
+			Up: &ttnpb.ApplicationUp_LocationSolved{
+				LocationSolved: &ttnpb.ApplicationLocation{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID2,
+				DeviceID:               "test-dev",
+			},
+			CorrelationIDs: []string{"correlation-id-5", "correlation-id-6"},
+			Up: &ttnpb.ApplicationUp_LocationSolved{
+				LocationSolved: &ttnpb.ApplicationLocation{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID1,
+				DeviceID:               "test-dev2",
+			},
+			CorrelationIDs: []string{"correlation-id-7", "correlation-id-8"},
+			Up: &ttnpb.ApplicationUp_DownlinkFailed{
+				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{},
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appID2,
+				DeviceID:               "test-dev",
+			},
+			CorrelationIDs: []string{"correlation-id-9", "correlation-id-10"},
+			Up: &ttnpb.ApplicationUp_DownlinkAck{
+				DownlinkAck: &ttnpb.ApplicationDownlink{},
+			},
+		},
+	}
+
+	assertAdd := func(ctx context.Context, ups ...*ttnpb.ApplicationUp) (error, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+
+		errCh := make(chan error, 1)
+		go func() {
+			errCh <- q.Add(ctx, ups...)
+		}()
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for Add to return")
+			return nil, false
+
+		case err := <-errCh:
+			return err, true
+		}
+	}
+
+	type subscribeFuncReq struct {
+		Context  context.Context
+		Uplink   *ttnpb.ApplicationUp
+		Response chan<- error
+	}
+	subscribe := func(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (<-chan subscribeFuncReq, <-chan error, func()) {
+		ctx, cancel := context.WithCancel(ctx)
+		subscribeFuncCh := make(chan subscribeFuncReq)
+		errCh := make(chan error, 1)
+		go func() {
+			errCh <- q.Subscribe(ctx, appID, func(ctx context.Context, up *ttnpb.ApplicationUp) error {
+				respCh := make(chan error, 1)
+				subscribeFuncCh <- subscribeFuncReq{
+					Context:  ctx,
+					Uplink:   up,
+					Response: respCh,
+				}
+				return <-respCh
+			})
+			close(errCh)
+		}()
+		return subscribeFuncCh, errCh, func() {
+			cancel()
+			close(subscribeFuncCh)
+		}
+	}
+
+	_, app1SubErrCh, app1SubStop := subscribe(ctx, appID1)
+	app1SubStop()
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for Subscribe to return")
+
+	case err := <-app1SubErrCh:
+		if !a.So(err, should.Resemble, context.Canceled) {
+			t.Fatalf("Received unexpected Subscribe error: %v", err)
+		}
+	}
+
+	err, ok := assertAdd(ctx, pbs[0:1]...)
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+	a.So(err, should.BeNil)
+
+	app1SubFuncCh, app1SubErrCh, app1SubStop := subscribe(ctx, appID1)
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for Subscribe callback to be called")
+
+	case err := <-app1SubErrCh:
+		t.Fatalf("Received unexpected Subscribe error: %v", err)
+
+	case req := <-app1SubFuncCh:
+		a.So(req.Context, should.HaveParentContext, ctx)
+		a.So(req.Uplink, should.Resemble, pbs[0])
+		close(req.Response)
+	}
+
+	err, ok = assertAdd(ctx, pbs[1:3]...)
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+	a.So(err, should.BeNil)
+
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for Subscribe callback to be called")
+
+	case err := <-app1SubErrCh:
+		t.Fatalf("Received unexpected Subscribe error: %v", err)
+
+	case req := <-app1SubFuncCh:
+		a.So(req.Context, should.HaveParentContext, ctx)
+		a.So(req.Uplink, should.Resemble, pbs[1])
+		close(req.Response)
+	}
+
+	app2SubFuncCh, app2SubErrCh, app2SubStop := subscribe(ctx, appID2)
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for Subscribe callback to be called")
+
+	case err := <-app2SubErrCh:
+		t.Fatalf("Received unexpected Subscribe error: %v", err)
+
+	case req := <-app2SubFuncCh:
+		a.So(req.Context, should.HaveParentContext, ctx)
+		a.So(req.Uplink, should.Resemble, pbs[2])
+		close(req.Response)
+	}
+	app1SubStop()
+	app2SubStop()
+
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for Subscribe to return")
+
+	case err := <-app1SubErrCh:
+		if !a.So(err, should.Resemble, context.Canceled) {
+			t.Fatalf("Received unexpected Subscribe error: %v", err)
+		}
+	}
+	select {
+	case <-ctx.Done():
+		t.Fatal("Timed out while waiting for Subscribe to return")
+
+	case err := <-app2SubErrCh:
+		if !a.So(err, should.Resemble, context.Canceled) {
+			t.Fatalf("Received unexpected Subscribe error: %v", err)
+		}
+	}
+}
+
+func TestApplicationUplinkQueues(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name string
+		New  func(t testing.TB) (q ApplicationUplinkQueue, closeFn func() error)
+		N    uint16
+	}{
+		{
+			Name: "Redis",
+			New:  NewRedisApplicationUplinkQueue,
+			N:    8,
+		},
+	} {
+		for i := 0; i < int(tc.N); i++ {
+			t.Run(fmt.Sprintf("%s/%d", tc.Name, i), func(t *testing.T) {
+				t.Parallel()
+				q, closeFn := tc.New(t)
+				if closeFn != nil {
+					defer func() {
+						if err := closeFn(); err != nil {
+							t.Errorf("Failed to close application uplink schedule: %s", err)
+						}
+					}()
+				}
+				t.Run("1st run", func(t *testing.T) { handleApplicationUplinkQueueTest(t, q) })
+				if t.Failed() {
+					t.Skip("Skipping 2nd run")
+				}
+				t.Run("2nd run", func(t *testing.T) { handleApplicationUplinkQueueTest(t, q) })
+			})
+		}
 	}
 }

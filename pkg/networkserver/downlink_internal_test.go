@@ -1188,7 +1188,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
 							FCnt:           0x23,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -1255,6 +1255,27 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case setRespCh <- DeviceRegistrySetByIDResponse{
 					Device: setDevice,
 				}:
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
+
+				case req := <-env.ApplicationUplinks.Add:
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					a.So(req.Uplinks, should.Resemble, []*ttnpb.ApplicationUp{
+						{
+							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
+							CorrelationIDs:       lastUp.CorrelationIDs,
+							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
+								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
+									Downlinks:    getDevice.QueuedApplicationDownlinks,
+									LastFCntDown: getDevice.Session.LastNFCntDown,
+								},
+							},
+						},
+					})
+					close(req.Response)
 				}
 
 				select {
@@ -1411,6 +1432,27 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case setRespCh <- DeviceRegistrySetByIDResponse{
 					Device: setDevice,
 				}:
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
+
+				case req := <-env.ApplicationUplinks.Add:
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					a.So(req.Uplinks, should.Resemble, []*ttnpb.ApplicationUp{
+						{
+							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
+							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.QueuedApplicationDownlinks[0].CorrelationIDs...),
+							Up: &ttnpb.ApplicationUp_DownlinkFailed{
+								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[0],
+									Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong),
+								},
+							},
+						},
+					})
+					close(req.Response)
 				}
 
 				select {
@@ -4008,6 +4050,27 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
+
+				case req := <-env.ApplicationUplinks.Add:
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					a.So(req.Uplinks, should.Resemble, []*ttnpb.ApplicationUp{
+						{
+							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
+							CorrelationIDs:       getDevice.QueuedApplicationDownlinks[0].CorrelationIDs,
+							Up: &ttnpb.ApplicationUp_DownlinkFailed{
+								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[0],
+									Error:               *ttnpb.ErrorDetailsToProto(errInvalidAbsoluteTime),
+								},
+							},
+						},
+					})
+					close(req.Response)
+				}
+
 				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
 						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
@@ -4567,7 +4630,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							},
 						},
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+							CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
 							FCnt:           0x42,
 							FPort:          0x1,
 							FRMPayload:     []byte("testPayload"),
@@ -4634,6 +4697,37 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{}:
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
+
+				case req := <-env.ApplicationUplinks.Add:
+					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
+					a.So(req.Uplinks, should.Resemble, []*ttnpb.ApplicationUp{
+						{
+							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
+							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.QueuedApplicationDownlinks[0].CorrelationIDs...),
+							Up: &ttnpb.ApplicationUp_DownlinkFailed{
+								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[0],
+									Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
+								},
+							},
+						},
+						{
+							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
+							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.QueuedApplicationDownlinks[1].CorrelationIDs...),
+							Up: &ttnpb.ApplicationUp_DownlinkFailed{
+								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[1],
+									Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
+								},
+							},
+						},
+					})
+					close(req.Response)
 				}
 
 				select {

@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
@@ -35,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -414,6 +414,74 @@ func NewJSPeer(ctx context.Context, js interface {
 	ttnpb.NsJsServer
 }) cluster.Peer {
 	return test.Must(test.NewGRPCServerPeer(ctx, js, ttnpb.RegisterNsJsServer)).(cluster.Peer)
+}
+
+var _ ApplicationUplinkQueue = MockApplicationUplinkQueue{}
+
+// MockApplicationUplinkQueue is a mock ApplicationUplinkQueue used for testing.
+type MockApplicationUplinkQueue struct {
+	AddFunc       func(ctx context.Context, ups ...*ttnpb.ApplicationUp) error
+	SubscribeFunc func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error
+}
+
+// Add calls AddFunc if set and panics otherwise.
+func (m MockApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error {
+	if m.AddFunc == nil {
+		panic("Add called, but not set")
+	}
+	return m.AddFunc(ctx, ups...)
+}
+
+// Subscribe calls SubscribeFunc if set and panics otherwise.
+func (m MockApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error {
+	if m.SubscribeFunc == nil {
+		panic("Subscribe called, but not set")
+	}
+	return m.SubscribeFunc(ctx, appID, f)
+}
+
+type ApplicationUplinkQueueAddRequest struct {
+	Context  context.Context
+	Uplinks  []*ttnpb.ApplicationUp
+	Response chan<- error
+}
+
+func MakeApplicationUplinkQueueAddChFunc(reqCh chan<- ApplicationUplinkQueueAddRequest) func(context.Context, ...*ttnpb.ApplicationUp) error {
+	return func(ctx context.Context, ups ...*ttnpb.ApplicationUp) error {
+		respCh := make(chan error)
+		reqCh <- ApplicationUplinkQueueAddRequest{
+			Context:  ctx,
+			Uplinks:  ups,
+			Response: respCh,
+		}
+		return <-respCh
+	}
+}
+
+type ApplicationUplinkQueueSubscribeRequest struct {
+	Context     context.Context
+	Identifiers ttnpb.ApplicationIdentifiers
+	Func        func(context.Context, *ttnpb.ApplicationUp) error
+	Response    chan<- error
+}
+
+func MakeApplicationUplinkQueueSubscribeChFunc(reqCh chan<- ApplicationUplinkQueueSubscribeRequest) func(context.Context, ttnpb.ApplicationIdentifiers, func(context.Context, *ttnpb.ApplicationUp) error) error {
+	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error {
+		respCh := make(chan error)
+		reqCh <- ApplicationUplinkQueueSubscribeRequest{
+			Context:     ctx,
+			Identifiers: appID,
+			Func:        f,
+			Response:    respCh,
+		}
+		return <-respCh
+	}
+}
+
+// ApplicationUplinkSubscribeBlockFunc is ApplicationUplinks.Subscribe function, which blocks until ctx is done and returns nil.
+func ApplicationUplinkSubscribeBlockFunc(ctx context.Context, _ func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
+	<-ctx.Done()
+	return ctx.Err()
 }
 
 var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}
@@ -806,30 +874,6 @@ func MakeWindowEndChFunc(reqCh chan<- WindowEndRequest) func(ctx context.Context
 	}
 }
 
-var _ ttnpb.AsNs_LinkApplicationServer = &MockAsNsLinkApplicationStream{}
-
-type MockAsNsLinkApplicationStream struct {
-	*test.MockServerStream
-	SendFunc func(*ttnpb.ApplicationUp) error
-	RecvFunc func() (*pbtypes.Empty, error)
-}
-
-// Send calls SendFunc if set and panics otherwise.
-func (m MockAsNsLinkApplicationStream) Send(msg *ttnpb.ApplicationUp) error {
-	if m.SendFunc == nil {
-		panic("Send called, but not set")
-	}
-	return m.SendFunc(msg)
-}
-
-// Recv calls RecvFunc if set and panics otherwise.
-func (m MockAsNsLinkApplicationStream) Recv() (*pbtypes.Empty, error) {
-	if m.RecvFunc == nil {
-		panic("Recv called, but not set")
-	}
-	return m.RecvFunc()
-}
-
 func AssertDownlinkTaskAddRequest(ctx context.Context, reqCh <-chan DownlinkTaskAddRequest, assert func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) bool, resp error) bool {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
@@ -845,6 +889,29 @@ func AssertDownlinkTaskAddRequest(ctx context.Context, reqCh <-chan DownlinkTask
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for DownlinkTasks.Add response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
+	}
+}
+
+func AssertApplicationUplinkQueueAddRequest(ctx context.Context, reqCh <-chan ApplicationUplinkQueueAddRequest, assert func(context.Context, ...*ttnpb.ApplicationUp) bool, resp error) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for ApplicationUplinkQueue.Add to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.Uplinks...) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for ApplicationUplinkQueue.Add response to be processed")
 			return false
 
 		case req.Response <- resp:
@@ -956,7 +1023,7 @@ func AssertAuthNsGsScheduleDownlinkRequest(ctx context.Context, authReqCh <-chan
 	return AssertNsGsScheduleDownlinkRequest(ctx, scheduleReqCh, scheduleAssert, scheduleResp)
 }
 
-func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, eventsPublishCh <-chan test.EventPubSubPublishRequest, appID ttnpb.ApplicationIdentifiers, replaceEvents ...events.Event) (ttnpb.AsNs_LinkApplicationClient, func(interface{}) events.Event, bool) {
+func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh <-chan test.ClusterGetPeerRequest, eventsPublishCh <-chan test.EventPubSubPublishRequest, appID ttnpb.ApplicationIdentifiers, replaceEvents ...events.Event) (ttnpb.AsNs_LinkApplicationClient, func(error) events.Event, bool) {
 	t := test.MustTFromContext(ctx)
 	t.Helper()
 
@@ -1030,8 +1097,8 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 		t.Error("Timed out while waiting for AS link to open")
 		return nil, nil, false
 	}
-	return link, func(v interface{}) events.Event {
-		return EvtEndApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, v)
+	return link, func(err error) events.Event {
+		return EvtEndApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, err)
 	}, a.So(err, should.BeNil)
 }
 
@@ -1043,6 +1110,39 @@ func AssertNetworkServerClose(ctx context.Context, ns *NetworkServer) bool {
 		return false
 	}
 	return true
+}
+
+type ApplicationUplinkQueueEnvironment struct {
+	Add       <-chan ApplicationUplinkQueueAddRequest
+	Subscribe <-chan ApplicationUplinkQueueSubscribeRequest
+}
+
+func newMockApplicationUplinkQueue(t *testing.T) (ApplicationUplinkQueue, ApplicationUplinkQueueEnvironment, func()) {
+	t.Helper()
+
+	addCh := make(chan ApplicationUplinkQueueAddRequest)
+	subscribeCh := make(chan ApplicationUplinkQueueSubscribeRequest)
+	return &MockApplicationUplinkQueue{
+			AddFunc:       MakeApplicationUplinkQueueAddChFunc(addCh),
+			SubscribeFunc: MakeApplicationUplinkQueueSubscribeChFunc(subscribeCh),
+		}, ApplicationUplinkQueueEnvironment{
+			Add:       addCh,
+			Subscribe: subscribeCh,
+		},
+		func() {
+			select {
+			case <-addCh:
+				t.Error("ApplicationUplinkQueue.Add call missed")
+			default:
+				close(addCh)
+			}
+			select {
+			case <-subscribeCh:
+				t.Error("ApplicationUplinkQueue.Subscribe call missed")
+			default:
+				close(subscribeCh)
+			}
+		}
 }
 
 type DeviceRegistryEnvironment struct {
@@ -1158,12 +1258,13 @@ type TestEnvironment struct {
 		Auth    <-chan test.ClusterAuthRequest
 		GetPeer <-chan test.ClusterGetPeerRequest
 	}
-	CollectionDone    <-chan WindowEndRequest
-	DeduplicationDone <-chan WindowEndRequest
-	DeviceRegistry    *DeviceRegistryEnvironment
-	DownlinkTasks     *DownlinkTaskQueueEnvironment
-	Events            <-chan test.EventPubSubPublishRequest
-	InteropClient     *InteropClientEnvironment
+	CollectionDone     <-chan WindowEndRequest
+	DeduplicationDone  <-chan WindowEndRequest
+	ApplicationUplinks *ApplicationUplinkQueueEnvironment
+	DeviceRegistry     *DeviceRegistryEnvironment
+	DownlinkTasks      *DownlinkTaskQueueEnvironment
+	Events             <-chan test.EventPubSubPublishRequest
+	InteropClient      *InteropClientEnvironment
 }
 
 func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplication bool, opts ...Option) (*NetworkServer, context.Context, TestEnvironment, func()) {
@@ -1218,6 +1319,12 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplicati
 	closeFuncs = append(closeFuncs, test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 		PublishFunc: test.MakeEventPubSubPublishChFunc(eventsPublishCh),
 	}))
+	if conf.ApplicationUplinks == nil {
+		m, mEnv, closeM := newMockApplicationUplinkQueue(t)
+		conf.ApplicationUplinks = m
+		env.ApplicationUplinks = &mEnv
+		closeFuncs = append(closeFuncs, closeM)
+	}
 	if conf.Devices == nil {
 		m, mEnv, closeM := newMockDeviceRegistry(t)
 		conf.Devices = m
@@ -1321,4 +1428,78 @@ func ForEachClass(f func(makeName func(parts ...string) string, class ttnpb.Clas
 			return fmt.Sprintf("Class:%s/%s", class.String(), strings.Join(parts, "/"))
 		}, class)
 	}
+}
+
+var redisNamespace = [...]string{
+	"networkserver_test",
+}
+
+const (
+	redisConsumerGroup = "ns"
+	redisConsumerID    = "test"
+)
+
+func NewRedisApplicationUplinkQueue(t testing.TB) (ApplicationUplinkQueue, func() error) {
+	cl, flush := test.NewRedis(t, append(redisNamespace[:], "application-uplinks")...)
+	return redis.NewApplicationUplinkQueue(cl, 100, redisConsumerGroup, redisConsumerID),
+		func() error {
+			flush()
+			return cl.Close()
+		}
+}
+
+func NewRedisDeviceRegistry(t testing.TB) (DeviceRegistry, func() error) {
+	cl, flush := test.NewRedis(t, append(redisNamespace[:], "devices")...)
+	return &redis.DeviceRegistry{
+			Redis: cl,
+		},
+		func() error {
+			flush()
+			return cl.Close()
+		}
+}
+
+func NewRedisDownlinkTaskQueue(t testing.TB) (DownlinkTaskQueue, func() error) {
+	a := assertions.New(t)
+
+	cl, flush := test.NewRedis(t, append(redisNamespace[:], "downlink-tasks")...)
+	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, redisConsumerID)
+	err := q.Init()
+	a.So(err, should.BeNil)
+
+	ctx, cancel := context.WithCancel(test.Context())
+	errCh := make(chan error, 1)
+	go func() {
+		t.Log("Running Redis downlink task queue...")
+		err := q.Run(ctx)
+		errCh <- err
+		close(errCh)
+		t.Logf("Stopped Redis downlink task queue with error: %s", err)
+	}()
+	return q,
+		func() error {
+			cancel()
+			err := q.Add(ctx, ttnpb.EndDeviceIdentifiers{
+				DeviceID:               "test",
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
+			}, time.Now(), false)
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to add mock device to task queue: %s", err)
+				return err
+			}
+
+			var runErr error
+			select {
+			case <-time.After(Timeout):
+				t.Error("Timed out waiting for redis.DownlinkTaskQueue.Run to return")
+			case runErr = <-errCh:
+			}
+
+			flush()
+			closeErr := cl.Close()
+			if runErr != nil && runErr != context.Canceled {
+				return runErr
+			}
+			return closeErr
+		}
 }

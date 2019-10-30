@@ -33,7 +33,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 )
 
@@ -103,6 +102,7 @@ type NetworkServer struct {
 	devAddrPrefixes []types.DevAddrPrefix
 
 	applicationServers *sync.Map // string -> *applicationUpStream
+	applicationUplinks ApplicationUplinkQueue
 
 	metadataAccumulators *sync.Map // uint64 -> *metadataAccumulator
 
@@ -114,8 +114,6 @@ type NetworkServer struct {
 
 	deduplicationDone WindowEndFunc
 	collectionDone    WindowEndFunc
-
-	handleASUplink func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error)
 
 	defaultMACSettings ttnpb.MACSettings
 
@@ -138,13 +136,6 @@ func WithDeduplicationDoneFunc(f WindowEndFunc) Option {
 func WithCollectionDoneFunc(f WindowEndFunc) Option {
 	return func(ns *NetworkServer) {
 		ns.collectionDone = f
-	}
-}
-
-// WithASUplinkHandler overrides the default function called, which is used for sending the uplink to AS.
-func WithASUplinkHandler(f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationUp) (bool, error)) Option {
-	return func(ns *NetworkServer) {
-		ns.handleASUplink = f
 	}
 }
 
@@ -187,14 +178,15 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	ns := &NetworkServer{
 		Component:               c,
 		ctx:                     ctx,
-		devices:                 conf.Devices,
 		netID:                   conf.NetID,
 		devAddrPrefixes:         devAddrPrefixes,
 		applicationServers:      &sync.Map{},
+		applicationUplinks:      conf.ApplicationUplinks,
+		devices:                 conf.Devices,
+		downlinkTasks:           conf.DownlinkTasks,
 		metadataAccumulators:    &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{},
 		hashPool:                &sync.Pool{},
-		downlinkTasks:           conf.DownlinkTasks,
 		downlinkPriorities:      downlinkPriorities,
 		defaultMACSettings: ttnpb.MACSettings{
 			ClassBTimeout:         conf.DefaultMACSettings.ClassBTimeout,
@@ -251,25 +243,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}
 	if ns.collectionDone == nil {
 		ns.collectionDone = NewWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow)
-	}
-
-	if ns.handleASUplink == nil {
-		ns.handleASUplink = func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, up *ttnpb.ApplicationUp) (bool, error) {
-			v, ok := ns.applicationServers.Load(unique.ID(ctx, ids))
-			if !ok {
-				return false, nil
-			}
-			as := v.(ttnpb.AsNs_LinkApplicationServer)
-
-			var err error
-			if err = as.Send(up); err != nil {
-				return true, err
-			}
-			if _, err = as.Recv(); err != nil {
-				return true, err
-			}
-			return true, nil
-		}
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))

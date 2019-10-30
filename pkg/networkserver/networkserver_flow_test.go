@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -135,7 +134,9 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 	defer func() {
 		closeLink()
 		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-			return a.So(ev, should.ResembleEvent, linkEndEvent(context.Canceled))
+			return a.So(ev.Data(), should.BeError) &&
+				a.So(errors.IsCanceled(ev.Data().(error)), should.BeTrue) &&
+				a.So(ev, should.ResembleEvent, linkEndEvent(ev.Data().(error)))
 		}), should.BeTrue) {
 			t.Error("AS link end event assertion failed")
 		}
@@ -863,51 +864,17 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 func TestFlow(t *testing.T) {
 	t.Parallel()
 
-	namespace := [...]string{
-		"networkserver_test",
-	}
-
 	for _, tc := range []struct {
-		Name                 string
-		NewRegistry          func(t testing.TB) (reg DeviceRegistry, closeFn func() error)
-		NewDownlinkTaskQueue func(t testing.TB) (tq DownlinkTaskQueue, closeFn func() error)
+		Name                      string
+		NewDeviceRegistry         func(t testing.TB) (dr DeviceRegistry, closeFn func() error)
+		NewApplicationUplinkQueue func(t testing.TB) (uq ApplicationUplinkQueue, closeFn func() error)
+		NewDownlinkTaskQueue      func(t testing.TB) (tq DownlinkTaskQueue, closeFn func() error)
 	}{
 		{
-			Name: "Redis registry/Redis downlink task queue",
-			NewRegistry: func(t testing.TB) (DeviceRegistry, func() error) {
-				cl, flush := test.NewRedis(t, append(namespace[:], "devices")...)
-				reg := &redis.DeviceRegistry{Redis: cl}
-				return reg, func() error {
-					flush()
-					return cl.Close()
-				}
-			},
-			NewDownlinkTaskQueue: func(t testing.TB) (DownlinkTaskQueue, func() error) {
-				cl, flush := test.NewRedis(t, append(namespace[:], "tasks")...)
-				tq := redis.NewDownlinkTaskQueue(cl, 100000, "ns", "test")
-				ctx, cancel := context.WithCancel(test.Context())
-				errch := make(chan error)
-				go func() {
-					errch <- tq.Run(ctx)
-				}()
-				return tq, func() error {
-					cancel()
-					if err := tq.Add(ctx, ttnpb.EndDeviceIdentifiers{
-						DeviceID:               "test",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test"},
-					}, time.Now(), false); err != nil {
-						t.Errorf("Failed to add mock device to task queue: %s", err)
-						return err
-					}
-					runErr := <-errch
-					flush()
-					closeErr := cl.Close()
-					if runErr != nil && runErr != context.Canceled {
-						return runErr
-					}
-					return closeErr
-				}
-			},
+			Name:                      "Redis application uplink queue/Redis registry/Redis downlink task queue",
+			NewApplicationUplinkQueue: NewRedisApplicationUplinkQueue,
+			NewDeviceRegistry:         NewRedisDeviceRegistry,
+			NewDownlinkTaskQueue:      NewRedisDownlinkTaskQueue,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -917,10 +884,19 @@ func TestFlow(t *testing.T) {
 				"Class A/OTAA/EU868/1.0.2": handleClassAOTAAEU868FlowTest1_0_2,
 			} {
 				t.Run(flow, func(t *testing.T) {
-					reg, regClose := tc.NewRegistry(t)
-					if regClose != nil {
+					uq, uqClose := tc.NewApplicationUplinkQueue(t)
+					if uqClose != nil {
 						defer func() {
-							if err := regClose(); err != nil {
+							if err := uqClose(); err != nil {
+								t.Errorf("Failed to close application uplink queue: %s", err)
+							}
+						}()
+					}
+
+					dr, drClose := tc.NewDeviceRegistry(t)
+					if drClose != nil {
+						defer func() {
+							if err := drClose(); err != nil {
 								t.Errorf("Failed to close device registry: %s", err)
 							}
 						}()
@@ -936,9 +912,10 @@ func TestFlow(t *testing.T) {
 					}
 
 					conf := Config{
-						NetID:         test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID),
-						Devices:       reg,
-						DownlinkTasks: tq,
+						NetID:              test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID),
+						ApplicationUplinks: uq,
+						Devices:            dr,
+						DownlinkTasks:      tq,
 						DownlinkPriorities: DownlinkPriorityConfig{
 							JoinAccept:             "highest",
 							MACCommands:            "highest",
