@@ -30,6 +30,7 @@ import ForgotPassword from '../forgot-password'
 import UpdatePassword from '../update-password'
 import FullViewError from '../error'
 import Code from '../code'
+import ConfirmEmail from '../confirm-email'
 
 const GenericNotFound = () => <FullViewError error={{ statusCode: 404 }} />
 
@@ -65,6 +66,7 @@ class OAuthApp extends React.PureComponent {
               <Route path="/forgot-password" component={ForgotPassword} />
               <Route path="/code" component={Code} />
               <Route path="/update-password" component={UpdatePassword} />
+              <Route path="/confirm-email" component={ConfirmEmail} />
               <Route component={GenericNotFound} />
             </Switch>
           </React.Fragment>
