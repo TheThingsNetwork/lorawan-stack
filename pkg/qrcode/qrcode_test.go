@@ -27,6 +27,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+func eui64Ptr(v types.EUI64) *types.EUI64 { return &v }
+
 func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 	for i, tc := range []struct {
 		Data []byte

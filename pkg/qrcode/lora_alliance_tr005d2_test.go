@@ -26,8 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func eui64Ptr(v types.EUI64) *types.EUI64 { return &v }
-
 func TestLoRaAllianceTR005Draft2(t *testing.T) {
 	t.Run("Encode", func(t *testing.T) {
 		for _, tc := range []struct {
@@ -154,7 +152,8 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 
 				var data LoRaAllianceTR005Draft2
 				err := data.UnmarshalText(tc.Data)
-				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				if tc.ErrorAssertion != nil {
+					a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 					return
 				}
 				if !a.So(err, should.BeNil) || !a.So(data, should.Resemble, tc.Expected) {

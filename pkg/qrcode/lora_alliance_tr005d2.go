@@ -29,8 +29,8 @@ import (
 type LoRaAllianceTR005Draft2 struct {
 	JoinEUI,
 	DevEUI types.EUI64
-	VendorID [2]byte
-	ModelID  [2]byte
+	VendorID,
+	ModelID [2]byte
 	DeviceValidationCode,
 	SerialNumber,
 	Proprietary string
@@ -52,12 +52,12 @@ func (m *LoRaAllianceTR005Draft2) Encode(dev *ttnpb.EndDevice) error {
 	return nil
 }
 
-// validTR005ExtensionChars defines the QR code alphanumeric character set except :, % and space.
-const validTR005ExtensionChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$*+-./"
+// validTR005Draft2ExtensionChars defines the QR code alphanumeric character set except :, % and space.
+const validTR005Draft2ExtensionChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$*+-./"
 
-func (m LoRaAllianceTR005Draft2) validateExtensionChars(s string) error {
+func (LoRaAllianceTR005Draft2) validateExtensionChars(s string) error {
 	for _, r := range s {
-		if strings.IndexRune(validTR005ExtensionChars, r) == -1 {
+		if strings.IndexRune(validTR005Draft2ExtensionChars, r) == -1 {
 			return errCharacter.WithAttributes("r", r)
 		}
 	}
@@ -66,12 +66,12 @@ func (m LoRaAllianceTR005Draft2) validateExtensionChars(s string) error {
 
 // Validate implements the Data interface.
 func (m LoRaAllianceTR005Draft2) Validate() error {
-	for _, err := range []error{
-		m.validateExtensionChars(m.DeviceValidationCode),
-		m.validateExtensionChars(m.SerialNumber),
-		m.validateExtensionChars(m.Proprietary),
+	for _, ext := range []string{
+		m.DeviceValidationCode,
+		m.SerialNumber,
+		m.Proprietary,
 	} {
-		if err != nil {
+		if err := m.validateExtensionChars(ext); err != nil {
 			return err
 		}
 	}
