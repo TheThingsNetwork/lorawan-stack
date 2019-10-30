@@ -28,3 +28,13 @@ implementation proposal in the referenced issues.
 -->
 
 ...
+
+#### Checklist
+<!-- Make sure that this pull request is complete. -->
+
+- [ ] Scope: The referenced issue is addressed, there are no unrelated changes.
+- [ ] Compatibility: The changes are backwards compatible with existing API, database and configuration, according to the stability commitments in `README.md`.
+- [ ] Testing: The changes are covered with unit tests. The changes are tested manually as well.
+- [ ] Documentation: Relevant documentation is added or updated.
+- [ ] Changelog: Significant features, behavior changes, deprecations and fixes are added to `CHANGELOG.md`.
+- [ ] Commits: Commit messages follow guidelines in `CONTRIBUTING.md`, there are no fixup commits left.
