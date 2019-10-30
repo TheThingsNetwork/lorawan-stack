@@ -327,7 +327,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 				Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 					DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 						Downlinks:    dev.QueuedApplicationDownlinks,
-						LastFCntDown: dev.Session.LastNFCntDown + 1,
+						LastFCntDown: dev.Session.LastNFCntDown,
 					},
 				},
 			})
