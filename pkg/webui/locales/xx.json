@@ -479,5 +479,8 @@
   "oauth.views.update-password.index.passwordChanged": "Xxxxxxxx xxxxxxx xxxxxxxxxxxx",
   "oauth.views.update-password.index.revokeAllAccess": "Xxx xxx xxxx xxx xxxxxxx",
   "oauth.views.update-password.index.revokeWarning": "Xxxx xxxx xxxxxx xxxxxx xxxx xxx xxxxxx xx xxxxxxx",
-  "oauth.views.update-password.index.sessionRevoked": "Xxxx xxxxxxx xx xxxxxxx"
+  "oauth.views.update-password.index.sessionRevoked": "Xxxx xxxxxxx xx xxxxxxx",
+  "oauth.views.validate.index.validateSuccess": "Xxxxxxx xxxx xxxxxxxxx xxxxxxxxxxxx",
+  "oauth.views.validate.index.validateFail": "Xxxxxxx xxxx xxxxxxxxxx xxxxxx",
+  "oauth.views.validate.index.goToLogin": "Xx xx Xxxxx"
 }

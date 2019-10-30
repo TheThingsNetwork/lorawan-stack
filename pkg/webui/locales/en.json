@@ -479,5 +479,8 @@
   "oauth.views.update-password.index.passwordChanged": "Password changed successfully",
   "oauth.views.update-password.index.revokeAllAccess": "Log out from all devices",
   "oauth.views.update-password.index.revokeWarning": "This will revoke access from all logged in devices",
-  "oauth.views.update-password.index.sessionRevoked": "Your session is revoked"
+  "oauth.views.update-password.index.sessionRevoked": "Your session is revoked",
+  "oauth.views.validate.index.validateSuccess": "Contact info validated successfully",
+  "oauth.views.validate.index.validateFail": "Contact info validation failed",
+  "oauth.views.validate.index.goToLogin": "Go to Login"
 }

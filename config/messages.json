@@ -1457,6 +1457,24 @@
       "file": "users.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:no_validation_reference": {
+    "translations": {
+      "en": "no validation reference set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "contact_info.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_validation_token": {
+    "translations": {
+      "en": "no validation token set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "contact_info.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:no_webhook_id": {
     "translations": {
       "en": "no webhook ID set"
