@@ -26,7 +26,6 @@ import DeviceDataForm from '../../components/device-data-form'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { getDeviceId } from '../../../lib/selectors/id'
-import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import PropTypes from '../../../lib/prop-types'
 import api from '../../api'
 import style from './device-add-single.styl'
@@ -34,9 +33,6 @@ import style from './device-add-single.styl'
 @connect(
   state => ({
     appId: selectSelectedApplicationId(state),
-    asConfig: selectAsConfig(),
-    nsConfig: selectNsConfig(),
-    jsConfig: selectJsConfig(),
   }),
   dispatch => ({
     redirectToList: (appId, deviceId) =>
@@ -56,9 +52,6 @@ import style from './device-add-single.styl'
 export default class DeviceAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
-    asConfig: PropTypes.stackComponent.isRequired,
-    jsConfig: PropTypes.stackComponent.isRequired,
-    nsConfig: PropTypes.stackComponent.isRequired,
     redirectToList: PropTypes.func.isRequired,
   }
 
@@ -81,14 +74,6 @@ export default class DeviceAdd extends Component {
   }
 
   render() {
-    const { asConfig, nsConfig, jsConfig } = this.props
-
-    const initialValues = {
-      network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
-      application_server_address: asConfig.enabled ? new URL(asConfig.base_url).hostname : '',
-      join_server_address: jsConfig.enabled ? new URL(jsConfig.base_url).hostname : '',
-    }
-
     return (
       <Container>
         <Row>
@@ -102,8 +87,6 @@ export default class DeviceAdd extends Component {
             <DeviceDataForm
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
-              initialValues={initialValues}
-              jsConfig={jsConfig}
             />
           </Col>
         </Row>

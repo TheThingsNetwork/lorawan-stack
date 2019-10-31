@@ -62,10 +62,18 @@ class Devices {
       throw new Error('Missing application_id for device.')
     }
 
+    // Ensure proper id object
+    if (!('ids' in device)) {
+      device.ids = { device_id: deviceId, application_ids: { application_id: applicationId } }
+    } else if (!device.ids.device_id) {
+      device.ids.device_id = deviceId
+    } else if (!device.ids.application_ids || !device.ids.application_ids.application_id) {
+      device.ids.application_ids = { application_id: applicationId }
+    }
+
     const params = {
       routeParams: {
         'end_device.ids.application_ids.application_id': appId,
-        ...(create ? {} : { 'end_device.ids.device_id': devId }),
       },
     }
 
@@ -109,15 +117,24 @@ class Devices {
     const requestTree = requestTreeOverwrite
       ? requestTreeOverwrite
       : splitSetPaths(paths, mergeBase)
-    const devicePayload = Marshaler.payload(device, 'end_device')
 
     // Retrieve join information if not present
     if (!create && !('supports_join' in device)) {
-      try {
-        const res = await this._getDevice(appId, devId, [['supports_join']])
-        device.supports_join = res.supports_join
-      } catch (err) {
-        throw new Error('Could not retrieve join information of the device')
+      const res = await this._getDevice(
+        appId,
+        devId,
+        [['supports_join'], ['join_server_address']],
+        true,
+      )
+      if ('supports_join' in res && res.supports_join) {
+        // The NS registry entry exists
+        device.supports_join = true
+      } else if (res.join_server_address) {
+        // The NS registry entry does not exist, but a join_server_address
+        // setting suggests that join is supported, so we add the path
+        // to the request tree to ensure that it will be set on creation
+        device.supports_join = true
+        requestTree.ns.push(['supports_join'])
       }
     }
 
@@ -129,20 +146,26 @@ class Devices {
     // Retrieve necessary EUIs in case of a join server query being necessary
     if ('js' in requestTree) {
       if (!create && (!ids || !ids.join_eui || !ids.dev_eui)) {
-        try {
-          const res = await this._getDevice(appId, devId, [['ids', 'join_eui'], ['ids', 'dev_eui']])
-          device.ids = {
-            ...device.ids,
-            join_eui: res.ids.join_eui,
-            dev_eui: res.ids.dev_eui,
-          }
-        } catch (err) {
+        const res = await this._getDevice(
+          appId,
+          devId,
+          [['ids', 'join_eui'], ['ids', 'dev_eui']],
+          true,
+        )
+        if (!res.ids || !res.ids.join_eui || !res.ids.dev_eui) {
           throw new Error(
             'Could not update Join Server data on a device without Join EUI or Dev EUI',
           )
         }
+        device.ids = {
+          ...device.ids,
+          join_eui: res.ids.join_eui,
+          dev_eui: res.ids.dev_eui,
+        }
       }
     }
+
+    const devicePayload = Marshaler.payload(device, 'end_device')
 
     try {
       const setParts = await makeRequests(

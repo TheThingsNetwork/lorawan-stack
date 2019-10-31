@@ -112,9 +112,9 @@ export async function makeRequests(
   ignoreNotFound = false,
 ) {
   const isCreate = operation === 'create'
-  const isSet = operation === 'set' || isCreate
+  const isSet = operation === 'set'
   const isDelete = operation === 'delete'
-  const rpcFunction = isSet ? 'Set' : isDelete ? 'Delete' : 'Get'
+  const rpcFunction = isSet || isCreate ? 'Set' : isDelete ? 'Delete' : 'Get'
 
   // Use a wrapper for the api calls to allow ignoring not found errors per component, if wished
   const requestWrapper = async function(
@@ -124,8 +124,7 @@ export async function makeRequests(
     ignoreRequestNotFound = ignoreNotFound,
   ) {
     try {
-      const res = await call(params, !isDelete ? payload : undefined)
-      return res
+      return await call(params, !isDelete ? payload : undefined)
     } catch (err) {
       if (err.code === 5 && ignoreRequestNotFound) {
         return { end_device: {} }
@@ -149,11 +148,23 @@ export async function makeRequests(
     }
   }
 
+  if (isSet && !('end_device.ids.device_id' in params.routeParams)) {
+    // Ensure using the PUT method by setting the device id route param. This
+    // ensures upserting without issues.
+    const { end_device } = payload
+    const { ids: { device_id } = {} } = end_device
+    if (device_id) {
+      params.routeParams['end_device.ids.device_id'] = device_id
+    }
+  }
+
   // Do a possible IS request first
   if (stackConfig.is && 'is' in requestTree) {
     let func
     if (isSet) {
-      func = isCreate ? 'Create' : 'Update'
+      func = 'Update'
+    } else if (isCreate) {
+      func = 'Create'
     } else if (isDelete) {
       func = 'Delete'
     } else {
@@ -170,11 +181,11 @@ export async function makeRequests(
     )
 
     isResult = Marshaler.payloadSingleResponse(isResult)
-  }
 
-  // Write the device id param based the id of the newly created device
-  if (isCreate && !('end_device.ids.device_id' in params.routeParams)) {
-    params.routeParams['end_device.ids.device_id'] = isResult.ids.device_id
+    // Set the device id param based on the id of the newly created device
+    if (isCreate) {
+      params.routeParams['end_device.ids.device_id'] = isResult.ids.device_id
+    }
   }
 
   // Compose an array of possible api calls to NS, AS, JS
