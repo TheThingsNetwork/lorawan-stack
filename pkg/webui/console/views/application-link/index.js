@@ -37,6 +37,7 @@ import Checkbox from '../../../components/checkbox'
 
 import { apiKey, address } from '../../lib/regexp'
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 
 import {
   getApplicationLink,
@@ -114,6 +115,30 @@ const validationSchema = Yup.object().shape({
 })
 @bind
 class ApplicationLink extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    deleteLinkSuccess: PropTypes.func.isRequired,
+    link: PropTypes.shape({
+      api_key: PropTypes.string,
+      tls: PropTypes.bool,
+      network_server_address: PropTypes.string,
+    }),
+    linkError: PropTypes.error,
+    linked: PropTypes.bool.isRequired,
+    stats: PropTypes.shape({
+      linked_at: PropTypes.string,
+      up_count: PropTypes.string,
+      downlink_count: PropTypes.string,
+    }),
+    updateLinkSuccess: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    link: {},
+    linkError: undefined,
+    stats: undefined,
+  }
+
   constructor(props) {
     super(props)
 
@@ -225,7 +250,7 @@ class ApplicationLink extends React.Component {
   }
 
   render() {
-    const { appId, link = {}, linkError } = this.props
+    const { appId, link, linkError } = this.props
     const { error } = this.state
 
     const initialValues = {
