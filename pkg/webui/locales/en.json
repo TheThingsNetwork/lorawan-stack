@@ -1,5 +1,7 @@
 {
   "components.data-sheet.index.noData": "No data available",
+  "components.error-notification.story.problem": "We got a problem here!",
+  "components.error-notification.story.lengthyProblem": "We got a problem here! And the description is quite lengthy as well, which can sometimes be a problem.",
   "components.event.index.eventData": "Event Data",
   "components.events.index.truncated": "Events have been truncated",
   "components.events.index.showing": "Showing all available events",
@@ -23,6 +25,8 @@
   "components.location-form.index.deleteFailure": "There was a problem removing the location",
   "components.location-form.index.deleteSuccess": "The location has been removed successfully",
   "components.navigation.side.side.hideSidebar": "Hide Sidebar",
+  "components.notification.details.index.showDetails": "Show Details",
+  "components.notification.details.index.hideDetails": "Hide Details",
   "components.safe-inspector.index.copied": "Copied to clipboard!",
   "components.safe-inspector.index.toggleVisibility": "Toggle visibility",
   "components.safe-inspector.index.copyClipboard": "Copy to clipboard",

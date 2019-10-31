@@ -286,7 +286,7 @@ export default class PubsubForm extends Component {
         </Form.Field>
         {isMqtt ? this.mqttSection : this.natsSection}
         <Message component="h4" content={sharedMessages.messageTypes} />
-        <Notification info={m.messageInfo} small />
+        <Notification content={m.messageInfo} info small />
         <Form.Field
           name="uplink_message"
           type="toggled-input"

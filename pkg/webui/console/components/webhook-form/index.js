@@ -152,7 +152,7 @@ export default class WebhookForm extends Component {
           required
         />
         <Message component="h4" content={sharedMessages.messageTypes} />
-        <Notification info={m.messageInfo} small />
+        <Notification info content={m.messageInfo} small />
         <Form.Field
           name="uplink_message"
           type="toggled-input"

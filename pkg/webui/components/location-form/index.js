@@ -99,7 +99,7 @@ class LocationForm extends Component {
 
     return (
       <React.Fragment>
-        {!entryExists && <Notification info={m.noLocationSet} small />}
+        {!entryExists && <Notification content={m.noLocationSet} info small />}
         <Form
           error={error}
           horizontal

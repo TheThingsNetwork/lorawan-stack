@@ -23,18 +23,25 @@ left-border($color)
   border-right: 1px solid $c-divider
   border-color: $c-divider-subtle
   border-radius: $br.m
-  padding: $cs.xl $cs.l $cs.xl $cs.xl
   margin-bottom: $ls.xxs
   box-shadow: 0 1px 1px 0 $c-divider-dark
   display: flex
-  flex-wrap: nowrap
+  flex-wrap: wrap
+  padding: 1px
 
   &.small
-    padding: $cs.s $cs.s $cs.s $cs.l
     border-left-width: $border-width
 
     .icon
       margin-right: $cs.l - $border-width
+      margin-left: 0
+
+    .container
+      margin: $cs.s $cs.s $cs.s $cs.l
+
+  &.with-details
+    .container
+      margin-right: 8rem
 
   &.error
     left-border($c-error)
@@ -60,6 +67,11 @@ left-border($color)
     display: inline-block
     color: $tc-deep-gray
 
+  .container
+    display: flex
+    margin: $cs.xl
+
   .icon
     display: flex
     margin-right: $cs.xl - $border-width
+    margin-left: $cs.m

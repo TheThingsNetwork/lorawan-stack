@@ -18,7 +18,7 @@ import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
 import Button from '../button'
-import Notification from '../notification'
+import ErrorNotification from '../error-notification'
 import Message from '../../lib/components/message'
 import List from '../list'
 import Icon from '../icon'
@@ -104,10 +104,10 @@ class Events extends React.Component {
 
     if (error) {
       return (
-        <Notification
+        <ErrorNotification
           small
           title={sharedMessages.eventsCannotShow}
-          error={error}
+          content={error}
           action={onRestart}
           actionMessage={sharedMessages.restartStream}
           buttonIcon="refresh"
