@@ -14,6 +14,6 @@
 
 /* eslint-disable import/prefer-default-export */
 
-const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc']
+const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc', 'qrg']
 
 export { STACK_COMPONENTS }
