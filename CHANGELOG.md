@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix device creation rollback potentially deleting existing device with same ID.
+
 ### Security
 
 ## [3.2.3] - 2019-10-24
