@@ -116,26 +116,29 @@ export async function makeRequests(
   const isDelete = operation === 'delete'
   const rpcFunction = isSet || isCreate ? 'Set' : isDelete ? 'Delete' : 'Get'
 
-  // Use a wrapper for the api calls to allow ignoring not found errors per component, if wished
+  // Use a wrapper for the api calls to control the result object and allow
+  // ignoring not found errors per component, if wished
   const requestWrapper = async function(
     call,
     params,
+    component,
     payload,
     ignoreRequestNotFound = ignoreNotFound,
   ) {
+    const res = { hasAttempted: true, component, paths: requestTree[component], hasErrored: false }
     try {
-      return await call(params, !isDelete ? payload : undefined)
-    } catch (err) {
-      if (err.code === 5 && ignoreRequestNotFound) {
-        return { end_device: {} }
+      const result = await call(params, !isDelete ? payload : undefined)
+      return { ...res, device: Marshaler.payloadSingleResponse(result) }
+    } catch (error) {
+      if (error.code === 5 && ignoreRequestNotFound) {
+        return { ...res, device: {} }
       }
 
-      throw err
+      return { ...res, hasErrored: true, error }
     }
   }
 
   const requests = new Array(3)
-  let isResult
 
   // Check whether the request would query against disabled components
   if (!ignoreDisabledComponents) {
@@ -158,6 +161,13 @@ export async function makeRequests(
     }
   }
 
+  const result = [
+    { component: 'ns', hasAttempted: false, hasErrored: false },
+    { component: 'as', hasAttempted: false, hasErrored: false },
+    { component: 'js', hasAttempted: false, hasErrored: false },
+    { component: 'is', hasAttempted: false, hasErrored: false },
+  ]
+
   // Do a possible IS request first
   if (stackConfig.is && 'is' in requestTree) {
     let func
@@ -170,9 +180,10 @@ export async function makeRequests(
     } else {
       func = 'Get'
     }
-    isResult = await requestWrapper(
+    result[3] = await requestWrapper(
       api.EndDeviceRegistry[func],
       params,
+      'is',
       {
         ...payload,
         ...Marshaler.pathsToFieldMask(requestTree.is),
@@ -180,47 +191,45 @@ export async function makeRequests(
       false,
     )
 
-    isResult = Marshaler.payloadSingleResponse(isResult)
-
-    // Set the device id param based on the id of the newly created device
     if (isCreate) {
-      params.routeParams['end_device.ids.device_id'] = isResult.ids.device_id
+      // Abort and return the result object when the IS create request has failed
+      if (result[3].hasErrored) {
+        return result
+      }
+      // Set the device id param based on the id of the newly created device
+      params.routeParams['end_device.ids.device_id'] = result[3].device.ids.device_id
     }
   }
 
   // Compose an array of possible api calls to NS, AS, JS
   if (stackConfig.ns && 'ns' in requestTree) {
-    requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction], params, {
+    requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction], params, 'ns', {
       ...payload,
       ...Marshaler.pathsToFieldMask(requestTree.ns),
     })
   }
   if (stackConfig.as && 'as' in requestTree) {
-    requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction], params, {
+    requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction], params, 'as', {
       ...payload,
       ...Marshaler.pathsToFieldMask(requestTree.as),
     })
   }
   if (stackConfig.js && 'js' in requestTree) {
-    requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction], params, {
+    requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction], params, 'js', {
       ...payload,
       ...Marshaler.pathsToFieldMask(requestTree.js),
     })
   }
 
-  // Run the requests in parallel and marshal the results
-  const responses = (await Promise.all(requests)).map(e =>
-    e ? Marshaler.payloadSingleResponse(e) : undefined,
-  )
+  // Run the requests in parallel
+  const responses = await Promise.all(requests)
 
-  // Return a map of device registry responses together with the paths that were
-  // requested (field_mask)
-  const result = [
-    { device: responses[0], paths: requestTree.ns },
-    { device: responses[1], paths: requestTree.as },
-    { device: responses[2], paths: requestTree.js },
-    { device: isResult, paths: requestTree.is },
-  ]
+  // Attach the results to the result array
+  for (const [i, response] of responses.entries()) {
+    if (response) {
+      result[i] = response
+    }
+  }
 
   return result
 }
