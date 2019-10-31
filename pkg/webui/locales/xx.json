@@ -196,6 +196,7 @@
   "console.views.application-link.index.statistics": "Xxxxxxxxxx",
   "console.views.application-link.index.unlink": "Xxxxxx",
   "console.views.application-link.index.unlinkSuccess": "Xxxxxxxxxxxx xxxxxxxx",
+  "console.views.application-link.index.tls": "XXX",
   "console.views.application-payload-formatters.index.warningTitle": "Xxxxxxx Xxxxxx",
   "console.views.application-payload-formatters.index.warningText": "Xxxxxx {link}, xx xxxxx xx xxxxxxxxx xxxxxxx xxxxxxxxxx",
   "console.views.application-payload-formatters.index.linkApplication": "xxxx xxxx xxxxxxxxxxx",

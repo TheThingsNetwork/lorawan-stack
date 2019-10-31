@@ -196,6 +196,7 @@
   "console.views.application-link.index.statistics": "Statistics",
   "console.views.application-link.index.unlink": "Unlink",
   "console.views.application-link.index.unlinkSuccess": "Successfully unlinked",
+  "console.views.application-link.index.tls": "TLS",
   "console.views.application-payload-formatters.index.warningTitle": "Linking Needed",
   "console.views.application-payload-formatters.index.warningText": "Please {link}, in order to configure payload formatters",
   "console.views.application-payload-formatters.index.linkApplication": "link your application",
