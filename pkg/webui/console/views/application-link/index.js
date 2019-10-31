@@ -21,20 +21,23 @@ import * as Yup from 'yup'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import sharedMessages from '../../../lib/shared-messages'
 import Form from '../../../components/form'
 import Input from '../../../components/input'
 import Button from '../../../components/button'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import DataSheet from '../../../components/data-sheet'
-import { apiKey, address } from '../../lib/regexp'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 import DateTime from '../../../lib/components/date-time'
 import Icon from '../../../components/icon'
 import SubmitBar from '../../../components/submit-bar'
 import withRequest from '../../../lib/components/with-request'
+import Checkbox from '../../../components/checkbox'
+
+import { apiKey, address } from '../../lib/regexp'
+import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 
 import {
   getApplicationLink,
@@ -68,6 +71,7 @@ const m = defineMessages({
   statistics: 'Statistics',
   unlink: 'Unlink',
   unlinkSuccess: 'Successfully unlinked',
+  tls: 'TLS',
 })
 
 const validationSchema = Yup.object().shape({
@@ -75,6 +79,7 @@ const validationSchema = Yup.object().shape({
     .matches(apiKey, sharedMessages.validateFormat)
     .required(sharedMessages.validateRequired),
   network_server_address: Yup.string().matches(address, sharedMessages.validateFormat),
+  tls: Yup.bool(),
 })
 
 @connect(
@@ -95,7 +100,7 @@ const validationSchema = Yup.object().shape({
   }),
 )
 @withRequest(
-  ({ getLink, appId }) => getLink(appId, ['api_key', 'network_server_address']),
+  ({ getLink, appId }) => getLink(appId, ['api_key', 'network_server_address', 'tls']),
   ({ fetching }) => fetching,
   () => false,
 )
@@ -108,24 +113,52 @@ const validationSchema = Yup.object().shape({
     />
   )
 })
-@bind
 class ApplicationLink extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    deleteLinkSuccess: PropTypes.func.isRequired,
+    link: PropTypes.shape({
+      api_key: PropTypes.string,
+      tls: PropTypes.bool,
+      network_server_address: PropTypes.string,
+    }),
+    linkError: PropTypes.error,
+    linked: PropTypes.bool.isRequired,
+    stats: PropTypes.shape({
+      linked_at: PropTypes.string,
+      up_count: PropTypes.string,
+      downlink_count: PropTypes.string,
+    }),
+    updateLinkSuccess: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    link: {},
+    linkError: undefined,
+    stats: undefined,
+  }
+
   constructor(props) {
     super(props)
 
     this.form = React.createRef()
-    this.state = { error: '' }
+    this.state = {
+      error: '',
+      nsAddress: props.link.network_server_address || '',
+    }
   }
 
+  @bind
   async handleLink(values, { setSubmitting, resetForm }) {
     const { appId, updateLinkSuccess } = this.props
-    const { api_key, network_server_address } = values
+    const { api_key, network_server_address, tls } = values
 
     await this.setState({ error: '' })
     try {
       const link = await api.application.link.set(appId, {
         api_key,
         network_server_address,
+        tls,
       })
 
       try {
@@ -146,6 +179,7 @@ class ApplicationLink extends React.Component {
     }
   }
 
+  @bind
   async handleUnlink() {
     const { appId, deleteLinkSuccess } = this.props
 
@@ -159,10 +193,19 @@ class ApplicationLink extends React.Component {
         message: m.unlinkSuccess,
         type: toast.types.SUCCESS,
       })
-      this.form.current.resetForm({})
+      this.form.current.resetForm({ tls: false })
     } catch (error) {
-      this.form.current.resetForm({})
+      this.form.current.resetForm({ tls: false })
       this.setState({ error })
+    }
+  }
+
+  @bind
+  onNSAddressChange(nsAddress) {
+    this.setState({ nsAddress })
+
+    if (!Boolean(nsAddress)) {
+      this.form.current.setFieldValue('tls', false)
     }
   }
 
@@ -220,12 +263,13 @@ class ApplicationLink extends React.Component {
   }
 
   render() {
-    const { appId, link = {}, linkError } = this.props
-    const { error } = this.state
+    const { appId, link, linkError } = this.props
+    const { error, nsAddress } = this.state
 
     const initialValues = {
       api_key: link.api_key || '',
       network_server_address: link.network_server_address || '',
+      tls: link.tls || false,
     }
 
     const formError = error || linkError || ''
@@ -253,7 +297,14 @@ class ApplicationLink extends React.Component {
                 description={sharedMessages.nsEmptyDefault}
                 name="network_server_address"
                 title={sharedMessages.nsAddress}
+                onChange={this.onNSAddressChange}
                 autoFocus
+              />
+              <Form.Field
+                component={Checkbox}
+                name="tls"
+                title={m.tls}
+                disabled={!Boolean(nsAddress)}
               />
               <Form.Field
                 component={Input}
