@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const components = ['is', 'as', 'ns', 'gs', 'js', 'edtc']
 export const dict = {
   is: 'Identity Server',
   as: 'Application Server',
@@ -20,4 +19,6 @@ export const dict = {
   gs: 'Gateway Server',
   js: 'Join Server',
   edtc: 'End Device Template Converter',
+  qrg: 'QR Code Generator',
 }
+export const components = Object.keys(dict)
