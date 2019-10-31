@@ -113,7 +113,6 @@ const validationSchema = Yup.object().shape({
     />
   )
 })
-@bind
 class ApplicationLink extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -146,6 +145,7 @@ class ApplicationLink extends React.Component {
     this.state = { error: '' }
   }
 
+  @bind
   async handleLink(values, { setSubmitting, resetForm }) {
     const { appId, updateLinkSuccess } = this.props
     const { api_key, network_server_address, tls } = values
@@ -176,6 +176,7 @@ class ApplicationLink extends React.Component {
     }
   }
 
+  @bind
   async handleUnlink() {
     const { appId, deleteLinkSuccess } = this.props
 
