@@ -142,7 +142,10 @@ class ApplicationLink extends React.Component {
     super(props)
 
     this.form = React.createRef()
-    this.state = { error: '' }
+    this.state = {
+      error: '',
+      nsAddress: props.link.network_server_address || '',
+    }
   }
 
   @bind
@@ -194,6 +197,15 @@ class ApplicationLink extends React.Component {
     } catch (error) {
       this.form.current.resetForm({ tls: false })
       this.setState({ error })
+    }
+  }
+
+  @bind
+  onNSAddressChange(nsAddress) {
+    this.setState({ nsAddress })
+
+    if (!Boolean(nsAddress)) {
+      this.form.current.setFieldValue('tls', false)
     }
   }
 
@@ -252,7 +264,7 @@ class ApplicationLink extends React.Component {
 
   render() {
     const { appId, link, linkError } = this.props
-    const { error } = this.state
+    const { error, nsAddress } = this.state
 
     const initialValues = {
       api_key: link.api_key || '',
@@ -285,7 +297,14 @@ class ApplicationLink extends React.Component {
                 description={sharedMessages.nsEmptyDefault}
                 name="network_server_address"
                 title={sharedMessages.nsAddress}
+                onChange={this.onNSAddressChange}
                 autoFocus
+              />
+              <Form.Field
+                component={Checkbox}
+                name="tls"
+                title={m.tls}
+                disabled={!Boolean(nsAddress)}
               />
               <Form.Field
                 component={Input}
@@ -294,7 +313,6 @@ class ApplicationLink extends React.Component {
                 title={sharedMessages.apiKey}
                 code
               />
-              <Form.Field component={Checkbox} name="tls" title={m.tls} />
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
               </SubmitBar>
