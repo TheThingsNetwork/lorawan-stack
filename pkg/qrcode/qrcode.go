@@ -52,6 +52,7 @@ var (
 // Parse attempts to parse the given QR code data.
 func Parse(data []byte) (Data, error) {
 	for _, model := range [...]Data{
+		&LoRaAllianceTR005Draft3{},
 		&LoRaAllianceTR005Draft2{},
 	} {
 		if err := model.UnmarshalText(data); err == nil {

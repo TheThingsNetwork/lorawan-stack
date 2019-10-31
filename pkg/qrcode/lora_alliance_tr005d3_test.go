@@ -26,14 +26,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func eui64Ptr(v types.EUI64) *types.EUI64 { return &v }
-
-func TestLoRaAllianceTR005Draft2(t *testing.T) {
+func TestLoRaAllianceTR005Draft3(t *testing.T) {
 	t.Run("Encode", func(t *testing.T) {
 		for _, tc := range []struct {
 			Name     string
 			Device   ttnpb.EndDevice
-			Expected LoRaAllianceTR005Draft2
+			Expected LoRaAllianceTR005Draft3
 		}{
 			{
 				Name: "Simple",
@@ -46,7 +44,7 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 						Value: "ABCD",
 					},
 				},
-				Expected: LoRaAllianceTR005Draft2{
+				Expected: LoRaAllianceTR005Draft3{
 					JoinEUI:              types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
 					DevEUI:               types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 					DeviceValidationCode: "ABCD",
@@ -55,7 +53,7 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 		} {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
-				var res LoRaAllianceTR005Draft2
+				var res LoRaAllianceTR005Draft3
 				err := res.Encode(&tc.Device)
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
@@ -70,13 +68,13 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 			Name           string
 			Data           []byte
 			CanonicalData  []byte
-			Expected       LoRaAllianceTR005Draft2
+			Expected       LoRaAllianceTR005Draft3
 			ErrorAssertion func(t *testing.T, err error) bool
 		}{
 			{
 				Name: "Simple",
-				Data: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42"),
-				Expected: LoRaAllianceTR005Draft2{
+				Data: []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF_42FFFF42"),
+				Expected: LoRaAllianceTR005Draft3{
 					JoinEUI:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevEUI:   types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					VendorID: [2]byte{0x42, 0xff},
@@ -85,8 +83,8 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 			},
 			{
 				Name: "Extensions",
-				Data: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%V0102%SSERIAL%PPROPRIETARY"),
-				Expected: LoRaAllianceTR005Draft2{
+				Data: []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF_42FFFF42_V0102_SSERIAL_PPROPRIETARY"),
+				Expected: LoRaAllianceTR005Draft3{
 					JoinEUI:              types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevEUI:               types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					VendorID:             [2]byte{0x42, 0xff},
@@ -98,26 +96,14 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 			},
 			{
 				Name:          "EmptyExtensions",
-				Data:          []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%V%S%P"),
-				CanonicalData: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42"),
-				Expected: LoRaAllianceTR005Draft2{
+				Data:          []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF_42FFFF42_V_S_P"),
+				CanonicalData: []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF_42FFFF42"),
+				Expected: LoRaAllianceTR005Draft3{
 					JoinEUI:              types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					DevEUI:               types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					VendorID:             [2]byte{0x42, 0xff},
 					ModelID:              [2]byte{0xff, 0x42},
 					DeviceValidationCode: "",
-				},
-			},
-			{
-				Name:          "WithEscape",
-				Data:          []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%25VABCD"),
-				CanonicalData: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%VABCD"),
-				Expected: LoRaAllianceTR005Draft2{
-					JoinEUI:              types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					DevEUI:               types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-					VendorID:             [2]byte{0x42, 0xff},
-					ModelID:              [2]byte{0xff, 0x42},
-					DeviceValidationCode: "ABCD",
 				},
 			},
 			{
@@ -128,22 +114,29 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 				},
 			},
 			{
+				Name: "Invalid/Parts",
+				Data: []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF"),
+				ErrorAssertion: func(t *testing.T, err error) bool {
+					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
+				},
+			},
+			{
 				Name: "Invalid/EUI",
-				Data: []byte("URN:LW:DP:42FFFFFFFF:4242FFFFFFFFFFFF:42FFFF42"),
+				Data: []byte("URN:DEV:LW:42FFFFFFFF_4242FFFFFFFFFFFF_42FFFF42"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
 			},
 			{
 				Name: "Invalid/ProdID",
-				Data: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42AABB"),
+				Data: []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF_42FFFF42AABB"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
 			},
 			{
 				Name: "Invalid/ExtensionChars",
-				Data: []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%P#_"),
+				Data: []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF_42FFFF42_P#"),
 				ErrorAssertion: func(t *testing.T, err error) bool {
 					return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
 				},
@@ -152,9 +145,10 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 			t.Run(tc.Name, func(t *testing.T) {
 				a := assertions.New(t)
 
-				var data LoRaAllianceTR005Draft2
+				var data LoRaAllianceTR005Draft3
 				err := data.UnmarshalText(tc.Data)
-				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				if tc.ErrorAssertion != nil {
+					a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 					return
 				}
 				if !a.So(err, should.BeNil) || !a.So(data, should.Resemble, tc.Expected) {
