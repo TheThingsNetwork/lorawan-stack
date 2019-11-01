@@ -4,7 +4,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   {{ hugo.Generator }}
   <title>{{ with .Title }}{{ . }} | {{ end }}{{ .Site.Title }}</title>
-  <link rel="canonical" href="{{ .Permalink }}" />
+  {{- if hasPrefix .Permalink "http" }}<link rel="canonical" href="{{ .Permalink }}" />{{ end }}
   <link rel="icon" type="image/png" href="{{ "favicon.png" | relURL }}">
   {{- $style := resources.Get "css/theme.scss" | resources.ToCSS (dict "includePaths" (slice "node_modules")) | resources.Minify | resources.Fingerprint }}
   <link rel="stylesheet" href="{{ $style.Permalink }}" integrity="{{ $style.Data.Integrity }}">
