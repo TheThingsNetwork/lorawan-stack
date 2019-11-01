@@ -128,6 +128,12 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 		case "invalidate_authentication_code":
 			// no validation rules for InvalidateAuthenticationCode
 		case "source_device":
+			if m.SourceDevice == nil {
+				return ClaimEndDeviceRequestValidationError{
+					field:  "source_device",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"authenticated_identifiers", "qr_code",
@@ -137,6 +143,10 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "authenticated_identifiers":
+					w, ok := m.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetAuthenticatedIdentifiers()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -149,6 +159,10 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 					}
 
 				case "qr_code":
+					w, ok := m.SourceDevice.(*ClaimEndDeviceRequest_QRCode)
+					if !ok || w == nil {
+						continue
+					}
 
 					if l := len(m.GetQRCode()); l < 0 || l > 1024 {
 						return ClaimEndDeviceRequestValidationError{
@@ -157,11 +171,6 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 						}
 					}
 
-				default:
-					return ClaimEndDeviceRequestValidationError{
-						field:  "source_device",
-						reason: "value is required",
-					}
 				}
 			}
 		default:

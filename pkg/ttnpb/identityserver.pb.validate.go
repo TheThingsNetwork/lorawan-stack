@@ -74,6 +74,10 @@ func (m *AuthInfoResponse) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "api_key":
+					w, ok := m.AccessMethod.(*AuthInfoResponse_APIKey)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetAPIKey()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -86,6 +90,10 @@ func (m *AuthInfoResponse) ValidateFields(paths ...string) error {
 					}
 
 				case "oauth_access_token":
+					w, ok := m.AccessMethod.(*AuthInfoResponse_OAuthAccessToken)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetOAuthAccessToken()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {

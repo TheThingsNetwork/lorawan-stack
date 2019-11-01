@@ -226,6 +226,17 @@ func TestTraffic(t *testing.T) {
 								GatewayIdentifiers: registeredGatewayID,
 							},
 						},
+						Settings: ttnpb.TxSettings{
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+									Bandwidth:       125000,
+									SpreadingFactor: 11,
+								}},
+							},
+							EnableCRC: true,
+							Frequency: 868500000,
+							Timestamp: 42,
+						},
 					},
 				},
 			},
@@ -237,6 +248,17 @@ func TestTraffic(t *testing.T) {
 							{
 								GatewayIdentifiers: registeredGatewayID,
 							},
+						},
+						Settings: ttnpb.TxSettings{
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+									Bandwidth:       125000,
+									SpreadingFactor: 11,
+								}},
+							},
+							EnableCRC: true,
+							Frequency: 868500000,
+							Timestamp: 42,
 						},
 					},
 				},
@@ -253,6 +275,17 @@ func TestTraffic(t *testing.T) {
 								GatewayIdentifiers: registeredGatewayID,
 							},
 						},
+						Settings: ttnpb.TxSettings{
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+									Bandwidth:       125000,
+									SpreadingFactor: 11,
+								}},
+							},
+							EnableCRC: true,
+							Frequency: 868500000,
+							Timestamp: 42,
+						},
 					},
 					{
 						RawPayload: []byte{0x04},
@@ -261,6 +294,17 @@ func TestTraffic(t *testing.T) {
 								GatewayIdentifiers: registeredGatewayID,
 							},
 						},
+						Settings: ttnpb.TxSettings{
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+									Bandwidth:       125000,
+									SpreadingFactor: 11,
+								}},
+							},
+							EnableCRC: true,
+							Frequency: 868500000,
+							Timestamp: 42,
+						},
 					},
 					{
 						RawPayload: []byte{0x05},
@@ -268,6 +312,17 @@ func TestTraffic(t *testing.T) {
 							{
 								GatewayIdentifiers: registeredGatewayID,
 							},
+						},
+						Settings: ttnpb.TxSettings{
+							DataRate: ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+									Bandwidth:       125000,
+									SpreadingFactor: 11,
+								}},
+							},
+							EnableCRC: true,
+							Frequency: 868500000,
+							Timestamp: 42,
 						},
 					},
 				},

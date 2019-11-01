@@ -518,6 +518,7 @@ func TestHandleUplink(t *testing.T) {
 				makeMsg := func(_ bool) *ttnpb.UplinkMessage {
 					return &ttnpb.UplinkMessage{
 						RxMetadata: MakeRxMetadataSlice(),
+						Settings:   makeDataUplinkSettings(),
 					}
 				}
 
@@ -551,6 +552,7 @@ func TestHandleUplink(t *testing.T) {
 							0x03, 0x02, 0x01, 0x00,
 						},
 						RxMetadata: MakeRxMetadataSlice(),
+						Settings:   makeDataUplinkSettings(),
 					}
 				}
 
@@ -572,6 +574,7 @@ func TestHandleUplink(t *testing.T) {
 					return &ttnpb.UplinkMessage{
 						RawPayload: bytes.Repeat([]byte{0x20}, 33),
 						RxMetadata: MakeRxMetadataSlice(),
+						Settings:   makeDataUplinkSettings(),
 					}
 				}
 
@@ -596,6 +599,7 @@ func TestHandleUplink(t *testing.T) {
 							0b111_000_00,
 						},
 						RxMetadata: MakeRxMetadataSlice(),
+						Settings:   makeDataUplinkSettings(),
 					}
 				}
 

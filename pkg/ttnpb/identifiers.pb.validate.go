@@ -674,6 +674,10 @@ func (m *OrganizationOrUserIdentifiers) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "organization_ids":
+					w, ok := m.Ids.(*OrganizationOrUserIdentifiers_OrganizationIDs)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetOrganizationIDs()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -686,6 +690,10 @@ func (m *OrganizationOrUserIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "user_ids":
+					w, ok := m.Ids.(*OrganizationOrUserIdentifiers_UserIDs)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetUserIDs()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -791,6 +799,10 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 				_ = subs
 				switch name {
 				case "application_ids":
+					w, ok := m.Ids.(*EntityIdentifiers_ApplicationIDs)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetApplicationIDs()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -803,6 +815,10 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "client_ids":
+					w, ok := m.Ids.(*EntityIdentifiers_ClientIDs)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetClientIDs()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -815,6 +831,10 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "device_ids":
+					w, ok := m.Ids.(*EntityIdentifiers_DeviceIDs)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetDeviceIDs()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -827,6 +847,10 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "gateway_ids":
+					w, ok := m.Ids.(*EntityIdentifiers_GatewayIDs)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetGatewayIDs()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -839,6 +863,10 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "organization_ids":
+					w, ok := m.Ids.(*EntityIdentifiers_OrganizationIDs)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetOrganizationIDs()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
@@ -851,6 +879,10 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 					}
 
 				case "user_ids":
+					w, ok := m.Ids.(*EntityIdentifiers_UserIDs)
+					if !ok || w == nil {
+						continue
+					}
 
 					if v, ok := interface{}(m.GetUserIDs()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
