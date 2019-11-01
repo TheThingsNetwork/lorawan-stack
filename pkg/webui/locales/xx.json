@@ -70,6 +70,7 @@
   "console.components.device-data-form.messages.sNtwkSIKeyDescription": "Xxxxxxx Xxxxxxx Xxxxxxx Xxxxxxxxx Xxx (xxxx xxx XxXxXXX x.x+)",
   "console.components.device-data-form.messages.supportsClassC": "Xxxxxxxx Xxxxx X",
   "console.components.device-data-form.messages.updateSuccess": "Xxxxxxxxxxxx xxxxxxx xxx xxxxxx",
+  "console.components.device-data-form.messages.unexposed": "Xxxxxxxxx",
   "console.components.device-data-form.messages.validate16": "Xxxx xxxxx xxxxx xx xx xxxxxxx xx xxxxxxxxxx xxxx",
   "console.components.device-data-form.messages.validate32": "Xxxx xxxxx xxxxx xx xx xxxxxxx xx xxxxxxxxxx xxxx",
   "console.components.device-data-form.messages.validate8": "Xxxx xxxxx xxxxx xx xx xxxxxxx x xxxxxxxxxx xxxx",

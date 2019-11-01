@@ -70,6 +70,7 @@
   "console.components.device-data-form.messages.sNtwkSIKeyDescription": "Serving Network Session Integrity Key (only for LoRaWAN 1.1+)",
   "console.components.device-data-form.messages.supportsClassC": "Supports Class C",
   "console.components.device-data-form.messages.updateSuccess": "Successfully updated end device",
+  "console.components.device-data-form.messages.unexposed": "Unexposed",
   "console.components.device-data-form.messages.validate16": "This value needs to be exactly 16 characters long",
   "console.components.device-data-form.messages.validate32": "This value needs to be exactly 32 characters long",
   "console.components.device-data-form.messages.validate8": "This value needs to be exactly 8 characters long",
