@@ -18,33 +18,27 @@ import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 import queryString from 'query-string'
 import { connect } from 'react-redux'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
-
 import Spinner from '../../../components/spinner'
 import Message from '../../../lib/components/message'
+import ErrorNotification from '../../../components/error-notification'
 import Notification from '../../../components/notification'
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
-import style from '../create-account/create-account.styl'
 
 const m = defineMessages({
-  emailConfirmed: 'Email confirmed successfully',
-  confirmEmail: 'Confirm your email',
-  confirmFail: 'Confirmation failed',
+  validateSuccess: 'Contact info validated successfully',
+  validateFail: 'Contact info validation failed',
   goToLogin: 'Go to Login',
 })
 
 @connect(
   null,
   {
-    goToLogin: () =>
-      push('/login', {
-        info: m.passwordChanged,
-      }),
+    goToLogin: () => push('/login'),
   },
 )
-export default class ConfirmEmail extends React.PureComponent {
+export default class Validate extends React.PureComponent {
   static propTypes = {
     goToLogin: PropTypes.func.isRequired,
     location: PropTypes.location.isRequired,
@@ -54,21 +48,20 @@ export default class ConfirmEmail extends React.PureComponent {
     error: undefined,
     success: undefined,
     fetching: true,
-    confirmed: false,
   }
 
   handleError(error) {
-    this.setState({ error: error.response, fetching: false, success: undefined })
+    this.setState({ error, fetching: false, success: undefined })
   }
 
   handleSuccess() {
-    this.setState({ success: m.emailConfirmed, fetching: false, confirmed: true, error: undefined })
+    this.setState({ success: m.validateSuccess, fetching: false, error: undefined })
   }
 
   async componentDidMount() {
     const validationData = queryString.parse(this.props.location.search)
     try {
-      await api.users.validateEmail({
+      await api.users.validate({
         token: validationData.token,
         id: validationData.reference,
       })
@@ -91,28 +84,27 @@ export default class ConfirmEmail extends React.PureComponent {
     }
 
     return (
-      <Container className={style.fullHeight}>
-        <Row justify="center" align="center" className={style.fullHeight}>
+      <Container>
+        <Row justify="center" align="center">
           <Col sm={12} md={8} lg={5}>
-            <IntlHelmet title={m.confirmEmail} />
             {error && (
-              <Notification
-                large
-                error={error}
-                title={m.confirmFail}
+              <ErrorNotification
+                content={error}
+                title={m.validateFail}
                 action={goToLogin}
                 actionMessage={m.goToLogin}
-                buttonIcon={'add_circle'}
+                buttonIcon={'error'}
               />
             )}
             {success && (
               <Notification
                 large
-                success={success}
-                title={m.emailConfirmed}
+                success
+                content={success}
+                title={m.validateSuccess}
                 action={goToLogin}
                 actionMessage={m.goToLogin}
-                buttonIcon={'add_circle'}
+                buttonIcon={'check_circle'}
               />
             )}
           </Col>
