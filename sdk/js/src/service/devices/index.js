@@ -165,27 +165,34 @@ class Devices {
       }
     }
 
+    // Perform the requests
     const devicePayload = Marshaler.payload(device, 'end_device')
+    const setParts = await makeRequests(
+      this._api,
+      this._stackConfig,
+      this._ignoreDisabledComponents,
+      create ? 'create' : 'set',
+      requestTree,
+      params,
+      devicePayload,
+    )
 
-    try {
-      const setParts = await makeRequests(
-        this._api,
-        this._stackConfig,
-        this._ignoreDisabledComponents,
-        create ? 'create' : 'set',
-        requestTree,
-        params,
-        devicePayload,
-      )
-      const result = mergeDevice(setParts)
-      return result
-    } catch (err) {
-      // Roll back changes
+    // Filter out errored requests
+    const errors = setParts.filter(part => part.hasErrored)
+
+    // Handle possible errored requests
+    if (errors.length !== 0) {
+      // Roll back successfully created registry entries
       if (create) {
-        this._deleteDevice(appId, devId, Object.keys(requestTree))
+        this._deleteDevice(appId, devId, setParts.map(e => e.hasAttempted && !e.hasErrored))
       }
-      throw err
+
+      // Throw the first error
+      throw errors[0].error
     }
+
+    const result = mergeDevice(setParts)
+    return result
   }
 
   async _getDevice(applicationId, deviceId, paths, ignoreNotFound) {
