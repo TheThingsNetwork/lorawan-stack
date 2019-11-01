@@ -48,6 +48,7 @@ export default defineMessages({
   sNtwkSIKeyDescription: 'Serving Network Session Integrity Key (only for LoRaWAN 1.1+)',
   supportsClassC: 'Supports Class C',
   updateSuccess: 'Successfully updated end device',
+  unexposed: 'Unexposed',
   validate16: 'This value needs to be exactly 16 characters long',
   validate32: 'This value needs to be exactly 32 characters long',
   validate8: 'This value needs to be exactly 8 characters long',
