@@ -41,6 +41,7 @@ type StackConfig struct {
 	AS   webui.APIConfig `json:"as" name:"as"`
 	JS   webui.APIConfig `json:"js" name:"js"`
 	EDTC webui.APIConfig `json:"edtc" name:"edtc"`
+	QRG  webui.APIConfig `json:"qrg" name:"qrg"`
 }
 
 // FrontendConfig is the configuration for the Console frontend.

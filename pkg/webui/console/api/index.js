@@ -29,6 +29,7 @@ const stack = {
   as: stackConfig.as.enabled ? stackConfig.as.base_url : undefined,
   js: stackConfig.js.enabled ? stackConfig.js.base_url : undefined,
   edtc: stackConfig.edtc.enabled ? stackConfig.edtc.base_url : undefined,
+  qrg: stackConfig.qrg.enabled ? stackConfig.qrg.base_url : undefined,
 }
 
 const isBaseUrl = stackConfig.is.base_url

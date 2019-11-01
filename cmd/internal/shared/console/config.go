@@ -49,6 +49,7 @@ var DefaultConsoleConfig = console.Config{
 				AS:   webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 				JS:   webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 				EDTC: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
+				QRG:  webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 			},
 		},
 	},
