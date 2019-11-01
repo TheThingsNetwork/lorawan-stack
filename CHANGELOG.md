@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix device creation rollback potentially deleting existing device with same ID.
+- Fix missing transport credentials when using external NS linking.
 
 ### Security
 
