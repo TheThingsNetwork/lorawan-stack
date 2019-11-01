@@ -406,7 +406,7 @@ func (c InteropClient) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.
 type ServiceBase struct {
 	Base             `name:",squash"`
 	Cluster          Cluster                `name:"cluster"`
-	Cache            Cache                  `name:"Cache"`
+	Cache            Cache                  `name:"cache"`
 	Redis            Redis                  `name:"redis"`
 	Events           Events                 `name:"events"`
 	GRPC             GRPC                   `name:"grpc"`
