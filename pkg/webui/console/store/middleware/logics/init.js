@@ -21,19 +21,32 @@ import createRequestLogic from './lib'
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
   async process(_, dispatch) {
+    dispatch(user.getUserRights())
     dispatch(user.getUserMe())
+
+    let info
 
     try {
       // there is no way to retrieve the current user directly
       // within the console app, so first get the authentication info
       // and only afterwards fetch the user
-      const info = await api.users.authInfo()
-      const userId = info.data.oauth_access_token.user_ids.user_id
-      const result = await api.users.get(userId)
-      dispatch(user.getUserMeSuccess(result.data))
+      info = await api.users.authInfo()
+      const rights = info.data.oauth_access_token.rights
+      dispatch(user.getUserRightsSuccess(rights))
     } catch (error) {
-      dispatch(user.getUserMeFailure())
+      dispatch(user.getUserRightsFailure())
       accessToken.clear()
+    }
+
+    if (info) {
+      try {
+        const userId = info.data.oauth_access_token.user_ids.user_id
+        const result = await api.users.get(userId)
+        dispatch(user.getUserMeSuccess(result.data))
+      } catch (error) {
+        dispatch(user.getUserMeFailure())
+        accessToken.clear()
+      }
     }
 
     // eslint-disable-next-line no-console
