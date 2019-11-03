@@ -185,7 +185,7 @@ var (
 
 // BlobConfigLocal is the blob store configuration for the local filesystem provider.
 type BlobConfigLocal struct {
-	Directory string `name:"directory" description:"Local directory that holds the buckets"`
+	Directory string `name:"directory" description:"OS filesystem directory, which contains buckets"`
 }
 
 // BlobConfigAWS is the blob store configuration for the AWS provider.
@@ -269,8 +269,8 @@ func (c BlobPathConfig) IsZero() bool {
 type FrequencyPlansConfig struct {
 	ConfigSource string            `name:"config-source" description:"Source of the frequency plans (static, directory, url, blob)"`
 	Static       map[string][]byte `name:"-"`
-	Directory    string            `name:"directory"`
-	URL          string            `name:"url"`
+	Directory    string            `name:"directory" description:"OS filesystem directory, which contains frequency plans"`
+	URL          string            `name:"url" description:"URL, which contains frequency plans"`
 	Blob         BlobPathConfig    `name:"blob"`
 }
 
@@ -312,8 +312,8 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) 
 type DeviceRepositoryConfig struct {
 	ConfigSource string            `name:"config-source" description:"Source of the device repository (static, directory, url, blob)"`
 	Static       map[string][]byte `name:"-"`
-	Directory    string            `name:"directory"`
-	URL          string            `name:"url"`
+	Directory    string            `name:"directory" description:"OS filesystem directory, which contains device repository"`
+	URL          string            `name:"url" description:"URL, which contains device repository"`
 	Blob         BlobPathConfig    `name:"blob"`
 }
 
@@ -354,8 +354,8 @@ func (c DeviceRepositoryConfig) Fetcher(ctx context.Context, blobConf BlobConfig
 // InteropClient represents the client-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropClient struct {
 	ConfigSource string         `name:"config-source" description:"Source of the interoperability client configuration (directory, url, blob)"`
-	Directory    string         `name:"directory"`
-	URL          string         `name:"url"`
+	Directory    string         `name:"directory" description:"OS filesystem directory, which contains interoperability client configuration"`
+	URL          string         `name:"url" description:"URL, which contains interoperability client configuration"`
 	Blob         BlobPathConfig `name:"blob"`
 
 	GetFallbackTLSConfig func(ctx context.Context) (*tls.Config, error) `name:"-"`
