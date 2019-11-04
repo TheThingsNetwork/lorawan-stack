@@ -118,6 +118,8 @@ script:
   fi
 - if [[ "$RUNTYPE" == "go.test" ]]; then $MAGE go:testBinaries; fi
 - if [[ "$RUNTYPE" == "release" ]]; then $MAGE version:files; fi
+- make git.diff
+after_success:
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
     set -e
@@ -126,14 +128,12 @@ script:
     git fetch
     git --work-tree=doc/public checkout origin/gh-pages -- .
     git reset -- .
-    $MAGE docs:build
   fi
-- make git.diff
-after_success:
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
     set -e
     $MAGE js:build
+    $MAGE docs:build
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
     snapcraft login --with snapcraft.login
     if [[ ! -z "$TRAVIS_TAG" && "$TRAVIS_TAG" =~ ^v3\.[0-9]+\.[0-9]+ ]]; then
