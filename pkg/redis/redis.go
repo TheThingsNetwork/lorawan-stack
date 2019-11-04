@@ -225,6 +225,10 @@ func WaitingTaskKey(k string) string {
 	return Key(k, "waiting")
 }
 
+func IsConsumerGroupExistsErr(err error) bool {
+	return err != nil && err.Error() == "BUSYGROUP Consumer Group name already exists"
+}
+
 // InitTaskGroup initializes the task group for streams at InputTaskKey(k) and ReadyTaskKey(k).
 // It must be called before all other task-related functions at subkeys of k.
 func InitTaskGroup(r redis.Cmdable, group, k string) error {
@@ -233,7 +237,7 @@ func InitTaskGroup(r redis.Cmdable, group, k string) error {
 		p.XGroupCreateMkStream(ReadyTaskKey(k), group, "$")
 		return nil
 	})
-	if err != nil && err.Error() == "BUSYGROUP Consumer Group name already exists" {
+	if IsConsumerGroupExistsErr(err) {
 		return nil
 	}
 	return ConvertError(err)
@@ -382,7 +386,7 @@ func DispatchTasks(r WatchCmdable, group, id string, maxLen int64, deadline time
 				for _, z := range zs {
 					toDel = append(toDel, z.Member)
 					p.XAdd(&redis.XAddArgs{
-						Stream:       fmt.Sprintf(ReadyTaskKey(k)),
+						Stream:       ReadyTaskKey(k),
 						MaxLenApprox: maxLen,
 						Values: map[string]interface{}{
 							payloadKey: z.Member,

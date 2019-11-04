@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -29,16 +30,25 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
+type ApplicationUplinkQueue interface {
+	// Add adds application uplinks ups to queue.
+	// Implementations must ensure that Add returns fast.
+	Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error
+
+	// Subscribe calls f sequentially for each application uplink in the queue.
+	// If f returns a non-nil error or ctx is done, Subscribe stops the iteration.
+	// TODO: Use ...*ttnpb.ApplicationUp in callback once https://github.com/TheThingsNetwork/lorawan-stack/issues/1523 is implemented.
+	Subscribe(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error
+}
+
 type applicationUpStream struct {
-	ttnpb.AsNs_LinkApplicationServer
-	closeCh chan struct{}
+	cancel    context.CancelFunc
+	waitClose func()
 }
 
 func (s applicationUpStream) Close() error {
-	// First read succeeds when either closeCh is closed by LinkApplication or LinkApplication initializes closing sequence.
-	// Second read succeeds when closeCh is closed by LinkApplication.
-	<-s.closeCh
-	<-s.closeCh
+	s.cancel()
+	s.waitClose()
 	return nil
 }
 
@@ -49,52 +59,50 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 	ids := ttnpb.ApplicationIdentifiers{
 		ApplicationID: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
-	var err error
-	if err = ids.ValidateContext(ctx); err != nil {
+	if err := ids.ValidateContext(ctx); err != nil {
 		return err
 	}
-	if err = rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
+	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return err
 	}
 
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	ctx, cancel := context.WithCancel(ctx)
 	ws := &applicationUpStream{
-		AsNs_LinkApplicationServer: link,
-		closeCh:                    make(chan struct{}),
+		cancel:    cancel,
+		waitClose: wg.Wait,
 	}
 	defer func() {
-		close(ws.closeCh)
+		wg.Done()
 	}()
 
 	uid := unique.ID(ctx, ids)
-
 	logger := log.FromContext(ctx).WithField("application_uid", uid)
 
 	v, ok := ns.applicationServers.LoadOrStore(uid, ws)
 	for ok {
-		logger.Debug("Close existing link")
+		logger.Debug("Close existing application link")
 		if err := v.(io.Closer).Close(); err != nil {
-			logger.WithError(err).Warn("Failed to close existing link")
+			logger.WithError(err).Warn("Failed to close existing application link")
 		}
 		v, ok = ns.applicationServers.LoadOrStore(uid, ws)
 	}
 	defer ns.applicationServers.Delete(uid)
 
 	logger.Debug("Linked application")
-
 	events.Publish(evtBeginApplicationLink(ctx, ids, nil))
-
-	select {
-	case <-ctx.Done():
-		err = ctx.Err()
-		logger.WithError(err).Debug("Context done - close stream")
-		events.Publish(evtEndApplicationLink(ctx, ids, err))
+	err := ns.applicationUplinks.Subscribe(ctx, ids, func(ctx context.Context, up *ttnpb.ApplicationUp) error {
+		if err := link.Send(up); err != nil {
+			return err
+		}
+		_, err := link.Recv()
 		return err
-
-	case ws.closeCh <- struct{}{}:
-		logger.Debug("Link closed - close stream")
-		events.Publish(evtEndApplicationLink(ctx, ids, nil))
-		return nil
-	}
+	})
+	logger.WithError(err).Debug("Close application link")
+	events.Publish(evtEndApplicationLink(ctx, ids, err))
+	return err
 }
 
 func validateApplicationDownlinks(macState ttnpb.MACState, session ttnpb.Session, downs ...*ttnpb.ApplicationDownlink) error {

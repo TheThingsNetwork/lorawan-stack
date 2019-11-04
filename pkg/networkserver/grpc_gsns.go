@@ -891,17 +891,9 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 
 	if len(queuedApplicationUplinks) > 0 {
-		go func() {
-			for _, asUp := range queuedApplicationUplinks {
-				logger.Debug("Send application uplink to Application Server")
-				ok, err := ns.handleASUplink(ctx, stored.ApplicationIdentifiers, asUp)
-				if err != nil {
-					logger.WithError(err).Error("Failed to send application uplink to Application Server")
-				} else if !ok {
-					logger.Warn("Application Server not found, drop application uplink")
-				}
-			}
-		}()
+		if err := ns.applicationUplinks.Add(ctx, queuedApplicationUplinks...); err != nil {
+			logger.WithError(err).Warn("Failed to queue application uplinks for sending to Application Server")
+		}
 	}
 	if len(queuedEvents) > 0 {
 		for _, ev := range queuedEvents {
@@ -1154,34 +1146,23 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task for join-accept")
 	}
-
-	go func() {
-		logger := logger.WithField(
-			"application_uid", unique.ID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers),
-		)
-		logger.Debug("Send join-accept to AS")
-		ok, err := ns.handleASUplink(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: dev.EndDeviceIdentifiers.ApplicationIdentifiers,
-				DeviceID:               dev.EndDeviceIdentifiers.DeviceID,
-				DevEUI:                 dev.EndDeviceIdentifiers.DevEUI,
-				JoinEUI:                dev.EndDeviceIdentifiers.JoinEUI,
-				DevAddr:                &devAddr,
-			},
-			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
-			Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-				AppSKey:              resp.SessionKeys.AppSKey,
-				InvalidatedDownlinks: invalidatedQueue,
-				SessionKeyID:         resp.SessionKeys.SessionKeyID,
-			}},
-		})
-		if err != nil {
-			logger.WithError(err).Error("Failed to send join-accept to Application Server")
-		} else if !ok {
-			logger.Warn("Application Server not found, drop join-accept")
-		}
-	}()
-
+	if err := ns.applicationUplinks.Add(ctx, &ttnpb.ApplicationUp{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: dev.EndDeviceIdentifiers.ApplicationIdentifiers,
+			DeviceID:               dev.EndDeviceIdentifiers.DeviceID,
+			DevEUI:                 dev.EndDeviceIdentifiers.DevEUI,
+			JoinEUI:                dev.EndDeviceIdentifiers.JoinEUI,
+			DevAddr:                &devAddr,
+		},
+		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+			AppSKey:              resp.SessionKeys.AppSKey,
+			InvalidatedDownlinks: invalidatedQueue,
+			SessionKeyID:         resp.SessionKeys.SessionKeyID,
+		}},
+	}); err != nil {
+		logger.WithError(err).Warn("Failed to queue join-accept for sending to Application Server")
+	}
 	return nil
 }
 

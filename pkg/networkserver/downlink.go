@@ -327,7 +327,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 				Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 					DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 						Downlinks:    dev.QueuedApplicationDownlinks,
-						LastFCntDown: dev.Session.LastNFCntDown + 1,
+						LastFCntDown: dev.Session.LastNFCntDown,
 					},
 				},
 			})
@@ -1386,20 +1386,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			},
 		)
 		if len(queuedApplicationUplinks) > 0 {
-			go func() {
-				// TODO: Enqueue the uplinks and let a task processor take care of them.
-				// (https://github.com/TheThingsNetwork/lorawan-stack/issues/560)
-				for _, up := range queuedApplicationUplinks {
-					ok, err := ns.handleASUplink(ctx, devID.ApplicationIdentifiers, up)
-					if !ok {
-						logger.Warn("Application Server not found, drop uplinks associated with downlink task processing")
-						return
-					}
-					if err != nil {
-						logger.WithError(err).Warn("Failed to send uplink to Application Server")
-					}
-				}
-			}()
+			if err := ns.applicationUplinks.Add(ctx, queuedApplicationUplinks...); err != nil {
+				logger.WithError(err).Warn("Failed to queue application uplinks for sending to Application Server")
+			}
 		}
 		if len(queuedEvents) > 0 {
 			for _, ev := range queuedEvents {

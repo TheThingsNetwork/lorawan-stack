@@ -22,7 +22,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
-	"go.thethings.network/lorawan-stack/pkg/networkserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -317,10 +316,6 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 func TestRegistries(t *testing.T) {
 	t.Parallel()
 
-	namespace := [...]string{
-		"networkserver_test",
-	}
-
 	for _, tc := range []struct {
 		Name string
 		New  func(t testing.TB) (reg DeviceRegistry, closeFn func() error)
@@ -328,15 +323,8 @@ func TestRegistries(t *testing.T) {
 	}{
 		{
 			Name: "Redis",
-			New: func(t testing.TB) (DeviceRegistry, func() error) {
-				cl, flush := test.NewRedis(t, namespace[:]...)
-				reg := &redis.DeviceRegistry{Redis: cl}
-				return reg, func() error {
-					flush()
-					return cl.Close()
-				}
-			},
-			N: 8,
+			New:  NewRedisDeviceRegistry,
+			N:    8,
 		},
 	} {
 		for i := 0; i < int(tc.N); i++ {

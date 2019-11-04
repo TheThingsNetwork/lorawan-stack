@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -498,20 +497,15 @@ func TestHandleUplink(t *testing.T) {
 		}
 	}
 
-	type AsNsLinkRecvRequest struct {
-		Uplink   *ttnpb.ApplicationUp
-		Response chan<- *pbtypes.Empty
-	}
-
 	errTest := errors.New("testError")
 
 	for _, tc := range []struct {
 		Name    string
-		Handler func(context.Context, TestEnvironment, <-chan AsNsLinkRecvRequest, func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool
+		Handler func(context.Context, TestEnvironment, func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool
 	}{
 		{
 			Name: "Invalid payload",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -532,7 +526,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Unknown Major",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -566,7 +560,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Invalid MType",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -588,7 +582,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Proprietary MType",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -613,7 +607,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get fail",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -652,7 +646,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get ABP device",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -708,7 +702,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get multicast device",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -765,7 +759,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get OTAA device/1.0.2/JS fail",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -867,7 +861,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get OTAA device/1.1/JS fail",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -971,7 +965,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get OTAA device/1.0.3/Cluster-local JS not found/Interop JS fail",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1081,7 +1075,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get OTAA device/1.1/Cluster-local JS not found/Interop JS fail",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1194,7 +1188,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get OTAA device/1.1/Cluster-local JS not found/Interop JS accept/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1379,6 +1373,27 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
+				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+							{
+								CorrelationIDs:       reqCorrelationIDs,
+								EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
+								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+									AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
+									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
+										makeApplicationDownlink(),
+									},
+									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+								}},
+							},
+						})
+				},
+					nil,
+				), should.BeTrue) {
+					return false
+				}
+
 				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
 					msg := makeJoinRequest(decoded)
 					if !decoded {
@@ -1394,35 +1409,13 @@ func TestHandleUplink(t *testing.T) {
 				}) {
 					return false
 				}
-
-				if asRecvCh != nil {
-					select {
-					case <-ctx.Done():
-						t.Error("Timed out while waiting for NetworkServer.handleASUplink to be called")
-						return false
-
-					case req := <-asRecvCh:
-						a.So(req.Uplink, should.Resemble, &ttnpb.ApplicationUp{
-							CorrelationIDs:       reqCorrelationIDs,
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
-							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
-								InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-									makeApplicationDownlink(),
-								},
-								SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-							}},
-						})
-						req.Response <- ttnpb.Empty
-					}
-				}
 				return true
 			},
 		},
 
 		{
 			Name: "Join-request/Get OTAA device/1.0.2/JS accept/Set fail",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1603,7 +1596,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Join-request/Get OTAA device/1.1/JS accept/Set success/Downlink add fail",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1780,6 +1773,27 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
+				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+							{
+								CorrelationIDs:       reqCorrelationIDs,
+								EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
+								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+									AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
+									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
+										makeApplicationDownlink(),
+									},
+									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+								}},
+							},
+						})
+				},
+					nil,
+				), should.BeTrue) {
+					return false
+				}
+
 				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
 					msg := makeJoinRequest(decoded)
 					if !decoded {
@@ -1795,35 +1809,13 @@ func TestHandleUplink(t *testing.T) {
 				}) {
 					return false
 				}
-
-				if asRecvCh != nil {
-					select {
-					case <-ctx.Done():
-						t.Error("Timed out while waiting for NetworkServer.handleASUplink to be called")
-						return false
-
-					case req := <-asRecvCh:
-						a.So(req.Uplink, should.Resemble, &ttnpb.ApplicationUp{
-							CorrelationIDs:       reqCorrelationIDs,
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
-							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
-								InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-									makeApplicationDownlink(),
-								},
-								SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-							}},
-						})
-						req.Response <- ttnpb.Empty
-					}
-				}
 				return true
 			},
 		},
 
 		{
 			Name: "Join-request/Get OTAA device/1.0.2/JS accept/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -1997,6 +1989,27 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
+				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+							{
+								CorrelationIDs:       reqCorrelationIDs,
+								EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
+								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+									AppSKey: makeSessionKeys(ttnpb.MAC_V1_0_2).AppSKey,
+									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
+										makeApplicationDownlink(),
+									},
+									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_0_2).SessionKeyID,
+								}},
+							},
+						})
+				},
+					nil,
+				), should.BeTrue) {
+					return false
+				}
+
 				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
 					msg := makeJoinRequest(decoded)
 					if !decoded {
@@ -2012,35 +2025,13 @@ func TestHandleUplink(t *testing.T) {
 				}) {
 					return false
 				}
-
-				if asRecvCh != nil {
-					select {
-					case <-ctx.Done():
-						t.Error("Timed out while waiting for NetworkServer.handleASUplink to be called")
-						return false
-
-					case req := <-asRecvCh:
-						a.So(req.Uplink, should.Resemble, &ttnpb.ApplicationUp{
-							CorrelationIDs:       reqCorrelationIDs,
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
-							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey: makeSessionKeys(ttnpb.MAC_V1_0_2).AppSKey,
-								InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-									makeApplicationDownlink(),
-								},
-								SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_0_2).SessionKeyID,
-							}},
-						})
-						req.Response <- ttnpb.Empty
-					}
-				}
 				return true
 			},
 		},
 
 		{
 			Name: "Join-request/Get OTAA device/1.1/JS accept/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -2217,6 +2208,27 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
+				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+							{
+								CorrelationIDs:       reqCorrelationIDs,
+								EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
+								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+									AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
+									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
+										makeApplicationDownlink(),
+									},
+									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+								}},
+							},
+						})
+				},
+					nil,
+				), should.BeTrue) {
+					return false
+				}
+
 				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
 					msg := makeJoinRequest(decoded)
 					if !decoded {
@@ -2232,35 +2244,13 @@ func TestHandleUplink(t *testing.T) {
 				}) {
 					return false
 				}
-
-				if asRecvCh != nil {
-					select {
-					case <-ctx.Done():
-						t.Error("Timed out while waiting for NetworkServer.handleASUplink to be called")
-						return false
-
-					case req := <-asRecvCh:
-						a.So(req.Uplink, should.Resemble, &ttnpb.ApplicationUp{
-							CorrelationIDs:       reqCorrelationIDs,
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
-							Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
-								InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-									makeApplicationDownlink(),
-								},
-								SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-							}},
-						})
-						req.Response <- ttnpb.Empty
-					}
-				}
 				return true
 			},
 		},
 
 		{
 			Name: "Rejoin-request",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -2280,7 +2270,7 @@ func TestHandleUplink(t *testing.T) {
 
 		{
 			Name: "Data uplink/Matching device/No concurrent update/1.0.2/First transmission/No ADR/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -2415,6 +2405,39 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
+				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+							{
+								CorrelationIDs:       upCorrelationIDs,
+								EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
+								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+									FPort:        fPort,
+									FCnt:         34,
+									FRMPayload:   makeDataUplinkFRMPayload(34),
+									RxMetadata:   mds,
+									Settings: ttnpb.TxSettings{
+										DataRateIndex: ttnpb.DATA_RATE_2,
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+												Bandwidth:       125000,
+												SpreadingFactor: 10,
+											}},
+										},
+										EnableCRC: true,
+										Frequency: 868300000,
+										Timestamp: 42,
+									},
+								}},
+							},
+						})
+				},
+					nil,
+				), should.BeTrue) {
+					return false
+				}
+
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2454,47 +2477,13 @@ func TestHandleUplink(t *testing.T) {
 				}) {
 					return false
 				}
-
-				if asRecvCh != nil {
-					select {
-					case <-ctx.Done():
-						t.Error("Timed out while waiting for NetworkServer.handleASUplink to be called")
-						return false
-
-					case req := <-asRecvCh:
-						a.So(req.Uplink, should.Resemble, &ttnpb.ApplicationUp{
-							CorrelationIDs:       upCorrelationIDs,
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-								SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-								FPort:        fPort,
-								FCnt:         34,
-								FRMPayload:   makeDataUplinkFRMPayload(34),
-								RxMetadata:   mds,
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_2,
-									DataRate: ttnpb.DataRate{
-										Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-											Bandwidth:       125000,
-											SpreadingFactor: 10,
-										}},
-									},
-									EnableCRC: true,
-									Frequency: 868300000,
-									Timestamp: 42,
-								},
-							}},
-						})
-						req.Response <- ttnpb.Empty
-					}
-				}
 				return true
 			},
 		},
 
 		{
 			Name: "Data uplink/Matching device/No concurrent update/1.1/First transmission/No ADR/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -2629,6 +2618,39 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
+				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+							{
+								CorrelationIDs:       upCorrelationIDs,
+								EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
+								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+									FPort:        fPort,
+									FCnt:         34,
+									FRMPayload:   makeDataUplinkFRMPayload(34),
+									RxMetadata:   mds,
+									Settings: ttnpb.TxSettings{
+										DataRateIndex: ttnpb.DATA_RATE_2,
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+												Bandwidth:       125000,
+												SpreadingFactor: 10,
+											}},
+										},
+										EnableCRC: true,
+										Frequency: 868300000,
+										Timestamp: 42,
+									},
+								}},
+							},
+						})
+				},
+					nil,
+				), should.BeTrue) {
+					return false
+				}
+
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2668,47 +2690,13 @@ func TestHandleUplink(t *testing.T) {
 				}) {
 					return false
 				}
-
-				if asRecvCh != nil {
-					select {
-					case <-ctx.Done():
-						t.Error("Timed out while waiting for NetworkServer.handleASUplink to be called")
-						return false
-
-					case req := <-asRecvCh:
-						a.So(req.Uplink, should.Resemble, &ttnpb.ApplicationUp{
-							CorrelationIDs:       upCorrelationIDs,
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-								SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-								FPort:        fPort,
-								FCnt:         34,
-								FRMPayload:   makeDataUplinkFRMPayload(34),
-								RxMetadata:   mds,
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_2,
-									DataRate: ttnpb.DataRate{
-										Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-											Bandwidth:       125000,
-											SpreadingFactor: 10,
-										}},
-									},
-									EnableCRC: true,
-									Frequency: 868300000,
-									Timestamp: 42,
-								},
-							}},
-						})
-						req.Response <- ttnpb.Empty
-					}
-				}
 				return true
 			},
 		},
 
 		{
 			Name: "Data uplink/Matching device/Concurrent update/1.0.2/First transmission/No ADR/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -2845,6 +2833,39 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
+				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+							{
+								CorrelationIDs:       upCorrelationIDs,
+								EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
+								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+									FPort:        fPort,
+									FCnt:         34,
+									FRMPayload:   makeDataUplinkFRMPayload(34),
+									RxMetadata:   mds,
+									Settings: ttnpb.TxSettings{
+										DataRateIndex: ttnpb.DATA_RATE_2,
+										DataRate: ttnpb.DataRate{
+											Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+												Bandwidth:       125000,
+												SpreadingFactor: 10,
+											}},
+										},
+										EnableCRC: true,
+										Frequency: 868300000,
+										Timestamp: 42,
+									},
+								}},
+							},
+						})
+				},
+					nil,
+				), should.BeTrue) {
+					return false
+				}
+
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
@@ -2884,47 +2905,13 @@ func TestHandleUplink(t *testing.T) {
 				}) {
 					return false
 				}
-
-				if asRecvCh != nil {
-					select {
-					case <-ctx.Done():
-						t.Error("Timed out while waiting for NetworkServer.handleASUplink to be called")
-						return false
-
-					case req := <-asRecvCh:
-						a.So(req.Uplink, should.Resemble, &ttnpb.ApplicationUp{
-							CorrelationIDs:       upCorrelationIDs,
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-							Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-								SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-								FPort:        fPort,
-								FCnt:         34,
-								FRMPayload:   makeDataUplinkFRMPayload(34),
-								RxMetadata:   mds,
-								Settings: ttnpb.TxSettings{
-									DataRateIndex: ttnpb.DATA_RATE_2,
-									DataRate: ttnpb.DataRate{
-										Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-											Bandwidth:       125000,
-											SpreadingFactor: 10,
-										}},
-									},
-									EnableCRC: true,
-									Frequency: 868300000,
-									Timestamp: 42,
-								},
-							}},
-						})
-						req.Response <- ttnpb.Empty
-					}
-				}
 				return true
 			},
 		},
 
 		{
 			Name: "Data uplink/Matching device/No concurrent update/1.0.2/Second transmission/No ADR/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 
@@ -3087,102 +3074,31 @@ func TestHandleUplink(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			handleTest := func(ctx context.Context, ns *NetworkServer, env TestEnvironment, asRecvCh <-chan AsNsLinkRecvRequest, stop func()) {
-				defer stop()
+			ns, ctx, env, stop := StartTest(t, Config{
+				NetID:              *netID.Copy(&types.NetID{}),
+				DefaultMACSettings: MACSettingConfig{},
+			}, (1<<12)*test.Delay, true)
+			defer stop()
 
-				<-env.DownlinkTasks.Pop
+			<-env.DownlinkTasks.Pop
 
-				if !tc.Handler(ctx, env, asRecvCh, func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan error {
-					ch := make(chan error)
-					go func() {
-						_, err := ttnpb.NewGsNsClient(ns.LoopbackConn()).HandleUplink(ctx, CopyUplinkMessage(msg))
-						ttnErr, ok := errors.From(err)
-						if ok {
-							ch <- ttnErr
-						} else {
-							ch <- err
-						}
-						close(ch)
-					}()
-					return ch
-				}) {
-					t.Error("Test handler failed")
-				}
-			}
-
-			makeConfig := func() Config {
-				return Config{
-					NetID:              *netID.Copy(&types.NetID{}),
-					DefaultMACSettings: MACSettingConfig{},
-				}
-			}
-
-			timeout := (1 << 12) * test.Delay
-
-			t.Run("no link", func(t *testing.T) {
-				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout, true)
-				handleTest(ctx, ns, env, nil, func() {
-					defer stop()
-					assertions.New(t).So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
-				})
-			})
-
-			t.Run("active link", func(t *testing.T) {
-				ns, ctx, env, stop := StartTest(t, makeConfig(), timeout, true)
-
-				link, linkEndEvent, ok := AssertLinkApplication(ctx, ns.LoopbackConn(), env.Cluster.GetPeer, env.Events, appID)
-				if !ok {
-					t.Fatal("Failed to link application")
-				}
-
-				a := assertions.New(t)
-
-				asRecvCh := make(chan AsNsLinkRecvRequest)
-				wg := &sync.WaitGroup{}
-				wg.Add(1)
+			if !tc.Handler(ctx, env, func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan error {
+				ch := make(chan error)
 				go func() {
-					defer wg.Done()
-					for {
-						up, err := link.Recv()
-						if err != nil {
-							t.Logf("Receive on AS link returned error: %v", err)
-							close(asRecvCh)
-							return
-						}
-
-						respCh := make(chan *pbtypes.Empty)
-						select {
-						case <-ctx.Done():
-							t.Error("Timed out while waiting for AS uplink to be processed")
-							return
-						case asRecvCh <- AsNsLinkRecvRequest{
-							Uplink:   up,
-							Response: respCh,
-						}:
-						}
-
-						select {
-						case <-ctx.Done():
-							t.Error("Timed out while waiting for AS uplink response to be processed")
-							return
-						case resp := <-respCh:
-							if err := link.Send(resp); err != nil {
-								t.Logf("Send on the link returned error: %v", err)
-							}
-						}
+					_, err := ttnpb.NewGsNsClient(ns.LoopbackConn()).HandleUplink(ctx, CopyUplinkMessage(msg))
+					ttnErr, ok := errors.From(err)
+					if ok {
+						ch <- ttnErr
+					} else {
+						ch <- err
 					}
+					close(ch)
 				}()
-				handleTest(ctx, ns, env, asRecvCh, func() {
-					defer stop()
-
-					a.So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
-					if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-						return a.So(ev, should.ResembleEvent, linkEndEvent(context.Canceled))
-					}), should.BeTrue) {
-						return
-					}
-				})
-			})
+				return ch
+			}) {
+				t.Error("Test handler failed")
+			}
+			assertions.New(t).So(AssertNetworkServerClose(ctx, ns), should.BeTrue)
 		})
 	}
 }

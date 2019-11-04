@@ -48,7 +48,7 @@ func (q *DownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdenti
 	return q.TaskQueue.Add(unique.ID(ctx, devID), startAt, replace)
 }
 
-// Pop calls f on the most recent downlink task in the schedule, for which timestamp is in range [0, time.Now()],
+// Pop calls f on the earliest downlink task in the schedule, for which timestamp is in range [0, time.Now()],
 // if such is available, otherwise it blocks until it is.
 func (q *DownlinkTaskQueue) Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
 	return q.TaskQueue.Pop(ctx, func(uid string, startAt time.Time) error {
