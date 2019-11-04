@@ -50,7 +50,6 @@ const m = defineMessages({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
   }),
 )
-@bind
 export default class GatewayAdd extends React.Component {
   static propTypes = {
     createSuccess: PropTypes.func.isRequired,
@@ -62,6 +61,7 @@ export default class GatewayAdd extends React.Component {
     error: '',
   }
 
+  @bind
   async handleSubmit(values, { resetForm }) {
     const { userId, createSuccess } = this.props
     const { owner_id, ...gateway } = values
