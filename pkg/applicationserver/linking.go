@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/discover"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
@@ -116,18 +117,12 @@ func (as *ApplicationServer) connectLink(ctx context.Context, link *link) error 
 	var allowInsecure bool
 	if link.NetworkServerAddress != "" {
 		allowInsecure = as.AllowInsecureForCredentials()
-		var options []grpc.DialOption
-		options = append(options, rpcclient.DefaultDialOptions(ctx)...)
-		if link.TLS {
-			tlsConfig, err := as.GetTLSClientConfig(ctx)
-			if err != nil {
-				return err
-			}
-			options = append(options, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
-		} else {
-			options = append(options, grpc.WithInsecure())
+		tlsConfig, err := as.GetTLSClientConfig(ctx)
+		if err != nil {
+			return err
 		}
-		conn, err := grpc.DialContext(ctx, link.NetworkServerAddress, options...)
+		ctx = discover.WithTLSFallback(ctx, link.TLS)
+		conn, err := discover.DialContext(ctx, link.NetworkServerAddress, credentials.NewTLS(tlsConfig), rpcclient.DefaultDialOptions(ctx)...)
 		if err != nil {
 			return err
 		}
