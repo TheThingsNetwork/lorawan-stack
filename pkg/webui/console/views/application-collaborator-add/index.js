@@ -24,9 +24,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import CollaboratorForm from '../../components/collaborator-form'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
-import withRequest from '../../../lib/components/with-request'
 
-import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
@@ -50,19 +48,13 @@ import api from '../../api'
   },
   (dispatch, ownProps) => ({
     redirectToList: appId => dispatch(push(`/applications/${appId}/collaborators`)),
-    getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
   }),
   (stateProps, dispatchProps, ownProps) => ({
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
     redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
-    getApplicationsRightsList: () => dispatchProps.getApplicationsRightsList(stateProps.appId),
   }),
-)
-@withRequest(
-  ({ getApplicationsRightsList }) => getApplicationsRightsList(),
-  ({ fetching, rights }) => fetching || !Boolean(rights.length),
 )
 @withBreadcrumb('apps.single.collaborators.add', function(props) {
   const appId = props.appId

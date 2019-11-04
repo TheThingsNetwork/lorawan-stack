@@ -27,10 +27,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 import withRequest from '../../../lib/components/with-request'
 
-import {
-  getApplicationCollaborator,
-  getApplicationsRightsList,
-} from '../../store/actions/applications'
+import { getApplicationCollaborator } from '../../store/actions/applications'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
@@ -71,8 +68,7 @@ import api from '../../api'
     }
   },
   (dispatch, ownProps) => ({
-    loadData(appId, collaboratorId, isUser) {
-      dispatch(getApplicationsRightsList(appId))
+    getApplicationCollaborator(appId, collaboratorId, isUser) {
       dispatch(getApplicationCollaborator(appId, collaboratorId, isUser))
     },
     redirectToList(appId) {
@@ -83,8 +79,8 @@ import api from '../../api'
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    loadData: () =>
-      dispatchProps.loadData(
+    getApplicationCollaborator: () =>
+      dispatchProps.getApplicationCollaborator(
         stateProps.appId,
         stateProps.collaboratorId,
         stateProps.collaboratorType === 'user',
@@ -93,7 +89,7 @@ import api from '../../api'
   }),
 )
 @withRequest(
-  ({ loadData }) => loadData(),
+  ({ getApplicationCollaborator }) => getApplicationCollaborator(),
   ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
 )
 @withBreadcrumb('apps.single.collaborators.edit', function(props) {

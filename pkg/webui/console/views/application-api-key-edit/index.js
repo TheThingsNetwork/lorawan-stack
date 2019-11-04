@@ -26,7 +26,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../components/api-key-form'
 import withRequest from '../../../lib/components/with-request'
 
-import { getApplicationApiKey, getApplicationsRightsList } from '../../store/actions/applications'
+import { getApplicationApiKey } from '../../store/actions/applications'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
@@ -60,15 +60,14 @@ import api from '../../api'
     }
   },
   dispatch => ({
-    loadData(appId, apiKeyId) {
-      dispatch(getApplicationsRightsList(appId))
+    getApplicationApiKey(appId, apiKeyId) {
       dispatch(getApplicationApiKey(appId, apiKeyId))
     },
     deleteSuccess: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
   }),
 )
 @withRequest(
-  ({ loadData, appId, keyId }) => loadData(appId, keyId),
+  ({ getApplicationApiKey, appId, keyId }) => getApplicationApiKey(appId, keyId),
   ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
 )
 @withBreadcrumb('apps.single.api-keys.edit', function(props) {

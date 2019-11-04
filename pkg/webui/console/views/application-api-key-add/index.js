@@ -24,7 +24,6 @@ import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyCreateForm } from '../../components/api-key-form'
-import withRequest from '../../../lib/components/with-request'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
 import {
@@ -49,10 +48,6 @@ import api from '../../api'
     getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
     navigateToList: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
   }),
-)
-@withRequest(
-  ({ appId, getApplicationsRightsList }) => getApplicationsRightsList(appId),
-  ({ fetching, rights }) => fetching || !Boolean(rights.length),
 )
 @withBreadcrumb('apps.single.api-keys.add', function(props) {
   const appId = props.appId
