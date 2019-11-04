@@ -154,6 +154,8 @@
   "console.containers.freq-plans-select.index.warning": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxxxx xxxxx",
   "console.containers.join-eui-prefixes-input.index.prefixesFetchingFailure": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxxx",
   "console.containers.join-eui-prefixes-input.join-eui-prefixes-input.empty": "Xx xxxxxx",
+  "console.containers.owners-select.owners-select.title": "Xxxxx",
+  "console.containers.owners-select.owners-select.warning": "Xxxxxx xxxx xxxx xxxxxxxxxxxx",
   "console.containers.pubsub-formats-select.index.title": "XxxXxx Xxxxxx",
   "console.containers.pubsub-formats-select.index.warning": "Xxxxx xxx xxxxx xxx xxxx xx xxxxxxxxx XxxXxx xxxxxxx",
   "console.containers.pubsubs-table.index.format": "Xxxxxx",
