@@ -25,14 +25,18 @@ import Input from '../../../components/input'
 import Checkbox from '../../../components/checkbox'
 import SubmitButton from '../../../components/submit-button'
 import toast from '../../../components/toast'
+import SubmitBar from '../../../components/submit-bar'
+
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as applicationIdRegexp, address } from '../../lib/regexp'
-import SubmitBar from '../../../components/submit-bar'
 import { getApplicationId } from '../../../lib/selectors/id'
 import { selectAsConfig } from '../../../lib/selectors/env'
+import OwnersSelect from '../../containers/owners-select'
+
+import { selectUserId } from '../../store/selectors/user'
 
 import api from '../../api'
 
@@ -58,6 +62,7 @@ const initialValues = {
 }
 
 const validationSchema = Yup.object().shape({
+  owner_id: Yup.string().required(sharedMessages.validateRequired),
   application_id: Yup.string()
     .matches(applicationIdRegexp, sharedMessages.validateAlphanum)
     .min(2, sharedMessages.validateTooShort)
@@ -74,8 +79,8 @@ const validationSchema = Yup.object().shape({
 })
 
 @connect(
-  ({ user }) => ({
-    userId: user.user.ids.user_id,
+  state => ({
+    userId: selectUserId(state),
     asEnabled: selectAsConfig().enabled,
   }),
   dispatch => ({
@@ -96,15 +101,20 @@ export default class Add extends React.Component {
 
   async handleSubmit(values, { resetForm }) {
     const { userId, navigateToApplication, asEnabled } = this.props
+    const { owner_id, application_id, name, description } = values
 
     await this.setState({ error: '' })
 
     try {
-      const result = await api.application.create(userId, {
-        ids: { application_id: values.application_id },
-        name: values.name,
-        description: values.description,
-      })
+      const result = await api.application.create(
+        owner_id,
+        {
+          ids: { application_id },
+          name,
+          description,
+        },
+        userId === owner_id,
+      )
 
       const appId = getApplicationId(result)
 
@@ -183,11 +193,11 @@ export default class Add extends React.Component {
               initialValues={initialValues}
               validationSchema={validationSchema}
             >
+              <OwnersSelect name="owner_id" required autoFocus />
               <Form.Field
                 title={sharedMessages.appId}
                 name="application_id"
                 placeholder={m.appIdPlaceholder}
-                autoFocus
                 required
                 component={Input}
               />
