@@ -18,6 +18,8 @@ import bind from 'autobind-decorator'
 
 import PropTypes from '../../../lib/prop-types'
 import EventsSubscription from '../../containers/events-subscription'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import { mayViewApplicationEvents } from '../../lib/feature-checks'
 
 import {
   clearApplicationEventsStream,
@@ -30,6 +32,7 @@ import {
   selectApplicationEventsError,
 } from '../../store/selectors/applications'
 
+@withFeatureRequirement(mayViewApplicationEvents)
 @connect(
   null,
   (dispatch, ownProps) => ({
