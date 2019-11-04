@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support LoRa Alliance TR005 Draft 3 QR code format.
 - TLS support for application link in the Console.
+- Embedded documentation served at `/assets/doc`.
 
 ### Changed
 

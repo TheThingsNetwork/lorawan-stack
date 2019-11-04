@@ -66,26 +66,30 @@ const (
 	docRedirectFilePath         = "doc/public/index.html"
 )
 
-// Build builds a static website from the documentation into doc/public.
+// Build builds a static website from the documentation into public/doc.
+// If the HUGO_BASE_URL environment variable is set, it also builds a public website into doc/public.
 func (d Docs) Build() (err error) {
-	mg.Deps(Version.getCurrent)
-	var args []string
-	if baseURL := os.Getenv("HUGO_BASE_URL"); baseURL != "" {
-		url, err := url.Parse(baseURL)
-		if err != nil {
-			return err
-		}
-		url.Path = path.Join(url.Path, currentVersion)
-		destination := path.Join("public", currentVersion)
-		args = append(args, "-b", url.String(), "-d", destination)
-		defer func() {
-			genErr := d.generateRedirect()
-			if err == nil {
-				err = genErr
-			}
-		}()
+	if err = execHugo("-b", "/assets/doc", "-d", "../public/doc"); err != nil {
+		return err
 	}
-	return execHugo(args...)
+	baseURL := os.Getenv("HUGO_BASE_URL")
+	if baseURL == "" {
+		return nil
+	}
+	mg.Deps(Version.getCurrent)
+	url, err := url.Parse(baseURL)
+	if err != nil {
+		return err
+	}
+	url.Path = path.Join(url.Path, currentVersion)
+	destination := path.Join("public", currentVersion)
+	defer func() {
+		genErr := d.generateRedirect()
+		if err == nil {
+			err = genErr
+		}
+	}()
+	return execHugo("-b", url.String(), "-d", destination)
 }
 
 func (Docs) generateRedirect() error {
