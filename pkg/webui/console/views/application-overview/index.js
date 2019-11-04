@@ -23,21 +23,31 @@ import DateTime from '../../../lib/components/date-time'
 import DevicesTable from '../../containers/devices-table'
 import DataSheet from '../../../components/data-sheet'
 import ApplicationEvents from '../../containers/application-events'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import PAGE_SIZES from '../../constants/page-sizes'
-import { getApplicationId } from '../../../lib/selectors/id'
-import { selectSelectedApplication } from '../../store/selectors/applications'
+import {
+  selectSelectedApplication,
+  selectSelectedApplicationId,
+} from '../../store/selectors/applications'
+import { mayViewApplicationInfo } from '../../lib/feature-checks'
 
 import style from './application-overview.styl'
 
 @connect(function(state) {
   return {
+    appId: selectSelectedApplicationId(state),
     application: selectSelectedApplication(state),
   }
 })
+@withFeatureRequirement(mayViewApplicationInfo, {
+  redirect: '/',
+})
 class ApplicationOverview extends React.Component {
   get applicationInfo() {
-    const { ids, name, description, created_at, updated_at } = this.props.application
+    const {
+      application: { ids, name, description, created_at, updated_at },
+    } = this.props
 
     const sheetData = [
       {
@@ -62,8 +72,7 @@ class ApplicationOverview extends React.Component {
   }
 
   render() {
-    const { application } = this.props
-    const appId = getApplicationId(application)
+    const { appId } = this.props
 
     return (
       <Container>

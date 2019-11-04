@@ -29,7 +29,10 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import DataSheet from '../../../components/data-sheet'
 import Button from '../../../components/button'
 import api from '../../api'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { mayViewMqttConnectionInfo } from '../../lib/feature-checks'
 
 import style from './application-integrations-mqtt.styl'
 
@@ -47,6 +50,9 @@ const m = defineMessages({
 @connect(state => ({
   appId: selectSelectedApplicationId(state),
 }))
+@withFeatureRequirement(mayViewMqttConnectionInfo, {
+  redirect: ({ appId }) => `/applications/${appId}`,
+})
 @withBreadcrumb('apps.single.integrations.mqtt', function(props) {
   const { appId } = props
 

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -21,23 +22,25 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import ErrorView from '../../../lib/components/error-view'
 import SubViewError from '../error/sub-view'
 import NotFoundRoute from '../../../lib/components/not-found-route'
-
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 import ApplicationCollaboratorsList from '../application-collaborators-list'
 import ApplicationCollaboratorAdd from '../application-collaborator-add'
 import ApplicationCollaboratorEdit from '../application-collaborator-edit'
 
-@withBreadcrumb('apps.single.collaborators', function(props) {
-  const { match } = props
-  const appId = match.params.appId
+import { mayViewOrEditApplicationCollaborators } from '../../lib/feature-checks'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
-  return (
-    <Breadcrumb
-      path={`/applications/${appId}/collaborators`}
-      icon="organization"
-      content={sharedMessages.collaborators}
-    />
-  )
+@connect(state => ({ appId: selectSelectedApplicationId(state) }))
+@withFeatureRequirement(mayViewOrEditApplicationCollaborators, {
+  redirect: ({ appId }) => `/applications/${appId}`,
 })
+@withBreadcrumb('apps.single.collaborators', ({ appId }) => (
+  <Breadcrumb
+    path={`/applications/${appId}/collaborators`}
+    icon="organization"
+    content={sharedMessages.collaborators}
+  />
+))
 export default class ApplicationCollaborators extends React.Component {
   render() {
     const { match } = this.props
