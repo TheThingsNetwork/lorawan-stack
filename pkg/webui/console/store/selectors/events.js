@@ -32,7 +32,7 @@ export const createEventsErrorSelector = entity =>
   function(state, entityId) {
     const store = selectEventsStore(state.events[entity], entityId)
 
-    return store.error
+    return store ? store.error : undefined
   }
 
 export const createLatestEventSelector = function(entity) {
