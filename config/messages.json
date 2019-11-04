@@ -4850,6 +4850,24 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/networkserver/redis:invalid_payload": {
+    "translations": {
+      "en": "invalid payload"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "application_uplink_queue.go"
+    }
+  },
+  "error:pkg/networkserver/redis:missing_payload": {
+    "translations": {
+      "en": "missing payload"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "application_uplink_queue.go"
+    }
+  },
   "error:pkg/networkserver/redis:read_only_field": {
     "translations": {
       "en": "read-only field `{field}`"
