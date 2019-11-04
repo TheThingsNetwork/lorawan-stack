@@ -87,7 +87,6 @@ const validationSchema = Yup.object().shape({
     navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
   }),
 )
-@bind
 export default class Add extends React.Component {
   static propTypes = {
     asEnabled: PropTypes.bool.isRequired,
@@ -99,6 +98,7 @@ export default class Add extends React.Component {
     link: true,
   }
 
+  @bind
   async handleSubmit(values, { resetForm }) {
     const { userId, navigateToApplication, asEnabled } = this.props
     const { owner_id, application_id, name, description } = values
