@@ -54,6 +54,7 @@ const m = defineMessages({
 export default class GatewayAdd extends React.Component {
   static propTypes = {
     createSuccess: PropTypes.func.isRequired,
+    env: PropTypes.env.isRequired,
     userId: PropTypes.string.isRequired,
   }
 
