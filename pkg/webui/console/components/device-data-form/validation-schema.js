@@ -85,18 +85,28 @@ const validationSchema = Yup.object({
       is: (mode, externalJs) => isOTAA(mode) && !externalJs,
       then: schema =>
         schema.shape({
-          nwk_key: Yup.object().shape({
-            key: Yup.string()
-              .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-              .transform(toUndefined)
-              .default(random16BytesString),
-          }),
-          app_key: Yup.object().shape({
-            key: Yup.string()
-              .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-              .transform(toUndefined)
-              .default(random16BytesString),
-          }),
+          nwk_key: Yup.lazy(
+            value =>
+              value !== undefined
+                ? Yup.object().shape({
+                    key: Yup.string()
+                      .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                      .transform(toUndefined)
+                      .default(random16BytesString),
+                  })
+                : Yup.object().strip(), // Avoid generating when key is unexposed
+          ),
+          app_key: Yup.lazy(
+            value =>
+              value !== undefined
+                ? Yup.object().shape({
+                    key: Yup.string()
+                      .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                      .transform(toUndefined)
+                      .default(random16BytesString),
+                  })
+                : Yup.object().strip(), // Avoid generating when key is unexposed
+          ),
         }),
       otherwise: schema =>
         schema.shape({
