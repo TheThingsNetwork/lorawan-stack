@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.58.3" />
+  <title>Available Templates | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.4/reference/email-templates/available/" />
+  <link rel="icon" type="image/png" href="/v3.2.4/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.4/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Available Templates">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Available Templates">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.4/reference/email-templates/available/">
+  <meta name="twitter:title" content="Available Templates" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.4/">
+        <img src="/v3.2.4/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.4/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.4/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.4/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.4/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.4/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Email Templates</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.4/reference/email-templates/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/email-templates/available/" class="is-active">Available Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/email-templates/overriding/" class="">Overriding Templates</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Available Templates</h1>
+
+<div class="content"><p>The following email templates are currently used by The Things Stack:</p>
+
+<table>
+<thead>
+<tr>
+<th>Full Name</th>
+<th>Identifier</th>
+<th>Scope</th>
+<th>Additional fields</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Invitation</td>
+<td><code>invitation</code></td>
+<td>Sent when inviting new users to the network.</td>
+<td><code>InvitationToken</code></td>
+</tr>
+
+<tr>
+<td>API Key changed</td>
+<td><code>api_key_changed</code></td>
+<td>Sent when the rights of an API Key have been changed.</td>
+<td><code>Identifiers</code> and <code>Rights</code></td>
+</tr>
+
+<tr>
+<td>API Key created</td>
+<td><code>api_key_created</code></td>
+<td>Send when an API Key has been created.</td>
+<td><code>Identifiers</code> and <code>Rights</code></td>
+</tr>
+
+<tr>
+<td>Collaborator changed</td>
+<td><code>collaborator_changed</code></td>
+<td>Sent when the rights of a collaborator have been changed.</td>
+<td><code>Collaborator</code></td>
+</tr>
+
+<tr>
+<td>Password changed</td>
+<td><code>password_changed</code></td>
+<td>Sent when the the password of a user has been changed.</td>
+<td></td>
+</tr>
+
+<tr>
+<td>Temporary password</td>
+<td><code>temporary_password</code></td>
+<td>Sent when a temporary password has been requested for an user.</td>
+<td><code>TemporaryPassword</code></td>
+</tr>
+
+<tr>
+<td>Email validation</td>
+<td><code>validate</code></td>
+<td>Sent when a user is added as a collaborator of an entity, in order to validate their email.</td>
+<td><code>ID</code> and <code>Token</code></td>
+</tr>
+
+<tr>
+<td>Entity State Changed</td>
+<td><code>entity_state_changed</code></td>
+<td>Sent when the approval state of an entity changed.</td>
+<td><code>State</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>The following fields can be used inside all of the email templates:</p>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>User.ID</code></td>
+<td>The identifier of the user.</td>
+<td>If the recipient is the contact of the target entity, the value will be empty.</td>
+</tr>
+
+<tr>
+<td><code>User.Name</code></td>
+<td>The full name of the user.</td>
+<td>If the recipient is the contact of the target entity, the value will be <code>user</code>.</td>
+</tr>
+
+<tr>
+<td><code>User.Email</code></td>
+<td>The email of the user.</td>
+<td>None.</td>
+</tr>
+
+<tr>
+<td><code>Network.Name</code></td>
+<td>The full name of the network running on the stack.</td>
+<td>None.</td>
+</tr>
+
+<tr>
+<td><code>Network.IdentityServerURL</code></td>
+<td>The base URL of the Identity Server.</td>
+<td>None.</td>
+</tr>
+
+<tr>
+<td><code>Network.ConsoleURL</code></td>
+<td>The base URL of the Console.</td>
+<td>None.</td>
+</tr>
+
+<tr>
+<td><code>Entity.Type</code></td>
+<td>The type of the target entity, such as <code>application</code>, <code>client</code>, <code>gateway</code>, <code>organization</code> or <code>user</code>.</td>
+<td>None.</td>
+</tr>
+
+<tr>
+<td><code>Enitity.ID</code></td>
+<td>The identifier of the target entity.</td>
+<td>None.</td>
+</tr>
+
+<tr>
+<td><code>Contact.Type</code></td>
+<td>The contact type of the recipient, such as <code>technical</code>, <code>billing</code> or <code>abuse</code>.</td>
+<td>Only used if the recipient is the contact of an entity.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.4/reference/email-templates/">← Email Templates</a>
+<a class="button is-pulled-right" href="/v3.2.4/reference/email-templates/overriding/">Overriding Templates →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.4/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.4/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.4/components/">Components</a></p>
+        <p><a class="" href="/v3.2.4/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 16 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/e1514b53a16df9e435b2ef5322c4501611f0cb8a">
+      doc: Add entity state change email to reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/email-templates/available.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.4/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

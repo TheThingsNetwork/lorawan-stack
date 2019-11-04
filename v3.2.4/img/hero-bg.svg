@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1040 177" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <rect id="Artboard1" x="0" y="0" width="1040" height="177" style="fill:none;"/>
+    <clipPath id="_clip1">
+        <rect id="Artboard11" serif:id="Artboard1" x="0" y="0" width="1040" height="177"/>
+    </clipPath>
+    <g clip-path="url(#_clip1)">
+        <g id="Group" transform="matrix(1,0,0,1,20,20)">
+            <g id="Mask" transform="matrix(1,0,0,1,-20,-20)">
+                <rect id="path-2" x="0" y="0" width="1040" height="177"/>
+                <rect id="path-21" serif:id="path-2" x="0" y="0" width="1040" height="177" style="fill:url(#_Linear2);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,84,-286)">
+                <g opacity="0.3">
+                    <path id="Rectangle-Copy-101" d="M20.303,90.048C9.605,93.704 3.313,104.763 5.638,115.827L72.166,432.473C72.354,433.366 72.596,434.246 72.89,435.109C76.887,446.805 89.609,453.046 101.305,449.049L335.697,368.952C346.395,365.296 352.687,354.237 350.362,343.173L283.834,26.527C283.646,25.634 283.404,24.754 283.11,23.891C279.113,12.195 266.391,5.954 254.695,9.951L20.303,90.048Z" style="fill:none;stroke:white;stroke-width:2.7px;"/>
+                    <path id="Rectangle-Copy-102" d="M193.303,299.048C182.605,302.704 176.313,313.763 178.638,324.827L245.166,641.473C245.354,642.366 245.596,643.246 245.89,644.109C249.887,655.805 262.609,662.046 274.305,658.049L508.697,577.952C519.395,574.296 525.687,563.237 523.362,552.173L456.834,235.527C456.646,234.634 456.404,233.754 456.11,232.891C452.113,221.195 439.391,214.954 427.695,218.951L193.303,299.048Z" style="fill:none;stroke:white;stroke-width:2.7px;"/>
+                    <path id="Rectangle-Copy-103" d="M361.303,399.048C350.605,402.704 344.313,413.763 346.638,424.827L413.166,741.473C413.354,742.366 413.596,743.246 413.89,744.109C417.887,755.805 430.609,762.046 442.305,758.049L676.697,677.952C687.395,674.296 693.687,663.237 691.362,652.173L624.834,335.527C624.646,334.634 624.404,333.754 624.11,332.891C620.113,321.195 607.391,314.954 595.695,318.951L361.303,399.048Z" style="fill:none;stroke:white;stroke-width:2.7px;"/>
+                    <path id="Rectangle-Copy-104" d="M536.303,119.048C525.605,122.704 519.313,133.763 521.638,144.827L588.166,461.473C588.354,462.366 588.596,463.246 588.89,464.109C592.887,475.805 605.609,482.046 617.305,478.049L851.697,397.952C862.395,394.296 868.687,383.237 866.362,372.173L799.834,55.527C799.646,54.634 799.404,53.754 799.11,52.891C795.113,41.195 782.391,34.954 770.695,38.951L536.303,119.048Z" style="fill:none;stroke:white;stroke-width:2.7px;"/>
+                </g>
+            </g>
+        </g>
+    </g>
+    <defs>
+        <linearGradient id="_Linear2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1040,0,0,1040,0,88.5)"><stop offset="0" style="stop-color:rgb(0,10,255);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(0,170,255);stop-opacity:1"/></linearGradient>
+    </defs>
+</svg>

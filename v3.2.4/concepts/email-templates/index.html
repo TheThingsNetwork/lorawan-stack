@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.58.3" />
+  <title>Email Templates | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.4/concepts/email-templates/" />
+  <link rel="icon" type="image/png" href="/v3.2.4/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.4/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Email Templates">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Email Templates">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.4/concepts/email-templates/">
+  <meta name="twitter:title" content="Email Templates" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.4/">
+        <img src="/v3.2.4/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.4/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.4/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.4/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.4/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.4/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">Email Templates</h1>
+
+<div class="content">
+
+<h2 id="what-is-it">What is it?</h2>
+
+<p>Email templates define the contents of the emails that The Things Stack sends to its users. They allow network operators to override the default contents of the emails with their own custom contents.</p>
+
+<h2 id="who-is-it-for">Who is it for?</h2>
+
+<p>Email templates are targeted at network operators that would like to customize the emails that The Things Stack sends to its users.</p>
+
+<h3 id="typical-use-cases">Typical use cases</h3>
+
+<ol>
+<li>Adding additional styling to the default text-only emails that The Things Stack sends.</li>
+<li>Translating the emails The Things Stack sends to its users (applies deployment-wide).</li>
+</ol>
+
+<h2 id="how-does-it-work">How does it work?</h2>
+
+<p>Email templates override the default emails that The Things Stack sends by providing custom template files written in Go&rsquo;s <a href="https://golang.org/pkg/html/template/">html/template</a> format. The templates are retrieved when The Things Stack sends the first email of a certain type, and then are cached until it is restarted. See <a href="https://thethingsstack.io/v3.2.4/reference/email-templates/available/">Available Templates</a> and <a href="https://thethingsstack.io/v3.2.4/reference/email-templates/overriding/">Overriding Default Templates</a>.</p>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.4/concepts/end-device-templates/">← End Device Templates</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.4/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.4/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.4/components/">Components</a></p>
+        <p><a class="" href="/v3.2.4/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/07b3c20644bab672a8993426e755814fc0dc2584">
+      doc: Make heading spacing consistent
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/concepts/email-templates.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.4/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

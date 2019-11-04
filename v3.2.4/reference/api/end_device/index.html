@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.58.3" />
+  <title>End Device APIs | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.4/reference/api/end_device/" />
+  <link rel="icon" type="image/png" href="/v3.2.4/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.4/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="End Device APIs">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="End Device APIs">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.4/reference/api/end_device/">
+  <meta name="twitter:title" content="End Device APIs" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.4/">
+        <img src="/v3.2.4/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.4/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.4/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.4/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.4/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.4/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">API</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.4/reference/api/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/api/authentication/" class="">Authentication</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/api/application/" class="">Application APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/api/application_server/" class="">Application Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/api/application_webhooks/" class="">Application Webhook APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/api/application_pub_sub/" class="">Application Pub-Sub APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/api/gateway/" class="">Gateway APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/api/gateway_server/" class="">Gateway Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/api/end_device/" class="is-active">End Device APIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">End Device APIs</h1>
+
+<div class="content">
+
+<h2 id="the-enddeviceregistry-service">The <code>EndDeviceRegistry</code> service</h2>
+
+
+<h3>Method <code>EndDeviceRegistry.Create</code></h3>
+<p>Create a new end device within an application.</p>
+
+<p>
+  Request: <a href="#message:CreateEndDeviceRequest"><code>CreateEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>POST</code> <code>/applications/{end_device.ids.application_ids.application_id}/devices</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to set to the IS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>EndDeviceRegistry.Get</code></h3>
+<p>Get the end device with the given identifiers, selecting the fields given
+ by the field mask.</p>
+
+<p>
+  Request: <a href="#message:GetEndDeviceRequest"><code>GetEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>GET</code> <code>/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to get from the IS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>EndDeviceRegistry.List</code></h3>
+<p>List applications. See request message for details.</p>
+
+<p>
+  Request: <a href="#message:ListEndDevicesRequest"><code>ListEndDevicesRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevices"><code>EndDevices</code></a>
+</p>
+<p><code>GET</code> <code>/applications/{application_ids.application_id}/devices</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to get from the IS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>EndDeviceRegistry.Update</code></h3>
+
+<p>
+  Request: <a href="#message:UpdateEndDeviceRequest"><code>UpdateEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>PUT</code> <code>/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to set to the IS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>EndDeviceRegistry.Delete</code></h3>
+
+<p>
+  Request: <a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>DELETE</code> <code>/applications/{application_ids.application_id}/devices/{device_id}</code></p>
+
+
+<h2 id="the-jsenddeviceregistry-service">The <code>JsEndDeviceRegistry</code> service</h2>
+
+
+<h3>Method <code>JsEndDeviceRegistry.Set</code></h3>
+<p>Set creates or updates the device.</p>
+
+<p>
+  Request: <a href="#message:SetEndDeviceRequest"><code>SetEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>PUT</code> <code>/js/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}</code></p>
+<p><code>POST</code> <code>/js/applications/{end_device.ids.application_ids.application_id}/devices</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to set to the JS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>JsEndDeviceRegistry.Get</code></h3>
+<p>Get returns the device that matches the given identifiers.
+ If there are multiple matches, an error will be returned.</p>
+
+<p>
+  Request: <a href="#message:GetEndDeviceRequest"><code>GetEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>GET</code> <code>/js/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to get from the JS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>JsEndDeviceRegistry.Delete</code></h3>
+<p>Delete deletes the device that matches the given identifiers.
+ If there are multiple matches, an error will be returned.</p>
+
+<p>
+  Request: <a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>DELETE</code> <code>/js/applications/{application_ids.application_id}/devices/{device_id}</code></p>
+
+
+<h2 id="the-nsenddeviceregistry-service">The <code>NsEndDeviceRegistry</code> service</h2>
+
+
+<h3>Method <code>NsEndDeviceRegistry.Set</code></h3>
+<p>Set creates or updates the device.</p>
+
+<p>
+  Request: <a href="#message:SetEndDeviceRequest"><code>SetEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>PUT</code> <code>/ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}</code></p>
+<p><code>POST</code> <code>/ns/applications/{end_device.ids.application_ids.application_id}/devices</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to set to the NS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>NsEndDeviceRegistry.Get</code></h3>
+<p>Get returns the device that matches the given identifiers.
+ If there are multiple matches, an error will be returned.</p>
+
+<p>
+  Request: <a href="#message:GetEndDeviceRequest"><code>GetEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>GET</code> <code>/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to get from the NS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>NsEndDeviceRegistry.Delete</code></h3>
+<p>Delete deletes the device that matches the given identifiers.
+ If there are multiple matches, an error will be returned.</p>
+
+<p>
+  Request: <a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>DELETE</code> <code>/ns/applications/{application_ids.application_id}/devices/{device_id}</code></p>
+
+
+<h2 id="the-asenddeviceregistry-service">The <code>AsEndDeviceRegistry</code> service</h2>
+
+
+<h3>Method <code>AsEndDeviceRegistry.Set</code></h3>
+<p>Set creates or updates the device.</p>
+
+<p>
+  Request: <a href="#message:SetEndDeviceRequest"><code>SetEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>PUT</code> <code>/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}</code></p>
+<p><code>POST</code> <code>/as/applications/{end_device.ids.application_ids.application_id}/devices</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to set to the AS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>AsEndDeviceRegistry.Get</code></h3>
+<p>Get returns the device that matches the given identifiers.
+ If there are multiple matches, an error will be returned.</p>
+
+<p>
+  Request: <a href="#message:GetEndDeviceRequest"><code>GetEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDevice"><code>EndDevice</code></a>
+</p>
+<p><code>GET</code> <code>/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}</code></p>
+
+
+<blockquote>
+<p>TODO: <a href="https://github.com/TheThingsNetwork/lorawan-stack/issues/206">Document what fields to get from the AS.</a></p>
+</blockquote>
+
+
+<h3>Method <code>AsEndDeviceRegistry.Delete</code></h3>
+<p>Delete deletes the device that matches the given identifiers.
+ If there are multiple matches, an error will be returned.</p>
+
+<p>
+  Request: <a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>DELETE</code> <code>/as/applications/{application_ids.application_id}/devices/{device_id}</code></p>
+
+
+<h2 id="messages">Messages</h2>
+
+<h3 id="message:CreateEndDeviceRequest">Message <code>CreateEndDeviceRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>end_device</code>
+    (<a href="#message:EndDevice"><code>EndDevice</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "end_device": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:EndDevice">Message <code>EndDevice</code></h3>
+<p>Defines an End Device registration and its state on the network.
+ The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
+ SDKs are responsible for combining (if desired) the three.</p>
+
+<dl>
+  <dt>
+    <code>ids</code>
+    (<a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>created_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>updated_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>name</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>50</code></p>
+      <p>Friendly name of the device. Stored in Entity Registry.</p>
+  </dd>
+  <dt>
+    <code>description</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2000</code></p>
+      <p>Description of the device. Stored in Entity Registry.</p>
+  </dd>
+  <dt>
+    <code>attributes</code>
+    (map of <code>string</code> to <code>string</code>)
+  </dt>
+  <dd>
+      <p>Attributes of the device. Stored in Entity Registry.</p>
+  </dd>
+  <dt>
+    <code>version_ids</code>
+    (<a href="#message:EndDeviceVersionIdentifiers"><code>EndDeviceVersionIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p>Version Identifiers. Stored in Entity Registry, Network Server and Application Server.</p>
+  </dd>
+  <dt>
+    <code>service_profile_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>64</code></p>
+      <p>Default service profile. Stored in Entity Registry.</p>
+  </dd>
+  <dt>
+    <code>network_server_address</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$</code></p>
+      <p>The address of the Network Server where this device is supposed to be registered.
+ Stored in Entity Registry and Join Server.
+ The typical format of the address is &ldquo;host:port&rdquo;. If the port is omitted,
+ the normal port inference (with DNS lookup, otherwise defaults) is used.
+ The connection shall be established with transport layer security (TLS).
+ Custom certificate authorities may be configured out-of-band.</p>
+  </dd>
+  <dt>
+    <code>network_server_kek_label</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2048</code></p>
+      <p>The KEK label of the Network Server to use for wrapping network session keys.
+ Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>application_server_address</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$</code></p>
+      <p>The address of the Application Server where this device is supposed to be registered.
+ Stored in Entity Registry and Join Server.
+ The typical format of the address is &ldquo;host:port&rdquo;. If the port is omitted,
+ the normal port inference (with DNS lookup, otherwise defaults) is used.
+ The connection shall be established with transport layer security (TLS).
+ Custom certificate authorities may be configured out-of-band.</p>
+  </dd>
+  <dt>
+    <code>application_server_kek_label</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2048</code></p>
+      <p>The KEK label of the Application Server to use for wrapping the application session key.
+ Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>application_server_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>100</code></p>
+      <p>The AS-ID of the Application Server to use.
+ Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>join_server_address</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$</code></p>
+      <p>The address of the Join Server where this device is supposed to be registered.
+ Stored in Entity Registry.
+ The typical format of the address is &ldquo;host:port&rdquo;. If the port is omitted,
+ the normal port inference (with DNS lookup, otherwise defaults) is used.
+ The connection shall be established with transport layer security (TLS).
+ Custom certificate authorities may be configured out-of-band.</p>
+  </dd>
+  <dt>
+    <code>locations</code>
+    (map of <code>string</code> to <a href="#message:Location"><code>Location</code></a>)
+  </dt>
+  <dd>
+      <p>Location of the device. Stored in Entity Registry.</p>
+  </dd>
+  <dt>
+    <code>supports_class_b</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>Whether the device supports class B.
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>supports_class_c</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>Whether the device supports class C.
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>lorawan_version</code>
+    (<a href="#enum:MACVersion"><code>MACVersion</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>LoRaWAN MAC version. Stored in Network Server.
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>lorawan_phy_version</code>
+    (<a href="#enum:PHYVersion"><code>PHYVersion</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>LoRaWAN PHY version. Stored in Network Server.
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>frequency_plan_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>64</code></p>
+      <p>ID of the frequency plan used by this device.
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>min_frequency</code>
+    (<code>uint64</code>)
+  </dt>
+  <dd>
+      <p>Minimum frequency the device is capable of using (Hz). Stored in Network Server.
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>max_frequency</code>
+    (<code>uint64</code>)
+  </dt>
+  <dd>
+      <p>Maximum frequency the device is capable of using (Hz). Stored in Network Server.
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>supports_join</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>The device supports join (it&rsquo;s OTAA).
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>resets_join_nonces</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server.
+ Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.</p>
+  </dd>
+  <dt>
+    <code>root_keys</code>
+    (<a href="#message:RootKeys"><code>RootKeys</code></a>)
+  </dt>
+  <dd>
+      <p>Device root keys. Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>net_id</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>Home NetID. Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>mac_settings</code>
+    (<a href="#message:MACSettings"><code>MACSettings</code></a>)
+  </dt>
+  <dd>
+      <p>Settings for how the Network Server handles MAC layer for this device. Stored in Network Server.</p>
+  </dd>
+  <dt>
+    <code>mac_state</code>
+    (<a href="#message:MACState"><code>MACState</code></a>)
+  </dt>
+  <dd>
+      <p>MAC state of the device. Stored in Network Server.</p>
+  </dd>
+  <dt>
+    <code>pending_mac_state</code>
+    (<a href="#message:MACState"><code>MACState</code></a>)
+  </dt>
+  <dd>
+      <p>Pending MAC state of the device. Stored in Network Server.</p>
+  </dd>
+  <dt>
+    <code>session</code>
+    (<a href="#message:Session"><code>Session</code></a>)
+  </dt>
+  <dd>
+      <p>Current session of the device. Stored in Network Server and Application Server.</p>
+  </dd>
+  <dt>
+    <code>pending_session</code>
+    (<a href="#message:Session"><code>Session</code></a>)
+  </dt>
+  <dd>
+      <p>Pending session. Stored in Network Server and Application Server until RekeyInd is received.</p>
+  </dd>
+  <dt>
+    <code>last_dev_nonce</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Last DevNonce used.
+ This field is only used for devices using LoRaWAN version 1.1 and later.
+ Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>used_dev_nonces</code>
+    (repeated <code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Used DevNonces sorted in ascending order.
+ This field is only used for devices using LoRaWAN versions preceding 1.1.
+ Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>last_join_nonce</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Last JoinNonce/AppNonce(for devices using LoRaWAN versions preceding 1.1) used.
+ Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>last_rj_count_0</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Last Rejoin counter value used (type 0/2).
+ Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>last_rj_count_1</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Last Rejoin counter value used (type 1).
+ Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>last_dev_status_received_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+      <p>Time when last DevStatus MAC command was received.
+ Stored in Network Server.</p>
+  </dd>
+  <dt>
+    <code>power_state</code>
+    (<a href="#enum:PowerState"><code>PowerState</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>The power state of the device; whether it is battery-powered or connected to an external power source.
+ Received via the DevStatus MAC command at status_received_at.
+ Stored in Network Server.</p>
+  </dd>
+  <dt>
+    <code>battery_percentage</code>
+    (<code>google.protobuf.FloatValue</code>)
+  </dt>
+  <dd>
+      <p><code>gte</code>: <code>0</code></p>
+      <p><code>lte</code>: <code>1</code></p>
+      <p>Latest-known battery percentage of the device.
+ Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
+ Stored in Network Server.</p>
+  </dd>
+  <dt>
+    <code>downlink_margin</code>
+    (<code>int32</code>)
+  </dt>
+  <dd>
+      <p>Demodulation signal-to-noise ratio (dB).
+ Received via the DevStatus MAC command at last_dev_status_received_at.
+ Stored in Network Server.</p>
+  </dd>
+  <dt>
+    <code>recent_adr_uplinks</code>
+    (repeated <a href="#message:UplinkMessage"><code>UplinkMessage</code></a>)
+  </dt>
+  <dd>
+      <p>Recent uplink messages with ADR bit set to 1 sorted by time. Stored in Network Server.
+ The field is reset each time an uplink message carrying MACPayload is received with ADR bit set to 0.
+ The number of messages stored is in the range [0,20];</p>
+  </dd>
+  <dt>
+    <code>recent_uplinks</code>
+    (repeated <a href="#message:UplinkMessage"><code>UplinkMessage</code></a>)
+  </dt>
+  <dd>
+      <p>Recent uplink messages sorted by time. Stored in Network Server.
+ The number of messages stored may depend on configuration.</p>
+  </dd>
+  <dt>
+    <code>recent_downlinks</code>
+    (repeated <a href="#message:DownlinkMessage"><code>DownlinkMessage</code></a>)
+  </dt>
+  <dd>
+      <p>Recent downlink messages sorted by time. Stored in Network Server.
+ The number of messages stored may depend on configuration.</p>
+  </dd>
+  <dt>
+    <code>queued_application_downlinks</code>
+    (repeated <a href="#message:ApplicationDownlink"><code>ApplicationDownlink</code></a>)
+  </dt>
+  <dd>
+      <p>Queued Application downlink messages. Stored in Application Server,
+ which sets them on the Network Server.</p>
+  </dd>
+  <dt>
+    <code>formatters</code>
+    (<a href="#message:MessagePayloadFormatters"><code>MessagePayloadFormatters</code></a>)
+  </dt>
+  <dd>
+      <p>The payload formatters for this end device. Stored in Application Server.
+ Copied on creation from template identified by version_ids.</p>
+  </dd>
+  <dt>
+    <code>provisioner_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$</code></p>
+      <p>ID of the provisioner. Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>provisioning_data</code>
+    (<code>google.protobuf.Struct</code>)
+  </dt>
+  <dd>
+      <p>Vendor-specific provisioning data. Stored in Join Server.</p>
+  </dd>
+  <dt>
+    <code>multicast</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>Indicates whether this device represents a multicast group.</p>
+  </dd>
+  <dt>
+    <code>claim_authentication_code</code>
+    (<a href="#message:EndDeviceAuthenticationCode"><code>EndDeviceAuthenticationCode</code></a>)
+  </dt>
+  <dd>
+      <p>Authentication code to claim ownership of the end device. Stored in Join Server.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "ids": {},
+  "created_at": "0001-01-01T00:00:00Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "name": "",
+  "description": "",
+  "attributes": {},
+  "version_ids": {},
+  "service_profile_id": "",
+  "network_server_address": "",
+  "network_server_kek_label": "",
+  "application_server_address": "",
+  "application_server_kek_label": "",
+  "application_server_id": "",
+  "join_server_address": "",
+  "locations": {},
+  "supports_class_b": false,
+  "supports_class_c": false,
+  "lorawan_version": "MAC_UNKNOWN",
+  "lorawan_phy_version": "PHY_UNKNOWN",
+  "frequency_plan_id": "",
+  "min_frequency": 0,
+  "max_frequency": 0,
+  "supports_join": false,
+  "resets_join_nonces": false,
+  "root_keys": {},
+  "net_id": "",
+  "mac_settings": {},
+  "mac_state": {},
+  "pending_mac_state": {},
+  "session": {},
+  "pending_session": {},
+  "last_dev_nonce": 0,
+  "used_dev_nonces": [],
+  "last_join_nonce": 0,
+  "last_rj_count_0": 0,
+  "last_rj_count_1": 0,
+  "last_dev_status_received_at": "0001-01-01T00:00:00Z",
+  "power_state": "POWER_UNKNOWN",
+  "battery_percentage": null,
+  "downlink_margin": 0,
+  "recent_adr_uplinks": [],
+  "recent_uplinks": [],
+  "recent_downlinks": [],
+  "queued_application_downlinks": [],
+  "formatters": {},
+  "provisioner_id": "",
+  "provisioning_data": {},
+  "multicast": false,
+  "claim_authentication_code": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:EndDeviceAuthenticationCode">Message <code>EndDeviceAuthenticationCode</code></h3>
+<p>Authentication code for end devices.</p>
+
+<dl>
+  <dt>
+    <code>value</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^[A-Z0-9]{1,32}$</code></p>
+  </dd>
+  <dt>
+    <code>valid_from</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>valid_to</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "value": "",
+  "valid_from": "0001-01-01T00:00:00Z",
+  "valid_to": "0001-01-01T00:00:00Z",
+}</code></pre>
+</details>
+
+
+<h3 id="message:EndDeviceIdentifiers">Message <code>EndDeviceIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>device_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>dev_eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN DevEUI.</p>
+  </dd>
+  <dt>
+    <code>join_eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).</p>
+  </dd>
+  <dt>
+    <code>dev_addr</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN DevAddr.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "device_id": "",
+  "application_ids": {},
+  "dev_eui": "",
+  "join_eui": "",
+  "dev_addr": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:EndDevices">Message <code>EndDevices</code></h3>
+
+<dl>
+  <dt>
+    <code>end_devices</code>
+    (repeated <a href="#message:EndDevice"><code>EndDevice</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "end_devices": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:EndDeviceVersionIdentifiers">Message <code>EndDeviceVersionIdentifiers</code></h3>
+<p>Identifies an end device model with version information.</p>
+
+<dl>
+  <dt>
+    <code>brand_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>model_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>hardware_version</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>firmware_version</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "brand_id": "",
+  "model_id": "",
+  "hardware_version": "",
+  "firmware_version": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:GetEndDeviceRequest">Message <code>GetEndDeviceRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>end_device_ids</code>
+    (<a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "end_device_ids": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:KeyEnvelope">Message <code>KeyEnvelope</code></h3>
+
+<dl>
+  <dt>
+    <code>key</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The unencrypted AES key.</p>
+  </dd>
+  <dt>
+    <code>kek_label</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2048</code></p>
+      <p>The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key.</p>
+  </dd>
+  <dt>
+    <code>encrypted_key</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "key": "",
+  "kek_label": "",
+  "encrypted_key": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:ListEndDevicesRequest">Message <code>ListEndDevicesRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>order</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Order the results by this field path (must be present in the field mask).
+ Default ordering is by ID. Prepend with a minus (-) to reverse the order.</p>
+  </dd>
+  <dt>
+    <code>limit</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p><code>lte</code>: <code>1000</code></p>
+      <p>Limit the number of results per page.</p>
+  </dd>
+  <dt>
+    <code>page</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Page number for pagination. 0 is interpreted as 1.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "application_ids": {},
+  "field_mask": {},
+  "order": "",
+  "limit": 0,
+  "page": 0,
+}</code></pre>
+</details>
+
+
+<h3 id="message:MACParameters">Message <code>MACParameters</code></h3>
+<p>MACParameters represent the parameters of the device&rsquo;s MAC layer (active or desired).
+ This is used internally by the Network Server.</p>
+
+<dl>
+  <dt>
+    <code>max_eirp</code>
+    (<code>float</code>)
+  </dt>
+  <dd>
+      <p>Maximum EIRP (dBm).</p>
+  </dd>
+  <dt>
+    <code>adr_data_rate_index</code>
+    (<a href="#enum:DataRateIndex"><code>DataRateIndex</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>ADR: data rate index to use.</p>
+  </dd>
+  <dt>
+    <code>adr_tx_power_index</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p><code>lte</code>: <code>15</code></p>
+      <p>ADR: transmission power index to use.</p>
+  </dd>
+  <dt>
+    <code>adr_nb_trans</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p><code>lte</code>: <code>15</code></p>
+      <p>ADR: number of retransmissions.</p>
+  </dd>
+  <dt>
+    <code>adr_ack_limit</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>ADR: number of messages to wait before setting ADRAckReq.
+ This field is deprecated, use adr_ack_limit_exponent instead.</p>
+  </dd>
+  <dt>
+    <code>adr_ack_delay</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
+ This field is deprecated, use adr_ack_delay_exponent instead.</p>
+  </dd>
+  <dt>
+    <code>rx1_delay</code>
+    (<a href="#enum:RxDelay"><code>RxDelay</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Rx1 delay (Rx2 delay is Rx1 delay + 1 second).</p>
+  </dd>
+  <dt>
+    <code>rx1_data_rate_offset</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p><code>lte</code>: <code>7</code></p>
+      <p>Data rate offset for Rx1.</p>
+  </dd>
+  <dt>
+    <code>rx2_data_rate_index</code>
+    (<a href="#enum:DataRateIndex"><code>DataRateIndex</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Data rate index for Rx2.</p>
+  </dd>
+  <dt>
+    <code>rx2_frequency</code>
+    (<code>uint64</code>)
+  </dt>
+  <dd>
+      <p><code>gte</code>: <code>100000</code></p>
+      <p>Frequency for Rx2 (Hz).</p>
+  </dd>
+  <dt>
+    <code>max_duty_cycle</code>
+    (<a href="#enum:AggregatedDutyCycle"><code>AggregatedDutyCycle</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Maximum uplink duty cycle (of all channels).</p>
+  </dd>
+  <dt>
+    <code>rejoin_time_periodicity</code>
+    (<a href="#enum:RejoinTimeExponent"><code>RejoinTimeExponent</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Time within which a rejoin-request must be sent.</p>
+  </dd>
+  <dt>
+    <code>rejoin_count_periodicity</code>
+    (<a href="#enum:RejoinCountExponent"><code>RejoinCountExponent</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Message count within which a rejoin-request must be sent.</p>
+  </dd>
+  <dt>
+    <code>ping_slot_frequency</code>
+    (<code>uint64</code>)
+  </dt>
+  <dd>
+      <p><code>gte</code>: <code>100000</code></p>
+      <p><code>lte</code>: <code>0</code></p>
+      <p>Frequency of the class B ping slot (Hz).</p>
+  </dd>
+  <dt>
+    <code>ping_slot_data_rate_index</code>
+    (<a href="#enum:DataRateIndex"><code>DataRateIndex</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Data rate index of the class B ping slot.</p>
+  </dd>
+  <dt>
+    <code>beacon_frequency</code>
+    (<code>uint64</code>)
+  </dt>
+  <dd>
+      <p><code>gte</code>: <code>100000</code></p>
+      <p><code>lte</code>: <code>0</code></p>
+      <p>Frequency of the class B beacon (Hz).</p>
+  </dd>
+  <dt>
+    <code>channels</code>
+    (repeated <a href="#message:MACParameters.Channel"><code>MACParameters.Channel</code></a>)
+  </dt>
+  <dd>
+      <p><code>min_items</code>: <code>1</code></p>
+      <p>Configured uplink channels and optionally Rx1 frequency.</p>
+  </dd>
+  <dt>
+    <code>uplink_dwell_time</code>
+    (<code>google.protobuf.BoolValue</code>)
+  </dt>
+  <dd>
+      <p>Whether uplink dwell time is set (400ms).
+ If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).</p>
+  </dd>
+  <dt>
+    <code>downlink_dwell_time</code>
+    (<code>google.protobuf.BoolValue</code>)
+  </dt>
+  <dd>
+      <p>Whether downlink dwell time is set (400ms).
+ If this field is not set, then the value is either unknown or irrelevant(Network Server cannot modify it).</p>
+  </dd>
+  <dt>
+    <code>adr_ack_limit_exponent</code>
+    (<a href="#message:ADRAckLimitExponentValue"><code>ADRAckLimitExponentValue</code></a>)
+  </dt>
+  <dd>
+      <p>ADR: number of messages to wait before setting ADRAckReq.</p>
+  </dd>
+  <dt>
+    <code>adr_ack_delay_exponent</code>
+    (<a href="#message:ADRAckDelayExponentValue"><code>ADRAckDelayExponentValue</code></a>)
+  </dt>
+  <dd>
+      <p>ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "max_eirp": 0,
+  "adr_data_rate_index": "DATA_RATE_0",
+  "adr_tx_power_index": 0,
+  "adr_nb_trans": 0,
+  "adr_ack_limit": 0,
+  "adr_ack_delay": 0,
+  "rx1_delay": "RX_DELAY_0",
+  "rx1_data_rate_offset": 0,
+  "rx2_data_rate_index": "DATA_RATE_0",
+  "rx2_frequency": 0,
+  "max_duty_cycle": "DUTY_CYCLE_1",
+  "rejoin_time_periodicity": "REJOIN_TIME_0",
+  "rejoin_count_periodicity": "REJOIN_COUNT_16",
+  "ping_slot_frequency": 0,
+  "ping_slot_data_rate_index": "DATA_RATE_0",
+  "beacon_frequency": 0,
+  "channels": [],
+  "uplink_dwell_time": null,
+  "downlink_dwell_time": null,
+  "adr_ack_limit_exponent": {},
+  "adr_ack_delay_exponent": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:MACSettings">Message <code>MACSettings</code></h3>
+
+<dl>
+  <dt>
+    <code>class_b_timeout</code>
+    (<code>google.protobuf.Duration</code>)
+  </dt>
+  <dd>
+      <p>Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>ping_slot_periodicity</code>
+    (<a href="#message:PingSlotPeriodValue"><code>PingSlotPeriodValue</code></a>)
+  </dt>
+  <dd>
+      <p>Periodicity of the class B ping slot.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>ping_slot_data_rate_index</code>
+    (<a href="#message:DataRateIndexValue"><code>DataRateIndexValue</code></a>)
+  </dt>
+  <dd>
+      <p>Data rate index of the class B ping slot.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>ping_slot_frequency</code>
+    (<code>google.protobuf.UInt64Value</code>)
+  </dt>
+  <dd>
+      <p><code>gte</code>: <code>100000</code></p>
+      <p>Frequency of the class B ping slot (Hz).
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>class_c_timeout</code>
+    (<code>google.protobuf.Duration</code>)
+  </dt>
+  <dd>
+      <p>Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>rx1_delay</code>
+    (<a href="#message:RxDelayValue"><code>RxDelayValue</code></a>)
+  </dt>
+  <dd>
+      <p>Class A Rx1 delay.
+ If unset, the default value from Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+  <dt>
+    <code>rx1_data_rate_offset</code>
+    (<code>google.protobuf.UInt32Value</code>)
+  </dt>
+  <dd>
+      <p><code>lte</code>: <code>7</code></p>
+      <p>Rx1 data rate offset.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>rx2_data_rate_index</code>
+    (<a href="#message:DataRateIndexValue"><code>DataRateIndexValue</code></a>)
+  </dt>
+  <dd>
+      <p>Data rate index for Rx2.
+ If unset, the default value from Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+  <dt>
+    <code>rx2_frequency</code>
+    (<code>google.protobuf.UInt64Value</code>)
+  </dt>
+  <dd>
+      <p><code>gte</code>: <code>100000</code></p>
+      <p>Frequency for Rx2 (Hz).
+ If unset, the default value from Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+  <dt>
+    <code>factory_preset_frequencies</code>
+    (repeated <code>uint64</code>)
+  </dt>
+  <dd>
+      <p>List of factory-preset frequencies.
+ If unset, the default value from Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+  <dt>
+    <code>max_duty_cycle</code>
+    (<a href="#message:AggregatedDutyCycleValue"><code>AggregatedDutyCycleValue</code></a>)
+  </dt>
+  <dd>
+      <p>Maximum uplink duty cycle (of all channels).</p>
+  </dd>
+  <dt>
+    <code>supports_32_bit_f_cnt</code>
+    (<code>google.protobuf.BoolValue</code>)
+  </dt>
+  <dd>
+      <p>Whether the device supports 32-bit frame counters.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>use_adr</code>
+    (<code>google.protobuf.BoolValue</code>)
+  </dt>
+  <dd>
+      <p>Whether the Network Server should use ADR for the device.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>adr_margin</code>
+    (<code>google.protobuf.FloatValue</code>)
+  </dt>
+  <dd>
+      <p>The ADR margin tells the network server how much margin it should add in ADR requests.
+ A bigger margin is less efficient, but gives a better chance of successful reception.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>resets_f_cnt</code>
+    (<code>google.protobuf.BoolValue</code>)
+  </dt>
+  <dd>
+      <p>Whether the device resets the frame counters (not LoRaWAN compliant).
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>status_time_periodicity</code>
+    (<code>google.protobuf.Duration</code>)
+  </dt>
+  <dd>
+      <p>The interval after which a DevStatusReq MACCommand shall be sent.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>status_count_periodicity</code>
+    (<code>google.protobuf.UInt32Value</code>)
+  </dt>
+  <dd>
+      <p>Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>desired_rx1_delay</code>
+    (<a href="#message:RxDelayValue"><code>RxDelayValue</code></a>)
+  </dt>
+  <dd>
+      <p>The Rx1 delay Network Server should configure device to use via MAC commands or Join-Accept.
+ If unset, the default value from Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+  <dt>
+    <code>desired_rx1_data_rate_offset</code>
+    (<code>google.protobuf.UInt32Value</code>)
+  </dt>
+  <dd>
+      <p>The Rx1 data rate offset Network Server should configure device to use via MAC commands or Join-Accept.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>desired_rx2_data_rate_index</code>
+    (<a href="#message:DataRateIndexValue"><code>DataRateIndexValue</code></a>)
+  </dt>
+  <dd>
+      <p>The Rx2 data rate index Network Server should configure device to use via MAC commands or Join-Accept.
+ If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+  <dt>
+    <code>desired_rx2_frequency</code>
+    (<code>google.protobuf.UInt64Value</code>)
+  </dt>
+  <dd>
+      <p><code>gte</code>: <code>100000</code></p>
+      <p>The Rx2 frequency index Network Server should configure device to use via MAC commands.
+ If unset, the default value from frequency plan, Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+  <dt>
+    <code>desired_max_duty_cycle</code>
+    (<a href="#message:AggregatedDutyCycleValue"><code>AggregatedDutyCycleValue</code></a>)
+  </dt>
+  <dd>
+      <p>The maximum uplink duty cycle (of all channels) Network Server should configure device to use via MAC commands.
+ If unset, the default value from Network Server configuration will be used.</p>
+  </dd>
+  <dt>
+    <code>desired_adr_ack_limit_exponent</code>
+    (<a href="#message:ADRAckLimitExponentValue"><code>ADRAckLimitExponentValue</code></a>)
+  </dt>
+  <dd>
+      <p>The ADR ACK limit Network Server should configure device to use via MAC commands.
+ If unset, the default value from Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+  <dt>
+    <code>desired_adr_ack_delay_exponent</code>
+    (<a href="#message:ADRAckDelayExponentValue"><code>ADRAckDelayExponentValue</code></a>)
+  </dt>
+  <dd>
+      <p>The ADR ACK delay Network Server should configure device to use via MAC commands.
+ If unset, the default value from Network Server configuration or regional parameters specification will be used.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "class_b_timeout": "0s",
+  "ping_slot_periodicity": {},
+  "ping_slot_data_rate_index": {},
+  "ping_slot_frequency": null,
+  "class_c_timeout": "0s",
+  "rx1_delay": {},
+  "rx1_data_rate_offset": null,
+  "rx2_data_rate_index": {},
+  "rx2_frequency": null,
+  "factory_preset_frequencies": [],
+  "max_duty_cycle": {},
+  "supports_32_bit_f_cnt": null,
+  "use_adr": null,
+  "adr_margin": null,
+  "resets_f_cnt": null,
+  "status_time_periodicity": "0s",
+  "status_count_periodicity": null,
+  "desired_rx1_delay": {},
+  "desired_rx1_data_rate_offset": null,
+  "desired_rx2_data_rate_index": {},
+  "desired_rx2_frequency": null,
+  "desired_max_duty_cycle": {},
+  "desired_adr_ack_limit_exponent": {},
+  "desired_adr_ack_delay_exponent": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:MACState">Message <code>MACState</code></h3>
+<p>MACState represents the state of MAC layer of the device.
+ MACState is reset on each join for OTAA or ResetInd for ABP devices.
+ This is used internally by the Network Server and is read only.</p>
+
+<dl>
+  <dt>
+    <code>current_parameters</code>
+    (<a href="#message:MACParameters"><code>MACParameters</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+      <p>Current LoRaWAN MAC parameters.</p>
+  </dd>
+  <dt>
+    <code>desired_parameters</code>
+    (<a href="#message:MACParameters"><code>MACParameters</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+      <p>Desired LoRaWAN MAC parameters.</p>
+  </dd>
+  <dt>
+    <code>device_class</code>
+    (<a href="#enum:Class"><code>Class</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Currently active LoRaWAN device class
+ - Device class is A by default
+ - If device sets ClassB bit in uplink, this will be set to B
+ - If device sent DeviceModeInd MAC message, this will be set to that value</p>
+  </dd>
+  <dt>
+    <code>lorawan_version</code>
+    (<a href="#enum:MACVersion"><code>MACVersion</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>LoRaWAN MAC version.</p>
+  </dd>
+  <dt>
+    <code>last_confirmed_downlink_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+      <p>Time when the last confirmed downlink message or MAC command was scheduled.</p>
+  </dd>
+  <dt>
+    <code>last_dev_status_f_cnt_up</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Frame counter value of last uplink containing DevStatusAns.</p>
+  </dd>
+  <dt>
+    <code>ping_slot_periodicity</code>
+    (<a href="#enum:PingSlotPeriod"><code>PingSlotPeriod</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Periodicity of the class B ping slot.</p>
+  </dd>
+  <dt>
+    <code>pending_application_downlink</code>
+    (<a href="#message:ApplicationDownlink"><code>ApplicationDownlink</code></a>)
+  </dt>
+  <dd>
+      <p>A confirmed application downlink, for which an acknowledgment is expected to arrive.</p>
+  </dd>
+  <dt>
+    <code>queued_responses</code>
+    (repeated <a href="#message:MACCommand"><code>MACCommand</code></a>)
+  </dt>
+  <dd>
+      <p>Queued MAC responses.
+ Regenerated on each uplink.</p>
+  </dd>
+  <dt>
+    <code>pending_requests</code>
+    (repeated <a href="#message:MACCommand"><code>MACCommand</code></a>)
+  </dt>
+  <dd>
+      <p>Pending MAC requests(i.e. sent requests, for which no response has been received yet).
+ Regenerated on each downlink.</p>
+  </dd>
+  <dt>
+    <code>queued_join_accept</code>
+    (<a href="#message:MACState.JoinAccept"><code>MACState.JoinAccept</code></a>)
+  </dt>
+  <dd>
+      <p>Queued join-accept.
+ Set each time a (re-)join request accept is received from Join Server and removed each time a downlink is scheduled.</p>
+  </dd>
+  <dt>
+    <code>pending_join_request</code>
+    (<a href="#message:JoinRequest"><code>JoinRequest</code></a>)
+  </dt>
+  <dd>
+      <p>Pending join request.
+ Set each time a join accept is scheduled and removed each time an uplink is received from the device.</p>
+  </dd>
+  <dt>
+    <code>rx_windows_available</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>Whether or not Rx windows are expected to be open.
+ Set to true every time an uplink is received.
+ Set to false every time a successful downlink scheduling attempt is made.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "current_parameters": {},
+  "desired_parameters": {},
+  "device_class": "CLASS_A",
+  "lorawan_version": "MAC_UNKNOWN",
+  "last_confirmed_downlink_at": "0001-01-01T00:00:00Z",
+  "last_dev_status_f_cnt_up": 0,
+  "ping_slot_periodicity": "PING_EVERY_1S",
+  "pending_application_downlink": {},
+  "queued_responses": [],
+  "pending_requests": [],
+  "queued_join_accept": {},
+  "pending_join_request": {},
+  "rx_windows_available": false,
+}</code></pre>
+</details>
+
+
+<h3 id="message:MessagePayloadFormatters">Message <code>MessagePayloadFormatters</code></h3>
+
+<dl>
+  <dt>
+    <code>up_formatter</code>
+    (<a href="#enum:PayloadFormatter"><code>PayloadFormatter</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Payload formatter for uplink messages, must be set together with its parameter.</p>
+  </dd>
+  <dt>
+    <code>up_formatter_parameter</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Parameter for the up_formatter, must be set together.</p>
+  </dd>
+  <dt>
+    <code>down_formatter</code>
+    (<a href="#enum:PayloadFormatter"><code>PayloadFormatter</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Payload formatter for downlink messages, must be set together with its parameter.</p>
+  </dd>
+  <dt>
+    <code>down_formatter_parameter</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Parameter for the down_formatter, must be set together.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "up_formatter": "FORMATTER_NONE",
+  "up_formatter_parameter": "",
+  "down_formatter": "FORMATTER_NONE",
+  "down_formatter_parameter": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:RootKeys">Message <code>RootKeys</code></h3>
+<p>Root keys for a LoRaWAN device.
+ These are stored on the Join Server.</p>
+
+<dl>
+  <dt>
+    <code>root_key_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2048</code></p>
+      <p>Join Server issued identifier for the root keys.</p>
+  </dd>
+  <dt>
+    <code>app_key</code>
+    (<a href="#message:KeyEnvelope"><code>KeyEnvelope</code></a>)
+  </dt>
+  <dd>
+      <p>The (encrypted) Application Key.</p>
+  </dd>
+  <dt>
+    <code>nwk_key</code>
+    (<a href="#message:KeyEnvelope"><code>KeyEnvelope</code></a>)
+  </dt>
+  <dd>
+      <p>The (encrypted) Network Key.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "root_key_id": "",
+  "app_key": {},
+  "nwk_key": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:Session">Message <code>Session</code></h3>
+
+<dl>
+  <dt>
+    <code>dev_addr</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).
+ Known by Network Server, Application Server and Join Server. Owned by Network Server.</p>
+  </dd>
+  <dt>
+    <code>keys</code>
+    (<a href="#message:SessionKeys"><code>SessionKeys</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>last_f_cnt_up</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Last uplink frame counter value used. Network Server only. Application Server assumes the Network Server checked it.</p>
+  </dd>
+  <dt>
+    <code>last_n_f_cnt_down</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Last network downlink frame counter value used. Network Server only.</p>
+  </dd>
+  <dt>
+    <code>last_a_f_cnt_down</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Last application downlink frame counter value used. Application Server only.</p>
+  </dd>
+  <dt>
+    <code>last_conf_f_cnt_down</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Frame counter of the last confirmed downlink message sent. Network Server only.</p>
+  </dd>
+  <dt>
+    <code>started_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+      <p>Time when the session started. Network Server only.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "dev_addr": "",
+  "keys": {},
+  "last_f_cnt_up": 0,
+  "last_n_f_cnt_down": 0,
+  "last_a_f_cnt_down": 0,
+  "last_conf_f_cnt_down": 0,
+  "started_at": "0001-01-01T00:00:00Z",
+}</code></pre>
+</details>
+
+
+<h3 id="message:SessionKeys">Message <code>SessionKeys</code></h3>
+<p>Session keys for a LoRaWAN session.
+ Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys.</p>
+
+<dl>
+  <dt>
+    <code>session_key_id</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2048</code></p>
+      <p>Join Server issued identifier for the session keys.
+ This ID can be used to request the keys from the Join Server in case the are lost.</p>
+  </dd>
+  <dt>
+    <code>f_nwk_s_int_key</code>
+    (<a href="#message:KeyEnvelope"><code>KeyEnvelope</code></a>)
+  </dt>
+  <dd>
+      <p>The (encrypted) Forwarding Network Session Integrity Key (or Network Session Key in 1.0 compatibility mode).
+ This key is stored by the (forwarding) Network Server.</p>
+  </dd>
+  <dt>
+    <code>s_nwk_s_int_key</code>
+    (<a href="#message:KeyEnvelope"><code>KeyEnvelope</code></a>)
+  </dt>
+  <dd>
+      <p>The (encrypted) Serving Network Session Integrity Key.
+ This key is stored by the (serving) Network Server.</p>
+  </dd>
+  <dt>
+    <code>nwk_s_enc_key</code>
+    (<a href="#message:KeyEnvelope"><code>KeyEnvelope</code></a>)
+  </dt>
+  <dd>
+      <p>The (encrypted) Network Session Encryption Key.
+ This key is stored by the (serving) Network Server.</p>
+  </dd>
+  <dt>
+    <code>app_s_key</code>
+    (<a href="#message:KeyEnvelope"><code>KeyEnvelope</code></a>)
+  </dt>
+  <dd>
+      <p>The (encrypted) Application Session Key.
+ This key is stored by the Application Server.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "session_key_id": "",
+  "f_nwk_s_int_key": {},
+  "s_nwk_s_int_key": {},
+  "nwk_s_enc_key": {},
+  "app_s_key": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:SetEndDeviceRequest">Message <code>SetEndDeviceRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>end_device</code>
+    (<a href="#message:EndDevice"><code>EndDevice</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "end_device": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:UpdateEndDeviceRequest">Message <code>UpdateEndDeviceRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>end_device</code>
+    (<a href="#message:EndDevice"><code>EndDevice</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "end_device": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+
+<h2 id="enums">Enums</h2>
+
+
+<h3 id="enum:MACVersion">Enum <code>MACVersion</code></h3>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>MAC_UNKNOWN</code></td>
+      <td><code>0</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>MAC_V1_0</code></td>
+      <td><code>1</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>MAC_V1_0_1</code></td>
+      <td><code>2</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>MAC_V1_0_2</code></td>
+      <td><code>3</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>MAC_V1_1</code></td>
+      <td><code>4</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>MAC_V1_0_3</code></td>
+      <td><code>5</code></td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<h3 id="enum:PHYVersion">Enum <code>PHYVersion</code></h3>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>PHY_UNKNOWN</code></td>
+      <td><code>0</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>PHY_V1_0</code></td>
+      <td><code>1</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>PHY_V1_0_1</code></td>
+      <td><code>2</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>PHY_V1_0_2_REV_A</code></td>
+      <td><code>3</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>PHY_V1_0_2_REV_B</code></td>
+      <td><code>4</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>PHY_V1_1_REV_A</code></td>
+      <td><code>5</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>PHY_V1_1_REV_B</code></td>
+      <td><code>6</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>PHY_V1_0_3_REV_A</code></td>
+      <td><code>7</code></td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<h3 id="enum:PowerState">Enum <code>PowerState</code></h3>
+<p>Power state of the device.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>POWER_UNKNOWN</code></td>
+      <td><code>0</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>POWER_BATTERY</code></td>
+      <td><code>1</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>POWER_EXTERNAL</code></td>
+      <td><code>2</code></td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.4/reference/api/gateway_server/">← Gateway Server APIs</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.4/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.4/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.4/components/">Components</a></p>
+        <p><a class="" href="/v3.2.4/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/5975dcc259f691e7a0c17deb45116865f32c71de">
+      doc: Increase heading level for API reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/api/end_device.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.4/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

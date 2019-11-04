@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.58.3" />
+  <title>Configuration | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.4/reference/configuration/" />
+  <link rel="icon" type="image/png" href="/v3.2.4/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.4/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Configuration">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Configuration">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.4/reference/configuration/">
+  <meta name="twitter:title" content="Configuration" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.4/">
+        <img src="/v3.2.4/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.4/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.4/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.4/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.4/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.4/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Configuration</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.4/reference/configuration/" class="is-active">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/the-things-stack/" class="">Generic Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/identity-server/" class="">Identity Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/gateway-server/" class="">Gateway Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/network-server/" class="">Network Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/application-server/" class="">Application Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/join-server/" class="">Join Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/console/" class="">Console Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/cli/" class="">Command-Line Interface Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.4/reference/configuration/gateway-configuration-server/" class="">Gateway Configuration Server Options</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Configuration</h1>
+
+<div class="content"><p>The Things Stack binary can be configured with many different options. Those options can be provided as command-line flags, environment variables or using a configuration file.</p>
+
+<h2 id="configuration-sources">Configuration Sources</h2>
+
+<p>In this reference we will refer to configuration options by name. On this page we will show how the <code>console.ui.canonical-url</code> option can be configured.</p>
+
+<h3 id="command-line-flags">Command-line flags</h3>
+
+<p>Command-line flags have the highest priority and, as such, override other means of configuration (environment variable or file). This looks as follows:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-stack start console --console.ui.canonical-url <span class="s2">&#34;https://thethings.example.com/console&#34;</span></code></pre></div>
+<h3 id="environment-variables">Environment variables</h3>
+
+<p>Environment variables for configuration options are very similar to the command-line flags, except that they are in uppercase, and all separators (<code>.</code> or <code>-</code>) are replaced by underscores (<code>_</code>). Environment variables are also prefixed with <code>TTN_LW_</code>.</p>
+
+<blockquote>
+<p>In many cases you&rsquo;ll want to use a <code>.env</code> file that is loaded using the <a href="https://direnv.net/man/direnv-stdlib.1.html"><code>dotenv</code> command of direnv</a> or the <a href="https://docs.docker.com/compose/compose-file/#env_file"><code>env_file</code> option of Docker Compose</a>. You can also <code>export</code> each environment variable, or run <code>export $(grep -v '^#' .env | xargs)</code> to export all variables in the <code>.env</code> file.</p>
+</blockquote>
+
+<p>The option from the command-line example from above would look as follows with environment variables:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TTN_LW_CONSOLE_UI_CANONICAL_URL</span><span class="o">=</span><span class="s2">&#34;https://thethings.example.com/console&#34;</span></code></pre></div>
+<h3 id="configuration-files">Configuration files</h3>
+
+<p>You can also configure The Things Stack with a YAML configuration file. This is again similar to the command-line flags, except that each <code>.</code> represents a YAML node. This allows you to group related options together:</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">console<span class="p">:</span><span class="w">
+</span><span class="w">  </span>ui<span class="p">:</span><span class="w">
+</span><span class="w">    </span>canonical-url<span class="p">:</span><span class="w"> </span><span class="s1">&#39;https://thethings.example.com/console&#39;</span><span class="w">
+</span><span class="w">    </span><span class="c"># other console UI options</span><span class="w">
+</span><span class="w">  </span><span class="c"># other console options</span></code></pre></div>
+<p>You can specify the location of the YAML configuration file with the command-line flag <code>-c</code> or <code>--config</code>. If this flag is not present, The Things Stack will look for config files in the following locations:</p>
+
+<ul>
+<li>The current directory</li>
+<li>The user&rsquo;s home directory (as <a href="https://golang.org/pkg/os/#UserHomeDir">determined by Go</a>)</li>
+<li>The user&rsquo;s config directory (as <a href="https://golang.org/pkg/os/#UserConfigDir">determined by Go</a>)</li>
+</ul>
+
+<p>You can run The Things Stack with the <code>--help</code> flag, and check the description of the <code>--config</code> flag for the exact locations that are being checked.</p>
+
+<h3 id="defaults">Defaults</h3>
+
+<p>The Things Stack can be used for local testing purposes without any custom configuration.</p>
+
+<h2 id="printing-the-current-configuration">Printing the Current Configuration</h2>
+
+<p>You can see the current configuration with the <code>config</code> command of <code>ttn-lw-stack</code> or <code>ttn-lw-cli</code>. By default this will print the configuration as CLI flags. Use the <code>--env</code> or <code>--yml</code> flags to print the configuration as environment variables or as YAML.</p></div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-right" href="/v3.2.4/reference/configuration/the-things-stack/">Generic Server Options →</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.4/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.4/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.4/components/">Components</a></p>
+        <p><a class="" href="/v3.2.4/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 16 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/ff77425cd825b9508a9c0ae98c4c2dfb2048af93">
+      doc: Move config documentation to reference and rewrite
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/configuration/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.4/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
