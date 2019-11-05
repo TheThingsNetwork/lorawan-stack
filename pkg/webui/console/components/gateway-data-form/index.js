@@ -36,7 +36,7 @@ const m = defineMessages({
 })
 
 const validationSchema = Yup.object().shape({
-  owner_id: Yup.string().required(sharedMessages.validateRequired),
+  owner_id: Yup.string(),
   ids: Yup.object().shape({
     gateway_id: Yup.string()
       .matches(gatewayIdRegexp, sharedMessages.validateAlphanum)
@@ -74,7 +74,7 @@ class GatewayDataForm extends React.Component {
         formikRef={formRef}
       >
         <Message component="h4" content={sharedMessages.generalSettings} />
-        <OwnersSelect name="owner_id" required autoFocus={!update} />
+        {!update && <OwnersSelect name="owner_id" required autoFocus />}
         <Form.Field
           title={sharedMessages.gatewayID}
           name="ids.gateway_id"
