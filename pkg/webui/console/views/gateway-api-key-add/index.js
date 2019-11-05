@@ -24,6 +24,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyCreateForm } from '../../components/api-key-form'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import {
   selectSelectedGatewayId,
@@ -32,6 +33,7 @@ import {
   selectGatewayRightsFetching,
   selectGatewayPseudoRights,
 } from '../../store/selectors/gateways'
+import { mayViewOrEditGatewayApiKeys } from '../../lib/feature-checks'
 
 import api from '../../api'
 
@@ -47,6 +49,9 @@ import api from '../../api'
     navigateToList: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
   }),
 )
+@withFeatureRequirement(mayViewOrEditGatewayApiKeys, {
+  redirect: ({ gtwId }) => `/gateway/${gtwId}`,
+})
 @withBreadcrumb('gtws.single.api-keys.add', function(props) {
   const gtwId = props.gtwId
 

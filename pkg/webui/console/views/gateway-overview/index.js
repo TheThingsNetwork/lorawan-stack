@@ -28,19 +28,19 @@ import DateTime from '../../../lib/components/date-time'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import GatewayMap from '../../components/gateway-map'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
-import { selectSelectedGateway as gatewaySelector } from '../../store/selectors/gateways'
-import { getGatewayId as idSelector } from '../../../lib/selectors/id'
+import { selectSelectedGateway, selectSelectedGatewayId } from '../../store/selectors/gateways'
+import { mayEditBasicGatewayInformation } from '../../lib/feature-checks'
 
 import style from './gateway-overview.styl'
 
-@connect(function(state, props) {
-  const gtw = gatewaySelector(state, props)
-
-  return {
-    gtwId: idSelector(gtw),
-    gateway: gtw,
-  }
+@connect(state => ({
+  gtwId: selectSelectedGatewayId(state),
+  gateway: selectSelectedGateway(state),
+}))
+@withFeatureRequirement(mayEditBasicGatewayInformation, {
+  redirect: '/',
 })
 @bind
 export default class GatewayOverview extends React.Component {
