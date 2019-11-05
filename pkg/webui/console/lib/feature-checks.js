@@ -14,11 +14,11 @@
 
 import { selectStackConfig } from '../../lib/selectors/env'
 import { selectApplicationRights } from '../store/selectors/applications'
+import { selectGatewayRights } from '../store/selectors/gateways'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
-const jsEnabled = stackConfig.js.enabled
-const nsEnabled = stackConfig.ns.enabled
+const gsEnabled = stackConfig.gs.enabled
 
 // Applications
 export const mayViewApplicationInfo = {
@@ -72,4 +72,42 @@ export const mayDeleteApplication = {
 export const mayReadApplicationDeviceKeys = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_DEVICES_READ_KEYS'),
+}
+
+// Gateways
+export const mayViewGatewayInfo = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_INFO'),
+}
+export const mayEditBasicGatewayInformation = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_SETTINGS_BASIC'),
+}
+export const mayViewOrEditGatewayApiKeys = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_SETTINGS_API_KEYS'),
+}
+export const mayViewOrEditGatewayCollaborators = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_SETTINGS_COLLABORATORS'),
+}
+export const mayDeleteGateway = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_DELETE'),
+}
+export const mayViewGatewayEvents = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_TRAFFIC_READ'),
+}
+export const mayLinkGateway = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_LINK') && gsEnabled,
+}
+export const mayViewGatewayStatus = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_STATUS_READ') && gsEnabled,
+}
+export const mayViewOrEditGatewayLocation = {
+  rightsSelector: selectGatewayRights,
+  check: rights => rights.includes('RIGHT_GATEWAY_LOCATION_READ'),
 }
