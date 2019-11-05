@@ -26,7 +26,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../components/api-key-form'
 import withRequest from '../../../lib/components/with-request'
 
-import { getGatewayApiKey, getGatewaysRightsList } from '../../store/actions/gateways'
+import { getGatewayApiKey } from '../../store/actions/gateways'
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
@@ -59,15 +59,14 @@ import api from '../../api'
     }
   },
   dispatch => ({
-    loadData(gtwId, apiKeyId) {
-      dispatch(getGatewaysRightsList(gtwId))
+    getGatewayApiKey(gtwId, apiKeyId) {
       dispatch(getGatewayApiKey(gtwId, apiKeyId))
     },
     deleteSuccess: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
   }),
 )
 @withRequest(
-  ({ gtwId, keyId, loadData }) => loadData(gtwId, keyId),
+  ({ gtwId, keyId, getGatewayApiKey }) => getGatewayApiKey(gtwId, keyId),
   ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
 )
 @withBreadcrumb('gtws.single.api-keys.edit', function(props) {
