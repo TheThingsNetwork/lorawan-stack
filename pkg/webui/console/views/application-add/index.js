@@ -53,14 +53,6 @@ const m = defineMessages({
   linkFailureTitle: 'Application link failed',
 })
 
-const initialValues = {
-  application_id: '',
-  name: '',
-  description: '',
-  link: true,
-  network_server_address: '',
-}
-
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),
   application_id: Yup.string()
@@ -177,7 +169,16 @@ export default class Add extends React.Component {
 
   render() {
     const { error } = this.state
-    const { asEnabled } = this.props
+    const { asEnabled, userId } = this.props
+
+    const initialValues = {
+      application_id: '',
+      name: '',
+      description: '',
+      link: true,
+      network_server_address: '',
+      owner_id: userId,
+    }
 
     return (
       <Container>
