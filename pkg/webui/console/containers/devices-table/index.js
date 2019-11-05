@@ -23,11 +23,13 @@ import FetchTable from '../fetch-table'
 import DateTime from '../../../lib/components/date-time'
 import Button from '../../../components/button'
 import withRequest from '../../../lib/components/with-request'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { getDevicesList } from '../../../console/store/actions/devices'
 import { getDeviceTemplateFormats } from '../../store/actions/device-template-formats'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectDeviceTemplateFormats } from '../../store/selectors/device-template-formats'
+import { mayViewApplicationDevices } from '../../lib/feature-checks'
 
 import style from './devices-table.styl'
 
@@ -58,6 +60,7 @@ const headers = [
   },
   { getDeviceTemplateFormats },
 )
+@withFeatureRequirement(mayViewApplicationDevices)
 @withRequest(({ getDeviceTemplateFormats }) => getDeviceTemplateFormats())
 @bind
 class DevicesTable extends React.Component {
