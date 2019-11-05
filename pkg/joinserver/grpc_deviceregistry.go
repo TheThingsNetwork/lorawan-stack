@@ -193,6 +193,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}
+		// TODO: Encrypt keys using component-local KEK(https://github.com/TheThingsNetwork/lorawan-stack/issues/847).
 	}
 
 	var evt events.Event
