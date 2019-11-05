@@ -16,10 +16,37 @@ import { selectStackConfig } from '../../lib/selectors/env'
 import { selectApplicationRights } from '../store/selectors/applications'
 import { selectGatewayRights } from '../store/selectors/gateways'
 import { selectOrganizationRights } from '../store/selectors/organizations'
+import { selectUserRights } from '../store/selectors/user'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
 const gsEnabled = stackConfig.gs.enabled
+
+// User
+export const mayViewApplicationsOfUser = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_APPLICATIONS_LIST'),
+}
+export const mayCreateApplications = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_APPLICATIONS_CREATE'),
+}
+export const mayViewGatewaysOfUser = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_GATEWAYS_LIST'),
+}
+export const mayCreateGateways = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_GATEWAYS_CREATE'),
+}
+export const mayViewOrganizationsOfUser = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_ORGANIZATIONS_LIST'),
+}
+export const mayCreateOrganizations = {
+  rightsSelector: selectUserRights,
+  check: rights => rights.includes('RIGHT_USER_ORGANIZATIONS_CREATE'),
+}
 
 // Applications
 export const mayViewApplicationInfo = {
