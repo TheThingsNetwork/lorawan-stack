@@ -29,7 +29,7 @@ import withRequest from '../../../lib/components/with-request'
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
-  selectGatewayUniversalRights,
+  selectGatewayPseudoRights,
   selectGatewayRightsFetching,
   selectGatewayRightsError,
 } from '../../store/selectors/gateways'
@@ -47,7 +47,7 @@ import api from '../../api'
       fetching: selectGatewayRightsFetching(state),
       error: selectGatewayRightsError(state),
       rights: selectGatewayRights(state),
-      universalRights: selectGatewayUniversalRights(state),
+      pseudoRights: selectGatewayPseudoRights(state),
     }
   },
   (dispatch, ownProps) => ({
@@ -89,7 +89,7 @@ export default class GatewayCollaboratorAdd extends React.Component {
   }
 
   render() {
-    const { rights, redirectToList, universalRights } = this.props
+    const { rights, redirectToList, pseudoRights } = this.props
 
     return (
       <Container>
@@ -105,7 +105,7 @@ export default class GatewayCollaboratorAdd extends React.Component {
               error={this.state.error}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={redirectToList}
-              universalRights={universalRights}
+              pseudoRights={pseudoRights}
               rights={rights}
             />
           </Col>

@@ -30,7 +30,7 @@ import { getGatewayApiKey, getGatewaysRightsList } from '../../store/actions/gat
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
-  selectGatewayUniversalRights,
+  selectGatewayPseudoRights,
   selectGatewayRightsError,
   selectGatewayRightsFetching,
   selectGatewayApiKey,
@@ -53,7 +53,7 @@ import api from '../../api'
       gtwId: selectSelectedGatewayId(state),
       apiKey: selectGatewayApiKey(state),
       rights: selectGatewayRights(state),
-      universalRights: selectGatewayUniversalRights(state),
+      pseudoRights: selectGatewayPseudoRights(state),
       fetching: keyFetching || rightsFetching,
       error: keyError || rightsError,
     }
@@ -97,7 +97,7 @@ export default class GatewayApiKeyEdit extends React.Component {
   }
 
   render() {
-    const { apiKey, rights, universalRights } = this.props
+    const { apiKey, rights, pseudoRights } = this.props
 
     return (
       <Container>
@@ -111,7 +111,7 @@ export default class GatewayApiKeyEdit extends React.Component {
           <Col lg={8} md={12}>
             <ApiKeyEditForm
               rights={rights}
-              universalRights={universalRights}
+              pseudoRights={pseudoRights}
               apiKey={apiKey}
               onEdit={this.editGatewayKey}
               onDelete={this.deleteGatewayKey}

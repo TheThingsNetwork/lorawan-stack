@@ -31,7 +31,7 @@ import { getGatewayCollaborator, getGatewaysRightsList } from '../../store/actio
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
-  selectGatewayUniversalRights,
+  selectGatewayPseudoRights,
   selectGatewayRightsFetching,
   selectGatewayRightsError,
   selectGatewayUserCollaborator,
@@ -62,7 +62,7 @@ import api from '../../api'
       collaborator,
       gtwId,
       rights: selectGatewayRights(state),
-      universalRights: selectGatewayUniversalRights(state),
+      pseudoRights: selectGatewayPseudoRights(state),
       fetching,
       error,
     }
@@ -130,7 +130,7 @@ export default class GatewayCollaboratorEdit extends React.Component {
   }
 
   render() {
-    const { collaborator, rights, redirectToList, universalRights } = this.props
+    const { collaborator, rights, redirectToList, pseudoRights } = this.props
 
     return (
       <Container>
@@ -156,7 +156,7 @@ export default class GatewayCollaboratorEdit extends React.Component {
               onDelete={this.handleDelete}
               onDeleteSuccess={redirectToList}
               collaborator={collaborator}
-              universalRights={universalRights}
+              pseudoRights={pseudoRights}
               rights={rights}
               update
             />

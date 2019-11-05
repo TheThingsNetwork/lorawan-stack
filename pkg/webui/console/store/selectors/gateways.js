@@ -91,7 +91,7 @@ export const selectGatewayApiKeyError = createErrorSelector(GET_GTW_API_KEY_BASE
 
 // Rights
 export const selectGatewayRights = createRightsSelector(ENTITY)
-export const selectGatewayUniversalRights = createPseudoRightsSelector(ENTITY)
+export const selectGatewayPseudoRights = createPseudoRightsSelector(ENTITY)
 export const selectGatewayRightsError = createErrorSelector(ENTITY)
 export const selectGatewayRightsFetching = createFetchingSelector(GET_GTWS_RIGHTS_LIST_BASE)
 
