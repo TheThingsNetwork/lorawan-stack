@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for creating applications and gateway with an organization as the initial owner in the Console. 
+
 ### Changed
 
 ### Deprecated

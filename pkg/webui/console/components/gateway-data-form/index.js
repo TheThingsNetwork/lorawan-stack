@@ -26,6 +26,7 @@ import PropTypes from '../../../lib/prop-types'
 import { GsFrequencyPlansSelect } from '../../containers/freq-plans-select'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as gatewayIdRegexp, address as addressRegexp } from '../../lib/regexp'
+import OwnersSelect from '../../containers/owners-select'
 
 const m = defineMessages({
   enforced: 'Enforced',
@@ -35,6 +36,7 @@ const m = defineMessages({
 })
 
 const validationSchema = Yup.object().shape({
+  owner_id: Yup.string().required(sharedMessages.validateRequired),
   ids: Yup.object().shape({
     gateway_id: Yup.string()
       .matches(gatewayIdRegexp, sharedMessages.validateAlphanum)
@@ -72,13 +74,13 @@ class GatewayDataForm extends React.Component {
         formikRef={formRef}
       >
         <Message component="h4" content={sharedMessages.generalSettings} />
+        <OwnersSelect name="owner_id" required autoFocus={!update} />
         <Form.Field
           title={sharedMessages.gatewayID}
           name="ids.gateway_id"
           placeholder={m.gatewayIdPlaceholder}
           required
           disabled={update}
-          autoFocus={!update}
           component={Input}
         />
         <Form.Field
@@ -119,15 +121,15 @@ class GatewayDataForm extends React.Component {
 }
 
 GatewayDataForm.propTypes = {
-  update: PropTypes.bool,
+  children: PropTypes.node.isRequired,
   error: PropTypes.error,
+  formRef: PropTypes.object,
   initialValues: PropTypes.object,
   mapErrorsToFields: PropTypes.object,
-  onSubmit: PropTypes.func.isRequired,
   /** React reference to be passed to the form */
-  formRef: PropTypes.object,
+  onSubmit: PropTypes.func.isRequired,
   /** SubmitBar contents */
-  children: PropTypes.node.isRequired,
+  update: PropTypes.bool,
 }
 
 GatewayDataForm.defaultProps = {

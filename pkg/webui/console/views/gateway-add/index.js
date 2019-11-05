@@ -19,14 +19,15 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { push } from 'connected-react-router'
 
-import sharedMessages from '../../../lib/shared-messages'
 import FormSubmit from '../../../components/form/submit'
 import SubmitButton from '../../../components/submit-button'
+import GatewayDataForm from '../../components/gateway-data-form'
+
+import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
-import GatewayDataForm from '../../components/gateway-data-form'
 
 import api from '../../api'
 
@@ -49,27 +50,29 @@ const m = defineMessages({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
   }),
 )
-@bind
 export default class GatewayAdd extends React.Component {
   static propTypes = {
-    userId: PropTypes.string.isRequired,
     createSuccess: PropTypes.func.isRequired,
+    env: PropTypes.env.isRequired,
+    userId: PropTypes.string.isRequired,
   }
 
   state = {
     error: '',
   }
 
+  @bind
   async handleSubmit(values, { resetForm }) {
     const { userId, createSuccess } = this.props
+    const { owner_id, ...gateway } = values
     const {
       ids: { gateway_id },
-    } = values
+    } = gateway
 
     await this.setState({ error: '' })
 
     try {
-      await api.gateway.create(userId, values)
+      await api.gateway.create(owner_id, gateway, userId === owner_id)
 
       createSuccess(gateway_id)
     } catch (error) {

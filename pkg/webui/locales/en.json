@@ -154,6 +154,8 @@
   "console.containers.freq-plans-select.index.warning": "Could not retrieve the list of available frequency plans",
   "console.containers.join-eui-prefixes-input.index.prefixesFetchingFailure": "Could not retrieve the list of available prefixes",
   "console.containers.join-eui-prefixes-input.join-eui-prefixes-input.empty": "No prefix",
+  "console.containers.owners-select.owners-select.title": "Owner",
+  "console.containers.owners-select.owners-select.warning": "Cannot load user oganizations",
   "console.containers.pubsub-formats-select.index.title": "PubSub Format",
   "console.containers.pubsub-formats-select.index.warning": "Could not fetch the list of available PubSub formats",
   "console.containers.pubsubs-table.index.format": "Format",

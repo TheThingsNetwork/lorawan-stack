@@ -133,10 +133,13 @@ class Applications {
 
   // Create
 
-  async create(userId = this._defaultUserId, application) {
+  async create(ownerId = this._defaultUserId, application, isUserOwner = true) {
+    const routeParams = isUserOwner
+      ? { 'collaborator.user_ids.user_id': ownerId }
+      : { 'collaborator.organization_ids.organization_id': ownerId }
     const response = await this._api.ApplicationRegistry.Create(
       {
-        routeParams: { 'collaborator.user_ids.user_id': userId },
+        routeParams,
       },
       { application },
     )

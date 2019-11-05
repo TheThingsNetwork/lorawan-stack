@@ -79,10 +79,13 @@ class Gateways {
 
   // Create
 
-  async create(userId = this._defaultUserId, gateway) {
+  async create(ownerId = this._defaultUserId, gateway, isUserOwner = true) {
+    const routeParams = isUserOwner
+      ? { 'collaborator.user_ids.user_id': ownerId }
+      : { 'collaborator.organization_ids.organization_id': ownerId }
     const response = await this._api.GatewayRegistry.Create(
       {
-        routeParams: { 'collaborator.user_ids.user_id': userId },
+        routeParams,
       },
       { gateway },
     )
