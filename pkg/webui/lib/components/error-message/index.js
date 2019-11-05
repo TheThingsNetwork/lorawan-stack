@@ -23,25 +23,28 @@ import { toMessageProps } from '../../errors/utils'
 
 import style from './error-message.styl'
 
-const ErrorMessage = function({ content, ...rest }) {
+const ErrorMessage = function({ content, className, ...rest }) {
   const props = {
-    content: {},
+    className: classnames(className, style.message),
+    ...toMessageProps(content),
     ...rest,
   }
-
-  props = { ...props, ...toMessageProps(content) }
-  props.className = classnames(rest.className, style.message)
 
   return <Message {...props} />
 }
 
 ErrorMessage.propTypes = {
+  className: PropTypes.string,
   /**
    * Content contains the error data. It will be marshalled into a `react-intl`
    * message in case of backend errors and then output as such. Can also
    * be a usual message type, in case of frontend-defined errors.
    */
-  content: PropTypes.error,
+  content: PropTypes.error.isRequired,
+}
+
+ErrorMessage.defaultProps = {
+  className: undefined,
 }
 
 export default ErrorMessage

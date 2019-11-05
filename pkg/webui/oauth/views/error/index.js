@@ -55,7 +55,7 @@ const FullViewError = function({ error, env }) {
     <div className={style.fullViewError}>
       <Container>
         <Row>
-          <Col>
+          <Col sm={12} md={6}>
             <IntlHelmet title={errorMessages.error} />
             <Message
               className={style.fullViewErrorHeader}
