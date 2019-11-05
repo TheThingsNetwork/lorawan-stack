@@ -17,10 +17,7 @@ import { replace } from 'connected-react-router'
 
 import withRequest from '../../../lib/components/with-request'
 
-import {
-  getOrganizationCollaborator,
-  getOrganizationsRightsList,
-} from '../../store/actions/organizations'
+import { getOrganizationCollaborator } from '../../store/actions/organizations'
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
@@ -64,8 +61,7 @@ export default OrganizationCollaboratorEdit =>
       }
     },
     dispatch => ({
-      loadData(orgId, collaboratorId, isUser) {
-        dispatch(getOrganizationsRightsList(orgId))
+      getOrganizationCollaborator(orgId, collaboratorId, isUser) {
         dispatch(getOrganizationCollaborator(orgId, collaboratorId, isUser))
       },
       redirectToList(orgId) {
@@ -80,8 +76,8 @@ export default OrganizationCollaboratorEdit =>
       ...stateProps,
       ...dispatchProps,
       ...ownProps,
-      loadData: () =>
-        dispatchProps.loadData(
+      getOrganizationCollaborator: () =>
+        dispatchProps.getOrganizationCollaborator(
           stateProps.orgId,
           stateProps.collaboratorId,
           stateProps.collaboratorType === 'user',
@@ -94,7 +90,7 @@ export default OrganizationCollaboratorEdit =>
     }),
   )(
     withRequest(
-      ({ loadData }) => loadData(),
+      ({ getOrganizationCollaborator }) => getOrganizationCollaborator(),
       ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
     )(OrganizationCollaboratorEdit),
   )

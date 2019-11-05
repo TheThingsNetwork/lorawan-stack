@@ -15,8 +15,6 @@
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import withRequest from '../../../lib/components/with-request'
-
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
@@ -51,9 +49,4 @@ export default OrganizationCollaboratorAdd =>
       addOrganizationCollaborator: collaborator =>
         dispatchProps.addOrganizationCollaborator(stateProps.orgId, collaborator),
     }),
-  )(
-    withRequest(
-      ({ getOrganizationsRightsList }) => getOrganizationsRightsList(),
-      ({ fetching, rights }) => fetching || !Boolean(rights.length),
-    )(OrganizationCollaboratorAdd),
-  )
+  )(OrganizationCollaboratorAdd)
