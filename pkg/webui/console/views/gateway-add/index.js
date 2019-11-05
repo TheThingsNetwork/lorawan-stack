@@ -88,6 +88,7 @@ export default class GatewayAdd extends React.Component {
       env: {
         config: { stack },
       },
+      userId,
     } = this.props
 
     const initialValues = {
@@ -97,6 +98,7 @@ export default class GatewayAdd extends React.Component {
       enforce_duty_cycle: true,
       gateway_server_address: stack.gs.enabled ? new URL(stack.gs.base_url).hostname : '',
       frequency_plan_id: undefined,
+      owner_id: userId,
     }
 
     return (
