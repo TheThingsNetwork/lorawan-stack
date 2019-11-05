@@ -18,21 +18,32 @@ import {
   selectSelectedOrganization,
   selectOrganizationFetching,
   selectOrganizationError,
+  selectOrganizationRights,
+  selectOrganizationRightsFetching,
+  selectOrganizationRightsError,
 } from '../../store/selectors/organizations'
-import { getOrganization, stopOrganizationEventsStream } from '../../store/actions/organizations'
+import {
+  getOrganization,
+  stopOrganizationEventsStream,
+  getOrganizationsRightsList,
+} from '../../store/actions/organizations'
 
 import withRequest from '../../../lib/components/with-request'
 
 const mapStateToProps = (state, props) => ({
   orgId: props.match.params.orgId,
-  fetching: selectOrganizationFetching(state),
+  fetching: selectOrganizationFetching(state) || selectOrganizationRightsFetching(state),
   organization: selectSelectedOrganization(state),
-  error: selectOrganizationError(state),
+  error: selectOrganizationError(state) || selectOrganizationRightsError(state),
+  rights: selectOrganizationRights(state),
 })
 
 const mapDispatchToProps = dispatch => ({
   stopStream: id => dispatch(stopOrganizationEventsStream(id)),
-  getOrganization: id => dispatch(getOrganization(id, 'name,description')),
+  loadData: id => {
+    dispatch(getOrganization(id, 'name,description'))
+    dispatch(getOrganizationsRightsList(id))
+  },
 })
 
 export default Organization =>
@@ -41,7 +52,7 @@ export default Organization =>
     mapDispatchToProps,
   )(
     withRequest(
-      ({ orgId, getOrganization }) => getOrganization(orgId),
+      ({ orgId, loadData }) => loadData(orgId),
       ({ fetching, organization }) => fetching || !Boolean(organization),
     )(Organization),
   )

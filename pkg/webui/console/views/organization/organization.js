@@ -24,17 +24,23 @@ import BreadcrumbView from '../../../lib/components/breadcrumb-view'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 import NotFoundRoute from '../../../lib/components/not-found-route'
-
 import OrganizationOverview from '../organization-overview'
 import OrganizationData from '../organization-data'
 import OrganizationGeneralSettings from '../organization-general-settings'
 import OrganizationApiKeys from '../organization-api-keys'
 import OrganizationCollaborators from '../organization-collaborators'
 
+import {
+  mayViewOrganizationInformation,
+  mayViewOrEditOrganizationApiKeys,
+  mayViewOrEditOrganizationCollaborators,
+  mayEditBasicOrganizationInformation,
+} from '../../lib/feature-checks'
+
 @withEnv
 @withSideNavigation(function(props) {
   const matchedUrl = props.match.url
-
+  const { rights } = props
   return {
     header: { title: props.orgId, icon: 'organization' },
     entries: [
@@ -42,6 +48,7 @@ import OrganizationCollaborators from '../organization-collaborators'
         title: sharedMessages.overview,
         path: matchedUrl,
         icon: 'overview',
+        hidden: !mayViewOrganizationInformation.check(rights),
       },
       {
         title: sharedMessages.data,
@@ -53,17 +60,20 @@ import OrganizationCollaborators from '../organization-collaborators'
         path: `${matchedUrl}/api-keys`,
         icon: 'api_keys',
         exact: false,
+        hidden: !mayViewOrEditOrganizationApiKeys.check(rights),
       },
       {
         title: sharedMessages.collaborators,
         path: `${matchedUrl}/collaborators`,
         icon: 'organization',
         exact: false,
+        hidden: !mayViewOrEditOrganizationCollaborators.check(rights),
       },
       {
         title: sharedMessages.generalSettings,
         path: `${matchedUrl}/general-settings`,
         icon: 'general_settings',
+        hidden: !mayEditBasicOrganizationInformation.check(rights),
       },
     ],
   }
