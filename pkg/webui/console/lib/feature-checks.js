@@ -15,6 +15,7 @@
 import { selectStackConfig } from '../../lib/selectors/env'
 import { selectApplicationRights } from '../store/selectors/applications'
 import { selectGatewayRights } from '../store/selectors/gateways'
+import { selectOrganizationRights } from '../store/selectors/organizations'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
@@ -110,4 +111,38 @@ export const mayViewGatewayStatus = {
 export const mayViewOrEditGatewayLocation = {
   rightsSelector: selectGatewayRights,
   check: rights => rights.includes('RIGHT_GATEWAY_LOCATION_READ'),
+}
+
+// Organizations
+export const mayViewOrganizationInformation = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_INFO'),
+}
+export const mayEditBasicOrganizationInformation = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_SETTINGS_BASIC'),
+}
+export const mayViewOrEditOrganizationApiKeys = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_SETTINGS_API_KEYS'),
+}
+export const mayViewOrEditOrganizationCollaborators = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_SETTINGS_MEMBERS'),
+}
+export const mayDeleteOrganization = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_DELETE'),
+}
+export const mayCreateApplicationsUnderOrganization = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_APPLICATIONS_CREATE'),
+}
+export const mayCreateGatewaysUnderOrganization = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_GATEWAYS_CREATE'),
+}
+export const mayAddOrganizationAsCollaborator = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR'),
 }
