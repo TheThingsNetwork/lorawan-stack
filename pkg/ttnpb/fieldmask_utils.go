@@ -182,10 +182,64 @@ outer:
 	return excluded
 }
 
+// AddFields appends all addPaths which are not already present in paths to paths and returns the result.
+func AddFields(paths []string, addPaths ...string) []string {
+	for _, p := range addPaths {
+		if !HasAnyField(paths, p) {
+			paths = append(paths, p)
+		}
+	}
+	return paths
+}
+
 func fieldsWithPrefix(prefix string, paths ...string) []string {
 	ret := make([]string, 0, len(paths))
 	for _, p := range paths {
 		ret = append(ret, prefix+"."+p)
 	}
 	return ret
+}
+
+// AddImplicitEndDeviceGetFields appends implicit EndDevice get paths to paths if not already present.
+func AddImplicitEndDeviceGetFields(paths ...string) []string {
+	return AddFields(paths,
+		"created_at",
+		"ids",
+		"updated_at",
+	)
+}
+
+// ApplyEndDeviceFieldMask applies fields specified by paths from src to dst and returns the result.
+// If dst is nil, a new EndDevice is created.
+func ApplyEndDeviceFieldMask(dst, src *EndDevice, paths ...string) (*EndDevice, error) {
+	if dst == nil {
+		dst = &EndDevice{}
+	}
+	return dst, dst.SetFields(src, paths...)
+}
+
+// FilterGetEndDevice returns a new EndDevice with only implicit fields and the ones specified by paths set.
+func FilterGetEndDevice(pb *EndDevice, paths ...string) (*EndDevice, error) {
+	return ApplyEndDeviceFieldMask(nil, pb, AddImplicitEndDeviceGetFields(paths...)...)
+}
+
+// AddImplicitSessionKeysGetFields appends implicit SessionKeys get paths to paths if not already present.
+func AddImplicitSessionKeysGetFields(paths ...string) []string {
+	return AddFields(paths,
+		"session_key_id",
+	)
+}
+
+// ApplySessionKeysFieldMask applies fields specified by paths from src to dst and returns the result.
+// If dst is nil, a new SessionKeys is created.
+func ApplySessionKeysFieldMask(dst, src *SessionKeys, paths ...string) (*SessionKeys, error) {
+	if dst == nil {
+		dst = &SessionKeys{}
+	}
+	return dst, dst.SetFields(src, paths...)
+}
+
+// FilterGetSessionKeys returns a new SessionKeys with only implicit fields and the ones specified by paths set.
+func FilterGetSessionKeys(pb *SessionKeys, paths ...string) (*SessionKeys, error) {
+	return ApplySessionKeysFieldMask(nil, pb, AddImplicitSessionKeysGetFields(paths...)...)
 }
