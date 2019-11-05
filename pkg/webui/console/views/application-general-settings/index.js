@@ -34,8 +34,9 @@ import diff from '../../../lib/diff'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Require from '../../lib/components/require'
 
-import { mayEditBasicApplicationInfo } from '../../lib/feature-checks'
+import { mayEditBasicApplicationInfo, mayDeleteApplication } from '../../lib/feature-checks'
 import {
   selectSelectedApplication,
   selectSelectedApplicationId,
@@ -166,24 +167,26 @@ export default class ApplicationGeneralSettings extends React.Component {
               <Form.Field title={sharedMessages.description} name="description" component={Input} />
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-                <ModalButton
-                  type="button"
-                  icon="delete"
-                  danger
-                  naked
-                  message={m.deleteApp}
-                  modalData={{
-                    message: {
-                      values: {
-                        appName: application.name
-                          ? application.name
-                          : application.ids.application_id,
+                <Require featureCheck={mayDeleteApplication}>
+                  <ModalButton
+                    type="button"
+                    icon="delete"
+                    danger
+                    naked
+                    message={m.deleteApp}
+                    modalData={{
+                      message: {
+                        values: {
+                          appName: application.name
+                            ? application.name
+                            : application.ids.application_id,
+                        },
+                        ...m.modalWarning,
                       },
-                      ...m.modalWarning,
-                    },
-                  }}
-                  onApprove={this.handleDelete}
-                />
+                    }}
+                    onApprove={this.handleDelete}
+                  />
+                </Require>
               </SubmitBar>
             </Form>
           </Col>

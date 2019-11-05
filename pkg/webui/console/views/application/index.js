@@ -67,7 +67,7 @@ import Devices from '../devices'
   function(state, props) {
     return {
       appId: props.match.params.appId,
-      fetching: selectApplicationFetching(state) && selectApplicationRightsFetching(state),
+      fetching: selectApplicationFetching(state) || selectApplicationRightsFetching(state),
       application: selectSelectedApplication(state),
       error: selectApplicationError(state) || selectApplicationRightsError(state),
       rights: selectApplicationRights(state),
