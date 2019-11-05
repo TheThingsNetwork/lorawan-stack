@@ -32,7 +32,7 @@ import {
   selectGatewayRights,
   selectGatewayRightsError,
   selectGatewayRightsFetching,
-  selectGatewayUniversalRights,
+  selectGatewayPseudoRights,
 } from '../../store/selectors/gateways'
 
 import api from '../../api'
@@ -43,7 +43,7 @@ import api from '../../api'
     fetching: selectGatewayRightsFetching(state),
     error: selectGatewayRightsError(state),
     rights: selectGatewayRights(state),
-    universalRights: selectGatewayUniversalRights(state),
+    pseudoRights: selectGatewayPseudoRights(state),
   }),
   dispatch => ({
     getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
@@ -76,7 +76,7 @@ export default class GatewayApiKeyAdd extends React.Component {
   }
 
   render() {
-    const { rights, universalRights } = this.props
+    const { rights, pseudoRights } = this.props
 
     return (
       <Container>
@@ -90,7 +90,7 @@ export default class GatewayApiKeyAdd extends React.Component {
           <Col lg={8} md={12}>
             <ApiKeyCreateForm
               rights={rights}
-              universalRights={universalRights}
+              pseudoRights={pseudoRights}
               onCreate={this.createGatewayKey}
               onCreateSuccess={this.handleApprove}
             />

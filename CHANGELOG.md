@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for creating applications and gateway with an organization as the initial owner in the Console. 
+- Support for creating applications and gateway with an organization as the initial owner in the Console.
 
 ### Changed
 
@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+
+- Fix gateway API key forms being broken in the Console.
 
 ### Security
 
