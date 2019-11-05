@@ -31,6 +31,9 @@ import diff from '../../../lib/diff'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+
+import { mayEditBasicOrganizationInformation } from '../../lib/feature-checks'
 
 const m = defineMessages({
   deleteOrg: 'Delete organization',
@@ -39,17 +42,16 @@ const m = defineMessages({
   updateSuccess: 'Successfully updated organization',
 })
 
-@withBreadcrumb('orgs.single.general-settings', function(props) {
-  const { orgId } = props
-
-  return (
-    <Breadcrumb
-      path={`/organizations/${orgId}/general-settings`}
-      icon="general_settings"
-      content={sharedMessages.generalSettings}
-    />
-  )
+@withFeatureRequirement(mayEditBasicOrganizationInformation, {
+  redirect: ({ orgId }) => `/organizations/${orgId}`,
 })
+@withBreadcrumb('orgs.single.general-settings', ({ orgId }) => (
+  <Breadcrumb
+    path={`/organizations/${orgId}/general-settings`}
+    icon="general_settings"
+    content={sharedMessages.generalSettings}
+  />
+))
 class GeneralSettings extends React.PureComponent {
   static propTypes = {
     deleteOrganization: PropTypes.func.isRequired,

@@ -16,17 +16,21 @@ import React from 'react'
 import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
-
 import DateTime from '../../../lib/components/date-time'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
 import { getOrganizationId } from '../../../lib/selectors/id'
-
 import OrganizationEvents from '../../containers/organization-events'
 import DataSheet from '../../../components/data-sheet'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+
+import { mayViewOrganizationInformation } from '../../lib/feature-checks'
 
 import style from './organization-overview.styl'
 
+@withFeatureRequirement(mayViewOrganizationInformation, {
+  redirect: '/',
+})
 class Overview extends React.Component {
   static propTypes = {
     organization: PropTypes.organization.isRequired,

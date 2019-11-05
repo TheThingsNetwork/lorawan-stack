@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -25,19 +26,22 @@ import SubViewError from '../error/sub-view'
 import OrganizationApiKeysList from '../organization-api-keys-list'
 import OrganizationApiKeyAdd from '../organization-api-key-add'
 import OrganizationApiKeyEdit from '../organization-api-key-edit'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
-@withBreadcrumb('org.single.api-keys', function(props) {
-  const { match } = props
-  const orgId = match.params.orgId
+import { mayViewOrEditOrganizationApiKeys } from '../../lib/feature-checks'
+import { selectSelectedOrganizationId } from '../../store/selectors/organizations'
 
-  return (
-    <Breadcrumb
-      path={`/organizations/${orgId}/api-keys`}
-      icon="api_keys"
-      content={sharedMessages.apiKeys}
-    />
-  )
+@connect(state => ({ orgId: selectSelectedOrganizationId(state) }))
+@withFeatureRequirement(mayViewOrEditOrganizationApiKeys, {
+  redirect: ({ orgId }) => `/organizations/${orgId}`,
 })
+@withBreadcrumb('org.single.api-keys', ({ orgId }) => (
+  <Breadcrumb
+    path={`/organizations/${orgId}/api-keys`}
+    icon="api_keys"
+    content={sharedMessages.apiKeys}
+  />
+))
 class OrganizationApiKeys extends React.Component {
   static propTypes = {
     match: PropTypes.match.isRequired,
