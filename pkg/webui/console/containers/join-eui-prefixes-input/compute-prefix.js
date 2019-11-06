@@ -12,18 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const BIN_BASE = 2
+const HEX_BASE = 16
 const CHAR_BYTES = 4
 
 /**
  * Computes the join EUI prefix given `joinEUI` and its `length`.
  * @param {string} joinEUI - The join EUI.
  * @param {number} length - The length of the prefix.
- * @returns {string} - The join EUI prefix.
+ * @returns {Array} - A list of join EUI prefixes.
  */
-function computePrefix(joinEUI, length = 0) {
-  // TODO: Support generating all prefixes that dont fulfil `length % CHAR_BYTES === 0`
-  // (https://github.com/TheThingsNetwork/lorawan-stack/issues/1263)
-  return joinEUI.slice(0, Math.ceil(length / CHAR_BYTES))
+function computePrefixes(joinEUI, length = 0) {
+  if (length % CHAR_BYTES === 0) {
+    return [joinEUI.slice(0, Math.ceil(length / CHAR_BYTES))]
+  }
+
+  const charCount = Math.floor(length / CHAR_BYTES)
+  const nextCharHex = joinEUI.slice(charCount, charCount + 1)
+  const nextCharBinary = parseInt(nextCharHex, HEX_BASE)
+    .toString(BIN_BASE)
+    .padStart(CHAR_BYTES, '0')
+
+  const rangeStart = parseInt(
+    nextCharBinary.slice(0, length % CHAR_BYTES).padEnd(CHAR_BYTES, '0'),
+    BIN_BASE,
+  )
+  const rangeEnd =
+    ((rangeStart >>> (CHAR_BYTES - (length % CHAR_BYTES))) + 1) <<
+    (CHAR_BYTES - (length % CHAR_BYTES))
+
+  const base = joinEUI.slice(0, charCount)
+  const prefixes = []
+
+  for (let i = rangeStart; i < rangeEnd; i++) {
+    prefixes.push(base + parseInt(i).toString(HEX_BASE))
+  }
+
+  return prefixes
 }
 
-export default computePrefix
+export default computePrefixes
