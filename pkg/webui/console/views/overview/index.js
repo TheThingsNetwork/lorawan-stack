@@ -33,7 +33,8 @@ import { getApplicationsList, GET_APPS_LIST } from '../../store/actions/applicat
 import { selectGatewaysTotalCount } from '../../store/selectors/gateways'
 import { getGatewaysList, GET_GTWS_LIST } from '../../store/actions/gateways'
 import { createFetchingSelector } from '../../store/selectors/fetching'
-import { selectUserId } from '../../store/selectors/user'
+import { selectUserId, selectUserRights } from '../../store/selectors/user'
+import { mayCreateApplications, mayCreateGateways } from '../../lib/feature-checks'
 
 import ServerIcon from '../../../assets/auxiliary-icons/server.svg'
 import AppAnimation from '../../../assets/animations/illustrations/app.json'
@@ -63,12 +64,18 @@ const componentMap = {
 }
 
 @connect(
-  state => ({
-    applicationCount: selectApplicationsTotalCount(state),
-    gatewayCount: selectGatewaysTotalCount(state),
-    fetching: createFetchingSelector([GET_APPS_LIST, GET_GTWS_LIST])(state),
-    userId: selectUserId(state),
-  }),
+  function(state) {
+    const rights = selectUserRights(state)
+
+    return {
+      applicationCount: selectApplicationsTotalCount(state),
+      gatewayCount: selectGatewaysTotalCount(state),
+      fetching: createFetchingSelector([GET_APPS_LIST, GET_GTWS_LIST])(state),
+      userId: selectUserId(state),
+      mayCreateApplications: mayCreateApplications.check(rights),
+      mayCreateGateways: mayCreateGateways.check(rights),
+    }
+  },
   dispatch => ({
     loadData() {
       dispatch(getApplicationsList())
@@ -116,7 +123,18 @@ export default class Overview extends React.Component {
     const {
       config: { stack: stackConfig },
     } = this.props.env
-    const { fetching, applicationCount, gatewayCount, userId } = this.props
+    const {
+      fetching,
+      applicationCount,
+      gatewayCount,
+      userId,
+      mayCreateGateways,
+      mayCreateApplications,
+    } = this.props
+    const hasEntities = applicationCount + gatewayCount !== 0
+    const mayCreateEntities = mayCreateApplications || mayCreateGateways
+    const appPath = hasEntities ? '/applications' : '/applications/add'
+    const gatewayPath = hasEntities ? '/gateways' : '/gateways/add'
 
     if (fetching || applicationCount === undefined || gatewayCount === undefined) {
       return (
@@ -125,10 +143,6 @@ export default class Overview extends React.Component {
         </Spinner>
       )
     }
-
-    const hasEntities = applicationCount + gatewayCount !== 0
-    const appPath = hasEntities ? '/applications' : '/applications/add'
-    const gatewayPath = hasEntities ? '/gateways' : '/gateways/add'
 
     return (
       <Container>
@@ -143,7 +157,7 @@ export default class Overview extends React.Component {
             />
             <Message
               className={style.getStarted}
-              content={hasEntities ? m.continueWorking : m.getStarted}
+              content={hasEntities || !mayCreateEntities ? m.continueWorking : m.getStarted}
               component="h2"
             />
           </Col>
