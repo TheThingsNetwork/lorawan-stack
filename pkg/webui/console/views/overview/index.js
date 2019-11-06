@@ -34,7 +34,13 @@ import { selectGatewaysTotalCount } from '../../store/selectors/gateways'
 import { getGatewaysList, GET_GTWS_LIST } from '../../store/actions/gateways'
 import { createFetchingSelector } from '../../store/selectors/fetching'
 import { selectUserId, selectUserRights } from '../../store/selectors/user'
-import { mayCreateApplications, mayCreateGateways } from '../../lib/feature-checks'
+
+import {
+  mayViewApplications,
+  mayViewGateways,
+  mayCreateApplications,
+  mayCreateGateways,
+} from '../../lib/feature-checks'
 
 import ServerIcon from '../../../assets/auxiliary-icons/server.svg'
 import AppAnimation from '../../../assets/animations/illustrations/app.json'
@@ -73,6 +79,8 @@ const componentMap = {
       fetching: createFetchingSelector([GET_APPS_LIST, GET_GTWS_LIST])(state),
       userId: selectUserId(state),
       mayCreateApplications: mayCreateApplications.check(rights),
+      mayViewApplications: mayViewApplications.check(rights),
+      mayViewGateways: mayViewGateways.check(rights),
       mayCreateGateways: mayCreateGateways.check(rights),
     }
   },
@@ -119,49 +127,16 @@ export default class Overview extends React.Component {
     this.gatewayAnimationRef.current.instance.setDirection(-1)
   }
 
-  render() {
-    const {
-      config: { stack: stackConfig },
-    } = this.props.env
-    const {
-      fetching,
-      applicationCount,
-      gatewayCount,
-      userId,
-      mayCreateGateways,
-      mayCreateApplications,
-    } = this.props
+  get chooser() {
+    const { applicationCount, gatewayCount, mayViewApplications, mayViewGateways } = this.props
     const hasEntities = applicationCount + gatewayCount !== 0
-    const mayCreateEntities = mayCreateApplications || mayCreateGateways
     const appPath = hasEntities ? '/applications' : '/applications/add'
     const gatewayPath = hasEntities ? '/gateways' : '/gateways/add'
 
-    if (fetching || applicationCount === undefined || gatewayCount === undefined) {
-      return (
-        <Spinner center>
-          <Message content={sharedMessages.loading} />
-        </Spinner>
-      )
-    }
-
     return (
-      <Container>
-        <Row className={style.welcomeSection}>
-          <IntlHelmet title={sharedMessages.overview} />
-          <Col sm={12} className={style.welcomeTitleSection}>
-            <Message
-              className={style.welcome}
-              content={hasEntities ? m.welcomeBack : m.welcome}
-              values={{ userId }}
-              component="h1"
-            />
-            <Message
-              className={style.getStarted}
-              content={hasEntities || !mayCreateEntities ? m.continueWorking : m.getStarted}
-              component="h2"
-            />
-          </Col>
-          <Col lg={6}>
+      <Row>
+        {mayViewApplications && (
+          <Col lg={mayViewGateways ? 6 : 12}>
             <Link to={appPath} className={style.chooserNav}>
               <div
                 onMouseEnter={this.handleAppChooserMouseEnter}
@@ -173,7 +148,9 @@ export default class Overview extends React.Component {
               </div>
             </Link>
           </Col>
-          <Col lg={6}>
+        )}
+        {mayViewGateways && (
+          <Col lg={mayViewApplications ? 6 : 12}>
             <Link to={gatewayPath} className={style.chooserNav}>
               <div
                 onMouseEnter={this.handleGatewayChooserMouseEnter}
@@ -185,7 +162,60 @@ export default class Overview extends React.Component {
               </div>
             </Link>
           </Col>
-        </Row>
+        )}
+      </Row>
+    )
+  }
+
+  render() {
+    const {
+      config: { stack: stackConfig },
+    } = this.props.env
+    const {
+      fetching,
+      applicationCount,
+      gatewayCount,
+      userId,
+      mayCreateApplications,
+      mayCreateGateways,
+      mayViewApplications,
+      mayViewGateways,
+    } = this.props
+    const hasEntities = applicationCount + gatewayCount !== 0
+    const mayCreateEntities = mayCreateApplications || mayCreateGateways
+    const mayNotViewEntities = !mayViewApplications && !mayViewGateways
+
+    if (fetching || applicationCount === undefined || gatewayCount === undefined) {
+      return (
+        <Spinner center>
+          <Message content={sharedMessages.loading} />
+        </Spinner>
+      )
+    }
+
+    return (
+      <Container>
+        <div className={style.welcomeSection}>
+          <Row>
+            <IntlHelmet title={sharedMessages.overview} />
+            <Col sm={12} className={style.welcomeTitleSection}>
+              <Message
+                className={style.welcome}
+                content={hasEntities ? m.welcomeBack : m.welcome}
+                values={{ userId }}
+                component="h1"
+              />
+              {!mayNotViewEntities && (
+                <Message
+                  className={style.getStarted}
+                  content={hasEntities || !mayCreateEntities ? m.continueWorking : m.getStarted}
+                  component="h2"
+                />
+              )}
+            </Col>
+          </Row>
+          {this.chooser}
+        </div>
         <hr />
         <Row className={style.componentSection}>
           <Col sm={4} className={style.versionInfoSection}>
