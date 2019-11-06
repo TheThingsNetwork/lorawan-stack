@@ -85,7 +85,21 @@ The HTTP server serves static files for the web UI. If these files are not in th
 The Things Stack supports interoperability according to LoRaWAN Backend Interfaces specification. The following options are used to configure the server for this.
 
 - `interop.listen-tls`: Address for the interop server to listen on
-- `interop.sender-client-cas`: Path to PEM encoded file with client CAs of sender IDs to trust
+
+- `interop.sender-client-ca.source`: Source of the interop server sender client CAs configuration (static, directory, url, blob)
+
+The `url` source loads interop server sender client CAs configuration from the given URL.
+
+- `interop.sender-client-ca.url`
+
+The `directory` source loads from the given directory.
+
+- `interop.sender-client-ca.directory`
+
+The `blob` source loads from the given path in a bucket. This requires the global [blob configuration]({{< ref "#blob-options" >}}).
+
+- `interop.sender-client-ca.blob.bucket`: Bucket to use
+- `interop.sender-client-ca.blob.path`: Path to use
 
 ## Redis Options
 
@@ -141,7 +155,7 @@ The `frequency-plans` configuration is used by the [Gateway Server]({{< relref "
 
 - `frequency-plans.config-source`: Source of the frequency plans (static, directory, url, blob)
 
-The `url` source loads frequency plans from the given URL. See the [lorawan-frequenc-plans](https://github.com/TheThingsNetwork/lorawan-frequency-plans) repository for more information.
+The `url` source loads frequency plans from the given URL. See the [lorawan-frequency-plans](https://github.com/TheThingsNetwork/lorawan-frequency-plans) repository for more information.
 
 - `frequency-plans.url`
 
