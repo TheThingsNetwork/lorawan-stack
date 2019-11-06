@@ -67,6 +67,7 @@ const filterValidator = function(filters) {
     fetching: base.fetching,
     fetchingSearch: base.fetchingSearch,
     pathname: state.router.location.pathname,
+    mayAdd: 'mayAdd' in base ? base.mayAdd : true,
   }
 })
 @bind
@@ -200,6 +201,7 @@ class FetchTable extends Component {
       totalCount,
       fetching,
       fetchingSearch,
+      mayAdd,
       pageSize,
       addMessage,
       tableTitle,
@@ -245,12 +247,14 @@ class FetchTable extends Component {
               />
             )}
             {actionItems}
-            <Button.Link
-              className={style.addButton}
-              message={addMessage}
-              icon="add"
-              to={`${pathname}${itemPathPrefix}/add`}
-            />
+            {mayAdd && (
+              <Button.Link
+                className={style.addButton}
+                message={addMessage}
+                icon="add"
+                to={`${pathname}${itemPathPrefix}/add`}
+              />
+            )}
           </div>
         </div>
         <Tabular
