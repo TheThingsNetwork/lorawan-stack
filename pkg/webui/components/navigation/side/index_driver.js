@@ -19,9 +19,15 @@ import SideNavigation from './side'
 export default function() {
   const driver = {
     component: undefined,
+    location: {
+      pathname: '/',
+    },
+
     when: {
       created(props) {
-        driver.component = shallow(<SideNavigation {...props} />)
+        driver.component = shallow(
+          <SideNavigation.WrappedComponent location={location} {...props} />,
+        )
 
         return driver
       },
