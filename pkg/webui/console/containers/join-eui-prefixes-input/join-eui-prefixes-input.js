@@ -29,18 +29,33 @@ const m = defineMessages({
   empty: 'No prefix',
 })
 
-const getOptions = prefixes =>
-  prefixes
-    .filter(prefix => Boolean(prefix.length))
-    .map(function({ join_eui, length }) {
-      const computedPrefix = computePrefix(join_eui, length).toUpperCase()
+const getOptions = prefixes => {
+  const result = []
 
-      return { label: computedPrefix, value: computedPrefix }
-    })
+  for (const prefix of prefixes) {
+    if (!Boolean(prefix) || !Boolean(prefix.length)) {
+      continue
+    }
+
+    const { join_eui, length } = prefix
+    const computedPrefixes = computePrefix(join_eui, length)
+
+    for (const computedPrefix of computedPrefixes) {
+      const hasDuplicate = Boolean(result.find(pr => pr.value === computedPrefix))
+      if (!hasDuplicate) {
+        result.push({
+          label: computedPrefix.toUpperCase(),
+          value: computedPrefix,
+        })
+      }
+    }
+  }
+
+  return result
+}
 
 const emptyOption = { label: m.empty, value: '' }
 
-@bind
 class JoinEUIPrefixesInput extends React.PureComponent {
   inputRef = React.createRef()
 
@@ -54,6 +69,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
     return `${name}-prefix`
   }
 
+  @bind
   async handleChange(value) {
     const { onChange } = this.props
     const { prefix } = this.state
@@ -66,6 +82,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
     }
   }
 
+  @bind
   async handlePrefixChange(prefix) {
     const { onChange } = this.props
 
@@ -78,6 +95,7 @@ class JoinEUIPrefixesInput extends React.PureComponent {
     }
   }
 
+  @bind
   handleBlur(event) {
     const { name, onBlur } = this.props
     const { target, relatedTarget } = event
