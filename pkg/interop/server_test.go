@@ -91,8 +91,9 @@ func TestServeHTTP(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			s, err := NewServer(test.Context(), config.InteropServer{
-				SenderClientCAs: map[string]string{
-					"000001": "testdata/rootCA.pem",
+				SenderClientCA: config.SenderClientCA{
+					Source:    "directory",
+					Directory: "testdata",
 				},
 			})
 			if !a.So(err, should.BeNil) {

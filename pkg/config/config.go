@@ -92,6 +92,12 @@ func (m *Manager) Get(key string) interface{} {
 // Option is the type of an option for the manager.
 type Option func(m *Manager)
 
+func WithDeprecatedFlag(name, usageMessage string) Option {
+	return func(m *Manager) {
+		m.flags.MarkDeprecated(name, usageMessage)
+	}
+}
+
 // DefaultOptions are the default options.
 var DefaultOptions = []Option{
 	EnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_")),

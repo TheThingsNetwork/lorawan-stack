@@ -34,7 +34,9 @@ var (
 	ctx    = context.Background()
 	logger *log.Logger
 	name   = "ttn-lw-stack"
-	mgr    = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig)
+	mgr    = conf.InitializeWithDefaults(name, "ttn_lw", DefaultConfig,
+		conf.WithDeprecatedFlag("interop.sender-client-cas", "use interop.sender-client-ca sub-fields instead"),
+	)
 	config = new(Config)
 
 	// Root command is the entrypoint of the program

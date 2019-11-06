@@ -91,8 +91,9 @@ func TestInteropTLS(t *testing.T) {
 			},
 			Interop: config.InteropServer{
 				ListenTLS: ":9188",
-				SenderClientCAs: map[string]string{
-					"000001": "testdata/clientca.pem",
+				SenderClientCA: config.SenderClientCA{
+					Source:    "directory",
+					Directory: "testdata",
 				},
 			},
 		},
