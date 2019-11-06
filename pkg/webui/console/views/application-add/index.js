@@ -26,7 +26,6 @@ import Checkbox from '../../../components/checkbox'
 import SubmitButton from '../../../components/submit-button'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
-
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
@@ -35,8 +34,10 @@ import { id as applicationIdRegexp, address } from '../../lib/regexp'
 import { getApplicationId } from '../../../lib/selectors/id'
 import { selectAsConfig } from '../../../lib/selectors/env'
 import OwnersSelect from '../../containers/owners-select'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { selectUserId } from '../../store/selectors/user'
+import { mayCreateApplications } from '../../lib/feature-checks'
 
 import api from '../../api'
 
@@ -70,6 +71,7 @@ const validationSchema = Yup.object().shape({
   }),
 })
 
+@withFeatureRequirement(mayCreateApplications, { redirect: '/applications' })
 @connect(
   state => ({
     userId: selectUserId(state),

@@ -31,7 +31,7 @@ import withFeatureRequirement from '../../lib/components/with-feature-requiremen
 
 import api from '../../api'
 import { selectUserId } from '../../store/selectors/user'
-import { mayEditBasicGatewayInformation } from '../../lib/feature-checks'
+import { mayCreateGateways } from '../../lib/feature-checks'
 
 import style from './gateway-add.styl'
 
@@ -50,9 +50,7 @@ const m = defineMessages({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
   }),
 )
-@withFeatureRequirement(mayEditBasicGatewayInformation, {
-  redirect: ({ gtwId }) => `/gateway/${gtwId}`,
-})
+@withFeatureRequirement(mayCreateGateways, { redirect: '/gateways' })
 export default class GatewayAdd extends React.Component {
   static propTypes = {
     createSuccess: PropTypes.func.isRequired,

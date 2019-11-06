@@ -21,12 +21,14 @@ import OrganizationForm from '../../components/organization-form'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import Form from '../../../components/form'
-
 import PropTypes from '../../../lib/prop-types'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 import { getOrganizationId } from '../../../lib/selectors/id'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+
+import { mayCreateOrganizations } from '../../lib/feature-checks'
 
 import style from './organization-add.styl'
 
@@ -42,6 +44,7 @@ const m = defineMessages({
   createOrganization: 'Create Organization',
 })
 
+@withFeatureRequirement(mayCreateOrganizations, { redirect: '/organizations' })
 class Add extends React.Component {
   static propTypes = {
     createOrganization: PropTypes.func.isRequired,
