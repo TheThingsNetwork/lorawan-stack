@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix gateway API key forms being broken in the Console.
+- Fix MAC command handling in retransmissions.
 
 ### Security
 
