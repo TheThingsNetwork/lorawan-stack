@@ -22,6 +22,9 @@ const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
 const gsEnabled = stackConfig.gs.enabled
 
+export const checkFromState = (featureCheck, state) =>
+  featureCheck.check(featureCheck.rightsSelector(state))
+
 // User
 export const mayViewApplicationsOfUser = {
   rightsSelector: selectUserRights,
