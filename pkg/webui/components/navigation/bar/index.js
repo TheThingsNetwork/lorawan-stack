@@ -26,7 +26,9 @@ const NavigationBar = function({ className, entries, anchored }) {
   return (
     <nav className={classnames(className, style.bar)}>
       {entries.map(function(entry, index) {
-        const { path, title, icon = null, exact = false } = entry
+        const { path, title, icon = null, exact = false, hidden } = entry
+
+        if (hidden) return null
 
         const Component = anchored ? NavigationAnchorLink : NavigationLink
 
