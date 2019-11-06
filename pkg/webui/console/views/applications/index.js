@@ -22,7 +22,11 @@ import Application from '../application'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
+import { mayViewApplications } from '../../lib/feature-checks'
+
+@withFeatureRequirement(mayViewApplications, { redirect: '/' })
 @withBreadcrumb('apps', function(props) {
   return <Breadcrumb path="/applications" content={sharedMessages.applications} />
 })

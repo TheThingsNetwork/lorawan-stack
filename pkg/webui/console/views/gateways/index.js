@@ -22,7 +22,11 @@ import Gateway from '../gateway'
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
+import { mayViewGateways } from '../../lib/feature-checks'
+
+@withFeatureRequirement(mayViewGateways, { redirect: '/' })
 @withBreadcrumb('gateways', function(props) {
   return <Breadcrumb path="/gateways" content={sharedMessages.gateways} />
 })
