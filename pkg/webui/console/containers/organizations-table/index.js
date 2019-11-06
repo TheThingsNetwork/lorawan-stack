@@ -27,6 +27,7 @@ import {
   selectOrganizationsFetching,
   selectOrganizationsError,
 } from '../../store/selectors/organizations'
+import { checkFromState, mayCreateOrganizations } from '../../lib/feature-checks'
 
 const headers = [
   {
@@ -63,6 +64,7 @@ export default class OrganizationsTable extends Component {
       totalCount: selectOrganizationsTotalCount(state),
       fetching: selectOrganizationsFetching(state),
       error: selectOrganizationsError(state),
+      mayAdd: checkFromState(mayCreateOrganizations, state),
     }
   }
 

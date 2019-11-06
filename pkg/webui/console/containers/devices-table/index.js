@@ -29,7 +29,11 @@ import { getDevicesList } from '../../../console/store/actions/devices'
 import { getDeviceTemplateFormats } from '../../store/actions/device-template-formats'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectDeviceTemplateFormats } from '../../store/selectors/device-template-formats'
-import { mayViewApplicationDevices } from '../../lib/feature-checks'
+import {
+  checkFromState,
+  mayCreateOrEditApplicationDevices,
+  mayViewApplicationDevices,
+} from '../../lib/feature-checks'
 
 import style from './devices-table.styl'
 
@@ -56,6 +60,7 @@ const headers = [
     return {
       appId: selectSelectedApplicationId(state),
       deviceTemplateFormats: selectDeviceTemplateFormats(state),
+      mayCreateDevices: checkFromState(mayCreateOrEditApplicationDevices, state),
     }
   },
   { getDeviceTemplateFormats },
@@ -68,6 +73,7 @@ class DevicesTable extends React.Component {
     appId: PropTypes.string.isRequired,
     devicePathPrefix: PropTypes.string,
     deviceTemplateFormats: PropTypes.shape({}).isRequired,
+    mayCreateDevices: PropTypes.bool.isRequired,
     totalCount: PropTypes.number,
   }
 
@@ -82,22 +88,28 @@ class DevicesTable extends React.Component {
     this.getDevicesList = filters => getDevicesList(props.appId, filters, ['name'])
   }
 
-  baseDataSelector({ devices }) {
-    return devices
+  baseDataSelector(state) {
+    const { mayCreateDevices } = this.props
+    return {
+      ...state.devices,
+      mayAdd: mayCreateDevices,
+    }
   }
 
   get importButton() {
-    const { deviceTemplateFormats, appId } = this.props
+    const { deviceTemplateFormats, mayCreateDevices, appId } = this.props
     const canBulkCreate = Object.keys(deviceTemplateFormats).length !== 0
 
     return (
-      <Button.Link
-        className={style.importDevices}
-        message={sharedMessages.importDevices}
-        icon="import_devices"
-        to={`/applications/${appId}/devices/import`}
-        disabled={!canBulkCreate}
-      />
+      mayCreateDevices && (
+        <Button.Link
+          className={style.importDevices}
+          message={sharedMessages.importDevices}
+          icon="import_devices"
+          to={`/applications/${appId}/devices/import`}
+          disabled={!canBulkCreate}
+        />
+      )
     )
   }
 

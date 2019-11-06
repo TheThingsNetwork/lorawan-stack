@@ -26,6 +26,7 @@ import {
   selectApplicationsFetching,
   selectApplicationsError,
 } from '../../store/selectors/applications'
+import { checkFromState, mayCreateApplications } from '../../lib/feature-checks'
 
 const headers = [
   {
@@ -59,6 +60,7 @@ export default class ApplicationsTable extends Component {
       totalCount: selectApplicationsTotalCount(state),
       fetching: selectApplicationsFetching(state),
       error: selectApplicationsError(state),
+      mayAdd: checkFromState(mayCreateApplications, state),
     }
   }
 
