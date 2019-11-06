@@ -168,11 +168,31 @@ export const mayCreateApplicationsUnderOrganization = {
   rightsSelector: selectOrganizationRights,
   check: rights => rights.includes('RIGHT_ORGANIZATION_APPLICATIONS_CREATE'),
 }
+export const mayViewApplicationsOfOrganization = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_APPLICATIONS_LIST'),
+}
 export const mayCreateGatewaysUnderOrganization = {
   rightsSelector: selectOrganizationRights,
   check: rights => rights.includes('RIGHT_ORGANIZATION_GATEWAYS_CREATE'),
 }
+export const mayViewGatewaysOfOrganization = {
+  rightsSelector: selectOrganizationRights,
+  check: rights => rights.includes('RIGHT_ORGANIZATION_GATEWAYS_LIST'),
+}
 export const mayAddOrganizationAsCollaborator = {
   rightsSelector: selectOrganizationRights,
   check: rights => rights.includes('RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR'),
+}
+
+// Composite
+export const mayViewApplications = {
+  rightsSelector: state => [...selectUserRights(state), ...selectOrganizationRights(state)],
+  check: rights =>
+    mayViewApplicationsOfUser.check(rights) || mayViewApplicationsOfOrganization.check(rights),
+}
+export const mayViewGateways = {
+  rightsSelector: state => [...selectUserRights(state), ...selectOrganizationRights(state)],
+  check: rights =>
+    mayViewApplicationsOfUser.check(rights) || mayViewApplicationsOfOrganization.check(rights),
 }
