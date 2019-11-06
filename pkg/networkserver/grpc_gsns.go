@@ -459,150 +459,156 @@ matchLoop:
 		}
 
 		if match.NbTrans > 1 {
-			logger.Debug("Skip handling MAC commands for uplink retransmission")
-		} else {
-			macBuf := pld.FOpts
-			if len(macBuf) == 0 && pld.FPort == 0 {
-				macBuf = pld.FRMPayload
+			match.Device.MACState.PendingRequests = nil
+		}
+		macBuf := pld.FOpts
+		if len(macBuf) == 0 && pld.FPort == 0 {
+			macBuf = pld.FRMPayload
+		}
+		if len(macBuf) > 0 && (len(pld.FOpts) == 0 || match.Device.MACState.LoRaWANVersion.EncryptFOpts()) {
+			if session.NwkSEncKey == nil || len(session.NwkSEncKey.Key) == 0 {
+				logger.Warn("Device missing NwkSEncKey in registry, skip")
+				continue
 			}
-			if len(macBuf) > 0 && (len(pld.FOpts) == 0 || match.Device.MACState.LoRaWANVersion.EncryptFOpts()) {
-				if session.NwkSEncKey == nil || len(session.NwkSEncKey.Key) == 0 {
-					logger.Warn("Device missing NwkSEncKey in registry, skip")
-					continue
-				}
-				key, err := cryptoutil.UnwrapAES128Key(ctx, *session.NwkSEncKey, ns.KeyVault)
-				if err != nil {
-					logger.WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
-					continue
-				}
-				macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, macBuf)
-				if err != nil {
-					logger.WithError(err).Warn("Failed to decrypt uplink, skip")
-					continue
-				}
+			key, err := cryptoutil.UnwrapAES128Key(ctx, *session.NwkSEncKey, ns.KeyVault)
+			if err != nil {
+				logger.WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
+				continue
 			}
-
-			var cmds []*ttnpb.MACCommand
-			for r := bytes.NewReader(macBuf); r.Len() > 0; {
-				cmd := &ttnpb.MACCommand{}
-				if err := lorawan.DefaultMACCommands.ReadUplink(match.band, r, cmd); err != nil {
-					logger.WithFields(log.Fields(
-						"bytes_left", r.Len(),
-						"mac_count", len(cmds),
-					)).WithError(err).Warn("Failed to read MAC command")
-					break
-				}
-				logger.WithField("cid", cmd.CID).Debug("Read MAC command")
-				cmds = append(cmds, cmd)
-			}
-			logger = logger.WithField("mac_count", len(cmds))
-			ctx = log.NewContext(ctx, logger)
-
-			match.Device.MACState.QueuedResponses = match.Device.MACState.QueuedResponses[:0]
-		macLoop:
-			for len(cmds) > 0 {
-				var cmd *ttnpb.MACCommand
-				cmd, cmds = cmds[0], cmds[1:]
-				logger := logger.WithField("cid", cmd.CID)
-				ctx := log.NewContext(ctx, logger)
-
-				logger.Debug("Handle MAC command")
-
-				def, ok := lorawan.DefaultMACCommands[cmd.CID]
-				if ok && !def.InitiatedByDevice && (match.Pending || match.FCntReset) {
-					logger.Debug("Received MAC command answer after MAC state reset, skip")
-					continue matchLoop
-				}
-
-				var evs []events.DefinitionDataClosure
-				var err error
-				switch cmd.CID {
-				case ttnpb.CID_RESET:
-					evs, err = handleResetInd(ctx, match.Device, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
-				case ttnpb.CID_LINK_CHECK:
-					if !deduplicated {
-						match.deferMACHandler(handleLinkCheckReq)
-						continue macLoop
-					}
-					evs, err = handleLinkCheckReq(ctx, match.Device, up)
-				case ttnpb.CID_LINK_ADR:
-					pld := cmd.GetLinkADRAns()
-					dupCount := 0
-					if match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-						logger.Debug("Count LinkADR duplicates")
-						for _, dup := range cmds {
-							if dup.CID != ttnpb.CID_LINK_ADR {
-								break
-							}
-							if *dup.GetLinkADRAns() != *pld {
-								err = errInvalidPayload
-								break
-							}
-							dupCount++
-						}
-						logger.WithField("duplicate_count", dupCount).Debug("Counted LinkADR duplicates")
-					}
-					if err != nil {
-						break
-					}
-					cmds = cmds[dupCount:]
-					evs, err = handleLinkADRAns(ctx, match.Device, pld, uint(dupCount), ns.FrequencyPlans)
-				case ttnpb.CID_DUTY_CYCLE:
-					evs, err = handleDutyCycleAns(ctx, match.Device)
-				case ttnpb.CID_RX_PARAM_SETUP:
-					evs, err = handleRxParamSetupAns(ctx, match.Device, cmd.GetRxParamSetupAns())
-				case ttnpb.CID_DEV_STATUS:
-					evs, err = handleDevStatusAns(ctx, match.Device, cmd.GetDevStatusAns(), session.LastFCntUp, up.ReceivedAt)
-					if err == nil {
-						match.SetPaths = append(match.SetPaths,
-							"battery_percentage",
-							"downlink_margin",
-							"last_dev_status_received_at",
-							"power_state",
-						)
-					}
-				case ttnpb.CID_NEW_CHANNEL:
-					evs, err = handleNewChannelAns(ctx, match.Device, cmd.GetNewChannelAns())
-				case ttnpb.CID_RX_TIMING_SETUP:
-					evs, err = handleRxTimingSetupAns(ctx, match.Device)
-				case ttnpb.CID_TX_PARAM_SETUP:
-					evs, err = handleTxParamSetupAns(ctx, match.Device)
-				case ttnpb.CID_DL_CHANNEL:
-					evs, err = handleDLChannelAns(ctx, match.Device, cmd.GetDLChannelAns())
-				case ttnpb.CID_REKEY:
-					evs, err = handleRekeyInd(ctx, match.Device, cmd.GetRekeyInd())
-				case ttnpb.CID_ADR_PARAM_SETUP:
-					evs, err = handleADRParamSetupAns(ctx, match.Device)
-				case ttnpb.CID_DEVICE_TIME:
-					if !deduplicated {
-						match.deferMACHandler(handleDeviceTimeReq)
-						continue macLoop
-					}
-					evs, err = handleDeviceTimeReq(ctx, match.Device, up)
-				case ttnpb.CID_REJOIN_PARAM_SETUP:
-					evs, err = handleRejoinParamSetupAns(ctx, match.Device, cmd.GetRejoinParamSetupAns())
-				case ttnpb.CID_PING_SLOT_INFO:
-					evs, err = handlePingSlotInfoReq(ctx, match.Device, cmd.GetPingSlotInfoReq())
-				case ttnpb.CID_PING_SLOT_CHANNEL:
-					evs, err = handlePingSlotChannelAns(ctx, match.Device, cmd.GetPingSlotChannelAns())
-				case ttnpb.CID_BEACON_TIMING:
-					evs, err = handleBeaconTimingReq(ctx, match.Device)
-				case ttnpb.CID_BEACON_FREQ:
-					evs, err = handleBeaconFreqAns(ctx, match.Device, cmd.GetBeaconFreqAns())
-				case ttnpb.CID_DEVICE_MODE:
-					evs, err = handleDeviceModeInd(ctx, match.Device, cmd.GetDeviceModeInd())
-				default:
-					logger.Warn("Unknown MAC command received, skip the rest")
-					break macLoop
-				}
-				if err != nil {
-					logger.WithError(err).Debug("Failed to process MAC command")
-					break macLoop
-				}
-				match.QueuedEvents = append(match.QueuedEvents, evs...)
+			macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, macBuf)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to decrypt uplink, skip")
+				continue
 			}
 		}
-		match.Device.MACState.PendingRequests = match.Device.MACState.PendingRequests[:0]
+
+		var cmds []*ttnpb.MACCommand
+		for r := bytes.NewReader(macBuf); r.Len() > 0; {
+			cmd := &ttnpb.MACCommand{}
+			if err := lorawan.DefaultMACCommands.ReadUplink(match.band, r, cmd); err != nil {
+				logger.WithFields(log.Fields(
+					"bytes_left", r.Len(),
+					"mac_count", len(cmds),
+				)).WithError(err).Warn("Failed to read MAC command")
+				break
+			}
+			logger := logger.WithField("cid", cmd.CID)
+			logger.Debug("Read MAC command")
+			def, ok := lorawan.DefaultMACCommands[cmd.CID]
+			switch {
+			case ok && !def.InitiatedByDevice && (match.Pending || match.FCntReset):
+				logger.Debug("Received MAC command answer after MAC state reset, skip")
+				continue matchLoop
+			case ok && match.NbTrans > 1 && !lorawan.DefaultMACCommands[cmd.CID].InitiatedByDevice:
+				logger.Debug("Skip processing of MAC command not initiated by the device in a retransmission")
+				continue
+			}
+			cmds = append(cmds, cmd)
+		}
+		logger = logger.WithField("mac_count", len(cmds))
+		ctx = log.NewContext(ctx, logger)
+
+		match.Device.MACState.QueuedResponses = match.Device.MACState.QueuedResponses[:0]
+	macLoop:
+		for len(cmds) > 0 {
+			var cmd *ttnpb.MACCommand
+			cmd, cmds = cmds[0], cmds[1:]
+			logger := logger.WithField("cid", cmd.CID)
+			ctx := log.NewContext(ctx, logger)
+
+			logger.Debug("Handle MAC command")
+
+			var evs []events.DefinitionDataClosure
+			var err error
+			switch cmd.CID {
+			case ttnpb.CID_RESET:
+				evs, err = handleResetInd(ctx, match.Device, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
+			case ttnpb.CID_LINK_CHECK:
+				if !deduplicated {
+					match.deferMACHandler(handleLinkCheckReq)
+					continue macLoop
+				}
+				evs, err = handleLinkCheckReq(ctx, match.Device, up)
+			case ttnpb.CID_LINK_ADR:
+				pld := cmd.GetLinkADRAns()
+				dupCount := 0
+				if match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+					logger.Debug("Count LinkADR duplicates")
+					for _, dup := range cmds {
+						if dup.CID != ttnpb.CID_LINK_ADR {
+							break
+						}
+						if *dup.GetLinkADRAns() != *pld {
+							err = errInvalidPayload
+							break
+						}
+						dupCount++
+					}
+					logger.WithField("duplicate_count", dupCount).Debug("Counted LinkADR duplicates")
+				}
+				if err != nil {
+					break
+				}
+				cmds = cmds[dupCount:]
+				evs, err = handleLinkADRAns(ctx, match.Device, pld, uint(dupCount), ns.FrequencyPlans)
+			case ttnpb.CID_DUTY_CYCLE:
+				evs, err = handleDutyCycleAns(ctx, match.Device)
+			case ttnpb.CID_RX_PARAM_SETUP:
+				evs, err = handleRxParamSetupAns(ctx, match.Device, cmd.GetRxParamSetupAns())
+			case ttnpb.CID_DEV_STATUS:
+				evs, err = handleDevStatusAns(ctx, match.Device, cmd.GetDevStatusAns(), session.LastFCntUp, up.ReceivedAt)
+				if err == nil {
+					match.SetPaths = append(match.SetPaths,
+						"battery_percentage",
+						"downlink_margin",
+						"last_dev_status_received_at",
+						"power_state",
+					)
+				}
+			case ttnpb.CID_NEW_CHANNEL:
+				evs, err = handleNewChannelAns(ctx, match.Device, cmd.GetNewChannelAns())
+			case ttnpb.CID_RX_TIMING_SETUP:
+				evs, err = handleRxTimingSetupAns(ctx, match.Device)
+			case ttnpb.CID_TX_PARAM_SETUP:
+				evs, err = handleTxParamSetupAns(ctx, match.Device)
+			case ttnpb.CID_DL_CHANNEL:
+				evs, err = handleDLChannelAns(ctx, match.Device, cmd.GetDLChannelAns())
+			case ttnpb.CID_REKEY:
+				evs, err = handleRekeyInd(ctx, match.Device, cmd.GetRekeyInd())
+			case ttnpb.CID_ADR_PARAM_SETUP:
+				evs, err = handleADRParamSetupAns(ctx, match.Device)
+			case ttnpb.CID_DEVICE_TIME:
+				if !deduplicated {
+					match.deferMACHandler(handleDeviceTimeReq)
+					continue macLoop
+				}
+				evs, err = handleDeviceTimeReq(ctx, match.Device, up)
+			case ttnpb.CID_REJOIN_PARAM_SETUP:
+				evs, err = handleRejoinParamSetupAns(ctx, match.Device, cmd.GetRejoinParamSetupAns())
+			case ttnpb.CID_PING_SLOT_INFO:
+				evs, err = handlePingSlotInfoReq(ctx, match.Device, cmd.GetPingSlotInfoReq())
+			case ttnpb.CID_PING_SLOT_CHANNEL:
+				evs, err = handlePingSlotChannelAns(ctx, match.Device, cmd.GetPingSlotChannelAns())
+			case ttnpb.CID_BEACON_TIMING:
+				evs, err = handleBeaconTimingReq(ctx, match.Device)
+			case ttnpb.CID_BEACON_FREQ:
+				evs, err = handleBeaconFreqAns(ctx, match.Device, cmd.GetBeaconFreqAns())
+			case ttnpb.CID_DEVICE_MODE:
+				evs, err = handleDeviceModeInd(ctx, match.Device, cmd.GetDeviceModeInd())
+			default:
+				logger.Warn("Unknown MAC command received, skip the rest")
+				break macLoop
+			}
+			if err != nil {
+				logger.WithError(err).Debug("Failed to process MAC command")
+				break macLoop
+			}
+			match.QueuedEvents = append(match.QueuedEvents, evs...)
+		}
+		if n := len(match.Device.MACState.PendingRequests); n > 0 {
+			logger.WithField("unanswered_request_count", n).Warn("MAC command buffer not fully answered")
+			match.Device.MACState.PendingRequests = match.Device.MACState.PendingRequests[:0]
+		}
 
 		if match.Pending {
 			if match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
