@@ -32,8 +32,12 @@ import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Require from '../../lib/components/require'
 
-import { mayEditBasicOrganizationInformation } from '../../lib/feature-checks'
+import {
+  mayEditBasicOrganizationInformation,
+  mayDeleteOrganization,
+} from '../../lib/feature-checks'
 
 const m = defineMessages({
   deleteOrg: 'Delete organization',
@@ -144,17 +148,22 @@ class GeneralSettings extends React.PureComponent {
             >
               <SubmitBar>
                 <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
-                <ModalButton
-                  type="button"
-                  icon="delete"
-                  danger
-                  naked
-                  message={m.deleteOrg}
-                  modalData={{
-                    message: { values: { orgName: organization.name || orgId }, ...m.modalWarning },
-                  }}
-                  onApprove={this.handleDelete}
-                />
+                <Require featureCheck={mayDeleteOrganization}>
+                  <ModalButton
+                    type="button"
+                    icon="delete"
+                    danger
+                    naked
+                    message={m.deleteOrg}
+                    modalData={{
+                      message: {
+                        values: { orgName: organization.name || orgId },
+                        ...m.modalWarning,
+                      },
+                    }}
+                    onApprove={this.handleDelete}
+                  />
+                </Require>
               </SubmitBar>
             </OrganizationForm>
           </Col>
