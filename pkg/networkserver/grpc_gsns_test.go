@@ -3007,6 +3007,9 @@ func TestHandleUplink(t *testing.T) {
 
 					macState := makeMACState()
 					macState.RxWindowsAvailable = true
+					macState.QueuedResponses = []*ttnpb.MACCommand{
+						MakeLinkCheckAns(mds...),
+					}
 					a.So(dev.MACState, should.Resemble, macState)
 					a.So(dev.PendingMACState, should.BeNil)
 					a.So(dev.PendingSession, should.BeNil)
@@ -3053,6 +3056,18 @@ func TestHandleUplink(t *testing.T) {
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
+				}), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
+				}), should.BeTrue) {
+					return false
+				}
+
+				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(upCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
 				}), should.BeTrue) {
 					return false
 				}
