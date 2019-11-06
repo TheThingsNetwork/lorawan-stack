@@ -817,13 +817,13 @@ loop:
 }
 
 // downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
-const downlinkRetryInterval = time.Second
+const downlinkRetryInterval = 2 * time.Second
 
 // gsScheduleWindow is the time interval, which is sufficient for GS to ensure downlink is scheduled.
 const gsScheduleWindow = 30 * time.Second
 
 // nsScheduleWindow is the time interval, which is sufficient for NS to ensure downlink is scheduled.
-var nsScheduleWindow = time.Second
+var nsScheduleWindow = 100 * time.Millisecond
 
 func recordDataDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genState generateDownlinkState, down *scheduledDownlink, defaults ttnpb.MACSettings) {
 	if genState.ApplicationDownlink == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && genDown.FCnt > dev.Session.LastNFCntDown {
