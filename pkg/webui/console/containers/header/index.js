@@ -22,19 +22,28 @@ import sharedMessages from '../../../lib/shared-messages'
 import HeaderComponent from '../../../components/header'
 
 import { logout } from '../../store/actions/user'
-import { selectUser, selectUserRights } from '../../store/selectors/user'
+import { selectUser } from '../../store/selectors/user'
 import {
+  checkFromState,
   mayViewApplications,
   mayViewGateways,
-  mayViewOrganizations,
+  mayViewOrganizationsOfUser,
 } from '../../lib/feature-checks'
 
 @withRouter
 @connect(
-  state => ({
-    user: selectUser(state),
-    rights: selectUserRights(state),
-  }),
+  function(state) {
+    const user = selectUser(state)
+    if (Boolean(user)) {
+      return {
+        user,
+        mayViewApplications: checkFromState(mayViewApplications, state),
+        mayViewGateways: checkFromState(mayViewGateways, state),
+        mayViewOrganizations: checkFromState(mayViewOrganizationsOfUser, state),
+      }
+    }
+    return { user }
+  },
   { handleLogout: logout },
 )
 @bind
@@ -58,7 +67,16 @@ class Header extends Component {
   }
 
   render() {
-    const { user, anchored, handleSearchRequest, handleLogout, searchable, rights } = this.props
+    const {
+      user,
+      anchored,
+      handleSearchRequest,
+      handleLogout,
+      searchable,
+      mayViewApplications,
+      mayViewGateways,
+      mayViewOrganizations,
+    } = this.props
 
     const navigationEntries = [
       {
@@ -71,19 +89,19 @@ class Header extends Component {
         title: sharedMessages.applications,
         icon: 'application',
         path: '/applications',
-        hidden: !mayViewApplications.check(rights),
+        hidden: !mayViewApplications,
       },
       {
         title: sharedMessages.gateways,
         icon: 'gateway',
         path: '/gateways',
-        hidden: !mayViewGateways.check(rights),
+        hidden: !mayViewGateways,
       },
       {
         title: sharedMessages.organizations,
         icon: 'organization',
         path: '/organizations',
-        hidden: !mayViewOrganizations.check(rights),
+        hidden: !mayViewOrganizations,
       },
     ]
 
