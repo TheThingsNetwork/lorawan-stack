@@ -197,21 +197,6 @@ type BlobConfigAWS struct {
 	SessionToken    string `name:"session-token" description:"Session token"`
 }
 
-type blobConfigAWSCredentials BlobConfigAWS
-
-func (c blobConfigAWSCredentials) Retrieve() (credentials.Value, error) {
-	if c.AccessKeyID == "" || c.SecretAccessKey == "" {
-		return credentials.Value{}, errMissingBlobConfig
-	}
-	return credentials.Value{
-		ProviderName:    "TTNConfigProvider",
-		AccessKeyID:     c.AccessKeyID,
-		SecretAccessKey: c.SecretAccessKey,
-	}, nil
-}
-
-func (c blobConfigAWSCredentials) IsExpired() bool { return false }
-
 // BlobConfigGCP is the blob store configuration for the GCP provider.
 type BlobConfigGCP struct {
 	CredentialsFile string `name:"credentials-file" description:"Path to the GCP credentials JSON file"`
@@ -232,11 +217,19 @@ func (c BlobConfig) Bucket(ctx context.Context, bucket string) (*blob.Bucket, er
 	case "local":
 		return ttnblob.Local(ctx, bucket, c.Local.Directory)
 	case "aws":
-		return ttnblob.AWS(ctx, bucket, &aws.Config{
-			Endpoint:    &c.AWS.Endpoint,
-			Region:      &c.AWS.Region,
-			Credentials: credentials.NewCredentials(blobConfigAWSCredentials(c.AWS)),
-		})
+		conf := aws.NewConfig()
+		if c.AWS.Endpoint != "" {
+			conf = conf.WithEndpoint(c.AWS.Endpoint)
+		}
+		if c.AWS.Region != "" {
+			conf = conf.WithRegion(c.AWS.Region)
+		}
+		if c.AWS.AccessKeyID != "" && c.AWS.SecretAccessKey != "" {
+			conf = conf.WithCredentials(credentials.NewStaticCredentials(
+				c.AWS.AccessKeyID, c.AWS.SecretAccessKey, c.AWS.SessionToken,
+			))
+		}
+		return ttnblob.AWS(ctx, bucket, conf)
 	case "gcp":
 		var jsonCreds []byte
 		if c.GCP.Credentials != "" {
