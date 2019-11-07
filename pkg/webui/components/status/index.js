@@ -14,13 +14,20 @@
 
 import React from 'react'
 import classnames from 'classnames'
-
+import { defineMessages, injectIntl } from 'react-intl'
 import Message from '../../lib/components/message'
 import PropTypes from '../../lib/prop-types'
 
 import style from './status.styl'
 
-const Status = function({ className, status, label, pulse, labelValues, children }) {
+const m = defineMessages({
+  good: 'good',
+  bad: 'bad',
+  mediocre: 'mediocre',
+  unknown: 'unknown',
+})
+
+const Status = function({ intl, className, status, label, pulse, labelValues, children, title }) {
   const cls = classnames(style.status, {
     [style.statusGood]: status === 'good',
     [style.statusBad]: status === 'bad',
@@ -39,10 +46,20 @@ const Status = function({ className, status, label, pulse, labelValues, children
     statusLabel = <Message className={style.statusLabel} content={label} values={labelValues} />
   }
 
+  let translatedTitle
+
+  if (title) {
+    translatedTitle = intl.formatMessage(title)
+  } else if (label) {
+    translatedTitle = intl.formatMessage(label)
+  } else {
+    translatedTitle = intl.formatMessage(m[status])
+  }
+
   return (
     <span className={classnames(className, style.container)}>
       {statusLabel}
-      <span className={classnames(cls)} />
+      <span className={classnames(cls)} title={translatedTitle} />
       {children}
     </span>
   )
@@ -54,6 +71,7 @@ Status.propTypes = {
   labelValues: PropTypes.shape({}),
   pulse: PropTypes.bool,
   status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
+  title: PropTypes.message,
 }
 
 Status.defaultProps = {
@@ -62,6 +80,7 @@ Status.defaultProps = {
   label: undefined,
   labelValues: undefined,
   status: 'unknown',
+  title: undefined,
 }
 
-export default Status
+export default injectIntl(Status)
