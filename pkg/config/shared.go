@@ -367,7 +367,7 @@ func (c InteropClient) IsZero() bool {
 
 // Fetcher returns fetch.Interface defined by conf.
 // If no configuration source is set, this method returns nil, nil.
-func (c InteropClient) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
+func (c InteropClient) Fetcher(ctx context.Context) (fetch.Interface, error) {
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if c.ConfigSource == "" {
 		switch {
@@ -385,7 +385,7 @@ func (c InteropClient) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.
 	case "url":
 		return fetch.FromHTTP(c.URL, true)
 	case "blob":
-		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
+		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err
 		}
@@ -412,6 +412,18 @@ type ServiceBase struct {
 	DeviceRepository DeviceRepositoryConfig `name:"device-repository" description:"Source of the device repository"`
 	Rights           Rights                 `name:"rights"`
 	KeyVault         KeyVault               `name:"key-vault"`
+}
+
+// FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.
+// If no configuration source is set, this method returns nil, nil.
+func (c ServiceBase) FrequencyPlansFetcher(ctx context.Context) (fetch.Interface, error) {
+	return c.FrequencyPlans.Fetcher(ctx, c.Blob)
+}
+
+// DeviceRepositoryFetcher returns a fetch.Interface based on the device repository configuration.
+// If no configuration source is set, this method returns nil, nil.
+func (c ServiceBase) DeviceRepositoryFetcher(ctx context.Context) (fetch.Interface, error) {
+	return c.DeviceRepository.Fetcher(ctx, c.Blob)
 }
 
 // MQTT contains the listen and public addresses of an MQTT frontend.
