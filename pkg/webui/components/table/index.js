@@ -195,7 +195,7 @@ Tabular.propTypes = {
     PropTypes.shape({
       displayName: PropTypes.message.isRequired,
       getValue: PropTypes.func,
-      name: PropTypes.string.isRequired,
+      name: PropTypes.string,
       render: PropTypes.func,
       centered: PropTypes.bool,
       sortable: PropTypes.bool,
