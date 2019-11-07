@@ -15,6 +15,7 @@
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
+import { withRouter } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import PropTypes from '../../../lib/prop-types'
 
@@ -28,7 +29,7 @@ import style from './side.styl'
 const m = defineMessages({
   hideSidebar: 'Hide Sidebar',
 })
-
+@withRouter
 @bind
 class SideNavigation extends Component {
   state = {
@@ -90,6 +91,23 @@ class SideNavigation extends Component {
         isMinimized: shouldMinimize,
       }
     })
+  }
+
+  componentDidMount() {
+    const { location, entries } = this.props
+    for (let i in entries) {
+      if (entries[i].path) {
+        if (location.pathname === entries[i].path) break
+      } else if (entries[i].nested) {
+        for (let j in entries[i].items) {
+          if (location.pathname === entries[i].items[j].path) {
+            const itemsExpanded = { [i]: { isOpen: true, isLink: true } }
+            this.setState({ itemsExpanded })
+            return
+          }
+        }
+      }
+    }
   }
 
   render() {
