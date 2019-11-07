@@ -31,12 +31,14 @@ import ModalButton from '../../../components/button/modal-button'
 import FormSubmit from '../../../components/form/submit'
 import SubmitButton from '../../../components/submit-button'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Require from '../../lib/components/require'
 import diff from '../../../lib/diff'
 
 import { updateGateway, deleteGateway } from '../../store/actions/gateways'
 import { attachPromise } from '../../store/actions/lib'
-import { getGatewayId } from '../../../lib/selectors/id'
-import { selectSelectedGateway } from '../../store/selectors/gateways'
+import { selectSelectedGateway, selectSelectedGatewayId } from '../../store/selectors/gateways'
+import { mayEditBasicGatewayInformation, mayDeleteGateway } from '../../lib/feature-checks'
 
 const m = defineMessages({
   updateSuccess: 'Successfully updated gateway',
@@ -45,14 +47,10 @@ const m = defineMessages({
 })
 
 @connect(
-  function(state) {
-    const gateway = selectSelectedGateway(state)
-
-    return {
-      gtwId: getGatewayId(gateway),
-      gateway,
-    }
-  },
+  state => ({
+    gateway: selectSelectedGateway(state),
+    gtwId: selectSelectedGatewayId(state),
+  }),
   dispatch => ({
     ...bindActionCreators(
       {
@@ -64,6 +62,9 @@ const m = defineMessages({
     onDeleteSuccess: () => dispatch(replace('/gateways')),
   }),
 )
+@withFeatureRequirement(mayEditBasicGatewayInformation, {
+  redirect: ({ gtwId }) => `/gateways/${gtwId}`,
+})
 @withBreadcrumb('gateways.single.general-settings', function(props) {
   const { gtwId } = props
 
@@ -180,15 +181,17 @@ export default class GatewayGeneralSettings extends React.Component {
               update
             >
               <FormSubmit component={SubmitButton} message={sharedMessages.saveChanges} />
-              <ModalButton
-                type="button"
-                icon="delete"
-                danger
-                naked
-                message={m.deleteGateway}
-                modalData={{ message: { values: { gtwName: name || gtwId }, ...m.modalWarning } }}
-                onApprove={this.handleDelete}
-              />
+              <Require featureCheck={mayDeleteGateway}>
+                <ModalButton
+                  type="button"
+                  icon="delete"
+                  danger
+                  naked
+                  message={m.deleteGateway}
+                  modalData={{ message: { values: { gtwName: name || gtwId }, ...m.modalWarning } }}
+                  onApprove={this.handleDelete}
+                />
+              </Require>
             </GatewayDataForm>
           </Col>
         </Row>

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -21,23 +22,25 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import ErrorView from '../../../lib/components/error-view'
 import SubViewError from '../error/sub-view'
 import NotFoundRoute from '../../../lib/components/not-found-route'
-
 import GatewayCollaboratorsList from '../gateway-collaborators-list'
 import GatewayCollaboratorAdd from '../gateway-collaborator-add'
 import GatewayCollaboratorEdit from '../gateway-collaborator-edit'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import { mayViewOrEditGatewayCollaborators } from '../../lib/feature-checks'
 
-@withBreadcrumb('gtws.single.collaborators', function(props) {
-  const { match } = props
-  const gtwId = match.params.gtwId
+import { selectSelectedGatewayId } from '../../store/selectors/gateways'
 
-  return (
-    <Breadcrumb
-      path={`/gateways/${gtwId}/collaborators`}
-      icon="organization"
-      content={sharedMessages.collaborators}
-    />
-  )
+@connect(state => ({ gtwId: selectSelectedGatewayId(state) }))
+@withFeatureRequirement(mayViewOrEditGatewayCollaborators, {
+  redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
+@withBreadcrumb('gtws.single.collaborators', ({ gtwId }) => (
+  <Breadcrumb
+    path={`/gateways/${gtwId}/collaborators`}
+    icon="organization"
+    content={sharedMessages.collaborators}
+  />
+))
 export default class GatewayCollaborators extends React.Component {
   render() {
     const { match } = this.props

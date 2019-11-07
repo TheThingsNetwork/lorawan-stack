@@ -22,3 +22,5 @@ export const selectUserId = function(state) {
 
   return ids.user_id
 }
+
+export const selectUserRights = state => selectUserStore(state).rights

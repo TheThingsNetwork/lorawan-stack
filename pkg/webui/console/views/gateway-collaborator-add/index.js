@@ -24,7 +24,6 @@ import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import CollaboratorForm from '../../components/collaborator-form'
-import withRequest from '../../../lib/components/with-request'
 
 import {
   selectSelectedGatewayId,
@@ -61,10 +60,6 @@ import api from '../../api'
     getGatewaysRightsList: () => dispatchProps.getGatewaysRightsList(stateProps.gtwId),
     redirectToList: () => dispatchProps.redirectToList(stateProps.gtwId),
   }),
-)
-@withRequest(
-  ({ getGatewaysRightsList }) => getGatewaysRightsList(),
-  ({ fetching, rights }) => fetching || !Boolean(rights.length),
 )
 @withBreadcrumb('gtws.single.collaborators.add', function(props) {
   const gtwId = props.gtwId

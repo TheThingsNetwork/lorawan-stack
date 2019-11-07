@@ -52,7 +52,10 @@ class SideNavigationList extends React.Component {
       <ul className={listClassNames}>
         {items.map(function(item, index) {
           const itemState = itemsExpanded[index] || {}
-          const { title, icon, path, exact = true, nested = false, items = [] } = item
+          const { title, icon, path, exact = true, nested = false, items = [], hidden } = item
+
+          if (hidden) return null
+
           const { isOpen = false, isLink = false } = itemState
 
           const isActive = nested && isLink
@@ -102,6 +105,7 @@ SideNavigationList.propTypes = {
         icon: PropTypes.string,
         nested: PropTypes.bool.isRequired,
         items: PropTypes.arrayOf(PropTypes.link).isRequired,
+        hidden: PropTypes.bool,
       }),
     ]),
   ).isRequired,

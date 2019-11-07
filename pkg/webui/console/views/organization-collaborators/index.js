@@ -13,21 +13,28 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-
 import sharedMessages from '../../../lib/shared-messages'
 import ErrorView from '../../../lib/components/error-view'
 import NotFoundRoute from '../../../lib/components/not-found-route'
 import PropTypes from '../../../lib/prop-types'
-
 import SubViewError from '../error/sub-view'
 import OrganizationCollaboratorsList from '../organization-collaborators-list'
 import OrganizationCollaboratorAdd from '../organization-collaborator-add'
 import OrganizationCollaboratorEdit from '../organization-collaborator-edit'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
+import { mayViewOrEditOrganizationApiKeys } from '../../lib/feature-checks'
+import { selectSelectedOrganizationId } from '../../store/selectors/organizations'
+
+@connect(state => ({ orgId: selectSelectedOrganizationId(state) }))
+@withFeatureRequirement(mayViewOrEditOrganizationApiKeys, {
+  redirect: ({ orgId }) => `/organizations/${orgId}`,
+})
 @withBreadcrumb('orgs.single.collaborators', function(props) {
   const { match } = props
   const { orgId } = match.params

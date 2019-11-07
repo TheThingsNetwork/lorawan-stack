@@ -23,8 +23,10 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import GatewayEvents from '../../containers/gateway-events'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { selectSelectedGatewayId } from '../../store/selectors/gateways'
+import { mayViewGatewayEvents } from '../../lib/feature-checks'
 
 import style from './gateway-data.styl'
 
@@ -32,14 +34,13 @@ const m = defineMessages({
   gtwData: 'Gateway Data',
 })
 
-@connect(state => ({
-  gtwId: selectSelectedGatewayId(state),
-}))
-@withBreadcrumb('gateways.single.data', function(props) {
-  return (
-    <Breadcrumb path={`/gateways/${props.gtwId}/data`} icon="data" content={sharedMessages.data} />
-  )
+@connect(state => ({ gtwId: selectSelectedGatewayId(state) }))
+@withFeatureRequirement(mayViewGatewayEvents, {
+  redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
+@withBreadcrumb('gateways.single.data', ({ gtwId }) => (
+  <Breadcrumb path={`/gateways/${gtwId}/data`} icon="data" content={sharedMessages.data} />
+))
 export default class Data extends React.Component {
   render() {
     const { gtwId } = this.props

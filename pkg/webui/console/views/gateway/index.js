@@ -33,12 +33,27 @@ import GatewayLocation from '../gateway-location'
 import GatewayData from '../gateway-data'
 import GatewayGeneralSettings from '../gateway-general-settings'
 
-import { getGateway, stopGatewayEventsStream } from '../../store/actions/gateways'
+import {
+  getGateway,
+  stopGatewayEventsStream,
+  getGatewaysRightsList,
+} from '../../store/actions/gateways'
 import {
   selectGatewayFetching,
   selectGatewayError,
   selectSelectedGateway,
+  selectGatewayRights,
+  selectGatewayRightsFetching,
+  selectGatewayRightsError,
 } from '../../store/selectors/gateways'
+import {
+  mayViewGatewayInfo,
+  mayViewGatewayEvents,
+  mayViewOrEditGatewayLocation,
+  mayViewOrEditGatewayCollaborators,
+  mayViewOrEditGatewayApiKeys,
+  mayEditBasicGatewayInformation,
+} from '../../lib/feature-checks'
 
 @connect(
   function(state, props) {
@@ -48,18 +63,22 @@ import {
     return {
       gtwId,
       gateway,
-      error: selectGatewayError(state),
-      fetching: selectGatewayFetching(state),
+      error: selectGatewayError(state) && selectGatewayRightsError(state),
+      fetching: selectGatewayFetching(state) && selectGatewayRightsFetching(state),
+      rights: selectGatewayRights(state),
     }
   },
   dispatch => ({
-    getGateway: (id, meta) => dispatch(getGateway(id, meta)),
+    loadData: (id, meta) => {
+      dispatch(getGateway(id, meta))
+      dispatch(getGatewaysRightsList(id))
+    },
     stopStream: id => dispatch(stopGatewayEventsStream(id)),
   }),
 )
 @withRequest(
-  ({ gtwId, getGateway }) =>
-    getGateway(gtwId, [
+  ({ gtwId, loadData }) =>
+    loadData(gtwId, [
       'name',
       'description',
       'enforce_duty_cycle',
@@ -74,6 +93,7 @@ import {
   const {
     match: { url: matchedUrl },
     gtwId,
+    rights,
   } = props
 
   return {
@@ -83,33 +103,39 @@ import {
         title: sharedMessages.overview,
         path: matchedUrl,
         icon: 'overview',
+        hidden: !mayViewGatewayInfo.check(rights),
       },
       {
         title: sharedMessages.data,
         path: `${matchedUrl}/data`,
         icon: 'data',
+        hidden: !mayViewGatewayEvents.check(rights),
       },
       {
         title: sharedMessages.location,
         path: `${matchedUrl}/location`,
         icon: 'location',
+        hidden: !mayViewOrEditGatewayLocation.check(rights),
       },
       {
         title: sharedMessages.collaborators,
         path: `${matchedUrl}/collaborators`,
         icon: 'organization',
         exact: false,
+        hidden: !mayViewOrEditGatewayCollaborators.check(rights),
       },
       {
         title: sharedMessages.apiKeys,
         path: `${matchedUrl}/api-keys`,
         icon: 'api_keys',
         exact: false,
+        hidden: !mayViewOrEditGatewayApiKeys.check(rights),
       },
       {
         title: sharedMessages.generalSettings,
         path: `${matchedUrl}/general-settings`,
         icon: 'general_settings',
+        hidden: !mayEditBasicGatewayInformation.check(rights),
       },
     ],
   }
@@ -121,12 +147,6 @@ import {
 })
 @withEnv
 export default class Gateway extends React.Component {
-  componentWillUnmount() {
-    const { stopStream, gtwId } = this.props
-
-    stopStream(gtwId)
-  }
-
   render() {
     const { match, gateway, gtwId, env } = this.props
 

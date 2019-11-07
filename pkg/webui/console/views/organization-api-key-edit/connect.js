@@ -17,10 +17,7 @@ import { replace } from 'connected-react-router'
 
 import withRequest from '../../../lib/components/with-request'
 
-import {
-  getOrganizationApiKey,
-  getOrganizationsRightsList,
-} from '../../store/actions/organizations'
+import { getOrganizationApiKey } from '../../store/actions/organizations'
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
@@ -55,8 +52,7 @@ export default OrganizationApiKeyEdit =>
       }
     },
     dispatch => ({
-      loadData(orgId, apiKeyId) {
-        dispatch(getOrganizationsRightsList(orgId))
+      getOrganizationApiKey(orgId, apiKeyId) {
         dispatch(getOrganizationApiKey(orgId, apiKeyId))
       },
       deleteOrganizationApiKeySuccess: orgId =>
@@ -77,7 +73,7 @@ export default OrganizationApiKeyEdit =>
     }),
   )(
     withRequest(
-      ({ loadData, orgId, keyId }) => loadData(orgId, keyId),
+      ({ getOrganizationApiKey, orgId, keyId }) => getOrganizationApiKey(orgId, keyId),
       ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
     )(OrganizationApiKeyEdit),
   )

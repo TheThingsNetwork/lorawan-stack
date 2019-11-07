@@ -22,16 +22,16 @@ import { push } from 'connected-react-router'
 import FormSubmit from '../../../components/form/submit'
 import SubmitButton from '../../../components/submit-button'
 import GatewayDataForm from '../../components/gateway-data-form'
-
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import api from '../../api'
-
 import { selectUserId } from '../../store/selectors/user'
+import { mayCreateGateways } from '../../lib/feature-checks'
 
 import style from './gateway-add.styl'
 
@@ -50,6 +50,7 @@ const m = defineMessages({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
   }),
 )
+@withFeatureRequirement(mayCreateGateways, { redirect: '/gateways' })
 export default class GatewayAdd extends React.Component {
   static propTypes = {
     createSuccess: PropTypes.func.isRequired,

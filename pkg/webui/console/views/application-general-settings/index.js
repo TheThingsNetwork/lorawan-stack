@@ -33,8 +33,14 @@ import ModalButton from '../../../components/button/modal-button'
 import diff from '../../../lib/diff'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Require from '../../lib/components/require'
 
-import { selectSelectedApplication } from '../../store/selectors/applications'
+import { mayEditBasicApplicationInfo, mayDeleteApplication } from '../../lib/feature-checks'
+import {
+  selectSelectedApplication,
+  selectSelectedApplicationId,
+} from '../../store/selectors/applications'
 import { updateApplication, deleteApplication } from '../../store/actions/applications'
 import { attachPromise } from '../../store/actions/lib'
 import PropTypes from '../../../lib/prop-types'
@@ -56,6 +62,7 @@ const validationSchema = Yup.object().shape({
 
 @connect(
   state => ({
+    appId: selectSelectedApplicationId(state),
     application: selectSelectedApplication(state),
   }),
   dispatch => ({
@@ -69,6 +76,9 @@ const validationSchema = Yup.object().shape({
     onDeleteSuccess: () => dispatch(replace(`/applications`)),
   }),
 )
+@withFeatureRequirement(mayEditBasicApplicationInfo, {
+  redirect: ({ appId }) => `/applications/${appId}`,
+})
 @withBreadcrumb('apps.single.general-settings', function(props) {
   const { appId } = props
 
@@ -157,24 +167,26 @@ export default class ApplicationGeneralSettings extends React.Component {
               <Form.Field title={sharedMessages.description} name="description" component={Input} />
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-                <ModalButton
-                  type="button"
-                  icon="delete"
-                  danger
-                  naked
-                  message={m.deleteApp}
-                  modalData={{
-                    message: {
-                      values: {
-                        appName: application.name
-                          ? application.name
-                          : application.ids.application_id,
+                <Require featureCheck={mayDeleteApplication}>
+                  <ModalButton
+                    type="button"
+                    icon="delete"
+                    danger
+                    naked
+                    message={m.deleteApp}
+                    modalData={{
+                      message: {
+                        values: {
+                          appName: application.name
+                            ? application.name
+                            : application.ids.application_id,
+                        },
+                        ...m.modalWarning,
                       },
-                      ...m.modalWarning,
-                    },
-                  }}
-                  onApprove={this.handleDelete}
-                />
+                    }}
+                    onApprove={this.handleDelete}
+                  />
+                </Require>
               </SubmitBar>
             </Form>
           </Col>

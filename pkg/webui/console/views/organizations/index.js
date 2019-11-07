@@ -22,7 +22,11 @@ import Organization from '../organization'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
+import { mayViewOrganizationsOfUser } from '../../lib/feature-checks'
+
+@withFeatureRequirement(mayViewOrganizationsOfUser, { redirect: '/' })
 @withBreadcrumb('orgs', function(props) {
   return <Breadcrumb path="/organizations" content={sharedMessages.organizations} />
 })

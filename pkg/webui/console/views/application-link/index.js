@@ -34,6 +34,7 @@ import Icon from '../../../components/icon'
 import SubmitBar from '../../../components/submit-bar'
 import withRequest from '../../../lib/components/with-request'
 import Checkbox from '../../../components/checkbox'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { apiKey, address } from '../../lib/regexp'
 import sharedMessages from '../../../lib/shared-messages'
@@ -52,6 +53,7 @@ import {
   selectApplicationLinkError,
   selectSelectedApplicationId,
 } from '../../store/selectors/applications'
+import { mayLinkApplication } from '../../lib/feature-checks'
 
 import api from '../../api'
 
@@ -83,22 +85,23 @@ const validationSchema = Yup.object().shape({
 })
 
 @connect(
-  function(state) {
-    return {
-      appId: selectSelectedApplicationId(state),
-      link: selectApplicationLink(state),
-      stats: selectApplicationLinkStats(state),
-      fetching: selectApplicationLinkFetching(state),
-      linked: selectApplicationIsLinked(state),
-      linkError: selectApplicationLinkError(state),
-    }
-  },
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    link: selectApplicationLink(state),
+    stats: selectApplicationLinkStats(state),
+    fetching: selectApplicationLinkFetching(state),
+    linked: selectApplicationIsLinked(state),
+    linkError: selectApplicationLinkError(state),
+  }),
   dispatch => ({
     getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
     updateLinkSuccess: (link, stats) => dispatch(updateApplicationLinkSuccess(link, stats)),
     deleteLinkSuccess: () => dispatch(deleteApplicationLinkSuccess()),
   }),
 )
+@withFeatureRequirement(mayLinkApplication, {
+  redirect: ({ appId }) => `/applications/${appId}`,
+})
 @withRequest(
   ({ getLink, appId }) => getLink(appId, ['api_key', 'network_server_address', 'tls']),
   ({ fetching }) => fetching,

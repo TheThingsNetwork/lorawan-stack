@@ -19,17 +19,17 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
-import sharedMessages from '../../../lib/shared-messages'
-import { getGatewayId } from '../../../lib/selectors/id'
-
 import LocationForm from '../../../components/location-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import sharedMessages from '../../../lib/shared-messages'
 
 import { updateGateway } from '../../store/actions/gateways'
 import { attachPromise } from '../../store/actions/lib'
-import { selectSelectedGateway } from '../../store/selectors/gateways'
+import { selectSelectedGateway, selectSelectedGatewayId } from '../../store/selectors/gateways'
+import { mayViewOrEditGatewayLocation } from '../../lib/feature-checks'
 
 import {
   latitude as latitudeRegexp,
@@ -69,14 +69,10 @@ const getRegistryLocation = function(antennas) {
 }
 
 @connect(
-  function(state) {
-    const gateway = selectSelectedGateway(state)
-
-    return {
-      gateway,
-      gtwId: getGatewayId(gateway),
-    }
-  },
+  state => ({
+    gateway: selectSelectedGateway(state),
+    gtwId: selectSelectedGatewayId(state),
+  }),
   { updateGateway: attachPromise(updateGateway) },
 )
 @withBreadcrumb('gateway.single.data', function(props) {
@@ -88,6 +84,9 @@ const getRegistryLocation = function(antennas) {
       content={sharedMessages.location}
     />
   )
+})
+@withFeatureRequirement(mayViewOrEditGatewayLocation, {
+  redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
 @bind
 export default class GatewayLocation extends React.Component {

@@ -27,6 +27,7 @@ import {
   selectGatewaysFetching,
   selectGatewaysError,
 } from '../../store/selectors/gateways'
+import { checkFromState, mayCreateGateways } from '../../lib/feature-checks'
 
 const headers = [
   {
@@ -85,6 +86,7 @@ export default class GatewaysTable extends React.Component {
       totalCount: selectGatewaysTotalCount(state),
       fetching: selectGatewaysFetching(state),
       error: selectGatewaysError(state),
+      mayAdd: checkFromState(mayCreateGateways, state),
     }
   }
 

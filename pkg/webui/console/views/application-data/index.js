@@ -23,7 +23,9 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Message from '../../../lib/components/message'
 import ApplicationEvents from '../../containers/application-events'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
+import { mayViewApplicationEvents } from '../../lib/feature-checks'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 import style from './application-data.styl'
@@ -33,6 +35,9 @@ const m = defineMessages({
 })
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))
+@withFeatureRequirement(mayViewApplicationEvents, {
+  redirect: ({ appId }) => `/applications/${appId}`,
+})
 @withBreadcrumb('apps.single.data', function(props) {
   return (
     <Breadcrumb

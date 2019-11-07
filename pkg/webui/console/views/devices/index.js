@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import DeviceList from '../device-list'
 import DeviceAdd from '../device-add'
@@ -23,9 +24,15 @@ import Device from '../device'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import { mayViewApplicationDevices } from '../../lib/feature-checks'
+import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
-@withBreadcrumb('devices', function(props) {
-  const { appId } = props.match.params
+@connect(state => ({ appId: selectSelectedApplicationId(state) }))
+@withFeatureRequirement(mayViewApplicationDevices, {
+  redirect: ({ appId }) => `/applications/${appId}`,
+})
+@withBreadcrumb('devices', function({ appId }) {
   return <Breadcrumb path={`/applications/${appId}/devices`} content={sharedMessages.devices} />
 })
 export default class Devices extends React.Component {

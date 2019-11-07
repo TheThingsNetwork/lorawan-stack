@@ -37,12 +37,29 @@ import ApplicationIntegrationsWebhooks from '../application-integrations-webhook
 import ApplicationIntegrationsPubsubs from '../application-integrations-pubsubs'
 import ApplicationIntegrationsMqtt from '../application-integrations-mqtt'
 
-import { getApplication, stopApplicationEventsStream } from '../../store/actions/applications'
+import {
+  getApplication,
+  stopApplicationEventsStream,
+  getApplicationsRightsList,
+} from '../../store/actions/applications'
 import {
   selectSelectedApplication,
   selectApplicationFetching,
   selectApplicationError,
+  selectApplicationRights,
+  selectApplicationRightsFetching,
+  selectApplicationRightsError,
 } from '../../store/selectors/applications'
+import {
+  mayViewApplicationInfo,
+  mayViewApplicationEvents,
+  mayLinkApplication,
+  mayViewApplicationDevices,
+  mayCreateOrEditApplicationIntegrations,
+  mayEditBasicApplicationInfo,
+  mayViewOrEditApplicationApiKeys,
+  mayViewOrEditApplicationCollaborators,
+} from '../../lib/feature-checks'
 
 import Devices from '../devices'
 
@@ -50,22 +67,27 @@ import Devices from '../devices'
   function(state, props) {
     return {
       appId: props.match.params.appId,
-      fetching: selectApplicationFetching(state),
+      fetching: selectApplicationFetching(state) || selectApplicationRightsFetching(state),
       application: selectSelectedApplication(state),
-      error: selectApplicationError(state),
+      error: selectApplicationError(state) || selectApplicationRightsError(state),
+      rights: selectApplicationRights(state),
     }
   },
   dispatch => ({
     stopStream: id => dispatch(stopApplicationEventsStream(id)),
-    getApplication: id => dispatch(getApplication(id, 'name,description')),
+    loadData: id => {
+      dispatch(getApplication(id, 'name,description'))
+      dispatch(getApplicationsRightsList(id))
+    },
   }),
 )
 @withRequest(
-  ({ appId, getApplication }) => getApplication(appId),
+  ({ appId, loadData }) => loadData(appId),
   ({ fetching, application }) => fetching || !Boolean(application),
 )
 @withSideNavigation(function(props) {
   const matchedUrl = props.match.url
+  const { rights } = props
 
   return {
     header: { title: props.appId, icon: 'application' },
@@ -74,28 +96,34 @@ import Devices from '../devices'
         title: sharedMessages.overview,
         path: matchedUrl,
         icon: 'overview',
+        hidden: !mayViewApplicationInfo.check(rights),
       },
       {
         title: sharedMessages.devices,
         path: `${matchedUrl}/devices`,
         icon: 'devices',
         exact: false,
+        hidden: !mayViewApplicationDevices.check(rights),
       },
       {
         title: sharedMessages.data,
         path: `${matchedUrl}/data`,
         icon: 'data',
+        exact: false,
+        hidden: !mayViewApplicationEvents.check(rights),
       },
       {
         title: sharedMessages.link,
         path: `${matchedUrl}/link`,
         icon: 'link',
+        hidden: !mayLinkApplication.check(rights),
       },
       {
         title: sharedMessages.payloadFormatters,
         icon: 'code',
         nested: true,
         exact: false,
+        hidden: !mayLinkApplication.check(rights),
         items: [
           {
             title: sharedMessages.uplink,
@@ -114,6 +142,7 @@ import Devices from '../devices'
         icon: 'integration',
         nested: true,
         exact: false,
+        hidden: !mayCreateOrEditApplicationIntegrations.check(rights),
         items: [
           {
             title: sharedMessages.mqtt,
@@ -140,17 +169,20 @@ import Devices from '../devices'
         path: `${matchedUrl}/collaborators`,
         icon: 'organization',
         exact: false,
+        hidden: !mayViewOrEditApplicationCollaborators.check(rights),
       },
       {
         title: sharedMessages.apiKeys,
         path: `${matchedUrl}/api-keys`,
         icon: 'api_keys',
         exact: false,
+        hidden: !mayViewOrEditApplicationApiKeys.check(rights),
       },
       {
         title: sharedMessages.generalSettings,
         path: `${matchedUrl}/general-settings`,
         icon: 'general_settings',
+        hidden: !mayEditBasicApplicationInfo.check(rights),
       },
     ],
   }

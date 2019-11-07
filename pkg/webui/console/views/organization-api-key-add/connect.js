@@ -15,9 +15,6 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import withRequest from '../../../lib/components/with-request'
-
-import { getOrganizationsRightsList } from '../../store/actions/organizations'
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
@@ -38,7 +35,6 @@ export default OrganizationApiKeyAdd =>
       pseudoRights: selectOrganizationPseudoRights(state),
     }),
     dispatch => ({
-      getOrganizationsRightsList: orgId => dispatch(getOrganizationsRightsList(orgId)),
       navigateToList: orgId => dispatch(replace(`/organizations/${orgId}/api-keys`)),
       createOrganizationApiKey: api.organization.apiKeys.create,
     }),
@@ -51,9 +47,4 @@ export default OrganizationApiKeyAdd =>
       createOrganizationApiKey: key =>
         dispatchProps.createOrganizationApiKey(stateProps.orgId, key),
     }),
-  )(
-    withRequest(
-      ({ getOrganizationsRightsList }) => getOrganizationsRightsList(),
-      ({ fetching, rights }) => fetching || !Boolean(rights.length),
-    )(OrganizationApiKeyAdd),
-  )
+  )(OrganizationApiKeyAdd)

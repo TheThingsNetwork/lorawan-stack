@@ -54,6 +54,7 @@ PropTypes.link = PropTypes.shape({
   icon: PropTypes.string,
   path: PropTypes.string.isRequired,
   exact: PropTypes.bool,
+  hidden: PropTypes.bool,
 })
 
 // Entities and entity-related prop-types

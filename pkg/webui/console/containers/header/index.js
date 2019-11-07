@@ -17,20 +17,34 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 
-import { logout } from '../../store/actions/user'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
-
 import HeaderComponent from '../../../components/header'
+
+import { logout } from '../../store/actions/user'
+import { selectUser } from '../../store/selectors/user'
+import {
+  checkFromState,
+  mayViewApplications,
+  mayViewGateways,
+  mayViewOrganizationsOfUser,
+} from '../../lib/feature-checks'
 
 @withRouter
 @connect(
-  state => ({
-    user: state.user.user,
-  }),
-  dispatch => ({
-    handleLogout: () => dispatch(logout()),
-  }),
+  function(state) {
+    const user = selectUser(state)
+    if (Boolean(user)) {
+      return {
+        user,
+        mayViewApplications: checkFromState(mayViewApplications, state),
+        mayViewGateways: checkFromState(mayViewGateways, state),
+        mayViewOrganizations: checkFromState(mayViewOrganizationsOfUser, state),
+      }
+    }
+    return { user }
+  },
+  { handleLogout: logout },
 )
 @bind
 class Header extends Component {
@@ -48,10 +62,21 @@ class Header extends Component {
     searchable: PropTypes.bool,
     /** A flag identifying whether the header should display the search input */
     user: PropTypes.object,
+    /** The rights of the current user */
+    rights: PropTypes.rights,
   }
 
   render() {
-    const { user, anchored, handleSearchRequest, handleLogout, searchable } = this.props
+    const {
+      user,
+      anchored,
+      handleSearchRequest,
+      handleLogout,
+      searchable,
+      mayViewApplications,
+      mayViewGateways,
+      mayViewOrganizations,
+    } = this.props
 
     const navigationEntries = [
       {
@@ -64,16 +89,19 @@ class Header extends Component {
         title: sharedMessages.applications,
         icon: 'application',
         path: '/applications',
+        hidden: !mayViewApplications,
       },
       {
         title: sharedMessages.gateways,
         icon: 'gateway',
         path: '/gateways',
+        hidden: !mayViewGateways,
       },
       {
         title: sharedMessages.organizations,
         icon: 'organization',
         path: '/organizations',
+        hidden: !mayViewOrganizations,
       },
     ]
 
