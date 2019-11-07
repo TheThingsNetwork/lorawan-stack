@@ -12,49 +12,92 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import computePrefix from './compute-prefix'
+import computePrefixes from './compute-prefix'
 
 describe('computePrefix', function() {
-  it('should compute empty prefix', function() {
-    const joinEUI = '0'.repeat(16)
-    const length = 0
-
-    expect(computePrefix(joinEUI, length)).toBe('')
-  })
-
-  it('should compute prefix of 1 byte', function() {
+  describe('should compoute prefix lengths that round exactly to characters', () => {
     const joinEUI = '1'.repeat(16)
-    const length = 8
 
-    expect(computePrefix(joinEUI, length)).toBe('11')
+    it('should compute empty prefix', () => {
+      const length = 0
+      const prefixes = computePrefixes(joinEUI, length)
+
+      expect(prefixes).toHaveLength(1)
+      expect(prefixes[0]).toBe('')
+    })
+
+    it('should compute prefixes with length rounded to full bytes (1-8)', () => {
+      for (let i = 1; i <= 8; i++) {
+        const length = i * 8
+        const prefixes = computePrefixes(joinEUI, length)
+
+        expect(prefixes).toHaveLength(1)
+        expect(prefixes[0]).toBe(joinEUI.slice(0, length / 4))
+      }
+    })
+
+    it('should compute prefixes with length rounded to full hex chars (e.g. 0.5, 1.5 bytes)', () => {
+      for (let i = 1; i <= 8; i++) {
+        const length = i * 8 - 4
+        const prefixes = computePrefixes(joinEUI, length)
+
+        expect(prefixes).toHaveLength(1)
+        expect(prefixes[0]).toBe(joinEUI.slice(0, Math.max(length / 4, 1)))
+      }
+    })
   })
 
-  it('should compute prefix of 1.5 bytes', function() {
-    const joinEUI = '1'.repeat(16)
-    const length = 12
+  describe('should compoute prefix lengths that do not round exactly to characters', () => {
+    const data = [
+      {
+        joinEUI: '1111111111111111',
+        length: 1,
+        result: ['0', '1', '2', '3', '4', '5', '6', '7'],
+      },
+      {
+        joinEUI: '1111111111111111',
+        length: 2,
+        result: ['0', '1', '2', '3'],
+      },
+      {
+        joinEUI: '1111111111111111',
+        length: 3,
+        result: ['0', '1'],
+      },
+      {
+        joinEUI: '1111111111111111',
+        length: 5,
+        result: ['10', '11', '12', '13', '14', '15', '16', '17'],
+      },
+      {
+        joinEUI: '1111111111111111',
+        length: 6,
+        result: ['10', '11', '12', '13'],
+      },
+      {
+        joinEUI: '1111111111111111',
+        length: 7,
+        result: ['10', '11'],
+      },
+      {
+        joinEUI: '1111111111111111',
+        length: 9,
+        result: ['110', '111', '112', '113', '114', '115', '116', '117'],
+      },
+      {
+        joinEUI: '1111111111111111',
+        length: 10,
+        result: ['110', '111', '112', '113'],
+      },
+    ]
 
-    expect(computePrefix(joinEUI, length)).toBe('111')
-  })
+    it('should compute prefix of lengths that do not round exactly to characters', () => {
+      for (let i = 0; i < data.length; i++) {
+        const { joinEUI, length, result } = data[i]
+        const prefixes = computePrefixes(joinEUI, length)
 
-  it('should compute prefix of 8 bytes', function() {
-    const joinEUI = '1'.repeat(16)
-    const length = 64
-
-    expect(computePrefix(joinEUI, length)).toBe(joinEUI)
-  })
-
-  it('should compute prefix of lengths that do not round exactly to characters', function() {
-    const joinEUI = '123456789ABCDEF1'
-    const lengths = Array.from(Array(65).keys()).filter(length => length % 4 !== 0) // consider only lengths that do not round exactly to a char
-    const prefixes = Array.from(Array(17).keys())
-      .slice(1, 17) // remove the empty string
-      .map(i => joinEUI.slice(0, i)) // generate simplified prefixes
-
-    for (let i = 0; i < lengths.length; i++) {
-      const length = lengths[i]
-      const prefix = prefixes[Math.floor(i / 3)]
-
-      expect(computePrefix(joinEUI, length)).toBe(prefix)
-    }
+        expect(prefixes).toStrictEqual(result)
+      }
+    })
   })
 })
