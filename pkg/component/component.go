@@ -154,7 +154,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		opt(c)
 	}
 
-	fpsFetcher, err := config.FrequencyPlans.Fetcher(ctx, c.GetBaseConfig(c.ctx).Blob)
+	fpsFetcher, err := config.FrequencyPlansFetcher(ctx)
 	if err != nil {
 		return nil, err
 	}

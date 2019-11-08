@@ -387,7 +387,7 @@ func NewClient(ctx context.Context, conf config.InteropClient) (*Client, error) 
 		fallbackTLS = tlsConf
 	}
 
-	fetcher, err := conf.Fetcher(ctx, conf.BlobConfig)
+	fetcher, err := conf.Fetcher(ctx)
 	if err != nil {
 		return nil, err
 	}
