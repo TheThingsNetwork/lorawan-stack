@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"go.thethings.network/lorawan-stack/pkg/web/middleware"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (
@@ -94,9 +95,95 @@ type Server struct {
 	as  ApplicationServer
 }
 
+// SenderClientCAsConfigurationName represents the filename of sender client CAs configuration.
+const SenderClientCAsConfigurationName = "config.yml"
+
 // NewServer builds a new server.
 func NewServer(ctx context.Context, conf config.InteropServer) (*Server, error) {
 	logger := log.FromContext(ctx).WithField("namespace", "interop")
+
+	decodeCerts := func(b []byte) (res []*x509.Certificate, err error) {
+		for len(b) > 0 {
+			var block *pem.Block
+			block, b = pem.Decode(b)
+			if block == nil {
+				break
+			}
+			if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
+				continue
+			}
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, cert)
+		}
+		return res, nil
+	}
+
+	var senderClientCAs map[string][]*x509.Certificate
+	if len(conf.SenderClientCADeprecated) > 0 {
+		senderClientCAs = make(map[string][]*x509.Certificate, len(conf.SenderClientCA.Static))
+		for id, filename := range conf.SenderClientCADeprecated {
+			b, err := ioutil.ReadFile(filename)
+			if err != nil {
+				return nil, err
+			}
+			certs, err := decodeCerts(b)
+			if err != nil {
+				return nil, err
+			}
+			if len(certs) > 0 {
+				senderClientCAs[id] = certs
+			}
+		}
+	} else if len(conf.SenderClientCA.Static) > 0 {
+		senderClientCAs = make(map[string][]*x509.Certificate, len(conf.SenderClientCA.Static))
+		for id, b := range conf.SenderClientCA.Static {
+			certs, err := decodeCerts(b)
+			if err != nil {
+				return nil, err
+			}
+			if len(certs) > 0 {
+				senderClientCAs[id] = certs
+			}
+		}
+	} else {
+		fetcher, err := conf.SenderClientCA.Fetcher(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if fetcher != nil {
+			confFileBytes, err := fetcher.File(SenderClientCAsConfigurationName)
+			if err != nil {
+				return nil, err
+			}
+
+			var yamlConf map[string]string
+			if err := yaml.UnmarshalStrict(confFileBytes, &yamlConf); err != nil {
+				return nil, err
+			}
+
+			senderClientCAs = make(map[string][]*x509.Certificate, len(yamlConf))
+			for senderID, filename := range yamlConf {
+				b, err := fetcher.File(filename)
+				if err != nil {
+					return nil, err
+				}
+				certs, err := decodeCerts(b)
+				if err != nil {
+					return nil, err
+				}
+				if len(certs) > 0 {
+					senderClientCAs[senderID] = certs
+				}
+			}
+		}
+	}
+	getSenderClientCAs := func(senderID string) []*x509.Certificate {
+		// TODO: Lookup client CAs by sender ID (https://github.com/TheThingsNetwork/lorawan-stack/issues/718)
+		return senderClientCAs[senderID]
+	}
 
 	server := echo.New()
 
@@ -108,33 +195,6 @@ func NewServer(ctx context.Context, conf config.InteropServer) (*Server, error) 
 		echomiddleware.BodyLimit("16M"),
 		middleware.Recover(),
 	)
-
-	senderClientCAs := make(map[string][]*x509.Certificate)
-	for senderID, filename := range conf.SenderClientCAs {
-		pemCerts, err := ioutil.ReadFile(filename)
-		if err != nil {
-			return nil, err
-		}
-		for len(pemCerts) > 0 {
-			var block *pem.Block
-			block, pemCerts = pem.Decode(pemCerts)
-			if block == nil {
-				break
-			}
-			if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
-				continue
-			}
-			cert, err := x509.ParseCertificate(block.Bytes)
-			if err != nil {
-				return nil, err
-			}
-			senderClientCAs[senderID] = append(senderClientCAs[senderID], cert)
-		}
-	}
-	getSenderClientCAs := func(senderID string) []*x509.Certificate {
-		// TODO: Lookup client CAs by sender ID (https://github.com/TheThingsNetwork/lorawan-stack/issues/718)
-		return senderClientCAs[senderID]
-	}
 
 	noop := &noopServer{}
 	s := &Server{

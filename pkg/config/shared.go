@@ -116,12 +116,6 @@ type HTTP struct {
 	Health          Health           `name:"health"`
 }
 
-// InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
-type InteropServer struct {
-	ListenTLS       string            `name:"listen-tls" description:"Address for the interop server to listen on"`
-	SenderClientCAs map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust"`
-}
-
 // Redis represents Redis configuration.
 type Redis struct {
 	Address   string   `name:"address" description:"Address of the Redis server"`
@@ -393,6 +387,42 @@ func (c InteropClient) Fetcher(ctx context.Context) (fetch.Interface, error) {
 	default:
 		return nil, nil
 	}
+}
+
+type SenderClientCA struct {
+	Source    string            `name:"source" description:"Source of the sender client CA configuration (static, directory, url, blob)"`
+	Static    map[string][]byte `name:"-"`
+	Directory string            `name:"directory" description:"OS filesystem directory, which contains sender client CA configuration"`
+	URL       string            `name:"url" description:"URL, which contains sender client CA configuration"`
+	Blob      BlobPathConfig    `name:"blob"`
+
+	BlobConfig BlobConfig `name:"-"`
+}
+
+// Fetcher returns fetch.Interface defined by conf.
+// If no configuration source is set, this method returns nil, nil.
+func (c SenderClientCA) Fetcher(ctx context.Context) (fetch.Interface, error) {
+	switch c.Source {
+	case "directory":
+		return fetch.FromFilesystem(c.Directory), nil
+	case "url":
+		return fetch.FromHTTP(c.URL, true)
+	case "blob":
+		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
+	default:
+		return nil, nil
+	}
+}
+
+// InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
+type InteropServer struct {
+	ListenTLS                string            `name:"listen-tls" description:"Address for the interop server to listen on"`
+	SenderClientCA           SenderClientCA    `name:"sender-client-ca"`
+	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust; deprecated - use sender-client-ca instead"`
 }
 
 // ServiceBase represents base service configuration.

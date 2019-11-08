@@ -12,10 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for creating applications and gateway with an organization as the initial owner in the Console.
 - Hide views and features in the Console that the user and stack configuration does not meet the necessary requirements for.
 - Full range of Join EUI prefixes in the Console.
+- Support specifying the source of interoperability server client CA configuration (see `interop.sender-client-ca.source` and related fields).
 
 ### Changed
 
 ### Deprecated
+
+- `--interop.sender-client-cas` in favor of `--interop.sender-client-ca` sub-fields in the stack.
 
 ### Removed
 
