@@ -183,7 +183,7 @@ func unwrapLoRaWANEnumType(typeName string) string {
 func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 	if maskOnly {
 		if t.Kind() == reflect.Struct && !isAtomicType(t, maskOnly) {
-			fs.Bool(name, false, fmt.Sprintf("select the %s field and all sub-fields", name))
+			fs.Bool(name, false, fmt.Sprintf("select the %s field and all allowed sub-fields", name))
 		} else {
 			fs.Bool(name, false, fmt.Sprintf("select the %s field", name))
 		}
