@@ -73,6 +73,10 @@ export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
 export const selectApplicationsFetching = state => selectAppsFetching(state)
 export const selectApplicationsError = state => selectAppsError(state)
 
+// Devices
+export const selectSelectedApplicationDevices = state => state.devices
+export const selectSelectedApplicationDevicesTotalCount = state => state.devices.totalCount
+
 // Events
 export const selectApplicationEvents = createEventsSelector(ENTITY)
 export const selectApplicationEventsError = createEventsErrorSelector(ENTITY)
@@ -96,6 +100,7 @@ export const selectApplicationApiKeyError = createErrorSelector(GET_APP_API_KEY_
 // Link
 const selectLinkStore = state => state.link
 export const selectApplicationLink = state => selectLinkStore(state).link
+export const selectApplicationLinkIndicator = state => selectLinkStore(state).linked
 export const selectApplicationLinkStats = state => selectLinkStore(state).stats
 export const selectApplicationLinkFetching = createFetchingSelector(GET_APP_LINK_BASE)
 export const selectApplicationLinkError = createErrorSelector(GET_APP_LINK_BASE)
