@@ -8599,6 +8599,10 @@
           },
           "description": "Location of the device. Stored in Entity Registry."
         },
+        "picture": {
+          "$ref": "#/definitions/v3Picture",
+          "description": "Stored in Entity Registry."
+        },
         "supports_class_b": {
           "type": "boolean",
           "format": "boolean",

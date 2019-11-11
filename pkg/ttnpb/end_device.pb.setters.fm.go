@@ -1391,6 +1391,27 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				dst.Locations = nil
 			}
+		case "picture":
+			if len(subs) > 0 {
+				newDst := dst.Picture
+				if newDst == nil {
+					newDst = &Picture{}
+					dst.Picture = newDst
+				}
+				var newSrc *Picture
+				if src != nil {
+					newSrc = src.Picture
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Picture = src.Picture
+				} else {
+					dst.Picture = nil
+				}
+			}
 		case "supports_class_b":
 			if len(subs) > 0 {
 				return fmt.Errorf("'supports_class_b' has no subfields, but %s were specified", subs)
