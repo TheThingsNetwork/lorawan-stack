@@ -48,6 +48,9 @@ type EndDevice struct {
 	ServiceProfileID string `gorm:"type:VARCHAR"`
 
 	Locations []EndDeviceLocation
+
+	Picture   *Picture
+	PictureID *string `gorm:"type:UUID;index:end_device_picture_index"`
 }
 
 func init() {
