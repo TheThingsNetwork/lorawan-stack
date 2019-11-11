@@ -24,6 +24,11 @@
   border-radius: 50%
   transition: background-color $ad.m
 
+  &:not(.flipped)
+    margin-left: $cs.xs
+  &.flipped
+    margin-right: $cs.xs
+
   &:after
     content: ''
     position: absolute
@@ -44,9 +49,6 @@
 
   &-unknown
     background-color: $c-icon-fill
-
-  &-label
-    padding-right: $cs.xs
 
 .good-pulse:after
   animation: goodPulse 2s infinite

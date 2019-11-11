@@ -27,20 +27,31 @@ const m = defineMessages({
   unknown: 'unknown',
 })
 
-const Status = function({ intl, className, status, label, pulse, labelValues, children, title }) {
+const Status = function({
+  intl,
+  className,
+  status,
+  label,
+  pulse,
+  labelValues,
+  children,
+  title,
+  flipped,
+}) {
   const cls = classnames(style.status, {
     [style.statusGood]: status === 'good',
     [style.statusBad]: status === 'bad',
     [style.statusMediocre]: status === 'mediocre',
     [style.statusUnknown]: status === 'unknown',
     [style[`${status}-pulse`]]: pulse,
+    [style.flipped]: flipped,
   })
 
   let statusLabel = null
   if (React.isValidElement(label)) {
     statusLabel = React.cloneElement(label, {
       ...label.props,
-      className: classnames(label.props.className, style.statusLabel),
+      className: classnames(label.props.className, style.statusLabel, { [style.flipped]: flipped }),
     })
   } else {
     statusLabel = <Message className={style.statusLabel} content={label} values={labelValues} />
@@ -58,15 +69,18 @@ const Status = function({ intl, className, status, label, pulse, labelValues, ch
 
   return (
     <span className={classnames(className, style.container)}>
+      {flipped && <span className={classnames(cls)} title={translatedTitle} />}
       {statusLabel}
-      <span className={classnames(cls)} title={translatedTitle} />
       {children}
+      {!flipped && <span className={classnames(cls)} title={translatedTitle} />}
     </span>
   )
 }
 
 Status.propTypes = {
+  children: PropTypes.node,
   className: PropTypes.string,
+  flipped: PropTypes.bool,
   label: PropTypes.message,
   labelValues: PropTypes.shape({}),
   pulse: PropTypes.bool,
@@ -75,10 +89,12 @@ Status.propTypes = {
 }
 
 Status.defaultProps = {
+  children: undefined,
   className: undefined,
-  pulse: true,
+  flipped: false,
   label: undefined,
   labelValues: undefined,
+  pulse: true,
   status: 'unknown',
   title: undefined,
 }
