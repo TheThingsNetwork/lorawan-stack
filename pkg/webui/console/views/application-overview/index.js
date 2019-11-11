@@ -17,43 +17,115 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import DateTime from '../../../lib/components/date-time'
 import DevicesTable from '../../containers/devices-table'
 import DataSheet from '../../../components/data-sheet'
 import ApplicationEvents from '../../containers/application-events'
+import EntityTitleSection from '../../components/entity-title-section'
+import KeyValueTag from '../../components/key-value-tag'
+import Status from '../../../components/status'
+import Spinner from '../../../components/spinner'
+import Message from '../../../lib/components/message'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import withRequest from '../../../lib/components/with-request'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 import {
   selectSelectedApplication,
   selectSelectedApplicationId,
+  selectApplicationCollaboratorsTotalCount,
+  selectApplicationCollaboratorsFetching,
+  selectApplicationApiKeysTotalCount,
+  selectApplicationApiKeysFetching,
+  selectSelectedApplicationDevicesTotalCount,
+  selectApplicationLinkIndicator,
+  selectSelectedApplicationDevicesFetching,
+  selectApplicationLinkFetching,
 } from '../../store/selectors/applications'
 import { mayViewApplicationInfo } from '../../lib/feature-checks'
+import {
+  getApplicationCollaboratorsList,
+  getApplicationApiKeysList,
+} from '../../store/actions/applications'
+import { getApplicationLink } from '../../store/actions/link'
 
 import style from './application-overview.styl'
 
-@connect(function(state) {
-  return {
-    appId: selectSelectedApplicationId(state),
-    application: selectSelectedApplication(state),
-  }
-})
+@connect(
+  (state, props) => {
+    const appId = selectSelectedApplicationId(state)
+
+    return {
+      appId,
+      application: selectSelectedApplication(state),
+      collaboratorsTotalCount: selectApplicationCollaboratorsTotalCount(state, { id: appId }),
+      apiKeysTotalCount: selectApplicationApiKeysTotalCount(state, { id: appId }),
+      devicesTotalCount: selectSelectedApplicationDevicesTotalCount(state),
+      link: selectApplicationLinkIndicator(state),
+      statusBarFetching:
+        selectApplicationLinkFetching(state) ||
+        selectSelectedApplicationDevicesFetching(state) ||
+        selectApplicationApiKeysFetching(state) ||
+        selectApplicationCollaboratorsFetching(state),
+    }
+  },
+  dispatch => ({
+    loadData(appId) {
+      dispatch(getApplicationCollaboratorsList(appId))
+      dispatch(getApplicationApiKeysList(appId))
+      dispatch(getApplicationLink(appId))
+    },
+  }),
+)
+@withRequest(({ appId, loadData }) => loadData(appId), () => false)
 @withFeatureRequirement(mayViewApplicationInfo, {
   redirect: '/',
 })
 class ApplicationOverview extends React.Component {
-  get applicationInfo() {
+  static propTypes = {
+    apiKeysTotalCount: PropTypes.number,
+    appId: PropTypes.string.isRequired,
+    application: PropTypes.application.isRequired,
+    collaboratorsTotalCount: PropTypes.number,
+    devicesTotalCount: PropTypes.number,
+    link: PropTypes.bool,
+    statusBarFetching: PropTypes.bool.isRequired,
+  }
+
+  static defaultProps = {
+    collaboratorsTotalCount: undefined,
+    apiKeysTotalCount: undefined,
+    devicesTotalCount: undefined,
+    link: undefined,
+  }
+
+  render() {
     const {
-      application: { ids, name, description, created_at, updated_at },
+      appId,
+      collaboratorsTotalCount,
+      apiKeysTotalCount,
+      devicesTotalCount,
+      statusBarFetching,
+      link,
+      application: { name, description, created_at, updated_at },
     } = this.props
+
+    const linkStatus = typeof link === 'boolean' ? (link ? 'good' : 'bad') : 'mediocre'
+    const linkLabel =
+      typeof link === 'boolean'
+        ? link
+          ? sharedMessages.linked
+          : sharedMessages.notLinked
+        : sharedMessages.fetching
 
     const sheetData = [
       {
         header: sharedMessages.generalInformation,
         items: [
-          { key: sharedMessages.appId, value: ids.application_id, type: 'code', sensitive: false },
+          { key: sharedMessages.appId, value: appId, type: 'code', sensitive: false },
           { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
           { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
         ],
@@ -61,38 +133,55 @@ class ApplicationOverview extends React.Component {
     ]
 
     return (
-      <div>
-        <div className={style.title}>
-          <h2>{name || ids.application_id}</h2>
-          {description && <span className={style.description}>{description}</span>}
-        </div>
-        <DataSheet data={sheetData} />
-      </div>
-    )
-  }
-
-  render() {
-    const { appId } = this.props
-
-    return (
-      <Container>
-        <IntlHelmet title={sharedMessages.overview} />
-        <Row>
-          <Col sm={12} lg={6}>
-            {this.applicationInfo}
-          </Col>
-          <Col sm={12} lg={6}>
-            <div className={style.latestEvents}>
+      <React.Fragment>
+        <EntityTitleSection
+          entityId={appId}
+          entityName={name}
+          description={description}
+          creationDate={created_at}
+        >
+          {statusBarFetching ? (
+            <Spinner after={0} faded micro inline>
+              <Message content={sharedMessages.fetching} />
+            </Spinner>
+          ) : (
+            <React.Fragment>
+              <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
+              <KeyValueTag
+                icon="devices"
+                value={devicesTotalCount}
+                keyMessage={sharedMessages.deviceCounted}
+              />
+              <KeyValueTag
+                icon="collaborators"
+                value={collaboratorsTotalCount}
+                keyMessage={sharedMessages.collaboratorCounted}
+              />
+              <KeyValueTag
+                icon="api_keys"
+                value={apiKeysTotalCount}
+                keyMessage={sharedMessages.apiKeyCounted}
+              />
+            </React.Fragment>
+          )}
+        </EntityTitleSection>
+        <Container>
+          <IntlHelmet title={sharedMessages.overview} />
+          <Row>
+            <Col sm={12} lg={6}>
+              <DataSheet data={sheetData} />
+            </Col>
+            <Col sm={12} lg={6}>
               <ApplicationEvents appId={appId} widget />
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} className={style.table}>
-            <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
-          </Col>
-        </Row>
-      </Container>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12} className={style.table}>
+              <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
+            </Col>
+          </Row>
+        </Container>
+      </React.Fragment>
     )
   }
 }
