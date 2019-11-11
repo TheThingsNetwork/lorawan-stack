@@ -96,6 +96,13 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	joinServerAddressField:        func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.JoinServerAddress = dev.JoinServerAddress },
 	serviceProfileIDField:         func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ServiceProfileID = dev.ServiceProfileID },
 	locationsField:                func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Locations = deviceLocations(dev.Locations).toMap() },
+	pictureField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		if dev.Picture == nil {
+			pb.Picture = nil
+		} else {
+			pb.Picture = dev.Picture.toPB()
+		}
+	},
 }
 
 // functions to set fields from the device proto into the device model.
@@ -127,6 +134,13 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 	serviceProfileIDField:         func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ServiceProfileID = pb.ServiceProfileID },
 	locationsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.Locations = deviceLocations(dev.Locations).updateFromMap(pb.Locations)
+	},
+	pictureField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.PictureID, dev.Picture = nil, nil
+		if pb.Picture != nil {
+			dev.Picture = &Picture{}
+			dev.Picture.fromPB(pb.Picture)
+		}
 	},
 }
 
