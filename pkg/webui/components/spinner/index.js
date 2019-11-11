@@ -57,7 +57,15 @@ export default class Spinner extends React.PureComponent {
   }
 
   render() {
-    const { className, center = false, small = false, faded = false, children } = this.props
+    const {
+      className,
+      center = false,
+      small = false,
+      micro = false,
+      faded = false,
+      children,
+      inline = false,
+    } = this.props
 
     const { visible = false } = this.state
 
@@ -67,8 +75,10 @@ export default class Spinner extends React.PureComponent {
       ...from(style, {
         center,
         small,
+        micro,
         faded,
         visible,
+        inline,
       }),
     )
 
