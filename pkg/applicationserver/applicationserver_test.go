@@ -816,7 +816,7 @@ hardware_versions:
 				},
 			} {
 				t.Run(ctc.Name, func(t *testing.T) {
-					ctx, cancel := context.WithDeadline(ctx, time.Now().Add(Timeout))
+					ctx, cancel := context.WithDeadline(ctx, time.Now().Add(2*Timeout))
 					chs := &connChannels{
 						up:          make(chan *ttnpb.ApplicationUp, 1),
 						downPush:    make(chan *ttnpb.DownlinkQueueRequest),
@@ -855,7 +855,7 @@ hardware_versions:
 				}
 			}()
 			// Wait for connection to establish.
-			time.Sleep(Timeout)
+			time.Sleep(2 * Timeout)
 
 			t.Run("Upstream", func(t *testing.T) {
 				ns.reset()
