@@ -40,6 +40,7 @@ const (
 	networkServerAddressField           = "network_server_address"
 	passwordField                       = "password"
 	passwordUpdatedAtField              = "password_updated_at"
+	pictureField                        = "picture"
 	primaryEmailAddressField            = "primary_email_address"
 	primaryEmailAddressValidatedAtField = "primary_email_address_validated_at"
 	profilePictureField                 = "profile_picture"

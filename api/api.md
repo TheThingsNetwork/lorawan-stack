@@ -1823,6 +1823,7 @@ SDKs are responsible for combining (if desired) the three.
 | `application_server_id` | [`string`](#string) |  | The AS-ID of the Application Server to use. Stored in Join Server. |
 | `join_server_address` | [`string`](#string) |  | The address of the Join Server where this device is supposed to be registered. Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `locations` | [`EndDevice.LocationsEntry`](#ttn.lorawan.v3.EndDevice.LocationsEntry) | repeated | Location of the device. Stored in Entity Registry. |
+| `picture` | [`Picture`](#ttn.lorawan.v3.Picture) |  | Stored in Entity Registry. |
 | `supports_class_b` | [`bool`](#bool) |  | Whether the device supports class B. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | `supports_class_c` | [`bool`](#bool) |  | Whether the device supports class C. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | `lorawan_version` | [`MACVersion`](#ttn.lorawan.v3.MACVersion) |  | LoRaWAN MAC version. Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |

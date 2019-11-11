@@ -1795,6 +1795,18 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 			}
 
+		case "picture":
+
+			if v, ok := interface{}(m.GetPicture()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return EndDeviceValidationError{
+						field:  "picture",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "supports_class_b":
 			// no validation rules for SupportsClassB
 		case "supports_class_c":
