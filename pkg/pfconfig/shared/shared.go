@@ -204,7 +204,7 @@ type LBTChannelConfig struct {
 // RFConfig contains the configuration for one of the radios.
 type RFConfig struct {
 	Enable      bool    `json:"enable"`
-	Type        string  `json:"type"`
+	Type        string  `json:"type,omitempty"`
 	Frequency   uint64  `json:"freq"`
 	RSSIOffset  float32 `json:"rssi_offset"`
 	TxEnable    bool    `json:"tx_enable"`
