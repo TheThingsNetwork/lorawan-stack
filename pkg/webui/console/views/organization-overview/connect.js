@@ -14,10 +14,41 @@
 
 import { connect } from 'react-redux'
 
-import { selectSelectedOrganization } from '../../store/selectors/organizations'
+import {
+  getOrganizationCollaboratorsList,
+  getOrganizationApiKeysList,
+} from '../../store/actions/organizations'
+import {
+  selectSelectedOrganization,
+  selectSelectedOrganizationId,
+  selectOrganizationCollaboratorsTotalCount,
+  selectOrganizationApiKeysTotalCount,
+  selectOrganizationApiKeysFetching,
+  selectOrganizationCollaboratorsFetching,
+} from '../../store/selectors/organizations'
 
-const mapStateToProps = state => ({
-  organization: selectSelectedOrganization(state),
+const mapStateToProps = state => {
+  const orgId = selectSelectedOrganizationId(state)
+
+  return {
+    orgId,
+    organization: selectSelectedOrganization(state),
+    collaboratorsTotalCount: selectOrganizationCollaboratorsTotalCount(state, { id: orgId }),
+    apiKeysTotalCount: selectOrganizationApiKeysTotalCount(state, { id: orgId }),
+    statusBarFetching:
+      selectOrganizationApiKeysFetching(state) || selectOrganizationCollaboratorsFetching(state),
+  }
+}
+
+const mapDispatchToProps = dispatch => ({
+  loadData(orgId) {
+    dispatch(getOrganizationCollaboratorsList(orgId))
+    dispatch(getOrganizationApiKeysList(orgId))
+  },
 })
 
-export default Overview => connect(mapStateToProps)(Overview)
+export default Overview =>
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(Overview)

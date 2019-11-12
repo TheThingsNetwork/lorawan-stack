@@ -19,26 +19,42 @@ import sharedMessages from '../../../lib/shared-messages'
 import DateTime from '../../../lib/components/date-time'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
-import { getOrganizationId } from '../../../lib/selectors/id'
 import OrganizationEvents from '../../containers/organization-events'
 import DataSheet from '../../../components/data-sheet'
+import EntityTitleSection from '../../components/entity-title-section'
+import KeyValueTag from '../../components/key-value-tag'
+import Spinner from '../../../components/spinner'
+import Message from '../../../lib/components/message'
+import withRequest from '../../../lib/components/with-request'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { mayViewOrganizationInformation } from '../../lib/feature-checks'
 
-import style from './organization-overview.styl'
-
 @withFeatureRequirement(mayViewOrganizationInformation, {
   redirect: '/',
 })
+@withRequest(({ orgId, loadData }) => loadData(orgId), () => false)
 class Overview extends React.Component {
   static propTypes = {
+    apiKeysTotalCount: PropTypes.number,
+    collaboratorsTotalCount: PropTypes.number,
+    orgId: PropTypes.string.isRequired,
     organization: PropTypes.organization.isRequired,
+    statusBarFetching: PropTypes.bool.isRequired,
   }
 
-  get organizationInfo() {
+  static defaultProps = {
+    collaboratorsTotalCount: undefined,
+    apiKeysTotalCount: undefined,
+  }
+
+  render() {
     const {
+      orgId,
       organization: { ids, name, description, created_at, updated_at },
+      collaboratorsTotalCount,
+      apiKeysTotalCount,
+      statusBarFetching,
     } = this.props
 
     const sheetData = [
@@ -58,34 +74,44 @@ class Overview extends React.Component {
     ]
 
     return (
-      <div>
-        <div className={style.title}>
-          <h2>{name || ids.organization_id}</h2>
-          {description && <span className={style.description}>{description}</span>}
-        </div>
-        <DataSheet data={sheetData} />
-      </div>
-    )
-  }
-
-  render() {
-    const { organization } = this.props
-    const orgId = getOrganizationId(organization)
-
-    return (
-      <Container>
-        <IntlHelmet title={sharedMessages.overview} />
-        <Row>
-          <Col sm={12} lg={6}>
-            {this.organizationInfo}
-          </Col>
-          <Col sm={12} lg={6}>
-            <div className={style.latestEvents}>
+      <React.Fragment>
+        <EntityTitleSection
+          entityId={orgId}
+          entityTitle={name}
+          description={description}
+          creationDate={created_at}
+        >
+          {statusBarFetching ? (
+            <Spinner after={0} faded micro inline>
+              <Message content={sharedMessages.fetching} />
+            </Spinner>
+          ) : (
+            <React.Fragment>
+              <KeyValueTag
+                icon="collaborators"
+                value={collaboratorsTotalCount}
+                keyMessage={sharedMessages.collaboratorCounted}
+              />
+              <KeyValueTag
+                icon="api_keys"
+                value={apiKeysTotalCount}
+                keyMessage={sharedMessages.apiKeyCounted}
+              />
+            </React.Fragment>
+          )}
+        </EntityTitleSection>
+        <Container>
+          <IntlHelmet title={sharedMessages.overview} />
+          <Row>
+            <Col sm={12} lg={6}>
+              <DataSheet data={sheetData} />
+            </Col>
+            <Col sm={12} lg={6}>
               <OrganizationEvents orgId={orgId} widget />
-            </div>
-          </Col>
-        </Row>
-      </Container>
+            </Col>
+          </Row>
+        </Container>
+      </React.Fragment>
     )
   }
 }
