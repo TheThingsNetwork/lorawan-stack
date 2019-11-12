@@ -30,7 +30,7 @@
 # Shared components
 /pkg/component @johanstokking @htdvisser
 /pkg/types @johanstokking @htdvisser @rvolosatovs
-/pkg/webui @bafonins @kschiffer
+/pkg/webui @bafonins @kschiffer @pgalic96
 
 # Subsystems
 /pkg/applicationserver @johanstokking @adriansmares
@@ -42,7 +42,7 @@
 /pkg/networkserver @johanstokking @rvolosatovs
 
 # SDKs
-/sdk/js @bafonins @kschiffer
+/sdk/js @bafonins @kschiffer @pgalic96
 
 # Clear generated code
 /sdk/js/generated
