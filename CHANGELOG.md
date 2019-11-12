@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix gateway API key forms being broken in the Console.
 - Fix MAC command handling in retransmissions.
+- Fix multicast device creation issues
 
 ### Security
 
