@@ -22,7 +22,7 @@ import {
   GET_APP_COLLABORATORS_LIST_BASE,
 } from '../actions/applications'
 import { GET_APP_LINK_BASE } from '../actions/link'
-
+import { GET_DEVICES_LIST_BASE } from '../actions/devices'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -76,6 +76,9 @@ export const selectApplicationsError = state => selectAppsError(state)
 // Devices
 export const selectSelectedApplicationDevices = state => state.devices
 export const selectSelectedApplicationDevicesTotalCount = state => state.devices.totalCount
+export const selectSelectedApplicationDevicesFetching = createFetchingSelector(
+  GET_DEVICES_LIST_BASE,
+)
 
 // Events
 export const selectApplicationEvents = createEventsSelector(ENTITY)
