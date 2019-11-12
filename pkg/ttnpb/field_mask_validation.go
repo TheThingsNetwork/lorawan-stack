@@ -36,6 +36,7 @@ var isEndDeviceReadFieldPaths = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"picture",
 }
 
 var isEndDeviceWriteFieldPaths = []string{
@@ -55,6 +56,7 @@ var isEndDeviceWriteFieldPaths = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"picture",
 }
 
 // AllowedFieldMaskPathsForRPC lists the allowed field mask paths for each RPC in this API.

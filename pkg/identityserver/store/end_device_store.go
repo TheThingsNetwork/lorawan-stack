@@ -52,6 +52,9 @@ func selectEndDeviceFields(ctx context.Context, query *gorm.DB, fieldMask *types
 			query = query.Preload("Attributes")
 		case locationsField:
 			query = query.Preload("Locations")
+		case pictureField:
+			deviceColumns = append(deviceColumns, "picture_id")
+			query = query.Preload("Picture")
 		default:
 			if columns, ok := deviceColumnNames[path]; ok {
 				deviceColumns = append(deviceColumns, columns...)
@@ -168,8 +171,23 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 	if err := ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
-	oldAttributes, oldLocations := devModel.Attributes, devModel.Locations
+	oldAttributes, oldLocations, oldPicture := devModel.Attributes, devModel.Locations, devModel.Picture
 	columns := devModel.fromPB(dev, fieldMask)
+	newPicture := devModel.Picture
+	if newPicture != oldPicture {
+		if oldPicture != nil {
+			if err = s.query(ctx, Picture{}).Delete(oldPicture).Error; err != nil {
+				return nil, err
+			}
+		}
+		if newPicture != nil {
+			if err = s.createEntity(ctx, &newPicture); err != nil {
+				return nil, err
+			}
+			devModel.PictureID, devModel.Picture = &newPicture.ID, nil
+			columns = append(columns, "picture_id")
+		}
+	}
 	s.updateEntity(ctx, &devModel, columns...)
 	if !reflect.DeepEqual(oldAttributes, devModel.Attributes) {
 		if err = s.replaceAttributes(ctx, "device", devModel.ID, oldAttributes, devModel.Attributes); err != nil {
@@ -181,6 +199,7 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 			return nil, err
 		}
 	}
+	devModel.Picture = newPicture
 	updated = &ttnpb.EndDevice{}
 	devModel.toPB(updated, fieldMask)
 	return updated, nil

@@ -16,6 +16,8 @@ package identityserver
 
 import (
 	"context"
+	"path"
+	"strings"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -48,6 +50,14 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	if err = blacklist.Check(ctx, req.DeviceID); err != nil {
 		return nil, err
 	}
+
+	if req.EndDevice.Picture != nil {
+		if err = is.processEndDevicePicture(ctx, &req.EndDevice); err != nil {
+			return nil, err
+		}
+	}
+	defer func() { is.setFullEndDevicePictureURL(ctx, &req.EndDevice) }()
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		dev, err = store.GetEndDeviceStore(db).CreateEndDevice(ctx, &req.EndDevice)
 		if err != nil {
@@ -124,6 +134,20 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 	return devs, nil
 }
 
+func (is *IdentityServer) setFullEndDevicePictureURL(ctx context.Context, dev *ttnpb.EndDevice) {
+	bucketURL := is.configFromContext(ctx).EndDevicePicture.BucketURL
+	if bucketURL == "" {
+		return
+	}
+	if dev != nil && dev.Picture != nil {
+		for size, file := range dev.Picture.Sizes {
+			if !strings.Contains(file, "://") {
+				dev.Picture.Sizes[size] = path.Join(bucketURL, file)
+			}
+		}
+	}
+}
+
 func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if err = rights.RequireApplication(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
@@ -132,6 +156,19 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	if len(req.FieldMask.Paths) == 0 {
 		req.FieldMask.Paths = updatePaths
 	}
+
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "picture") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "picture") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "picture")
+		}
+		if req.EndDevice.Picture != nil {
+			if err = is.processEndDevicePicture(ctx, &req.EndDevice); err != nil {
+				return nil, err
+			}
+		}
+		defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		dev, err = store.GetEndDeviceStore(db).UpdateEndDevice(ctx, &req.EndDevice, &req.FieldMask)
 		return err

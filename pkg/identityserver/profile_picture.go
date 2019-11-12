@@ -32,10 +32,13 @@ import (
 )
 
 const maxProfilePictureStoredDimensions = 1024
+const maxEndDevicePictureStoredDimensions = 1024
 
 var profilePictureDimensions = []int{64, 128, 256, 512}
+var endDevicePictureDimensions = []int{64, 128, 256, 512}
 
 var profilePictureRand = rand.New(randutil.NewLockedSource(rand.NewSource(time.Now().UnixNano())))
+var endDevicePictureRand = rand.New(randutil.NewLockedSource(rand.NewSource(time.Now().UnixNano())))
 
 func fillGravatar(ctx context.Context, usr *ttnpb.User) (err error) {
 	if usr == nil || usr.ProfilePicture != nil || usr.PrimaryEmailAddress == "" {
@@ -90,6 +93,53 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 
 	region := trace.StartRegion(ctx, "store profile picture")
 	usr.ProfilePicture, err = picture.Store(ctx, bucket, id, usr.ProfilePicture, profilePictureDimensions...)
+	region.End()
+	if err != nil {
+		return err
+	}
+
+	return
+}
+
+func (is *IdentityServer) processEndDevicePicture(ctx context.Context, dev *ttnpb.EndDevice) (err error) {
+	// External pictures, consider only largest.
+	if dev.Picture.Sizes != nil {
+		original := dev.Picture.Sizes[0]
+		if original == "" {
+			var max uint32
+			for size, url := range dev.Picture.Sizes {
+				if size > max {
+					max = size
+					original = url
+				}
+			}
+		}
+		if original != "" {
+			dev.Picture.Sizes = map[uint32]string{0: original}
+		} else {
+			dev.Picture.Sizes = nil
+		}
+	}
+
+	// Embedded (uploaded) picture. Make square.
+	if dev.Picture.Embedded != nil && len(dev.Picture.Embedded.Data) > 0 {
+		region := trace.StartRegion(ctx, "make end device picture square")
+		dev.Picture, err = picture.MakeSquare(bytes.NewBuffer(dev.Picture.Embedded.Data), maxEndDevicePictureStoredDimensions)
+		region.End()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Store picture to bucket.
+	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, is.configFromContext(ctx).EndDevicePicture.Bucket)
+	if err != nil {
+		return err
+	}
+	id := fmt.Sprintf("%s.%s", unique.ID(ctx, dev.EndDeviceIdentifiers), ulid.MustNew(ulid.Now(), endDevicePictureRand).String())
+
+	region := trace.StartRegion(ctx, "store end device picture")
+	dev.Picture, err = picture.Store(ctx, bucket, id, dev.Picture, endDevicePictureDimensions...)
 	region.End()
 	if err != nil {
 		return err
