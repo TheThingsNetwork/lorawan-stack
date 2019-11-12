@@ -43,6 +43,7 @@ var (
 	selectEndDeviceFlags     = &pflag.FlagSet{}
 	setEndDeviceFlags        = &pflag.FlagSet{}
 	endDeviceFlattenPaths    = []string{"provisioning_data"}
+	endDevicePictureFlags    = &pflag.FlagSet{}
 )
 
 func selectEndDeviceIDFlags() *pflag.FlagSet {
@@ -330,6 +331,13 @@ var (
 				}
 			}
 
+			if picture, err := cmd.Flags().GetString("picture"); err == nil && picture != "" {
+				device.Picture, err = readPicture(picture)
+				if err != nil {
+					return err
+				}
+			}
+
 			abp, _ := cmd.Flags().GetBool("abp")
 			multicast, _ := cmd.Flags().GetBool("multicast")
 			if abp || multicast {
@@ -498,7 +506,7 @@ var (
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
+			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags(), endDevicePictureFlags)
 			if len(paths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
@@ -532,6 +540,14 @@ var (
 					device.JoinServerAddress = getHost(config.JoinServerGRPCAddress)
 				}
 				isPaths = append(isPaths, "join_server_address")
+			}
+
+			if picture, err := cmd.Flags().GetString("picture"); err == nil && picture != "" {
+				device.Picture, err = readPicture(picture)
+				if err != nil {
+					return err
+				}
+				isPaths = append(paths, "picture")
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -1007,6 +1023,8 @@ func init() {
 
 	addDeprecatedDeviceFlags(setEndDeviceFlags)
 
+	endDevicePictureFlags.String("picture", "", "upload the end device picture from this file")
+
 	endDevicesListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
 	endDevicesCommand.AddCommand(endDevicesListFrequencyPlans)
 	endDevicesListCommand.Flags().AddFlagSet(applicationIDFlags())
@@ -1024,11 +1042,13 @@ func init() {
 	endDevicesCreateCommand.Flags().Bool("abp", false, "configure end device as ABP")
 	endDevicesCreateCommand.Flags().Bool("with-session", false, "generate ABP session DevAddr and keys")
 	endDevicesCreateCommand.Flags().Bool("with-claim-authentication-code", false, "generate claim authentication code of 4 bytes")
+	endDevicesCreateCommand.Flags().AddFlagSet(endDevicePictureFlags)
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesUpdateCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
+	endDevicesUpdateCommand.Flags().AddFlagSet(endDevicePictureFlags)
 	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
 	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags("", ""))
