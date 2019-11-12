@@ -69,6 +69,10 @@ type Config struct {
 		Bucket      string `name:"bucket" description:"Bucket used for storing profile pictures"`
 		BucketURL   string `name:"bucket-url" description:"Base URL for public bucket access"`
 	} `name:"profile-picture"`
+	EndDevicePicture struct {
+		Bucket    string `name:"bucket" description:"Bucket used for storing end device pictures"`
+		BucketURL string `name:"bucket-url" description:"Base URL for public bucket access"`
+	} `name:"end-device-picture"`
 	Email struct {
 		email.Config `name:",squash"`
 		SendGrid     sendgrid.Config `name:"sendgrid"`
