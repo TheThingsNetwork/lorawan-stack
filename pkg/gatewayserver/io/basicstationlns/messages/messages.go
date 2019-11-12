@@ -197,6 +197,12 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool, dlTime time.T
 		return RouterConfig{}, err
 	}
 
+	// Remove hardware specific values that are not necessary.
+	sx1301Conf.TxLUTConfigs = nil
+	for i := range sx1301Conf.Radios {
+		sx1301Conf.Radios[i].Type = ""
+	}
+
 	// These fields are not defined in the v1.5 ref design https://doc.sm.tc/station/gw_v1.5.html#rfconf-object and would cause a parsing error.
 	sx1301Conf.Radios[0].TxFreqMin = 0
 	sx1301Conf.Radios[0].TxFreqMax = 0
