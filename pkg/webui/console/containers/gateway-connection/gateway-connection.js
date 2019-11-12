@@ -28,6 +28,24 @@ import { isNotFoundError, isTranslated } from '../../../lib/errors/utils'
 import style from './gateway-connection.styl'
 
 class GatewayConnection extends React.PureComponent {
+  static propTypes = {
+    className: PropTypes.string,
+    error: PropTypes.oneOfType([PropTypes.error, PropTypes.shape({ message: PropTypes.message })]),
+    fetching: PropTypes.bool,
+    lastSeen: PropTypes.instanceOf(Date),
+    startStatistics: PropTypes.func.isRequired,
+    statistics: PropTypes.gatewayStats,
+    stopStatistics: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    fetching: false,
+    error: null,
+    statistics: null,
+    lastSeen: undefined,
+  }
+
   componentDidMount() {
     const { startStatistics } = this.props
 
@@ -70,7 +88,7 @@ class GatewayConnection extends React.PureComponent {
     }
 
     return (
-      <Status className={style.status} status={statusIndicator}>
+      <Status className={style.status} status={statusIndicator} flipped>
         <Message className={style.lastSeen} content={message} />
         {statusIndicator === 'good' && lastSeen && <DateTime.Relative value={lastSeen} />}
       </Status>
@@ -81,7 +99,16 @@ class GatewayConnection extends React.PureComponent {
     const { statistics, error, startStatistics, fetching } = this.props
 
     if (isNotFoundError(error)) {
-      return <Button naked secondary disabled={fetching} icon="refresh" onClick={startStatistics} />
+      return (
+        <Button
+          naked
+          secondary
+          disabled={fetching}
+          title={sharedMessages.refresh}
+          icon="refresh"
+          onClick={startStatistics}
+        />
+      )
     }
 
     if (!statistics) {
@@ -118,24 +145,6 @@ class GatewayConnection extends React.PureComponent {
       </div>
     )
   }
-}
-
-GatewayConnection.propTypes = {
-  className: PropTypes.string,
-  error: PropTypes.error,
-  fetching: PropTypes.bool,
-  lastSeen: PropTypes.instanceOf(Date),
-  startStatistics: PropTypes.func.isRequired,
-  statistics: PropTypes.gatewayStats,
-  stopStatistics: PropTypes.func.isRequired,
-}
-
-GatewayConnection.defaultProps = {
-  className: undefined,
-  fetching: false,
-  error: null,
-  statistics: null,
-  lastSeen: undefined,
 }
 
 export default GatewayConnection
