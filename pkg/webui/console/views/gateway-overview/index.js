@@ -28,38 +28,77 @@ import DateTime from '../../../lib/components/date-time'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import GatewayMap from '../../components/gateway-map'
+import EntityTitleSection from '../../components/entity-title-section'
+import KeyValueTag from '../../components/key-value-tag'
+import Spinner from '../../../components/spinner'
+import withRequest from '../../../lib/components/with-request'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
-import { selectSelectedGateway, selectSelectedGatewayId } from '../../store/selectors/gateways'
+import { getGatewayCollaboratorsList, getGatewayApiKeysList } from '../../store/actions/gateways'
+import {
+  selectSelectedGateway,
+  selectSelectedGatewayId,
+  selectGatewayCollaboratorsTotalCount,
+  selectGatewayCollaboratorsFetching,
+  selectGatewayApiKeysTotalCount,
+  selectGatewayApiKeysFetching,
+} from '../../store/selectors/gateways'
 import { mayEditBasicGatewayInformation } from '../../lib/feature-checks'
 
-import style from './gateway-overview.styl'
-
-@connect(state => ({
-  gtwId: selectSelectedGatewayId(state),
-  gateway: selectSelectedGateway(state),
-}))
+@connect(
+  state => {
+    const gtwId = selectSelectedGatewayId(state)
+    return {
+      gtwId,
+      gateway: selectSelectedGateway(state),
+      collaboratorsTotalCount: selectGatewayCollaboratorsTotalCount(state, { id: gtwId }),
+      apiKeysTotalCount: selectGatewayApiKeysTotalCount(state, { id: gtwId }),
+      statusBarFetching:
+        selectGatewayCollaboratorsFetching(state) || selectGatewayApiKeysFetching(state),
+    }
+  },
+  dispatch => ({
+    loadData(gtwId) {
+      dispatch(getGatewayCollaboratorsList(gtwId))
+      dispatch(getGatewayApiKeysList(gtwId))
+    },
+  }),
+)
+@withRequest(({ gtwId, loadData }) => loadData(gtwId), () => false)
 @withFeatureRequirement(mayEditBasicGatewayInformation, {
   redirect: '/',
 })
 @bind
 export default class GatewayOverview extends React.Component {
   static propTypes = {
+    apiKeysTotalCount: PropTypes.number,
+    collaboratorsTotalCount: PropTypes.number,
     gateway: PropTypes.gateway.isRequired,
     gtwId: PropTypes.string.isRequired,
+    statusBarFetching: PropTypes.bool.isRequired,
   }
 
-  get gatewayInfo() {
-    const { gtwId, gateway } = this.props
+  static defaultProps = {
+    apiKeysTotalCount: undefined,
+    collaboratorsTotalCount: undefined,
+  }
+
+  render() {
     const {
-      ids,
-      name,
-      description,
-      created_at,
-      updated_at,
-      frequency_plan_id,
-      gateway_server_address,
-    } = gateway
+      gtwId,
+      collaboratorsTotalCount,
+      apiKeysTotalCount,
+      statusBarFetching,
+      gateway: {
+        ids,
+        name,
+        description,
+        created_at,
+        updated_at,
+        frequency_plan_id,
+        gateway_server_address,
+      },
+    } = this.props
 
     const sheetData = [
       {
@@ -109,32 +148,46 @@ export default class GatewayOverview extends React.Component {
     ]
 
     return (
-      <div className={style.overviewInfo}>
-        <h2 className={style.title}>{name || gtwId}</h2>
-        <GatewayConnection className={style.statistics} gtwId={gtwId} />
-        <DataSheet data={sheetData} />
-      </div>
-    )
-  }
-
-  render() {
-    const { gtwId, gateway } = this.props
-
-    return (
-      <Container>
-        <IntlHelmet title={sharedMessages.overview} />
-        <Row>
-          <Col sm={12} lg={6}>
-            {this.gatewayInfo}
-          </Col>
-          <Col sm={12} lg={6}>
-            <div className={style.latestEvents}>
+      <React.Fragment>
+        <EntityTitleSection
+          entityId={gtwId}
+          entityName={name}
+          description={description}
+          creationDate={created_at}
+        >
+          <GatewayConnection gtwId={gtwId} />
+          {statusBarFetching ? (
+            <Spinner after={0} faded micro inline>
+              <Message content={sharedMessages.fetching} />
+            </Spinner>
+          ) : (
+            <React.Fragment>
+              <KeyValueTag
+                icon="collaborators"
+                value={collaboratorsTotalCount}
+                keyMessage={sharedMessages.collaboratorCounted}
+              />
+              <KeyValueTag
+                icon="api_keys"
+                value={apiKeysTotalCount}
+                keyMessage={sharedMessages.apiKeyCounted}
+              />
+            </React.Fragment>
+          )}
+        </EntityTitleSection>
+        <Container>
+          <IntlHelmet title={sharedMessages.overview} />
+          <Row>
+            <Col sm={12} lg={6}>
+              <DataSheet data={sheetData} />
+            </Col>
+            <Col sm={12} lg={6}>
               <GatewayEvents gtwId={gtwId} widget />
-            </div>
-            <GatewayMap gtwId={gtwId} gateway={gateway} />
-          </Col>
-        </Row>
-      </Container>
+              <GatewayMap gtwId={gtwId} gateway={this.props.gateway} />
+            </Col>
+          </Row>
+        </Container>
+      </React.Fragment>
     )
   }
 }
