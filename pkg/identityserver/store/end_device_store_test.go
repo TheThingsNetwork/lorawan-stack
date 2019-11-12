@@ -60,6 +60,12 @@ func TestEndDeviceStore(t *testing.T) {
 			Locations: map[string]*ttnpb.Location{
 				"": {Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY},
 			},
+			Picture: &ttnpb.Picture{
+				Embedded: &ttnpb.Picture_Embedded{
+					MimeType: "image/png",
+					Data:     []byte("test-dev-picture"),
+				},
+			},
 		})
 
 		a.So(err, should.BeNil)
@@ -68,6 +74,9 @@ func TestEndDeviceStore(t *testing.T) {
 			a.So(created.Name, should.Equal, "Foo EndDevice")
 			a.So(created.Description, should.Equal, "The Amazing Foo EndDevice")
 			a.So(created.Attributes, should.HaveLength, 3)
+			if a.So(created.Picture, should.NotBeNil) {
+				a.So(created.Picture.Embedded, should.NotBeNil)
+			}
 			a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
@@ -111,7 +120,10 @@ func TestEndDeviceStore(t *testing.T) {
 				"":    {Latitude: 12.3456, Longitude: 23.4567, Altitude: 1091, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY},
 				"geo": {Latitude: 12.345, Longitude: 23.456, Accuracy: 500, Source: ttnpb.SOURCE_LORA_RSSI_GEOLOCATION},
 			},
-		}, &ptypes.FieldMask{Paths: []string{"description", "attributes", "locations"}})
+			Picture: &ttnpb.Picture{
+				Sizes: map[uint32]string{0: "https://example.com/picture.jpg"},
+			},
+		}, &ptypes.FieldMask{Paths: []string{"description", "attributes", "locations", "picture"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
@@ -120,6 +132,9 @@ func TestEndDeviceStore(t *testing.T) {
 			if a.So(updated.Locations, should.HaveLength, 2) {
 				a.So(updated.Locations[""], should.Resemble, &ttnpb.Location{Latitude: 12.3456, Longitude: 23.4567, Altitude: 1091, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY})
 				a.So(updated.Locations["geo"], should.Resemble, &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Accuracy: 500, Source: ttnpb.SOURCE_LORA_RSSI_GEOLOCATION})
+			}
+			if a.So(updated.Picture, should.NotBeNil) && a.So(updated.Picture.Sizes, should.HaveLength, 1) {
+				a.So(updated.Picture.Sizes[0], should.Equal, "https://example.com/picture.jpg")
 			}
 			a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
 			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
