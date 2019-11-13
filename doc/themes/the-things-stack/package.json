@@ -1,6 +1,6 @@
 {
   "name": "hugo-theme-the-things-stack",
-  "version": "3.2.4",
+  "version": "3.2.5",
   "private": true,
   "description": "Hugo Theme for The Things Stack",
   "dependencies": {

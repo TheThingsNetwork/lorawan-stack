@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.2.5] - 2019-11-15
+
+### Added
+
 - Support for creating applications and gateway with an organization as the initial owner in the Console.
 - Hide views and features in the Console that the user and stack configuration does not meet the necessary requirements for.
 - Full range of Join EUI prefixes in the Console.
@@ -16,21 +30,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Reading and writing of session keys in Application and Network server registries now require device key read and write rights respectively.
+
 ### Deprecated
 
 - `--interop.sender-client-cas` in favor of `--interop.sender-client-ca` sub-fields in the stack.
-
-### Removed
 
 ### Fixed
 
 - Fix gateway API key forms being broken in the Console.
 - Fix MAC command handling in retransmissions.
 - Fix multicast device creation issues.
+- Fix device key unwrapping.
 
-### Security
-
-## [3.2.4]
+## [3.2.4] - 2019-11-04
 
 ### Added
 
@@ -39,19 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TLS support for application link in the Console.
 - Embedded documentation served at `/assets/doc`.
 
-### Changed
-
-- Reading and writing of session keys in Application and Network server registries now require device key read and write rights respectively.
-
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Fix device creation rollback potentially deleting existing device with same ID.
 - Fix missing transport credentials when using external NS linking.
-- Fix device key unwrapping.
 
 ### Security
 
@@ -401,7 +405,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.4...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.5...HEAD
+[3.2.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.4...v3.2.5
 [3.2.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.3...v3.2.4
 [3.2.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.2...v3.2.3
 [3.2.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.1...v3.2.2
