@@ -228,8 +228,9 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 			class = ttnpb.CLASS_C
 		} else if dev.SupportsClassB {
 			class = ttnpb.CLASS_B
+		} else {
+			return nil, errClassAMulticast
 		}
-		return nil, errClassAMulticast
 	} else if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC {
 		class = ttnpb.CLASS_C
 	}

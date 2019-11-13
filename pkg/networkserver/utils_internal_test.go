@@ -52,6 +52,68 @@ func TestNewMACState(t *testing.T) {
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 		{
+			Name: "1.0.2/EU868/multicast/class A",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
+				Multicast: true,
+			},
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.Resemble, errClassAMulticast)
+			},
+		},
+		{
+			Name: "1.0.2/EU868/multicast/class B",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
+				Multicast:      true,
+				SupportsClassB: true,
+			},
+			MACState: func() *ttnpb.MACState {
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DeviceClass = ttnpb.CLASS_B
+				return macState
+			}(),
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		},
+		{
+			Name: "1.0.2/EU868/multicast/class C",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
+				Multicast:      true,
+				SupportsClassC: true,
+			},
+			MACState: func() *ttnpb.MACState {
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DeviceClass = ttnpb.CLASS_C
+				return macState
+			}(),
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		},
+		{
 			Name: "1.1/EU868",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.EUFrequencyPlanID,
@@ -66,6 +128,68 @@ func TestNewMACState(t *testing.T) {
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				return macState
+			}(),
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		},
+		{
+			Name: "1.1/EU868/multicast/class A",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
+				Multicast: true,
+			},
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.Resemble, errClassAMulticast)
+			},
+		},
+		{
+			Name: "1.1/EU868/multicast/class B",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
+				Multicast:      true,
+				SupportsClassB: true,
+			},
+			MACState: func() *ttnpb.MACState {
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DeviceClass = ttnpb.CLASS_B
+				return macState
+			}(),
+			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
+		},
+		{
+			Name: "1.1/EU868/multicast/class C",
+			Device: &ttnpb.EndDevice{
+				FrequencyPlanID:   test.EUFrequencyPlanID,
+				LoRaWANVersion:    ttnpb.MAC_V1_1,
+				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+				MACSettings: &ttnpb.MACSettings{
+					DesiredRx1Delay: &ttnpb.RxDelayValue{
+						Value: ttnpb.RX_DELAY_13,
+					},
+				},
+				Multicast:      true,
+				SupportsClassC: true,
+			},
+			MACState: func() *ttnpb.MACState {
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DeviceClass = ttnpb.CLASS_C
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),

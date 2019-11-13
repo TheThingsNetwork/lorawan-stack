@@ -234,10 +234,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		}
 
-		if req.EndDevice.Multicast && req.EndDevice.SupportsJoin {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "supports_join")
-		}
-
 		sets = append(sets,
 			"ids.application_ids",
 			"ids.device_id",
@@ -259,6 +255,9 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		if req.EndDevice.SupportsJoin {
+			if ttnpb.HasAnyField(sets, "multicast") && req.EndDevice.Multicast {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "supports_join")
+			}
 			if req.EndDevice.JoinEUI == nil {
 				return nil, nil, errNoJoinEUI
 			}
