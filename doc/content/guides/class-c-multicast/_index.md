@@ -45,11 +45,12 @@ When creating a device, you can specify in the Console and CLI whether it's a mu
 $ ttn-lw-cli end-devices create app1 mc1 \
   --frequency-plan-id EU_863_870 \
   --lorawan-version 1.0.3 \
-  --lorawan-phy-version 1.0.3-b \
+  --lorawan-phy-version 1.0.3-a \
   --session.dev-addr 00E4304D \
   --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA \
   --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255 \
-  --multicast
+  --multicast \
+  --supports-class-c
 ```
 </details>
 
@@ -67,11 +68,12 @@ First, create a multicast group:
 $ ttn-lw-cli end-devices create app1 mc1 \
   --frequency-plan-id EU_863_870 \
   --lorawan-version 1.0.3 \
-  --lorawan-phy-version 1.0.3-b \
+  --lorawan-phy-version 1.0.3-a \
   --session.dev-addr 00E4304D \
   --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA \
   --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255 \
-  --multicast
+  --multicast \
+  --supports-class-c
 ```
 
 Then, schedule the following message to the [MQTT server]({{< relref "../getting-started/mqtt" >}}) or [HTTP webhooks]({{< relref "../getting-started/webhooks" >}}):
