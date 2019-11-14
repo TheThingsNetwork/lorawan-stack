@@ -109,6 +109,8 @@ var contactInfoFlags = util.FieldFlags(&ttnpb.ContactInfo{})
 var (
 	errContactInfoExists           = errors.DefineAlreadyExists("contact_info_exists", "contact info already exists")
 	errMatchingContactInfoNotFound = errors.DefineAlreadyExists("contact_info_not_found", "matching contact info not found")
+	errNoValidationReference       = errors.DefineInvalidArgument("no_validation_reference", "no validation reference set")
+	errNoValidationToken           = errors.DefineInvalidArgument("no_validation_token", "no validation token set")
 )
 
 func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error)) *cobra.Command {
@@ -173,8 +175,47 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 			return io.Write(os.Stdout, config.OutputFormat, updatedInfo)
 		},
 	}
+	validate := &cobra.Command{
+		Use:   "validate [reference] [token]",
+		Short: "Validate contact info",
+		Long:  "Validate contact info by providing the reference and the validation token that you received",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			reference, _ := cmd.Flags().GetString("reference")
+			token, _ := cmd.Flags().GetString("token")
+			switch len(args) {
+			case 1:
+				reference = args[0]
+			case 2:
+				reference = args[0]
+				token = args[1]
+			default:
+			}
+			if reference == "" {
+				return errNoValidationReference
+			}
+			if token == "" {
+				return errNoValidationToken
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewContactInfoRegistryClient(is).Validate(ctx, &ttnpb.ContactInfoValidation{
+				ID:    reference,
+				Token: token,
+			})
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	add.Flags().AddFlagSet(contactInfoFlags)
+	cmd.AddCommand(add)
 	remove.Flags().AddFlagSet(contactInfoFlags)
-	cmd.AddCommand(add, remove)
+	cmd.AddCommand(remove)
+	validate.Flags().String("reference", "", "Reference of the requested validation")
+	validate.Flags().String("token", "", "Token that you received")
+	cmd.AddCommand(validate)
 	return cmd
 }

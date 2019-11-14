@@ -24,14 +24,16 @@ type Validate struct {
 // TemplateName returns the name of the template to use for this email.
 func (Validate) TemplateName() string { return "validate" }
 
-const validateSubject = `Please confirm your email address for {{.Network.Name}}`
+const validateSubject = `Please validate your contact info for {{.Network.Name}}`
 
-const validateText = `Please confirm your email address for {{.Network.Name}}.
+const validateText = `Please validate your contact info for {{.Network.Name}}.
 
-Your email address will be used as contact for {{.Entity.Type}} "{{.Entity.ID}}".
+Your info will be used as contact for {{.Entity.Type}} "{{.Entity.ID}}".
+
+Validate via web interface: {{ .Network.IdentityServerURL }}/validate?reference={{ .ID }}&token={{ .Token }}
 
 Reference: {{.ID}}
-Confirmation Token: {{.Token}}
+Validation Token: {{.Token}}
 `
 
 // DefaultTemplates returns the default templates for this email.
