@@ -35,6 +35,7 @@ type Config struct {
 	DownlinkPriorities  DownlinkPriorityConfig `name:"downlink-priorities" description:"Downlink message priorities"`
 	DefaultMACSettings  MACSettingConfig       `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
 	Interop             config.InteropClient   `name:"interop" description:"Interop client configuration"`
+	DeviceKEKLabel      string                 `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }
 
 // MACSettingConfig defines MAC-layer configuration.
