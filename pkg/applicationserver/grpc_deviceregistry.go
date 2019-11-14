@@ -58,7 +58,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"pending_session.keys.app_s_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"pending_session.keys.app_s_key.encrypted_key",
 				"pending_session.keys.app_s_key.kek_label",
 			)
@@ -66,7 +66,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"session.keys.app_s_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"session.keys.app_s_key.encrypted_key",
 				"session.keys.app_s_key.kek_label",
 			)
@@ -121,7 +121,9 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
 		} else {
 			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
-			if err := ttnpb.ProhibitFields(req.FieldMask.Paths, "ids.dev_addr"); err != nil {
+			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
+				"ids.dev_addr",
+			); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
 			if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") {
@@ -134,17 +136,17 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		if req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 		}
-		sets = append(sets,
+		sets = ttnpb.AddFields(sets,
 			"ids.application_ids",
 			"ids.device_id",
 		)
 		if req.EndDevice.JoinEUI != nil && !req.EndDevice.JoinEUI.IsZero() {
-			sets = append(sets,
+			sets = ttnpb.AddFields(sets,
 				"ids.join_eui",
 			)
 		}
 		if req.EndDevice.DevEUI != nil && !req.EndDevice.DevEUI.IsZero() {
-			sets = append(sets,
+			sets = ttnpb.AddFields(sets,
 				"ids.dev_eui",
 			)
 		}

@@ -59,14 +59,14 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
-		gets = ttnpb.EnsureFields(gets,
+		gets = ttnpb.AddFields(gets,
 			"provisioner_id",
 			"provisioning_data",
 		)
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"root_keys.app_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"root_keys.app_key.encrypted_key",
 				"root_keys.app_key.kek_label",
 			)
@@ -74,7 +74,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"root_keys.nwk_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"root_keys.nwk_key.encrypted_key",
 				"root_keys.nwk_key.kek_label",
 			)

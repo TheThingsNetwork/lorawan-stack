@@ -70,7 +70,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"pending_session.keys.f_nwk_s_int_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"pending_session.keys.f_nwk_s_int_key.encrypted_key",
 				"pending_session.keys.f_nwk_s_int_key.kek_label",
 			)
@@ -78,7 +78,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"pending_session.keys.nwk_s_enc_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"pending_session.keys.nwk_s_enc_key.encrypted_key",
 				"pending_session.keys.nwk_s_enc_key.kek_label",
 			)
@@ -86,7 +86,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"pending_session.keys.s_nwk_s_int_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"pending_session.keys.s_nwk_s_int_key.encrypted_key",
 				"pending_session.keys.s_nwk_s_int_key.kek_label",
 			)
@@ -95,7 +95,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"session.keys.f_nwk_s_int_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"session.keys.f_nwk_s_int_key.encrypted_key",
 				"session.keys.f_nwk_s_int_key.kek_label",
 			)
@@ -103,7 +103,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"session.keys.nwk_s_enc_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"session.keys.nwk_s_enc_key.encrypted_key",
 				"session.keys.nwk_s_enc_key.kek_label",
 			)
@@ -111,7 +111,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"session.keys.s_nwk_s_int_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"session.keys.s_nwk_s_int_key.encrypted_key",
 				"session.keys.s_nwk_s_int_key.kek_label",
 			)
@@ -120,7 +120,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"mac_state.queued_join_accept.keys.app_s_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"mac_state.queued_join_accept.keys.app_s_key.encrypted_key",
 				"mac_state.queued_join_accept.keys.app_s_key.kek_label",
 			)
@@ -128,7 +128,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"mac_state.queued_join_accept.keys.f_nwk_s_int_key.encrypted_key",
 				"mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
 			)
@@ -136,7 +136,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"mac_state.queued_join_accept.keys.nwk_s_enc_key.encrypted_key",
 				"mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
 			)
@@ -144,7 +144,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
 		) {
-			gets = ttnpb.EnsureFields(gets,
+			gets = ttnpb.AddFields(gets,
 				"mac_state.queued_join_accept.keys.s_nwk_s_int_key.encrypted_key",
 				"mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
 			)
@@ -152,16 +152,16 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_delay") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.adr_ack_delay_exponent") {
-		gets = append(gets, "mac_state.current_parameters.adr_ack_delay_exponent")
+		gets = ttnpb.AddFields(gets, "mac_state.current_parameters.adr_ack_delay_exponent")
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_limit") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.adr_ack_limit_exponent") {
-		gets = append(gets, "mac_state.current_parameters.adr_ack_limit_exponent")
+		gets = ttnpb.AddFields(gets, "mac_state.current_parameters.adr_ack_limit_exponent")
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_delay") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.adr_ack_delay_exponent") {
-		gets = append(gets, "mac_state.desired_parameters.adr_ack_delay_exponent")
+		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.adr_ack_delay_exponent")
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_limit") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.adr_ack_limit_exponent") {
-		gets = append(gets, "mac_state.desired_parameters.adr_ack_limit_exponent")
+		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.adr_ack_limit_exponent")
 	}
 
 	dev, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
@@ -280,7 +280,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_state",
 		"session",
 	}, req.FieldMask.Paths...) {
-		gets = append(gets,
+		gets = ttnpb.AddFields(gets,
 			"frequency_plan_id",
 			"last_dev_status_received_at",
 			"lorawan_phy_version",
@@ -289,7 +289,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"multicast",
 			"queued_application_downlinks",
 			"recent_uplinks",
-			"session",
+			"session.dev_addr",
+			"session.last_conf_f_cnt_down",
+			"session.last_f_cnt_up",
+			"session.last_n_f_cnt_down",
 		)
 		needsDownlinkCheck = true
 	}
@@ -338,17 +341,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		}
 
-		sets = append(sets,
+		sets = ttnpb.AddFields(sets,
 			"ids.application_ids",
 			"ids.device_id",
 		)
 		if req.EndDevice.JoinEUI != nil && !req.EndDevice.JoinEUI.IsZero() {
-			sets = append(sets,
+			sets = ttnpb.AddFields(sets,
 				"ids.join_eui",
 			)
 		}
 		if req.EndDevice.DevEUI != nil && !req.EndDevice.DevEUI.IsZero() {
-			sets = append(sets,
+			sets = ttnpb.AddFields(sets,
 				"ids.dev_eui",
 			)
 		}
@@ -380,7 +383,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 		req.EndDevice.EndDeviceIdentifiers.DevAddr = &req.EndDevice.Session.DevAddr
-		sets = append(sets,
+		sets = ttnpb.AddFields(sets,
 			"ids.dev_addr",
 		)
 
@@ -431,7 +434,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, err
 		}
 		req.EndDevice.MACState = macState
-		sets = append(sets, "mac_state")
+		sets = ttnpb.AddFields(sets, "mac_state")
 
 		return &req.EndDevice, sets, nil
 	})
