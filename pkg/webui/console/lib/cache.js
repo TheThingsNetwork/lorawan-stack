@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { selectApplicationRootPath } from '../../lib/selectors/env'
+import stringToHash from '../../lib/string-to-hash'
+
+const hash = stringToHash(selectApplicationRootPath())
+const hashKey = key => `${key}-${hash}`
+
 export function get(key) {
-  const value = localStorage.getItem(key)
+  const hashedKey = hashKey(key)
+  const value = localStorage.getItem(hashedKey)
   try {
     return JSON.parse(value)
   } catch (e) {
@@ -22,12 +29,14 @@ export function get(key) {
 }
 
 export function set(key, val) {
+  const hashedKey = hashKey(key)
   const value = JSON.stringify(val)
-  localStorage.setItem(key, value)
+  localStorage.setItem(hashedKey, value)
 }
 
 export function remove(key) {
-  return localStorage.removeItem(key)
+  const hashedKey = hashKey(key)
+  return localStorage.removeItem(hashedKey)
 }
 
 export function clearAll() {
