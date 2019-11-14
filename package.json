@@ -72,6 +72,7 @@
   },
   "dependencies": {
     "@formatjs/intl-relativetimeformat": "^2.8.2",
+    "@redux-offline/redux-offline": "^2.5.2",
     "autobind-decorator": "^2.1.0",
     "axios": "^0.19.0",
     "cancelable-promise": "^2.4.0",
