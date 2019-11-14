@@ -525,6 +525,16 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"ids.device_id",
 					"ids.join_eui",
 				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: registeredApplicationID,
+						},
+						DeviceID: "new-device",
+						JoinEUI:  unregisteredJoinEUI,
+						DevEUI:   unregisteredDevEUI,
+					},
+				})
 				return dev, err
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
@@ -578,6 +588,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}))
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"net_id",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					NetID:                &types.NetID{0x42, 0x00, 0x00},
 				})
 				return dev, err
 			},
@@ -652,11 +666,28 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(gets, should.HaveSameElementsDeep, []string{
-					"root_keys.app_key.key", "root_keys.nwk_key.key",
+					"root_keys.app_key.key",
+					"root_keys.nwk_key.key",
 				})
 				dev, sets, err := cb(CopyEndDevice(registeredDevice))
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"root_keys.app_key.key", "root_keys.nwk_key.key",
+					"root_keys.app_key.encrypted_key",
+					"root_keys.app_key.kek_label",
+					"root_keys.app_key.key",
+					"root_keys.nwk_key.encrypted_key",
+					"root_keys.nwk_key.kek_label",
+					"root_keys.nwk_key.key",
+				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					RootKeys: &ttnpb.RootKeys{
+						AppKey: &ttnpb.KeyEnvelope{
+							EncryptedKey: []byte{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff},
+						},
+						NwkKey: &ttnpb.KeyEnvelope{
+							EncryptedKey: []byte{0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42},
+						},
+					},
 				})
 				return dev, err
 			},
