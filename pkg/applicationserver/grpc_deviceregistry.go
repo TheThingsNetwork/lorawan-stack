@@ -49,23 +49,52 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	dev, err := r.AS.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
+
+	gets := req.FieldMask.Paths
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_session.keys.app_s_key.key",
+		"session.keys.app_s_key.key",
+	) {
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"pending_session.keys.app_s_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"pending_session.keys.app_s_key.encrypted_key",
+				"pending_session.keys.app_s_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"session.keys.app_s_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"session.keys.app_s_key.encrypted_key",
+				"session.keys.app_s_key.kek_label",
+			)
+		}
+	}
+
+	dev, err := r.AS.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, gets)
 	if err != nil {
 		return nil, err
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key") && dev.Session != nil && dev.Session.AppSKey != nil {
-		key, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.AppSKey, r.AS.KeyVault)
+
+	if dev.GetPendingSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_session.keys.app_s_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.PendingSession.SessionKeys, "pending_session.keys", req.FieldMask.Paths...)
 		if err != nil {
 			return nil, err
 		}
-		dev.Session.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
+		dev.PendingSession.SessionKeys = sk
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "pending_session.keys.app_s_key") && dev.PendingSession != nil && dev.PendingSession.AppSKey != nil {
-		key, err := cryptoutil.UnwrapAES128Key(ctx, *dev.PendingSession.AppSKey, r.AS.KeyVault)
+	if dev.GetSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"session.keys.app_s_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.Session.SessionKeys, "session.keys", req.FieldMask.Paths...)
 		if err != nil {
 			return nil, err
 		}
-		dev.PendingSession.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
+		dev.Session.SessionKeys = sk
 	}
 	return dev, nil
 }

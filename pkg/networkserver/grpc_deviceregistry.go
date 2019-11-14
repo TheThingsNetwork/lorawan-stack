@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -54,6 +55,102 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 	}
 
 	gets := req.FieldMask.Paths
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"mac_state.queued_join_accept.keys.app_s_key.key",
+		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+		"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+		"pending_session.keys.f_nwk_s_int_key.key",
+		"pending_session.keys.nwk_s_enc_key.key",
+		"pending_session.keys.s_nwk_s_int_key.key",
+		"session.keys.f_nwk_s_int_key.key",
+		"session.keys.nwk_s_enc_key.key",
+		"session.keys.s_nwk_s_int_key.key",
+	) {
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"pending_session.keys.f_nwk_s_int_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"pending_session.keys.f_nwk_s_int_key.encrypted_key",
+				"pending_session.keys.f_nwk_s_int_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"pending_session.keys.nwk_s_enc_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"pending_session.keys.nwk_s_enc_key.encrypted_key",
+				"pending_session.keys.nwk_s_enc_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"pending_session.keys.s_nwk_s_int_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"pending_session.keys.s_nwk_s_int_key.encrypted_key",
+				"pending_session.keys.s_nwk_s_int_key.kek_label",
+			)
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"session.keys.f_nwk_s_int_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"session.keys.f_nwk_s_int_key.encrypted_key",
+				"session.keys.f_nwk_s_int_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"session.keys.nwk_s_enc_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"session.keys.nwk_s_enc_key.encrypted_key",
+				"session.keys.nwk_s_enc_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"session.keys.s_nwk_s_int_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"session.keys.s_nwk_s_int_key.encrypted_key",
+				"session.keys.s_nwk_s_int_key.kek_label",
+			)
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"mac_state.queued_join_accept.keys.app_s_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"mac_state.queued_join_accept.keys.app_s_key.encrypted_key",
+				"mac_state.queued_join_accept.keys.app_s_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"mac_state.queued_join_accept.keys.f_nwk_s_int_key.encrypted_key",
+				"mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"mac_state.queued_join_accept.keys.nwk_s_enc_key.encrypted_key",
+				"mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+		) {
+			gets = ttnpb.EnsureFields(gets,
+				"mac_state.queued_join_accept.keys.s_nwk_s_int_key.encrypted_key",
+				"mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
+			)
+		}
+	}
+
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_delay") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.adr_ack_delay_exponent") {
 		gets = append(gets, "mac_state.current_parameters.adr_ack_delay_exponent")
 	}
@@ -71,43 +168,50 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 	if err != nil {
 		return nil, err
 	}
-	for _, s := range []struct {
-		val  *ttnpb.Session
-		path string
-	}{
-		{
-			val:  dev.Session,
-			path: "session",
-		},
-		{
-			val:  dev.PendingSession,
-			path: "pending_session",
-		},
-	} {
-		if s.val == nil {
-			continue
+
+	if dev.GetMACState().GetQueuedJoinAccept() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"mac_state.queued_join_accept.keys.app_s_key.key",
+		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+		"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+	) {
+		appSKey := dev.MACState.QueuedJoinAccept.Keys.AppSKey
+		dev.MACState.QueuedJoinAccept.Keys.AppSKey = nil
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, ns.KeyVault, dev.MACState.QueuedJoinAccept.Keys, "mac_state.queued_join_accept.keys", req.FieldMask.Paths...)
+		if err != nil {
+			return nil, err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.f_nwk_s_int_key") && s.val.FNwkSIntKey != nil {
-			key, err := cryptoutil.UnwrapAES128Key(ctx, *s.val.FNwkSIntKey, ns.KeyVault)
-			if err != nil {
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.queued_join_accept.keys.app_s_key.key") && appSKey != nil {
+			key, err := cryptoutil.UnwrapAES128Key(ctx, *appSKey, ns.KeyVault)
+			if err != nil && !errors.IsNotFound(err) {
 				return nil, err
+			} else if err == nil {
+				sk.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
 			}
-			s.val.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: &key}
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.s_nwk_s_int_key") && s.val.SNwkSIntKey != nil {
-			key, err := cryptoutil.UnwrapAES128Key(ctx, *s.val.SNwkSIntKey, ns.KeyVault)
-			if err != nil {
-				return nil, err
-			}
-			s.val.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: &key}
+		dev.MACState.QueuedJoinAccept.Keys = sk
+	}
+	if dev.GetPendingSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_session.keys.f_nwk_s_int_key.key",
+		"pending_session.keys.nwk_s_enc_key.key",
+		"pending_session.keys.s_nwk_s_int_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, ns.KeyVault, dev.PendingSession.SessionKeys, "pending_session.keys", req.FieldMask.Paths...)
+		if err != nil {
+			return nil, err
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, s.path+".keys.nwk_s_enc_key") && s.val.NwkSEncKey != nil {
-			key, err := cryptoutil.UnwrapAES128Key(ctx, *s.val.NwkSEncKey, ns.KeyVault)
-			if err != nil {
-				return nil, err
-			}
-			s.val.NwkSEncKey = &ttnpb.KeyEnvelope{Key: &key}
+		dev.PendingSession.SessionKeys = sk
+	}
+	if dev.GetSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"session.keys.f_nwk_s_int_key.key",
+		"session.keys.nwk_s_enc_key.key",
+		"session.keys.s_nwk_s_int_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, ns.KeyVault, dev.Session.SessionKeys, "session.keys", req.FieldMask.Paths...)
+		if err != nil {
+			return nil, err
 		}
+		dev.Session.SessionKeys = sk
 	}
 
 	if dev.MACState != nil {
