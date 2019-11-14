@@ -346,9 +346,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
 		}
 
-		if dev == nil {
-			evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
-		} else {
+		if dev != nil {
 			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
 			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
 				"ids.dev_addr",
@@ -364,6 +362,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return &req.EndDevice, sets, nil
 		}
 
+		evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
 		if err := ttnpb.RequireFields(sets,
 			"frequency_plan_id",
 			"lorawan_phy_version",

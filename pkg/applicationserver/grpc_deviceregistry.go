@@ -134,9 +134,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	var evt events.Event
 	dev, err := r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		sets := req.FieldMask.Paths
-		if dev == nil {
-			evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
-		} else {
+		if dev != nil {
 			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
 			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
 				"ids.dev_addr",
@@ -150,6 +148,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			return &req.EndDevice, sets, nil
 		}
 
+		evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
 		if req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 		}
