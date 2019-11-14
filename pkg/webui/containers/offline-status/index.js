@@ -13,31 +13,40 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import PropTypes from '../../lib/prop-types'
-import Status from '../status'
-import Message from '../../lib/components/message'
 
-import style from './offline.styl'
+import sharedMessages from '../../lib/shared-messages'
+import { selectOfflineStatus } from '../../lib/selectors/offline'
 
-export default class Offline extends Component {
+import Offline from '../../components/offline'
+
+@connect(state => ({ online: selectOfflineStatus(state) }))
+export default class OfflineStatus extends Component {
   static propTypes = {
-    content: PropTypes.string,
-    status: PropTypes.string,
+    online: PropTypes.bool,
   }
 
   static defaultProps = {
-    content: undefined,
-    status: undefined,
+    online: undefined,
   }
 
   render() {
-    const { status, content } = this.props
-    return (
-      <span>
-        <Status className={style.status} status={status}>
-          <Message className={style.message} content={content} />
-        </Status>
-      </span>
-    )
+    const { online } = this.props
+
+    let statusIndicator = null
+    let message = null
+
+    if (online === undefined) {
+      return null
+    } else if (online) {
+      message = sharedMessages.online
+      statusIndicator = 'good'
+    } else {
+      statusIndicator = 'bad'
+      message = sharedMessages.offline
+    }
+
+    return <Offline status={statusIndicator} content={message} />
   }
 }
