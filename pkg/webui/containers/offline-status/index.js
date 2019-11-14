@@ -14,25 +14,56 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { defineMessages } from 'react-intl'
+import toast from '../../components/toast'
 import PropTypes from '../../lib/prop-types'
+
+import Status from '../../components/status'
+import Message from '../../lib/components/message'
 
 import sharedMessages from '../../lib/shared-messages'
 import { selectOfflineStatus } from '../../lib/selectors/offline'
 
-import Offline from '../../components/offline'
+import style from './offline.styl'
+
+const m = defineMessages({
+  offline: 'The Application is now offline',
+  online: 'The Application is back online',
+})
 
 @connect(state => ({ online: selectOfflineStatus(state) }))
 export default class OfflineStatus extends Component {
   static propTypes = {
     online: PropTypes.bool,
+    showOfflineOnly: PropTypes.bool,
+    showWarnings: PropTypes.bool,
   }
 
   static defaultProps = {
     online: undefined,
+    showOfflineOnly: true,
+    showWarnings: true,
+  }
+
+  handleMessage(message, type) {
+    const { showWarnings } = this.props
+    if (showWarnings) {
+      toast({
+        message,
+        type,
+      })
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const online = this.props
+    if (online && !prevProps.online) {
+      this.handleMessage(m.online, toast.types.INFO)
+    }
   }
 
   render() {
-    const { online } = this.props
+    const { online, showOfflineOnly } = this.props
 
     let statusIndicator = null
     let message = null
@@ -45,8 +76,18 @@ export default class OfflineStatus extends Component {
     } else {
       statusIndicator = 'bad'
       message = sharedMessages.offline
+      this.handleMessage(m.offline, toast.types.ERROR)
     }
 
-    return <Offline status={statusIndicator} content={message} />
+    if (!showOfflineOnly || !online) {
+      return (
+        <span>
+          <Status className={style.status} status={statusIndicator}>
+            <Message className={style.message} content={message} />
+          </Status>
+        </span>
+      )
+    }
+    return false
   }
 }
