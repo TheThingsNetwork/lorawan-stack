@@ -181,7 +181,15 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"root_keys.app_key.encrypted_key",
+		"root_keys.app_key.kek_label",
+		"root_keys.app_key.key",
+		"root_keys.nwk_key.encrypted_key",
+		"root_keys.nwk_key.kek_label",
+		"root_keys.nwk_key.key",
+		"root_keys.root_key_id",
+	) {
 		if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}

@@ -169,7 +169,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 				a.So(devID, should.Equal, "bar-device")
 				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+				return CopyEndDevice(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				}), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -209,13 +211,20 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(paths, should.HaveSameElementsDeep, []string{"ids"})
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+				return CopyEndDevice(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				}), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
+			},
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				})
 			},
 			GetByIDCalls: 1,
 		},
@@ -238,7 +247,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids", "root_keys"},
+					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -265,20 +274,29 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationID: registeredApplicationID,
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
-				a.So(paths, should.HaveSameElementsDeep, []string{"ids", "root_keys", "provisioner_id", "provisioning_data"})
-				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"ids",
+					"provisioner_id",
+					"provisioning_data",
+					"root_keys.app_key.encrypted_key",
+					"root_keys.app_key.kek_label",
+					"root_keys.app_key.key",
+					"root_keys.nwk_key.encrypted_key",
+					"root_keys.nwk_key.kek_label",
+					"root_keys.nwk_key.key",
+				})
+				return CopyEndDevice(registeredDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"ids", "root_keys"},
+					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
-				expected := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
+				expected := CopyEndDevice(registeredDevice)
 				expected.RootKeys = &ttnpb.RootKeys{
-					RootKeyID: registeredDevice.RootKeys.RootKeyID,
 					NwkKey: &ttnpb.KeyEnvelope{
 						Key: registeredNwkKey,
 					},
@@ -394,7 +412,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: *CopyEndDevice(registeredDevice),
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetByIDFunc must not be called")
@@ -537,7 +555,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: *CopyEndDevice(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					NetID:                &types.NetID{0x42, 0x00, 0x00},
+				}),
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{"net_id"},
 				},
@@ -551,11 +572,20 @@ func TestDeviceRegistrySet(t *testing.T) {
 				a.So(gets, should.HaveSameElementsDeep, []string{
 					"net_id",
 				})
-				dev, sets, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				dev, sets, err := cb(CopyEndDevice(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					NetID:                registeredDevice.NetID,
+				}))
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"net_id",
 				})
 				return dev, err
+			},
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					NetID:                &types.NetID{0x42, 0x00, 0x00},
+				})
 			},
 			SetByIDCalls: 1,
 		},
@@ -572,9 +602,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: *CopyEndDevice(registeredDevice),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"root_keys"},
+					Paths: []string{"root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -600,9 +630,19 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: *CopyEndDevice(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					RootKeys: &ttnpb.RootKeys{
+						AppKey: &ttnpb.KeyEnvelope{
+							Key: &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff},
+						},
+						NwkKey: &ttnpb.KeyEnvelope{
+							Key: &types.AES128Key{0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42},
+						},
+					},
+				}),
 				FieldMask: pbtypes.FieldMask{
-					Paths: []string{"root_keys"},
+					Paths: []string{"root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
 			},
 			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
@@ -612,13 +652,26 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(gets, should.HaveSameElementsDeep, []string{
-					"root_keys",
+					"root_keys.app_key.key", "root_keys.nwk_key.key",
 				})
-				dev, sets, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				dev, sets, err := cb(CopyEndDevice(registeredDevice))
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"root_keys",
+					"root_keys.app_key.key", "root_keys.nwk_key.key",
 				})
 				return dev, err
+			},
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					RootKeys: &ttnpb.RootKeys{
+						AppKey: &ttnpb.KeyEnvelope{
+							Key: &types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff},
+						},
+						NwkKey: &ttnpb.KeyEnvelope{
+							Key: &types.AES128Key{0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42},
+						},
+					},
+				})
 			},
 			SetByIDCalls: 1,
 		},
@@ -762,7 +815,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				})
 				a.So(devID, should.Equal, "bar-device")
 				a.So(paths, should.BeNil)
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				dev, _, err := cb(CopyEndDevice(registeredDevice))
 				return dev, err
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -826,7 +879,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				})
 				a.So(devID, should.Equal, registeredDeviceID)
 				a.So(paths, should.BeNil)
-				dev, _, err := cb(deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice))
+				dev, _, err := cb(CopyEndDevice(registeredDevice))
 				return dev, err
 			},
 			SetByIDCalls: 1,
