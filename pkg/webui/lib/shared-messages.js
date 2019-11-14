@@ -143,6 +143,8 @@ export default defineMessages({
   ntwkSEncKey: 'NwkSEncKey',
   nwkKey: 'NwkKey',
   ok: 'Ok',
+  offline: 'Offline',
+  online: 'Online',
   options: 'Options',
   organization: 'Organization',
   organizationId: 'Organization ID',

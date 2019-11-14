@@ -390,6 +390,8 @@
   "lib.shared-messages.ntwkSEncKey": "NwkSEncKey",
   "lib.shared-messages.nwkKey": "NwkKey",
   "lib.shared-messages.ok": "Ok",
+  "lib.shared-messages.offline": "Offline",
+  "lib.shared-messages.online": "Online",
   "lib.shared-messages.options": "Options",
   "lib.shared-messages.organization": "Organization",
   "lib.shared-messages.organizationId": "Organization ID",
