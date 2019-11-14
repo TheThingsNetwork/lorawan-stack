@@ -53,6 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix MAC command handling in retransmissions.
 - Fix multicast device creation issues.
 - Fix device key unwrapping.
+- Fix setting gateway locations in the Console.
+
+### Security
 
 ## [3.2.4] - 2019-11-04
 
