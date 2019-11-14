@@ -1,0 +1,151 @@
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.step
+  display: flex
+  align-items: flex-start
+
+  &:not(:last-child)
+    margin-right: $cs.xs
+
+    .content > .title::after
+      display: block
+
+  &.vertical
+    position: relative
+
+    &:not(:last-child)
+      margin-right: 0
+
+      .tail::after
+        display: block
+
+      .content > .title::after
+        display: none
+
+.tail
+  position: absolute
+  top: 0
+  left: 1rem
+  width: 1px
+  height: 100%
+  padding-top: 'calc(%s + 2rem)' % $cs.xs
+  padding-bottom: $cs.xs
+  padding-left: 0
+  padding-right: 0
+  box-sizing: border-box
+
+  &::after
+    background: $c-divider-dark
+    width: 1px
+    height: 100%
+    border-radius: 1px
+    content: ''
+    display: none
+
+.active
+  .status,
+  .content > .title
+    font-weight: 600
+
+.current
+  .status
+    color: white
+    background-color: $c-active-blue
+
+  .content > .title
+    color: $tc-black
+
+  .content > .description
+    color: $tc-deep-gray
+
+.wait
+  .status
+    opacity: .7
+    background-color: white
+    border: 1px solid $tc-subtle-gray
+    color: $tc-subtle-gray
+
+  .content > .title
+    color: $tc-subtle-gray
+
+  .content > .description
+    color: $tc-subtle-gray
+
+.success
+  .status
+    background-color: $c-active-blue
+    color: white
+
+  .content > .title
+    color: $tc-deep-gray
+
+  .content > .description
+    color: $tc-subtle-gray
+
+  .content > .title::after,
+  .tail::after
+    background: $c-active-blue
+
+.success.transition-failed
+  .content > .title::after,
+  .tail::after
+    background: $c-error
+
+.failure
+  .status
+    background-color: $c-error
+    color: white
+
+  .content > .title,
+  .content > .description
+    color: $c-error
+
+.status
+  height: 2rem
+  width: 2rem
+  border-radius: 2rem
+  text-align: center
+  margin-right: $cs.xs
+  transition: background-color $ad.m
+  box-sizing: border-box
+
+  .label
+    nudge('down', 2px)
+
+.content
+  flex: 1
+  overflow: hidden
+
+  .title
+    position: relative
+    color: $tc-deep-gray
+    padding-right: $cs.xs
+
+    &::after
+      content: ''
+      position: absolute
+      display: none
+      top: 50%
+      left: 100%
+      width: 9999px
+      height: 1px
+      background: $c-divider-dark
+      transition: background $ad.s
+
+  .description
+    font-size: $fs.s
+    color: $tc-subtle-gray
+    margin-bottom: $cs.m
+    margin-top: 0
