@@ -61,6 +61,7 @@ type Config struct {
 	PubSub              PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
 	ApplicationPackages ApplicationPackagesConfig `name:"application-packages" description:"Application packages configuration"`
 	Interop             InteropConfig             `name:"interop" description:"Interop client configuration"`
+	DeviceKEKLabel      string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }
 
 var errLinkMode = errors.DefineInvalidArgument("link_mode", "invalid link mode `{value}`")

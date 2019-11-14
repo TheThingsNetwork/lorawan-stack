@@ -41,7 +41,8 @@ var (
 )
 
 type asEndDeviceRegistryServer struct {
-	AS *ApplicationServer
+	AS       *ApplicationServer
+	kekLabel string
 }
 
 // Get implements ttnpb.AsEndDeviceRegistryServer.
@@ -131,17 +132,33 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		}
 	}
 
+	sets := append(req.FieldMask.Paths[:0:0], req.FieldMask.Paths...)
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key.key") {
+		if req.EndDevice.Session != nil && !req.EndDevice.Session.GetAppSKey().GetKey().IsZero() {
+			appSKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.Session.AppSKey.Key, r.kekLabel, r.AS.KeyVault)
+			if err != nil {
+				return nil, err
+			}
+			req.EndDevice.Session.AppSKey = &appSKey
+		} else if req.EndDevice.Session != nil {
+			req.EndDevice.Session.AppSKey = nil
+		}
+		sets = ttnpb.AddFields(sets,
+			"session.keys.app_s_key.encrypted_key",
+			"session.keys.app_s_key.kek_label",
+		)
+	}
+
 	var evt events.Event
 	dev, err := r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		sets := req.FieldMask.Paths
 		if dev != nil {
 			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
-			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
+			if err := ttnpb.ProhibitFields(sets,
 				"ids.dev_addr",
 			); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
-			if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") {
+			if ttnpb.HasAnyField(sets, "session.dev_addr") {
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
 				sets = append(sets, "ids.dev_addr")
 			}

@@ -149,7 +149,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopID:     conf.Interop.ID,
 	}
 
-	as.grpc.asDevices = asEndDeviceRegistryServer{AS: as}
+	as.grpc.asDevices = asEndDeviceRegistryServer{
+		AS:       as,
+		kekLabel: conf.DeviceKEKLabel,
+	}
 	as.grpc.appAs = iogrpc.New(as, iogrpc.WithMQTTConfigProvider(as))
 
 	ctx, cancel := context.WithCancel(as.Context())
