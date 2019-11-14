@@ -228,7 +228,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 			dev.MACState.DesiredParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(dev.MACState.DesiredParameters.ADRAckLimitExponent.Value)
 		}
 	}
-	return dev, nil
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
 func validABPSessionKey(key *ttnpb.KeyEnvelope) bool {
@@ -443,7 +443,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	if !needsDownlinkCheck {
-		return dev, nil
+		return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 	}
 
 	var downAt time.Time
@@ -455,7 +455,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		var ok bool
 		downAt, ok = nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
 		if !ok {
-			return dev, nil
+			return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 		}
 	}
 	downAt = downAt.Add(-nsScheduleWindow)
@@ -463,7 +463,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to add downlink task after device set")
 	}
-	return dev, nil
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
 // Delete implements NsEndDeviceRegistryServer.

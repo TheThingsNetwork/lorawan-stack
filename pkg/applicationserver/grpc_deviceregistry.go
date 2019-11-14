@@ -96,7 +96,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		}
 		dev.Session.SessionKeys = sk
 	}
-	return dev, nil
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
 var (
@@ -156,7 +156,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if evt != nil {
 		events.Publish(evt)
 	}
-	return dev, nil
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
 // Delete implements ttnpb.AsEndDeviceRegistryServer.
