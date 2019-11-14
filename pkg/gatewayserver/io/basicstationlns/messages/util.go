@@ -88,30 +88,3 @@ func getDataRateIndexFromDataRate(bandID string, DR ttnpb.DataRate) (int, error)
 	}
 	return 0, errDataRate
 }
-
-// getDataRatesFromBandID parses the available data rates from the band into DataRates.
-func getDataRatesFromBandID(id string) (DataRates, error) {
-	band, err := band.GetByID(id)
-	if err != nil {
-		return DataRates{}, err
-	}
-
-	// Set the default values.
-	drs := DataRates{}
-	for _, dr := range drs {
-		dr[0] = -1
-		dr[1] = 0
-		dr[2] = 0
-	}
-
-	for i, dr := range band.DataRates {
-		if loraDR := dr.Rate.GetLoRa(); loraDR != nil {
-			loraDR.GetSpreadingFactor()
-			drs[i][0] = int(loraDR.GetSpreadingFactor())
-			drs[i][1] = int(loraDR.GetBandwidth() / 1000)
-		} else if fskDR := dr.Rate.GetFSK(); fskDR != nil {
-			drs[i][0] = 0 // must be set to 0 for FSK, the BW field is ignored.
-		}
-	}
-	return drs, nil
-}

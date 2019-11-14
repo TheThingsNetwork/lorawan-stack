@@ -24,66 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestGetDataRatesFromFrequencyPlan(t *testing.T) {
-	a := assertions.New(t)
-	for _, tc := range []struct {
-		Name           string
-		BandID         string
-		DataRates      DataRates
-		ErrorAssertion func(error) bool
-	}{
-		{
-			Name:           "InvalidBandID",
-			BandID:         "EU",
-			DataRates:      DataRates{},
-			ErrorAssertion: errors.IsNotFound,
-		},
-		{
-			Name:   "ValidBAndID",
-			BandID: "EU_433",
-			DataRates: DataRates{
-				[3]int{12, 125, 0},
-				[3]int{11, 125, 0},
-				[3]int{10, 125, 0},
-				[3]int{9, 125, 0},
-				[3]int{8, 125, 0},
-				[3]int{7, 125, 0},
-				[3]int{7, 250, 0},
-			},
-		},
-		{
-			Name:   "ValidBAndIDUS",
-			BandID: "US_902_928",
-			DataRates: DataRates{
-				[3]int{10, 125, 0},
-				[3]int{9, 125, 0},
-				[3]int{8, 125, 0},
-				[3]int{7, 125, 0},
-				[3]int{8, 500, 0},
-				[3]int{0, 0, 0},
-				[3]int{0, 0, 0},
-				[3]int{0, 0, 0},
-				[3]int{12, 500, 0},
-				[3]int{11, 500, 0},
-				[3]int{10, 500, 0},
-				[3]int{9, 500, 0},
-				[3]int{8, 500, 0},
-				[3]int{7, 500, 0},
-			},
-		},
-	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			drs, err := getDataRatesFromBandID(tc.BandID)
-			if err != nil && (tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue)) {
-				t.Fatalf("Unexpected error: %v", err)
-			}
-			if !a.So(drs, should.Resemble, tc.DataRates) {
-				t.Fatalf("Invalid datarates: %v", drs)
-			}
-		})
-	}
-}
-
 func TestGetUint32IntegerAsByteSlice(t *testing.T) {
 	a := assertions.New(t)
 
