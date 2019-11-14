@@ -3176,15 +3176,6 @@
       "file": "downstream.go"
     }
   },
-  "error:pkg/gatewayserver/io/basicstationlns/messages:frequency_plan": {
-    "translations": {
-      "en": "invalid frequency plan"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/basicstationlns/messages",
-      "file": "messages.go"
-    }
-  },
   "error:pkg/gatewayserver/io/basicstationlns/messages:join_request_message": {
     "translations": {
       "en": "invalid join-request message received"
@@ -5676,6 +5667,15 @@
     "description": {
       "package": "pkg/pfconfig/shared",
       "file": "shared.go"
+    }
+  },
+  "error:pkg/pfconfig/basicstationlns:frequency_plan": {
+    "translations": {
+      "en": "invalid frequency plan"
+    },
+    "description": {
+      "package": "pkg/pfconfig/basicstationlns",
+      "file": "basicstationlns.go"
     }
   },
   "error:pkg/pfconfig/shared:invalid_key": {

@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	pfconfig "go.thethings.network/lorawan-stack/pkg/pfconfig/basicstationlns"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -329,7 +330,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					"firmware", version.Firmware,
 					"model", version.Model,
 				))
-				cfg, err := messages.GetRouterConfig(*fp, version.IsProduction(), time.Now())
+				cfg, err := pfconfig.GetRouterConfig(*fp, version.IsProduction(), time.Now())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to generate router configuration")
 					return err
