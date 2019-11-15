@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Command-line Interface | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.5/guides/getting-started/cli/" />
+  <link rel="icon" type="image/png" href="/v3.2.5/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.5/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Command-line Interface">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Command-line Interface">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.5/guides/getting-started/cli/">
+  <meta name="twitter:title" content="Command-line Interface" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.5/">
+        <img src="/v3.2.5/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.5/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.5/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.5/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.5/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.5/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Getting Started</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.5/guides/getting-started/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/installation/" class="">Installation</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/certificates/" class="">Certificates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/configuration/" class="">Configuration</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/running-the-stack/" class="">Running The Things Stack</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/console/" class="">Console</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/cli/" class="is-active">Command-line Interface</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/mqtt/" class="">MQTT Server</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/webhooks/" class="">HTTP Webhooks</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Command-line Interface</h1>
+
+<div class="content">
+
+<h2 id="login">Login</h2>
+
+<p>The CLI needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running in one terminal session, login with the following command:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli login</code></pre></div>
+<p>This will open the OAuth login page where you can login with your credentials. Once you logged in in the browser, return to the terminal session to proceed.</p>
+
+<p>If you run this command on a remote machine, pass <code>--callback=false</code> to get a link to login on your local machine.</p>
+
+<h2 id="create-gateway">Create gateway</h2>
+
+<p>First, list the available frequency plans:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli gateways list-frequency-plans</code></pre></div>
+<p>Then, create the first gateway with the chosen frequency plan:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli gateways create gtw1 <span class="se">\
+</span><span class="se"></span>  --user-id admin <span class="se">\
+</span><span class="se"></span>  --frequency-plan-id EU_863_870 <span class="se">\
+</span><span class="se"></span>  --gateway-eui 00800000A00009EF <span class="se">\
+</span><span class="se"></span>  --enforce-duty-cycle</code></pre></div>
+<p>This creates a gateway <code>gtw1</code> with user <code>admin</code> as collaborator, frequency plan <code>EU_863_870</code>, EUI <code>00800000A00009EF</code> and respecting duty-cycle limitations. You can now connect your gateway to The Things Stack.</p>
+
+<blockquote>
+<p>Note: The CLI returns the created and updated entities by default in JSON. This can be useful in scripts.</p>
+</blockquote>
+
+<h2 id="create-application">Create application</h2>
+
+<p>Create the first application:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli applications create app1 --user-id admin</code></pre></div>
+<p>This creates an application <code>app1</code> with the <code>admin</code> user as collaborator.</p>
+
+<p>Devices are created within applications.</p>
+
+<h3 id="link-application">Link application</h3>
+
+<p>In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli applications api-keys create <span class="se">\
+</span><span class="se"></span>  --name link <span class="se">\
+</span><span class="se"></span>  --application-id app1 <span class="se">\
+</span><span class="se"></span>  --right-application-link</code></pre></div>
+<p>The CLI will return an API key such as <code>NNSXS.VEEBURF3KR77ZR...</code>. This API key has only link rights and can therefore only be used for linking.</p>
+
+<p>You can now link the Application Server to the Network Server:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli applications link <span class="nb">set</span> app1 --api-key NNSXS.VEEBURF3KR77ZR..</code></pre></div>
+<p>Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.</p>
+
+<h2 id="create-end-device">Create end device</h2>
+
+<p>First, list the available frequency plans and LoRaWAN versions:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-devices list-frequency-plans
+$ ttn-lw-cli end-devices create --help</code></pre></div>
+<h3 id="over-the-air-activation-otaa-device">Over-the-air-activation (OTAA) device</h3>
+
+<p>To create an end device using over-the-air-activation (OTAA):</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-devices create app1 dev1 <span class="se">\
+</span><span class="se"></span>  --dev-eui 0004A30B001C0530 <span class="se">\
+</span><span class="se"></span>  --app-eui 800000000000000C <span class="se">\
+</span><span class="se"></span>  --frequency-plan-id EU_863_870 <span class="se">\
+</span><span class="se"></span>  --root-keys.app-key.key 752BAEC23EAE7964AF27C325F4C23C9A <span class="se">\
+</span><span class="se"></span>  --lorawan-version <span class="m">1</span>.0.3 <span class="se">\
+</span><span class="se"></span>  --lorawan-phy-version <span class="m">1</span>.0.3-a</code></pre></div>
+<p>This will create a LoRaWAN 1.0.3 end device <code>dev1</code> in application <code>app1</code> with the <code>EU_863_870</code> frequency plan.</p>
+
+<p>The end device should now be able to join the private network.</p>
+
+<blockquote>
+<p>Note: The <code>AppEUI</code> is returned as <code>join_eui</code> (V3 uses LoRaWAN 1.1 terminology).</p>
+
+<p>Hint: You can also pass <code>--with-root-keys</code> to have root keys generated.</p>
+</blockquote>
+
+<h3 id="activation-by-personalization-abp-device">Activation by personalization (ABP device)</h3>
+
+<p>It is also possible to register an ABP activated device using the <code>--abp</code> flag as follows:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-devices create app1 dev2 <span class="se">\
+</span><span class="se"></span>  --frequency-plan-id EU_863_870 <span class="se">\
+</span><span class="se"></span>  --lorawan-version <span class="m">1</span>.0.3 <span class="se">\
+</span><span class="se"></span>  --lorawan-phy-version <span class="m">1</span>.0.3-a <span class="se">\
+</span><span class="se"></span>  --abp <span class="se">\
+</span><span class="se"></span>  --session.dev-addr 00E4304D <span class="se">\
+</span><span class="se"></span>  --session.keys.app-s-key.key A0CAD5A30036DBE03096EB67CA975BAA <span class="se">\
+</span><span class="se"></span>  --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255</code></pre></div>
+<blockquote>
+<p>Note: The <code>NwkSKey</code> is returned as <code>f_nwk_s_int_key</code> (The Things Stack uses LoRaWAN 1.1 terminology).</p>
+
+<p>Hint: You can also pass <code>--with-session</code> to have a session generated.</p>
+</blockquote>
+
+<h2 id="working-with-data">Working with data</h2>
+
+<p>With your The Things Stack setup, a gateway connected and a device registered on your network, it&rsquo;s time to start working with data.</p>
+
+<p>Learn how to work with the <a href="/v3.2.5/guides/getting-started/mqtt/">builtin MQTT server</a> and <a href="/v3.2.5/guides/getting-started/webhooks/">HTTP webhooks</a>.</p>
+</div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.5/guides/getting-started/console/">← Console</a>
+<a class="button is-pulled-right" href="/v3.2.5/guides/getting-started/mqtt/">MQTT Server →</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.5/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.5/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.5/components/">Components</a></p>
+        <p><a class="" href="/v3.2.5/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/234b9384e22fc18a7bb09851db4a34bd760ccb5a">
+      doc: Make code blocks consistent
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/cli/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.5/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

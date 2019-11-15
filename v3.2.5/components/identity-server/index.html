@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Identity Server | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.5/components/identity-server/" />
+  <link rel="icon" type="image/png" href="/v3.2.5/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.5/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Identity Server">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Identity Server">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.5/components/identity-server/">
+  <meta name="twitter:title" content="Identity Server" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.5/">
+        <img src="/v3.2.5/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.5/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.5/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.5/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.5/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.5/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">Identity Server</h1>
+
+<div class="content"><p>The Identity Server provides the registries that store entities such as applications with their end devices, gateways, users, organizations and OAuth clients. It also manages access control through memberships and API keys.</p>
+
+<h2 id="entity-registries">Entity Registries</h2>
+
+<p>The entity registries store common information about all major entities in The Things Stack. This includes a name, description, and attributes (user-defined key-value pairs).</p>
+
+<h3 id="users">Users</h3>
+
+<p>The first entity registered in the Identity Server is usually the admin user. Users can register by providing an email address and choosing a user ID and password. This information can later be used to login.</p>
+
+<p>The user ID is the unique identifier of a user. User IDs are in the same namespace as organization IDs. This means that it is not possible to create a user with the same ID as an existing organization. For security reasons it is also not possible to re-use the ID of a deleted user or organization.</p>
+
+<p>Users can be &ldquo;admin&rdquo;, which gives them elevated privileges. The normal registration process does not allow users to register as admin, which is why the <a href="https://thethingsstack.io/v3.2.5/guides/getting-started/">Getting Started guide</a> creates the admin user with a different command.</p>
+
+<p>Users can be in one of multiple states: requested, approved, rejected, suspended, etc. The state of a user determines if the user is able to perform actions, and which actions. Normally, users are in the &ldquo;approved&rdquo; state. If The Things Stack is configured to require admin approval for new users, users are initially in the &ldquo;requested&rdquo; state, and an admin user can update them to the &ldquo;approved&rdquo; or &ldquo;rejected&rdquo; state. Users can also be suspended by admins if they misbehave.</p>
+
+<h3 id="gateways">Gateways</h3>
+
+<p>Gateways can be registered by choosing an ID and optionally registering the EUI of the gateway. After registration, an API key can be created; the gateway can use its ID (or EUI) together with that API key to authenticate with the The Things Stack.</p>
+
+<p>For correct operation of the gateway, it is important to set the frequency plan ID and set whether the gateway needs to be compliant with a duty cycle.</p>
+
+<p>If the gateway is capable of communicating with a <a href="/v3.2.5/components/gateway-configuration-server/">Gateway Configuration Server</a>, the Gateway Server address, and firmware update settings can be set in the gateway registry.</p>
+
+<p>The gateway registry also stores information about the antenna(s) of the gateway, such as location and gain.</p>
+
+<p>For more details, see the the <a href="https://thethingsstack.io/v3.2.5/reference/api/gateway/">gateway API reference</a>.</p>
+
+<h3 id="applications">Applications</h3>
+
+<p>Applications are used to organize registrations and traffic of multiple end devices in once place. An application typically corresponds to a collection of end devices that are in the same deployment, or of the same type.</p>
+
+<p>For more details, see the the <a href="https://thethingsstack.io/v3.2.5/reference/api/application/">application API reference</a>.</p>
+
+<h3 id="end-devices">End Devices</h3>
+
+<p>The end device registry in the Identity Server stores only metadata of end devices, allowing clients such as the Console and CLI to list end devices in an application. It typically stores metadata about the brand, model, hardware, firmware and location of the end device. It also stores addresses of the Network Server, Application Server and Join Server, so that clients such as the Console and CLI know where other properties of the end device are stored.</p>
+
+<p>For more details, see the the <a href="https://thethingsstack.io/v3.2.5/reference/api/end_device/">end device API reference</a>.</p>
+
+<h3 id="organizations">Organizations</h3>
+
+<p>Organizations are used to create groups of multiple users, and easily assign rights to the entire group of users.</p>
+
+<p>The organization ID is the unique identifier of a organization. Organization IDs are in the same namespace as user IDs. This means that it is not possible to create an organization with the same ID as an existing user. For security reasons it is also not possible to re-use the ID of a deleted user or organization.</p>
+
+<h3 id="oauth-clients">OAuth Clients</h3>
+
+<p>It is possible to register external OAuth clients in the OAuth registries. OAuth clients are registered with a client ID and secret.</p>
+
+<p>As with users, OAuth clients can be in one of multiple states. OAuth clients created by non-admin users need to be approved by an admin user.</p>
+
+<p>Official OAuth clients can be marked as &ldquo;endorsed&rdquo;, or can be pre-authorized for all users.</p>
+
+<h2 id="entity-access">Entity Access</h2>
+
+<p>The Identity Server is responsible for access control to entities.</p>
+
+<h3 id="memberships">Memberships</h3>
+
+<p>Memberships define the rights that a user or organization has on another entity. The simplest membership is one where a user is a direct member (or collaborator) of an application or gateway. The rights of a membership indicate what the user is allowed to do with the application or gateway.</p>
+
+<p>An indirect membership means that a user is a member of an organization, and the organization is a member of an application or gateway. In this case, the rights of the user-organization membership and the organization-application or organization-gateway membership are intersected in order to compute the effective rights of the user.</p>
+
+<h3 id="api-keys">API Keys</h3>
+
+<p>With most entities it is possible to create API keys. These API keys allow you to call APIs on behalf of the entity. API keys do not expire, but it is possible to revoke an API key.</p>
+
+<p>API keys have associated rights. This means that it is possible to create for instance an <em>Application API key</em> that can be used to read information about end devices, but not see the root keys, and not make changes.</p>
+
+<p>It is possible to combine memberships and API keys, so you can for instance create an <em>Organization API key</em> with the right to list the applications where the organization is a member, and the right to read information about end devices in these applications.</p>
+
+<h2 id="oauth">OAuth</h2>
+
+<p>The Identity Server is an OAuth 2.0 server. Users can authorize OAuth clients to access their data, manage authorizations, and even manage individual access tokens.</p></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-right" href="/v3.2.5/components/gateway-server/">Gateway Server →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.5/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.5/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.5/components/">Components</a></p>
+        <p><a class="" href="/v3.2.5/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 31 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/466ec488d719a7c1193b074173180ab8bbc0ddf0">
+      doc: Add high level IS component documentation
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/components/identity-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.5/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

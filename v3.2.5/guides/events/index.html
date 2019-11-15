@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Working with Events | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.5/guides/events/" />
+  <link rel="icon" type="image/png" href="/v3.2.5/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.5/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Working with Events">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Working with Events">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.5/guides/events/">
+  <meta name="twitter:title" content="Working with Events" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.5/">
+        <img src="/v3.2.5/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.5/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.5/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.5/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.5/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.5/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Working with Events</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.5/guides/events/" class="is-active">Overview</a>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Working with Events</h1>
+
+<div class="content"><p>The Things Stack generates lots of events that allow you to get insight in what is going on. You can subscribe to application, gateway, end device events, as well as to user, organization and OAuth client events.</p>
+
+<p>This guide shows how to subscribe to events with the CLI and with the HTTP API.</p>
+
+<h2 id="subscribe-with-cli">Subscribe with CLI</h2>
+
+<p>To follow your gateway <code>gtw1</code> and application <code>app1</code> events at the same time:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli events subscribe --gateway-id gtw1 --application-id app1</code></pre></div>
+<h2 id="subscribe-with-http">Subscribe with HTTP</h2>
+
+<p>You can get streaming events with <code>curl</code>. For this, you need an API key for the entities you want to watch, for example:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli user api-key create <span class="se">\
+</span><span class="se"></span>  --user-id admin <span class="se">\
+</span><span class="se"></span>  --right-application-all <span class="se">\
+</span><span class="se"></span>  --right-gateway-all</code></pre></div>
+<p>With the created API key:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ curl https://thethings.example.com/api/v3/events <span class="se">\
+</span><span class="se"></span>  -X POST <span class="se">\
+</span><span class="se"></span>  -H <span class="s2">&#34;Authorization: Bearer NNSXS.BR55PTYILPPVXY..&#34;</span> <span class="se">\
+</span><span class="se"></span>  --data <span class="s1">&#39;{&#34;identifiers&#34;:[{&#34;application_ids&#34;:{&#34;application_id&#34;:&#34;app1&#34;}},{&#34;gateway_ids&#34;:{&#34;gateway_id&#34;:&#34;gtw1&#34;}}]}&#39;</span></code></pre></div>
+<blockquote>
+<p>Note: The created API key for events is highly privileged; do not use it if you don&rsquo;t need it for events.</p>
+</blockquote>
+
+<h2 id="example-join-flow">Example: join flow</h2>
+
+<p>These are the events of a typical join flow:</p>
+<div class="highlight"><pre class="chroma"><code class="language-js" data-lang="js"><span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;gs.up.receive&#34;</span><span class="p">,</span> <span class="c1">// Gateway Server received an uplink message from a device.
+</span><span class="c1"></span>  <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2019-04-04T09:54:34.786220Z&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;identifiers&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&#34;gateway_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;gateway_id&#34;</span><span class="o">:</span> <span class="s2">&#34;multitech&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;eui&#34;</span><span class="o">:</span> <span class="s2">&#34;00800000A0000DB4&#34;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&#34;correlation_ids&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&#34;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&#34;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;js.join.accept&#34;</span><span class="p">,</span> <span class="c1">// Join Server accepted the join-accept.
+</span><span class="c1"></span>  <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2019-04-04T09:54:34.806812Z&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;identifiers&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&#34;device_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;device_id&#34;</span><span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;application_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&#34;application_id&#34;</span><span class="o">:</span> <span class="s2">&#34;app1&#34;</span>
+        <span class="p">},</span>
+        <span class="s2">&#34;dev_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;join_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&#34;correlation_ids&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.NsJs/HandleJoin:01D7KWB0NCTDY835V5N3CYWBZK&#34;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;ns.up.join.forward&#34;</span><span class="p">,</span> <span class="c1">// Network Server forwarded the join-accept and it got accepted.
+</span><span class="c1"></span>  <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2019-04-04T09:54:34.808132Z&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;identifiers&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&#34;device_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;device_id&#34;</span><span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;application_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&#34;application_id&#34;</span><span class="o">:</span> <span class="s2">&#34;app1&#34;</span>
+        <span class="p">},</span>
+        <span class="s2">&#34;dev_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;join_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&#34;correlation_ids&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&#34;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;ns:uplink:01D7KWB0N5C1T8TE2HAVBJN5Y4&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7KWB0N5G2N5C0AFXT4YMF8R&#34;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;ns.up.merge_metadata&#34;</span><span class="p">,</span> <span class="c1">// Network Server merged metadata of incoming uplink messages.
+</span><span class="c1"></span>  <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2019-04-04T09:54:34.991332Z&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;identifiers&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&#34;device_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;device_id&#34;</span><span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;application_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&#34;application_id&#34;</span><span class="o">:</span> <span class="s2">&#34;app1&#34;</span>
+        <span class="p">},</span>
+        <span class="s2">&#34;dev_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;join_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&#34;data&#34;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;@type&#34;</span><span class="o">:</span> <span class="s2">&#34;type.googleapis.com/google.protobuf.Value&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;value&#34;</span><span class="o">:</span> <span class="mi">1</span> <span class="c1">// There was 1 gateway that received the join-request.
+</span><span class="c1"></span>  <span class="p">},</span>
+  <span class="s2">&#34;correlation_ids&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="c1">// Here you find the correlation IDs of all gs.up.receive events that were merged.
+</span><span class="c1"></span>    <span class="s2">&#34;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;ns:uplink:01D7KWB0N5C1T8TE2HAVBJN5Y4&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7KWB0N5G2N5C0AFXT4YMF8R&#34;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;as.up.join.receive&#34;</span><span class="p">,</span> <span class="c1">// Application Server receives the join-accept.
+</span><span class="c1"></span>  <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2019-04-04T09:54:35.005090Z&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;identifiers&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&#34;device_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;device_id&#34;</span><span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;application_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&#34;application_id&#34;</span><span class="o">:</span> <span class="s2">&#34;app1&#34;</span>
+        <span class="p">},</span>
+        <span class="s2">&#34;dev_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;join_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;dev_addr&#34;</span><span class="o">:</span> <span class="s2">&#34;0063ECE2&#34;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&#34;correlation_ids&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&#34;as:up:01D7KWB0VX1D7G3RKFN9HDA39Q&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;ns:uplink:01D7KWB0N5C1T8TE2HAVBJN5Y4&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7KWB0N5G2N5C0AFXT4YMF8R&#34;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;as.up.join.forward&#34;</span><span class="p">,</span> <span class="c1">// Application Server forwards the join-accept to an application (CLI, MQTT, webhooks, etc).
+</span><span class="c1"></span>  <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2019-04-04T09:54:35.010243Z&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;identifiers&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&#34;device_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;device_id&#34;</span><span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;application_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&#34;application_id&#34;</span><span class="o">:</span> <span class="s2">&#34;app1&#34;</span>
+        <span class="p">},</span>
+        <span class="s2">&#34;dev_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;join_eui&#34;</span><span class="o">:</span> <span class="s2">&#34;4200000000000000&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;dev_addr&#34;</span><span class="o">:</span> <span class="s2">&#34;0063ECE2&#34;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&#34;correlation_ids&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&#34;as:up:01D7KWB0VX1D7G3RKFN9HDA39Q&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;ns:uplink:01D7KWB0N5C1T8TE2HAVBJN5Y4&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D7KWB0N5G2N5C0AFXT4YMF8R&#34;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;gs.down.send&#34;</span><span class="p">,</span> <span class="c1">// Gateway Server sent the join-accept to the gateway.
+</span><span class="c1"></span>  <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2019-04-04T09:54:35.046147Z&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;identifiers&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&#34;gateway_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;gateway_id&#34;</span><span class="o">:</span> <span class="s2">&#34;multitech&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;eui&#34;</span><span class="o">:</span> <span class="s2">&#34;00800000A0000DB4&#34;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&#34;correlation_ids&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&#34;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.NsGs/ScheduleDownlink:01D7KWB0W84AJ1P5A3AQV6R4J7&#34;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;gs.up.forward&#34;</span><span class="p">,</span> <span class="c1">// Gateway Server forwarded join-request to the Network Server.
+</span><span class="c1"></span>  <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2019-04-04T09:54:35.991226Z&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;identifiers&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&#34;gateway_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;gateway_id&#34;</span><span class="o">:</span> <span class="s2">&#34;multitech&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;eui&#34;</span><span class="o">:</span> <span class="s2">&#34;00800000A0000DB4&#34;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&#34;correlation_ids&#34;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&#34;gs:conn:01D7KWADW2E5CJA32VS1MTR2J6&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01D7KWB0N2KVCV8HZABC8DDHSA&#34;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+
+<div class="is-clearfix">
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.5/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.5/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.5/components/">Components</a></p>
+        <p><a class="" href="/v3.2.5/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/97b0e7ade29ecb2313d3cf347769eb89205e6620">
+      doc: Use double quotes in bash
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/events/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.5/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

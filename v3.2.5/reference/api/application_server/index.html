@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Application Server APIs | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.5/reference/api/application_server/" />
+  <link rel="icon" type="image/png" href="/v3.2.5/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.5/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Application Server APIs">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Application Server APIs">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.5/reference/api/application_server/">
+  <meta name="twitter:title" content="Application Server APIs" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.5/">
+        <img src="/v3.2.5/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.5/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.5/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.5/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.5/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.5/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">API</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.5/reference/api/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/reference/api/authentication/" class="">Authentication</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/reference/api/application/" class="">Application APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/reference/api/application_server/" class="is-active">Application Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/reference/api/application_webhooks/" class="">Application Webhook APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/reference/api/application_pub_sub/" class="">Application Pub-Sub APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/reference/api/gateway/" class="">Gateway APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/reference/api/gateway_server/" class="">Gateway Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.5/reference/api/end_device/" class="">End Device APIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Application Server APIs</h1>
+
+<div class="content">
+
+<h2 id="the-as-service">The <code>As</code> service</h2>
+
+
+<h3>Method <code>As.SetLink</code></h3>
+<p>Set a link configuration from the Application Server a Network Server.
+ This call returns immediately after setting the link configuration; it does not wait for a link to establish.
+ To get link statistics or errors, use the <code>GetLinkStats</code> call.</p>
+
+<p>
+  Request: <a href="#message:SetApplicationLinkRequest"><code>SetApplicationLinkRequest</code></a>
+  <br>
+  Response: <a href="#message:ApplicationLink"><code>ApplicationLink</code></a>
+</p>
+<p><code>PUT</code> <code>/as/applications/{application_ids.application_id}/link</code></p>
+
+
+
+<h3>Method <code>As.GetLink</code></h3>
+
+<p>
+  Request: <a href="#message:GetApplicationLinkRequest"><code>GetApplicationLinkRequest</code></a>
+  <br>
+  Response: <a href="#message:ApplicationLink"><code>ApplicationLink</code></a>
+</p>
+<p><code>GET</code> <code>/as/applications/{application_ids.application_id}/link</code></p>
+
+
+
+<h3>Method <code>As.GetLinkStats</code></h3>
+<p>GetLinkStats returns the link statistics.
+ This call returns a NotFound error code if there is no link for the given application identifiers.
+ This call returns the error code of the link error if linking to a Network Server failed.</p>
+
+<p>
+  Request: <a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>
+  <br>
+  Response: <a href="#message:ApplicationLinkStats"><code>ApplicationLinkStats</code></a>
+</p>
+<p><code>GET</code> <code>/as/applications/{application_id}/link/stats</code></p>
+
+
+
+<h3>Method <code>As.DeleteLink</code></h3>
+
+<p>
+  Request: <a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>DELETE</code> <code>/as/applications/{application_id}/link</code></p>
+
+
+<h2 id="the-appas-service">The <code>AppAs</code> service</h2>
+
+
+<h3>Method <code>AppAs.DownlinkQueuePush</code></h3>
+
+<p>
+  Request: <a href="#message:DownlinkQueueRequest"><code>DownlinkQueueRequest</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>POST</code> <code>/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push</code></p>
+
+
+
+<h3>Method <code>AppAs.DownlinkQueueReplace</code></h3>
+
+<p>
+  Request: <a href="#message:DownlinkQueueRequest"><code>DownlinkQueueRequest</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>POST</code> <code>/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace</code></p>
+
+
+
+<h3>Method <code>AppAs.DownlinkQueueList</code></h3>
+
+<p>
+  Request: <a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>
+  <br>
+  Response: <a href="#message:ApplicationDownlinks"><code>ApplicationDownlinks</code></a>
+</p>
+<p><code>GET</code> <code>/as/applications/{application_ids.application_id}/devices/{device_id}/down</code></p>
+
+
+<h2 id="messages">Messages</h2>
+
+<h3 id="message:ApplicationDownlink">Message <code>ApplicationDownlink</code></h3>
+
+<dl>
+  <dt>
+    <code>session_key_id</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2048</code></p>
+      <p>Join Server issued identifier for the session keys used by this downlink.</p>
+  </dd>
+  <dt>
+    <code>f_port</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p><code>gte</code>: <code>1</code></p>
+      <p><code>lte</code>: <code>255</code></p>
+      <p><code>not_in</code>: <code>[224]</code></p>
+  </dd>
+  <dt>
+    <code>f_cnt</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>frm_payload</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>decoded_payload</code>
+    (<code>google.protobuf.Struct</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>confirmed</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>class_b_c</code>
+    (<a href="#message:ApplicationDownlink.ClassBC"><code>ApplicationDownlink.ClassBC</code></a>)
+  </dt>
+  <dd>
+      <p>Optional gateway and timing information for class B and C.
+ If set, this downlink message will only be transmitted as class B or C downlink.
+ If not set, this downlink message may be transmitted in class A, B and C.</p>
+  </dd>
+  <dt>
+    <code>priority</code>
+    (<a href="#enum:TxSchedulePriority"><code>TxSchedulePriority</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Priority for scheduling the downlink message.</p>
+  </dd>
+  <dt>
+    <code>correlation_ids</code>
+    (repeated <code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>100</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "session_key_id": "",
+  "f_port": 0,
+  "f_cnt": 0,
+  "frm_payload": "",
+  "decoded_payload": {},
+  "confirmed": false,
+  "class_b_c": {},
+  "priority": "LOWEST",
+  "correlation_ids": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:ApplicationDownlink.ClassBC">Message <code>ApplicationDownlink.ClassBC</code></h3>
+
+<dl>
+  <dt>
+    <code>gateways</code>
+    (repeated <a href="#message:GatewayAntennaIdentifiers"><code>GatewayAntennaIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p>Possible gateway identifiers and antenna index to use for this downlink message.
+ The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.
+ If none of the gateways can be selected, the downlink message fails.
+ If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.</p>
+  </dd>
+  <dt>
+    <code>absolute_time</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+      <p>Absolute time when the downlink message should be transmitted.
+ This requires the gateway to have GPS time synchronization.
+ If the time is in the past or if there is a scheduling conflict, the downlink message fails.
+ If null, the time is selected based on slot availability. This is recommended in class B mode.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateways": [],
+  "absolute_time": "0001-01-01T00:00:00Z",
+}</code></pre>
+</details>
+
+
+<h3 id="message:ApplicationDownlinks">Message <code>ApplicationDownlinks</code></h3>
+
+<dl>
+  <dt>
+    <code>downlinks</code>
+    (repeated <a href="#message:ApplicationDownlink"><code>ApplicationDownlink</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "downlinks": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:ApplicationIdentifiers">Message <code>ApplicationIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>application_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "application_id": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:ApplicationLink">Message <code>ApplicationLink</code></h3>
+
+<dl>
+  <dt>
+    <code>network_server_address</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$</code></p>
+      <p>The address of the external Network Server where to link to.
+ The typical format of the address is &ldquo;host:port&rdquo;. If the port is omitted,
+ the normal port inference (with DNS lookup, otherwise defaults) is used.
+ Leave empty when linking to a cluster Network Server.</p>
+  </dd>
+  <dt>
+    <code>api_key</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>min_len</code>: <code>1</code></p>
+  </dd>
+  <dt>
+    <code>default_formatters</code>
+    (<a href="#message:MessagePayloadFormatters"><code>MessagePayloadFormatters</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>tls</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>Enable TLS for linking to the external Network Server.
+ For cluster-local Network Servers, the cluster&rsquo;s TLS setting is used.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "network_server_address": "",
+  "api_key": "",
+  "default_formatters": {},
+  "tls": false,
+}</code></pre>
+</details>
+
+
+<h3 id="message:ApplicationLinkStats">Message <code>ApplicationLinkStats</code></h3>
+<p>Link stats as monitored by the Application Server.</p>
+
+<dl>
+  <dt>
+    <code>linked_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>network_server_address</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$</code></p>
+  </dd>
+  <dt>
+    <code>last_up_received_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+      <p>Timestamp when the last upstream message has been received from a Network Server.
+ This can be a join-accept, uplink message or downlink message event.</p>
+  </dd>
+  <dt>
+    <code>up_count</code>
+    (<code>uint64</code>)
+  </dt>
+  <dd>
+      <p>Number of upstream messages received.</p>
+  </dd>
+  <dt>
+    <code>last_downlink_forwarded_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+      <p>Timestamp when the last downlink message has been forwarded to a Network Server.</p>
+  </dd>
+  <dt>
+    <code>downlink_count</code>
+    (<code>uint64</code>)
+  </dt>
+  <dd>
+      <p>Number of downlink messages forwarded.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "linked_at": "0001-01-01T00:00:00Z",
+  "network_server_address": "",
+  "last_up_received_at": "0001-01-01T00:00:00Z",
+  "up_count": 0,
+  "last_downlink_forwarded_at": "0001-01-01T00:00:00Z",
+  "downlink_count": 0,
+}</code></pre>
+</details>
+
+
+<h3 id="message:DownlinkQueueRequest">Message <code>DownlinkQueueRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>end_device_ids</code>
+    (<a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>downlinks</code>
+    (repeated <a href="#message:ApplicationDownlink"><code>ApplicationDownlink</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "end_device_ids": {},
+  "downlinks": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:EndDeviceIdentifiers">Message <code>EndDeviceIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>device_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>dev_eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN DevEUI.</p>
+  </dd>
+  <dt>
+    <code>join_eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).</p>
+  </dd>
+  <dt>
+    <code>dev_addr</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN DevAddr.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "device_id": "",
+  "application_ids": {},
+  "dev_eui": "",
+  "join_eui": "",
+  "dev_addr": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:GatewayAntennaIdentifiers">Message <code>GatewayAntennaIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>antenna_index</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "antenna_index": 0,
+}</code></pre>
+</details>
+
+
+<h3 id="message:GatewayIdentifiers">Message <code>GatewayIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>Secondary identifier, which can only be used in specific requests.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_id": "",
+  "eui": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:GetApplicationLinkRequest">Message <code>GetApplicationLinkRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "application_ids": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:MessagePayloadFormatters">Message <code>MessagePayloadFormatters</code></h3>
+
+<dl>
+  <dt>
+    <code>up_formatter</code>
+    (<a href="#enum:PayloadFormatter"><code>PayloadFormatter</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Payload formatter for uplink messages, must be set together with its parameter.</p>
+  </dd>
+  <dt>
+    <code>up_formatter_parameter</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Parameter for the up_formatter, must be set together.</p>
+  </dd>
+  <dt>
+    <code>down_formatter</code>
+    (<a href="#enum:PayloadFormatter"><code>PayloadFormatter</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Payload formatter for downlink messages, must be set together with its parameter.</p>
+  </dd>
+  <dt>
+    <code>down_formatter_parameter</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Parameter for the down_formatter, must be set together.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "up_formatter": "FORMATTER_NONE",
+  "up_formatter_parameter": "",
+  "down_formatter": "FORMATTER_NONE",
+  "down_formatter_parameter": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:SetApplicationLinkRequest">Message <code>SetApplicationLinkRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>link</code>
+    (<a href="#message:ApplicationLink"><code>ApplicationLink</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "application_ids": {},
+  "link": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+
+<h2 id="enums">Enums</h2>
+
+
+<h3 id="enum:PayloadFormatter">Enum <code>PayloadFormatter</code></h3>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>FORMATTER_NONE</code></td>
+      <td><code>0</code></td>
+      <td> No payload formatter to work with raw payload only.</td>
+    </tr>
+    <tr>
+      <td><code>FORMATTER_REPOSITORY</code></td>
+      <td><code>1</code></td>
+      <td> Use payload formatter for the end device type from a repository.</td>
+    </tr>
+    <tr>
+      <td><code>FORMATTER_GRPC_SERVICE</code></td>
+      <td><code>2</code></td>
+      <td> gRPC service payload formatter. The parameter is the host:port of the service.</td>
+    </tr>
+    <tr>
+      <td><code>FORMATTER_JAVASCRIPT</code></td>
+      <td><code>3</code></td>
+      <td> Custom payload formatter that executes Javascript code. The parameter is a JavaScript filename.</td>
+    </tr>
+    <tr>
+      <td><code>FORMATTER_CAYENNELPP</code></td>
+      <td><code>4</code></td>
+      <td> CayenneLPP payload formatter.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<h3 id="enum:TxSchedulePriority">Enum <code>TxSchedulePriority</code></h3>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>LOWEST</code></td>
+      <td><code>0</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>LOW</code></td>
+      <td><code>1</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>BELOW_NORMAL</code></td>
+      <td><code>2</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>NORMAL</code></td>
+      <td><code>3</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>ABOVE_NORMAL</code></td>
+      <td><code>4</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>HIGH</code></td>
+      <td><code>5</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code>HIGHEST</code></td>
+      <td><code>6</code></td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.5/reference/api/application/">← Application APIs</a>
+<a class="button is-pulled-right" href="/v3.2.5/reference/api/application_webhooks/">Application Webhook APIs →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.5/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.5/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.5/components/">Components</a></p>
+        <p><a class="" href="/v3.2.5/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/5975dcc259f691e7a0c17deb45116865f32c71de">
+      doc: Increase heading level for API reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/api/application_server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.5/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
