@@ -122,13 +122,14 @@ export class SafeInspector extends Component {
     this.setState(prev => ({ msb: !prev.msb }))
   }
 
-  handleDataClick() {
+  handleDataClick(e) {
     if (!this.state.hidden) {
       selectText(this.displayElem.current)
     }
+    e.stopPropagation()
   }
 
-  handleCopyClick() {
+  handleCopyClick(e) {
     const { noCopyPopup } = this.props
     this.setState({ copied: true, copyIcon: 'done' })
     if (noCopyPopup) {
@@ -136,6 +137,7 @@ export class SafeInspector extends Component {
         this.setState({ copied: false, copyIcon: 'file_copy' })
       }, 2000)
     }
+    e.stopPropagation()
   }
 
   handleCopyAnimationEnd() {
