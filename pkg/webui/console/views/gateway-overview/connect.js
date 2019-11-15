@@ -26,13 +26,19 @@ import {
 
 const mapStateToProps = state => {
   const gtwId = selectSelectedGatewayId(state)
+  const collaboratorsTotalCount = selectGatewayCollaboratorsTotalCount(state, { id: gtwId })
+  const apiKeysTotalCount = selectGatewayApiKeysTotalCount(state, { id: gtwId })
+
   return {
     gtwId,
     gateway: selectSelectedGateway(state),
-    collaboratorsTotalCount: selectGatewayCollaboratorsTotalCount(state, { id: gtwId }),
-    apiKeysTotalCount: selectGatewayApiKeysTotalCount(state, { id: gtwId }),
+    collaboratorsTotalCount,
+    apiKeysTotalCount,
     statusBarFetching:
-      selectGatewayCollaboratorsFetching(state) || selectGatewayApiKeysFetching(state),
+      collaboratorsTotalCount === undefined ||
+      apiKeysTotalCount === undefined ||
+      selectGatewayCollaboratorsFetching(state) ||
+      selectGatewayApiKeysFetching(state),
   }
 }
 const mapDispatchToProps = dispatch => ({
