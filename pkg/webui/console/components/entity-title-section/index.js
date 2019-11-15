@@ -26,20 +26,18 @@ const EntityTitleSection = ({ entityName, entityId, description, creationDate, c
     <React.Fragment>
       <Container>
         <Row>
-          <Col md={12}>
-            <div className={style.container}>
-              <h1 className={style.title}>{entityName || entityId}</h1>
-              <span className={style.id}>
-                <strong>ID:</strong> {entityId}
-              </span>
-              {description && <span className={style.description}>{description}</span>}
-              <div className={style.bottom}>
-                <div className={style.children}>{children}</div>
-                <div className={style.creationDate}>
-                  <span>
-                    Created <DateTime.Relative value={creationDate} />
-                  </span>
-                </div>
+          <Col md={12} className={style.container}>
+            <h1 className={style.title}>{entityName || entityId}</h1>
+            <span className={style.id}>
+              <strong>ID:</strong> {entityId}
+            </span>
+            {description && <span className={style.description}>{description}</span>}
+            <div className={style.bottom}>
+              <div className={style.children}>{children}</div>
+              <div className={style.creationDate}>
+                <span>
+                  Created <DateTime.Relative value={creationDate} />
+                </span>
               </div>
             </div>
           </Col>
@@ -61,6 +59,34 @@ EntityTitleSection.propTypes = {
 EntityTitleSection.defaultProps = {
   entityName: undefined,
   description: undefined,
+}
+
+EntityTitleSection.Device = ({ deviceName, deviceId, children }) => {
+  return (
+    <Container>
+      <Row>
+        <Col>
+          <div className={style.containerDevice}>
+            <h1 className={style.title}>{deviceName || deviceId}</h1>
+            <span className={style.id}>
+              <strong>ID:</strong> {deviceId}
+            </span>
+          </div>
+          {children}
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+EntityTitleSection.Device.propTypes = {
+  children: PropTypes.node.isRequired,
+  deviceId: PropTypes.string.isRequired,
+  deviceName: PropTypes.string,
+}
+
+EntityTitleSection.Device.defaultProps = {
+  deviceName: undefined,
 }
 
 export default EntityTitleSection
