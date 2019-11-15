@@ -16,6 +16,7 @@ package cryptoutil
 
 import (
 	"context"
+	"fmt"
 
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -70,4 +71,46 @@ func UnwrapAES128Key(ctx context.Context, wrapped ttnpb.KeyEnvelope, v crypto.Ke
 		copy(key[:], keyBytes)
 	}
 	return key, nil
+}
+
+func pathWithPrefix(prefix, path string) string {
+	if prefix == "" {
+		return path
+	}
+	return fmt.Sprintf("%s.%s", prefix, path)
+}
+
+func UnwrapSelectedSessionKeys(ctx context.Context, keyVault crypto.KeyVault, sk ttnpb.SessionKeys, prefix string, paths ...string) (ttnpb.SessionKeys, error) {
+	ret := ttnpb.SessionKeys{
+		SessionKeyID: sk.SessionKeyID,
+	}
+	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "app_s_key.key")) && sk.AppSKey != nil {
+		key, err := UnwrapAES128Key(ctx, *sk.AppSKey, keyVault)
+		if err != nil {
+			return ttnpb.SessionKeys{}, err
+		}
+		ret.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
+	}
+	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "f_nwk_s_int_key.key")) && sk.FNwkSIntKey != nil {
+		key, err := UnwrapAES128Key(ctx, *sk.FNwkSIntKey, keyVault)
+		if err != nil {
+			return ttnpb.SessionKeys{}, err
+		}
+		ret.FNwkSIntKey = &ttnpb.KeyEnvelope{Key: &key}
+	}
+	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "nwk_s_enc_key.key")) && sk.NwkSEncKey != nil {
+		key, err := UnwrapAES128Key(ctx, *sk.NwkSEncKey, keyVault)
+		if err != nil {
+			return ttnpb.SessionKeys{}, err
+		}
+		ret.NwkSEncKey = &ttnpb.KeyEnvelope{Key: &key}
+	}
+	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "s_nwk_s_int_key.key")) && sk.SNwkSIntKey != nil {
+		key, err := UnwrapAES128Key(ctx, *sk.SNwkSIntKey, keyVault)
+		if err != nil {
+			return ttnpb.SessionKeys{}, err
+		}
+		ret.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: &key}
+	}
+	return ret, nil
 }

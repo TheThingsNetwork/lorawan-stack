@@ -51,15 +51,37 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	paths := req.FieldMask.Paths
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
+	gets := req.FieldMask.Paths
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"root_keys.app_key.key",
+		"root_keys.nwk_key.key",
+	) {
 		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
-		paths = append(paths, "provisioner_id", "provisioning_data")
+		gets = ttnpb.AddFields(gets,
+			"provisioner_id",
+			"provisioning_data",
+		)
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"root_keys.app_key.key",
+		) {
+			gets = ttnpb.AddFields(gets,
+				"root_keys.app_key.encrypted_key",
+				"root_keys.app_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"root_keys.nwk_key.key",
+		) {
+			gets = ttnpb.AddFields(gets,
+				"root_keys.nwk_key.encrypted_key",
+				"root_keys.nwk_key.kek_label",
+			)
+		}
 	}
 	logger := log.FromContext(ctx)
-	dev, err := srv.JS.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, paths)
+	dev, err := srv.JS.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
 	if errors.IsNotFound(err) {
 		return nil, errDeviceNotFound
 	}
@@ -69,7 +91,10 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 	if !dev.ApplicationIdentifiers.Equal(req.ApplicationIdentifiers) {
 		return nil, errDeviceNotFound
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"root_keys.app_key.key",
+		"root_keys.nwk_key.key",
+	) {
 		rootKeysEnc := dev.RootKeys
 		dev.RootKeys = &ttnpb.RootKeys{
 			RootKeyID: rootKeysEnc.GetRootKeyID(),
@@ -81,50 +106,62 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 			}
 			cc = nil
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key") {
-			var networkCryptoService cryptoservices.Network
-			if rootKeysEnc.GetNwkKey() != nil {
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.nwk_key.key") {
+			switch {
+			case !rootKeysEnc.GetNwkKey().GetKey().IsZero():
+				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
+					Key: rootKeysEnc.GetNwkKey().GetKey(),
+				}
+			case len(rootKeysEnc.GetNwkKey().GetEncryptedKey()) > 0:
 				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, *rootKeysEnc.NwkKey, srv.JS.KeyVault)
 				if err != nil {
 					return nil, err
 				}
-				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-			} else if cc != nil && dev.ProvisionerID != "" {
-				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth())
-			}
-			if networkCryptoService != nil {
-				if nwkKey, err := networkCryptoService.GetNwkKey(ctx, dev); err == nil && nwkKey != nil {
+				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
+					Key: &nwkKey,
+				}
+			case cc != nil && dev.ProvisionerID != "":
+				nwkKey, err := cryptoservices.NewNetworkRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth()).GetNwkKey(ctx, dev)
+				if err != nil {
+					return nil, err
+				}
+				if nwkKey != nil {
 					dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
 						Key: nwkKey,
 					}
-				} else if err != nil {
-					return nil, err
 				}
 			}
 		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.app_key") {
-			var applicationCryptoService cryptoservices.Application
-			if rootKeysEnc.GetAppKey() != nil {
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys.app_key.key") {
+			switch {
+			case !rootKeysEnc.GetAppKey().GetKey().IsZero():
+				dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
+					Key: rootKeysEnc.GetAppKey().GetKey(),
+				}
+			case len(rootKeysEnc.GetAppKey().GetEncryptedKey()) > 0:
 				appKey, err := cryptoutil.UnwrapAES128Key(ctx, *rootKeysEnc.AppKey, srv.JS.KeyVault)
 				if err != nil {
 					return nil, err
 				}
-				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-			} else if cc != nil && dev.ProvisionerID != "" {
-				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth())
-			}
-			if applicationCryptoService != nil {
-				if appKey, err := applicationCryptoService.GetAppKey(ctx, dev); err == nil && appKey != nil {
+				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
+					Key: &appKey,
+				}
+			case cc != nil && dev.ProvisionerID != "":
+				appKey, err := cryptoservices.NewApplicationRPCClient(cc, srv.JS.KeyVault, srv.JS.WithClusterAuth()).GetAppKey(ctx, dev)
+				if err != nil {
+					return nil, err
+				}
+				if appKey != nil {
 					dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
 						Key: appKey,
 					}
-				} else if err != nil {
-					return nil, err
 				}
 			}
 		}
 	}
-	return dev, nil
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
 var (
@@ -144,10 +181,19 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "root_keys") {
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"root_keys.app_key.encrypted_key",
+		"root_keys.app_key.kek_label",
+		"root_keys.app_key.key",
+		"root_keys.nwk_key.encrypted_key",
+		"root_keys.nwk_key.kek_label",
+		"root_keys.nwk_key.key",
+		"root_keys.root_key_id",
+	) {
 		if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}
+		// TODO: Encrypt keys using component-local KEK(https://github.com/TheThingsNetwork/lorawan-stack/issues/847).
 	}
 
 	var evt events.Event
@@ -179,7 +225,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	if evt != nil {
 		events.Publish(evt)
 	}
-	return dev, nil
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
 // Provision is deprecated.

@@ -399,6 +399,7 @@ func NewPopulatedJoinAcceptPayload(r randyLorawan, easy bool) *JoinAcceptPayload
 	}
 	return out
 }
+
 func NewPopulatedMessage_JoinAcceptPayload(r randyLorawan) *Message_JoinAcceptPayload {
 	return &Message_JoinAcceptPayload{NewPopulatedJoinAcceptPayload(r, false)}
 }
@@ -424,9 +425,11 @@ func NewPopulatedRejoinRequestPayloadType(r randyLorawan, typ RejoinType) *Rejoi
 func NewPopulatedRejoinRequestPayload(r randyLorawan, easy bool) *RejoinRequestPayload {
 	return NewPopulatedRejoinRequestPayloadType(r, RejoinType(r.Intn(3)))
 }
+
 func NewPopulatedMessage_RejoinRequestPayload(r randyLorawan) *Message_RejoinRequestPayload {
 	return &Message_RejoinRequestPayload{NewPopulatedRejoinRequestPayload(r, false)}
 }
+
 func NewPopulatedMessage_RejoinRequestPayloadType(r randyLorawan, typ RejoinType) *Message_RejoinRequestPayload {
 	return &Message_RejoinRequestPayload{NewPopulatedRejoinRequestPayloadType(r, typ)}
 }

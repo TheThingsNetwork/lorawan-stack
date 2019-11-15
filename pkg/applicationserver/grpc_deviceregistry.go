@@ -49,25 +49,57 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	dev, err := r.AS.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, req.FieldMask.Paths)
+
+	gets := req.FieldMask.Paths
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_session.keys.app_s_key.key",
+		"session.keys.app_s_key.key",
+	) {
+		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+			return nil, err
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"pending_session.keys.app_s_key.key",
+		) {
+			gets = ttnpb.AddFields(gets,
+				"pending_session.keys.app_s_key.encrypted_key",
+				"pending_session.keys.app_s_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"session.keys.app_s_key.key",
+		) {
+			gets = ttnpb.AddFields(gets,
+				"session.keys.app_s_key.encrypted_key",
+				"session.keys.app_s_key.kek_label",
+			)
+		}
+	}
+
+	dev, err := r.AS.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, gets)
 	if err != nil {
 		return nil, err
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.keys.app_s_key") && dev.Session != nil && dev.Session.AppSKey != nil {
-		key, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.AppSKey, r.AS.KeyVault)
+
+	if dev.GetPendingSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_session.keys.app_s_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.PendingSession.SessionKeys, "pending_session.keys", req.FieldMask.Paths...)
 		if err != nil {
 			return nil, err
 		}
-		dev.Session.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
+		dev.PendingSession.SessionKeys = sk
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "pending_session.keys.app_s_key") && dev.PendingSession != nil && dev.PendingSession.AppSKey != nil {
-		key, err := cryptoutil.UnwrapAES128Key(ctx, *dev.PendingSession.AppSKey, r.AS.KeyVault)
+	if dev.GetSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"session.keys.app_s_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, dev.Session.SessionKeys, "session.keys", req.FieldMask.Paths...)
 		if err != nil {
 			return nil, err
 		}
-		dev.PendingSession.AppSKey = &ttnpb.KeyEnvelope{Key: &key}
+		dev.Session.SessionKeys = sk
 	}
-	return dev, nil
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
 var (
@@ -84,6 +116,20 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_session.keys.app_s_key.encrypted_key",
+		"pending_session.keys.app_s_key.kek_label",
+		"pending_session.keys.app_s_key.key",
+		"pending_session.keys.session_key_id",
+		"session.keys.app_s_key.encrypted_key",
+		"session.keys.app_s_key.kek_label",
+		"session.keys.app_s_key.key",
+		"session.keys.session_key_id",
+	) {
+		if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+			return nil, err
+		}
+	}
 
 	var evt events.Event
 	dev, err := r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -92,7 +138,9 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
 		} else {
 			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
-			if err := ttnpb.ProhibitFields(req.FieldMask.Paths, "ids.dev_addr"); err != nil {
+			if err := ttnpb.ProhibitFields(req.FieldMask.Paths,
+				"ids.dev_addr",
+			); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
 			if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") {
@@ -105,17 +153,17 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		if req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 		}
-		sets = append(sets,
+		sets = ttnpb.AddFields(sets,
 			"ids.application_ids",
 			"ids.device_id",
 		)
 		if req.EndDevice.JoinEUI != nil && !req.EndDevice.JoinEUI.IsZero() {
-			sets = append(sets,
+			sets = ttnpb.AddFields(sets,
 				"ids.join_eui",
 			)
 		}
 		if req.EndDevice.DevEUI != nil && !req.EndDevice.DevEUI.IsZero() {
-			sets = append(sets,
+			sets = ttnpb.AddFields(sets,
 				"ids.dev_eui",
 			)
 		}
@@ -127,7 +175,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if evt != nil {
 		events.Publish(evt)
 	}
-	return dev, nil
+	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
 
 // Delete implements ttnpb.AsEndDeviceRegistryServer.

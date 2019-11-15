@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	. "go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -30,7 +30,7 @@ func TestTopLevelFields(t *testing.T) {
 		"b.c",
 		"b.c.d",
 	}
-	a.So(ttnpb.TopLevelFields(paths), should.Resemble, []string{"a", "b"})
+	a.So(TopLevelFields(paths), should.Resemble, []string{"a", "b"})
 }
 
 func TestBottomLevelFields(t *testing.T) {
@@ -45,7 +45,7 @@ func TestBottomLevelFields(t *testing.T) {
 		"f.g.h.i.j",
 		"f.g.h.i.k",
 	}
-	a.So(ttnpb.BottomLevelFields(paths), should.HaveSameElementsDeep, []string{
+	a.So(BottomLevelFields(paths), should.HaveSameElementsDeep, []string{
 		"a",
 		"b.c",
 		"d.e",
@@ -68,7 +68,7 @@ func TestHasOnlyAllowedFields(t *testing.T) {
 			"b.c",
 			"b.c.d", // lower level allowed
 		}
-		a.So(ttnpb.HasOnlyAllowedFields(requested, allowed...), should.BeTrue)
+		a.So(HasOnlyAllowedFields(requested, allowed...), should.BeTrue)
 	}
 
 	{
@@ -76,7 +76,7 @@ func TestHasOnlyAllowedFields(t *testing.T) {
 			"a",
 			"e.f",
 		}
-		a.So(ttnpb.HasOnlyAllowedFields(requested, allowed...), should.BeFalse)
+		a.So(HasOnlyAllowedFields(requested, allowed...), should.BeFalse)
 	}
 
 	{
@@ -84,7 +84,7 @@ func TestHasOnlyAllowedFields(t *testing.T) {
 			"a",
 			"d", // higher level not allowed
 		}
-		a.So(ttnpb.HasOnlyAllowedFields(requested, allowed...), should.BeFalse)
+		a.So(HasOnlyAllowedFields(requested, allowed...), should.BeFalse)
 	}
 }
 
@@ -95,12 +95,12 @@ func TestHasAnyField(t *testing.T) {
 		"b.c",
 		"d",
 	}
-	a.So(ttnpb.HasAnyField(requested, "x", "a"), should.BeTrue)
-	a.So(ttnpb.HasAnyField(requested, "x.y", "b"), should.BeFalse)
-	a.So(ttnpb.HasAnyField(requested, "x", "b.c"), should.BeTrue)
-	a.So(ttnpb.HasAnyField(requested, "x", "b.c.d"), should.BeTrue)
-	a.So(ttnpb.HasAnyField(requested, "d"), should.BeTrue)
-	a.So(ttnpb.HasAnyField(requested, "d.e", "b"), should.BeTrue)
+	a.So(HasAnyField(requested, "x", "a"), should.BeTrue)
+	a.So(HasAnyField(requested, "x.y", "b"), should.BeFalse)
+	a.So(HasAnyField(requested, "x", "b.c"), should.BeTrue)
+	a.So(HasAnyField(requested, "x", "b.c.d"), should.BeTrue)
+	a.So(HasAnyField(requested, "d"), should.BeTrue)
+	a.So(HasAnyField(requested, "d.e", "b"), should.BeTrue)
 }
 
 func TestFlattenPaths(t *testing.T) {
@@ -112,13 +112,13 @@ func TestFlattenPaths(t *testing.T) {
 		"a.b.c.d",
 		"e.f",
 	}
-	a.So(ttnpb.FlattenPaths(paths, []string{"a.b"}), should.Resemble, []string{"a", "a.b", "e.f"})
+	a.So(FlattenPaths(paths, []string{"a.b"}), should.Resemble, []string{"a", "a.b", "e.f"})
 }
 
 func TestContainsField(t *testing.T) {
 	a := assertions.New(t)
-	a.So(ttnpb.ContainsField("a.b", []string{"a.b", "c"}), should.BeTrue)
-	a.So(ttnpb.ContainsField("x", []string{"a.b", "c"}), should.BeFalse)
+	a.So(ContainsField("a.b", []string{"a.b", "c"}), should.BeTrue)
+	a.So(ContainsField("x", []string{"a.b", "c"}), should.BeFalse)
 }
 
 func TestAllowedFields(t *testing.T) {
@@ -132,7 +132,7 @@ func TestAllowedFields(t *testing.T) {
 		"a.b",
 		"c.d",
 	}
-	a.So(ttnpb.AllowedFields(paths, allowedPaths), should.Resemble, []string{"c.d"})
+	a.So(AllowedFields(paths, allowedPaths), should.Resemble, []string{"c.d"})
 }
 
 func TestAllowedBottomLevelFields(t *testing.T) {
@@ -148,7 +148,7 @@ func TestAllowedBottomLevelFields(t *testing.T) {
 		"c.d",
 		"c.e",
 	}
-	a.So(ttnpb.AllowedBottomLevelFields(paths, allowedPaths), should.HaveSameElementsDeep, []string{"c.d", "c.e"})
+	a.So(AllowedBottomLevelFields(paths, allowedPaths), should.HaveSameElementsDeep, []string{"c.d", "c.e"})
 }
 
 func TestExcludeFields(t *testing.T) {
@@ -164,5 +164,31 @@ func TestExcludeFields(t *testing.T) {
 		"a",
 		"c.d",
 	}
-	a.So(ttnpb.ExcludeFields(paths, excludePaths...), should.HaveSameElementsDeep, []string{"c", "e", "e.f"})
+	a.So(ExcludeFields(paths, excludePaths...), should.HaveSameElementsDeep, []string{"c", "e", "e.f"})
+}
+
+func TestAllFields(t *testing.T) {
+	a := assertions.New(t)
+	paths := []string{
+		"a.b.c",
+		"c",
+		"c.d",
+		"e",
+	}
+	addPaths := []string{
+		"a.b.c",
+		"a.b.c.d.f",
+		"a.b.c.d.e",
+		"a.b.c.g",
+		"c",
+		"e.f",
+		"f",
+	}
+	a.So(AddFields(paths, addPaths...), should.HaveSameElementsDeep, []string{
+		"a.b.c",
+		"c",
+		"c.d",
+		"e",
+		"f",
+	})
 }

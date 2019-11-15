@@ -34,22 +34,6 @@ var (
 	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
-// appendImplicitDeviceGetPaths appends implicit ttnpb.EndDevice get paths to paths.
-func appendImplicitDeviceGetPaths(paths ...string) []string {
-	return append(append(make([]string, 0, 3+len(paths)),
-		"created_at",
-		"ids",
-		"updated_at",
-	), paths...)
-}
-
-func applyDeviceFieldMask(dst, src *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, error) {
-	if dst == nil {
-		dst = &ttnpb.EndDevice{}
-	}
-	return dst, dst.SetFields(src, paths...)
-}
-
 // DeviceRegistry is a Redis device registry.
 type DeviceRegistry struct {
 	Redis *ttnredis.Client
@@ -75,7 +59,7 @@ func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return applyDeviceFieldMask(nil, pb, appendImplicitDeviceGetPaths(paths...)...)
+	return ttnpb.FilterGetEndDevice(pb, paths...)
 }
 
 func equalEUI64(x, y *types.EUI64) bool {
@@ -105,15 +89,13 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			return err
 		}
 
-		gets = appendImplicitDeviceGetPaths(gets...)
-
 		var err error
 		if stored != nil {
 			pb = &ttnpb.EndDevice{}
 			if err := cmd.ScanProto(pb); err != nil {
 				return err
 			}
-			pb, err = applyDeviceFieldMask(nil, pb, gets...)
+			pb, err = ttnpb.FilterGetEndDevice(pb, gets...)
 			if err != nil {
 				return err
 			}
@@ -135,7 +117,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			return nil
 		}
 		if pb != nil && len(sets) == 0 {
-			pb, err = applyDeviceFieldMask(nil, stored, gets...)
+			pb, err = ttnpb.FilterGetEndDevice(stored, gets...)
 			return err
 		}
 
@@ -174,7 +156,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				pb.CreatedAt = pb.UpdatedAt
 				sets = append(sets, "created_at")
 
-				updated, err = applyDeviceFieldMask(updated, pb, sets...)
+				updated, err = ttnpb.ApplyEndDeviceFieldMask(updated, pb, sets...)
 				if err != nil {
 					return err
 				}
@@ -197,7 +179,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				if err := cmd.ScanProto(updated); err != nil {
 					return err
 				}
-				updated, err = applyDeviceFieldMask(updated, pb, sets...)
+				updated, err = ttnpb.ApplyEndDeviceFieldMask(updated, pb, sets...)
 				if err != nil {
 					return err
 				}
@@ -227,7 +209,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				}
 				return nil
 			}
-			pb, err = applyDeviceFieldMask(nil, updated, gets...)
+			pb, err = ttnpb.FilterGetEndDevice(updated, gets...)
 			if err != nil {
 				return err
 			}

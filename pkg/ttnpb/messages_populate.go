@@ -38,6 +38,7 @@ func NewPopulatedUplinkMessage(r randyMessages, easy bool) (msg *UplinkMessage) 
 	}
 	panic("unreachable")
 }
+
 func NewPopulatedUplinkMessageUplink(r randyLorawan, sNwkSIntKey, fNwkSIntKey types.AES128Key, confirmed bool) *UplinkMessage {
 	out := &UplinkMessage{}
 	out.Settings = *NewPopulatedTxSettings(r, false)

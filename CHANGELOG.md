@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix gateway API key forms being broken in the Console.
 - Fix MAC command handling in retransmissions.
-- Fix multicast device creation issues
+- Fix multicast device creation issues.
 
 ### Security
 
@@ -41,6 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Reading and writing of session keys in Application and Network server registries now require device key read and write rights respectively.
+
 ### Deprecated
 
 ### Removed
@@ -49,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix device creation rollback potentially deleting existing device with same ID.
 - Fix missing transport credentials when using external NS linking.
+- Fix device key unwrapping.
 
 ### Security
 

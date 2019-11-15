@@ -62,6 +62,7 @@ func TestIdentifiersIsZero(t *testing.T) {
 		a.So(ids.IsZero(), should.BeFalse)
 	}
 }
+
 func TestCombinedIdentifiers(t *testing.T) {
 	a := assertions.New(t)
 

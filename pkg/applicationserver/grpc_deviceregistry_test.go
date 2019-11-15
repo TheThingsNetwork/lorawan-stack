@@ -62,32 +62,41 @@ func TestDeviceRegistryGet(t *testing.T) {
 	registeredKEKs := map[string][]byte{
 		"test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
 	}
-	expectedDevice := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-				ApplicationID: registeredApplicationID,
-			},
-			DeviceID: registeredDeviceID,
-		},
-		Formatters: &ttnpb.MessagePayloadFormatters{
-			UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
-			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
-		},
-		Session: &ttnpb.Session{
-			SessionKeys: ttnpb.SessionKeys{
-				AppSKey: &ttnpb.KeyEnvelope{
-					Key: aes128KeyPtr(types.AES128Key{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}),
-				},
+
+	expectedSession := &ttnpb.Session{
+		SessionKeys: ttnpb.SessionKeys{
+			AppSKey: &ttnpb.KeyEnvelope{
+				Key: aes128KeyPtr(types.AES128Key{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}),
 			},
 		},
 	}
+
+	nilDeviceAssertion := func(t *testing.T, dev *ttnpb.EndDevice) bool {
+		t.Helper()
+		return assertions.New(t).So(dev, should.BeNil)
+	}
+
+	nilErrorAssertion := func(t *testing.T, err error) bool {
+		t.Helper()
+		return assertions.New(t).So(err, should.BeNil)
+	}
+	permissionDeniedErrorAssertion := func(t *testing.T, err error) bool {
+		t.Helper()
+		return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
+	}
+	notFoundErrorAssertion := func(t *testing.T, err error) bool {
+		t.Helper()
+		return assertions.New(t).So(errors.IsNotFound(err), should.BeTrue)
+	}
+
 	for _, tc := range []struct {
-		Name           string
-		ContextFunc    func(context.Context) context.Context
-		GetFunc        func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
-		DeviceRequest  *ttnpb.GetEndDeviceRequest
-		ErrorAssertion func(*testing.T, error) bool
-		GetCalls       uint64
+		Name            string
+		ContextFunc     func(context.Context) context.Context
+		GetFunc         func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
+		DeviceRequest   *ttnpb.GetEndDeviceRequest
+		DeviceAssertion func(*testing.T, *ttnpb.EndDevice) bool
+		ErrorAssertion  func(*testing.T, error) bool
+		GetCalls        uint64
 	}{
 		{
 			Name: "Permission denied",
@@ -108,10 +117,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 					Paths: []string{"formatters"},
 				},
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
-			},
+			DeviceAssertion: nilDeviceAssertion,
+			ErrorAssertion:  permissionDeniedErrorAssertion,
 		},
 
 		{
@@ -135,10 +142,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 					Paths: []string{"formatters"},
 				},
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
-			},
+			DeviceAssertion: nilDeviceAssertion,
+			ErrorAssertion:  permissionDeniedErrorAssertion,
 		},
 
 		{
@@ -166,20 +171,87 @@ func TestDeviceRegistryGet(t *testing.T) {
 					Paths: []string{"formatters"},
 				},
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(errors.IsNotFound(err), should.BeTrue)
-			},
-			GetCalls: 1,
+			DeviceAssertion: nilDeviceAssertion,
+			ErrorAssertion:  notFoundErrorAssertion,
+			GetCalls:        1,
 		},
 
 		{
-			Name: "Get",
+			Name: "Get formatters",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+						),
+					},
+				})
+			},
+			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationID: registeredApplicationID,
+					},
+					DeviceID: registeredDeviceID,
+				})
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"formatters",
+				})
+				return deepcopy.Copy(&ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					Formatters:           registeredDevice.Formatters,
+				}).(*ttnpb.EndDevice), nil
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"formatters"},
+				},
+			},
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					Formatters:           registeredDevice.Formatters,
+				})
+			},
+			ErrorAssertion: nilErrorAssertion,
+			GetCalls:       1,
+		},
+
+		{
+			Name: "Get formatters, session/no key rights",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+						),
+					},
+				})
+			},
+			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+				test.MustTFromContext(ctx).Errorf("GetFunc must not be called")
+				return nil, errors.New("GetFunc must not be called")
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"formatters", "session"},
+				},
+			},
+			DeviceAssertion: nilDeviceAssertion,
+			ErrorAssertion:  permissionDeniedErrorAssertion,
+		},
+
+		{
+			Name: "Get formatters,session/has rights",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
 						),
 					},
 				})
@@ -204,7 +276,15 @@ func TestDeviceRegistryGet(t *testing.T) {
 					Paths: []string{"formatters", "session"},
 				},
 			},
-			GetCalls: 1,
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+					Formatters:           registeredDevice.Formatters,
+					Session:              expectedSession,
+				})
+			},
+			ErrorAssertion: nilErrorAssertion,
+			GetCalls:       1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -247,13 +327,11 @@ func TestDeviceRegistryGet(t *testing.T) {
 			req := deepcopy.Copy(tc.DeviceRequest).(*ttnpb.GetEndDeviceRequest)
 
 			dev, err := ttnpb.NewAsEndDeviceRegistryClient(as.LoopbackConn()).Get(ctx, req)
-			a.So(getCalls, should.Equal, tc.GetCalls)
-			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
-				a.So(dev, should.BeNil)
-			} else if a.So(err, should.BeNil) {
-				a.So(dev, should.Resemble, expectedDevice)
-			}
 			a.So(req, should.Resemble, tc.DeviceRequest)
+			a.So(getCalls, should.Equal, tc.GetCalls)
+			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(tc.DeviceAssertion(t, dev), should.BeTrue)
+			}
 		})
 	}
 }
