@@ -29,14 +29,19 @@ import {
 
 const mapStateToProps = state => {
   const orgId = selectSelectedOrganizationId(state)
+  const collaboratorsTotalCount = selectOrganizationCollaboratorsTotalCount(state, { id: orgId })
+  const apiKeysTotalCount = selectOrganizationApiKeysTotalCount(state, { id: orgId })
 
   return {
     orgId,
     organization: selectSelectedOrganization(state),
-    collaboratorsTotalCount: selectOrganizationCollaboratorsTotalCount(state, { id: orgId }),
-    apiKeysTotalCount: selectOrganizationApiKeysTotalCount(state, { id: orgId }),
+    collaboratorsTotalCount,
+    apiKeysTotalCount,
     statusBarFetching:
-      selectOrganizationApiKeysFetching(state) || selectOrganizationCollaboratorsFetching(state),
+      collaboratorsTotalCount === undefined ||
+      apiKeysTotalCount === undefined ||
+      selectOrganizationApiKeysFetching(state) ||
+      selectOrganizationCollaboratorsFetching(state),
   }
 }
 
