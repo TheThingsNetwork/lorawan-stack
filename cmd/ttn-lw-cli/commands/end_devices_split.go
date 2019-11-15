@@ -177,7 +177,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 	return &res, nil
 }
 
-func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []string, isCreate bool) (*ttnpb.EndDevice, error) {
+func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []string, isCreate, touch bool) (*ttnpb.EndDevice, error) {
 	var res ttnpb.EndDevice
 	res.SetFields(device, "ids", "created_at", "updated_at")
 
@@ -207,7 +207,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 
 	if len(jsPaths) > 0 && !config.JoinServerEnabled {
 		logger.WithField("paths", jsPaths).Warn("Join Server disabled but fields specified to set")
-	} else if len(jsPaths) > 0 {
+	} else if (len(jsPaths) > 0 || touch && device.SupportsJoin) && config.JoinServerEnabled {
 		js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 		if err != nil {
 			return nil, err
@@ -233,7 +233,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 
 	if len(nsPaths) > 0 && !config.NetworkServerEnabled {
 		logger.WithField("paths", nsPaths).Warn("Network Server disabled but fields specified to set")
-	} else if (len(nsPaths) > 0 || isCreate) && config.NetworkServerEnabled {
+	} else if (len(nsPaths) > 0 || isCreate || touch) && config.NetworkServerEnabled {
 		ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
 		if err != nil {
 			return nil, err
@@ -259,7 +259,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 
 	if len(asPaths) > 0 && !config.ApplicationServerEnabled {
 		logger.WithField("paths", asPaths).Warn("Application Server disabled but fields specified to set")
-	} else if (len(asPaths) > 0 || isCreate) && config.ApplicationServerEnabled {
+	} else if (len(asPaths) > 0 || isCreate || touch) && config.ApplicationServerEnabled {
 		as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 		if err != nil {
 			return nil, err

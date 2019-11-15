@@ -467,7 +467,7 @@ var (
 
 			device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...)
 
-			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, true)
+			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, true, false)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
 				if err := deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers); err != nil {
@@ -572,7 +572,8 @@ var (
 				return errAddressMismatchEndDevice
 			}
 
-			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths, false)
+			touch, _ := cmd.Flags().GetBool("touch")
+			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths, false, touch)
 			if err != nil {
 				return err
 			}
@@ -1027,6 +1028,7 @@ func init() {
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
+	endDevicesUpdateCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
 	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
 	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags("", ""))
