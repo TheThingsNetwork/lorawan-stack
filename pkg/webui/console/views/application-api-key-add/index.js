@@ -18,11 +18,10 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyCreateForm } from '../../components/api-key-form'
 
 import { getApplicationsRightsList } from '../../store/actions/applications'
@@ -78,12 +77,7 @@ export default class ApplicationApiKeyAdd extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.addApiKey} />
-            <Message component="h2" content={sharedMessages.addApiKey} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.addApiKey} />
         <Row>
           <Col lg={8} md={12}>
             <ApiKeyCreateForm

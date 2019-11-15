@@ -19,21 +19,18 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { push } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import FormSubmit from '../../../components/form/submit'
 import SubmitButton from '../../../components/submit-button'
 import GatewayDataForm from '../../components/gateway-data-form'
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import api from '../../api'
 import { selectUserId } from '../../store/selectors/user'
 import { mayCreateGateways } from '../../lib/feature-checks'
-
-import style from './gateway-add.styl'
 
 const m = defineMessages({
   createGateway: 'Create Gateway',
@@ -104,12 +101,7 @@ export default class GatewayAdd extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.addGateway} />
-            <Message className={style.title} component="h2" content={sharedMessages.addGateway} />
-          </Col>
-        </Row>
+        <PageTitle tall title={sharedMessages.addGateway} />
         <Row>
           <Col md={10} lg={9}>
             <GatewayDataForm

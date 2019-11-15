@@ -16,12 +16,11 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import OrganizationEvents from '../../containers/organization-events'
 
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 
@@ -50,12 +49,7 @@ export default class Data extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={m.orgData} />
-            <Message component="h2" content={m.orgData} />
-          </Col>
-        </Row>
+        <PageTitle hideHeading title={m.orgData} />
         <Row>
           <Col className={style.wrapper}>
             <OrganizationEvents orgId={orgId} />

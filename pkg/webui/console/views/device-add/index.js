@@ -18,10 +18,9 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import DeviceDataForm from '../../components/device-data-form'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
@@ -76,12 +75,7 @@ export default class DeviceAdd extends Component {
   render() {
     return (
       <Container>
-        <Row>
-          <Col sm={12}>
-            <IntlHelmet title={sharedMessages.addDevice} />
-            <Message className={style.title} component="h2" content={sharedMessages.addDevice} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.addDevice} />
         <Row>
           <Col className={style.form} lg={8} md={12}>
             <DeviceDataForm

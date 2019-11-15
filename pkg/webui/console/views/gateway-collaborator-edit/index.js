@@ -18,13 +18,12 @@ import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import { replace } from 'connected-react-router'
 
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
 import CollaboratorForm from '../../components/collaborator-form'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
+import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import withRequest from '../../../lib/components/with-request'
 
 import { getGatewayCollaborator } from '../../store/actions/gateways'
@@ -133,19 +132,10 @@ export default class GatewayCollaboratorEdit extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet
-              title={sharedMessages.collaboratorEdit}
-              values={{ collaboratorId: collaborator.id }}
-            />
-            <Message
-              component="h2"
-              content={sharedMessages.collaboratorEditRights}
-              values={{ collaboratorId: collaborator.id }}
-            />
-          </Col>
-        </Row>
+        <PageTitle
+          title={sharedMessages.collaboratorEdit}
+          values={{ collaboratorId: collaborator.id }}
+        />
         <Row>
           <Col lg={8} md={12}>
             <CollaboratorForm

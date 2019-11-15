@@ -20,14 +20,13 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import Form from '../../../components/form'
 import Input from '../../../components/input'
 import Checkbox from '../../../components/checkbox'
 import SubmitButton from '../../../components/submit-button'
 import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as applicationIdRegexp, address } from '../../lib/regexp'
@@ -184,11 +183,8 @@ export default class Add extends React.Component {
 
     return (
       <Container>
+        <PageTitle tall title={sharedMessages.addApplication} />
         <Row className={style.wrapper}>
-          <Col sm={12}>
-            <IntlHelmet title={sharedMessages.addApplication} />
-            <Message component="h2" content={sharedMessages.addApplication} />
-          </Col>
           <Col className={style.form} md={10} lg={9}>
             <Form
               error={error}

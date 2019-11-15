@@ -17,11 +17,10 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
+import PageTitle from '../../../components/page-title'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Message from '../../../lib/components/message'
 import ApplicationEvents from '../../containers/application-events'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
@@ -53,12 +52,7 @@ export default class Data extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={m.appData} />
-            <Message component="h2" content={m.appData} />
-          </Col>
-        </Row>
+        <PageTitle hideHeading title={m.appData} />
         <Row>
           <Col className={style.wrapper}>
             <ApplicationEvents appId={appId} />

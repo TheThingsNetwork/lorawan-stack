@@ -18,12 +18,11 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import sharedMessages from '../../../lib/shared-messages'
 import CollaboratorForm from '../../components/collaborator-form'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 
 import {
   selectSelectedApplicationId,
@@ -83,12 +82,7 @@ export default class ApplicationCollaboratorAdd extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.addCollaborator} />
-            <Message component="h2" content={sharedMessages.addCollaborator} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.addCollaborator} />
         <Row>
           <Col lg={8} md={12}>
             <CollaboratorForm

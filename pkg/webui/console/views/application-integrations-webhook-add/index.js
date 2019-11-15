@@ -18,10 +18,9 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
 import WebhookForm from '../../components/webhook-form'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -65,12 +64,7 @@ export default class ApplicationWebhookAdd extends Component {
   render() {
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.addWebhook} />
-            <Message component="h2" content={sharedMessages.addWebhook} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.addWebhook} />
         <Row>
           <Col lg={8} md={12}>
             <WebhookForm

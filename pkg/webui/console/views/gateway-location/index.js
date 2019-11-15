@@ -19,10 +19,10 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
+import PageTitle from '../../../components/page-title'
 import LocationForm from '../../../components/location-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 import sharedMessages from '../../../lib/shared-messages'
 
@@ -36,8 +36,6 @@ import {
   longitude as longitudeRegexp,
   int32 as int32Regexp,
 } from '../../lib/regexp'
-
-import style from './gateway-location.styl'
 
 const m = defineMessages({
   setGatewayLocation: 'Set gateway antenna location',
@@ -138,9 +136,9 @@ export default class GatewayLocation extends React.Component {
 
     return (
       <Container>
-        <IntlHelmet title={sharedMessages.location} />
+        <PageTitle title={sharedMessages.location} />
         <Row>
-          <Col className={style.container} lg={8} md={12}>
+          <Col lg={8} md={12}>
             <LocationForm
               entityId={gtwId}
               formTitle={m.setGatewayLocation}

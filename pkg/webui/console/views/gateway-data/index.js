@@ -17,11 +17,10 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
+import PageTitle from '../../../components/page-title'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Message from '../../../lib/components/message'
 import GatewayEvents from '../../containers/gateway-events'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
@@ -47,14 +46,9 @@ export default class Data extends React.Component {
 
     return (
       <Container>
+        <PageTitle hideHeading title={m.gtwData} />
         <Row>
-          <Col>
-            <IntlHelmet title={m.gtwData} />
-            <Message component="h2" content={m.gtwData} />
-          </Col>
-        </Row>
-        <Row>
-          <Col className={style.wrapper} lg={8} md={12}>
+          <Col className={style.wrapper}>
             <GatewayEvents gtwId={gtwId} />
           </Col>
         </Row>
