@@ -4,10 +4,6 @@
     "title": "The Things Stack for LoRaWAN v3 API",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],
