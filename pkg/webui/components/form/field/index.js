@@ -64,6 +64,7 @@ class FormField extends React.Component {
       }),
     ]).isRequired,
     description: PropTypes.message,
+    hidden: PropTypes.bool,
     name: PropTypes.string.isRequired,
     onChange: PropTypes.func,
     required: PropTypes.bool,
@@ -76,6 +77,7 @@ class FormField extends React.Component {
     warning: '',
     description: '',
     required: false,
+    hidden: false,
   }
 
   componentDidMount() {
@@ -141,6 +143,7 @@ class FormField extends React.Component {
       required,
       readOnly,
       component: Component,
+      hidden,
     } = this.props
     const { horizontal, disabled: formDisabled } = this.context
 
@@ -189,6 +192,7 @@ class FormField extends React.Component {
         horizontal,
         required,
         readOnly,
+        hidden,
       }),
     )
 
