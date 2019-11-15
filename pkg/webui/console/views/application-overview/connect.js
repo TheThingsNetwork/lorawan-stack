@@ -34,15 +34,21 @@ import { getApplicationLink } from '../../store/actions/link'
 
 const mapStateToProps = (state, props) => {
   const appId = selectSelectedApplicationId(state)
+  const collaboratorsTotalCount = selectApplicationCollaboratorsTotalCount(state, { id: appId })
+  const apiKeysTotalCount = selectApplicationApiKeysTotalCount(state, { id: appId })
+  const devicesTotalCount = selectSelectedApplicationDevicesTotalCount(state)
 
   return {
     appId,
     application: selectSelectedApplication(state),
-    collaboratorsTotalCount: selectApplicationCollaboratorsTotalCount(state, { id: appId }),
-    apiKeysTotalCount: selectApplicationApiKeysTotalCount(state, { id: appId }),
-    devicesTotalCount: selectSelectedApplicationDevicesTotalCount(state),
+    collaboratorsTotalCount,
+    apiKeysTotalCount,
+    devicesTotalCount,
     link: selectApplicationLinkIndicator(state),
     statusBarFetching:
+      collaboratorsTotalCount === undefined ||
+      apiKeysTotalCount === undefined ||
+      devicesTotalCount === undefined ||
       selectApplicationLinkFetching(state) ||
       selectSelectedApplicationDevicesFetching(state) ||
       selectApplicationApiKeysFetching(state) ||
