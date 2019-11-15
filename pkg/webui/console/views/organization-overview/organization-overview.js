@@ -77,7 +77,7 @@ class Overview extends React.Component {
       <React.Fragment>
         <EntityTitleSection
           entityId={orgId}
-          entityTitle={name}
+          entityName={name}
           description={description}
           creationDate={created_at}
         >
