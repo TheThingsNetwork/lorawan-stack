@@ -16,6 +16,7 @@ import React from 'react'
 import { Formik } from 'formik'
 import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
+import classnames from 'classnames'
 
 import Notification from '../notification'
 import ErrorNotification from '../error-notification'
@@ -24,6 +25,8 @@ import FormContext from './context'
 import FormField from './field'
 import FormInfoField from './field/info'
 import FormSubmit from './submit'
+
+import style from './form.styl'
 
 class InnerForm extends React.PureComponent {
   constructor(props) {
@@ -63,7 +66,7 @@ class InnerForm extends React.PureComponent {
     } = this.props
 
     return (
-      <form className={className} onSubmit={handleSubmit}>
+      <form className={classnames(style.container, className)} onSubmit={handleSubmit}>
         {(formError || formInfo) && (
           <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
             {formError && <ErrorNotification content={formError} small />}
