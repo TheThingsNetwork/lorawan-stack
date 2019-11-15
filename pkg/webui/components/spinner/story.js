@@ -20,6 +20,8 @@ import Spinner from '.'
 storiesOf('Spinner', module)
   .add('Default', () => <Spinner />)
   .add('With children', () => <Spinner>This is a message</Spinner>)
+  .add('With inline children', () => <Spinner inline>This is a message</Spinner>)
   .add('Centered', () => <Spinner center>This is a message</Spinner>)
   .add('Faded', () => <Spinner faded />)
   .add('Small', () => <Spinner small />)
+  .add('Micro', () => <Spinner micro />)
