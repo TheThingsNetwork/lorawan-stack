@@ -129,28 +129,18 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 			logger.WithError(err).Error("Failed to delete Redis key")
 		}
 	}()
-	for {
-		_, err := q.Redis.XGroupCreateMkStream(upStream, q.Group, "0").Result()
-		if err != nil && !ttnredis.IsConsumerGroupExistsErr(err) {
-			return ttnredis.ConvertError(err)
-		}
 
-		var timeout time.Duration
-		if hasDL {
-			timeout = time.Until(dl)
-			if timeout <= 0 {
-				return context.DeadlineExceeded
-			}
-		}
-		rets, err := q.Redis.XReadGroup(&redis.XReadGroupArgs{
-			Group:    q.Group,
-			Consumer: q.ID,
-			Streams:  []string{closeStream, upStream, upStream, ">", "0", ">"},
-			Block:    timeout,
-		}).Result()
+	_, err = q.Redis.XGroupCreateMkStream(upStream, q.Group, "0").Result()
+	if err != nil && !ttnredis.IsConsumerGroupExistsErr(err) {
+		return ttnredis.ConvertError(err)
+	}
+
+	processStreams := func(arg *redis.XReadGroupArgs) error {
+		rets, err := q.Redis.XReadGroup(arg).Result()
 		if err != nil {
 			return ttnredis.ConvertError(err)
 		}
+
 		for _, ret := range rets {
 			switch ret.Stream {
 			case closeStream:
@@ -179,6 +169,32 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 					}
 				}
 			}
+		}
+		return nil
+	}
+
+	if err = processStreams(&redis.XReadGroupArgs{
+		Group:    q.Group,
+		Consumer: q.ID,
+		Streams:  []string{upStream, "0"},
+	}); err != nil {
+		return err
+	}
+	for {
+		var timeout time.Duration
+		if hasDL {
+			timeout = time.Until(dl)
+			if timeout <= 0 {
+				return context.DeadlineExceeded
+			}
+		}
+		if err = processStreams(&redis.XReadGroupArgs{
+			Group:    q.Group,
+			Consumer: q.ID,
+			Streams:  []string{closeStream, upStream, ">", ">"},
+			Block:    timeout,
+		}); err != nil {
+			return err
 		}
 	}
 }
