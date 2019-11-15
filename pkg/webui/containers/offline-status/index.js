@@ -46,19 +46,18 @@ export default class OfflineStatus extends Component {
   }
 
   handleMessage(message, type) {
-    const { showWarnings } = this.props
-    if (showWarnings) {
-      toast({
-        message,
-        type,
-      })
-    }
+    toast({
+      message,
+      type,
+    })
   }
 
   componentDidUpdate(prevProps) {
-    const online = this.props
-    if (online && !prevProps.online) {
+    const { online, showWarnings } = this.props
+    if (showWarnings && online && !prevProps.online) {
       this.handleMessage(m.online, toast.types.INFO)
+    } else if (showWarnings && !online) {
+      this.handleMessage(m.offline, toast.types.ERROR)
     }
   }
 
@@ -76,7 +75,6 @@ export default class OfflineStatus extends Component {
     } else {
       statusIndicator = 'bad'
       message = sharedMessages.offline
-      this.handleMessage(m.offline, toast.types.ERROR)
     }
 
     if (!showOfflineOnly || !online) {
@@ -88,6 +86,5 @@ export default class OfflineStatus extends Component {
         </span>
       )
     }
-    return false
   }
 }
