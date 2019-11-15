@@ -57,6 +57,7 @@ const m = defineMessages({
 export class SafeInspector extends Component {
   static defaultProps = {
     className: undefined,
+    noCopyPopup: false,
     disableResize: false,
     hideable: true,
     initiallyVisible: false,
@@ -67,20 +68,22 @@ export class SafeInspector extends Component {
   static propTypes = {
     /** The classname to be applied **/
     className: PropTypes.string,
-    /** The data to be displayed */
+    /** Whether to hide the copy popup click and just display checkmark */
     data: PropTypes.string.isRequired,
-    /** Whether the component should resize when its data is truncated */
+    /** The data to be displayed */
     disableResize: PropTypes.bool,
-    /** Whether the data can be hidden (like passwords) */
+    /** Whether the component should resize when its data is truncated */
     hideable: PropTypes.bool,
-    /** Whether the data is initially visible */
+    /** Whether the data can be hidden (like passwords) */
     initiallyVisible: PropTypes.bool,
-    /** Utility functions passed via react-intl hoc **/
+    /** Whether the data is initially visible */
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
     }).isRequired,
-    /** Whether the data is in byte format */
+    /** Utility functions passed via react-intl hoc **/
     isBytes: PropTypes.bool,
+    /** Whether the data is in byte format */
+    noCopyPopup: PropTypes.bool,
     /** Whether a smaller style should be rendered (useful for display in tables) */
     small: PropTypes.bool,
   }
@@ -92,6 +95,7 @@ export class SafeInspector extends Component {
       hidden: (props.hideable && !props.initiallyVisible) || false,
       byteStyle: true,
       copied: false,
+      copyIcon: 'file_copy',
       msb: true,
       truncated: false,
     }
@@ -125,11 +129,17 @@ export class SafeInspector extends Component {
   }
 
   handleCopyClick() {
-    this.setState({ copied: true })
+    const { noCopyPopup } = this.props
+    this.setState({ copied: true, copyIcon: 'done' })
+    if (noCopyPopup) {
+      setTimeout(() => {
+        this.setState({ copied: false, copyIcon: 'file_copy' })
+      }, 2000)
+    }
   }
 
   handleCopyAnimationEnd() {
-    this.setState({ copied: false })
+    this.setState({ copied: false, copyIcon: 'file_copy' })
   }
 
   componentDidMount() {
@@ -169,9 +179,9 @@ export class SafeInspector extends Component {
   }
 
   render() {
-    const { hidden, byteStyle, msb, copied } = this.state
+    const { hidden, byteStyle, msb, copied, copyIcon } = this.state
 
-    const { className, data, isBytes, hideable, small, intl } = this.props
+    const { className, data, isBytes, hideable, small, intl, noCopyPopup } = this.props
 
     let formattedData = isBytes ? data.toUpperCase() : data
     let display = formattedData
@@ -198,6 +208,10 @@ export class SafeInspector extends Component {
     const dataStyle = classnames(style.data, {
       [style.dataHidden]: hidden,
       [style.dataTruncated]: this.state.truncated,
+    })
+
+    const copyButtonStyle = classnames(style.buttonIcon, {
+      [style.buttonIconCopied]: copied,
     })
 
     return (
@@ -235,12 +249,12 @@ export class SafeInspector extends Component {
             ref={this.copyElem}
           >
             <Icon
-              className={style.buttonIcon}
+              className={copyButtonStyle}
               onClick={this.handleCopyClick}
               small
-              icon="file_copy"
+              icon={copyIcon}
             />
-            {copied && (
+            {copied && !noCopyPopup && (
               <Message
                 content={m.copied}
                 onAnimationEnd={this.handleCopyAnimationEnd}
