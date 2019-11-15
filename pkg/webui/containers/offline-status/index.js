@@ -41,8 +41,8 @@ export default class OfflineStatus extends Component {
 
   static defaultProps = {
     online: undefined,
-    showOfflineOnly: true,
-    showWarnings: true,
+    showOfflineOnly: false,
+    showWarnings: false,
   }
 
   handleMessage(message, type) {
