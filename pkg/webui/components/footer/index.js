@@ -46,7 +46,7 @@ const Footer = function({ className, links, supportLink }) {
             <Message content={item.title} />
           </Link>
         ))}
-        <OfflineStatus />
+        <OfflineStatus showOfflineOnly showWarnings />
         <span className={style.version}>v{process.env.VERSION}</span>
         {supportLink && (
           <Button.AnchorLink
