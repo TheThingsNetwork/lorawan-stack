@@ -266,6 +266,11 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		LoRaWANVersion: dev.LoRaWANVersion,
 		DeviceClass:    class,
 	}
+	if dev.GetMACSettings().GetPingSlotPeriodicity() != nil {
+		macState.PingSlotPeriodicity = dev.MACSettings.PingSlotPeriodicity
+	} else if defaults.GetPingSlotPeriodicity() != nil {
+		macState.PingSlotPeriodicity = defaults.PingSlotPeriodicity
+	}
 
 	macState.CurrentParameters.MaxEIRP = phy.DefaultMaxEIRP
 	macState.DesiredParameters.MaxEIRP = macState.CurrentParameters.MaxEIRP
@@ -367,6 +372,8 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 	macState.CurrentParameters.MaxDutyCycle = ttnpb.DUTY_CYCLE_1
 	if dev.GetMACSettings().GetMaxDutyCycle() != nil {
 		macState.CurrentParameters.MaxDutyCycle = dev.MACSettings.MaxDutyCycle.Value
+	} else if defaults.MaxDutyCycle != nil {
+		macState.CurrentParameters.MaxDutyCycle = defaults.MaxDutyCycle.Value
 	}
 	macState.DesiredParameters.MaxDutyCycle = macState.CurrentParameters.MaxDutyCycle
 	if dev.GetMACSettings().GetDesiredMaxDutyCycle() != nil {
@@ -391,24 +398,40 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		macState.CurrentParameters.PingSlotFrequency = *phy.Beacon.PingSlotChannel
 	}
 	macState.DesiredParameters.PingSlotFrequency = macState.CurrentParameters.PingSlotFrequency
-	if fp.PingSlot != nil && fp.PingSlot.Frequency != 0 {
+	if dev.GetMACSettings().GetDesiredPingSlotFrequency() != nil && dev.MACSettings.DesiredPingSlotFrequency.Value != 0 {
+		macState.DesiredParameters.PingSlotFrequency = dev.MACSettings.DesiredPingSlotFrequency.Value
+	} else if fp.PingSlot != nil && fp.PingSlot.Frequency != 0 {
 		macState.DesiredParameters.PingSlotFrequency = fp.PingSlot.Frequency
+	} else if defaults.DesiredPingSlotFrequency != nil && defaults.DesiredPingSlotFrequency.Value != 0 {
+		macState.DesiredParameters.PingSlotFrequency = defaults.DesiredPingSlotFrequency.Value
 	}
 
-	macState.CurrentParameters.PingSlotDataRateIndex = ttnpb.DATA_RATE_0
 	if dev.GetMACSettings().GetPingSlotDataRateIndex() != nil {
-		macState.CurrentParameters.PingSlotDataRateIndex = dev.MACSettings.PingSlotDataRateIndex.Value
+		macState.CurrentParameters.PingSlotDataRateIndex = dev.MACSettings.PingSlotDataRateIndex
 	} else if defaults.PingSlotDataRateIndex != nil {
-		macState.CurrentParameters.PingSlotDataRateIndex = defaults.PingSlotDataRateIndex.Value
+		macState.CurrentParameters.PingSlotDataRateIndex = defaults.PingSlotDataRateIndex
 	}
 	macState.DesiredParameters.PingSlotDataRateIndex = macState.CurrentParameters.PingSlotDataRateIndex
-	if fp.DefaultPingSlotDataRate != nil {
-		macState.DesiredParameters.PingSlotDataRateIndex = ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)
+	if dev.GetMACSettings().GetDesiredPingSlotDataRateIndex() != nil {
+		macState.DesiredParameters.PingSlotDataRateIndex = dev.MACSettings.DesiredPingSlotDataRateIndex
+	} else if fp.DefaultPingSlotDataRate != nil {
+		macState.DesiredParameters.PingSlotDataRateIndex = &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)}
+	} else if defaults.DesiredPingSlotDataRateIndex != nil {
+		macState.DesiredParameters.PingSlotDataRateIndex = defaults.DesiredPingSlotDataRateIndex
 	}
 
-	// TODO: Support class B. (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
 	macState.CurrentParameters.BeaconFrequency = 0
+	if dev.GetMACSettings().GetBeaconFrequency() != nil && dev.MACSettings.BeaconFrequency.Value != 0 {
+		macState.CurrentParameters.BeaconFrequency = dev.MACSettings.BeaconFrequency.Value
+	} else if defaults.BeaconFrequency != nil {
+		macState.CurrentParameters.BeaconFrequency = defaults.BeaconFrequency.Value
+	}
 	macState.DesiredParameters.BeaconFrequency = macState.CurrentParameters.BeaconFrequency
+	if dev.GetMACSettings().GetDesiredBeaconFrequency() != nil && dev.MACSettings.DesiredBeaconFrequency.Value != 0 {
+		macState.DesiredParameters.BeaconFrequency = dev.MACSettings.DesiredBeaconFrequency.Value
+	} else if defaults.DesiredBeaconFrequency != nil && defaults.DesiredBeaconFrequency.Value != 0 {
+		macState.DesiredParameters.BeaconFrequency = defaults.DesiredBeaconFrequency.Value
+	}
 
 	if len(phy.DownlinkChannels) > len(phy.UplinkChannels) || len(fp.DownlinkChannels) > len(fp.UplinkChannels) ||
 		len(phy.UplinkChannels) > int(phy.MaxUplinkChannels) || len(phy.DownlinkChannels) > int(phy.MaxDownlinkChannels) ||
