@@ -451,7 +451,7 @@ It is also possible to use `go build`, or release snapshots, as described below.
 
 ## Releasing
 
-You can build a release snapshot with `./mage buildSnapshot`.
+You can build a release snapshot with `go run github.com/goreleaser/goreleaser --snapshot`.
 
 > Note: You will at least need to have [`rpm`](http://rpm5.org/) and [`snapcraft`](https://snapcraft.io/) in your `PATH`.
 
@@ -462,8 +462,9 @@ This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcra
 
 Releasing a new version consists of the following steps:
 
-1. Updating the `CHANGELOG.md` file:
-  - Change the **Unreleased** section to the new version
+1. Creating a `release/<version>` branch(further, called "release branch") (e.g. `release/3.2.1`).
+2. Updating the `CHANGELOG.md` file:
+  - Change the **Unreleased** section to the new version and add date obtained via `date +%Y-%m-%d` (e.g. `## [3.2.1] - 2019-10-11`)
   - Check if we didn't forget anything important
   - Remove empty subsections
   - Update the list of links in the bottom of the file
@@ -483,12 +484,16 @@ Releasing a new version consists of the following steps:
 
     ### Security
     ```
-2. Updating the `SECURITY.md` file with the supported versions
-3. Bumping the version
-4. Writing the version files
-5. Creating the version bump commit
-6. Creating the version tag
-7. Building the release and pushing to package managers (this is done by CI)
+3. Updating the `SECURITY.md` file with the supported versions
+4. Bumping the version
+5. Writing the version files
+6. Creating the version bump commit
+7. Creating a pull request from release branch containing all changes made so far to `master`
+8. Merging all commits from release branch to `master` locally via `git merge --ff-only release/<version>`
+9. Creating the version tag
+10. Pushing the version tag
+11. Pushing `master`
+12. Building the release and pushing to package managers (this is done by CI)
 
 Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
 
@@ -505,12 +510,22 @@ These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5
 A typical release process is executed directly on the `master` branch and looks like this:
 
 ```bash
+$ version=$(./mage version:bumpPatch version:current)
+$ git checkout -b "release/${version}"
+$ ${EDITOR:-vim} CHANGELOG.md SECURITY.md # edit CHANGELOG.md and SECURITY.md
 $ git add CHANGELOG.md SECURITY.md
-$ ./mage version:bumpPatch version:files version:commitBump version:tag
-$ git push origin $(mage version:current)
-$ git push origin master
+$ ./mage version:bumpPatch version:files version:commitBump
+$ git push origin "release/${version}"
 ```
 
-Note that you must have sufficient repository rights to push to `master`.
+After this, open a pull request from `release/${version}`. After it is approved:
+
+```bash
+$ git checkout master
+$ git merge --ff-only "release/${version}"
+$ ./mage version:bumpPatch version:tag
+$ git push origin ${version}
+$ git push origin master
+```
 
 After pushing the tag, our CI system will start building the release. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases). After this is done, you'll need to edit the release notes. We typically copy-paste these from `CHANGELOG.md`.
