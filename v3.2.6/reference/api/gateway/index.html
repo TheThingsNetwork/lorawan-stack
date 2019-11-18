@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Gateway APIs | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.6/reference/api/gateway/" />
+  <link rel="icon" type="image/png" href="/v3.2.6/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.6/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Gateway APIs">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Gateway APIs">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.6/reference/api/gateway/">
+  <meta name="twitter:title" content="Gateway APIs" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.6/">
+        <img src="/v3.2.6/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.6/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.6/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.6/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.6/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.6/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">API</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.6/reference/api/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/reference/api/authentication/" class="">Authentication</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/reference/api/application/" class="">Application APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/reference/api/application_server/" class="">Application Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/reference/api/application_webhooks/" class="">Application Webhook APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/reference/api/application_pub_sub/" class="">Application Pub-Sub APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/reference/api/gateway/" class="is-active">Gateway APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/reference/api/gateway_server/" class="">Gateway Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/reference/api/end_device/" class="">End Device APIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Gateway APIs</h1>
+
+<div class="content">
+
+<h2 id="the-gatewayregistry-service">The <code>GatewayRegistry</code> service</h2>
+
+
+<h3>Method <code>GatewayRegistry.Create</code></h3>
+<p>Create a new gateway. This also sets the given organization or user as
+ first collaborator with all possible rights.</p>
+
+<p>
+  Request: <a href="#message:CreateGatewayRequest"><code>CreateGatewayRequest</code></a>
+  <br>
+  Response: <a href="#message:Gateway"><code>Gateway</code></a>
+</p>
+<p><code>POST</code> <code>/users/{collaborator.user_ids.user_id}/gateways</code></p>
+<p><code>POST</code> <code>/organizations/{collaborator.organization_ids.organization_id}/gateways</code></p>
+
+
+
+<h3>Method <code>GatewayRegistry.Get</code></h3>
+<p>Get the gateway with the given identifiers, selecting the fields given
+ by the field mask. The method may return more or less fields, depending on
+ the rights of the caller.</p>
+
+<p>
+  Request: <a href="#message:GetGatewayRequest"><code>GetGatewayRequest</code></a>
+  <br>
+  Response: <a href="#message:Gateway"><code>Gateway</code></a>
+</p>
+<p><code>GET</code> <code>/gateways/{gateway_ids.gateway_id}</code></p>
+
+
+
+<h3>Method <code>GatewayRegistry.List</code></h3>
+<p>List gateways. See request message for details.</p>
+
+<p>
+  Request: <a href="#message:ListGatewaysRequest"><code>ListGatewaysRequest</code></a>
+  <br>
+  Response: <a href="#message:Gateways"><code>Gateways</code></a>
+</p>
+<p><code>GET</code> <code>/gateways</code></p>
+<p><code>GET</code> <code>/users/{collaborator.user_ids.user_id}/gateways</code></p>
+<p><code>GET</code> <code>/organizations/{collaborator.organization_ids.organization_id}/gateways</code></p>
+
+
+
+<h3>Method <code>GatewayRegistry.Update</code></h3>
+
+<p>
+  Request: <a href="#message:UpdateGatewayRequest"><code>UpdateGatewayRequest</code></a>
+  <br>
+  Response: <a href="#message:Gateway"><code>Gateway</code></a>
+</p>
+<p><code>PUT</code> <code>/gateways/{gateway.ids.gateway_id}</code></p>
+
+
+
+<h3>Method <code>GatewayRegistry.Delete</code></h3>
+
+<p>
+  Request: <a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>DELETE</code> <code>/gateways/{gateway_id}</code></p>
+
+
+<h2 id="the-gatewayaccess-service">The <code>GatewayAccess</code> service</h2>
+
+
+<h3>Method <code>GatewayAccess.ListRights</code></h3>
+
+<p>
+  Request: <a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>
+  <br>
+  Response: <a href="#message:Rights"><code>Rights</code></a>
+</p>
+<p><code>GET</code> <code>/gateways/{gateway_id}/rights</code></p>
+
+
+
+<h3>Method <code>GatewayAccess.CreateAPIKey</code></h3>
+
+<p>
+  Request: <a href="#message:CreateGatewayAPIKeyRequest"><code>CreateGatewayAPIKeyRequest</code></a>
+  <br>
+  Response: <a href="#message:APIKey"><code>APIKey</code></a>
+</p>
+<p><code>POST</code> <code>/gateways/{gateway_ids.gateway_id}/api-keys</code></p>
+
+
+
+<h3>Method <code>GatewayAccess.ListAPIKeys</code></h3>
+
+<p>
+  Request: <a href="#message:ListGatewayAPIKeysRequest"><code>ListGatewayAPIKeysRequest</code></a>
+  <br>
+  Response: <a href="#message:APIKeys"><code>APIKeys</code></a>
+</p>
+<p><code>GET</code> <code>/gateways/{gateway_ids.gateway_id}/api-keys</code></p>
+
+
+
+<h3>Method <code>GatewayAccess.GetAPIKey</code></h3>
+
+<p>
+  Request: <a href="#message:GetGatewayAPIKeyRequest"><code>GetGatewayAPIKeyRequest</code></a>
+  <br>
+  Response: <a href="#message:APIKey"><code>APIKey</code></a>
+</p>
+<p><code>GET</code> <code>/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}</code></p>
+
+
+
+<h3>Method <code>GatewayAccess.UpdateAPIKey</code></h3>
+<p>Update the rights of an existing gateway API key. To generate an API key,
+ the CreateAPIKey should be used. To delete an API key, update it
+ with zero rights. It is required for the caller to have all assigned or/and removed rights.</p>
+
+<p>
+  Request: <a href="#message:UpdateGatewayAPIKeyRequest"><code>UpdateGatewayAPIKeyRequest</code></a>
+  <br>
+  Response: <a href="#message:APIKey"><code>APIKey</code></a>
+</p>
+<p><code>PUT</code> <code>/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}</code></p>
+
+
+
+<h3>Method <code>GatewayAccess.GetCollaborator</code></h3>
+<p>Get the rights of a collaborator (member) of the gateway.
+ Pseudo-rights in the response (such as the &ldquo;_ALL&rdquo; right) are not expanded.</p>
+
+<p>
+  Request: <a href="#message:GetGatewayCollaboratorRequest"><code>GetGatewayCollaboratorRequest</code></a>
+  <br>
+  Response: <a href="#message:GetCollaboratorResponse"><code>GetCollaboratorResponse</code></a>
+</p>
+<p><code>GET</code> <code>/gateways/{gateway_ids.gateway_id}/collaborator</code></p>
+<p><code>GET</code> <code>/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}</code></p>
+<p><code>GET</code> <code>/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}</code></p>
+
+
+
+<h3>Method <code>GatewayAccess.SetCollaborator</code></h3>
+<p>Set the rights of a collaborator (member) on the gateway. It is required for the caller to
+ have all assigned or/and removed rights.
+ Setting a collaborator without rights, removes them.</p>
+
+<p>
+  Request: <a href="#message:SetGatewayCollaboratorRequest"><code>SetGatewayCollaboratorRequest</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>PUT</code> <code>/gateways/{gateway_ids.gateway_id}/collaborators</code></p>
+
+
+
+<h3>Method <code>GatewayAccess.ListCollaborators</code></h3>
+
+<p>
+  Request: <a href="#message:ListGatewayCollaboratorsRequest"><code>ListGatewayCollaboratorsRequest</code></a>
+  <br>
+  Response: <a href="#message:Collaborators"><code>Collaborators</code></a>
+</p>
+<p><code>GET</code> <code>/gateways/{gateway_ids.gateway_id}/collaborators</code></p>
+
+
+<h2 id="the-configuration-service">The <code>Configuration</code> service</h2>
+
+<p>The Gateway Server exposes the list of available frequency plans with the <code>Configuration</code> service.</p>
+
+
+<h3>Method <code>Configuration.ListFrequencyPlans</code></h3>
+
+<p>
+  Request: <a href="#message:ListFrequencyPlansRequest"><code>ListFrequencyPlansRequest</code></a>
+  <br>
+  Response: <a href="#message:ListFrequencyPlansResponse"><code>ListFrequencyPlansResponse</code></a>
+</p>
+<p><code>GET</code> <code>/configuration/frequency-plans</code></p>
+
+
+<h2 id="messages">Messages</h2>
+
+<h3 id="message:APIKey">Message <code>APIKey</code></h3>
+
+<dl>
+  <dt>
+    <code>id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Immutable and unique public identifier for the API key.
+ Generated by the Access Server.</p>
+  </dd>
+  <dt>
+    <code>key</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Immutable and unique secret value of the API key.
+ Generated by the Access Server.</p>
+  </dd>
+  <dt>
+    <code>name</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>50</code></p>
+      <p>User-defined (friendly) name for the API key.</p>
+  </dd>
+  <dt>
+    <code>rights</code>
+    (repeated <a href="#enum:Right"><code>Right</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+      <p>Rights that are granted to this API key.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "id": "",
+  "key": "",
+  "name": "",
+  "rights": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:APIKeys">Message <code>APIKeys</code></h3>
+
+<dl>
+  <dt>
+    <code>api_keys</code>
+    (repeated <a href="#message:APIKey"><code>APIKey</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "api_keys": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:Collaborator">Message <code>Collaborator</code></h3>
+
+<dl>
+  <dt>
+    <code>ids</code>
+    (<a href="#message:OrganizationOrUserIdentifiers"><code>OrganizationOrUserIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>rights</code>
+    (repeated <a href="#enum:Right"><code>Right</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "ids": {},
+  "rights": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:Collaborators">Message <code>Collaborators</code></h3>
+
+<dl>
+  <dt>
+    <code>collaborators</code>
+    (repeated <a href="#message:Collaborator"><code>Collaborator</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "collaborators": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:CreateGatewayAPIKeyRequest">Message <code>CreateGatewayAPIKeyRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>name</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>50</code></p>
+  </dd>
+  <dt>
+    <code>rights</code>
+    (repeated <a href="#enum:Right"><code>Right</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "name": "",
+  "rights": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:CreateGatewayRequest">Message <code>CreateGatewayRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway</code>
+    (<a href="#message:Gateway"><code>Gateway</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>collaborator</code>
+    (<a href="#message:OrganizationOrUserIdentifiers"><code>OrganizationOrUserIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+      <p>Collaborator to grant all rights on the newly created gateway.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway": {},
+  "collaborator": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:FrequencyPlanDescription">Message <code>FrequencyPlanDescription</code></h3>
+
+<dl>
+  <dt>
+    <code>id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>base_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>The ID of the frequency that the current frequency plan is based on.</p>
+  </dd>
+  <dt>
+    <code>name</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>base_frequency</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Base frequency in MHz for hardware support (433, 470, 868 or 915)</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "id": "",
+  "base_id": "",
+  "name": "",
+  "base_frequency": 0,
+}</code></pre>
+</details>
+
+
+<h3 id="message:Gateway">Message <code>Gateway</code></h3>
+<p>Gateway is the message that defines a gateway on the network.</p>
+
+<dl>
+  <dt>
+    <code>ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>created_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>updated_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>name</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>50</code></p>
+  </dd>
+  <dt>
+    <code>description</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2000</code></p>
+  </dd>
+  <dt>
+    <code>attributes</code>
+    (map of <code>string</code> to <code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>contact_info</code>
+    (repeated <a href="#message:ContactInfo"><code>ContactInfo</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>version_ids</code>
+    (<a href="#message:GatewayVersionIdentifiers"><code>GatewayVersionIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>gateway_server_address</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$</code></p>
+      <p>The address of the Gateway Server to connect to.
+ The typical format of the address is &ldquo;host:port&rdquo;. If the port is omitted,
+ the normal port inference (with DNS lookup, otherwise defaults) is used.
+ The connection shall be established with transport layer security (TLS).
+ Custom certificate authorities may be configured out-of-band.</p>
+  </dd>
+  <dt>
+    <code>auto_update</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>update_channel</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>frequency_plan_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>64</code></p>
+  </dd>
+  <dt>
+    <code>antennas</code>
+    (repeated <a href="#message:GatewayAntenna"><code>GatewayAntenna</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>status_public</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>The status of this gateway may be publicly displayed.</p>
+  </dd>
+  <dt>
+    <code>location_public</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>The location of this gateway may be publicly displayed.</p>
+  </dd>
+  <dt>
+    <code>schedule_downlink_late</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>Enable server-side buffering of downlink messages. This is recommended for gateways using the Semtech UDP Packet
+ Forwarder v2.x or older, as it does not feature a just-in-time queue. If enabled, the Gateway Server schedules the
+ downlink message late to the gateway so that it does not overwrite previously scheduled downlink messages that have
+ not been transmitted yet.</p>
+  </dd>
+  <dt>
+    <code>enforce_duty_cycle</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the
+ duty cycle only in controlled research and development environments.</p>
+  </dd>
+  <dt>
+    <code>downlink_path_constraint</code>
+    (<a href="#enum:DownlinkPathConstraint"><code>DownlinkPathConstraint</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "ids": {},
+  "created_at": "0001-01-01T00:00:00Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "name": "",
+  "description": "",
+  "attributes": {},
+  "contact_info": [],
+  "version_ids": {},
+  "gateway_server_address": "",
+  "auto_update": false,
+  "update_channel": "",
+  "frequency_plan_id": "",
+  "antennas": [],
+  "status_public": false,
+  "location_public": false,
+  "schedule_downlink_late": false,
+  "enforce_duty_cycle": false,
+  "downlink_path_constraint": "DOWNLINK_PATH_CONSTRAINT_NONE",
+}</code></pre>
+</details>
+
+
+<h3 id="message:GatewayAntenna">Message <code>GatewayAntenna</code></h3>
+<p>GatewayAntenna is the message that defines a gateway antenna.</p>
+
+<dl>
+  <dt>
+    <code>gain</code>
+    (<code>float</code>)
+  </dt>
+  <dd>
+      <p>gain is the antenna gain relative to this gateway, in dBi.</p>
+  </dd>
+  <dt>
+    <code>location</code>
+    (<a href="#message:Location"><code>Location</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+      <p>location is the antenna&rsquo;s location.</p>
+  </dd>
+  <dt>
+    <code>attributes</code>
+    (map of <code>string</code> to <code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gain": 0,
+  "location": {},
+  "attributes": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:GatewayIdentifiers">Message <code>GatewayIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>Secondary identifier, which can only be used in specific requests.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_id": "",
+  "eui": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:Gateways">Message <code>Gateways</code></h3>
+
+<dl>
+  <dt>
+    <code>gateways</code>
+    (repeated <a href="#message:Gateway"><code>Gateway</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateways": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:GatewayVersionIdentifiers">Message <code>GatewayVersionIdentifiers</code></h3>
+<p>Identifies an end device model with version information.</p>
+
+<dl>
+  <dt>
+    <code>brand_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>model_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>hardware_version</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>firmware_version</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "brand_id": "",
+  "model_id": "",
+  "hardware_version": "",
+  "firmware_version": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:GetCollaboratorResponse">Message <code>GetCollaboratorResponse</code></h3>
+
+<dl>
+  <dt>
+    <code>ids</code>
+    (<a href="#message:OrganizationOrUserIdentifiers"><code>OrganizationOrUserIdentifiers</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>rights</code>
+    (repeated <a href="#enum:Right"><code>Right</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "ids": {},
+  "rights": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:GetGatewayAPIKeyRequest">Message <code>GetGatewayAPIKeyRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>key_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Unique public identifier for the API key.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "key_id": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:GetGatewayCollaboratorRequest">Message <code>GetGatewayCollaboratorRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>collaborator</code>
+    (<a href="#message:OrganizationOrUserIdentifiers"><code>OrganizationOrUserIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "collaborator": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:GetGatewayRequest">Message <code>GetGatewayRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:ListFrequencyPlansRequest">Message <code>ListFrequencyPlansRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>base_frequency</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Optional base frequency in MHz for hardware support (433, 470, 868 or 915)</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "base_frequency": 0,
+}</code></pre>
+</details>
+
+
+<h3 id="message:ListFrequencyPlansResponse">Message <code>ListFrequencyPlansResponse</code></h3>
+
+<dl>
+  <dt>
+    <code>frequency_plans</code>
+    (repeated <a href="#message:FrequencyPlanDescription"><code>FrequencyPlanDescription</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "frequency_plans": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:ListGatewayAPIKeysRequest">Message <code>ListGatewayAPIKeysRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>limit</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p><code>lte</code>: <code>1000</code></p>
+      <p>Limit the number of results per page.</p>
+  </dd>
+  <dt>
+    <code>page</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Page number for pagination. 0 is interpreted as 1.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "limit": 0,
+  "page": 0,
+}</code></pre>
+</details>
+
+
+<h3 id="message:ListGatewayCollaboratorsRequest">Message <code>ListGatewayCollaboratorsRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>limit</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p><code>lte</code>: <code>1000</code></p>
+      <p>Limit the number of results per page.</p>
+  </dd>
+  <dt>
+    <code>page</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Page number for pagination. 0 is interpreted as 1.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "limit": 0,
+  "page": 0,
+}</code></pre>
+</details>
+
+
+<h3 id="message:ListGatewaysRequest">Message <code>ListGatewaysRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>collaborator</code>
+    (<a href="#message:OrganizationOrUserIdentifiers"><code>OrganizationOrUserIdentifiers</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>order</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Order the results by this field path (must be present in the field mask).
+ Default ordering is by ID. Prepend with a minus (-) to reverse the order.</p>
+  </dd>
+  <dt>
+    <code>limit</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p><code>lte</code>: <code>1000</code></p>
+      <p>Limit the number of results per page.</p>
+  </dd>
+  <dt>
+    <code>page</code>
+    (<code>uint32</code>)
+  </dt>
+  <dd>
+      <p>Page number for pagination. 0 is interpreted as 1.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "collaborator": {},
+  "field_mask": {},
+  "order": "",
+  "limit": 0,
+  "page": 0,
+}</code></pre>
+</details>
+
+
+<h3 id="message:OrganizationOrUserIdentifiers">Message <code>OrganizationOrUserIdentifiers</code></h3>
+<p>OrganizationOrUserIdentifiers contains either organization or user identifiers.</p>
+
+<dl>
+  <dt>
+    <code>organization_ids</code>
+    (<a href="#message:OrganizationIdentifiers"><code>OrganizationIdentifiers</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>user_ids</code>
+    (<a href="#message:UserIdentifiers"><code>UserIdentifiers</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+  <p><code>ids</code>: only one of <code>organization_ids</code>, <code>user_ids</code> can be set.</p>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "organization_ids": {},
+  "user_ids": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:Rights">Message <code>Rights</code></h3>
+
+<dl>
+  <dt>
+    <code>rights</code>
+    (repeated <a href="#enum:Right"><code>Right</code></a>)
+  </dt>
+  <dd>
+      <p><code>defined_only</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "rights": [],
+}</code></pre>
+</details>
+
+
+<h3 id="message:SetGatewayCollaboratorRequest">Message <code>SetGatewayCollaboratorRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>collaborator</code>
+    (<a href="#message:Collaborator"><code>Collaborator</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "collaborator": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:UpdateGatewayAPIKeyRequest">Message <code>UpdateGatewayAPIKeyRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway_ids</code>
+    (<a href="#message:GatewayIdentifiers"><code>GatewayIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>api_key</code>
+    (<a href="#message:APIKey"><code>APIKey</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway_ids": {},
+  "api_key": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:UpdateGatewayRequest">Message <code>UpdateGatewayRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>gateway</code>
+    (<a href="#message:Gateway"><code>Gateway</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "gateway": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+
+<h3 id="message:UserIdentifiers">Message <code>UserIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>user_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+      <p>This ID shares namespace with organization IDs.</p>
+  </dd>
+  <dt>
+    <code>email</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Secondary identifier, which can only be used in specific requests.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "user_id": "",
+  "email": "",
+}</code></pre>
+</details>
+
+
+<h2 id="enums">Enums</h2>
+
+
+<h3 id="enum:DownlinkPathConstraint">Enum <code>DownlinkPathConstraint</code></h3>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DOWNLINK_PATH_CONSTRAINT_NONE</code></td>
+      <td><code>0</code></td>
+      <td> Indicates that the gateway can be selected for downlink without constraints by the Network Server.</td>
+    </tr>
+    <tr>
+      <td><code>DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER</code></td>
+      <td><code>1</code></td>
+      <td> Indicates that the gateway can be selected for downlink only if no other or better gateway can be selected.</td>
+    </tr>
+    <tr>
+      <td><code>DOWNLINK_PATH_CONSTRAINT_NEVER</code></td>
+      <td><code>2</code></td>
+      <td> Indicates that this gateway will never be selected for downlink, even if that results in no available downlink path.</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.6/reference/api/application_pub_sub/">← Application Pub-Sub APIs</a>
+<a class="button is-pulled-right" href="/v3.2.6/reference/api/gateway_server/">Gateway Server APIs →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.6/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.6/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.6/components/">Components</a></p>
+        <p><a class="" href="/v3.2.6/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 31 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/466ec488d719a7c1193b074173180ab8bbc0ddf0">
+      doc: Add high level IS component documentation
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/api/gateway.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.6/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

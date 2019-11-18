@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Console | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.6/guides/getting-started/console/" />
+  <link rel="icon" type="image/png" href="/v3.2.6/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.6/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Console">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Console">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.6/guides/getting-started/console/">
+  <meta name="twitter:title" content="Console" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.6/">
+        <img src="/v3.2.6/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.6/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.6/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.2.6/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.6/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.6/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Getting Started</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.2.6/guides/getting-started/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/guides/getting-started/installation/" class="">Installation</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/guides/getting-started/certificates/" class="">Certificates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/guides/getting-started/configuration/" class="">Configuration</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/guides/getting-started/running-the-stack/" class="">Running The Things Stack</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/guides/getting-started/console/" class="is-active">Console</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/guides/getting-started/cli/" class="">Command-line Interface</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/guides/getting-started/mqtt/" class="">MQTT Server</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.2.6/guides/getting-started/webhooks/" class="">HTTP Webhooks</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Console</h1>
+
+<div class="content">
+
+<h2 id="login">Login</h2>
+
+<p>The Console needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running, open <code>https://thethings.example.com</code> (replace with the URL of your deployment) in your browser.</p>
+
+<figure>
+    <img src="front.png"
+         alt="Front page"/> 
+</figure>
+
+
+<p>You are now on the Console landing page. Click <strong>Login with your The Things Stack Account</strong> in order to reach the login page.</p>
+
+<figure>
+    <img src="login.png"
+         alt="Login"/> 
+</figure>
+
+
+<p>After entering your credentials and logging in, you will reach the Console overview page. You can now fully use the capabilities of the Console.</p>
+
+<figure>
+    <img src="overview.png"
+         alt="Overview"/> 
+</figure>
+
+
+<h2 id="create-gateway">Create gateway</h2>
+
+<p>Go to <strong>Gateways</strong> in the top menu, and click <strong>+ Add Gateway</strong> to reach the gateway registration page. Fill the gateway ID, gateway EUI (if your gateway has an EUI) and frequency plan. The other fields are optional. Click <strong>Create Gateway</strong> to create the gateway.</p>
+
+<figure>
+    <img src="gateway-creation.png"
+         alt="Gateway creation"/> 
+</figure>
+
+
+<p>Your gateway will be created and you will be redirected to the gateway overview page of your newly created gateway.</p>
+
+<figure>
+    <img src="gateway-overview.png"
+         alt="Gateway overview"/> 
+</figure>
+
+
+<p>You can now connect your gateway to The Things Stack.</p>
+
+<h2 id="create-application">Create application</h2>
+
+<p>Go to <strong>Applications</strong> in the top menu, and click <strong>+ Add Application</strong> to reach the application registration page. Fill the application ID. The other fields are optional. Click <strong>Create Application</strong> to create the application.</p>
+
+<figure>
+    <img src="application-creation.png"
+         alt="Application creation"/> 
+</figure>
+
+
+<p>Your application will be created and you will be redirected to the application overview page of your newly created application.</p>
+
+<figure>
+    <img src="application-overview.png"
+         alt="Application overview"/> 
+</figure>
+
+
+<p>Devices are created within applications.</p>
+
+<h3 id="link-application">Link application</h3>
+
+<p>In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server by going to <strong>API keys</strong> in the left menu of your application, and then clicking <strong>+ Add API Key</strong>.</p>
+
+<p>In the API Key creation screen, enter a name for your linking API key and select the <strong>Link as Application to a Network Server</strong> right, then press <strong>Create API Key</strong>.</p>
+
+<figure>
+    <img src="api-key-creation.png"
+         alt="Application API Key creation"/> 
+</figure>
+
+
+<p>You will see a screen that shows your newly created API Key. You now can copy it in your clipboard by pressing the clipboard button. After saving the key in a safe place, press <strong>I have copied the key</strong>. You will not be able to see this key again in the future, but if you lose it, you can create a new one to replace it.</p>
+
+<figure>
+    <img src="api-key-created.png"
+         alt="Application API Key created"/> 
+</figure>
+
+
+<p>Now go to <strong>Link</strong> in the left menu of the application and enter the API key you&rsquo;ve just created. You can leave the Network Server address empty. Press <strong>Save Changes</strong> to save the link settings.</p>
+
+<figure>
+    <img src="application-link-creation.png"
+         alt="Application link creation"/> 
+</figure>
+
+
+<p>You can now see the status of the linking process appear in the right part of your screen. This also shows the statistics of the link between the Application Server and the Network Server.</p>
+
+<p>Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.</p>
+
+<h2 id="create-end-device">Create end device</h2>
+
+<p>Go to <strong>Devices</strong> in the left menu and click on <strong>+ Add Device</strong> to reach the end device registration page. Fill the device ID, the LoRaWAN MAC and PHY versions and the frequency plan used by the device.</p>
+
+<figure>
+    <img src="device-creation-1.png"
+         alt="Creating a new device"/> 
+</figure>
+
+
+<h3 id="over-the-air-activation-otaa-device">Over-the-air-activation (OTAA) device</h3>
+
+<p>After filling the fields in the &ldquo;General Settings&rdquo; section, scroll to the lower part of the device registration page and make sure that &ldquo;Over The Air Activation (OTAA)&rdquo; is selected. Fill the Join EUI (App EUI in LoRaWAN versions before 1.1), the Device EUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press <strong>Create Device</strong> to create the device.</p>
+
+<figure>
+    <img src="device-creation-otaa.png"
+         alt="Creating an OTAA device"/> 
+</figure>
+
+
+<p>You&rsquo;ll now reach the device overview page for your device. The end device should now be able to join the private network.</p>
+
+<figure>
+    <img src="device-otaa-created.png"
+         alt="OTAA device overview"/> 
+</figure>
+
+
+<h3 id="activation-by-personalization-abp-device">Activation by personalization (ABP device)</h3>
+
+<p>After filling the fields in the &ldquo;General Settings&rdquo; section, scroll to the lower part of the device registration page and make sure that &ldquo;Activation By Personalization (ABP)&rdquo; is selected. Fill the Device Address, the FNwkSIntKey (NwkSKey in LoRaWAN versions before 1.1) and the AppSKey. The other key fields are only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press <strong>Create Device</strong> to create the device.</p>
+
+<figure>
+    <img src="device-creation-abp.png"
+         alt="Creating an ABP device"/> 
+</figure>
+
+
+<p>You&rsquo;ll now reach the device overview page for your device. The end device should now be able to communicate with the private network.</p>
+
+<figure>
+    <img src="device-abp-created.png"
+         alt="ABP device overview"/> 
+</figure>
+
+
+<h2 id="working-with-data">Working with data</h2>
+
+<p>With your The Things Stack setup, a gateway connected and a device registered on your network, it&rsquo;s time to start working with data.</p>
+
+<p>Learn how to work with the <a href="/v3.2.6/guides/getting-started/mqtt/">builtin MQTT server</a> and <a href="/v3.2.6/guides/getting-started/webhooks/">HTTP webhooks</a>.</p>
+</div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.2.6/guides/getting-started/running-the-stack/">← Running The Things Stack</a>
+<a class="button is-pulled-right" href="/v3.2.6/guides/getting-started/cli/">Command-line Interface →</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.6/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.6/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.2.6/components/">Components</a></p>
+        <p><a class="" href="/v3.2.6/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 11 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/97261f0e515012f5d8043cf745cb793ba345b5bf">
+      doc: Remove custom CSS from console content
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/console/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.6/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

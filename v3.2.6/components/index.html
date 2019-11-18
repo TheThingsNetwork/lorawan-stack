@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Components | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.2.6/components/" />
+  <link rel="icon" type="image/png" href="/v3.2.6/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.2.6/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Components">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Components">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.2.6/components/">
+  <meta name="twitter:title" content="Components" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.2.6/">
+        <img src="/v3.2.6/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.2.6/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.2.6/concepts/">Concepts</a>
+        <a class="navbar-item is-active" href="/v3.2.6/components/">Components</a>
+        <a class="navbar-item" href="/v3.2.6/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.2.6/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">Components</h1>
+
+<div class="content"><p>The Things Stack is composed of a number of components. The core components Network Server, Application Server and Join Server follow the LoRaWAN Network Reference Model. The Things Stack also contains an Identity Server, Gateway Server, Console and Command-line Interface.</p>
+
+<figure>
+    <img src="components.png"
+         alt="The Things Stack components"/> 
+</figure>
+
+</div>
+
+
+<div class="is-clearfix">
+</div>
+
+
+
+<div class="columns is-multiline has-vertical-space">
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/identity-server/">Identity Server</a></h3>
+        <div class="content has-text-grey">
+          <p>The Identity Server provides the registries that store entities such as applications with their end devices, gateways, users, organizations and OAuth clients. It also manages access control through memberships and API keys.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/identity-server/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/gateway-server/">Gateway Server</a></h3>
+        <div class="content has-text-grey">
+          <p>The Gateway Server maintains connections with gateways supporting the UDP, MQTT, gRPC and Basic Station protocols. It forwards uplink traffic to Network Servers, and schedules downlink traffic on gateways.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/gateway-server/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/network-server/">Network Server</a></h3>
+        <div class="content has-text-grey">
+          <p>The Network Server handles the LoRaWAN network layer, including MAC commands, regional parameters and adaptive data rate (ADR).</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/network-server/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/application-server/">Application Server</a></h3>
+        <div class="content has-text-grey">
+          <p>The Application Server handles the LoRaWAN application layer, including uplink data decryption and decoding, downlink queuing and downlink data encoding and encryption.</p>
+
+<p>It hosts an MQTT server for streaming application data and manages HTTP webhooks and pub/sub integrations.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/application-server/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/join-server/">Join Server</a></h3>
+        <div class="content has-text-grey">
+          <p>The Join Server handles the LoRaWAN join flow, including Network and Application Server authentication and session key generation.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/join-server/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/console/">Console</a></h3>
+        <div class="content has-text-grey">
+          <p>The Console is the official management application of The Things Stack for LoRaWAN. It is a web application which can be used to register applications, end devices or gateways, monitor network traffic, or configure network related options, among other things. The console uses an OAuth access token to communicate with The Things Stack.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/console/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/cli/">Command-line Interface</a></h3>
+        <div class="content has-text-grey">
+          <p>The Command-line Interface (CLI) provides a cross-platform interface for managing components through the command-line.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/cli/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/crypto-server/">Crypto Server</a></h3>
+        <div class="content has-text-grey">
+          <p>The Crypto Server can handle cryptographic operations when working with hardware secure modules (HSMs).</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/crypto-server/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/device-template-converter/">Device Template Converter</a></h3>
+        <div class="content has-text-grey">
+          <p>The Device Template Converter converts data to device templates for migrating networks and importing vendor-specific data.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/device-template-converter/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/device-claiming-server/">Device Claiming Server</a></h3>
+        <div class="content has-text-grey">
+          <p>The Device Claiming Server is used to transfer end devices to a new owner&rsquo;s application using a claim authentication code or QR code.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/device-claiming-server/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-half is-flex">
+    <div class="card has-radius is-fullwidth">
+      <div class="card-content">
+        <h3 class="title is-size-5 is-uppercase"><a href="https://thethingsstack.io/v3.2.6/components/gateway-configuration-server/">Gateway Configuration Server</a></h3>
+        <div class="content has-text-grey">
+          <p>The Gateway Configuration Server generates configuration files for gateways and manages gateway firmware updates.</p>
+        </div>
+        <div class="buttons">
+          <a href="https://thethingsstack.io/v3.2.6/components/gateway-configuration-server/" class="button is-primary is-outlined">Read</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.2.6/guides/">Guides</a></p>
+        <p><a class="" href="/v3.2.6/concepts/">Concepts</a></p>
+        <p><a class=" is-active" href="/v3.2.6/components/">Components</a></p>
+        <p><a class="" href="/v3.2.6/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Kevin Schiffer on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/66ae7e73e7989b3d59ec11078201d1db6563b3e9">
+      doc: Enhance console component documentation
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/components/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.2.6/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
