@@ -15,13 +15,12 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import CollaboratorForm from '../../components/collaborator-form'
 
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
 
 @withBreadcrumb('orgs.single.collaborators.add', props => {
@@ -52,12 +51,7 @@ class OrganizationCollaboratorAdd extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.addCollaborator} />
-            <Message component="h2" content={sharedMessages.addCollaborator} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.addCollaborator} />
         <Row>
           <Col lg={8} md={12}>
             <CollaboratorForm

@@ -18,10 +18,9 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
 import PubsubForm from '../../components/pubsub-form'
 
 import sharedMessages from '../../../lib/shared-messages'
@@ -67,12 +66,7 @@ export default class ApplicationPubsubAdd extends Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.addPubsub} />
-            <Message component="h2" content={sharedMessages.addPubsub} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.addPubsub} />
         <Row>
           <Col lg={8} md={12}>
             <PubsubForm

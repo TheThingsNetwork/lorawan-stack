@@ -19,10 +19,9 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { replace } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
 import WebhookForm from '../../components/webhook-form'
 import toast from '../../../components/toast'
 import diff from '../../../lib/diff'
@@ -142,12 +141,7 @@ export default class ApplicationWebhookEdit extends Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={m.editWebhook} />
-            <Message component="h2" content={m.editWebhook} />
-          </Col>
-        </Row>
+        <PageTitle title={m.editWebhook} />
         <Row>
           <Col lg={8} md={12}>
             <WebhookForm

@@ -16,14 +16,13 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 
+import PageTitle from '../../../components/page-title'
 import toast from '../../../components/toast'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import PayloadFormattersForm from '../../components/payload-formatters-form'
-import Message from '../../../lib/components/message'
 import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
 import { updateApplicationLinkSuccess } from '../../store/actions/link'
 import {
@@ -94,8 +93,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
 
     return (
       <React.Fragment>
-        <IntlHelmet title={sharedMessages.payloadFormattersDownlink} />
-        <Message component="h2" content={sharedMessages.payloadFormattersDownlink} />
+        <PageTitle title={sharedMessages.payloadFormattersDownlink} />
         <PayloadFormattersForm
           uplink={false}
           linked={linked}

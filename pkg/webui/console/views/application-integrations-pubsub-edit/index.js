@@ -22,8 +22,6 @@ import { replace } from 'connected-react-router'
 import PropTypes from '../../../lib/prop-types'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
 import PubsubForm from '../../components/pubsub-form'
 import toast from '../../../components/toast'
 import diff from '../../../lib/diff'
@@ -148,12 +146,7 @@ export default class ApplicationPubsubEdit extends Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={m.editPubsub} />
-            <Message component="h2" content={m.editPubsub} />
-          </Col>
-        </Row>
+        <PageTitle title={m.editPubsub} />
         <Row>
           <Col lg={8} md={12}>
             <PubsubForm

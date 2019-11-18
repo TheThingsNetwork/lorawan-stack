@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
+import classnames from 'classnames'
 
 import DateTime from '../../../lib/components/date-time'
 
@@ -61,16 +62,21 @@ EntityTitleSection.defaultProps = {
   description: undefined,
 }
 
-EntityTitleSection.Device = ({ deviceName, deviceId, children }) => {
+EntityTitleSection.Device = ({ deviceName, deviceId, description, children }) => {
   return (
     <Container>
       <Row>
         <Col>
-          <div className={style.containerDevice}>
+          <div
+            className={classnames(style.containerDevice, {
+              [style.hasDescription]: Boolean(description),
+            })}
+          >
             <h1 className={style.title}>{deviceName || deviceId}</h1>
             <span className={style.id}>
               <strong>ID:</strong> {deviceId}
             </span>
+            {description && <span className={style.description}>{description}</span>}
           </div>
           {children}
         </Col>
@@ -83,10 +89,12 @@ EntityTitleSection.Device.propTypes = {
   children: PropTypes.node.isRequired,
   deviceId: PropTypes.string.isRequired,
   deviceName: PropTypes.string,
+  description: PropTypes.string,
 }
 
 EntityTitleSection.Device.defaultProps = {
   deviceName: undefined,
+  description: undefined,
 }
 
 export default EntityTitleSection

@@ -50,7 +50,7 @@ export default class Data extends React.Component {
 
     return (
       <Container>
-        <IntlHelmet title={sharedMessages.data} />
+        <IntlHelmet hideHeading title={sharedMessages.data} />
         <Row>
           <Col>
             <DeviceEvents devIds={devIds} />

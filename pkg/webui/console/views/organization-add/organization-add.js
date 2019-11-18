@@ -17,20 +17,17 @@ import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
+import PageTitle from '../../../components/page-title'
 import OrganizationForm from '../../components/organization-form'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import Form from '../../../components/form'
 import PropTypes from '../../../lib/prop-types'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 import { getOrganizationId } from '../../../lib/selectors/id'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { mayCreateOrganizations } from '../../lib/feature-checks'
-
-import style from './organization-add.styl'
 
 const initialValues = {
   ids: {
@@ -74,16 +71,7 @@ class Add extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.addOrganization} />
-            <Message
-              className={style.title}
-              component="h2"
-              content={sharedMessages.addOrganization}
-            />
-          </Col>
-        </Row>
+        <PageTitle tall title={sharedMessages.addOrganization} />
         <Row>
           <Col md={10} lg={9}>
             <OrganizationForm

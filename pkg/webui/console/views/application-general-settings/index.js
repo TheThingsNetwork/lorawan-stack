@@ -21,7 +21,7 @@ import * as Yup from 'yup'
 import { replace } from 'connected-react-router'
 import { bindActionCreators } from 'redux'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
+import PageTitle from '../../../components/page-title'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
@@ -147,12 +147,7 @@ export default class ApplicationGeneralSettings extends React.Component {
     const { error } = this.state
     return (
       <Container>
-        <IntlHelmet title={sharedMessages.generalSettings} />
-        <Row>
-          <Col>
-            <Message component="h2" content={sharedMessages.generalSettings} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.generalSettings} />
         <Row>
           <Col lg={8} md={12}>
             <Form

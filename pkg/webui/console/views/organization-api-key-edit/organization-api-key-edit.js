@@ -19,9 +19,8 @@ import { ApiKeyEditForm } from '../../components/api-key-form'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 
-import Message from '../../../lib/components/message'
+import PageTitle from '../../../components/page-title'
 import sharedMessages from '../../../lib/shared-messages'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
 
 @withBreadcrumb('orgs.single.api-keys.edit', function(props) {
@@ -61,12 +60,7 @@ class OrganizationApiKeyEdit extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.keyEdit} />
-            <Message component="h2" content={sharedMessages.keyEdit} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.keyEdit} />
         <Row>
           <Col lg={8} md={12}>
             <ApiKeyEditForm

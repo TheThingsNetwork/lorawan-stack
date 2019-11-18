@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
+import PageTitle from '../../../components/page-title'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
@@ -25,7 +26,6 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import ErrorView from '../../../lib/components/error-view'
 import SubViewError from '../error/sub-view'
 import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import DataSheet from '../../../components/data-sheet'
 import Button from '../../../components/button'
 import api from '../../api'
@@ -160,11 +160,10 @@ export default class ApplicationMqtt extends React.Component {
     return (
       <ErrorView ErrorComponent={SubViewError}>
         <Container>
+          <PageTitle title={sharedMessages.mqtt} />
           <Row>
             <Col lg={8} md={12}>
-              <IntlHelmet title={sharedMessages.mqtt} />
-              <Message component="h2" content={m.mqttIntegrations} />
-              <Message component="p" content={m.mqttInfoText} />
+              <Message component="p" content={m.mqttInfoText} className={style.info} />
               <hr className={style.hRule} />
               <DataSheet data={connectionData} />
             </Col>

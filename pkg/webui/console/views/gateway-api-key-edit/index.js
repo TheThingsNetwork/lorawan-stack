@@ -18,11 +18,10 @@ import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import { replace } from 'connected-react-router'
 
+import PageTitle from '../../../components/page-title'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import { ApiKeyEditForm } from '../../components/api-key-form'
 import withRequest from '../../../lib/components/with-request'
 
@@ -100,12 +99,7 @@ export default class GatewayApiKeyEdit extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.keyEdit} />
-            <Message component="h2" content={sharedMessages.keyEdit} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.keyEdit} />
         <Row>
           <Col lg={8} md={12}>
             <ApiKeyEditForm

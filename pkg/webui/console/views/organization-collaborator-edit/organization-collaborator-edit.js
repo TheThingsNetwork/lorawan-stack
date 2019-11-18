@@ -21,8 +21,6 @@ import CollaboratorForm from '../../components/collaborator-form'
 import toast from '../../../components/toast'
 
 import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
 
 @withBreadcrumb('orgs.single.collaborators.edit', function(props) {
@@ -69,19 +67,10 @@ class OrganizationCollaboratorEdit extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet
-              title={sharedMessages.collaboratorEdit}
-              values={{ collaboratorId: collaborator.id }}
-            />
-            <Message
-              component="h2"
-              content={sharedMessages.collaboratorEditRights}
-              values={{ collaboratorId: collaborator.id }}
-            />
-          </Col>
-        </Row>
+        <PageTitle
+          title={sharedMessages.collaboratorEdit}
+          values={{ collaboratorId: collaborator.id }}
+        />
         <Row>
           <Col lg={8} md={12}>
             <CollaboratorForm

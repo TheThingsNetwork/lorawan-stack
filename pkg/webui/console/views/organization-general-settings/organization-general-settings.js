@@ -17,6 +17,7 @@ import bind from 'autobind-decorator'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
+import PageTitle from '../../../components/page-title'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import ModalButton from '../../../components/button/modal-button'
@@ -26,9 +27,7 @@ import toast from '../../../components/toast'
 import Form from '../../../components/form'
 import OrganizationForm from '../../components/organization-form'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import diff from '../../../lib/diff'
-import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
@@ -129,12 +128,7 @@ class GeneralSettings extends React.PureComponent {
 
     return (
       <Container>
-        <IntlHelmet title={sharedMessages.generalSettings} />
-        <Row>
-          <Col>
-            <Message component="h2" content={sharedMessages.generalSettings} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.generalSettings} />
         <Row>
           <Col lg={8} md={12}>
             <OrganizationForm

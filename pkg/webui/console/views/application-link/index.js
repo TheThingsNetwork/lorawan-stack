@@ -19,6 +19,7 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
+import PageTitle from '../../../components/page-title'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Form from '../../../components/form'
@@ -27,7 +28,6 @@ import Button from '../../../components/button'
 import SubmitButton from '../../../components/submit-button'
 import Message from '../../../lib/components/message'
 import DataSheet from '../../../components/data-sheet'
-import IntlHelmet from '../../../lib/components/intl-helmet'
 import toast from '../../../components/toast'
 import DateTime from '../../../lib/components/date-time'
 import Icon from '../../../components/icon'
@@ -279,13 +279,8 @@ class ApplicationLink extends React.Component {
 
     return (
       <Container className={style.main}>
+        <PageTitle title={sharedMessages.link} values={{ appId }} />
         <Row>
-          <Col lg={8} md={12}>
-            <IntlHelmet title={sharedMessages.link} />
-            <Message component="h2" content={m.linkApplication} values={{ appId }} />
-          </Col>
-        </Row>
-        <Row className={style.form}>
           <Col lg={6} md={12}>
             <Message component="h3" content={m.linkSettings} />
             <Form

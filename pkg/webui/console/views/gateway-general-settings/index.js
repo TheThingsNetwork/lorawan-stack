@@ -21,7 +21,6 @@ import { bindActionCreators } from 'redux'
 import { replace } from 'connected-react-router'
 
 import toast from '../../../components/toast'
-import Message from '../../../lib/components/message'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -30,7 +29,7 @@ import GatewayDataForm from '../../components/gateway-data-form'
 import ModalButton from '../../../components/button/modal-button'
 import FormSubmit from '../../../components/form/submit'
 import SubmitButton from '../../../components/submit-button'
-import IntlHelmet from '../../../lib/components/intl-helmet'
+import PageTitle from '../../../components/page-title'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 import Require from '../../lib/components/require'
 import diff from '../../../lib/diff'
@@ -165,12 +164,7 @@ export default class GatewayGeneralSettings extends React.Component {
 
     return (
       <Container>
-        <Row>
-          <Col>
-            <IntlHelmet title={sharedMessages.generalSettings} />
-            <Message component="h2" content={sharedMessages.generalSettings} />
-          </Col>
-        </Row>
+        <PageTitle title={sharedMessages.generalSettings} />
         <Row>
           <Col lg={8} md={12}>
             <GatewayDataForm
