@@ -20,6 +20,7 @@ import PropTypes from '../../lib/prop-types'
 
 import Message from '../../lib/components/message'
 import Button from '../../components/button'
+import OfflineStatus from '../../containers/offline-status'
 
 import style from './footer.styl'
 
@@ -45,6 +46,7 @@ const Footer = function({ className, links, supportLink }) {
             <Message content={item.title} />
           </Link>
         ))}
+        <OfflineStatus showOfflineOnly showWarnings />
         <span className={style.version}>v{process.env.VERSION}</span>
         {supportLink && (
           <Button.AnchorLink
