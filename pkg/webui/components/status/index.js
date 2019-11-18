@@ -43,7 +43,7 @@ const Status = function({
     [style.statusBad]: status === 'bad',
     [style.statusMediocre]: status === 'mediocre',
     [style.statusUnknown]: status === 'unknown',
-    [style[`${status}-pulse`]]: pulse,
+    [style[`${status}-pulse`]]: typeof pulse === 'boolean' ? pulse : status === 'good',
     [style.flipped]: flipped,
   })
 
@@ -94,7 +94,7 @@ Status.defaultProps = {
   flipped: false,
   label: undefined,
   labelValues: undefined,
-  pulse: true,
+  pulse: undefined,
   status: 'unknown',
   title: undefined,
 }
