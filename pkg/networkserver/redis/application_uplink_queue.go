@@ -16,13 +16,11 @@ package redis
 
 import (
 	"context"
-	"crypto/rand"
-	"time"
+	"fmt"
+	"sync"
 
 	"github.com/go-redis/redis"
-	ulid "github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -33,6 +31,8 @@ type ApplicationUplinkQueue struct {
 	MaxLen int64
 	Group  string
 	ID     string
+
+	subscriptions sync.Map
 }
 
 // NewApplicationUplinkQueue returns new application uplink queue.
@@ -49,26 +49,33 @@ func (q *ApplicationUplinkQueue) uidUplinkKey(uid string) string {
 	return q.Redis.Key("uid", uid, "uplinks")
 }
 
-func (q *ApplicationUplinkQueue) uidCloseKey(uid, streamID string) string {
-	return q.Redis.Key("uid", uid, "close", streamID)
-}
-
 const payloadKey = "payload"
 
 func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error {
 	for _, up := range ups {
+		uid := unique.ID(ctx, up.ApplicationIdentifiers)
+
 		s, err := ttnredis.MarshalProto(up)
 		if err != nil {
 			return err
 		}
-		if err := q.Redis.XAdd(&redis.XAddArgs{
-			Stream:       q.uidUplinkKey(unique.ID(ctx, up.ApplicationIdentifiers)),
+
+		if err = q.Redis.XAdd(&redis.XAddArgs{
+			Stream:       q.uidUplinkKey(uid),
 			MaxLenApprox: q.MaxLen,
 			Values: map[string]interface{}{
 				payloadKey: s,
 			},
 		}).Err(); err != nil {
 			return ttnredis.ConvertError(err)
+		}
+
+		upCh, ok := q.subscriptions.Load(uid)
+		if ok {
+			select {
+			case upCh.(chan *ttnpb.ApplicationUp) <- up:
+			default:
+			}
 		}
 	}
 	return nil
@@ -82,70 +89,32 @@ var (
 // Subscribe ranges over q.upStream(unique.ID(ctx, appID)) using f until ctx is done.
 // Subscribe assumes that there's at most 1 active consumer in q.Group per stream at all times.
 func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f func(context.Context, *ttnpb.ApplicationUp) error) error {
-	streamULID, err := ulid.New(ulid.Now(), rand.Reader)
-	if err != nil {
-		return err
-	}
 	uid := unique.ID(ctx, appID)
 	upStream := q.uidUplinkKey(uid)
-	closeStream := q.uidCloseKey(uid, streamULID.String())
 
-	_, err = q.Redis.XGroupCreateMkStream(closeStream, q.Group, "0").Result()
-	if err != nil {
-		return ttnredis.ConvertError(err)
-	}
-
-	dl, hasDL := ctx.Deadline()
-	if hasDL {
-		_, err = q.Redis.ExpireAt(closeStream, dl).Result()
-		if err != nil {
-			return ttnredis.ConvertError(err)
-		}
-	}
-
-	doneCh := make(chan struct{})
-	defer func() {
-		close(doneCh)
-	}()
-	go func() {
-		logger := log.FromContext(ctx).WithField("key", closeStream)
-		select {
-		case <-ctx.Done():
-			_, err := q.Redis.XAdd(&redis.XAddArgs{
-				Stream: closeStream,
-				Values: map[string]interface{}{"": ""},
-			}).Result()
-			if err != nil {
-				logger.WithError(err).Error("Failed to add message to Redis stream")
-				return
-			}
-			<-doneCh
-
-		case <-doneCh:
-		}
-
-		_, err := q.Redis.Del(closeStream).Result()
-		if err != nil {
-			logger.WithError(err).Error("Failed to delete Redis key")
-		}
-	}()
-
-	_, err = q.Redis.XGroupCreateMkStream(upStream, q.Group, "0").Result()
+	_, err := q.Redis.XGroupCreateMkStream(upStream, q.Group, "0").Result()
 	if err != nil && !ttnredis.IsConsumerGroupExistsErr(err) {
 		return ttnredis.ConvertError(err)
 	}
 
-	processStreams := func(arg *redis.XReadGroupArgs) error {
-		rets, err := q.Redis.XReadGroup(arg).Result()
-		if err != nil {
+	upCh := make(chan *ttnpb.ApplicationUp, 1)
+	_, ok := q.subscriptions.LoadOrStore(uid, upCh)
+	if ok {
+		panic(fmt.Sprintf("duplicate subscription for application %s", uid))
+	}
+	defer q.subscriptions.Delete(uid)
+
+	for {
+		rets, err := q.Redis.XReadGroup(&redis.XReadGroupArgs{
+			Group:    q.Group,
+			Consumer: q.ID,
+			Streams:  []string{upStream, upStream, "0", ">"},
+		}).Result()
+		if err != nil && err != redis.Nil {
 			return ttnredis.ConvertError(err)
 		}
-
 		for _, ret := range rets {
 			switch ret.Stream {
-			case closeStream:
-				return ctx.Err()
-
 			case upStream:
 				for _, msg := range ret.Messages {
 					v, ok := msg.Values[payloadKey]
@@ -163,38 +132,20 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 					if err = f(ctx, up); err != nil {
 						return err
 					}
-					_, err = q.Redis.XAck(upStream, q.Group, msg.ID).Result()
-					if err != nil {
+					if err = q.Redis.XAck(upStream, q.Group, msg.ID).Err(); err != nil {
 						return ttnredis.ConvertError(err)
 					}
 				}
+			default:
+				panic(fmt.Sprintf("unknown stream read %s", ret.Stream))
 			}
 		}
-		return nil
-	}
 
-	if err = processStreams(&redis.XReadGroupArgs{
-		Group:    q.Group,
-		Consumer: q.ID,
-		Streams:  []string{upStream, "0"},
-	}); err != nil {
-		return err
-	}
-	for {
-		var timeout time.Duration
-		if hasDL {
-			timeout = time.Until(dl)
-			if timeout <= 0 {
-				return context.DeadlineExceeded
-			}
-		}
-		if err = processStreams(&redis.XReadGroupArgs{
-			Group:    q.Group,
-			Consumer: q.ID,
-			Streams:  []string{closeStream, upStream, ">", ">"},
-			Block:    timeout,
-		}); err != nil {
-			return err
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+
+		case <-upCh:
 		}
 	}
 }
