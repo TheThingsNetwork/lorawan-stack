@@ -77,14 +77,16 @@ export default class OfflineStatus extends Component {
       message = sharedMessages.offline
     }
 
-    if (!showOfflineOnly || !online) {
-      return (
-        <span>
-          <Status className={style.status} status={statusIndicator}>
-            <Message className={style.message} content={message} />
-          </Status>
-        </span>
-      )
+    if (showOfflineOnly && online) {
+      return null
     }
+
+    return (
+      <span>
+        <Status className={style.status} status={statusIndicator}>
+          <Message className={style.message} content={message} />
+        </Status>
+      </span>
+    )
   }
 }
