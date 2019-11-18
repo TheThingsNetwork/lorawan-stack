@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix active application link count being limited to 10 per CPU.
+
 ### Security
 
 ## [3.2.5] - 2019-11-15

@@ -2015,10 +2015,9 @@ func handleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
 	}
 
 	err, ok := assertAdd(ctx, pbs[0:1]...)
-	if !a.So(ok, should.BeTrue) {
+	if !a.So(ok, should.BeTrue) || !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	a.So(err, should.BeNil)
 
 	app1SubFuncCh, app1SubErrCh, app1SubStop := subscribe(ctx, appID1)
 	select {
@@ -2029,8 +2028,9 @@ func handleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
 		t.Fatalf("Received unexpected Subscribe error: %v", err)
 
 	case req := <-app1SubFuncCh:
-		a.So(req.Context, should.HaveParentContext, ctx)
-		a.So(req.Uplink, should.Resemble, pbs[0])
+		if !a.So(req.Context, should.HaveParentContext, ctx) || !a.So(req.Uplink, should.Resemble, pbs[0]) {
+			t.FailNow()
+		}
 		close(req.Response)
 	}
 
@@ -2048,8 +2048,9 @@ func handleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
 		t.Fatalf("Received unexpected Subscribe error: %v", err)
 
 	case req := <-app1SubFuncCh:
-		a.So(req.Context, should.HaveParentContext, ctx)
-		a.So(req.Uplink, should.Resemble, pbs[1])
+		if !a.So(req.Context, should.HaveParentContext, ctx) || !a.So(req.Uplink, should.Resemble, pbs[1]) {
+			t.FailNow()
+		}
 		close(req.Response)
 	}
 
@@ -2062,8 +2063,9 @@ func handleApplicationUplinkQueueTest(t *testing.T, q ApplicationUplinkQueue) {
 		t.Fatalf("Received unexpected Subscribe error: %v", err)
 
 	case req := <-app2SubFuncCh:
-		a.So(req.Context, should.HaveParentContext, ctx)
-		a.So(req.Uplink, should.Resemble, pbs[2])
+		if !a.So(req.Context, should.HaveParentContext, ctx) || !a.So(req.Uplink, should.Resemble, pbs[2]) {
+			t.FailNow()
+		}
 		close(req.Response)
 	}
 	app1SubStop()
