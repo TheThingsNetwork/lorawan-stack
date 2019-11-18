@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Reading and writing of session keys in Application and Network server registries now require device key read and write rights respectively.
+- Implement redesign of entity overview title sections to improve visual consistency.
 
 ### Deprecated
 

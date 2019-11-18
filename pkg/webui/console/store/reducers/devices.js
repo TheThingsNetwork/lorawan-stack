@@ -16,7 +16,7 @@ import { GET_DEVICES_LIST_SUCCESS } from '../actions/devices'
 
 const defaultState = {
   devices: [],
-  totalCount: 0,
+  totalCount: undefined,
 }
 
 const devices = function(state = defaultState, { type, payload }) {

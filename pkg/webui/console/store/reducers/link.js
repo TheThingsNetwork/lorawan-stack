@@ -20,7 +20,7 @@ import {
 } from '../actions/link'
 
 const defaultProps = {
-  linked: false,
+  linked: undefined,
   link: undefined,
   stats: undefined,
 }

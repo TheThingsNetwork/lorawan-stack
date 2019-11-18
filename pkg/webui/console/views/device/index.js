@@ -15,10 +15,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
-import { Col, Row, Container } from 'react-grid-system'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import EntityTitleSection from '../../components/entity-title-section'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Tabs from '../../../components/tabs'
 import IntlHelmet from '../../../lib/components/intl-helmet'
@@ -144,14 +144,9 @@ export default class Device extends React.Component {
     return (
       <React.Fragment>
         <IntlHelmet titleTemplate={`%s - ${deviceName || devId} - ${siteName}`} />
-        <Container>
-          <Row>
-            <Col>
-              <h2 className={style.title}>{deviceName || devId}</h2>
-              <Tabs className={style.tabs} narrow tabs={tabs} />
-            </Col>
-          </Row>
-        </Container>
+        <EntityTitleSection.Device deviceId={devId} deviceName={deviceName}>
+          <Tabs className={style.tabs} narrow tabs={tabs} />
+        </EntityTitleSection.Device>
         <hr className={style.rule} />
         <Switch>
           <Route exact path={basePath} component={DeviceOverview} />

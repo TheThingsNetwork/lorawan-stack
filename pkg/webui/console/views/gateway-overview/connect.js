@@ -14,46 +14,42 @@
 
 import { connect } from 'react-redux'
 
+import { getGatewayCollaboratorsList, getGatewayApiKeysList } from '../../store/actions/gateways'
 import {
-  getOrganizationCollaboratorsList,
-  getOrganizationApiKeysList,
-} from '../../store/actions/organizations'
-import {
-  selectSelectedOrganization,
-  selectSelectedOrganizationId,
-  selectOrganizationCollaboratorsTotalCount,
-  selectOrganizationApiKeysTotalCount,
-  selectOrganizationApiKeysFetching,
-  selectOrganizationCollaboratorsFetching,
-} from '../../store/selectors/organizations'
+  selectSelectedGateway,
+  selectSelectedGatewayId,
+  selectGatewayCollaboratorsTotalCount,
+  selectGatewayCollaboratorsFetching,
+  selectGatewayApiKeysTotalCount,
+  selectGatewayApiKeysFetching,
+} from '../../store/selectors/gateways'
 
 const mapStateToProps = state => {
-  const orgId = selectSelectedOrganizationId(state)
-  const collaboratorsTotalCount = selectOrganizationCollaboratorsTotalCount(state, { id: orgId })
-  const apiKeysTotalCount = selectOrganizationApiKeysTotalCount(state, { id: orgId })
+  const gtwId = selectSelectedGatewayId(state)
+  const collaboratorsTotalCount = selectGatewayCollaboratorsTotalCount(state, { id: gtwId })
+  const apiKeysTotalCount = selectGatewayApiKeysTotalCount(state, { id: gtwId })
 
   return {
-    orgId,
-    organization: selectSelectedOrganization(state),
+    gtwId,
+    gateway: selectSelectedGateway(state),
     collaboratorsTotalCount,
     apiKeysTotalCount,
     statusBarFetching:
       collaboratorsTotalCount === undefined ||
       apiKeysTotalCount === undefined ||
-      selectOrganizationApiKeysFetching(state) ||
-      selectOrganizationCollaboratorsFetching(state),
+      selectGatewayCollaboratorsFetching(state) ||
+      selectGatewayApiKeysFetching(state),
   }
 }
-
 const mapDispatchToProps = dispatch => ({
-  loadData(orgId) {
-    dispatch(getOrganizationCollaboratorsList(orgId))
-    dispatch(getOrganizationApiKeysList(orgId))
+  loadData(gtwId) {
+    dispatch(getGatewayCollaboratorsList(gtwId))
+    dispatch(getGatewayApiKeysList(gtwId))
   },
 })
 
-export default Overview =>
+export default GatewayOverview =>
   connect(
     mapStateToProps,
     mapDispatchToProps,
-  )(Overview)
+  )(GatewayOverview)

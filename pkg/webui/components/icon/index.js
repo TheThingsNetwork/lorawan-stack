@@ -45,6 +45,7 @@ const hardcoded = {
   uplink: 'arrow_drop_up',
   downlink: 'arrow_drop_down',
   import_devices: 'playlist_add',
+  collaborators: 'people',
 }
 
 const Icon = function({

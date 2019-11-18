@@ -13,48 +13,62 @@
 // limitations under the License.
 
 import React from 'react'
-import { Col, Row, Container } from 'react-grid-system'
+import bind from 'autobind-decorator'
+import { Container, Col, Row } from 'react-grid-system'
+
+import DataSheet from '../../../components/data-sheet'
+import GatewayConnection from '../../containers/gateway-connection'
+import GatewayEvents from '../../containers/gateway-events'
+import Tag from '../../../components/tag'
 
 import sharedMessages from '../../../lib/shared-messages'
-import DateTime from '../../../lib/components/date-time'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import DateTime from '../../../lib/components/date-time'
+import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
-import OrganizationEvents from '../../containers/organization-events'
-import DataSheet from '../../../components/data-sheet'
+import GatewayMap from '../../components/gateway-map'
 import EntityTitleSection from '../../components/entity-title-section'
 import KeyValueTag from '../../components/key-value-tag'
 import Spinner from '../../../components/spinner'
-import Message from '../../../lib/components/message'
 import withRequest from '../../../lib/components/with-request'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
-import { mayViewOrganizationInformation } from '../../lib/feature-checks'
+import { mayEditBasicGatewayInformation } from '../../lib/feature-checks'
 
-@withFeatureRequirement(mayViewOrganizationInformation, {
+@withRequest(({ gtwId, loadData }) => loadData(gtwId), () => false)
+@withFeatureRequirement(mayEditBasicGatewayInformation, {
   redirect: '/',
 })
-@withRequest(({ orgId, loadData }) => loadData(orgId), () => false)
-class Overview extends React.Component {
+@bind
+export default class GatewayOverview extends React.Component {
   static propTypes = {
     apiKeysTotalCount: PropTypes.number,
     collaboratorsTotalCount: PropTypes.number,
-    orgId: PropTypes.string.isRequired,
-    organization: PropTypes.organization.isRequired,
+    gateway: PropTypes.gateway.isRequired,
+    gtwId: PropTypes.string.isRequired,
     statusBarFetching: PropTypes.bool.isRequired,
   }
 
   static defaultProps = {
-    collaboratorsTotalCount: undefined,
     apiKeysTotalCount: undefined,
+    collaboratorsTotalCount: undefined,
   }
 
   render() {
     const {
-      orgId,
-      organization: { ids, name, description, created_at, updated_at },
+      gtwId,
       collaboratorsTotalCount,
       apiKeysTotalCount,
       statusBarFetching,
+      gateway: {
+        ids,
+        name,
+        description,
+        created_at,
+        updated_at,
+        frequency_plan_id,
+        gateway_server_address,
+      },
     } = this.props
 
     const sheetData = [
@@ -62,13 +76,44 @@ class Overview extends React.Component {
         header: sharedMessages.generalInformation,
         items: [
           {
-            key: sharedMessages.organizationId,
-            value: ids.organization_id,
+            key: sharedMessages.gatewayID,
+            value: gtwId,
             type: 'code',
             sensitive: false,
           },
-          { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
-          { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
+          {
+            key: sharedMessages.gatewayEUI,
+            value: ids.eui,
+            type: 'code',
+            sensitive: false,
+          },
+          {
+            key: sharedMessages.gatewayDescription,
+            value: description || <Message content={sharedMessages.none} />,
+          },
+          {
+            key: sharedMessages.createdAt,
+            value: <DateTime value={created_at} />,
+          },
+          {
+            key: sharedMessages.updatedAt,
+            value: <DateTime value={updated_at} />,
+          },
+          {
+            key: sharedMessages.gatewayServerAddress,
+            value: gateway_server_address,
+            type: 'code',
+            sensitive: false,
+          },
+        ],
+      },
+      {
+        header: sharedMessages.lorawanInformation,
+        items: [
+          {
+            key: sharedMessages.frequencyPlan,
+            value: <Tag content={frequency_plan_id} />,
+          },
         ],
       },
     ]
@@ -76,11 +121,12 @@ class Overview extends React.Component {
     return (
       <React.Fragment>
         <EntityTitleSection
-          entityId={orgId}
+          entityId={gtwId}
           entityName={name}
           description={description}
           creationDate={created_at}
         >
+          <GatewayConnection gtwId={gtwId} />
           {statusBarFetching ? (
             <Spinner after={0} faded micro inline>
               <Message content={sharedMessages.fetching} />
@@ -107,7 +153,8 @@ class Overview extends React.Component {
               <DataSheet data={sheetData} />
             </Col>
             <Col sm={12} lg={6}>
-              <OrganizationEvents orgId={orgId} widget />
+              <GatewayEvents gtwId={gtwId} widget />
+              <GatewayMap gtwId={gtwId} gateway={this.props.gateway} />
             </Col>
           </Row>
         </Container>
@@ -115,5 +162,3 @@ class Overview extends React.Component {
     )
   }
 }
-
-export default Overview

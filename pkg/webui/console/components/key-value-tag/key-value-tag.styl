@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.overview-info
-  margin-top: $ls.xs
+.container
+  padding: $cs.xxs
+  line-height: 1
+  height: $fs.m
+  display: flex
+  &:not(:last-child)
+    margin-right: $cs.l
 
-  .title
-    margin-top: $ls.xs
-    margin-bottom: $ls.xxs
+.icon
+  color: $c-icon-fill
+  margin-right: $cs.xs
 
-  .statistics
-    margin-bottom: $ls.xs
-
-.latest-events
-  margin-top: $ls.xs
+.value
+  font-weight: bold
+  margin-right: $cs.xxs

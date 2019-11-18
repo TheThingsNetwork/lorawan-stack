@@ -190,7 +190,7 @@ const startGatewayStatisticsLogic = createLogic({
     } catch (error) {
       dispatch(
         gateways.startGatewayStatisticsFailure({
-          message: sharedMessages.unknown,
+          message: sharedMessages.statusUnknown,
         }),
       )
       done()

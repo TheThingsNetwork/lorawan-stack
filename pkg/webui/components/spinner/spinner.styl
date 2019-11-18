@@ -14,6 +14,7 @@
 
 $l = $cs.xl
 $s = $cs.l
+$xs = $cs.m
 
 .box
   text-align: center
@@ -24,6 +25,17 @@ $s = $cs.l
 
   &.visible
     opacity: 1
+
+  &.micro
+    height: $xs
+
+  &.inline
+    display: flex
+    justify-content: flex-start
+    align-items: center
+
+    .spinner
+      margin-right: $cs.xs
 
 .spinner
   width: $l
@@ -73,8 +85,16 @@ $s = $cs.l
     height: $s
     top: ($s * -1) // visual centering
 
+  &.micro
+    height: $xs
+    top: ($xs * -1) // visual centering
+
 .small .spinner
   width: $s
+  height: @width
+
+.micro .spinner
+  width: $xs
   height: @width
 
   .bar,

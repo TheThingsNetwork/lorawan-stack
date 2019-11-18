@@ -12,89 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
-import { Col, Row, Container } from 'react-grid-system'
+import ApplicationOverview from './application-overview'
+import connect from './connect'
 
-import sharedMessages from '../../../lib/shared-messages'
+const ConnectedApplicationOverview = connect(ApplicationOverview)
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import DateTime from '../../../lib/components/date-time'
-import DevicesTable from '../../containers/devices-table'
-import DataSheet from '../../../components/data-sheet'
-import ApplicationEvents from '../../containers/application-events'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-
-import PAGE_SIZES from '../../constants/page-sizes'
-import {
-  selectSelectedApplication,
-  selectSelectedApplicationId,
-} from '../../store/selectors/applications'
-import { mayViewApplicationInfo } from '../../lib/feature-checks'
-
-import style from './application-overview.styl'
-
-@connect(function(state) {
-  return {
-    appId: selectSelectedApplicationId(state),
-    application: selectSelectedApplication(state),
-  }
-})
-@withFeatureRequirement(mayViewApplicationInfo, {
-  redirect: '/',
-})
-class ApplicationOverview extends React.Component {
-  get applicationInfo() {
-    const {
-      application: { ids, name, description, created_at, updated_at },
-    } = this.props
-
-    const sheetData = [
-      {
-        header: sharedMessages.generalInformation,
-        items: [
-          { key: sharedMessages.appId, value: ids.application_id, type: 'code', sensitive: false },
-          { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
-          { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
-        ],
-      },
-    ]
-
-    return (
-      <div>
-        <div className={style.title}>
-          <h2>{name || ids.application_id}</h2>
-          {description && <span className={style.description}>{description}</span>}
-        </div>
-        <DataSheet data={sheetData} />
-      </div>
-    )
-  }
-
-  render() {
-    const { appId } = this.props
-
-    return (
-      <Container>
-        <IntlHelmet title={sharedMessages.overview} />
-        <Row>
-          <Col sm={12} lg={6}>
-            {this.applicationInfo}
-          </Col>
-          <Col sm={12} lg={6}>
-            <div className={style.latestEvents}>
-              <ApplicationEvents appId={appId} widget />
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} className={style.table}>
-            <DevicesTable pageSize={PAGE_SIZES.SMALL} devicePathPrefix="/devices" />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
-}
-
-export default ApplicationOverview
+export { ConnectedApplicationOverview as default, ApplicationOverview }
