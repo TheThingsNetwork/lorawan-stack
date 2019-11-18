@@ -52,8 +52,6 @@ import style from './device.styl'
       devId,
       appId,
       device,
-      deviceName: device && device.name,
-      devIds: device && device.ids,
       fetching: selectDeviceFetching(state),
       error: selectGetDeviceError(state),
     }
@@ -113,7 +111,7 @@ export default class Device extends React.Component {
         params: { appId },
       },
       devId,
-      deviceName,
+      device: { name, description },
       env: { siteName },
     } = this.props
 
@@ -143,8 +141,8 @@ export default class Device extends React.Component {
 
     return (
       <React.Fragment>
-        <IntlHelmet titleTemplate={`%s - ${deviceName || devId} - ${siteName}`} />
-        <EntityTitleSection.Device deviceId={devId} deviceName={deviceName}>
+        <IntlHelmet titleTemplate={`%s - ${name || devId} - ${siteName}`} />
+        <EntityTitleSection.Device deviceId={devId} deviceName={name} description={description}>
           <Tabs className={style.tabs} narrow tabs={tabs} />
         </EntityTitleSection.Device>
         <hr className={style.rule} />
