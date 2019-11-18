@@ -30,6 +30,6 @@ func deviceNeedsBeaconTimingReq(dev *ttnpb.EndDevice) bool {
 func handleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) ([]events.DefinitionDataClosure, error) {
 	_ = deviceNeedsBeaconTimingReq(dev)
 	// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19)
-	// NOTE: This command is deprecated in LoRaWAN 1.1
+	// NOTE: This command is deprecated in LoRaWAN 1.0.3
 	return nil, nil
 }
