@@ -18,6 +18,7 @@ export default defineMessages({
   abp: 'Activation By Personalization (ABP)',
   activationMode: 'Activation Mode',
   activationSettings: 'Activation Settings',
+  appEUIDescription: 'AppEUI identifies the Join Server',
   appKeyDescription:
     'The root key to derive the application session key to secure communication between the device and the application',
   appSKeyDescription: 'Application Session Key',
@@ -35,9 +36,11 @@ export default defineMessages({
   deviceNamePlaceholder: 'My New Device',
   external: 'External',
   externalJoinServer: 'External Join Server',
-  fwdNtwkKeyDescription: 'Forwarding Network Session Integrity Key (or LoRaWAN 1.0.x NwkSKey)',
-  joinEUIDescription: 'JoinEUI identifies the Join Server (in LoRaWAN 1.0.x known as AppEUI)',
+  fNwkSIntKeyDescription: 'Forwarding Network Session Integrity Key',
+  nwkSKeyDescription: 'Network Session Key',
+  joinEUIDescription: 'JoinEUI identifies the Join Server',
   leaveBlankPlaceholder: 'Leave blank to generate automatically',
+  multicast: 'Multicast',
   ntwkSEncKeyDescription: 'Network Session Encryption Key (only for LoRaWAN 1.1+)',
   nwkKeyDescription:
     'The root key to derive network session keys to secure communication between the device and the network',
