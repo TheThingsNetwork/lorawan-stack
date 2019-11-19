@@ -371,7 +371,6 @@
   "lib.shared-messages.latitudeDesc": "The North-South position in degrees, where 0 is the equator",
   "lib.shared-messages.link": "Link",
   "lib.shared-messages.linked": "Linked",
-  "lib.shared-messages.loading": "Loading",
   "lib.shared-messages.location": "Location",
   "lib.shared-messages.locationSolved": "Location Solved",
   "lib.shared-messages.login": "Login",
