@@ -49,12 +49,12 @@ func DeriveFNwkSIntKey(nwkKey types.AES128Key, jn types.JoinNonce, joinEUI types
 	return deriveSKey(nwkKey, 0x01, jn, joinEUI, dn)
 }
 
-// DeriveSNwkSIntKey derives the LoRaWAN 1.1 Forwarding Network Session Integrity Key
+// DeriveSNwkSIntKey derives the LoRaWAN 1.1 Serving Network Session Integrity Key
 func DeriveSNwkSIntKey(nwkKey types.AES128Key, jn types.JoinNonce, joinEUI types.EUI64, dn types.DevNonce) types.AES128Key {
 	return deriveSKey(nwkKey, 0x03, jn, joinEUI, dn)
 }
 
-// DeriveNwkSEncKey derives the LoRaWAN 1.1 Forwarding Network Session Integrity Key
+// DeriveNwkSEncKey derives the LoRaWAN 1.1 Network Session Encryption Key
 func DeriveNwkSEncKey(nwkKey types.AES128Key, jn types.JoinNonce, joinEUI types.EUI64, dn types.DevNonce) types.AES128Key {
 	return deriveSKey(nwkKey, 0x04, jn, joinEUI, dn)
 }
