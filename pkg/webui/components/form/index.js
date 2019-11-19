@@ -127,6 +127,7 @@ const formRenderer = ({ children, ...rest }) =>
 @bind
 class Form extends React.PureComponent {
   static propTypes = {
+    enableReinitialize: PropTypes.bool,
     formikRef: PropTypes.shape({ current: PropTypes.any }),
     initialValues: PropTypes.shape({}),
     isInitialValid: PropTypes.bool,
@@ -137,6 +138,7 @@ class Form extends React.PureComponent {
     validationSchema: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]),
   }
   static defaultProps = {
+    enableReinitialize: false,
     formikRef: undefined,
     initialValues: undefined,
     isInitialValid: false,
@@ -155,6 +157,7 @@ class Form extends React.PureComponent {
       validateOnChange,
       validationSchema,
       formikRef,
+      enableReinitialize,
       ...rest
     } = this.props
 
@@ -169,6 +172,7 @@ class Form extends React.PureComponent {
         validateOnBlur={validateOnBlur}
         validateOnChange={validateOnChange}
         validationSchema={validationSchema}
+        enableReinitialize={enableReinitialize}
       />
     )
   }
