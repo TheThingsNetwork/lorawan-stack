@@ -91,9 +91,17 @@ import style from './device.styl'
   ({ fetching, device }) => fetching || !Boolean(device),
 )
 @withBreadcrumb('device.single', function(props) {
-  const { devId, appId } = props
+  const {
+    devId,
+    appId,
+    device: { name },
+  } = props
   return (
-    <Breadcrumb path={`/applications/${appId}/devices/${devId}`} icon="device" content={devId} />
+    <Breadcrumb
+      path={`/applications/${appId}/devices/${devId}`}
+      icon="device"
+      content={name || devId}
+    />
   )
 })
 @withEnv
