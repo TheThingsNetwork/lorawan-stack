@@ -118,6 +118,7 @@ class Form extends React.PureComponent {
       validateOnChange,
       validationSchema,
       formikRef,
+      enableReinitialize,
       ...rest
     } = this.props
     return (
@@ -131,6 +132,7 @@ class Form extends React.PureComponent {
         validateOnBlur={validateOnBlur}
         validateOnChange={validateOnChange}
         validationSchema={validationSchema}
+        enableReinitialize={enableReinitialize}
       />
     )
   }
@@ -138,19 +140,20 @@ class Form extends React.PureComponent {
 
 Form.propTypes = {
   // formik props
-  onSubmit: PropTypes.func.isRequired,
-  onReset: PropTypes.func,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  enableReinitialize: PropTypes.bool,
+  error: PropTypes.error,
+  formikRef: PropTypes.shape({ current: PropTypes.instanceOf(Formik) }),
+  horizontal: PropTypes.bool,
   initialValues: PropTypes.object.isRequired,
+  isInitialValid: PropTypes.bool,
+  // custom props
+  onReset: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
   validateOnBlur: PropTypes.bool,
   validateOnChange: PropTypes.bool,
   validationSchema: PropTypes.object,
-  isInitialValid: PropTypes.bool,
-  formikRef: PropTypes.shape({ current: PropTypes.instanceOf(Formik) }),
-  // custom props
-  horizontal: PropTypes.bool,
-  className: PropTypes.string,
-  error: PropTypes.error,
-  disabled: PropTypes.bool,
 }
 
 Form.defaultProps = {
@@ -164,6 +167,7 @@ Form.defaultProps = {
   error: '',
   horizontal: true,
   disabled: false,
+  enableReinitialize: false,
 }
 
 Form.Field = FormField
