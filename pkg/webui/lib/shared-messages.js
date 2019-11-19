@@ -92,7 +92,7 @@ export default defineMessages({
   enabled: 'Enabled',
   entityId: 'Entity ID',
   eventsCannotShow: 'Cannot show events',
-  fetching: 'Fetching…',
+  fetching: 'Fetching data…',
   firmwareVersion: 'Firmware Version',
   frequencyPlan: 'Frequency Plan',
   fwdNtwkKey: 'FNwkSIntKey',
