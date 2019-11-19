@@ -97,6 +97,7 @@ export default defineMessages({
   edit: 'Edit',
   email: 'Email',
   emailAddress: 'Email Address',
+  empty: 'Empty',
   enabled: 'Enabled',
   entityId: 'Entity ID',
   eventsCannotShow: 'Cannot show events',

@@ -32,7 +32,29 @@ import { updateDevice } from '../../store/actions/device'
 import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/device'
-import { selectJsConfig } from '../../../lib/selectors/env'
+import {
+  selectIsConfig,
+  selectAsConfig,
+  selectJsConfig,
+  selectNsConfig,
+} from '../../../lib/selectors/env'
+import { hasExternalJs, isDeviceOTAA } from './utils'
+import m from './messages'
+
+import IdentityServerForm from './identity-server-form'
+import ApplicationServerForm from './application-server-form'
+import JoinServerForm from './join-server-form'
+import NetworkServerForm from './network-server-form'
+import DeleteSection from './delete-section'
+import Collapse from './collapse'
+
+const getComponentBaseUrl = config => {
+  try {
+    const { base_url } = config
+
+    return new URL(base_url).hostname
+  } catch (e) {}
+}
 
 @connect(
   state => ({
@@ -99,23 +121,104 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   render() {
-    const { device: initialValues, onDeleteSuccess, jsConfig } = this.props
-    const { error } = this.state
+    const { device, isConfig, asConfig, jsConfig, nsConfig } = this.props
+
+    const isOTAA = isDeviceOTAA(device)
+    const { enabled: isEnabled } = isConfig
+    const { enabled: asEnabled } = asConfig
+    const { enabled: jsEnabled } = jsConfig
+    const { enabled: nsEnabled } = nsConfig
+
+    const isDisabled = !isEnabled
+    let isDescription = m.isDescription
+    if (isDisabled) {
+      isDescription = m.isDescriptionMissing
+    }
+
+    // 1. Disable the section if AS is not in cluster.
+    // 2. Disable the section if the device is OTAA, since no OTAA related fields are stored in the AS.
+    // 3. Disable the section if NS is not in cluster, since activation mode is unknown.
+    // 4. Disable the seciton if `application_server_address` is not equal to the cluster AS address
+    const sameAsAddress = getComponentBaseUrl(asConfig) === device.application_server_address
+    const asDisabled = !asEnabled || isOTAA || !nsEnabled || !sameAsAddress
+    let asDescription = m.asDescription
+    if (!asEnabled) {
+      asDescription = m.asDescriptionMissing
+    } else if (!nsEnabled) {
+      asDescription = m.activationModeUnknown
+    } else if (isOTAA) {
+      asDescription = m.asDescriptionOTAA
+    } else if (!sameAsAddress) {
+      asDescription = m.notInCluster
+    }
+
+    // 1. Disable the section if JS is not in cluster.
+    // 2. Disable the section if the device is ABP/Multicast, since JS does not store ABP/Multicast
+    // devices.
+    // 3. Disable the seciton if `join_server_address` is not equal to the cluster JS address
+    // 4. Disable the seciton if an external JS is used
+    const sameJsAddress = getComponentBaseUrl(jsConfig) === device.join_server_address
+    const externalJs = hasExternalJs(device)
+    const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress || externalJs
+    let jsDescription = m.jsDescription
+    if (!jsEnabled) {
+      jsDescription = m.jsDescriptionMissing
+    } else if (!isOTAA) {
+      jsDescription = m.jsDescriptionOTAA
+    } else if (!sameJsAddress || externalJs) {
+      jsDescription = m.notInCluster
+    }
+
+    // 1. Disable the section if NS is not in cluster.
+    // 2. Disable the seciton if `network_server_address` is not equal to the cluster NS address
+    const sameNsAddress = getComponentBaseUrl(nsConfig) === device.network_server_address
+    const nsDisabled = !nsEnabled || !sameNsAddress
+    let nsDescription = m.nsDescription
+    if (!nsEnabled) {
+      nsDescription = m.nsDescriptionMissing
+    } else if (!sameNsAddress) {
+      nsDescription = m.notInCluster
+    }
 
     return (
       <Container>
         <IntlHelmet title={sharedMessages.generalSettings} />
         <Row>
           <Col lg={8} md={12}>
-            <DeviceDataForm
-              error={error}
-              onSubmit={this.handleSubmit}
-              onDelete={this.handleDelete}
-              onDeleteSuccess={onDeleteSuccess}
-              initialValues={initialValues}
-              jsConfig={jsConfig}
-              update
-            />
+            <Collapse
+              title={m.isTitle}
+              description={isDescription}
+              disabled={isDisabled}
+              initialCollapsed={false}
+            >
+              <IdentityServerForm
+                device={device}
+                onSubmit={this.handleSubmit}
+                jsConfig={jsConfig}
+              />
+            </Collapse>
+            <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
+              <NetworkServerForm device={device} onSubmit={this.handleSubmit} />
+            </Collapse>
+            <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
+              <ApplicationServerForm device={device} onSubmit={this.handleSubmit} />
+            </Collapse>
+            <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
+              <JoinServerForm
+                device={device}
+                onSubmit={this.handleSubmit}
+                asConfig={asConfig}
+                nsConfig={nsConfig}
+              />
+            </Collapse>
+            <Collapse title={m.consoleTitle} description={m.consoleDescription}>
+              <DeleteSection
+                device={device}
+                onDelete={this.handleDelete}
+                onDeleteSuccess={this.handleDeleteSuccess}
+                onDeleteFailure={this.handleDeleteFailure}
+              />
+            </Collapse>
           </Col>
         </Row>
       </Container>

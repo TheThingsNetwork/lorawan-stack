@@ -15,9 +15,8 @@
 import * as Yup from 'yup'
 
 import randomByteString from '../../../lib/random-bytes'
-import sharedMessages from '../../../../lib/shared-messages'
-import { id as deviceIdRegexp, address as addressRegexp } from '../../../lib/regexp'
 import m from '../../../components/device-data-form/messages'
+import sharedMessages from '../../../../lib/shared-messages'
 
 import { parseLorawanMacVersion } from '../utils'
 
@@ -25,31 +24,9 @@ const random16BytesString = () => randomByteString(32)
 const toUndefined = value => (!Boolean(value) ? undefined : value)
 
 const validationSchema = Yup.object().shape({
-  ids: Yup.object().shape({
-    device_id: Yup.string()
-      .matches(deviceIdRegexp, sharedMessages.validateAlphanum)
-      .min(2, sharedMessages.validateTooShort)
-      .max(36, sharedMessages.validateTooLong)
-      .required(sharedMessages.validateRequired),
-  }),
-  name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  description: Yup.string().max(2000, sharedMessages.validateTooLong),
-  network_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
-  application_server_address: Yup.string().matches(
-    addressRegexp,
-    sharedMessages.validateAddressFormat,
-  ),
-  _external_js: Yup.boolean(),
-  join_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
-  resets_join_nonces: Yup.bool().when('_supports_join', {
-    is: true,
-    then: schema => schema,
-    otherwise: schema => schema.strip(),
-  }),
+  net_id: Yup.nullableString().emptyOrLength(3 * 2, m.validate6), // 3 Byte hex
   root_keys: Yup.object().when(
-    ['_external_js', '_lorawan_version', '_supports_join'],
+    ['_external_js', '_lorawan_version'],
     (externalJs, version, schema) => {
       const strippedSchema = Yup.object().strip()
       const keySchema = Yup.lazy(() => {
@@ -83,6 +60,17 @@ const validationSchema = Yup.object().shape({
       })
     },
   ),
+  resets_join_nonces: Yup.boolean().when('_lorawan_version', {
+    // Verify if lorawan version is 1.1.0 or higher.
+    is: version => parseLorawanMacVersion(version) >= 110,
+    then: schema => schema,
+    otherwise: schema => schema.strip(),
+  }),
+  application_server_id: Yup.string().max(100, sharedMessages.validateTooLong),
+  application_server_kek_label: Yup.string().max(2048, sharedMessages.validateTooLong),
+  network_server_kek_label: Yup.string().max(2048, sharedMessages.validateTooLong),
+  _external_js: Yup.boolean(),
+  _lorawan_version: Yup.string(),
 })
 
 export default validationSchema
