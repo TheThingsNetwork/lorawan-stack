@@ -58,7 +58,7 @@ export default defineMessages({
   resetsFCnt: 'Resets Frame Counters',
   resetsJoinNonces: 'Resets Join Nonces',
   resetWarning: 'Reseting is insecure and makes your device susceptible for replay attacks',
-  sNtwkSIKeyDescription: 'Serving Network Session Integrity Key (only for LoRaWAN 1.1+)',
+  sNtwkSIKeyDescription: 'Serving Network Session Integrity Key',
   supportsClassC: 'Supports Class C',
   unexposed: 'Unexposed',
   updateSuccess: 'Successfully updated end device',
