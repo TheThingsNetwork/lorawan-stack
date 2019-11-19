@@ -21,25 +21,42 @@ import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
 import diff from '../../../lib/diff'
-import DeviceDataForm from '../../components/device-data-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import PropTypes from '../../../lib/prop-types'
 import api from '../../api'
+import toast from '../../../components/toast'
 
 import { updateDevice } from '../../store/actions/device'
 import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/device'
-import { selectJsConfig } from '../../../lib/selectors/env'
+import {
+  selectIsConfig,
+  selectAsConfig,
+  selectJsConfig,
+  selectNsConfig,
+} from '../../../lib/selectors/env'
+import { isDeviceOTAA } from './utils'
+import m from './messages'
+
+import IdentityServerForm from './identity-server-form'
+import ApplicationServerForm from './application-server-form'
+import JoinServerForm from './join-server-form'
+import NetworkServerForm from './network-server-form'
+import DeleteSection from './delete-section'
+import Collapse from './collapse'
 
 @connect(
   state => ({
     device: selectSelectedDevice(state),
     devId: selectSelectedDeviceId(state),
     appId: selectSelectedApplicationId(state),
+    isConfig: selectIsConfig(),
+    asConfig: selectAsConfig(),
     jsConfig: selectJsConfig(),
+    nsConfig: selectNsConfig(),
   }),
   dispatch => ({
     ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
@@ -65,14 +82,13 @@ import { selectJsConfig } from '../../../lib/selectors/env'
 export default class DeviceGeneralSettings extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    asConfig: PropTypes.stackComponent.isRequired,
     device: PropTypes.device.isRequired,
+    isConfig: PropTypes.stackComponent.isRequired,
     jsConfig: PropTypes.stackComponent.isRequired,
+    nsConfig: PropTypes.stackComponent.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     updateDevice: PropTypes.func.isRequired,
-  }
-
-  state = {
-    error: '',
   }
 
   @bind
@@ -83,6 +99,7 @@ export default class DeviceGeneralSettings extends React.Component {
     const {
       ids: { device_id: deviceId },
     } = device
+
     const changed = diff(device, updatedDevice, ['updated_at', 'created_at'])
 
     return updateDevice(appId, deviceId, changed)
@@ -98,24 +115,97 @@ export default class DeviceGeneralSettings extends React.Component {
     return api.device.delete(appId, deviceId)
   }
 
+  @bind
+  async handleDeleteSuccess() {
+    const { device, onDeleteSuccess } = this.props
+    const {
+      ids: { device_id: deviceId },
+    } = device
+
+    onDeleteSuccess()
+    toast({
+      title: deviceId,
+      message: m.deleteSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }
+
   render() {
-    const { device: initialValues, onDeleteSuccess, jsConfig } = this.props
-    const { error } = this.state
+    const { device, isConfig, asConfig, jsConfig, nsConfig } = this.props
+
+    const isOTAA = isDeviceOTAA(device)
+    const { enabled: isEnabled } = isConfig
+    const { enabled: asEnabled } = asConfig
+    const { enabled: jsEnabled } = jsConfig
+    const { enabled: nsEnabled } = nsConfig
+
+    const isDisabled = !isEnabled
+    let isDescription = m.isDescription
+    if (isDisabled) {
+      isDescription = m.isDescriptionMissing
+    }
+
+    // 1. Disable the section if AS is not in cluster.
+    // 2. Disable the section if the device is OTAA, since no OTAA related fields are stored in the AS.
+    // 3. Disable the section if NS is not in cluster, since activation mode is unknown.
+    const asDisabled = !asEnabled || isOTAA || !nsEnabled
+    let asDescription = m.asDescription
+    if (!asEnabled) {
+      asDescription = m.asDescriptionMissing
+    } else if (!nsEnabled) {
+      asDescription = m.activationModeUnknown
+    } else if (isOTAA) {
+      asDescription = m.asDescriptionOTAA
+    }
+
+    // 1. Disable the section if JS is not in cluster.
+    // 2. Disable the section if the device is ABP/Multicast, since JS does not store ABP/Multicast
+    // devices.
+    // 3. Disable the section if NS is not in cluster, since activation mode is unknown.
+    const jsDisabled = !jsEnabled || !isOTAA || !nsEnabled
+    let jsDescription = m.jsDescription
+    if (!jsEnabled) {
+      jsDescription = m.jsDescriptionMissing
+    } else if (!nsEnabled) {
+      jsDescription = m.activationModeUnknown
+    } else if (!isOTAA) {
+      jsDescription = m.jsDescriptionOTAA
+    }
+
+    const nsDisabled = !nsEnabled
+    let nsDescription = m.nsDescription
+    if (!nsEnabled) {
+      nsDescription = m.nsDescriptionMissing
+    }
 
     return (
       <Container>
         <IntlHelmet title={sharedMessages.generalSettings} />
         <Row>
           <Col lg={8} md={12}>
-            <DeviceDataForm
-              error={error}
-              onSubmit={this.handleSubmit}
-              onDelete={this.handleDelete}
-              onDeleteSuccess={onDeleteSuccess}
-              initialValues={initialValues}
-              jsConfig={jsConfig}
-              update
-            />
+            <Collapse title={m.isTitle} description={isDescription} disabled={isDisabled}>
+              <IdentityServerForm device={device} onSubmit={this.handleSubmit} />
+            </Collapse>
+            <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
+              <ApplicationServerForm device={device} onSubmit={this.handleSubmit} />
+            </Collapse>
+            <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
+              <JoinServerForm device={device} onSubmit={this.handleSubmit} jsConfig={jsConfig} />
+            </Collapse>
+            <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
+              <NetworkServerForm device={device} onSubmit={this.handleSubmit} />
+            </Collapse>
+            <Collapse
+              title={m.consoleTitle}
+              description={m.consoleDescription}
+              initialCollapsed={false}
+            >
+              <DeleteSection
+                device={device}
+                onDelete={this.handleDelete}
+                onDeleteSuccess={this.handleDeleteSuccess}
+              />
+            </Collapse>
           </Col>
         </Row>
       </Container>
