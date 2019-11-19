@@ -31,7 +31,7 @@ const Overlay = ({ className, visible, loading = false, children }) => (
     />
     {visible && loading && (
       <Spinner center>
-        <Message content={sharedMessages.loading} />
+        <Message content={sharedMessages.fetching} />
       </Spinner>
     )}
     {children}

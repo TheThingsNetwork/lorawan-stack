@@ -16,11 +16,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import 'focus-visible/dist/focus-visible'
 import { setConfiguration } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
 
 import Spinner from '../../components/spinner'
 import ErrorMessage from './error-message'
+import Message from './message'
 
 import '../../styles/main.styl'
+
+const m = defineMessages({
+  initializing: 'Initializing…',
+})
 
 // React grid configuration
 // Keep these in line with styles/variables.less
@@ -47,7 +53,11 @@ export default class Init extends React.PureComponent {
     }
 
     if (!initialized) {
-      return <Spinner center>Please wait…</Spinner>
+      return (
+        <Spinner center>
+          <Message content={m.initializing} />
+        </Spinner>
+      )
     }
 
     return this.props.children

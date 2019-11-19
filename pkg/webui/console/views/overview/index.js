@@ -188,7 +188,7 @@ export default class Overview extends React.Component {
     if (fetching || applicationCount === undefined || gatewayCount === undefined) {
       return (
         <Spinner center>
-          <Message content={sharedMessages.loading} />
+          <Message content={sharedMessages.fetching} />
         </Spinner>
       )
     }

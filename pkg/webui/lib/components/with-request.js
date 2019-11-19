@@ -15,6 +15,9 @@
 import React from 'react'
 
 import Spinner from '../../components/spinner'
+import Message from '../../lib/components/message'
+
+import sharedMessages from '../../lib/shared-messages'
 
 /**
  * `withRequest` is a HOC that handles:
@@ -64,7 +67,11 @@ const withRequest = (
     render() {
       const { initialFetching } = this.state
       if (initialFetching || mapPropsToFetching(this.props)) {
-        return <Spinner center />
+        return (
+          <Spinner center>
+            <Message content={sharedMessages.fetching} />
+          </Spinner>
+        )
       }
 
       return <Component {...this.props} />

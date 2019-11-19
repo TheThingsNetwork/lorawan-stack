@@ -155,7 +155,7 @@ export default class CreateAccount extends React.PureComponent {
     if (fetching) {
       return (
         <Spinner center>
-          <Message content={sharedMessages.loading} />
+          <Message content={sharedMessages.fetching} />
         </Spinner>
       )
     }
