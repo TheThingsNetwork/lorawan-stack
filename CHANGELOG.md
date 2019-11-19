@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix duty-cycle limitation in `AU_915_928` band
+
 ### Security
 
 ## [3.2.6] - 2019-11-18
