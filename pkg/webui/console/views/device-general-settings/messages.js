@@ -15,25 +15,24 @@
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
-  isTitle: 'Identity Server Settings',
-  isDescription: 'Edit end device fields related to the Identity Server',
+  isTitle: 'Basic',
+  isDescription: 'Description, cluster information and metadata',
   isDescriptionMissing: 'Identity Server is not available',
-  asTitle: 'Application Server Settings',
-  asDescription: 'Edit end device fields related to the Application Server',
+  asTitle: 'Application Layer',
+  asDescription: 'Application-layer behavior and session',
   asDescriptionMissing: 'Application Server is not available',
   asDescriptionOTAA: 'Application Server does not store any OTAA specific device fields',
-  jsTitle: 'Join Server Settings',
-  jsDescription: 'Edit end device fields related to the Join Server',
+  jsTitle: 'Join',
+  jsDescription: 'Root keys and network settings for device activation',
   jsDescriptionMissing: 'Join Server is not available',
   jsDescriptionOTAA: 'ABP/multicast devices are not stored on the Join Server',
-  nsTitle: 'Network Server Settings',
-  nsDescription: 'Edit end device fields related to the Network Server',
+  nsTitle: 'Network Layer',
+  nsDescription: 'LoRaWAN network-layer settings, behavior and session',
   nsDescriptionMissing: 'Network Server is not available',
-  consoleTitle: 'Console Settings',
-  consoleDescription: 'General settings of the end device',
   deleteSuccess: 'The end device has been deleted successfully',
   deleteFailure: 'End device deletion failed',
   activationModeUnknown: 'Activation mode unknown because Network Server is not available',
+  notInCluster: 'Not registered in this cluster',
 })
 
 export default messages
