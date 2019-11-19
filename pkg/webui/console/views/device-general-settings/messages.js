@@ -32,6 +32,7 @@ const messages = defineMessages({
   consoleTitle: 'Console Settings',
   consoleDescription: 'General settings of the end device',
   deleteSuccess: 'The end device has been deleted successfully',
+  deleteFailure: 'End device deletion failed',
   activationModeUnknown: 'Activation mode unknown because Network Server is not available',
 })
 

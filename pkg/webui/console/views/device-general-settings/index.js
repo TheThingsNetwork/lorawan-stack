@@ -120,6 +120,35 @@ export default class DeviceGeneralSettings extends React.Component {
     return api.device.delete(appId, deviceId)
   }
 
+  @bind
+  async handleDeleteSuccess() {
+    const { device, onDeleteSuccess } = this.props
+    const {
+      ids: { device_id: deviceId },
+    } = device
+
+    onDeleteSuccess()
+    toast({
+      title: deviceId,
+      message: m.deleteSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }
+
+  @bind
+  async handleDeleteFailure() {
+    const { device } = this.props
+    const {
+      ids: { device_id: deviceId },
+    } = device
+
+    toast({
+      title: deviceId,
+      message: m.deleteFailure,
+      type: toast.types.ERROR,
+    })
+  }
+
   render() {
     const { device, isConfig, asConfig, jsConfig, nsConfig } = this.props
 
