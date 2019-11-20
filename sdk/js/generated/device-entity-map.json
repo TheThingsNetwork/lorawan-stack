@@ -412,6 +412,7 @@
   },
   "max_frequency": ["ns", "ns"],
   "min_frequency": ["ns", "ns"],
+  "multicast": [ "ns", "read_only"],
   "power_state": ["ns", "ns"],
   "queued_application_downlinks": ["ns", "read_only"],
   "recent_adr_uplinks": ["ns", "read_only"],

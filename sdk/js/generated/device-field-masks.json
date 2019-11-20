@@ -336,6 +336,7 @@
       "mac_state.rx_windows_available",
       "max_frequency",
       "min_frequency",
+      "multicast",
       "pending_session",
       "pending_session.dev_addr",
       "pending_session.keys",

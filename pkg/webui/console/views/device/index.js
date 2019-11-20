@@ -85,6 +85,7 @@ import style from './device.styl'
         'join_server_address',
         'locations',
         'formatters',
+        'multicast',
       ],
       { ignoreNotFound: true },
     ),
