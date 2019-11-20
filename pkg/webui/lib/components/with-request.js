@@ -33,25 +33,26 @@ const withRequest = (
   mapPropsToError = ({ error } = {}) => error,
 ) => Component =>
   class WithRequest extends React.Component {
-    state = { initialFetching: true }
+    constructor(props) {
+      super(props)
+      // Avoid render of old content by setting an initial fetching state if
+      // the component is mounted with fetching prop evaluating to false.
+      // This way we can close the "fetching gap" between the initial render
+      // and the next render after the request action has been dispatched.
+      this.state = {
+        initialFetching: mapPropsToFetching(props) === false,
+      }
+    }
     componentDidMount() {
+      const { initialFetching } = this.state
       mapPropsToRequest(this.props)
+
+      if (initialFetching) {
+        this.setState({ initialFetching: false })
+      }
     }
 
     componentDidUpdate(prevProps) {
-      const prevFetching = mapPropsToFetching(prevProps)
-      const fetching = mapPropsToFetching(this.props)
-      const { initialFetching } = this.state
-
-      // Avoid initial render with old data (when request has been performed
-      // before, thus fetching calculation being initially true, before the new
-      // request is being made).
-      if (initialFetching && prevFetching !== !fetching) {
-        // Remove internal fetching state as soon as the fetching calculation
-        // has switched.
-        this.setState({ initialFetching: false })
-      }
-
       const error = mapPropsToError(this.props)
       const prevError = mapPropsToError(prevProps)
 
