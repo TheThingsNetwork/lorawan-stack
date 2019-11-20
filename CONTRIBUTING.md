@@ -2,7 +2,7 @@
 
 Thank you for your interest in building this thing together with us. We're really happy with our active community and are glad that you're a part of it. There are many ways to contribute to our project, but given the fact that you're on Github looking at the code for The Things Stack for LoRaWAN, you're probably here for one of the following reasons:
 
-- **Asking a question**: If you have questions, please use the [forum](https://www.thethingsnetwork.org/forum/).
+- **Asking a question**: If you have questions, please use the [forum](https://www.thethingsnetwork.org/forum/). We have a special [category for The Things Stack](https://www.thethingsnetwork.org/forum/c/network-and-routing/v3).
 - **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please use the issue template and fill out all sections.
 - **Reporting an issue**: If you notice that a component of The Things Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please use the issue template and fill out all sections. For sensitive (security) issues, you can [contact us directly](#security-issues).
 - **Implementing a new feature or fixing a bug**: If you see an [open issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) that you would like to work on, let the other contributors know by commenting in the issue.
