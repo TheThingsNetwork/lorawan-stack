@@ -399,6 +399,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 			return
 		}
 		a.So(asUp.CorrelationIDs, should.HaveSameElementsDeep, reqCIDs)
+		a.So([]time.Time{start, asUp.GetJoinAccept().GetReceivedAt(), time.Now()}, should.BeChronological)
 		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               devID,
@@ -413,6 +414,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 					Key: &appSKey,
 				},
 				SessionKeyID: []byte("session-key-id"),
+				ReceivedAt:   asUp.GetJoinAccept().GetReceivedAt(),
 			}},
 		})
 
@@ -726,6 +728,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 		}
 
 		a.So(asUp.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, mds)
+		a.So([]time.Time{start, asUp.GetUplinkMessage().GetReceivedAt(), time.Now()}, should.BeChronological)
 		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceID:               devID,
@@ -752,6 +755,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 					Frequency:     867100000,
 					Timestamp:     42,
 				},
+				ReceivedAt: asUp.GetUplinkMessage().GetReceivedAt(),
 			}},
 		})
 
