@@ -316,6 +316,9 @@ func (l *link) sendUp(ctx context.Context, up *ttnpb.ApplicationUp, ack func() e
 	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up, l.connName)
 
+	now := time.Now().UTC()
+	up.ReceivedAt = &now
+
 	handleUpErr := l.handleUp(ctx, up, l)
 	if err := ack(); err != nil {
 		return err
