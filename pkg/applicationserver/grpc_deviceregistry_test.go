@@ -459,6 +459,18 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"ids.application_ids",
 					"ids.device_id",
 				})
+				a.So(dev, should.Resemble, &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationID: registeredApplicationID,
+						},
+						DeviceID: "new-device",
+					},
+					Formatters: &ttnpb.MessagePayloadFormatters{
+						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
+					},
+				})
 				return dev, err
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
@@ -506,6 +518,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"formatters",
 				})
+				a.So(dev, should.Resemble, registeredDevice)
 				return dev, err
 			},
 			SetCalls: 1,

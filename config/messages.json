@@ -5120,33 +5120,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:invalid_f_nwk_s_int_key": {
-    "translations": {
-      "en": "invalid FNwkSIntKey"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:invalid_nwk_s_enc_key": {
-    "translations": {
-      "en": "invalid NwkSEncKey"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/networkserver:invalid_s_nwk_s_int_key": {
-    "translations": {
-      "en": "invalid SNwkSIntKey"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:join_server_not_found": {
     "translations": {
       "en": "Join Server not found"

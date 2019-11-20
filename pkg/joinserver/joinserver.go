@@ -54,6 +54,7 @@ type Config struct {
 	Devices         DeviceRegistry      `name:"-"`
 	Keys            KeyRegistry         `name:"-"`
 	JoinEUIPrefixes []types.EUI64Prefix `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
+	DeviceKEKLabel  string              `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }
 
 // JoinServer implements the Join Server component.
@@ -100,7 +101,10 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
 
-	js.grpc.jsDevices = jsEndDeviceRegistryServer{JS: js}
+	js.grpc.jsDevices = jsEndDeviceRegistryServer{
+		JS:       js,
+		kekLabel: conf.DeviceKEKLabel,
+	}
 	js.grpc.asJs = asJsServer{JS: js}
 	js.grpc.nsJs = nsJsServer{JS: js}
 	js.grpc.js = jsServer{JS: js}
