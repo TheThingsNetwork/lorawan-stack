@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 
 import Tag from '../../../components/tag'
 import TagGroup from '../../../components/tag/group'
+import SafeInspector from '../../../components/safe-inspector'
 import FetchTable from '../fetch-table'
 import PropTypes from '../../../lib/prop-types'
 import Message from '../../../lib/components/message'
@@ -44,6 +45,11 @@ const headers = [
     name: 'id',
     displayName: m.keyId,
     width: 35,
+    render(entityId) {
+      return (
+        <SafeInspector noCopyPopup disableResize data={entityId} hideable={false} isBytes={false} />
+      )
+    },
   },
   {
     name: 'name',
@@ -86,8 +92,8 @@ export default class ApiKeysTable extends Component {
 }
 
 ApiKeysTable.propTypes = {
-  pageSize: PropTypes.number.isRequired,
   baseDataSelector: PropTypes.func.isRequired,
-  getItemsAction: PropTypes.func.isRequired,
   entityId: PropTypes.string,
+  getItemsAction: PropTypes.func.isRequired,
+  pageSize: PropTypes.number.isRequired,
 }
