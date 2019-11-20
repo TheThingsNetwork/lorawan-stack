@@ -188,8 +188,11 @@ import Devices from '../devices'
   }
 })
 @withBreadcrumb('apps.single', function(props) {
-  const { appId } = props
-  return <Breadcrumb path={`/applications/${appId}`} icon="application" content={appId} />
+  const {
+    appId,
+    application: { name },
+  } = props
+  return <Breadcrumb path={`/applications/${appId}`} icon="application" content={name || appId} />
 })
 @withEnv
 export default class Application extends React.Component {

@@ -79,8 +79,11 @@ import {
   }
 })
 @withBreadcrumb('orgs.single', function(props) {
-  const { orgId } = props
-  return <Breadcrumb path={`/organizations/${orgId}`} icon="organization" content={orgId} />
+  const {
+    orgId,
+    organization: { name },
+  } = props
+  return <Breadcrumb path={`/organizations/${orgId}`} icon="organization" content={name || orgId} />
 })
 class Organization extends React.Component {
   static propTypes = {
