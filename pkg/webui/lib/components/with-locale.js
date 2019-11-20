@@ -166,7 +166,8 @@ export default class UserLocale extends React.PureComponent {
     const { messages, loaded, xx } = this.state
 
     if (!loaded) {
-      return <Spinner center />
+      // Not using <Message />, since we're initializing locales
+      return <Spinner center>Loading locale…</Spinner>
     }
 
     const lang = (user && user.language) || config.language || defaultLanguage

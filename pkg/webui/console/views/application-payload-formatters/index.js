@@ -75,8 +75,10 @@ const m = defineMessages({
 export default class ApplicationPayloadFormatters extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
-    linked: PropTypes.bool.isRequired,
     fetching: PropTypes.bool.isRequired,
+    getLink: PropTypes.func.isRequired,
+    linked: PropTypes.bool.isRequired,
+    match: PropTypes.match.isRequired,
   }
 
   componentDidMount() {
@@ -89,7 +91,11 @@ export default class ApplicationPayloadFormatters extends React.Component {
     const { match, fetching, linked, appId } = this.props
 
     if (fetching) {
-      return <Spinner center message={sharedMessages.loading} />
+      return (
+        <Spinner center>
+          <Message content={sharedMessages.fetching} />
+        </Spinner>
+      )
     }
 
     const linkWarning = linked ? null : (
