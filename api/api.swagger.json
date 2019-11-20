@@ -7287,6 +7287,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a\nrejoin-request."
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server time when the Network Server received the message."
         }
       }
     },
@@ -7547,7 +7552,8 @@
         },
         "received_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Server time when the Application Server received the message."
         },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationUplink"
@@ -7609,6 +7615,11 @@
         },
         "settings": {
           "$ref": "#/definitions/v3TxSettings"
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server time when the Network Server received the message."
         }
       }
     },

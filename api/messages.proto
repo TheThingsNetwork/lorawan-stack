@@ -166,6 +166,8 @@ message ApplicationUplink {
   google.protobuf.Struct decoded_payload = 5;
   repeated RxMetadata rx_metadata = 6 [(validate.rules).repeated.min_items = 1];
   TxSettings settings = 7 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  // Server time when the Network Server received the message.
+  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 }
 
 message ApplicationLocation {
@@ -184,6 +186,8 @@ message ApplicationJoinAccept {
   // Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a
   // rejoin-request.
   bool pending_session = 4;
+  // Server time when the Network Server received the message.
+  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 }
 
 message ApplicationDownlink {
@@ -236,6 +240,7 @@ message ApplicationInvalidatedDownlinks {
 message ApplicationUp {
   EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated string correlation_ids = 2 [(gogoproto.customname) = "CorrelationIDs", (validate.rules).repeated.items.string.max_len = 100];
+  // Server time when the Application Server received the message.
   google.protobuf.Timestamp received_at = 12 [(gogoproto.stdtime) = true];
 
   oneof up {

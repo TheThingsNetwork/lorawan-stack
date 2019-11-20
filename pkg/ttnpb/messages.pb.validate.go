@@ -561,6 +561,18 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "received_at":
+
+			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationUplinkValidationError{
+						field:  "received_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ApplicationUplinkValidationError{
 				field:  name,
@@ -805,6 +817,18 @@ func (m *ApplicationJoinAccept) ValidateFields(paths ...string) error {
 
 		case "pending_session":
 			// no validation rules for PendingSession
+		case "received_at":
+
+			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationJoinAcceptValidationError{
+						field:  "received_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return ApplicationJoinAcceptValidationError{
 				field:  name,
