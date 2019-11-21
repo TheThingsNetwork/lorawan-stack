@@ -16,7 +16,6 @@ package identityserver
 
 import (
 	"context"
-	"path"
 	"runtime/trace"
 	"strings"
 	"time"
@@ -269,10 +268,11 @@ func (is *IdentityServer) setFullProfilePictureURL(ctx context.Context, usr *ttn
 	if bucketURL == "" {
 		return
 	}
+	bucketURL = strings.TrimSuffix(bucketURL, "/") + "/"
 	if usr != nil && usr.ProfilePicture != nil {
 		for size, file := range usr.ProfilePicture.Sizes {
 			if !strings.Contains(file, "://") {
-				usr.ProfilePicture.Sizes[size] = path.Join(bucketURL, file)
+				usr.ProfilePicture.Sizes[size] = bucketURL + strings.TrimPrefix(file, "/")
 			}
 		}
 	}
