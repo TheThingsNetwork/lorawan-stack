@@ -164,9 +164,11 @@ func (s *srv) handlePackets() {
 				}
 			}
 
-			if s.firewall != nil && !s.firewall.Filter(packet) {
-				logger.Warn("Packet filtered")
-				break
+			if s.firewall != nil {
+				if err := s.firewall.Filter(packet); err != nil {
+					logger.WithError(err).Warn("Packet filtered")
+					break
+				}
 			}
 
 			cs, err := s.connect(ctx, eui)
