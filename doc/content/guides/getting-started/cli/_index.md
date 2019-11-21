@@ -38,6 +38,21 @@ This creates a gateway `gtw1` with user `admin` as collaborator, frequency plan 
 
 >Note: The CLI returns the created and updated entities by default in JSON. This can be useful in scripts.
 
+### Create gateway API key
+
+Some gateways require an API Key with Link Gateway Rights to be able to connect to The Things Stack.
+
+Create an API key for the gateway:
+
+```bash
+$ ttn-lw-cli gateways api-keys create \
+  --name link \
+  --gateway-id gtw1 \
+  --right-gateway-link
+```
+
+The CLI will return an API key such as `NNSXS.VEEBURF3KR77ZR...`. This API key has only link rights and can therefore only be used for linking this gateway. Make sure to copy the key and save it in a safe place. You will not be able to see this key again in the future, and if you lose it, you can create a new one to replace it in the gateway configuration.
+
 ## Create application
 
 Create the first application:
@@ -61,7 +76,7 @@ $ ttn-lw-cli applications api-keys create \
   --right-application-link
 ```
 
-The CLI will return an API key such as `NNSXS.VEEBURF3KR77ZR...`. This API key has only link rights and can therefore only be used for linking.
+The CLI will return an API key such as `NNSXS.VEEBURF3KR77ZR...`. This API key has only link rights and can therefore only be used for linking this application. Make sure to copy the key and save it in a safe place. You will not be able to see this key again in the future, and if you lose it, you can create a new one to replace it in the gateway configuration.
 
 You can now link the Application Server to the Network Server:
 
