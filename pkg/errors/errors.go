@@ -60,6 +60,9 @@ func (e Error) Fields() map[string]interface{} {
 		res[pref] = cause.Error()
 		pref += "_cause"
 	}
+	for k, v := range Attributes(Stack(e)...) {
+		res[k] = v
+	}
 	return res
 }
 
