@@ -16,8 +16,6 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createLogicMiddleware } from 'redux-logic'
 import { routerMiddleware } from 'connected-react-router'
 
-import { offline } from '@redux-offline/redux-offline'
-import offlineConfig from '@redux-offline/redux-offline/lib/defaults'
 import dev from '../../lib/dev'
 
 import createRootReducer from './reducers'
@@ -33,10 +31,7 @@ export default function(history) {
     createLogicMiddleware(logics),
   )
 
-  const store = createStore(
-    createRootReducer(history),
-    composeEnhancers(middleware, offline(offlineConfig)),
-  )
+  const store = createStore(createRootReducer(history), composeEnhancers(middleware))
   if (dev && module.hot) {
     module.hot.accept('./reducers', () => {
       store.replaceReducer(createRootReducer(history))
