@@ -188,6 +188,7 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"f_cnt",
 	"f_port",
 	"frm_payload",
+	"received_at",
 	"rx_metadata",
 	"session_key_id",
 	"settings",
@@ -215,6 +216,7 @@ var ApplicationUplinkFieldPathsTopLevel = []string{
 	"f_cnt",
 	"f_port",
 	"frm_payload",
+	"received_at",
 	"rx_metadata",
 	"session_key_id",
 	"settings",
@@ -242,6 +244,7 @@ var ApplicationJoinAcceptFieldPathsNested = []string{
 	"app_s_key.key",
 	"invalidated_downlinks",
 	"pending_session",
+	"received_at",
 	"session_key_id",
 }
 
@@ -249,6 +252,7 @@ var ApplicationJoinAcceptFieldPathsTopLevel = []string{
 	"app_s_key",
 	"invalidated_downlinks",
 	"pending_session",
+	"received_at",
 	"session_key_id",
 }
 var ApplicationDownlinkFieldPathsNested = []string{
@@ -421,6 +425,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.join_accept.app_s_key.key",
 	"up.join_accept.invalidated_downlinks",
 	"up.join_accept.pending_session",
+	"up.join_accept.received_at",
 	"up.join_accept.session_key_id",
 	"up.location_solved",
 	"up.location_solved.attributes",
@@ -436,6 +441,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.f_cnt",
 	"up.uplink_message.f_port",
 	"up.uplink_message.frm_payload",
+	"up.uplink_message.received_at",
 	"up.uplink_message.rx_metadata",
 	"up.uplink_message.session_key_id",
 	"up.uplink_message.settings",

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add support for encrypting device keys at rest (see `as.device-kek-label`, `js.device-kek-label` and `ns.device-kek-label` options).
+- The Network Server now provides the timestamp at which it received join-accept or data uplink messages
 
 ### Changed
 
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix active application link count being limited to 10 per CPU.
+- The Application Server now fills the timestamp at which it has received uplinks from the Network Server.
 
 ## [3.2.5] - 2019-11-15
 

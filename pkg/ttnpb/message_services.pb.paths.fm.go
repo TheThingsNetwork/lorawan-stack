@@ -20,6 +20,7 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"message.f_cnt",
 	"message.f_port",
 	"message.frm_payload",
+	"message.received_at",
 	"message.rx_metadata",
 	"message.session_key_id",
 	"message.settings",

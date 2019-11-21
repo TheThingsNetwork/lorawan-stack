@@ -890,6 +890,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				RxMetadata:   up.RxMetadata,
 				SessionKeyID: stored.Session.SessionKeyID,
 				Settings:     up.Settings,
+				ReceivedAt:   up.ReceivedAt,
 			}},
 		})
 		queuedEvents = append(queuedEvents, evtForwardDataUplink.BindData(nil))
@@ -1032,6 +1033,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	if err != nil {
 		return err
 	}
+	respRecvAt := timeNow()
 
 	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
 
@@ -1165,6 +1167,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			AppSKey:              resp.SessionKeys.AppSKey,
 			InvalidatedDownlinks: invalidatedQueue,
 			SessionKeyID:         resp.SessionKeys.SessionKeyID,
+			ReceivedAt:           respRecvAt,
 		}},
 	}); err != nil {
 		logger.WithError(err).Warn("Failed to queue join-accept for sending to Application Server")

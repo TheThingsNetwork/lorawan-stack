@@ -1193,6 +1193,8 @@ func TestHandleUplink(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				msg := makeJoinRequest(false)
 
@@ -1250,6 +1252,8 @@ func TestHandleUplink(t *testing.T) {
 
 				joinResp := makeJoinResponse(ttnpb.MAC_V1_1)
 
+				now := clock.Add(time.Nanosecond)
+
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
 					func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
@@ -1284,6 +1288,8 @@ func TestHandleUplink(t *testing.T) {
 				), should.BeTrue) {
 					return false
 				}
+
+				now = clock.Add(time.Nanosecond)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
@@ -1385,6 +1391,7 @@ func TestHandleUplink(t *testing.T) {
 										makeApplicationDownlink(),
 									},
 									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+									ReceivedAt:   now,
 								}},
 							},
 						})
@@ -1601,6 +1608,8 @@ func TestHandleUplink(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				msg := makeJoinRequest(false)
 
@@ -1648,6 +1657,8 @@ func TestHandleUplink(t *testing.T) {
 
 				joinResp := makeJoinResponse(ttnpb.MAC_V1_1)
 
+				now := clock.Add(time.Nanosecond)
+
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 					func(ctx context.Context, ids ttnpb.Identifiers) bool {
@@ -1684,6 +1695,8 @@ func TestHandleUplink(t *testing.T) {
 				), should.BeTrue) {
 					return false
 				}
+
+				now = clock.Add(time.Nanosecond)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
@@ -1785,6 +1798,7 @@ func TestHandleUplink(t *testing.T) {
 										makeApplicationDownlink(),
 									},
 									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+									ReceivedAt:   now,
 								}},
 							},
 						})
@@ -1820,6 +1834,8 @@ func TestHandleUplink(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				msg := makeJoinRequest(false)
 
@@ -1867,6 +1883,8 @@ func TestHandleUplink(t *testing.T) {
 
 				joinResp := makeJoinResponse(ttnpb.MAC_V1_0_2)
 
+				now := clock.Add(time.Nanosecond)
+
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 					func(ctx context.Context, ids ttnpb.Identifiers) bool {
@@ -1900,6 +1918,8 @@ func TestHandleUplink(t *testing.T) {
 				), should.BeTrue) {
 					return false
 				}
+
+				now = clock.Add(time.Nanosecond)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
@@ -2001,6 +2021,7 @@ func TestHandleUplink(t *testing.T) {
 										makeApplicationDownlink(),
 									},
 									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_0_2).SessionKeyID,
+									ReceivedAt:   now,
 								}},
 							},
 						})
@@ -2036,6 +2057,8 @@ func TestHandleUplink(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now()
+				clock := MockClock(start)
+				defer SetTimeNow(clock.Now)()
 
 				msg := makeJoinRequest(false)
 
@@ -2083,6 +2106,8 @@ func TestHandleUplink(t *testing.T) {
 
 				joinResp := makeJoinResponse(ttnpb.MAC_V1_1)
 
+				now := clock.Add(time.Nanosecond)
+
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 					func(ctx context.Context, ids ttnpb.Identifiers) bool {
@@ -2119,6 +2144,8 @@ func TestHandleUplink(t *testing.T) {
 				), should.BeTrue) {
 					return false
 				}
+
+				now = clock.Add(time.Nanosecond)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
@@ -2220,6 +2247,7 @@ func TestHandleUplink(t *testing.T) {
 										makeApplicationDownlink(),
 									},
 									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
+									ReceivedAt:   now,
 								}},
 							},
 						})
@@ -2429,6 +2457,7 @@ func TestHandleUplink(t *testing.T) {
 										Frequency: 868300000,
 										Timestamp: 42,
 									},
+									ReceivedAt: start,
 								}},
 							},
 						})
@@ -2642,6 +2671,7 @@ func TestHandleUplink(t *testing.T) {
 										Frequency: 868300000,
 										Timestamp: 42,
 									},
+									ReceivedAt: start,
 								}},
 							},
 						})
@@ -2857,6 +2887,7 @@ func TestHandleUplink(t *testing.T) {
 										Frequency: 868300000,
 										Timestamp: 42,
 									},
+									ReceivedAt: start,
 								}},
 							},
 						})

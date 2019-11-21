@@ -351,6 +351,16 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 					dst.Settings = zero
 				}
 			}
+		case "received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ReceivedAt = src.ReceivedAt
+			} else {
+				var zero time.Time
+				dst.ReceivedAt = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -458,6 +468,16 @@ func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ..
 			} else {
 				var zero bool
 				dst.PendingSession = zero
+			}
+		case "received_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'received_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ReceivedAt = src.ReceivedAt
+			} else {
+				var zero time.Time
+				dst.ReceivedAt = zero
 			}
 
 		default:

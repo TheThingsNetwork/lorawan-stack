@@ -4631,6 +4631,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | `app_s_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  | Encrypted Application Session Key (if Join Server sent it to Network Server). |
 | `invalidated_downlinks` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) | repeated | Downlink messages in the queue that got invalidated because of the session change. |
 | `pending_session` | [`bool`](#bool) |  | Indicates whether the security context refers to the pending session, i.e. when this join-accept is an answer to a rejoin-request. |
+| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Network Server received the message. |
 
 #### Field Rules
 
@@ -4666,7 +4667,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | ----- | ---- | ----- | ----------- |
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
 | `correlation_ids` | [`string`](#string) | repeated |  |
-| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Application Server received the message. |
 | `uplink_message` | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |  |
 | `join_accept` | [`ApplicationJoinAccept`](#ttn.lorawan.v3.ApplicationJoinAccept) |  |  |
 | `downlink_ack` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
@@ -4695,6 +4696,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
 | `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated |  |
 | `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  |  |
+| `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Network Server received the message. |
 
 #### Field Rules
 

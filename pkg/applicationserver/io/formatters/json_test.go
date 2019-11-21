@@ -58,7 +58,7 @@ func TestJSONUpstream(t *testing.T) {
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"uplink_message":{"session_key_id":"ESIzRA==","f_port":42,"f_cnt":42,"frm_payload":"AQID","decoded_payload":{"test_key":42},"settings":{"data_rate":{}}}}`,
+			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"uplink_message":{"session_key_id":"ESIzRA==","f_port":42,"f_cnt":42,"frm_payload":"AQID","decoded_payload":{"test_key":42},"settings":{"data_rate":{}},"received_at":"0001-01-01T00:00:00Z"}}`,
 		},
 		{
 			Message: &ttnpb.ApplicationUp{
@@ -75,7 +75,7 @@ func TestJSONUpstream(t *testing.T) {
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"ESIzRA=="}}`,
+			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"ESIzRA==","received_at":"0001-01-01T00:00:00Z"}}`,
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
