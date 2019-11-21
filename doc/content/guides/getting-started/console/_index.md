@@ -19,7 +19,7 @@ After entering your credentials and logging in, you will reach the Console overv
 
 {{< figure src="overview.png" alt="Overview" >}}
 
-## Create gateway
+## Create Gateway
 
 Go to **Gateways** in the top menu, and click **+ Add Gateway** to reach the gateway registration page. Fill the gateway ID, gateway EUI (if your gateway has an EUI) and frequency plan. The other fields are optional. Click **Create Gateway** to create the gateway.
 
@@ -31,7 +31,7 @@ Your gateway will be created and you will be redirected to the gateway overview 
 
 You can now connect your gateway to The Things Stack.
 
-### Create a Gateway API key
+### Create Gateway API Key
 
 Some gateways require an API Key with Link Gateway Rights to be able to connect to The Things Stack. 
 
@@ -43,7 +43,7 @@ You will see a screen that shows your newly created API Key. You now can copy it
 
 {{< figure src="gateway-api-key-created.png" alt="Gateway API Key created" >}}
 
-## Create application
+## Create Application
 
 Go to **Applications** in the top menu, and click **+ Add Application** to reach the application registration page. Fill the application ID. The other fields are optional. Click **Create Application** to create the application.
 
@@ -55,7 +55,7 @@ Your application will be created and you will be redirected to the application o
 
 Devices are created within applications.
 
-### Link application
+### Link Application
 
 In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server by going to **API keys** in the left menu of your application, and then clicking **+ Add API Key**.
 
@@ -75,13 +75,13 @@ You can now see the status of the linking process appear in the right part of yo
 
 Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.
 
-## Create end device
+## Create End Device
 
 Go to **Devices** in the left menu and click on **+ Add Device** to reach the end device registration page. Fill the device ID, the LoRaWAN MAC and PHY versions and the frequency plan used by the device.
 
 {{< figure src="device-creation-1.png" alt="Creating a new device" >}}
 
-### Over-the-air-activation (OTAA) device
+### Over-The-Air-Activation (OTAA) Device
 
 After filling the fields in the "General Settings" section, scroll to the lower part of the device registration page and make sure that "Over The Air Activation (OTAA)" is selected. Fill the Join EUI (App EUI in LoRaWAN versions before 1.1), the Device EUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press **Create Device** to create the device.
 
@@ -91,7 +91,7 @@ You'll now reach the device overview page for your device. The end device should
 
 {{< figure src="device-otaa-created.png" alt="OTAA device overview" >}}
 
-### Activation by personalization (ABP device)
+### Activation By Personalization (ABP) Device
 
 After filling the fields in the "General Settings" section, scroll to the lower part of the device registration page and make sure that "Activation By Personalization (ABP)" is selected. Fill the Device Address, the FNwkSIntKey (NwkSKey in LoRaWAN versions before 1.1) and the AppSKey. The other key fields are only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press **Create Device** to create the device.
 
@@ -101,7 +101,7 @@ You'll now reach the device overview page for your device. The end device should
 
 {{< figure src="device-abp-created.png" alt="ABP device overview" >}}
 
-## Working with data
+## Working With Data
 
 With your The Things Stack setup, a gateway connected and a device registered on your network, it's time to start working with data.
 
