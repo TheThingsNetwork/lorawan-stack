@@ -1,9 +1,8 @@
 ---
-title: "Console"
-description: ""
+title: 'Console'
+description: ''
 weight: 8
 ---
-
 
 ## Login
 
@@ -25,7 +24,7 @@ Go to **Gateways** in the top menu, and click **+ Add Gateway** to reach the gat
 
 {{< figure src="gateway-creation.png" alt="Gateway creation" >}}
 
-Your gateway will be created and you will be redirected to the gateway overview page of your newly created gateway. 
+Your gateway will be created and you will be redirected to the gateway overview page of your newly created gateway.
 
 {{< figure src="gateway-overview.png" alt="Gateway overview" >}}
 
@@ -45,7 +44,9 @@ Devices are created within applications.
 
 ### Link application
 
-In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server by going to **API keys** in the left menu of your application, and then clicking **+ Add API Key**.
+If you haven't unchecked the "Link automatically" checkbox during creation, your device will be automatically linked to the Application Server. You can skip this section in this case.
+
+In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. To do this, create an API key for the Application Server by going to **API keys** in the left menu of your application, and then clicking **+ Add API Key**.
 
 In the API Key creation screen, enter a name for your linking API key and select the **Link as Application to a Network Server** right, then press **Create API Key**.
 
@@ -71,7 +72,7 @@ Go to **Devices** in the left menu and click on **+ Add Device** to reach the en
 
 ### Over-the-air-activation (OTAA) device
 
-After filling the fields in the "General Settings" section, scroll to the lower part of the device registration page and make sure that "Over The Air Activation (OTAA)" is selected. Fill the Join EUI (App EUI in LoRaWAN versions before 1.1), the Device EUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press **Create Device** to create the device.
+After filling the fields in the "General Settings" section, scroll to the lower part of the device registration page and make sure that "Over The Air Activation (OTAA)" is selected. Fill the Join EUI (App EUI in LoRaWAN versions before 1.1), and the Device EUI. Based on whether or not you're using an external Join Server, you can also set the AppKey and NwkKey, which will be generated automatically if you leave the fields blank. Press **Create Device** to create the device.
 
 {{< figure src="device-creation-otaa.png" alt="Creating an OTAA device" >}}
 
@@ -81,7 +82,7 @@ You'll now reach the device overview page for your device. The end device should
 
 ### Activation by personalization (ABP device)
 
-After filling the fields in the "General Settings" section, scroll to the lower part of the device registration page and make sure that "Activation By Personalization (ABP)" is selected. Fill the Device Address, the FNwkSIntKey (NwkSKey in LoRaWAN versions before 1.1) and the AppSKey. The other key fields are only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press **Create Device** to create the device.
+After filling the fields in the "General Settings" section, scroll to the lower part of the device registration page and make sure that "Activation By Personalization (ABP)" is selected. Fill the Device Address, the FNwkSIntKey (NwkSKey in LoRaWAN versions before 1.1) and the AppSKey. The other key fields are only needed for LoRaWAN version 1.1 or later. All other fields on the page are either optional or generated automatically for you when left blank. Press **Create Device** to create the device.
 
 {{< figure src="device-creation-abp.png" alt="Creating an ABP device" >}}
 
