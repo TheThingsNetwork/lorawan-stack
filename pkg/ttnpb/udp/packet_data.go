@@ -45,17 +45,17 @@ type RxPacket struct {
 	Size uint16       `json:"size"`           // RF packet payload size in bytes (unsigned integer)
 	Data string       `json:"data"`           // Base64 encoded RF packet payload, padded
 	RSig []RSig       `json:"rsig"`           // Received signal information, per antenna (Optional)
-	Brd  uint8        `json:"brd"`            // Concentrator board used for Rx (unsigned integer)
-	Aesk uint8        `json:"aesk"`           // AES key index used for encrypting fine timestamps
+	Brd  uint         `json:"brd"`            // Concentrator board used for Rx (unsigned integer)
+	Aesk uint         `json:"aesk"`           // AES key index used for encrypting fine timestamps (unsigned integer)
 }
 
 // RSig contains the metadata associated with the received signal
 type RSig struct {
 	Ant    uint8   `json:"ant"`    // Antenna number on which signal has been received
-	Chan   uint8   `json:"chan"`   // Concentrator "IF" channel used for Rx (unsigned integer)
-	RSSIC  int16   `json:"rssic"`  // RSSI in dBm of the channel (signed integer, 1 dB precision)
-	RSSIS  *int16  `json:"rssis"`  // RSSI in dBm of the signal (signed integer, 1 DB precision) (Optional)
-	RSSISD *uint16 `json:"rssisd"` // Standard deviation of RSSI during preamble (unsigned integer) (Optional)
+	Chan   uint    `json:"chan"`   // Concentrator "IF" channel used for Rx (unsigned integer)
+	RSSIC  int     `json:"rssic"`  // RSSI in dBm of the channel (signed integer, 1 dB precision)
+	RSSIS  *int    `json:"rssis"`  // RSSI in dBm of the signal (signed integer, 1 dB precision) (Optional)
+	RSSISD *uint   `json:"rssisd"` // Standard deviation of RSSI during preamble (unsigned integer) (Optional)
 	LSNR   float64 `json:"lsnr"`   // Lora SNR ratio in dB (signed float, 0.1 dB precision)
 	ETime  string  `json:"etime"`  // Encrypted fine timestamp, ns precision [0..999999999] (Optional)
 	FTime  *uint32 `json:"ftime"`  // Fine timestamp, ns precision [0..999999999] (Optional)
