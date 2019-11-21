@@ -89,6 +89,13 @@ It is also possible to use [Gravatar](https://gravatar.com) for profile pictures
 
 - `is.profile-picture.use-gravatar`: Use Gravatar fallback for users without profile picture
 
+## End Device Picture Storage Options
+
+Similar to profile pictures, end devices can have pictures associated with them. 
+
+- `is.end-device-picture.bucket`: Bucket used for storing end device pictures
+- `is.end-device-picture.bucket-url`: Base URL for public bucket access
+
 ## User Registration Options
 
 The user registration process can be customized by requiring approval by admin users, requiring email validation or by requiring new users to be invited by existing users.
@@ -105,3 +112,4 @@ There are several options to customize the requirements for user passwords.
 - `is.user-registration.password-requirements.min-length`: Minimum password length
 - `is.user-registration.password-requirements.min-special`: Minimum number of special characters
 - `is.user-registration.password-requirements.min-uppercase`: Minimum number of uppercase letters
+
