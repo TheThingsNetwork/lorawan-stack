@@ -140,6 +140,7 @@ export default class Add extends React.Component {
     }
   }
 
+  @bind
   handleLinkChange(event) {
     this.setState({
       link: event.target.checked,
