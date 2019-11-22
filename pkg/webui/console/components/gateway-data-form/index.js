@@ -32,7 +32,11 @@ const m = defineMessages({
   enforced: 'Enforced',
   dutyCycle: 'Duty Cycle',
   gatewayIdPlaceholder: 'my-new-gateway',
+  gatewayNamePlaceholder: 'My New Gateway',
   gsServerAddressDescription: 'The address of the Gateway Server to connect to',
+  gatewayDescPlaceholder: 'Description for my new gateway',
+  gatewayDescDescription:
+    'Optional gateway description; can also be used to save notes about the gateway',
 })
 
 const validationSchema = Yup.object().shape({
@@ -92,9 +96,16 @@ class GatewayDataForm extends React.Component {
           placeholder={sharedMessages.gatewayEUI}
           component={Input}
         />
-        <Form.Field title={sharedMessages.gatewayName} name="name" component={Input} />
+        <Form.Field
+          title={sharedMessages.gatewayName}
+          placeholder={m.gatewayNamePlaceholder}
+          name="name"
+          component={Input}
+        />
         <Form.Field
           title={sharedMessages.gatewayDescription}
+          description={m.gatewayDescDescription}
+          placeholder={m.gatewayDescPlaceholder}
           name="description"
           type="textarea"
           component={Input}

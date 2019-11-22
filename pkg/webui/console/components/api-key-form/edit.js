@@ -119,7 +119,12 @@ class EditForm extends React.Component {
           disabled
           component={Input}
         />
-        <FormField title={sharedMessages.name} name="name" component={Input} />
+        <FormField
+          title={sharedMessages.name}
+          placeholder={sharedMessages.apiKeyNamePlaceholder}
+          name="name"
+          component={Input}
+        />
         <FormField
           name="rights"
           title={sharedMessages.rights}

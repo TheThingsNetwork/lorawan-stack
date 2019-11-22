@@ -40,6 +40,8 @@ const validationSchema = Yup.object().shape({
 
 const m = defineMessages({
   orgDescPlaceholder: 'Description for my new organization',
+  orgDescDescription:
+    'Optional organization description; can also be used to save notes about the organization',
   orgIdPlaceholder: 'my-new-organization',
   orgNamePlaceholder: 'My New Organization',
 })
@@ -115,6 +117,7 @@ class OrganizationForm extends React.Component {
           name="description"
           type="textarea"
           placeholder={m.orgDescPlaceholder}
+          description={m.orgDescDescription}
           component={Input}
         />
         {children}

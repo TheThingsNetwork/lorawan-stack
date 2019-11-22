@@ -28,10 +28,9 @@ export default defineMessages({
     'Are you sure you want to delete "{deviceId}"? Deleting an end device cannot be undone!',
   deviceDescDescription:
     'Optional device description; can also be used to save notes about the device',
-  deviceEUIDescription: 'The DevEUI is the unique identifier for this device on the network.',
-  deviceIdDescription: 'ID of your device; this cannot be changed afterwards',
+  deviceDescPlaceholder: 'Description for my new device',
+  deviceEUIDescription: 'The DevEUI is the unique identifier for this device on the network',
   deviceIdPlaceholder: 'my-new-device',
-  deviceNameDescription: 'Human friendly name of your device for display purposes',
   deviceNamePlaceholder: 'My New Device',
   external: 'External',
   externalJoinServer: 'External Join Server',

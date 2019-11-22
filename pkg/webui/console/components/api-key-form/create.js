@@ -83,7 +83,13 @@ class CreateForm extends React.Component {
           initialValues={initialValues}
         >
           <Message component="h4" content={sharedMessages.generalInformation} />
-          <FormField title={sharedMessages.name} name="name" autoFocus component={Input} />
+          <FormField
+            title={sharedMessages.name}
+            placeholder={sharedMessages.apiKeyNamePlaceholder}
+            name="name"
+            autoFocus
+            component={Input}
+          />
           <FormField
             name="rights"
             title={sharedMessages.rights}

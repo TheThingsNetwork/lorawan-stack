@@ -47,6 +47,8 @@ const m = defineMessages({
   appIdPlaceholder: 'my-new-application',
   appNamePlaceholder: 'My New Application',
   appDescPlaceholder: 'Description for my new application',
+  appDescDescription:
+    'Optional application description; can also be used to save notes about the application',
   createApplication: 'Create Application',
   linkAutomatically: 'Link automatically',
   linkFailure: 'There was a problem while linking the application',
@@ -208,8 +210,10 @@ export default class Add extends React.Component {
               />
               <Form.Field
                 title={sharedMessages.description}
+                type="textarea"
                 name="description"
                 placeholder={m.appDescPlaceholder}
+                description={m.appDescDescription}
                 component={Input}
               />
               {asEnabled && this.linkingBit}
