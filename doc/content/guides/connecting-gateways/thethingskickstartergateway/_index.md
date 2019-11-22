@@ -36,7 +36,7 @@ Enter the following fields:
 
 Click the **Show Advanced Options** button and enter the following fields:
 
-1. **Account Server**: The URL of The Things Stack. If you're using a port other that `:443` then append that to the URL.
+1. **Account Server**: The URL of The Things Stack. If you're using a port other than `:443` then append that to the URL.
 2. **Gateway Key**: The API Key that you created earlier.
 3. Click **Save** when done.
 
