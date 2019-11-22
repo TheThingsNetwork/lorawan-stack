@@ -112,10 +112,10 @@ class Marshaler {
 
     traverse(patch).map(function(x) {
       if (this.node instanceof Array) {
-        // Do not consider array elements and do not recurse into them
+        // Add only the top level array path and do not recurse into arrays.
+        paths.push(this.path.join('.'))
         this.update(undefined, true)
-      }
-      if (this.isLeaf) {
+      } else if (this.isLeaf) {
         paths.push(this.path.join('.'))
       }
     })
