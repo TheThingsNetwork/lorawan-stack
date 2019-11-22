@@ -42,7 +42,8 @@ import { mayEditBasicGatewayInformation, mayDeleteGateway } from '../../lib/feat
 const m = defineMessages({
   updateSuccess: 'Successfully updated gateway',
   deleteGateway: 'Delete Gateway',
-  modalWarning: 'Are you sure you want to delete "{gtwName}"? Deleting a gateway cannot be undone!',
+  modalWarning:
+    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID and EUI!',
 })
 
 @connect(
@@ -78,11 +79,11 @@ const m = defineMessages({
 @bind
 export default class GatewayGeneralSettings extends React.Component {
   static propTypes = {
-    gtwId: PropTypes.string.isRequired,
-    gateway: PropTypes.object.isRequired,
-    updateGateway: PropTypes.func.isRequired,
     deleteGateway: PropTypes.func.isRequired,
+    gateway: PropTypes.object.isRequired,
+    gtwId: PropTypes.string.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
+    updateGateway: PropTypes.func.isRequired,
   }
 
   constructor(props) {

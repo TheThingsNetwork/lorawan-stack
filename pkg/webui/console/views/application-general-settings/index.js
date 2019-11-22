@@ -49,7 +49,7 @@ const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
   modalWarning:
-    'Are you sure you want to delete "{appName}"? Deleting an application cannot be undone!',
+    'Are you sure you want to delete "{appName}"? This action cannot be undone and it will not be possible to reuse the application ID!',
   updateSuccess: 'Successfully updated application',
 })
 
