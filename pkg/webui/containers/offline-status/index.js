@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import toast from '../../components/toast'
 import PropTypes from '../../lib/prop-types'
@@ -22,7 +22,6 @@ import Status from '../../components/status'
 import Message from '../../lib/components/message'
 
 import sharedMessages from '../../lib/shared-messages'
-import { selectOfflineStatus } from '../../lib/selectors/offline'
 
 import style from './offline.styl'
 
@@ -31,18 +30,28 @@ const m = defineMessages({
   online: 'The Application is back online',
 })
 
-@connect(state => ({ online: selectOfflineStatus(state) }))
+@bind
 export default class OfflineStatus extends Component {
   static propTypes = {
-    online: PropTypes.bool,
     showOfflineOnly: PropTypes.bool,
     showWarnings: PropTypes.bool,
   }
 
   static defaultProps = {
-    online: undefined,
     showOfflineOnly: false,
     showWarnings: false,
+  }
+
+  state = {
+    online: true,
+  }
+
+  handleOnline() {
+    this.setState({ online: true })
+  }
+
+  handleOffline() {
+    this.setState({ online: false })
   }
 
   handleMessage(message, type) {
@@ -52,8 +61,19 @@ export default class OfflineStatus extends Component {
     })
   }
 
+  componentDidMount() {
+    window.addEventListener('online', this.handleOnline)
+    window.addEventListener('offline', this.handleOffline)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('online', this.handleOnline)
+    window.removeEventListener('offline', this.handleOffline)
+  }
+
   componentDidUpdate(prevProps) {
-    const { online, showWarnings } = this.props
+    const { showWarnings } = this.props
+    const { online } = this.state
     if (showWarnings && online && !prevProps.online) {
       this.handleMessage(m.online, toast.types.INFO)
     } else if (showWarnings && !online) {
@@ -62,7 +82,8 @@ export default class OfflineStatus extends Component {
   }
 
   render() {
-    const { online, showOfflineOnly } = this.props
+    const { showOfflineOnly } = this.props
+    const { online } = this.state
 
     let statusIndicator = null
     let message = null
