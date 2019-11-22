@@ -31,12 +31,11 @@ import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as applicationIdRegexp, address } from '../../lib/regexp'
 import { getApplicationId } from '../../../lib/selectors/id'
-import { selectAsConfig } from '../../../lib/selectors/env'
 import OwnersSelect from '../../containers/owners-select'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
-import { selectUserId } from '../../store/selectors/user'
-import { mayCreateApplications } from '../../lib/feature-checks'
+import { selectUserId, selectUserRights } from '../../store/selectors/user'
+import { mayCreateApplications, mayLinkApplication } from '../../lib/feature-checks'
 
 import api from '../../api'
 
@@ -74,26 +73,31 @@ const validationSchema = Yup.object().shape({
 @connect(
   state => ({
     userId: selectUserId(state),
-    asEnabled: selectAsConfig().enabled,
+    rights: selectUserRights(state),
   }),
   dispatch => ({
     navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
   }),
 )
 export default class Add extends React.Component {
-  static propTypes = {
-    asEnabled: PropTypes.bool.isRequired,
-    navigateToApplication: PropTypes.func.isRequired,
-    userId: PropTypes.string.isRequired,
+  constructor(props) {
+    super(props)
+    const { rights } = this.props
+    this.state = {
+      error: '',
+      link: mayLinkApplication.check(rights),
+    }
   }
-  state = {
-    error: '',
-    link: true,
+
+  static propTypes = {
+    navigateToApplication: PropTypes.func.isRequired,
+    rights: PropTypes.rights.isRequired,
+    userId: PropTypes.string.isRequired,
   }
 
   @bind
   async handleSubmit(values, { resetForm }) {
-    const { userId, navigateToApplication, asEnabled } = this.props
+    const { userId, navigateToApplication } = this.props
     const { owner_id, application_id, name, description } = values
 
     await this.setState({ error: '' })
@@ -111,7 +115,7 @@ export default class Add extends React.Component {
 
       const appId = getApplicationId(result)
 
-      if (asEnabled && values.link) {
+      if (values.link) {
         try {
           const key = {
             name: 'Application Server Linking',
@@ -171,13 +175,14 @@ export default class Add extends React.Component {
 
   render() {
     const { error } = this.state
-    const { asEnabled, userId } = this.props
+    const { userId, rights } = this.props
+    const mayLink = mayLinkApplication.check(rights)
 
     const initialValues = {
       application_id: '',
       name: '',
       description: '',
-      link: true,
+      link: mayLink,
       network_server_address: '',
       owner_id: userId,
     }
@@ -213,7 +218,7 @@ export default class Add extends React.Component {
                 placeholder={m.appDescPlaceholder}
                 component={Input}
               />
-              {asEnabled && this.linkingBit}
+              {mayLink && this.linkingBit}
               <SubmitBar>
                 <Form.Submit message={m.createApplication} component={SubmitButton} />
               </SubmitBar>
