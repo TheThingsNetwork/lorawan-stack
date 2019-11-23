@@ -60,7 +60,7 @@ var DefaultConfig = Config{
 	DownlinkPathExpires: 30 * time.Second,
 	ConnectionExpires:   5 * time.Minute,
 	ScheduleLateTime:    800 * time.Millisecond,
-	AddrChangeBlock:     5 * time.Minute,
+	AddrChangeBlock:     15 * time.Second, // Release source IP address after missing typically 3 PULL_DATA messages.
 }
 
 type srv struct {
