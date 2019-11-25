@@ -116,16 +116,28 @@ type HTTP struct {
 	Health          Health           `name:"health"`
 }
 
+// RedisFailover represents Redis failover configuration.
+type RedisFailover struct {
+	Enable     bool     `name:"enable" description:"Enable failover using Redis Sentinel"`
+	Addresses  []string `name:"addresses" description:"Redis Sentinel server addresses"`
+	MasterName string   `name:"master-name" description:"Redis Sentinel master name"`
+}
+
 // Redis represents Redis configuration.
 type Redis struct {
-	Address   string   `name:"address" description:"Address of the Redis server"`
-	Password  string   `name:"password" description:"Password of the Redis server"`
-	Database  int      `name:"database" description:"Redis database to use"`
-	Namespace []string `name:"namespace" description:"Namespace for Redis keys"`
+	Address   string        `name:"address" description:"Address of the Redis server"`
+	Password  string        `name:"password" description:"Password of the Redis server"`
+	Database  int           `name:"database" description:"Redis database to use"`
+	Namespace []string      `name:"namespace" description:"Namespace for Redis keys"`
+	Failover  RedisFailover `name:"failover" description:"Redis failover configuration"`
 }
 
 // IsZero returns whether the Redis configuration is empty.
-func (r Redis) IsZero() bool { return r.Address == "" && r.Database == 0 && len(r.Namespace) == 0 }
+func (r Redis) IsZero() bool {
+	return r.Database == 0 && len(r.Namespace) == 0 &&
+		(r.Failover.Enable && r.Failover.MasterName == "" && len(r.Failover.Addresses) == 0 ||
+			!r.Failover.Enable && r.Address == "")
+}
 
 // CloudEvents represents configuration for the cloud events backend.
 type CloudEvents struct {

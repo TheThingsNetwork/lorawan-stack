@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add support for Redis Sentinel (see `redis.failover.enable`, `redis.failover.master-name`, `redis.failover.addresses` options).
+
 ### Changed
 
 ### Deprecated
@@ -33,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix an issue causing unexpected behavior surrounding login, logout and token management in the Console.
-- Fix an issue causing the application link page of the Console to load infinitely. 
+- Fix an issue causing the application link page of the Console to load infinitely.
 
 ## [3.2.6] - 2019-11-18
 

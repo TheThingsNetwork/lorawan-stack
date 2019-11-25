@@ -19,6 +19,8 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -78,15 +80,29 @@ type Config struct {
 	Namespace []string
 }
 
+// newRedisClient returns a Redis client, which connects using correct client type.
+func newRedisClient(conf config.Redis) *redis.Client {
+	if conf.Failover.Enable {
+		redis.SetLogger(log.New(ioutil.Discard, "", 0))
+		return redis.NewFailoverClient(&redis.FailoverOptions{
+			MasterName:    conf.Failover.MasterName,
+			SentinelAddrs: conf.Failover.Addresses,
+			Password:      conf.Password,
+			DB:            conf.Database,
+		})
+	}
+	return redis.NewClient(&redis.Options{
+		Addr:     conf.Address,
+		Password: conf.Password,
+		DB:       conf.Database,
+	})
+}
+
 // New returns a new initialized Redis store.
 func New(conf *Config) *Client {
 	return &Client{
 		namespace: Key(append(conf.Redis.Namespace, conf.Namespace...)...),
-		Client: redis.NewClient(&redis.Options{
-			Addr:     conf.Address,
-			Password: conf.Password,
-			DB:       conf.Database,
-		}),
+		Client:    newRedisClient(conf.Redis),
 	}
 }
 

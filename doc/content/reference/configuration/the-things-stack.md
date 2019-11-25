@@ -105,10 +105,21 @@ The `blob` source loads from the given path in a bucket. This requires the globa
 
 Redis is the main data store for the [Network Server]({{< relref "network-server.md" >}}), [Application Server]({{< relref "application-server.md" >}}) and [Join Server]({{< relref "join-server.md" >}}). Redis is also used by the [Identity Server]({{< relref "identity-server.md" >}}) for caching and can be used by the [events system]({{< ref "#events-options" >}}) for exchanging events between components.
 
-- `redis.address`: Address of the Redis server
+Redis configuration options:
+
 - `redis.password`: Password of the Redis server
 - `redis.database`: Redis database to use
 - `redis.namespace`: Namespace for Redis keys
+
+If connecting to a single Redis instance:
+
+- `redis.address`: Address of the Redis server
+
+Or you can enable failover using [Redis Sentinel](https://redis.io/topics/sentinel):
+
+- `redis.failover.enable`: Set to `true`
+- `redis.failover.addresses`: List of addresses of the Redis Sentinel instances (required)
+- `redis.failover.master-name`: Redis Sentinel master name (required)
 
 ## Blob Options
 
@@ -170,7 +181,7 @@ The `blob` source loads from the given path in a bucket. This requires the globa
 
 ## Cluster Options
 
-The `cluster` options configure how The Things Stack communicates with other components in the cluster. These options do not need to be set when running a single instance of The Things Stack. The most important options are the ones to configure the addresses of the other components in the cluster. 
+The `cluster` options configure how The Things Stack communicates with other components in the cluster. These options do not need to be set when running a single instance of The Things Stack. The most important options are the ones to configure the addresses of the other components in the cluster.
 
 - `cluster.identity-server`: Address for the Identity Server
 - `cluster.gateway-server`: Address for the Gateway Server
