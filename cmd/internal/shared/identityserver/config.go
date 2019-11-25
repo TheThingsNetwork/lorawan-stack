@@ -60,4 +60,6 @@ func init() {
 	DefaultIdentityServerConfig.ProfilePicture.Bucket = "profile_pictures"
 	DefaultIdentityServerConfig.ProfilePicture.BucketURL = path.Join(shared.DefaultAssetsBaseURL, "blob", "profile_pictures")
 	DefaultIdentityServerConfig.ProfilePicture.UseGravatar = true
+	DefaultIdentityServerConfig.EndDevicePicture.Bucket = "end_device_pictures"
+	DefaultIdentityServerConfig.EndDevicePicture.BucketURL = path.Join(shared.DefaultAssetsBaseURL, "blob", "end_device_pictures")
 }
