@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for encrypting device keys at rest (see `as.device-kek-label`, `js.device-kek-label` and `ns.device-kek-label` options).
 - The Network Server now provides the timestamp at which it received join-accept or data uplink messages
+- Add more details to logs that contain errors.
 
 ### Changed
 

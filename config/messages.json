@@ -3239,6 +3239,15 @@
       "file": "format.go"
     }
   },
+  "error:pkg/gatewayserver/io/udp:already_connected": {
+    "translations": {
+      "en": "gateway is already connected"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "firewall.go"
+    }
+  },
   "error:pkg/gatewayserver/io/udp:connection_expired": {
     "translations": {
       "en": "connection expired"
@@ -3264,6 +3273,24 @@
     "description": {
       "package": "pkg/gatewayserver/io/udp",
       "file": "udp.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp:no_address": {
+    "translations": {
+      "en": "packet has no gateway address"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "firewall.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp:no_eui": {
+    "translations": {
+      "en": "packet has no gateway EUI"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "firewall.go"
     }
   },
   "error:pkg/gatewayserver/io:buffer_full": {

@@ -21,12 +21,13 @@ import (
 	"sync"
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	encoding "go.thethings.network/lorawan-stack/pkg/ttnpb/udp"
 )
 
 // Firewall filters packets by tracking addresses and time.
 type Firewall interface {
-	Filter(packet encoding.Packet) bool
+	Filter(packet encoding.Packet) error
 }
 
 type addrTime struct {
@@ -59,9 +60,18 @@ func NewMemoryFirewall(ctx context.Context, addrChangeBlock time.Duration) Firew
 	return f
 }
 
-func (f *memoryFirewall) Filter(packet encoding.Packet) bool {
-	if packet.GatewayEUI == nil || packet.GatewayAddr == nil {
-		return false
+var (
+	errNoEUI            = errors.DefineInvalidArgument("no_eui", "packet has no gateway EUI")
+	errNoAddress        = errors.DefineInvalidArgument("no_address", "packet has no gateway address")
+	errAlreadyConnected = errors.DefineFailedPrecondition("already_connected", "gateway is already connected")
+)
+
+func (f *memoryFirewall) Filter(packet encoding.Packet) error {
+	if packet.GatewayEUI == nil {
+		return errNoEUI
+	}
+	if packet.GatewayAddr == nil {
+		return errNoAddress
 	}
 	now := time.Now().UTC()
 	eui := *packet.GatewayEUI
@@ -69,14 +79,17 @@ func (f *memoryFirewall) Filter(packet encoding.Packet) bool {
 	if ok {
 		a := val.(addrTime)
 		if !bytes.Equal(a.IP, packet.GatewayAddr.IP) && a.lastSeen.Add(f.addrChangeBlock).After(now) {
-			return false
+			return errAlreadyConnected.WithAttributes(
+				"connected_ip", a.IP.String(),
+				"connecting_ip", packet.GatewayAddr.IP.String(),
+			)
 		}
 	}
 	f.m.Store(eui, addrTime{
 		IP:       packet.GatewayAddr.IP,
 		lastSeen: now,
 	})
-	return true
+	return nil
 }
 
 func (f *memoryFirewall) gc() {

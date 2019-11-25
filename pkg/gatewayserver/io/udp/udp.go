@@ -60,7 +60,7 @@ var DefaultConfig = Config{
 	DownlinkPathExpires: 30 * time.Second,
 	ConnectionExpires:   5 * time.Minute,
 	ScheduleLateTime:    800 * time.Millisecond,
-	AddrChangeBlock:     5 * time.Minute,
+	AddrChangeBlock:     15 * time.Second, // Release source IP address after missing typically 3 PULL_DATA messages.
 }
 
 type srv struct {
@@ -164,9 +164,11 @@ func (s *srv) handlePackets() {
 				}
 			}
 
-			if s.firewall != nil && !s.firewall.Filter(packet) {
-				logger.Warn("Packet filtered")
-				break
+			if s.firewall != nil {
+				if err := s.firewall.Filter(packet); err != nil {
+					logger.WithError(err).Warn("Packet filtered")
+					break
+				}
 			}
 
 			cs, err := s.connect(ctx, eui)
