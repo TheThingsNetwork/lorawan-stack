@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>End Device Templates | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.3.0/concepts/end-device-templates/" />
+  <link rel="icon" type="image/png" href="/v3.3.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.3.0/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="End Device Templates">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="End Device Templates">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.3.0/concepts/end-device-templates/">
+  <meta name="twitter:title" content="End Device Templates" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.3.0/">
+        <img src="/v3.3.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.3.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.3.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.3.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.3.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.3.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">End Device Templates</h1>
+
+<div class="content">
+
+<h2 id="what-is-it">What is it?</h2>
+
+<p>End device templates define a device that is not created (yet). It can be used to create a device or many devices at once. Templates allows for using common values for many devices, such as a device profile.</p>
+
+<h2 id="who-is-it-for">Who is it for?</h2>
+
+<p>End device templates are primarily targeted at device makers and service providers who are managing and onboarding large amounts of devices.</p>
+
+<h3 id="typical-use-cases">Typical use cases</h3>
+
+<ol>
+<li>Create a batch of end devices with the same profile and incrementing <code>DevEUI</code> from a range</li>
+<li>Convert vendor-specific end device data, such as serial numbers and provisioning data, to a device template</li>
+<li>Migrate end devices from a different LoRaWAN server stack</li>
+</ol>
+
+<h2 id="how-does-it-work">How does it work?</h2>
+
+<p>End device templates can be used to quickly create large amounts of end devices with common settings. Templates can be created from existing devices or converted from an input file. By executing templates, you can create devices directly. See <a href="https://thethingsstack.io/v3.3.0/reference/end-device-templates/creating/">Creating Templates</a>, <a href="https://thethingsstack.io/v3.3.0/reference/end-device-templates/converting/">Converting Templates</a> and <a href="https://thethingsstack.io/v3.3.0/reference/end-device-templates/executing/">Executing Templates</a>.</p>
+
+<p>Templates can also be be mapped with other templates to combine fields. For example, you can convert root key provisioning data to device templates and map that with a template containing the device profile from a device repository. See <a href="https://thethingsstack.io/v3.3.0/reference/end-device-templates/mapping/">Mapping Templates</a>.</p>
+
+<p>Tooling supports assigning the LoRaWAN <code>JoinEUI</code> and <code>DevEUI</code> from a range automatically to create a template file that can be used in mapping or executing templates to bulk create devices. See <a href="https://thethingsstack.io/v3.3.0/reference/end-device-templates/assigning-euis/">Assigning EUIs</a>.</p>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-right" href="/v3.3.0/concepts/email-templates/">Email Templates →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.3.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.3.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.3.0/components/">Components</a></p>
+        <p><a class="" href="/v3.3.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 11 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/2ef55b78ce00baf704eff59c9604f970295a7c1d">
+      doc: Fix content of summaries
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/concepts/end-device-templates.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.3.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
