@@ -9,12 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add support for encrypting device keys at rest (see `as.device-kek-label`, `js.device-kek-label` and `ns.device-kek-label` options).
-- The Network Server now provides the timestamp at which it received join-accept or data uplink messages
-- Add more details to logs that contain errors.
-- Support for end device pictures in the Identity Server.
-- Support for end device pictures in the CLI.
-
 ### Changed
 
 ### Deprecated
@@ -24,6 +18,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [3.3.0] - 2019-11-25
+
+### Added
+
+- Add support for encrypting device keys at rest (see `as.device-kek-label`, `js.device-kek-label` and `ns.device-kek-label` options).
+- The Network Server now provides the timestamp at which it received join-accept or data uplink messages.
+- Add more details to logs that contain errors.
+- Support for end device pictures in the Identity Server.
+  - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- Support for end device pictures in the CLI.
+
+### Fixed
+
+- Fix an issue causing unexpected behavior surrounding login, logout and token management in the Console.
+- Fix an issue causing the application link page of the Console to load infinitely. 
 
 ## [3.2.6] - 2019-11-18
 
@@ -422,7 +432,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.6...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.0...HEAD
+[3.3.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.6...v3.3.0
 [3.2.6]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.5...v3.2.6
 [3.2.5]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.4...v3.2.5
 [3.2.4]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.3...v3.2.4
