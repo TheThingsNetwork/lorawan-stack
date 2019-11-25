@@ -40,15 +40,15 @@ const render = () => {
   DOM.render(
     <EnvProvider env={env}>
       <Provider store={store}>
-        <Init>
-          <WithLocale>
+        <WithLocale>
+          <Init>
             <BreadcrumbsProvider>
               <SideNavigationProvider>
                 <App history={history} />
               </SideNavigationProvider>
             </BreadcrumbsProvider>
-          </WithLocale>
-        </Init>
+          </Init>
+        </WithLocale>
       </Provider>
     </EnvProvider>,
     rootElement,

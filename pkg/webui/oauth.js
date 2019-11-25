@@ -37,11 +37,11 @@ const render = () => {
   DOM.render(
     <EnvProvider env={env}>
       <Provider store={store}>
-        <Init>
-          <WithLocale>
+        <WithLocale>
+          <Init>
             <App history={history} />
-          </WithLocale>
-        </Init>
+          </Init>
+        </WithLocale>
       </Provider>
     </EnvProvider>,
     rootElement,
