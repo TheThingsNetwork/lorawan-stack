@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import api from '../api'
+import * as cache from './cache'
 
 export default async function() {
-  const storedToken = localStorage.accessToken ? JSON.parse(localStorage.accessToken) : undefined
+  const storedToken = cache.get('accessToken')
   let token
 
   if (!storedToken || Date.parse(storedToken.expiry) < Date.now()) {
@@ -29,14 +30,12 @@ export default async function() {
 
   // We want to make sure the stored token is the correct one
   if (!storedToken || storedToken.access_token !== token.access_token) {
-    localStorage.setItem('accessToken', JSON.stringify(token))
+    cache.set('accessToken', token)
   }
 
   return token
 }
 
 export function clear() {
-  if (localStorage.accessToken) {
-    localStorage.removeItem('accessToken')
-  }
+  cache.remove('accessToken')
 }
