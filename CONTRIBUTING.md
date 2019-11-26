@@ -6,7 +6,7 @@ Thank you for your interest in building this thing together with us. We're reall
 - **Requesting a new feature**: If you have a great idea or think some functionality is missing, we want to know! The only thing you have to do for that is to [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please use the issue template and fill out all sections.
 - **Reporting an issue**: If you notice that a component of The Things Stack is not behaving as it should, there may be a bug in our systems. In this case you should [create an issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) if it doesn't exist yet. Please use the issue template and fill out all sections. For sensitive (security) issues, you can [contact us directly](#security-issues).
 - **Implementing a new feature or fixing a bug**: If you see an [open issue](https://github.com/TheThingsNetwork/lorawan-stack/issues) that you would like to work on, let the other contributors know by commenting in the issue.
-- **Writing documentation**: If you see that our documentation is lacking or incorrect, it would be great if you could help us improve it. This will help users and fellow contributors understand better how to work with our stack, and will prevent making mistakes and introducing bugs. Our documentation is spread across a number of places. Code documentation obviously lives together with the code, and is therefore probably in this repository. User documentation for The Things Stack that is published on [thethingsstack.io](https://thethingsstack.io), is built from the source files in the [`doc` folder](https://github.com/TheThingsNetwork/lorawan-stack/tree/master/doc/content) of this repository. More general documentation can be found on [The Things Network's official documentation pages](https://www.thethingsnetwork.org/docs). The source files for that documentation can be found in [the `docs` repository](https://github.com/TheThingsNetwork/docs).
+- **Writing documentation**: If you see that our documentation is lacking or incorrect, it would be great if you could help us improve it. This will help users and fellow contributors understand how to better work with our stack. Better documentation helps prevent making mistakes and introducing new bugs. Our documentation is spread across a number of places. Code documentation obviously lives together with the code, and is therefore probably in this repository. User documentation for The Things Stack that is published on [thethingsstack.io](https://thethingsstack.io), is built from the source files in the [`doc` folder](https://github.com/TheThingsNetwork/lorawan-stack/tree/master/doc/content) of this repository. More general documentation can be found on [The Things Network's official documentation pages](https://www.thethingsnetwork.org/docs). The source files for that documentation can be found in [the `docs` repository](https://github.com/TheThingsNetwork/docs).
 
 If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment.
 
@@ -78,7 +78,7 @@ Good commit messages:
 - `dev: Set version from git tag`
 - `ns,as,gs: Fix TLS check`
 
-Make sure that commits are scoped to something meaningful and could, potentially, be cherry-picked individually.
+Make sure that commits are scoped to something meaningful and could potentially be cherry-picked individually.
 
 ### Commit Body
 
