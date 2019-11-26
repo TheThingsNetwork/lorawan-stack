@@ -124,6 +124,7 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 			"ADRAckLimitExponentValue",
 			"AggregatedDutyCycleValue",
 			"DataRateIndexValue",
+			"GatewayAntennaIdentifiers",
 			"Picture",
 			"PingSlotPeriodValue",
 			"RxDelayValue":
@@ -291,6 +292,15 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 		return
 	case reflect.Slice:
 		el := t.Elem()
+		switch el.PkgPath() {
+		case "go.thethings.network/lorawan-stack/pkg/ttnpb":
+			switch el.Name() {
+			case "GatewayAntennaIdentifiers":
+				fs.StringSlice(name, nil, "")
+				return
+			}
+		}
+
 		switch el.Kind() {
 		case reflect.Bool:
 			fs.BoolSlice(name, nil, "")
@@ -605,6 +615,15 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 					case vt.Elem().ConvertibleTo(ft.Elem()):
 						for i := 0; i < v.Len(); i++ {
 							slice.Index(i).Set(v.Index(i).Convert(ft.Elem()))
+						}
+					case ft.Elem().PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb" &&
+						ft.Elem().Name() == "GatewayAntennaIdentifiers" && vt.Elem().Kind() == reflect.String:
+						for i := 0; i < v.Len(); i++ {
+							slice.Index(i).Set(reflect.ValueOf(ttnpb.GatewayAntennaIdentifiers{
+								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+									GatewayID: v.Index(i).String(),
+								},
+							}))
 						}
 					case ft.Elem().Kind() == reflect.Int32 && vt.Elem().Kind() == reflect.String:
 						if reflect.PtrTo(ft.Elem()).Implements(textUnmarshalerType) {
