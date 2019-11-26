@@ -162,6 +162,7 @@ export default class CollaboratorForm extends Component {
           name="collaborator_id"
           component={Input}
           title={sharedMessages.collaboratorId}
+          placeholder={sharedMessages.collaboratorIdPlaceholder}
           required
           autoFocus={!update}
           disabled={update}

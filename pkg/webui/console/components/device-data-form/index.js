@@ -384,7 +384,6 @@ class DeviceDataForm extends Component {
           title={sharedMessages.devID}
           name="ids.device_id"
           placeholder={m.deviceIdPlaceholder}
-          description={m.deviceIdDescription}
           autoFocus
           required
           disabled={update}
@@ -394,13 +393,13 @@ class DeviceDataForm extends Component {
           title={sharedMessages.devName}
           name="name"
           placeholder={m.deviceNamePlaceholder}
-          description={m.deviceNameDescription}
           component={Input}
         />
         <Form.Field
           title={sharedMessages.devDesc}
           name="description"
           type="textarea"
+          placeholder={m.deviceDescPlaceholder}
           description={m.deviceDescDescription}
           component={Input}
         />
