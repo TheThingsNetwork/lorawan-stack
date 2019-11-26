@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable import/prefer-default-export */
+export const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc', 'qrg']
 
-const STACK_COMPONENTS = ['as', 'is', 'ns', 'js', 'gs', 'edtc', 'qrg']
-
-export { STACK_COMPONENTS }
+export const URI_PREFIX_STACK_COMPONENT_MAP = {
+  as: 'as',
+  ns: 'ns',
+  js: 'js',
+  gs: 'gs',
+  edtc: 'edtc',
+  qrg: 'qrg',
+}
