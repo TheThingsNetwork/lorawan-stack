@@ -206,7 +206,7 @@ message ApplicationDownlink {
     // The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.
     // If none of the gateways can be selected, the downlink message fails.
     // If empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.
-    repeated GatewayAntennaIdentifiers gateways = 7;
+    repeated GatewayAntennaIdentifiers gateways = 7 [(gogoproto.nullable) = false];
     // Absolute time when the downlink message should be transmitted.
     // This requires the gateway to have GPS time synchronization.
     // If the time is in the past or if there is a scheduling conflict, the downlink message fails.
