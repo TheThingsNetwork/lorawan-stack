@@ -257,7 +257,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 		},
 
 		{
-			Name: "Get keys",
+			Name: "Get keys/AppKey encrypted/NwkKey plaintext",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -285,7 +285,76 @@ func TestDeviceRegistryGet(t *testing.T) {
 					"root_keys.nwk_key.kek_label",
 					"root_keys.nwk_key.key",
 				})
-				return CopyEndDevice(registeredDevice), nil
+				ret := CopyEndDevice(registeredDevice)
+				ret.RootKeys.AppKey = &ttnpb.KeyEnvelope{
+					EncryptedKey: ret.RootKeys.AppKey.EncryptedKey,
+					KEKLabel:     ret.RootKeys.AppKey.KEKLabel,
+				}
+				ret.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
+					Key: ret.RootKeys.NwkKey.Key,
+				}
+				return ret, nil
+			},
+			DeviceRequest: &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
+				},
+			},
+			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				a := assertions.New(t)
+				expected := CopyEndDevice(registeredDevice)
+				expected.RootKeys = &ttnpb.RootKeys{
+					NwkKey: &ttnpb.KeyEnvelope{
+						Key: registeredNwkKey,
+					},
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: registeredAppKey,
+					},
+				}
+				return a.So(dev, should.Resemble, expected)
+			},
+			GetByIDCalls: 1,
+		},
+
+		{
+			Name: "Get keys/AppKey plaintext/NwkKey encrypted",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+						),
+					},
+				})
+			},
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
+					ApplicationID: registeredApplicationID,
+				})
+				a.So(devID, should.Equal, registeredDeviceID)
+				a.So(paths, should.HaveSameElementsDeep, []string{
+					"ids",
+					"provisioner_id",
+					"provisioning_data",
+					"root_keys.app_key.encrypted_key",
+					"root_keys.app_key.kek_label",
+					"root_keys.app_key.key",
+					"root_keys.nwk_key.encrypted_key",
+					"root_keys.nwk_key.kek_label",
+					"root_keys.nwk_key.key",
+				})
+				ret := CopyEndDevice(registeredDevice)
+				ret.RootKeys.AppKey = &ttnpb.KeyEnvelope{
+					Key: ret.RootKeys.AppKey.Key,
+				}
+				ret.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
+					EncryptedKey: ret.RootKeys.NwkKey.EncryptedKey,
+					KEKLabel:     ret.RootKeys.NwkKey.KEKLabel,
+				}
+				return ret, nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),

@@ -146,7 +146,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 				if err != nil {
 					return nil, err
 				}
-				dev.RootKeys.NwkKey = &ttnpb.KeyEnvelope{
+				dev.RootKeys.AppKey = &ttnpb.KeyEnvelope{
 					Key: &appKey,
 				}
 			case cc != nil && dev.ProvisionerID != "":
