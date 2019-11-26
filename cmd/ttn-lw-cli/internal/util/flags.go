@@ -124,9 +124,9 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 			"ADRAckLimitExponentValue",
 			"AggregatedDutyCycleValue",
 			"DataRateIndexValue",
+			"Picture",
 			"PingSlotPeriodValue",
-			"RxDelayValue",
-			"Picture":
+			"RxDelayValue":
 			return true
 		}
 	}
@@ -184,116 +184,157 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 	if maskOnly {
 		if t.Kind() == reflect.Struct && !isAtomicType(t, maskOnly) {
 			fs.Bool(name, false, fmt.Sprintf("select the %s field and all allowed sub-fields", name))
-		} else {
-			fs.Bool(name, false, fmt.Sprintf("select the %s field", name))
+			return
 		}
+		fs.Bool(name, false, fmt.Sprintf("select the %s field", name))
 		return
 	}
 	if t.Kind() == reflect.Struct && !isAtomicType(t, maskOnly) {
 		return
 	}
-	if t.PkgPath() == "" {
-		switch t.Kind() {
-		case reflect.Bool:
-			fs.Bool(name, false, "")
-		case reflect.String:
-			fs.String(name, "", "")
-		case reflect.Int32:
-			fs.Int32(name, 0, "")
-		case reflect.Int64:
-			fs.Int64(name, 0, "")
-		case reflect.Uint32:
-			fs.Uint32(name, 0, "")
-		case reflect.Uint64:
-			fs.Uint64(name, 0, "")
-		case reflect.Float32:
-			fs.Float32(name, 0, "")
-		case reflect.Float64:
+
+	switch t.PkgPath() {
+	case "time":
+		switch t.Name() {
+		case "Time":
+			fs.String(name, "", "(YYYY-MM-DDTHH:MM:SSZ)")
+			return
+		case "Duration":
+			fs.Duration(name, 0, "(1h2m3s)")
+			return
+		}
+
+	case "github.com/gogo/protobuf/types":
+		switch t.Name() {
+		case "DoubleValue":
 			fs.Float64(name, 0, "")
-		case reflect.Slice:
-			switch t.Elem().Kind() {
-			case reflect.Bool:
-				fs.BoolSlice(name, nil, "")
-			case reflect.String:
-				fs.StringSlice(name, nil, "")
-			case reflect.Int32:
-				if values := enumValues(t.Elem()); values != nil {
-					fs.StringSlice(name, nil, strings.Join(values, "|"))
-				} else {
-					fs.IntSlice(name, nil, "")
-				}
-			case reflect.Int64:
-				fs.IntSlice(name, nil, "")
-			case reflect.Uint8:
-				fs.String(name, "", "(hex)")
-			case reflect.Uint32, reflect.Uint64:
-				fs.UintSlice(name, nil, "")
-			case reflect.Ptr:
-				// Not supported
-			default:
-				fmt.Printf("flags: %s slice not yet supported (%s)\n", t.Elem().Kind(), name)
-			}
-		case reflect.Map:
-			// Not supported
-		default:
-			fmt.Printf("flags: %s not yet supported (%s)\n", t.Kind(), name)
+			return
+		case "FloatValue":
+			fs.Float32(name, 0, "")
+			return
+		case "Int64Value":
+			fs.Int64(name, 0, "")
+			return
+		case "UInt64Value":
+			fs.Uint64(name, 0, "")
+			return
+		case "Int32Value":
+			fs.Int32(name, 0, "")
+			return
+		case "UInt32Value":
+			fs.Uint32(name, 0, "")
+			return
+		case "BoolValue":
+			fs.Bool(name, false, "")
+			return
+		case "StringValue":
+			fs.String(name, "", "")
+			return
+		case "BytesValue":
+			fs.String(name, "", "(hex)")
+			return
 		}
-	} else if t.Kind() == reflect.Int32 && strings.HasSuffix(t.PkgPath(), "ttnpb") {
-		if values := enumValues(t); values != nil {
+
+	case "go.thethings.network/lorawan-stack/pkg/ttnpb":
+		switch typeName := t.Name(); typeName {
+		case
+			"ADRAckDelayExponentValue",
+			"ADRAckLimitExponentValue",
+			"AggregatedDutyCycleValue",
+			"DataRateIndexValue",
+			"PingSlotPeriodValue",
+			"RxDelayValue":
+			enumType := unwrapLoRaWANEnumType(typeName)
+			values := make([]string, 0, len(proto.EnumValueMap(enumType)))
+			for value := range proto.EnumValueMap(enumType) {
+				values = append(values, value)
+			}
 			fs.String(name, "", strings.Join(values, "|"))
+			return
+
+		case "Picture":
+			// Not supported
+			return
 		}
-	} else if (t.Kind() == reflect.Slice || t.Kind() == reflect.Array) && t.Elem().Kind() == reflect.Uint8 {
-		fs.String(name, "", "(hex)")
-	} else {
-		switch t.PkgPath() {
-		case "time":
-			switch t.Name() {
-			case "Time":
-				fs.String(name, "", "(YYYY-MM-DDTHH:MM:SSZ)")
-			case "Duration":
-				fs.Duration(name, 0, "(1h2m3s)")
-			}
-		case "github.com/gogo/protobuf/types":
-			switch t.Name() {
-			case "DoubleValue":
-				fs.Float64(name, 0, "")
-			case "FloatValue":
-				fs.Float32(name, 0, "")
-			case "Int64Value":
-				fs.Int64(name, 0, "")
-			case "UInt64Value":
-				fs.Uint64(name, 0, "")
-			case "Int32Value":
-				fs.Int32(name, 0, "")
-			case "UInt32Value":
-				fs.Uint32(name, 0, "")
-			case "BoolValue":
-				fs.Bool(name, false, "")
-			case "StringValue":
-				fs.String(name, "", "")
-			case "BytesValue":
-				fs.String(name, "", "(hex)")
-			}
-		case "go.thethings.network/lorawan-stack/pkg/ttnpb":
-			switch typeName := t.Name(); typeName {
-			case
-				"ADRAckDelayExponentValue",
-				"ADRAckLimitExponentValue",
-				"AggregatedDutyCycleValue",
-				"DataRateIndexValue",
-				"PingSlotPeriodValue",
-				"RxDelayValue":
-				enumType := unwrapLoRaWANEnumType(typeName)
-				values := make([]string, 0, len(proto.EnumValueMap(enumType)))
-				for value := range proto.EnumValueMap(enumType) {
-					values = append(values, value)
-				}
+		if t.Kind() == reflect.Int32 {
+			if values := enumValues(t); values != nil {
 				fs.String(name, "", strings.Join(values, "|"))
+				return
 			}
-		default:
-			fmt.Printf("flags: %s.%s not yet supported (%s)\n", t.PkgPath(), t.Name(), name)
 		}
 	}
+
+	switch t.Kind() {
+	case reflect.Bool:
+		fs.Bool(name, false, "")
+		return
+	case reflect.String:
+		fs.String(name, "", "")
+		return
+	case reflect.Int32:
+		fs.Int32(name, 0, "")
+		return
+	case reflect.Int64:
+		fs.Int64(name, 0, "")
+		return
+	case reflect.Uint32:
+		fs.Uint32(name, 0, "")
+		return
+	case reflect.Uint64:
+		fs.Uint64(name, 0, "")
+		return
+	case reflect.Float32:
+		fs.Float32(name, 0, "")
+		return
+	case reflect.Float64:
+		fs.Float64(name, 0, "")
+		return
+	case reflect.Slice:
+		el := t.Elem()
+		switch el.Kind() {
+		case reflect.Bool:
+			fs.BoolSlice(name, nil, "")
+			return
+		case reflect.String:
+			fs.StringSlice(name, nil, "")
+			return
+		case reflect.Int32:
+			if values := enumValues(el); values != nil {
+				fs.StringSlice(name, nil, strings.Join(values, "|"))
+				return
+			}
+			fs.IntSlice(name, nil, "")
+			return
+		case reflect.Int64:
+			fs.IntSlice(name, nil, "")
+			return
+		case reflect.Uint8:
+			fs.String(name, "", "(hex)")
+			return
+		case reflect.Uint32, reflect.Uint64:
+			fs.UintSlice(name, nil, "")
+			return
+		case reflect.Ptr:
+			// Not supported
+			return
+		}
+		panic(fmt.Sprintf("flags: %s slice not yet supported (%s)\n", el.Kind(), name))
+	case reflect.Array:
+		el := t.Elem()
+		switch el.Kind() {
+		case reflect.Uint8:
+			fs.String(name, "", "(hex)")
+			return
+		}
+		panic(fmt.Sprintf("flags: %s array not yet supported (%s)\n", el.Kind(), name))
+	case reflect.Map:
+		// Not supported
+		return
+	}
+	if t.PkgPath() == "" {
+		panic(fmt.Sprintf("flags: %s not yet supported (%s)\n", t.Kind(), name))
+	}
+	panic(fmt.Sprintf("flags: %s.%s not yet supported (%s)\n", t.PkgPath(), t.Name(), name))
 }
 
 func fieldMaskFlags(prefix []string, t reflect.Type, maskOnly bool) *pflag.FlagSet {
