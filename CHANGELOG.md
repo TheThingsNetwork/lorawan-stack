@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix `AppKey` decryption in Join Server.
+
 ### Security
 
 ## [3.3.0] - 2019-11-25
