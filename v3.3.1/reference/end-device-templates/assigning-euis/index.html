@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Assigning EUIs | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.3.1/reference/end-device-templates/assigning-euis/" />
+  <link rel="icon" type="image/png" href="/v3.3.1/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.3.1/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Assigning EUIs">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Assigning EUIs">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.3.1/reference/end-device-templates/assigning-euis/">
+  <meta name="twitter:title" content="Assigning EUIs" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.3.1/">
+        <img src="/v3.3.1/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.3.1/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.3.1/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.3.1/components/">Components</a>
+        <a class="navbar-item" href="/v3.3.1/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.3.1/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">End Device Templates</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.3.1/reference/end-device-templates/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/end-device-templates/creating/" class="">Creating Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/end-device-templates/converting/" class="">Converting Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/end-device-templates/executing/" class="">Executing Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/end-device-templates/mapping/" class="">Mapping Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/end-device-templates/assigning-euis/" class="is-active">Assigning EUIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Assigning EUIs</h1>
+
+<div class="content">
+
+<div class="notification is-primary">
+  <h3 class="has-text-light">Command-line interface only</h3>
+  <p>The instructions below use the command-line interface (CLI).</p>
+  <div class="buttons">
+    <a class="button is-primary is-inverted is-outlined" href="https://thethingsstack.io/v3.3.1/guides/getting-started/installation/">Learn how to install the CLI</a>
+  </div>
+</div>
+
+
+<p>You can use the <code>end-device template assign-euis</code> command to assign the <code>JoinEUI</code> and <code>DevEUI</code> to device templates. The <code>DevEUI</code> is assigned from the given start number. This personalizes the device templates.</p>
+
+<p>You can use the command in two different ways:</p>
+
+<ol>
+<li>Pipe a number of device templates to assign EUIs to, for example the result of <a href="/v3.3.1/reference/end-device-templates/mapping/">Mapping Templates</a> or <a href="/v3.3.1/reference/end-device-templates/converting/">Converting Templates</a></li>
+<li>Pipe a generic device template, for example the result of <a href="/v3.3.1/reference/end-device-templates/creating/">Creating Templates</a>, and pass the <code>--count</code> flag to generate a number of personalized device templates</li>
+</ol>
+
+<p>Once the device templates are personalized with EUIs, you can set additional fields (see <a href="/v3.3.1/reference/end-device-templates/creating/">Creating Templates</a>) or execute templates (see <a href="/v3.3.1/reference/end-device-templates/executing/">Executing Templates</a>).</p>
+
+<blockquote>
+<p>Note: to make your device compliant with most LoRaWAN networks, use the <code>JoinEUI</code> of the LoRaWAN Join Server where the devices will be registered and use a <code>DevEUI</code> from an IEEE issued MAC address block that is assigned to your company. If you intend to operate your own LoRaWAN Join Server, use a <code>JoinEUI</code> from your IEEE assigned MAC address block as LoRa Alliance requires that for DNS lookup. <a href="https://standards.ieee.org/products-services/index.html">Learn how to apply for a IEEE issued MAC address block</a>.</p>
+</blockquote>
+
+<h2 id="example">Example</h2>
+
+<p>This example illustrates creating a device profile template, assigning 5 <code>DevEUI</code>s and creating them in your The Things Stack application.</p>
+
+<p>First, create a mapping file with a device profile in <code>profile.json</code>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-device template extend <span class="se">\
+</span><span class="se"></span>  --frequency-plan-id EU_863_870 <span class="se">\
+</span><span class="se"></span>  --lorawan-version <span class="m">1</span>.0.3 <span class="se">\
+</span><span class="se"></span>  --lorawan-phy-version <span class="m">1</span>.0.3-a <span class="se">\
+</span><span class="se"></span>  --supports-join &gt; profile.json</code></pre></div>
+<p>Second, assign the EUIs. The first argument is the <code>JoinEUI</code>, the second argument is the first <code>DevEUI</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ cat profile.json <span class="se">\
+</span><span class="se"></span>  <span class="p">|</span> ttn-lw-cli end-device template assign-euis 70b3d57ed0000000 70b3d57ed0000001 --count <span class="m">5</span> &gt; devices.json</code></pre></div>
+<p><details><summary>Show output</summary></p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;device_id&#34;</span><span class="p">:</span> <span class="s2">&#34;eui-70b3d57ed0000001&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">},</span>
+      <span class="nt">&#34;dev_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000001&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;join_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000000&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;attributes&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.device_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.join_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.dev_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;device_id&#34;</span><span class="p">:</span> <span class="s2">&#34;eui-70b3d57ed0000002&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">},</span>
+      <span class="nt">&#34;dev_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000002&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;join_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000000&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;attributes&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;ids.dev_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.device_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.join_eui&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;device_id&#34;</span><span class="p">:</span> <span class="s2">&#34;eui-70b3d57ed0000003&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">},</span>
+      <span class="nt">&#34;dev_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000003&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;join_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000000&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;attributes&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.device_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.join_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.dev_eui&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;device_id&#34;</span><span class="p">:</span> <span class="s2">&#34;eui-70b3d57ed0000004&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">},</span>
+      <span class="nt">&#34;dev_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000004&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;join_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000000&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;attributes&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;ids.device_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.join_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.dev_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;device_id&#34;</span><span class="p">:</span> <span class="s2">&#34;eui-70b3d57ed0000005&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">},</span>
+      <span class="nt">&#34;dev_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000005&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;join_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000000&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;attributes&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.device_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.join_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.dev_eui&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p></details></p>
+
+<p>Finally, you can create these devices in your The Things Stack application <code>test-app</code>, see <a href="/v3.3.1/reference/end-device-templates/executing/">Executing Templates</a>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ cat devices.json <span class="se">\
+</span><span class="se"></span>  <span class="p">|</span> ttn-lw-cli end-device template execute <span class="se">\
+</span><span class="se"></span>  <span class="p">|</span> ttn-lw-cli device create --application-id test-app</code></pre></div></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.3.1/reference/end-device-templates/mapping/">← Mapping Templates</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.3.1/guides/">Guides</a></p>
+        <p><a class="" href="/v3.3.1/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.3.1/components/">Components</a></p>
+        <p><a class="" href="/v3.3.1/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Johan Stokking on 07 Aug 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/81b8360a8c13564a2c7ea05d69b62f6c056f97f7">
+      all: Rename to The Things Stack
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/end-device-templates/assigning-euis.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.3.1/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

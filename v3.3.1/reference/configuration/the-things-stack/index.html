@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Generic Server Options | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.3.1/reference/configuration/the-things-stack/" />
+  <link rel="icon" type="image/png" href="/v3.3.1/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.3.1/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Generic Server Options">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Generic Server Options">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.3.1/reference/configuration/the-things-stack/">
+  <meta name="twitter:title" content="Generic Server Options" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.3.1/">
+        <img src="/v3.3.1/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.3.1/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.3.1/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.3.1/components/">Components</a>
+        <a class="navbar-item" href="/v3.3.1/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.3.1/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Configuration</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.3.1/reference/configuration/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/the-things-stack/" class="is-active">Generic Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/identity-server/" class="">Identity Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/gateway-server/" class="">Gateway Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/network-server/" class="">Network Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/application-server/" class="">Application Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/join-server/" class="">Join Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/console/" class="">Console Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/cli/" class="">Command-Line Interface Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/reference/configuration/gateway-configuration-server/" class="">Gateway Configuration Server Options</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Generic Server Options</h1>
+
+<div class="content">
+
+<h2 id="global-options">Global Options</h2>
+
+<p>Under normal circumstances, only <code>info</code>, <code>warn</code> and <code>error</code> logs are printed to the console. For development, you may also want to see <code>debug</code> logs.</p>
+
+<ul>
+<li><code>log.level</code>: The minimum level log messages must have to be shown (default &ldquo;info&rdquo;)</li>
+</ul>
+
+<h2 id="tls-options">TLS Options</h2>
+
+<p>The Things Stack serves several endpoints using TLS. TLS certificates can come from different sources.</p>
+
+<ul>
+<li><code>tls.source</code>: Source of the TLS certificate (file, acme, key-vault)</li>
+</ul>
+
+<p>If <code>file</code> is specified as <code>tls.source</code>, the location of the certificate and key need to be configured.</p>
+
+<ul>
+<li><code>tls.certificate</code>: Location of TLS certificate</li>
+<li><code>tls.key</code>: Location of TLS private key</li>
+</ul>
+
+<p>If <code>acme</code> is specified as <code>tls.source</code>, certificates will be requested from Let&rsquo;s Encrypt (the default <code>tls.acme.endpoint</code>) and stored in the given <code>tls.acme.dir</code>.</p>
+
+<ul>
+<li><code>tls.acme.endpoint</code>: ACME endpoint</li>
+<li><code>tls.acme.dir</code>: Location of ACME storage directory</li>
+<li><code>tls.acme.email</code>: Email address to register with the ACME account</li>
+<li><code>tls.acme.hosts</code>: Hosts to enable automatic certificates for</li>
+<li><code>tls.acme.default-host</code>: Default host to assume for clients without SNI</li>
+</ul>
+
+<p>If <code>key-vault</code> is specified as <code>tls.source</code>, the certificate with the given ID is loaded from the key vault.</p>
+
+<ul>
+<li><code>tls.key-vault.id</code>: ID of the certificate</li>
+</ul>
+
+<p>For client-side TLS, you may configure a Root CA and optionally disable verification of certificate chains.</p>
+
+<ul>
+<li><code>tls.root-ca</code>: Location of TLS root CA certificate (optional)</li>
+<li><code>tls.insecure-skip-verify</code>: Skip verification of certificate chains (insecure)</li>
+</ul>
+
+<h2 id="grpc-options">gRPC Options</h2>
+
+<p>The <code>grpc</code> options configure how The Things Stack listens for gRPC connections. The format is <code>host:port</code>. When listening on TLS ports, it uses the global <a href="#tls-options">TLS configuration</a>.</p>
+
+<ul>
+<li><code>grpc.listen</code>: Address for the TCP gRPC server to listen on</li>
+<li><code>grpc.listen-tls</code>: Address for the TLS gRPC server to listen on</li>
+</ul>
+
+<p>When running a cluster in a trusted network, you can allow sending credentials over insecure connections with the <code>allow-insecure-for-credentials</code> option:</p>
+
+<ul>
+<li><code>grpc.allow-insecure-for-credentials</code>: Allow transmission of credentials over insecure transport</li>
+</ul>
+
+<h2 id="http-options">HTTP Options</h2>
+
+<p>The <code>http</code> options configure how The Things Stack listens for HTTP connections. The format is <code>host:port</code>. When listening on TLS ports, it uses the global <a href="#tls-options">TLS configuration</a>.</p>
+
+<ul>
+<li><code>http.listen</code>: Address for the HTTP server to listen on</li>
+<li><code>http.listen-tls</code>: Address for the HTTPS server to listen on</li>
+</ul>
+
+<p>The Things Stack uses secure cookies that are encrypted with a <code>block-key</code> and signed with a <code>hash-key</code>. In production deployments you&rsquo;ll want these to stay the same between restarts. The keys are encoded as hex.</p>
+
+<ul>
+<li><code>http.cookie.block-key</code>: Key for cookie contents encryption (16, 24 or 32 bytes)</li>
+<li><code>http.cookie.hash-key</code>: Key for cookie contents verification (32 or 64 bytes)</li>
+</ul>
+
+<p>The Things Stack serves a number of internal endpoints for health, metrics and debugging. These will usually be disabled or password protected in production deployments.</p>
+
+<ul>
+<li><code>http.health.enable</code>: Enable health check endpoint on HTTP server</li>
+<li><code>http.health.password</code>: Password to protect health endpoint (username is health)</li>
+<li><code>http.metrics.enable</code>: Enable metrics endpoint on HTTP server</li>
+<li><code>http.metrics.password</code>: Password to protect metrics endpoint (username is metrics)</li>
+<li><code>http.pprof.enable</code>: Enable pprof endpoint on HTTP server</li>
+<li><code>http.pprof.password</code>: Password to protect pprof endpoint (username is pprof)</li>
+</ul>
+
+<p>It is possible to redirect users to the canonical URL of a deployment. There are options to redirect to a given host, or redirect from HTTP to HTTPS.</p>
+
+<ul>
+<li><code>http.redirect-to-host</code>: Redirect all requests to one host</li>
+<li><code>http.redirect-to-tls</code>: Redirect HTTP requests to HTTPS</li>
+</ul>
+
+<p>The HTTP server serves static files for the web UI. If these files are not in the standard location, you may need to change the search path.</p>
+
+<ul>
+<li><code>http.static.mount</code>: Path on the server where static assets will be served</li>
+<li><code>http.static.search-path</code>: List of paths for finding the directory to serve static assets from</li>
+</ul>
+
+<h2 id="interoperability-options">Interoperability Options</h2>
+
+<p>The Things Stack supports interoperability according to LoRaWAN Backend Interfaces specification. The following options are used to configure the server for this.</p>
+
+<ul>
+<li><p><code>interop.listen-tls</code>: Address for the interop server to listen on</p></li>
+
+<li><p><code>interop.sender-client-ca.source</code>: Source of the interop server sender client CAs configuration (static, directory, url, blob)</p></li>
+</ul>
+
+<p>The <code>url</code> source loads interop server sender client CAs configuration from the given URL.</p>
+
+<ul>
+<li><code>interop.sender-client-ca.url</code></li>
+</ul>
+
+<p>The <code>directory</code> source loads from the given directory.</p>
+
+<ul>
+<li><code>interop.sender-client-ca.directory</code></li>
+</ul>
+
+<p>The <code>blob</code> source loads from the given path in a bucket. This requires the global <a href="#blob-options">blob configuration</a>.</p>
+
+<ul>
+<li><code>interop.sender-client-ca.blob.bucket</code>: Bucket to use</li>
+<li><code>interop.sender-client-ca.blob.path</code>: Path to use</li>
+</ul>
+
+<h2 id="redis-options">Redis Options</h2>
+
+<p>Redis is the main data store for the <a href="/v3.3.1/reference/configuration/network-server/">Network Server</a>, <a href="/v3.3.1/reference/configuration/application-server/">Application Server</a> and <a href="/v3.3.1/reference/configuration/join-server/">Join Server</a>. Redis is also used by the <a href="/v3.3.1/reference/configuration/identity-server/">Identity Server</a> for caching and can be used by the <a href="#events-options">events system</a> for exchanging events between components.</p>
+
+<p>Redis configuration options:</p>
+
+<ul>
+<li><code>redis.password</code>: Password of the Redis server</li>
+<li><code>redis.database</code>: Redis database to use</li>
+<li><code>redis.namespace</code>: Namespace for Redis keys</li>
+</ul>
+
+<p>If connecting to a single Redis instance:</p>
+
+<ul>
+<li><code>redis.address</code>: Address of the Redis server</li>
+</ul>
+
+<p>Or you can enable failover using <a href="https://redis.io/topics/sentinel">Redis Sentinel</a>:</p>
+
+<ul>
+<li><code>redis.failover.enable</code>: Set to <code>true</code></li>
+<li><code>redis.failover.addresses</code>: List of addresses of the Redis Sentinel instances (required)</li>
+<li><code>redis.failover.master-name</code>: Redis Sentinel master name (required)</li>
+</ul>
+
+<h2 id="blob-options">Blob Options</h2>
+
+<p>The <code>blob</code> options configure how The Things Stack reads or writes files such as pictures, the frequency plans repository or files required for Backend Interfaces interoperability. The <code>provider</code> field selects the provider that is used, and which other options are read.</p>
+
+<ul>
+<li><code>blob.provider</code>: Blob store provider (local, aws, gcp) (default &ldquo;local&rdquo;)</li>
+</ul>
+
+<p>If the blob provider is <code>local</code>, you need to specify the directory to use.</p>
+
+<ul>
+<li><code>blob.local.directory</code>: Local directory that holds the buckets (default &ldquo;./public/blob&rdquo;)</li>
+</ul>
+
+<p>If the blob provider is <code>aws</code>, you need to specify the S3 region, the access key ID and secret access key.</p>
+
+<ul>
+<li><code>blob.aws.region</code>: S3 region</li>
+<li><code>blob.aws.access-key-id</code>: Access key ID</li>
+<li><code>blob.aws.secret-access-key</code>: Secret access key</li>
+</ul>
+
+<p>If the blob provider is <code>gcp</code>, you can specify the credentials with either the credentials data, or with the path to the credentials file.</p>
+
+<ul>
+<li><code>blob.gcp.credentials</code>: JSON data of the GCP credentials, if not using JSON file</li>
+<li><code>blob.gcp.credentials-file</code>: Path to the GCP credentials JSON file</li>
+</ul>
+
+<h2 id="events-options">Events Options</h2>
+
+<p>The <code>events</code> options configure how events are shared between components. When using a single instance of The Things Stack, the <code>internal</code> backend is the best option. If you need to communicate in a cluster, you can use the <code>redis</code> or <code>cloud</code> backend.</p>
+
+<ul>
+<li><code>events.backend</code>: Backend to use for events (internal, redis, cloud) (default &ldquo;internal&rdquo;)</li>
+</ul>
+
+<p>When using the <code>redis</code> backend, the global <a href="#redis-options">Redis configuration</a> is used. Alternatively, you may customize the Redis configuration that is used for events.</p>
+
+<ul>
+<li><code>events.redis.address</code>: Address of the Redis server</li>
+<li><code>events.redis.password</code>: Password of the Redis server</li>
+<li><code>events.redis.database</code>: Redis database to use</li>
+<li><code>events.redis.namespace</code>: Namespace for Redis keys</li>
+</ul>
+
+<p>With the <code>cloud</code> backend, the configured publish and subscribe URLs are passed to <a href="https://gocloud.dev/howto/pubsub/">the Go CDK</a>.</p>
+
+<ul>
+<li><code>events.cloud.publish-url</code>: URL for the topic to send events</li>
+<li><code>events.cloud.subscribe-url</code>: URL for the subscription to receiving events</li>
+</ul>
+
+<h2 id="frequency-plans-options">Frequency Plans Options</h2>
+
+<p>The <code>frequency-plans</code> configuration is used by the <a href="/v3.3.1/reference/configuration/gateway-server/">Gateway Server</a> and the <a href="/v3.3.1/reference/configuration/network-server/">Network Server</a>. It can load configuration from a number of sources.</p>
+
+<ul>
+<li><code>frequency-plans.config-source</code>: Source of the frequency plans (static, directory, url, blob)</li>
+</ul>
+
+<p>The <code>url</code> source loads frequency plans from the given URL. See the <a href="https://github.com/TheThingsNetwork/lorawan-frequency-plans">lorawan-frequency-plans</a> repository for more information.</p>
+
+<ul>
+<li><code>frequency-plans.url</code></li>
+</ul>
+
+<p>The <code>directory</code> source loads from the given directory.</p>
+
+<ul>
+<li><code>frequency-plans.directory</code></li>
+</ul>
+
+<p>The <code>blob</code> source loads from the given path in a bucket. This requires the global <a href="#blob-options">blob configuration</a>.</p>
+
+<ul>
+<li><code>frequency-plans.blob.bucket</code>: Bucket to use</li>
+<li><code>frequency-plans.blob.path</code>: Path to use</li>
+</ul>
+
+<h2 id="cluster-options">Cluster Options</h2>
+
+<p>The <code>cluster</code> options configure how The Things Stack communicates with other components in the cluster. These options do not need to be set when running a single instance of The Things Stack. The most important options are the ones to configure the addresses of the other components in the cluster.</p>
+
+<ul>
+<li><code>cluster.identity-server</code>: Address for the Identity Server</li>
+<li><code>cluster.gateway-server</code>: Address for the Gateway Server</li>
+<li><code>cluster.network-server</code>: Address for the Network Server</li>
+<li><code>cluster.application-server</code>: Address for the Application Server</li>
+<li><code>cluster.join-server</code>: Address for the Join Server</li>
+<li><code>cluster.crypto-server</code>: Address for the Crypto Server</li>
+</ul>
+
+<p>The cluster keys are 128 bit, hex-encoded keys that cluster components use to authenticate to each other.</p>
+
+<ul>
+<li><code>cluster.keys</code>: Keys used to communicate between components of the cluster. The first one will be used by the cluster to identify itself</li>
+</ul>
+
+<p>It is possible to configure the cluster to use TLS or not. We recommend to enable TLS for production deployments.</p>
+
+<ul>
+<li><code>cluster.tls</code>: Do cluster gRPC over TLS</li>
+</ul>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.3.1/reference/configuration/">← Configuration</a>
+<a class="button is-pulled-right" href="/v3.3.1/reference/configuration/identity-server/">Identity Server Options →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.3.1/guides/">Guides</a></p>
+        <p><a class="" href="/v3.3.1/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.3.1/components/">Components</a></p>
+        <p><a class="" href="/v3.3.1/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Aggelos Kolaitis on 22 Nov 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/8f6155d4dc2435601100000d692242dde2506370">
+      all: Add failover support using Redis Sentinel
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/configuration/the-things-stack.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.3.1/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

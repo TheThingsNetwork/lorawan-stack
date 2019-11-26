@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Running The Things Stack | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.3.1/guides/getting-started/running-the-stack/" />
+  <link rel="icon" type="image/png" href="/v3.3.1/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.3.1/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Running The Things Stack">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Running The Things Stack">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.3.1/guides/getting-started/running-the-stack/">
+  <meta name="twitter:title" content="Running The Things Stack" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.3.1/">
+        <img src="/v3.3.1/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.3.1/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.3.1/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.3.1/components/">Components</a>
+        <a class="navbar-item" href="/v3.3.1/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.3.1/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Getting Started</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.3.1/guides/getting-started/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/guides/getting-started/installation/" class="">Installation</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/guides/getting-started/certificates/" class="">Certificates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/guides/getting-started/configuration/" class="">Configuration</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/guides/getting-started/running-the-stack/" class="is-active">Running The Things Stack</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/guides/getting-started/console/" class="">Console</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/guides/getting-started/cli/" class="">Command-line Interface</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/guides/getting-started/mqtt/" class="">MQTT Server</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.1/guides/getting-started/webhooks/" class="">HTTP Webhooks</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Running The Things Stack</h1>
+
+<div class="content">
+
+<p>Now that all configuration is done, we&rsquo;re ready to initialize The Things Stack and start it. Open a terminal prompt in the same directory as your <code>docker-compose.yml</code> file.</p>
+
+<h2 id="initialization">Initialization</h2>
+
+<p>The first time The Things Stack is started, it requires some initialization. We&rsquo;ll start by pulling the Docker images:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker-compose pull</code></pre></div>
+<p>Next, we need to initialize the database of the Identity Server:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker-compose run --rm stack is-db init</code></pre></div>
+<p>We&rsquo;ll now create an initial <code>admin</code> user. Make sure to give it a good password.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker-compose run --rm stack is-db create-admin-user <span class="se">\
+</span><span class="se"></span>  --id admin <span class="se">\
+</span><span class="se"></span>  --email your@email.com</code></pre></div>
+<p>Then we&rsquo;ll register the command-line interface as an OAuth client:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker-compose run --rm stack is-db create-oauth-client <span class="se">\
+</span><span class="se"></span>  --id cli <span class="se">\
+</span><span class="se"></span>  --name <span class="s2">&#34;Command Line Interface&#34;</span> <span class="se">\
+</span><span class="se"></span>  --owner admin <span class="se">\
+</span><span class="se"></span>  --no-secret <span class="se">\
+</span><span class="se"></span>  --redirect-uri <span class="s2">&#34;local-callback&#34;</span> <span class="se">\
+</span><span class="se"></span>  --redirect-uri <span class="s2">&#34;code&#34;</span></code></pre></div>
+<p>We do the same for the console. For <code>--secret</code>, make sure to enter the same value as you set for <code>TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET</code> in the <a href="/v3.3.1/guides/getting-started/configuration/">Configuration</a> step.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker-compose run --rm stack is-db create-oauth-client <span class="se">\
+</span><span class="se"></span>  --id console <span class="se">\
+</span><span class="se"></span>  --name <span class="s2">&#34;Console&#34;</span> <span class="se">\
+</span><span class="se"></span>  --owner admin <span class="se">\
+</span><span class="se"></span>  --secret the secret you generated before <span class="se">\
+</span><span class="se"></span>  --redirect-uri <span class="s2">&#34;https://thethings.example.com/console/oauth/callback&#34;</span> <span class="se">\
+</span><span class="se"></span>  --redirect-uri <span class="s2">&#34;/console/oauth/callback&#34;</span></code></pre></div>
+<h2 id="running-the-things-stack">Running The Things Stack</h2>
+
+<p>Now it&rsquo;s time to start The Things Stack:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ docker-compose up</code></pre></div>
+<p>This will start the stack and print logs to your terminal. You can also start the stack in detached mode by adding <code>-d</code> to the command above. In that case you can get logs with <a href="https://docs.docker.com/compose/reference/logs/"><code>docker-compose logs</code></a>.</p>
+
+<p>With The Things Stack up and running, it&rsquo;s time to connect gateways, create devices and work with streaming data. See <a href="/v3.3.1/guides/getting-started/console/">Console</a> or <a href="/v3.3.1/guides/getting-started/cli/">Command-line Interface</a> to proceed.</p>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.3.1/guides/getting-started/configuration/">← Configuration</a>
+<a class="button is-pulled-right" href="/v3.3.1/guides/getting-started/console/">Console →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.3.1/guides/">Guides</a></p>
+        <p><a class="" href="/v3.3.1/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.3.1/components/">Components</a></p>
+        <p><a class="" href="/v3.3.1/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/97b0e7ade29ecb2313d3cf347769eb89205e6620">
+      doc: Use double quotes in bash
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/running-the-stack.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.3.1/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
