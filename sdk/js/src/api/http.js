@@ -14,7 +14,7 @@
 
 import axios from 'axios'
 
-import { STACK_COMPONENTS } from '../util/constants'
+import { URI_PREFIX_STACK_COMPONENT_MAP } from '../util/constants'
 import stream from './stream/stream-node'
 
 /**
@@ -132,7 +132,9 @@ class Http {
   _parseStackComponent(endpoint) {
     try {
       const component = endpoint.split('/')[1]
-      return STACK_COMPONENTS.includes(component) ? component : 'is'
+      return Boolean(URI_PREFIX_STACK_COMPONENT_MAP[component])
+        ? URI_PREFIX_STACK_COMPONENT_MAP[component]
+        : 'is'
     } catch (err) {
       throw new Error('Unable to extract The Things Stack component:', endpoint)
     }
