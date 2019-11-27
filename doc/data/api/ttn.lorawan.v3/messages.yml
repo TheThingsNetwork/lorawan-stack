@@ -271,6 +271,13 @@ ApplicationJoinAccept:
        rejoin-request.
     type: bool
     default: false
+  - name: received_at
+    comment: |2
+       Server time when the Network Server received the message.
+    message:
+      package: google.protobuf
+      name: Timestamp
+    default: "0001-01-01T00:00:00Z"
 ApplicationLink:
   name: ApplicationLink
   fields:
@@ -653,6 +660,8 @@ ApplicationUp:
         max_len: 100
     default: []
   - name: received_at
+    comment: |2
+       Server time when the Application Server received the message.
     message:
       package: google.protobuf
       name: Timestamp
@@ -747,6 +756,13 @@ ApplicationUplink:
     rules:
       required: true
     default: {}
+  - name: received_at
+    comment: |2
+       Server time when the Network Server received the message.
+    message:
+      package: google.protobuf
+      name: Timestamp
+    default: "0001-01-01T00:00:00Z"
 ApplicationWebhook:
   name: ApplicationWebhook
   fields:
@@ -2021,6 +2037,12 @@ EndDevice:
     map_value:
       message:
         name: Location
+    default: {}
+  - name: picture
+    comment: |2
+       Stored in Entity Registry.
+    message:
+      name: Picture
     default: {}
   - name: supports_class_b
     comment: |2
