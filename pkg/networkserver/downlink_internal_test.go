@@ -78,6 +78,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		SNwkSIntKey: &ttnpb.KeyEnvelope{
 			Key: &sNwkSIntKey,
 		},
+		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 	}
 
 	rxMetadata := MakeRxMetadataSlice()
