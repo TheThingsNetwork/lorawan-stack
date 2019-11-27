@@ -160,5 +160,7 @@ gateway-server-grpc-address: 'thethings.example.com:8884'
 network-server-grpc-address: 'thethings.example.com:8884'
 application-server-grpc-address: 'thethings.example.com:8884'
 join-server-grpc-address: 'thethings.example.com:8884'
+device-claiming-server-grpc-address: 'thethings.example.com:8884'
 device-template-converter-grpc-address: 'thethings.example.com:8884'
+qr-code-generator-grpc-address: 'thethings.example.com:8884'
 ```
