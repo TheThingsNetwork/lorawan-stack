@@ -15,7 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Logo from '../logo'
+import Logo from '../../containers/logo'
 import Link from '../link'
 import NavigationBar from '../navigation/bar'
 import ProfileDropdown from '../profile-dropdown'
