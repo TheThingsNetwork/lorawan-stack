@@ -15,16 +15,22 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 
+import TtsLogo from '../../assets/static/logo.svg'
+import ExampleLogo from './story-logo.svg'
 import Logo from '.'
 
 storiesOf('Logo', module)
-  .add('Default', () => <Logo />)
-  .add('TTI', () => (
+  .add('Default', () => <Logo logo={{ src: TtsLogo, alt: 'Logo' }} />)
+  .add('With secondary Logo', () => (
     <Logo
-      env={{
-        branding: {
-          tti: true,
-        },
-      }}
+      logo={{ src: TtsLogo, alt: 'Logo' }}
+      secondaryLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+    />
+  ))
+  .add('With vertical secondary', () => (
+    <Logo
+      vertical
+      logo={{ src: TtsLogo, alt: 'Logo' }}
+      secondaryLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
     />
   ))

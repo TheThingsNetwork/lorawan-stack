@@ -12,5 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.logo
+.container
+  display: flex
   line-height: 0
+
+  &:not(.vertical)
+    max-height: 2.2rem
+
+    &:not(.custom-branding)
+      img
+        height: 100%
+
+
+    &.custom-branding .logo
+      border-dark('right')
+      padding-right: $ls.xs
+
+      img
+        height: auto
+        width: 10rem
+
+    .secondary-logo
+      display: flex
+      align-items: center
+      padding-left: $ls.xs
+
+      img
+        height: 1.6rem
+
+  &.vertical
+    max-width: 15rem
+    flex-direction: column
+    margin-bottom: $ls.xs
+
+    &.custom-branding .logo
+      border-dark('bottom')
+      padding-bottom: $ls.xs
+      margin-bottom: $ls.xs
+      height: auto
+
+      img
+        width: 100%
+        height: auto
+
+    .secondary-logo
+      display: flex
+      align-items: center
+      margin-left: auto
+      margin-right: auto
+
+      img
+        height: 2.2rem

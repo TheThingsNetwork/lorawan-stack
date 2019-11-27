@@ -16,28 +16,45 @@ import React from 'react'
 import classnames from 'classnames'
 
 import PropTypes from '../../lib/prop-types'
-import TtsLogo from '../../assets/logos/tts.svg'
 
 import style from './logo.styl'
 
-const Logo = function(props) {
-  const { className } = props
-
-  const classname = classnames(style.logo, className)
+const Logo = function({ className, logo, secondaryLogo, vertical }) {
+  const classname = classnames(style.container, className, {
+    [style.vertical]: vertical,
+    [style.customBranding]: Boolean(secondaryLogo),
+  })
 
   return (
     <div className={classname}>
-      <img alt="The Things Stack Logo" src={TtsLogo} />
+      <div className={style.logo}>
+        <img {...logo} />
+      </div>
+      {Boolean(secondaryLogo) && (
+        <div className={style.secondaryLogo}>
+          <img {...secondaryLogo} />
+        </div>
+      )}
     </div>
   )
 }
 
+const imgPropType = PropTypes.shape({
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired,
+})
+
 Logo.propTypes = {
   className: PropTypes.string,
+  logo: imgPropType.isRequired,
+  secondaryLogo: imgPropType,
+  vertical: PropTypes.bool,
 }
 
 Logo.defaultProps = {
   className: undefined,
+  secondaryLogo: undefined,
+  vertical: false,
 }
 
 export default Logo
