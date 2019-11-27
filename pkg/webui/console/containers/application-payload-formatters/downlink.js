@@ -15,7 +15,9 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
+import Notification from '../../../components/notification'
 import PageTitle from '../../../components/page-title'
 import toast from '../../../components/toast'
 import PropTypes from '../../../lib/prop-types'
@@ -32,7 +34,12 @@ import {
 } from '../../store/selectors/applications'
 
 import api from '../../api'
+import style from './application-payload-formatters.styl'
 
+const m = defineMessages({
+  infoText:
+    'These payload formatters are executed on downlink messages to all devices in this application. If payload formatters are also set for a specific device, only those will be executed for downlinks to that device.',
+})
 @connect(
   function(state) {
     const formatters = selectApplicationLinkFormatters(state) || {}
@@ -61,8 +68,8 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     formatters: PropTypes.object.isRequired,
-    updateLinkSuccess: PropTypes.func.isRequired,
     linked: PropTypes.bool.isRequired,
+    updateLinkSuccess: PropTypes.func.isRequired,
   }
 
   async onSubmit(values) {
@@ -91,9 +98,14 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   render() {
     const { formatters, linked } = this.props
 
+    const applicationFormatterInfo = (
+      <Notification className={style.notification} small info content={m.infoText} />
+    )
+
     return (
       <React.Fragment>
         <PageTitle title={sharedMessages.payloadFormattersDownlink} />
+        {linked && applicationFormatterInfo}
         <PayloadFormattersForm
           uplink={false}
           linked={linked}
