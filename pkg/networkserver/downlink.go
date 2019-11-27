@@ -1258,15 +1258,14 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				req.Priority = genDown.Priority
 
 				var paths []downlinkPath
-				fixedPaths := genState.ApplicationDownlink.GetClassBC().GetGateways()
-				if len(fixedPaths) > 0 {
+				if fixedPaths := genState.ApplicationDownlink.GetClassBC().GetGateways(); len(fixedPaths) > 0 {
 					paths = make([]downlinkPath, 0, len(fixedPaths))
-					for _, gtw := range fixedPaths {
+					for i := range fixedPaths {
 						paths = append(paths, downlinkPath{
-							GatewayIdentifiers: gtw.GatewayIdentifiers,
+							GatewayIdentifiers: fixedPaths[i].GatewayIdentifiers,
 							DownlinkPath: &ttnpb.DownlinkPath{
 								Path: &ttnpb.DownlinkPath_Fixed{
-									Fixed: gtw,
+									Fixed: &fixedPaths[i],
 								},
 							},
 						})
