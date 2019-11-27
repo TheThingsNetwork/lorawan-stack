@@ -16,12 +16,14 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
 import { Switch, Route, Redirect } from 'react-router'
+import { defineMessages } from 'react-intl'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import Tab from '../../../components/tabs'
 import NotFoundRoute from '../../../lib/components/not-found-route'
+import Notification from '../../../components/notification'
 
 import DeviceUplinkPayloadFormatters from '../../containers/device-payload-formatters/uplink'
 import DeviceDownlinkPayloadFormatters from '../../containers/device-payload-formatters/downlink'
@@ -33,8 +35,15 @@ import {
 } from '../../store/selectors/applications'
 import { selectSelectedDeviceId } from '../../store/selectors/device'
 
+import PropTypes from '../../../lib/prop-types'
 import style from './device-payload-formatters.styl'
 
+const m = defineMessages({
+  infoUplinkText:
+    'These payload formatters are executed on uplink messages from this device. If payload formatters are also set for the application, those are not executed for uplinks from this device.',
+  infoDownlinkText:
+    'These payload formatters are executed on downlink messages to this device. If payload formatters are also set for the application, those are not executed for downlinks to this device.',
+})
 @connect(function(state) {
   const link = selectApplicationLink(state)
   const fetching = selectApplicationLinkFetching(state)
@@ -57,15 +66,31 @@ import style from './device-payload-formatters.styl'
   )
 })
 export default class DevicePayloadFormatters extends Component {
+  static propTypes = {
+    location: PropTypes.location.isRequired,
+    match: PropTypes.match.isRequired,
+  }
+
   render() {
     const {
       match: { url },
+      location: { pathname },
     } = this.props
 
     const tabs = [
       { title: sharedMessages.uplink, name: 'uplink', link: `${url}/uplink` },
       { title: sharedMessages.downlink, name: 'downlink', link: `${url}/downlink` },
     ]
+    let deviceFormatterInfo
+    if (pathname === `${url}/uplink`) {
+      deviceFormatterInfo = (
+        <Notification className={style.notification} small info content={m.infoUplinkText} />
+      )
+    } else if (pathname === `${url}/downlink`) {
+      deviceFormatterInfo = (
+        <Notification className={style.notification} small info content={m.infoDownlinkText} />
+      )
+    }
 
     return (
       <Container>
@@ -76,6 +101,7 @@ export default class DevicePayloadFormatters extends Component {
         </Row>
         <Row>
           <Col>
+            {deviceFormatterInfo}
             <Switch>
               <Redirect exact from={url} to={`${url}/uplink`} />
               <Route exact path={`${url}/uplink`} component={DeviceUplinkPayloadFormatters} />
