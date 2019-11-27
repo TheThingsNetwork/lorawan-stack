@@ -17,12 +17,11 @@ package version
 
 import (
 	"fmt"
-	"strings"
 )
 
 // String returns the version string.
 func String() string {
-	version := strings.TrimPrefix(TTN, "v")
+	version := TTN
 	if GitCommit != "" && BuildDate != "" {
 		version += fmt.Sprintf(" (%s, %s)", GitCommit, BuildDate)
 	}

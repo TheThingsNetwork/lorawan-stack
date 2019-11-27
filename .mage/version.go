@@ -72,11 +72,11 @@ func (Version) Files() error {
 		fmt.Println("Writing version files")
 	}
 	mg.Deps(Version.getCurrent)
-	err := ioutil.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, currentVersion)), 0644)
+	version := strings.TrimPrefix(currentVersion, "v")
+	err := ioutil.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0644)
 	if err != nil {
 		return err
 	}
-	version := strings.TrimPrefix(currentVersion, "v")
 	for _, packageJSONFile := range packageJSONFilePaths {
 		err = sh.Run(
 			nodeBin("json"),
