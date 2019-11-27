@@ -128,14 +128,14 @@ services:
       # - TTN_LW_AS_INTEROP_BLOB_BUCKET=enter bucket name
 
       # If Gateway Server enabled, defaults for "thethings.example.com":
-      # - TTN_LW_GS_MQTT_PUBLIC_ADDRESS=thethings.example.com:1883
-      # - TTN_LW_GS_MQTT_PUBLIC_TLS_ADDRESS=thethings.example.com:8883
-      # - TTN_LW_GS_MQTT_V2_PUBLIC_ADDRESS=thethings.example.com:1883
-      # - TTN_LW_GS_MQTT_V2_PUBLIC_TLS_ADDRESS=thethings.example.com:8883
+      # - TTN_LW_GS_MQTT_PUBLIC_ADDRESS=thethings.example.com:1882
+      # - TTN_LW_GS_MQTT_PUBLIC_TLS_ADDRESS=thethings.example.com:8882
+      # - TTN_LW_GS_MQTT_V2_PUBLIC_ADDRESS=thethings.example.com:1881
+      # - TTN_LW_GS_MQTT_V2_PUBLIC_TLS_ADDRESS=thethings.example.com:8881
 
       # If Gateway Configuration Server enabled, defaults for "thethings.example.com":
       # - TTN_LW_GCS_BASIC_STATION_DEFAULT_LNS_URI=wss://thethings.example.com:8887
-      # - TTN_LW_GCS_THE_THINGS_GATEWAY_DEFAULT_MQTT_SERVER=mqtts://thethings.example.com:8882
+      # - TTN_LW_GCS_THE_THINGS_GATEWAY_DEFAULT_MQTT_SERVER=mqtts://thethings.example.com:8881
 
       # If Network Server enabled, Network Server interoperability configuration:
       # If interoperability configuration repository is a directory on OS FS:
@@ -152,11 +152,13 @@ services:
       # - TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=https://thethings.example.com/oauth/authorize
       # - TTN_LW_CONSOLE_OAUTH_TOKEN_URL=https://thethings.example.com/oauth/token
       # - TTN_LW_CONSOLE_UI_CANONICAL_URL=https://thethings.example.com/console
-      # - TTN_LW_CONSOLE_UI_AS_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_UI_GS_BASE_URL=https://thethings.example.com/api/v3
       # - TTN_LW_CONSOLE_UI_IS_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_UI_JS_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_GS_BASE_URL=https://thethings.example.com/api/v3
       # - TTN_LW_CONSOLE_UI_NS_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_AS_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_JS_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_EDTC_BASE_URL=https://thethings.example.com/api/v3
+      # - TTN_LW_CONSOLE_UI_QRG_BASE_URL=https://thethings.example.com/api/v3
 
       # Console OAuth client and secret:
       - TTN_LW_CONSOLE_OAUTH_CLIENT_ID=console
