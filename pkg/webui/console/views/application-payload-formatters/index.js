@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Switch, Route, Link } from 'react-router-dom'
+import { Switch, Route, Link, Redirect } from 'react-router-dom'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
@@ -88,7 +88,13 @@ export default class ApplicationPayloadFormatters extends React.Component {
   }
 
   render() {
-    const { match, fetching, linked, appId } = this.props
+    const {
+      match,
+      fetching,
+      linked,
+      appId,
+      match: { url },
+    } = this.props
 
     if (fetching) {
       return (
@@ -120,6 +126,7 @@ export default class ApplicationPayloadFormatters extends React.Component {
           <Col>
             {linkWarning}
             <Switch>
+              <Redirect exact from={url} to={`${url}/uplink`} />
               <Route path={`${match.url}/uplink`} component={ApplicationUplinkPayloadFormatters} />
               <Route
                 path={`${match.url}/downlink`}
