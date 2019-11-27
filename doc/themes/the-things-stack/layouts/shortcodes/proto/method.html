@@ -13,7 +13,7 @@
 </p>
 
 {{- range .http }}
-<p><code>{{ .method }}</code> <code>{{ .path }}</code></p>
+<p><code>{{ .method }}</code> <code>/api/v3{{ .path }}</code></p>
 {{- end }}
 {{- else -}}
 {{ errorf "method %s of service %s of package %s not found: %s" $method $service $package .Position }}
