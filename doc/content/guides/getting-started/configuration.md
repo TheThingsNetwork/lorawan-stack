@@ -134,11 +134,13 @@ TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="https://thethings.example.com/oauth/authoriz
 TTN_LW_CONSOLE_OAUTH_TOKEN_URL="https://thethings.example.com/oauth/token"
 
 TTN_LW_CONSOLE_UI_CANONICAL_URL="https://thethings.example.com/console"
-TTN_LW_CONSOLE_UI_AS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_GS_BASE_URL="https://thethings.example.com/api/v3"
 TTN_LW_CONSOLE_UI_IS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_JS_BASE_URL="https://thethings.example.com/api/v3"
+TTN_LW_CONSOLE_UI_GS_BASE_URL="https://thethings.example.com/api/v3"
 TTN_LW_CONSOLE_UI_NS_BASE_URL="https://thethings.example.com/api/v3"
+TTN_LW_CONSOLE_UI_AS_BASE_URL="https://thethings.example.com/api/v3"
+TTN_LW_CONSOLE_UI_JS_BASE_URL="https://thethings.example.com/api/v3"
+TTN_LW_CONSOLE_UI_EDTC_BASE_URL="https://thethings.example.com/api/v3"
+TTN_LW_CONSOLE_UI_QRG_BASE_URL="https://thethings.example.com/api/v3"
 
 TTN_LW_CONSOLE_OAUTH_CLIENT_ID="console"
 TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET=... # choose or generate a secret
