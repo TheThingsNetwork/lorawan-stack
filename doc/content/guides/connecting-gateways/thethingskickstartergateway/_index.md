@@ -36,11 +36,11 @@ Enter the following fields:
 
 Click the **Show Advanced Options** button and enter the following fields:
 
-1. **Account Server**: The URL of The Things Stack. If you're using a port other than `:443` then append that to the URL.
+1. **Account Server**: The URL of The Things Stack. If you followed the [Getting Started guide]({{< ref "/guides/getting-started" >}}) this is the same as what you use instead of `https://thethings.example.com`.
 2. **Gateway Key**: The API Key that you created earlier.
 3. Click **Save** when done.
 
-This will apply the setting and reboot the gateway. If all the steps have been followed correctly, your gateway will now connect The Things Stack.
+This will apply the setting and reboot the gateway. If all the steps have been followed correctly, your gateway will now connect to The Things Stack.
 
 ## Troubleshooting
 
