@@ -516,6 +516,32 @@ matchLoop:
 		logger = logger.WithField("mac_count", len(cmds))
 		ctx = log.NewContext(ctx, logger)
 
+		if pld.ClassB {
+			switch {
+			case !match.Device.SupportsClassB:
+				logger.Debug("Ignore class B bit in uplink, since device does not support class B")
+
+			case match.Device.MACState.CurrentParameters.PingSlotFrequency == 0:
+				logger.Debug("Ignore class B bit in uplink, since ping slot frequency is not known")
+
+			case match.Device.MACState.CurrentParameters.PingSlotDataRateIndexValue == nil:
+				logger.Debug("Ignore class B bit in uplink, since ping slot data rate index is not known")
+
+			case match.Device.MACState.PingSlotPeriodicity == nil:
+				logger.Debug("Ignore class B bit in uplink, since ping slot periodicity is not known")
+
+			case match.Device.MACState.DeviceClass != ttnpb.CLASS_B:
+				logger.WithField("previous_class", match.Device.MACState.DeviceClass).Debug("Switch device class to class B")
+				match.Device.MACState.DeviceClass = ttnpb.CLASS_B
+			}
+		} else if match.Device.MACState.DeviceClass == ttnpb.CLASS_B {
+			if match.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && match.Device.SupportsClassC {
+				match.Device.MACState.DeviceClass = ttnpb.CLASS_C
+			} else {
+				match.Device.MACState.DeviceClass = ttnpb.CLASS_A
+			}
+		}
+
 		match.Device.MACState.QueuedResponses = match.Device.MACState.QueuedResponses[:0]
 	macLoop:
 		for len(cmds) > 0 {
