@@ -21,7 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
-var errCallback = errors.DefineUnauthenticated("oauth_callback_error", "an error occurred: {error}")
+var errCallback = errors.DefinePermissionDenied("oauth_callback_error", "an error occurred: {error}")
 var errNoStateParam = errors.DefinePermissionDenied("oauth_callback_no_state", "no state parameter present in request")
 var errNoCode = errors.DefinePermissionDenied("oauth_callback_no_code", "no code parameter present in request")
 var errInvalidState = errors.DefinePermissionDenied("oauth_callback_invalid_state", "invalid state parameter")

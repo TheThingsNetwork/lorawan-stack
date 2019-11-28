@@ -57,8 +57,8 @@ var (
 )
 
 var (
-	errInvitationTokenRequired   = errors.DefineUnauthenticated("invitation_token_required", "invitation token required")
-	errInvitationTokenExpired    = errors.DefineUnauthenticated("invitation_token_expired", "invitation token expired")
+	errInvitationTokenRequired   = errors.DefineInvalidArgument("invitation_token_required", "invitation token required")
+	errInvitationTokenExpired    = errors.DefineInvalidArgument("invitation_token_expired", "invitation token expired")
 	errPasswordStrengthMinLength = errors.DefineInvalidArgument("password_strength_min_length", "need at least `{n}` characters")
 	errPasswordStrengthMaxLength = errors.DefineInvalidArgument("password_strength_max_length", "need at most `{n}` characters")
 	errPasswordStrengthUppercase = errors.DefineInvalidArgument("password_strength_uppercase", "need at least `{n}` uppercase letter(s)")

@@ -202,7 +202,7 @@ func TestOAuthFlow(t *testing.T) {
 			Method:       "POST",
 			Path:         "/oauth/api/auth/login",
 			Body:         loginFormData{"json", "user", "wrong_pass"},
-			ExpectedCode: http.StatusUnauthorized,
+			ExpectedCode: http.StatusBadRequest,
 		},
 		{
 			Name: "login",
