@@ -18,6 +18,8 @@ export const selectApplicationRootPath = () => configSelector().APP_ROOT
 
 export const selectAssetsRootPath = () => configSelector().ASSETS_ROOT
 
+export const selectBrandingRootPath = () => configSelector().BRANDING_ROOT
+
 export const selectApplicationConfig = () => configSelector().APP_CONFIG
 
 export const selectApplicationSiteName = () => configSelector().SITE_NAME

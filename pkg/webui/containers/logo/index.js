@@ -13,24 +13,27 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 
-import TtsLogo from '../../assets/static/logo.svg'
-import ExampleLogo from './story-logo.svg'
-import Logo from '.'
+import LogoComponent from '../../components/logo'
 
-storiesOf('Logo', module)
-  .add('Default', () => <Logo logo={{ src: TtsLogo, alt: 'Logo' }} />)
-  .add('With secondary Logo', () => (
-    <Logo
-      logo={{ src: TtsLogo, alt: 'Logo' }}
-      secondaryLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
-    />
-  ))
-  .add('With vertical secondary', () => (
-    <Logo
-      vertical
-      logo={{ src: TtsLogo, alt: 'Logo' }}
-      secondaryLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
-    />
-  ))
+import {
+  selectAssetsRootPath,
+  selectBrandingRootPath,
+  selectApplicationSiteName,
+} from '../../lib/selectors/env'
+
+const logo = {
+  src: `${selectAssetsRootPath()}/logo.svg`,
+  alt: `${selectApplicationSiteName} Logo`,
+}
+const hasCustomBranding = selectBrandingRootPath() !== selectAssetsRootPath()
+const secondaryLogo = hasCustomBranding
+  ? {
+      src: `${selectBrandingRootPath()}/logo.svg`,
+      alt: 'Logo',
+    }
+  : undefined
+
+const Logo = props => <LogoComponent logo={logo} secondaryLogo={secondaryLogo} {...props} />
+
+export default Logo

@@ -30,7 +30,7 @@ import Button from '../../../components/button'
 import Form from '../../../components/form'
 import Input from '../../../components/input'
 import SubmitButton from '../../../components/submit-button'
-import Logo from '../../../components/logo'
+import Logo from '../../../containers/logo'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
 
@@ -114,7 +114,7 @@ export default class OAuth extends React.PureComponent {
         <div>
           <div className={style.left}>
             <div>
-              <Logo className={style.logo} />
+              <Logo vertical className={style.logo} />
               <Message content={m.loginToContinue} />
             </div>
           </div>

@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for selecting gateways when queueing downlinks via CLI (see `class-b-c.gateways` option).
+- Add support for Redis Sentinel (see `redis.failover.enable`, `redis.failover.master-name`, `redis.failover.addresses` options).
+- Add options `is.oauth.ui.branding-base-url` and `console.ui.branding-base-url` that can be used to customize the branding (logos) of the web UI.
 
 ### Changed
 

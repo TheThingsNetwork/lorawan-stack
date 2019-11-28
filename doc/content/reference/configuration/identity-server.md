@@ -1,6 +1,6 @@
 ---
-title: "Identity Server Options"
-description: ""
+title: 'Identity Server Options'
+description: ''
 weight: 2
 ---
 
@@ -59,9 +59,10 @@ If you do not want to serve the OAuth user interface on `/oauth`, you may custom
 
 - `is.oauth.mount`: Path on the server where the OAuth server will be served
 
-If page assets for the OAuth UI are served from a CDN or on a different path on the server, the base URL needs to be customized as well.
+If page assets for the OAuth UI are served from a CDN or on a different path on the server, the base URL needs to be customized as well. If you want to [customize the branding]({{< relref "../../branding" >}}) of the OAuth UI, you can set the base URL for where your branding assets are located.
 
 - `is.oauth.ui.assets-base-url`: The base URL to the page assets
+- `is.oauth.ui.branding-base-url`: The base URL to the branding assets
 
 The appearance of The Things Stack can optionally be customized.
 
@@ -91,7 +92,7 @@ It is also possible to use [Gravatar](https://gravatar.com) for profile pictures
 
 ## End Device Picture Storage Options
 
-Similar to profile pictures, end devices can have pictures associated with them. 
+Similar to profile pictures, end devices can have pictures associated with them.
 
 - `is.end-device-picture.bucket`: Bucket used for storing end device pictures
 - `is.end-device-picture.bucket-url`: Base URL for public bucket access
@@ -112,4 +113,3 @@ There are several options to customize the requirements for user passwords.
 - `is.user-registration.password-requirements.min-length`: Minimum password length
 - `is.user-registration.password-requirements.min-special`: Minimum number of special characters
 - `is.user-registration.password-requirements.min-uppercase`: Minimum number of uppercase letters
-

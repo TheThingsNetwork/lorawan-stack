@@ -21,7 +21,7 @@ import sharedMessages from '../../lib/shared-messages'
 
 import Message from '../../lib/components/message'
 import Button from '../button'
-import Logo from '../logo'
+import Logo from '../../containers/logo'
 
 import style from './modal.styl'
 
@@ -112,7 +112,7 @@ class Modal extends React.PureComponent {
                 </h1>
                 {subtitle && <Message content={subtitle} />}
               </div>
-              {logo && <Logo className={style.logo} />}
+              {logo && <Logo vertical className={style.logo} />}
             </div>
           )}
           {title && <div className={style.line} />}
