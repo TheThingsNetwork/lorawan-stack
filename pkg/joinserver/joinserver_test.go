@@ -46,8 +46,8 @@ var (
 	}
 	nwkKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	appKey = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	nsAddr = "66.66.66.66:1234"
-	asAddr = "66.66.66.255:1234"
+	nsAddr = "ns.test.org:1234"
+	asAddr = "as.test.org:1234"
 )
 
 func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
@@ -245,8 +245,8 @@ func TestHandleJoin(t *testing.T) {
 			Name:        "1.1.0/cluster auth/new device/wrapped keys/addr KEKs",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			KeyVault: map[string][]byte{
-				"ns:66.66.66.66":  {0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
-				"as:66.66.66.255": {0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
+				"ns:ns.test.org": {0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
+				"as:as.test.org": {0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
 			},
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -315,7 +315,7 @@ func TestHandleJoin(t *testing.T) {
 					})...),
 				SessionKeys: ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "as:66.66.66.255",
+						KEKLabel: "as:as.test.org",
 						EncryptedKey: MustWrapAES128Key(
 							crypto.DeriveAppSKey(
 								appKey,
@@ -327,7 +327,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					SNwkSIntKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "ns:66.66.66.66",
+						KEKLabel: "ns:ns.test.org",
 						EncryptedKey: MustWrapAES128Key(
 							crypto.DeriveSNwkSIntKey(
 								nwkKey,
@@ -339,7 +339,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "ns:66.66.66.66",
+						KEKLabel: "ns:ns.test.org",
 						EncryptedKey: MustWrapAES128Key(
 							crypto.DeriveFNwkSIntKey(
 								nwkKey,
@@ -351,7 +351,7 @@ func TestHandleJoin(t *testing.T) {
 						),
 					},
 					NwkSEncKey: &ttnpb.KeyEnvelope{
-						KEKLabel: "ns:66.66.66.66",
+						KEKLabel: "ns:ns.test.org",
 						EncryptedKey: MustWrapAES128Key(
 							crypto.DeriveNwkSEncKey(
 								nwkKey,
@@ -1085,7 +1085,7 @@ func TestHandleJoin(t *testing.T) {
 			Name: "1.0.0/TLS client auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: "66.66.66.66",
+					CommonName: "*.test.org",
 				})
 			},
 			Device: &ttnpb.EndDevice{
@@ -2099,7 +2099,7 @@ func TestGetAppSKey(t *testing.T) {
 			Name: "Matching request/TLS client auth/address ID",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return auth.NewContextWithX509DN(ctx, pkix.Name{
-					CommonName: "66.66.66.255",
+					CommonName: "as.test.org",
 				})
 			},
 			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
