@@ -23,7 +23,7 @@ Open the front panel of the gateway casing.
 
 While the gateway is powered on, hold the pink reset button for 5 seconds (until each of the 5 LEDs illuminate). This erases the existing configuration on the gateway.
 
-The gateway will now expose a WiFi Access Point whose SSID is of the form `TheThings-Gateway-xxxxx`, to which you should now connect.
+The gateway will now expose a WiFi Access Point whose SSID is of the form `TheThings-Gateway-xxxxx`, to which you should now connect using password `thethings`.
 
 In a web browser, open the gateway's configuration page by navigating to http://192.168.84.1/
 
