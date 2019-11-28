@@ -4,6 +4,10 @@ description: ""
 weight: 10
 ---
 
+## Configuration
+
+If you have not configured the CLI yet, see the [**Configuration** step]({{< relref "../configuration.md#command-line-interface" >}}).
+
 ## Login
 
 The CLI needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running in one terminal session, login with the following command:
