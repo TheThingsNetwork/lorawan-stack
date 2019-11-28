@@ -118,7 +118,7 @@ func adaptGatewayAddress(address string) (result string, err error) {
 	if strings.Contains(address, "://") {
 		return address, nil
 	}
-	var host, port string
+	var scheme, host, port string
 	if strings.Contains(address, ":") {
 		host, port, err = net.SplitHostPort(address)
 		if err != nil {
@@ -128,9 +128,15 @@ func adaptGatewayAddress(address string) (result string, err error) {
 		host = address
 	}
 	if port == "" {
-		port = "8882"
+		port = "8881"
 	}
-	return fmt.Sprintf("mqtts://%v:%v", host, port), nil
+	switch port {
+	case "1881", "1882", "1883":
+		scheme = "mqtt"
+	case "8881", "8882", "8883":
+		scheme = "mqtts"
+	}
+	return fmt.Sprintf("%s://%s:%s", scheme, host, port), nil
 }
 
 // adaptAuthorization removes the Authorization prefix.

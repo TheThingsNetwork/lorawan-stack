@@ -75,7 +75,7 @@ func mockGateway() *ttnpb.Gateway {
 		},
 		UpdateChannel:        "stable",
 		FrequencyPlanID:      "EU_863_870",
-		GatewayServerAddress: "mqtts://localhost:8883",
+		GatewayServerAddress: "mqtts://localhost:8881",
 	}
 }
 
@@ -136,7 +136,7 @@ func TestServer(t *testing.T) {
 				a.So(resp["frequency_plan_url"], should.Equal, "http://example.com/api/v2/frequency-plans/EU_863_870")
 				a.So(resp["firmware_url"], should.Equal, "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1/stable")
 				a.So(resp["router"], should.Resemble, map[string]interface{}{
-					"mqtt_address": "mqtts://localhost:8883",
+					"mqtt_address": "mqtts://localhost:8881",
 				})
 				a.So(resp["auto_update"], should.Equal, false)
 			},
