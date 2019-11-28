@@ -741,7 +741,7 @@ var DefaultMACCommands = MACCommandSpec{
 	},
 
 	ttnpb.CID_PING_SLOT_INFO: &MACCommandDescriptor{
-		InitiatedByDevice: false,
+		InitiatedByDevice: true,
 		ExpectAnswer:      true,
 
 		UplinkLength: 1,
