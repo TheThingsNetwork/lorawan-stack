@@ -60,9 +60,25 @@ func (s *Server) handleGatewayInfo(c echo.Context) error {
 	}, s.getAuth(c)); err != nil {
 		return err
 	} else {
+		scheme := c.Scheme()
+		hostport := c.Request().Host
+		if host, port, err := net.SplitHostPort(hostport); err == nil {
+			switch port {
+			case "80":
+				scheme = "http"
+				hostport = host
+			case "1885":
+				scheme = "http"
+			case "443":
+				scheme = "https"
+				hostport = host
+			case "8885":
+				scheme = "https"
+			}
+		}
 		freqPlanURL := &url.URL{
-			Scheme: c.Scheme(),
-			Host:   c.Request().Host,
+			Scheme: scheme,
+			Host:   hostport,
 			Path:   fmt.Sprintf("%v/frequency-plans/%v", compatAPIPrefix, gateway.FrequencyPlanID),
 		}
 		response := &gatewayInfoResponse{
