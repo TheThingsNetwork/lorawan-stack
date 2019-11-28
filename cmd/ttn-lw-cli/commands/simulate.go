@@ -189,7 +189,14 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 	timeout, _ := cmd.Flags().GetDuration("timeout")
 	linkCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
-	linkCtx = rpcmetadata.MD{ID: gtwID.GatewayID}.ToOutgoingContext(linkCtx)
+	md := rpcmetadata.MD{
+		ID: gtwID.GatewayID,
+	}
+	if apiKey, _ := cmd.Flags().GetString("gateway-api-key"); apiKey != "" {
+		md.AuthType = "Bearer"
+		md.AuthValue = apiKey
+	}
+	linkCtx = md.ToOutgoingContext(linkCtx)
 	link, err := ttnpb.NewGtwGsClient(gs).LinkGateway(linkCtx)
 	if err != nil {
 		return err
@@ -614,5 +621,6 @@ func init() {
 
 	simulateCommand.AddCommand(simulateDataUplinkCommand)
 
+	simulateCommand.PersistentFlags().String("gateway-api-key", "", "API key used for linking the gateway (optional when using user authentication)")
 	Root.AddCommand(simulateCommand)
 }
