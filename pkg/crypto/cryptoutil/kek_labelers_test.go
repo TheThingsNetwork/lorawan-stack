@@ -35,9 +35,9 @@ func TestComponentPrefixKEKLabeler(t *testing.T) {
 		Expected      string
 	}{
 		{
-			Addr: "localhost",
+			Addr: "",
 			Func: func(ctx context.Context, labeler ComponentPrefixKEKLabeler, addr string) string {
-				return labeler.NsKEKLabel(ctx, nil, "")
+				return labeler.NsKEKLabel(ctx, nil, addr)
 			},
 			Expected: "ns",
 		},

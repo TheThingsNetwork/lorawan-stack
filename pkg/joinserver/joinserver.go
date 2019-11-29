@@ -172,9 +172,27 @@ func validateCallerByAddress(dn pkix.Name, addr string) error {
 	if h, _, err := net.SplitHostPort(addr); err == nil {
 		host = h
 	}
-	if !strings.EqualFold(host, dn.CommonName) {
+
+	host = strings.TrimSuffix(host, ".")
+	pattern := strings.TrimSuffix(dn.CommonName, ".")
+	if len(pattern) == 0 || len(host) == 0 {
 		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
 	}
+
+	patternParts := strings.Split(pattern, ".")
+	hostParts := strings.Split(host, ".")
+	if len(patternParts) != len(hostParts) {
+		return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
+	}
+	for i, patternPart := range patternParts {
+		if i == 0 && patternPart == "*" {
+			continue
+		}
+		if patternPart != hostParts[i] {
+			return errCallerNotAuthorized.WithAttributes("name", dn.CommonName)
+		}
+	}
+
 	return nil
 }
 

@@ -31,13 +31,14 @@ type ComponentPrefixKEKLabeler struct {
 	ReplaceOldNew []string
 }
 
-func hostFromAddr(addr string) string {
+// hostFromAddress returns the cluster host from the given address.
+func hostFromAddress(ctx context.Context, addr string) string {
 	host := addr
 	if url, err := url.Parse(addr); err == nil && url.Host != "" {
 		host = url.Host
 	}
 	if h, _, err := net.SplitHostPort(host); err == nil {
-		return h
+		host = h
 	}
 	return host
 }
@@ -65,7 +66,7 @@ func (c ComponentPrefixKEKLabeler) NsKEKLabel(ctx context.Context, netID *types.
 		parts = append(parts, netID.String())
 	}
 	if addr != "" {
-		parts = append(parts, hostFromAddr(addr))
+		parts = append(parts, hostFromAddress(ctx, addr))
 	}
 	return c.join(parts...)
 }
@@ -75,7 +76,7 @@ func (c ComponentPrefixKEKLabeler) AsKEKLabel(ctx context.Context, addr string) 
 	parts := make([]string, 0, 2)
 	parts = append(parts, "as")
 	if addr != "" {
-		parts = append(parts, hostFromAddr(addr))
+		parts = append(parts, hostFromAddress(ctx, addr))
 	}
 	return c.join(parts...)
 }
