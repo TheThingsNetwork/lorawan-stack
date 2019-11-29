@@ -44,6 +44,8 @@ func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, enti
 		switch entityType {
 		case "organization", "user":
 			query = query.Where(`"accounts"."uid" LIKE ?`, "%"+v+"%")
+		case "end_device":
+			query = query.Where(`"end_devices"."device_id" LIKE ?`, "%"+v+"%")
 		default:
 			query = query.Where(fmt.Sprintf(`"%[1]ss"."%[1]s_id" LIKE ?`, entityType), "%"+v+"%")
 		}
@@ -65,7 +67,13 @@ func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, enti
 		}
 	}
 	if kv := req.GetAttributesContain(); len(kv) > 0 {
-		sub := s.query(ctx, &Attribute{}).Select("entity_id").Where("entity_type = ?", entityType)
+		sub := s.query(ctx, &Attribute{}).Select("entity_id")
+		switch entityType {
+		case "end_device":
+			sub = sub.Where("entity_type = ?", "device")
+		default:
+			sub = sub.Where("entity_type = ?", entityType)
+		}
 		for k, v := range kv {
 			sub = sub.Where("key = ? AND value ILIKE ?", k, fmt.Sprintf("%%%s%%", v))
 		}
@@ -122,6 +130,48 @@ func (s *entitySearch) FindEntities(ctx context.Context, member *ttnpb.Organizat
 	identifiers := make([]ttnpb.Identifiers, len(results))
 	for i, result := range results {
 		identifiers[i] = buildIdentifiers(entityType, result.FriendlyID)
+	}
+	return identifiers, nil
+}
+
+func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) ([]*ttnpb.EndDeviceIdentifiers, error) {
+	defer trace.StartRegion(ctx, "find end devices").End()
+
+	query := s.query(ctx, &EndDevice{}).
+		Where(&EndDevice{ApplicationID: req.ApplicationID}).
+		Select(`"end_devices"."device_id" AS "friendly_id"`)
+	query = s.queryMetaFields(ctx, query, "end_device", req)
+
+	if v := req.DevEUIContains; v != "" {
+		query = query.Where("dev_eui ILIKE ?", fmt.Sprintf("%%%s%%", v))
+	}
+	if v := req.JoinEUIContains; v != "" {
+		query = query.Where("join_eui ILIKE ?", fmt.Sprintf("%%%s%%", v))
+	}
+	// DevAddrContains
+
+	query = query.Order(`"friendly_id"`)
+	page := query
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		page = query.Limit(limit).Offset(offset)
+	}
+	var results []struct {
+		FriendlyID string
+	}
+	if err := page.Scan(&results).Error; err != nil {
+		return nil, err
+	}
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		countTotal(ctx, query)
+	} else {
+		setTotal(ctx, uint64(len(results)))
+	}
+	identifiers := make([]*ttnpb.EndDeviceIdentifiers, len(results))
+	for i, result := range results {
+		identifiers[i] = &ttnpb.EndDeviceIdentifiers{
+			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: req.ApplicationID},
+			DeviceID:               result.FriendlyID,
+		}
 	}
 	return identifiers, nil
 }
