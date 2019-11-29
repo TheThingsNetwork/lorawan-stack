@@ -1253,6 +1253,7 @@ func TestHandleUplink(t *testing.T) {
 				joinResp := makeJoinResponse(ttnpb.MAC_V1_1)
 
 				now := clock.Add(time.Nanosecond)
+				joinAt := now
 
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
@@ -1289,13 +1290,13 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				now = clock.Add(time.Nanosecond)
-
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
 					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
 				}), should.BeTrue) {
 					return false
 				}
+
+				now = clock.Add(time.Nanosecond)
 
 				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequest, start, duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
@@ -1391,7 +1392,7 @@ func TestHandleUplink(t *testing.T) {
 										makeApplicationDownlink(),
 									},
 									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-									ReceivedAt:   now,
+									ReceivedAt:   joinAt,
 								}},
 							},
 						})
