@@ -16,6 +16,10 @@ weight: 5
 
 {{< proto/method service="GatewayRegistry" method="Delete" >}}
 
+## The `EntityRegistrySearch` service
+
+{{< proto/method service="EntityRegistrySearch" method="SearchGateways" >}}
+
 ## The `GatewayAccess` service
 
 {{< proto/method service="GatewayAccess" method="ListRights" >}}
@@ -87,6 +91,8 @@ The Gateway Server exposes the list of available frequency plans with the `Confi
 {{< proto/message message="OrganizationOrUserIdentifiers" >}}
 
 {{< proto/message message="Rights" >}}
+
+{{< proto/message message="SearchEntitiesRequest" >}}
 
 {{< proto/message message="SetGatewayCollaboratorRequest" >}}
 

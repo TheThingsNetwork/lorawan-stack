@@ -16,6 +16,10 @@ weight: 1
 
 {{< proto/method service="ApplicationRegistry" method="Delete" >}}
 
+## The `EntityRegistrySearch` service
+
+{{< proto/method service="EntityRegistrySearch" method="SearchApplications" >}}
+
 ## The `ApplicationAccess` service
 
 {{< proto/method service="ApplicationAccess" method="ListRights" >}}
@@ -71,6 +75,8 @@ weight: 1
 {{< proto/message message="OrganizationOrUserIdentifiers" >}}
 
 {{< proto/message message="Rights" >}}
+
+{{< proto/message message="SearchEntitiesRequest" >}}
 
 {{< proto/message message="SetApplicationCollaboratorRequest" >}}
 
