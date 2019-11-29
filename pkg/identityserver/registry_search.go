@@ -186,10 +186,13 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEnti
 	if err != nil {
 		return nil, err
 	}
+	if member != nil {
+		return nil, errSearchForbidden
+	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	res := &ttnpb.Users{}
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "user")
+		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, nil, req, "user")
 		if err != nil {
 			return err
 		}
