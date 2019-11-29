@@ -189,19 +189,23 @@ func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error
 	return nil
 }
 
+type redisSort struct {
+	*redis.Sort
+}
+
 // FindProtosOption is an option for the FindProtos query.
-type FindProtosOption func(*redis.Sort)
+type FindProtosOption func(redisSort)
 
 // FindProtosWithAlpha changes the order of the query from numerical to lexicographical.
 func FindProtosWithAlpha(alpha bool) FindProtosOption {
-	return func(s *redis.Sort) {
+	return func(s redisSort) {
 		s.Alpha = alpha
 	}
 }
 
 // FindProtosWithOffsetAndCount changes the offset and the limit of the query.
 func FindProtosWithOffsetAndCount(offset, count int64) FindProtosOption {
-	return func(s *redis.Sort) {
+	return func(s redisSort) {
 		s.Offset, s.Count = offset, count
 	}
 }
@@ -213,7 +217,7 @@ func FindProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...F
 		Get:   []string{keyCmd("*")},
 	}
 	for _, opt := range opts {
-		opt(s)
+		opt(redisSort{s})
 	}
 	return &ProtosCmd{
 		result: r.Sort(k, s).Result,
