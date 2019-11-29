@@ -54,7 +54,7 @@ func WithPagination(ctx context.Context, limit, page uint32, total *uint64) cont
 // countTotal counts the total number of results (without limiting) and sets it
 // into the destination set by SetTotalCount.
 func countTotal(ctx context.Context, db *gorm.DB) {
-	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok && opts.total != nil {
+	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok && opts.total != nil && *opts.total == 0 {
 		db.Count(opts.total)
 	}
 }
