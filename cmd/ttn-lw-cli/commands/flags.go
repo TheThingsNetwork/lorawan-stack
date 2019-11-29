@@ -155,6 +155,34 @@ func getSearchEntitiesRequest(flagSet *pflag.FlagSet) (req *ttnpb.SearchEntities
 	}, opt, getTotal
 }
 
+func searchEndDevicesFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.String("dev-eui-contains", "", "")
+	flagSet.String("join-eui-contains", "", "")
+	flagSet.String("dev-addr-contains", "", "")
+	flagSet.Lookup("dev-addr-contains").Hidden = true // Part of the API but not actually supported.
+	flagSet.AddFlagSet(searchFlags())
+	return flagSet
+}
+
+func getSearchEndDevicesRequest(flagSet *pflag.FlagSet) (req *ttnpb.SearchEndDevicesRequest, opt grpc.CallOption, getTotal func() uint64) {
+	baseReq, opt, getTotal := getSearchEntitiesRequest(flagSet)
+	devEUIContains, _ := flagSet.GetString("dev-eui-contains")
+	joinEUIContains, _ := flagSet.GetString("join-eui-contains")
+	devAddrContains, _ := flagSet.GetString("dev-addr-contains")
+	return &ttnpb.SearchEndDevicesRequest{
+		IDContains:          baseReq.IDContains,
+		NameContains:        baseReq.NameContains,
+		DescriptionContains: baseReq.DescriptionContains,
+		AttributesContain:   baseReq.AttributesContain,
+		DevEUIContains:      devEUIContains,
+		JoinEUIContains:     joinEUIContains,
+		DevAddrContains:     devAddrContains,
+		Limit:               baseReq.Limit,
+		Page:                baseReq.Page,
+	}, opt, getTotal
+}
+
 var errNoIDs = errors.DefineInvalidArgument("no_ids", "no IDs set")
 
 func combinedIdentifiersFlags() *pflag.FlagSet {
