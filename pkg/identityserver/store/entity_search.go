@@ -25,67 +25,93 @@ import (
 
 // GetEntitySearch returns an EntitySearch on the given db (or transaction).
 func GetEntitySearch(db *gorm.DB) EntitySearch {
-	return &entitySearch{db: db}
+	return &entitySearch{store: newStore(db)}
 }
 
 type entitySearch struct {
-	db *gorm.DB
+	*store
 }
 
-func (s *entitySearch) FindEntities(ctx context.Context, req *ttnpb.SearchEntitiesRequest, entityType string) ([]ttnpb.Identifiers, error) {
+type metaFields interface {
+	GetIDContains() string
+	GetNameContains() string
+	GetDescriptionContains() string
+	GetAttributesContain() map[string]string
+}
+
+func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, entityType string, req metaFields) *gorm.DB {
+	if v := req.GetIDContains(); v != "" {
+		switch entityType {
+		case "organization", "user":
+			query = query.Where(`"accounts"."uid" LIKE ?`, "%"+v+"%")
+		default:
+			query = query.Where(fmt.Sprintf(`"%[1]ss"."%[1]s_id" LIKE ?`, entityType), "%"+v+"%")
+		}
+	}
+	if v := req.GetNameContains(); v != "" {
+		query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", v))
+	}
+	if v := req.GetDescriptionContains(); v != "" {
+		query = query.Where("description ILIKE ?", fmt.Sprintf("%%%s%%", v))
+	}
+	if kv := req.GetAttributesContain(); len(kv) > 0 {
+		sub := s.query(ctx, &Attribute{}).Select("entity_id").Where("entity_type = ?", entityType)
+		for k, v := range kv {
+			sub = sub.Where("key = ? AND value ILIKE ?", k, fmt.Sprintf("%%%s%%", v))
+		}
+		query = query.Where(fmt.Sprintf(`"%ss"."id" IN (?)`, entityType), sub.QueryExpr())
+	}
+	return query
+}
+
+func (s *entitySearch) FindEntities(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchEntitiesRequest, entityType string) ([]ttnpb.Identifiers, error) {
 	defer trace.StartRegion(ctx, "find entities").End()
 
-	table := entityType + "s"
-	db := s.db.Scopes(withContext(ctx)).Table(table)
-	idField := fmt.Sprintf("%s_id", entityType)
-	if entityType == "user" || entityType == "organization" {
-		idField = "accounts.uid"
-		db = db.Joins(fmt.Sprintf("JOIN accounts ON accounts.account_type = ? AND accounts.account_id = %s.id", table), entityType)
-	}
-	db = db.Select(fmt.Sprintf("%s AS id", idField)).Where(fmt.Sprintf("%s.deleted_at IS NULL", table))
-	if req.IDContains != "" {
-		db = db.Where(fmt.Sprintf("%s LIKE ?", idField), "%"+req.IDContains+"%") // TODO: Escape wildcards (https://github.com/TheThingsNetwork/lorawan-stack/issues/73).
-	}
-	if req.NameContains != "" {
-		db = db.Where("name LIKE ?", "%"+req.NameContains+"%") // TODO: Escape wildcards (https://github.com/TheThingsNetwork/lorawan-stack/issues/73).
-	}
-	if req.DescriptionContains != "" {
-		db = db.Where("description LIKE ?", "%"+req.DescriptionContains+"%") // TODO: Escape wildcards (https://github.com/TheThingsNetwork/lorawan-stack/issues/73).
-	}
-	if len(req.AttributesContain) > 0 {
-		sub := s.db.Scopes(withContext(ctx)).Table("attributes").Select("entity_id").Where("entity_type = ?", entityType)
-		for key, value := range req.AttributesContain {
-			sub = sub.Where("key = ? AND value LIKE ?", key, "%"+value+"%") // TODO: Escape wildcards (https://github.com/TheThingsNetwork/lorawan-stack/issues/73).
-		}
-		db = db.Where(fmt.Sprintf("%s.id IN (?)", table), sub.QueryExpr())
+	query := s.query(ctx, modelForEntityType(entityType))
+	switch entityType {
+	case "organization":
+		query = query.
+			Joins(`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`).
+			Select(`"accounts"."uid" AS "friendly_id"`)
+	case "user":
+		query = query.
+			Joins(`JOIN "accounts" ON "accounts"."account_type" = 'user' AND "accounts"."account_id" = "users"."id"`).
+			Select(`"accounts"."uid" AS "friendly_id"`)
+	default:
+		query = query.
+			Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType))
 	}
 
-	var entities []struct {
-		ID string
+	if member != nil {
+		membershipsQuery := (&membershipStore{store: s.store}).queryMemberships(ctx, member, entityType, true).Select("entity_id").QueryExpr()
+		if entityType == "organization" {
+			query = query.Where(`"accounts"."account_type" = ? AND "accounts"."account_id" IN (?)`, entityType, membershipsQuery)
+		} else {
+			query = query.Where(fmt.Sprintf(`"%[1]ss"."id" IN (?)`, entityType), membershipsQuery)
+		}
 	}
-	if err := db.Scan(&entities).Error; err != nil {
+
+	query = s.queryMetaFields(ctx, query, entityType, req)
+
+	query = query.Order(`"friendly_id"`)
+	page := query
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		page = query.Limit(limit).Offset(offset)
+	}
+	var results []struct {
+		FriendlyID string
+	}
+	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-
-	if len(entities) == 0 {
-		return nil, nil
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		countTotal(ctx, query)
+	} else {
+		setTotal(ctx, uint64(len(results)))
 	}
-
-	identifiers := make([]ttnpb.Identifiers, len(entities))
-	for i, entity := range entities {
-		switch entityType {
-		case "application":
-			identifiers[i] = ttnpb.ApplicationIdentifiers{ApplicationID: entity.ID}
-		case "client":
-			identifiers[i] = ttnpb.ClientIdentifiers{ClientID: entity.ID}
-		case "gateway":
-			identifiers[i] = ttnpb.GatewayIdentifiers{GatewayID: entity.ID}
-		case "organization":
-			identifiers[i] = ttnpb.OrganizationIdentifiers{OrganizationID: entity.ID}
-		case "user":
-			identifiers[i] = ttnpb.UserIdentifiers{UserID: entity.ID}
-		}
+	identifiers := make([]ttnpb.Identifiers, len(results))
+	for i, result := range results {
+		identifiers[i] = buildIdentifiers(entityType, result.FriendlyID)
 	}
-
 	return identifiers, nil
 }

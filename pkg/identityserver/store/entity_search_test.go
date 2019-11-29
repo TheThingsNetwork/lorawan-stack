@@ -89,7 +89,7 @@ func TestEntitySearch(t *testing.T) {
 
 		for _, entityType := range []string{"application", "client", "gateway", "user", "organization"} {
 			t.Run(entityType, func(t *testing.T) {
-				ids, err := s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err := s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					IDContains:          "foo",
 					NameContains:        "foo",
 					DescriptionContains: "foo",
@@ -101,28 +101,28 @@ func TestEntitySearch(t *testing.T) {
 				a.So(err, should.BeNil)
 				a.So(ids, should.HaveLength, 1)
 
-				ids, err = s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					IDContains: "foo",
 				}, entityType)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.HaveLength, 1)
 
-				ids, err = s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					NameContains: "foo",
 				}, entityType)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.HaveLength, 1)
 
-				ids, err = s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					DescriptionContains: "foo",
 				}, entityType)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.HaveLength, 1)
 
-				ids, err = s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					AttributesContain: map[string]string{
 						"test": "foo",
 					},

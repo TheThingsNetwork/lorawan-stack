@@ -26,30 +26,34 @@ import (
 
 type registrySearch struct {
 	*IdentityServer
-	adminOnly bool
 }
 
-var errSearchAdminOnly = errors.DefinePermissionDenied("search_admin_only", "search is only available to admins")
+var errSearchForbidden = errors.DefinePermissionDenied("search_forbidden", "search is forbidden")
 
-func (rs *registrySearch) SearchAllowed(ctx context.Context) error {
+func (rs *registrySearch) memberForSearch(ctx context.Context) (*ttnpb.OrganizationOrUserIdentifiers, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if rs.adminOnly && !authInfo.IsAdmin {
-		return errSearchAdminOnly
+	if authInfo.IsAdmin {
+		return nil, nil
 	}
-	return nil
+	member := authInfo.GetOrganizationOrUserIdentifiers()
+	if member != nil {
+		return member, nil
+	}
+	return nil, errSearchForbidden
 }
 
 func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Applications, error) {
-	if err := rs.SearchAllowed(ctx); err != nil {
+	member, err := rs.memberForSearch(ctx)
+	if err != nil {
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	res := &ttnpb.Applications{}
-	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "application")
+	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "application")
 		if err != nil {
 			return err
 		}
@@ -76,13 +80,14 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 }
 
 func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Clients, error) {
-	if err := rs.SearchAllowed(ctx); err != nil {
+	member, err := rs.memberForSearch(ctx)
+	if err != nil {
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	res := &ttnpb.Clients{}
-	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "client")
+	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "client")
 		if err != nil {
 			return err
 		}
@@ -109,13 +114,14 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEn
 }
 
 func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Gateways, error) {
-	if err := rs.SearchAllowed(ctx); err != nil {
+	member, err := rs.memberForSearch(ctx)
+	if err != nil {
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	res := &ttnpb.Gateways{}
-	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "gateway")
+	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "gateway")
 		if err != nil {
 			return err
 		}
@@ -142,13 +148,14 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 }
 
 func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Organizations, error) {
-	if err := rs.SearchAllowed(ctx); err != nil {
+	member, err := rs.memberForSearch(ctx)
+	if err != nil {
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	res := &ttnpb.Organizations{}
-	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "organization")
+	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "organization")
 		if err != nil {
 			return err
 		}
@@ -175,13 +182,14 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 }
 
 func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Users, error) {
-	if err := rs.SearchAllowed(ctx); err != nil {
+	member, err := rs.memberForSearch(ctx)
+	if err != nil {
 		return nil, err
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	res := &ttnpb.Users{}
-	err := rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, req, "user")
+	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
+		entityIDs, err := store.GetEntitySearch(db).FindEntities(ctx, member, req, "user")
 		if err != nil {
 			return err
 		}

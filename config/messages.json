@@ -3986,9 +3986,9 @@
       "file": "user_registry.go"
     }
   },
-  "error:pkg/identityserver:search_admin_only": {
+  "error:pkg/identityserver:search_forbidden": {
     "translations": {
-      "en": "search is only available to admins"
+      "en": "search is forbidden"
     },
     "description": {
       "package": "pkg/identityserver",
