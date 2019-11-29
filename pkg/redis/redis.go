@@ -143,14 +143,18 @@ func SetProto(r redis.Cmdable, k string, pb proto.Message, expiration time.Durat
 
 // FindProto finds the protocol buffer stored under the key stored under k.
 // The external key is constructed using keyCmd.
-func FindProto(r WatchCmdable, k string, keyCmd func(string) string) *ProtoCmd {
+func FindProto(r WatchCmdable, k string, keyCmd func(string) (string, error)) *ProtoCmd {
 	var result func() (string, error)
 	if err := r.Watch(func(tx *redis.Tx) error {
 		id, err := tx.Get(k).Result()
 		if err != nil {
 			return err
 		}
-		result = tx.Get(keyCmd(id)).Result
+		ik, err := keyCmd(id)
+		if err != nil {
+			return err
+		}
+		result = tx.Get(ik).Result
 		return nil
 	}, k); err != nil {
 		return &ProtoCmd{result: func() (string, error) { return "", err }}
@@ -158,14 +162,17 @@ func FindProto(r WatchCmdable, k string, keyCmd func(string) string) *ProtoCmd {
 	return &ProtoCmd{result: result}
 }
 
-// ProtosCmd is a command, which can unmarshal its result into multiple protocol buffers.
-type ProtosCmd struct {
+type findProtosCmd struct {
 	result func() ([]string, error)
 }
+
+// ProtosCmd is a command, which can unmarshal its result into multiple protocol buffers.
+type ProtosCmd findProtosCmd
 
 // Range ranges over command result and unmarshals it into a protocol buffer.
 // f must return a new empty proto.Message of the type expected to be present in the command.
 // The function returned by f will be called after the commands result is unmarshaled into the message returned by f.
+// If both the function returned by f and the message are nil, the entry is skipped.
 func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error {
 	ss, err := cmd.result()
 	if err != nil {
@@ -177,6 +184,9 @@ func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error
 		}
 
 		pb, cb := f()
+		if pb == nil && cb == nil {
+			continue
+		}
 		if err := UnmarshalProto(s, pb); err != nil {
 			return err
 		}
@@ -189,35 +199,81 @@ func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error
 	return nil
 }
 
-// FindProtosOption is an option for the FindProtos query.
-type FindProtosOption func(*redis.Sort)
+// ProtosWithKeysCmd is a command, which can unmarshal its result into multiple protocol buffers given a key.
+type ProtosWithKeysCmd findProtosCmd
 
-// FindProtosWithAlpha changes the order of the query from numerical to lexicographical.
-func FindProtosWithAlpha(alpha bool) FindProtosOption {
-	return func(s *redis.Sort) {
+// Range ranges over command result and unmarshals it into a protocol buffer.
+// f must return a new empty proto.Message of the type expected to be present in the command given the key.
+// The function returned by f will be called after the commands result is unmarshaled into the message returned by f.
+// If both the function returned by f and the message are nil, the entry is skipped.
+func (cmd ProtosWithKeysCmd) Range(f func(string) (proto.Message, func() (bool, error))) error {
+	ss, err := cmd.result()
+	if err != nil {
+		return err
+	}
+	if len(ss)%2 != 0 {
+		panic(fmt.Sprintf("odd slice length: %d", len(ss)))
+	}
+	for i := 0; i < len(ss); i += 2 {
+		pb, cb := f(ss[i])
+		if pb == nil && cb == nil {
+			continue
+		}
+		if err := UnmarshalProto(ss[i+1], pb); err != nil {
+			return err
+		}
+		if ok, err := cb(); err != nil {
+			return err
+		} else if !ok {
+			return nil
+		}
+	}
+	return nil
+}
+
+type redisSort struct {
+	*redis.Sort
+}
+
+// FindProtosOption is an option for the FindProtos query.
+type FindProtosOption func(redisSort)
+
+// FindProtosSorted ensures that entries are sorted. If alpha is true, lexicographical sorting is used, otherwise - numerical.
+func FindProtosSorted(alpha bool) FindProtosOption {
+	return func(s redisSort) {
 		s.Alpha = alpha
+		s.By = ""
 	}
 }
 
 // FindProtosWithOffsetAndCount changes the offset and the limit of the query.
 func FindProtosWithOffsetAndCount(offset, count int64) FindProtosOption {
-	return func(s *redis.Sort) {
+	return func(s redisSort) {
 		s.Offset, s.Count = offset, count
 	}
 }
 
-// FindProtos gets protos stored under keys in k.
-func FindProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) *ProtosCmd {
+func findProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) findProtosCmd {
 	s := &redis.Sort{
-		Alpha: true,
-		Get:   []string{keyCmd("*")},
+		Get: []string{keyCmd("*")},
+		By:  "nosort", // see https://redis.io/commands/sort#skip-sorting-the-elements
 	}
 	for _, opt := range opts {
-		opt(s)
+		opt(redisSort{s})
 	}
-	return &ProtosCmd{
+	return findProtosCmd{
 		result: r.Sort(k, s).Result,
 	}
+}
+
+// FindProtos gets protos stored under keys in k.
+func FindProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) ProtosCmd {
+	return ProtosCmd(findProtos(r, k, keyCmd, opts...))
+}
+
+// FindProtosWithKeys gets protos stored under keys in k including the keys.
+func FindProtosWithKeys(r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) ProtosWithKeysCmd {
+	return ProtosWithKeysCmd(findProtos(r, k, keyCmd, append([]FindProtosOption{func(s redisSort) { s.Get = append([]string{"#"}, s.Get...) }}, opts...)...))
 }
 
 const (
