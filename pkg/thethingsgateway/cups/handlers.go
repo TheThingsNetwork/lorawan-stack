@@ -74,6 +74,8 @@ func (s *Server) handleGatewayInfo(c echo.Context) error {
 				hostport = host
 			case "8885":
 				scheme = "https"
+			default:
+				scheme = "https"
 			}
 		}
 		freqPlanURL := &url.URL{
@@ -124,9 +126,8 @@ func (s *Server) adaptUpdateChannel(channel string) string {
 	return channel
 }
 
-// adaptGatewayAddress prepends the gateway address with the scheme "mqtts" and appends
-// the port "8882" if they have not been mentioned. If the scheme has been given, no
-// changes are done to the address.
+// adaptGatewayAddress infers the scheme and port for the gateway address if not
+// already present.
 func adaptGatewayAddress(address string) (result string, err error) {
 	if address == "" {
 		return address, nil
@@ -134,7 +135,7 @@ func adaptGatewayAddress(address string) (result string, err error) {
 	if strings.Contains(address, "://") {
 		return address, nil
 	}
-	var scheme, host, port string
+	var host, port string
 	if strings.Contains(address, ":") {
 		host, port, err = net.SplitHostPort(address)
 		if err != nil {
@@ -148,11 +149,11 @@ func adaptGatewayAddress(address string) (result string, err error) {
 	}
 	switch port {
 	case "1881", "1882", "1883":
-		scheme = "mqtt"
+		return fmt.Sprintf("mqtt://%s:%s", host, port), nil
 	case "8881", "8882", "8883":
-		scheme = "mqtts"
+		return fmt.Sprintf("mqtts://%s:%s", host, port), nil
 	}
-	return fmt.Sprintf("%s://%s:%s", scheme, host, port), nil
+	return fmt.Sprintf("%s:%s", host, port), nil
 }
 
 // adaptAuthorization removes the Authorization prefix.
