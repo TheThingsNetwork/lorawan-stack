@@ -130,17 +130,18 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 
-			req := getSearchEntitiesRequest(cmd.Flags())
+			req, opt, getTotal := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-			res, err := ttnpb.NewEntityRegistrySearchClient(is).SearchGateways(ctx, req)
+			res, err := ttnpb.NewEntityRegistrySearchClient(is).SearchGateways(ctx, req, opt)
 			if err != nil {
 				return err
 			}
+			getTotal()
 
 			return io.Write(os.Stdout, config.OutputFormat, res.Gateways)
 		},

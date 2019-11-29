@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"google.golang.org/grpc"
 )
 
 func firstArgs(i int, args ...string) []string {
@@ -134,20 +135,24 @@ func searchFlags() *pflag.FlagSet {
 	flagSet.String("name-contains", "", "")
 	flagSet.String("description-contains", "", "")
 	flagSet.StringToString("attributes-contain", nil, "(key=value)")
+	flagSet.AddFlagSet(paginationFlags())
 	return flagSet
 }
 
-func getSearchEntitiesRequest(flagSet *pflag.FlagSet) *ttnpb.SearchEntitiesRequest {
+func getSearchEntitiesRequest(flagSet *pflag.FlagSet) (req *ttnpb.SearchEntitiesRequest, opt grpc.CallOption, getTotal func() uint64) {
 	idContains, _ := flagSet.GetString("id-contains")
 	nameContains, _ := flagSet.GetString("name-contains")
 	descriptionContains, _ := flagSet.GetString("description-contains")
 	attributesContain, _ := flagSet.GetStringToString("attributes-contain")
+	limit, page, opt, getTotal := withPagination(flagSet)
 	return &ttnpb.SearchEntitiesRequest{
 		IDContains:          idContains,
 		NameContains:        nameContains,
 		DescriptionContains: descriptionContains,
 		AttributesContain:   attributesContain,
-	}
+		Limit:               limit,
+		Page:                page,
+	}, opt, getTotal
 }
 
 var errNoIDs = errors.DefineInvalidArgument("no_ids", "no IDs set")
