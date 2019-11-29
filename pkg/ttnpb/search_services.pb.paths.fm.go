@@ -7,7 +7,10 @@ var SearchEntitiesRequestFieldPathsNested = []string{
 	"description_contains",
 	"field_mask",
 	"id_contains",
+	"limit",
 	"name_contains",
+	"order",
+	"page",
 }
 
 var SearchEntitiesRequestFieldPathsTopLevel = []string{
@@ -15,7 +18,10 @@ var SearchEntitiesRequestFieldPathsTopLevel = []string{
 	"description_contains",
 	"field_mask",
 	"id_contains",
+	"limit",
 	"name_contains",
+	"order",
+	"page",
 }
 var SearchEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",
@@ -27,7 +33,10 @@ var SearchEndDevicesRequestFieldPathsNested = []string{
 	"field_mask",
 	"id_contains",
 	"join_eui_contains",
+	"limit",
 	"name_contains",
+	"order",
+	"page",
 }
 
 var SearchEndDevicesRequestFieldPathsTopLevel = []string{
@@ -39,5 +48,8 @@ var SearchEndDevicesRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"id_contains",
 	"join_eui_contains",
+	"limit",
 	"name_contains",
+	"order",
+	"page",
 }

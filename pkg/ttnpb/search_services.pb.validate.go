@@ -90,6 +90,19 @@ func (m *SearchEntitiesRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "order":
+			// no validation rules for Order
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return SearchEntitiesRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
 		default:
 			return SearchEntitiesRequestValidationError{
 				field:  name,
@@ -231,6 +244,19 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "order":
+			// no validation rules for Order
+		case "limit":
+
+			if m.GetLimit() > 1000 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "limit",
+					reason: "value must be less than or equal to 1000",
+				}
+			}
+
+		case "page":
+			// no validation rules for Page
 		default:
 			return SearchEndDevicesRequestValidationError{
 				field:  name,
