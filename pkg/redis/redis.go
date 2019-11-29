@@ -200,10 +200,11 @@ type redisSort struct {
 // FindProtosOption is an option for the FindProtos query.
 type FindProtosOption func(redisSort)
 
-// FindProtosWithAlpha changes the order of the query from numerical to lexicographical.
-func FindProtosWithAlpha(alpha bool) FindProtosOption {
+// FindProtosSorted ensures that entries are sorted. If alpha is true, lexicographical sorting is used, otherwise - numerical.
+func FindProtosSorted(alpha bool) FindProtosOption {
 	return func(s redisSort) {
 		s.Alpha = alpha
+		s.By = ""
 	}
 }
 
@@ -217,8 +218,8 @@ func FindProtosWithOffsetAndCount(offset, count int64) FindProtosOption {
 // FindProtos gets protos stored under keys in k.
 func FindProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) *ProtosCmd {
 	s := &redis.Sort{
-		Alpha: true,
-		Get:   []string{keyCmd("*")},
+		Get: []string{keyCmd("*")},
+		By:  "nosort", // see https://redis.io/commands/sort#skip-sorting-the-elements
 	}
 	for _, opt := range opts {
 		opt(redisSort{s})

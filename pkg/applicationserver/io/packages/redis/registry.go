@@ -96,7 +96,7 @@ func (r ApplicationPackagesRegistry) List(ctx context.Context, ids ttnpb.EndDevi
 	defer trace.StartRegion(ctx, "list application package associations by device id").End()
 
 	err := r.Redis.Watch(func(tx *redis.Tx) (err error) {
-		opts := []ttnredis.FindProtosOption{ttnredis.FindProtosWithAlpha(false)}
+		opts := []ttnredis.FindProtosOption{ttnredis.FindProtosSorted(false)}
 
 		limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
 		if limit != 0 {
