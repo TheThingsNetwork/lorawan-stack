@@ -181,6 +181,9 @@ func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error
 		}
 
 		pb, cb := f()
+		if pb == nil && cb == nil {
+			continue
+		}
 		if err := UnmarshalProto(s, pb); err != nil {
 			return err
 		}
