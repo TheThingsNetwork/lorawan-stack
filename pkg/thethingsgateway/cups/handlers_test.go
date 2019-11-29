@@ -94,11 +94,19 @@ func TestAdaptGatewayAddress(t *testing.T) {
 			Address: "localhost",
 			Assert: func(a *assertions.Assertion, address string, err error) {
 				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "mqtts://localhost:8882")
+				a.So(address, assertions.ShouldEqual, "mqtts://localhost:8881")
 			},
 		},
 		{
-			Name:    "Host and port, no scheme",
+			Name:    "Host and MQTT port, no scheme",
+			Address: "localhost:1881",
+			Assert: func(a *assertions.Assertion, address string, err error) {
+				a.So(err, assertions.ShouldBeNil)
+				a.So(address, assertions.ShouldEqual, "mqtt://localhost:1881")
+			},
+		},
+		{
+			Name:    "Host and MQTTS port, no scheme",
 			Address: "localhost:8881",
 			Assert: func(a *assertions.Assertion, address string, err error) {
 				a.So(err, assertions.ShouldBeNil)
@@ -107,18 +115,18 @@ func TestAdaptGatewayAddress(t *testing.T) {
 		},
 		{
 			Name:    "Full mqtts address",
-			Address: "mqtts://localhost:8882",
+			Address: "mqtts://localhost:8871",
 			Assert: func(a *assertions.Assertion, address string, err error) {
 				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "mqtts://localhost:8882")
+				a.So(address, assertions.ShouldEqual, "mqtts://localhost:8871")
 			},
 		},
 		{
 			Name:    "Full mqtt address",
-			Address: "mqtt://localhost:1882",
+			Address: "mqtt://localhost:1871",
 			Assert: func(a *assertions.Assertion, address string, err error) {
 				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "mqtt://localhost:1882")
+				a.So(address, assertions.ShouldEqual, "mqtt://localhost:1871")
 			},
 		},
 		{
