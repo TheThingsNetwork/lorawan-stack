@@ -76,7 +76,9 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	defer trace.StartRegion(ctx, "get end device by eui").End()
 
 	pb := &ttnpb.EndDevice{}
-	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), r.uidKey).ScanProto(pb); err != nil {
+	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), func(uid string) (string, error) {
+		return r.uidKey(uid), nil
+	}).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return ttnpb.FilterGetEndDevice(pb, paths...)

@@ -143,14 +143,18 @@ func SetProto(r redis.Cmdable, k string, pb proto.Message, expiration time.Durat
 
 // FindProto finds the protocol buffer stored under the key stored under k.
 // The external key is constructed using keyCmd.
-func FindProto(r WatchCmdable, k string, keyCmd func(string) string) *ProtoCmd {
+func FindProto(r WatchCmdable, k string, keyCmd func(string) (string, error)) *ProtoCmd {
 	var result func() (string, error)
 	if err := r.Watch(func(tx *redis.Tx) error {
 		id, err := tx.Get(k).Result()
 		if err != nil {
 			return err
 		}
-		result = tx.Get(keyCmd(id)).Result
+		ik, err := keyCmd(id)
+		if err != nil {
+			return err
+		}
+		result = tx.Get(ik).Result
 		return nil
 	}, k); err != nil {
 		return &ProtoCmd{result: func() (string, error) { return "", err }}
