@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Email templates can now also be loaded from blob buckets.
 - Support for pagination in search APIs.
 - Search is now also available to non-admin users.
+- Support for searching end devices within an application.
 
 ### Changed
 
