@@ -39,10 +39,13 @@ Most emails contain the name of the network and links to the Identity Server or 
 - `is.email.network.identity-server-url`: The URL of the Identity Server
 - `is.email.network.console-url`: The URL of the Console
 
-Although The Things Stack comes with a number of builtin email templates, it is possible to override those with custom templates. You can specify either a directory or a URL to load templates from. For mor information on email templates, see the [email templates reference]({{< relref "../email-templates" >}}).
+Although The Things Stack comes with a number of builtin email templates, it is possible to override those with custom templates. You can specify the source where to load templates from, and options for that source. For more information on email templates, see the [email templates reference]({{< relref "../email-templates" >}}).
 
-- `is.email.templates.directory`: Retrieve the email templates from the filesystem
-- `is.email.templates.url`: Retrieve the email templates from a web server
+- `is.email.templates.source`: Source of the email template files (directory, url, blob)
+- `is.email.templates.directory`: Directory on the filesystem where email templates are located
+- `is.email.templates.url`: URL where email templates are located
+- `is.email.templates.blob.bucket`: Bucket where email templates are located
+- `is.email.templates.blob.path`: Path within the bucket.
 
 If your custom templates rely on other files, such as headers or footers, those files need to be included.
 
