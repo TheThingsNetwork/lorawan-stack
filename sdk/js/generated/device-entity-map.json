@@ -1,5 +1,7 @@
 {
   "application_server_address": [["is", "js"], ["is", "js"]],
+  "application_server_id": ["js", "js"],
+  "application_server_kek_label": ["js", "js"],
   "attributes": ["is", "is"],
   "created_at": [["is", "ns"], "read_only"],
   "description": ["is", "is"],
@@ -18,6 +20,7 @@
   "locations": ["is", "is"],
   "name": ["is", "is"],
   "network_server_address": [["is", "js"], ["is", "js"]],
+  "network_server_kek_label": ["js", "js"],
   "service_profile_id": ["is", "is"],
   "updated_at": [["is", "ns"], "read_only"],
   "version_ids": {
@@ -412,7 +415,7 @@
   },
   "max_frequency": ["ns", "ns"],
   "min_frequency": ["ns", "ns"],
-  "multicast": [ "ns", "read_only"],
+  "multicast": ["ns", "read_only"],
   "power_state": ["ns", "ns"],
   "queued_application_downlinks": ["ns", "read_only"],
   "recent_adr_uplinks": ["ns", "read_only"],

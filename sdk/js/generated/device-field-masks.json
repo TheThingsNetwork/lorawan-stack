@@ -451,6 +451,8 @@
   "js": {
     "get": [
       "application_server_address",
+      "application_server_id",
+      "application_server_kek_label",
       "claim_authentication_code",
       "ids",
       "ids.application_ids",
@@ -465,6 +467,7 @@
       "last_rj_count_1",
       "net_id",
       "network_server_address",
+      "network_server_kek_label",
       "provisioner_id",
       "provisioning_data",
       "resets_join_nonces",
@@ -478,6 +481,8 @@
     ],
     "set": [
       "application_server_address",
+      "application_server_id",
+      "application_server_kek_label",
       "claim_authentication_code",
       "ids",
       "ids.application_ids",
@@ -492,6 +497,7 @@
       "last_rj_count_1",
       "net_id",
       "network_server_address",
+      "network_server_kek_label",
       "provisioner_id",
       "provisioning_data",
       "resets_join_nonces",
