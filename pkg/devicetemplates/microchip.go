@@ -33,8 +33,25 @@ import (
 	jose "gopkg.in/square/go-jose.v2"
 )
 
-var microchipPublicKeys = map[string][]byte{
-	"B0uaDLLiyKe-SorP71F3BNoVrfY": []byte(`-----BEGIN CERTIFICATE-----
+const (
+	microchipATECC608AMAHTNTPart = "ATECC608A-MAHTN-T"
+	microchipATECC608TNGLORAPart = "ATECC608A-TNGLORA"
+)
+
+var microchipPublicKeys = map[string]map[string][]byte{
+	microchipATECC608AMAHTNTPart: {
+		// Certificate:
+		// Data:
+		// 		Version: 3 (0x2)
+		// 		Serial Number:
+		// 				76:5f:7b:3e:38:02:7b:6b:8f:8a:18:49:5f:51:55:5d
+		// Signature Algorithm: ecdsa-with-SHA256
+		// 		Issuer: O=Microchip Technology Inc, CN=Log Signer Test
+		// 		Validity
+		// 				Not Before: Jan 18 20:29:41 2019 GMT
+		// 				Not After : Feb 18 20:29:41 2019 GMT
+		// 		Subject: O=Microchip Technology Inc, CN=Log Signer Test
+		"B0uaDLLiyKe-SorP71F3BNoVrfY": []byte(`-----BEGIN CERTIFICATE-----
 MIIByDCCAW6gAwIBAgIQdl97PjgCe2uPihhJX1FVXTAKBggqhkjOPQQDAjA9MSEw
 HwYDVQQKDBhNaWNyb2NoaXAgVGVjaG5vbG9neSBJbmMxGDAWBgNVBAMMD0xvZyBT
 aWduZXIgVGVzdDAeFw0xOTAxMTgyMDI5NDFaFw0xOTAyMTgyMDI5NDFaMD0xITAf
@@ -46,7 +63,18 @@ MBaAFAdLmgyy4sinvkqKz+9RdwTaFa32MAwGA1UdEwEB/wQCMAAwCgYIKoZIzj0E
 AwIDSAAwRQIhAI9jMSnc+HKKnjZ5ghmYVXYgPn9M9ae6gfE4AN5xekEZAiBNk7Pz
 FVV78rUrxt7igKFg3mMLfE8Qeoh6dDKmRkbAEA==
 -----END CERTIFICATE-----`),
-	"7cCILlAOwYo1-PChGuoyUISMK3g": []byte(`-----BEGIN CERTIFICATE-----
+		// Certificate:
+		//     Data:
+		//         Version: 3 (0x2)
+		//         Serial Number:
+		//             64:62:16:c8:c6:48:f5:c3:1c:05:98:a9:5f:14:ce:58
+		//     Signature Algorithm: ecdsa-with-SHA256
+		//         Issuer: O=Microchip Technology Inc, CN=Log Signer 001
+		//         Validity
+		//             Not Before: Jan 22 00:27:42 2019 GMT
+		//             Not After : Jul 22 00:27:42 2019 GMT
+		//         Subject: O=Microchip Technology Inc, CN=Log Signer 001
+		"7cCILlAOwYo1-PChGuoyUISMK3g": []byte(`-----BEGIN CERTIFICATE-----
 MIIBxjCCAWygAwIBAgIQZGIWyMZI9cMcBZipXxTOWDAKBggqhkjOPQQDAjA8MSEw
 HwYDVQQKDBhNaWNyb2NoaXAgVGVjaG5vbG9neSBJbmMxFzAVBgNVBAMMDkxvZyBT
 aWduZXIgMDAxMB4XDTE5MDEyMjAwMjc0MloXDTE5MDcyMjAwMjc0MlowPDEhMB8G
@@ -58,7 +86,20 @@ gBTtwIguUA7BijX48KEa6jJQhIwreDAMBgNVHRMBAf8EAjAAMAoGCCqGSM49BAMC
 A0gAMEUCIQD9/x9zxmHkeWGwjEq67QsQqBVmoY8k6PvFVr4Bz1tYOwIgYfck+fv/
 pno8+2vVTkQDhcinNrgoPLQORzV5/l/b4z4=
 -----END CERTIFICATE-----`),
-	"8VeKGdyU2d8wev6_VzNJOBOv-cA": []byte(`-----BEGIN CERTIFICATE-----
+	},
+	microchipATECC608TNGLORAPart: {
+		// Certificate:
+		//     Data:
+		//         Version: 3 (0x2)
+		//         Serial Number:
+		//             73:a1:f2:32:3a:e4:4f:64:ce:63:5e:c5:01:7e:d7:56
+		//     Signature Algorithm: ecdsa-with-SHA256
+		//         Issuer: O=Microchip Technology Inc, CN=Log Signer 002
+		//         Validity
+		//             Not Before: Aug 15 19:47:59 2019 GMT
+		//             Not After : Aug 15 19:47:59 2020 GMT
+		// 				Subject: O=Microchip Technology Inc, CN=Log Signer 002
+		"8VeKGdyU2d8wev6_VzNJOBOv-cA": []byte(`-----BEGIN CERTIFICATE-----
 MIIBxzCCAWygAwIBAgIQc6HyMjrkT2TOY17FAX7XVjAKBggqhkjOPQQDAjA8MSEw
 HwYDVQQKDBhNaWNyb2NoaXAgVGVjaG5vbG9neSBJbmMxFzAVBgNVBAMMDkxvZyBT
 aWduZXIgMDAyMB4XDTE5MDgxNTE5NDc1OVoXDTIwMDgxNTE5NDc1OVowPDEhMB8G
@@ -70,6 +111,7 @@ gBTxV4oZ3JTZ3zB6/r9XM0k4E6/5wDAMBgNVHRMBAf8EAjAAMAoGCCqGSM49BAMC
 A0kAMEYCIQDKHgctLnq/zNqfB+1v0KRhDVPvRf6Dimt8aW9WLS0NWAIhAJvUe3uJ
 pkMG4zpov9FCoj4G340idEadm7mVbAd5GOB9
 -----END CERTIFICATE-----`),
+	},
 }
 
 var joinEUI = types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}
@@ -282,23 +324,26 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 }
 
 func init() {
-	keys := make(map[string]interface{}, len(microchipPublicKeys))
-	for kid, key := range microchipPublicKeys {
-		block, _ := pem.Decode(key)
-		if block == nil {
-			panic(fmt.Sprintf("invalid Microchip public key %v", kid))
+	getKeys := func(raw map[string][]byte) map[string]interface{} {
+		keys := make(map[string]interface{}, len(raw))
+		for kid, key := range raw {
+			block, _ := pem.Decode(key)
+			if block == nil {
+				panic(fmt.Sprintf("invalid Microchip public key %v", kid))
+			}
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				panic(err)
+			}
+			keys[kid] = cert.PublicKey
 		}
-		cert, err := x509.ParseCertificate(block.Bytes)
-		if err != nil {
-			panic(err)
-		}
-		keys[kid] = cert.PublicKey
+		return keys
 	}
 
 	RegisterConverter("microchip-atecc608a-mahtn-t", &microchipATECC608AMAHTNT{
-		keys: keys,
+		keys: getKeys(microchipPublicKeys[microchipATECC608AMAHTNTPart]),
 	})
 	RegisterConverter("microchip-atecc608a-tnglora", &microchipATECC608TNGLORA{
-		keys: keys,
+		keys: getKeys(microchipPublicKeys[microchipATECC608TNGLORAPart]),
 	})
 }
