@@ -76,7 +76,8 @@ func (welcome welcomeEmail) DefaultTemplates() (subject, html, text string) {
 func TestEmail(t *testing.T) {
 	a := assertions.New(t)
 
-	registry := email.NewTemplateRegistry(fetch.FromFilesystem("testdata"), "header.html", "footer.html", "header.txt", "footer.txt")
+	registry, err := email.NewTemplateRegistry(fetch.FromFilesystem("testdata"), "header.html", "footer.html", "header.txt", "footer.txt")
+	a.So(err, should.BeNil)
 
 	data := welcomeEmail{}
 	data.User.Name = "John Doe"
@@ -101,7 +102,10 @@ func Example() {
 	var sender email.Sender
 
 	// This can fetch templates from the filesystem, github, S3, ...
-	registry := email.NewTemplateRegistry(fetcher)
+	registry, err := email.NewTemplateRegistry(fetcher)
+	if err != nil {
+		return // error setting up the template registry
+	}
 
 	data := welcomeEmail{}
 	data.User.Name = "John Doe"

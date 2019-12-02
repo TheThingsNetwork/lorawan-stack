@@ -19,6 +19,7 @@ import (
 	"html/template"
 	"sync"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 )
 
@@ -30,7 +31,7 @@ type TemplateRegistry struct {
 }
 
 // NewTemplateRegistry returns a new template registry that uses the given fetcher.
-func NewTemplateRegistry(fetcher fetch.Interface, includes ...string) *TemplateRegistry {
+func NewTemplateRegistry(fetcher fetch.Interface, includes ...string) (*TemplateRegistry, error) {
 	r := &TemplateRegistry{
 		fetcher: fetcher,
 		shared:  template.New("").Funcs(defaultFuncs),
@@ -38,15 +39,15 @@ func NewTemplateRegistry(fetcher fetch.Interface, includes ...string) *TemplateR
 	for _, include := range includes {
 		data, err := fetcher.File(include)
 		if err != nil {
-			continue
+			return nil, err
 		}
 		shared, err := r.shared.New(include).Parse(string(data))
 		if err != nil {
-			continue
+			return nil, err
 		}
 		r.shared = shared
 	}
-	return r
+	return r, nil
 }
 
 type registeredTemplate struct {
@@ -70,17 +71,30 @@ func (r *TemplateRegistry) getTemplate(data MessageData) (m *MessageTemplate, er
 	}()
 
 	m = &MessageTemplate{Name: name}
-	var subject, html, text string
+	subject, html, text := data.DefaultTemplates()
+
 	if r.fetcher != nil {
-		subjectBytes, _ := r.fetcher.File(fmt.Sprintf("%s.subject.txt", name))
-		subject = string(subjectBytes)
-		htmlBytes, _ := r.fetcher.File(fmt.Sprintf("%s.html", name))
-		html = string(htmlBytes)
-		textBytes, _ := r.fetcher.File(fmt.Sprintf("%s.txt", name))
-		text = string(textBytes)
-	}
-	if subject == "" || html == "" {
-		subject, html, text = data.DefaultTemplates()
+		subjectBytes, err := r.fetcher.File(fmt.Sprintf("%s.subject.txt", name))
+		if err != nil && !errors.IsNotFound(err) {
+			return nil, err
+		}
+		if len(subjectBytes) > 0 {
+			subject = string(subjectBytes)
+		}
+		htmlBytes, err := r.fetcher.File(fmt.Sprintf("%s.html", name))
+		if err != nil && !errors.IsNotFound(err) {
+			return nil, err
+		}
+		if len(htmlBytes) > 0 {
+			html = string(htmlBytes)
+		}
+		textBytes, err := r.fetcher.File(fmt.Sprintf("%s.txt", name))
+		if err != nil && !errors.IsNotFound(err) {
+			return nil, err
+		}
+		if len(textBytes) > 0 {
+			text = string(textBytes)
+		}
 	}
 
 	template, err := r.shared.Clone()

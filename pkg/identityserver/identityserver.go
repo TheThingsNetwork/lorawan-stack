@@ -16,7 +16,6 @@ package identityserver
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -75,16 +74,9 @@ type Config struct {
 	} `name:"end-device-picture"`
 	Email struct {
 		email.Config `name:",squash"`
-		SendGrid     sendgrid.Config `name:"sendgrid"`
-		SMTP         smtp.Config     `name:"smtp"`
-		Templates    struct {
-			Static     map[string][]byte `name:"-"`
-			Directory  string            `name:"directory" description:"Retrieve the email templates from the filesystem"`
-			URL        string            `name:"url" description:"Retrieve the email templates from a web server"`
-			Includes   []string          `name:"includes" description:"The email templates that will be preloaded on startup"`
-			registry   *email.TemplateRegistry
-			registryMu sync.Mutex
-		} `name:"templates"`
+		SendGrid     sendgrid.Config      `name:"sendgrid"`
+		SMTP         smtp.Config          `name:"smtp"`
+		Templates    emailTemplatesConfig `name:"templates"`
 	} `name:"email"`
 }
 
@@ -94,12 +86,12 @@ type Config struct {
 // OAuth clients, Gateways, Organizations and Users.
 type IdentityServer struct {
 	*component.Component
-	ctx    context.Context
-	config *Config
-	db     *gorm.DB
-	oauth  oauth.Server
-
-	redis *redis.Client
+	ctx            context.Context
+	config         *Config
+	db             *gorm.DB
+	redis          *redis.Client
+	emailTemplates *email.TemplateRegistry
+	oauth          oauth.Server
 }
 
 // Context returns the context of the Identity Server.
@@ -144,6 +136,11 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		<-is.Context().Done()
 		is.db.Close()
 	}()
+
+	is.emailTemplates, err = is.initEmailTemplates(is.Context())
+	if err != nil {
+		return nil, err
+	}
 
 	is.oauth = oauth.NewServer(is.Context(), struct {
 		store.UserStore
