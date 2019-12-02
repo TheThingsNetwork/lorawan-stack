@@ -24,7 +24,7 @@ import {
 
 const logo = {
   src: `${selectAssetsRootPath()}/logo.svg`,
-  alt: `${selectApplicationSiteName} Logo`,
+  alt: `${selectApplicationSiteName()} Logo`,
 }
 const hasCustomBranding = selectBrandingRootPath() !== selectAssetsRootPath()
 const secondaryLogo = hasCustomBranding
