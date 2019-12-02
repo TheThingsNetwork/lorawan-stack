@@ -19,6 +19,7 @@ import (
 	"html/template"
 	"sync"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/fetch"
 )
 
@@ -73,15 +74,24 @@ func (r *TemplateRegistry) getTemplate(data MessageData) (m *MessageTemplate, er
 	subject, html, text := data.DefaultTemplates()
 
 	if r.fetcher != nil {
-		subjectBytes, _ := r.fetcher.File(fmt.Sprintf("%s.subject.txt", name))
+		subjectBytes, err := r.fetcher.File(fmt.Sprintf("%s.subject.txt", name))
+		if err != nil && !errors.IsNotFound(err) {
+			return nil, err
+		}
 		if len(subjectBytes) > 0 {
 			subject = string(subjectBytes)
 		}
-		htmlBytes, _ := r.fetcher.File(fmt.Sprintf("%s.html", name))
+		htmlBytes, err := r.fetcher.File(fmt.Sprintf("%s.html", name))
+		if err != nil && !errors.IsNotFound(err) {
+			return nil, err
+		}
 		if len(htmlBytes) > 0 {
 			html = string(htmlBytes)
 		}
-		textBytes, _ := r.fetcher.File(fmt.Sprintf("%s.txt", name))
+		textBytes, err := r.fetcher.File(fmt.Sprintf("%s.txt", name))
+		if err != nil && !errors.IsNotFound(err) {
+			return nil, err
+		}
 		if len(textBytes) > 0 {
 			text = string(textBytes)
 		}
