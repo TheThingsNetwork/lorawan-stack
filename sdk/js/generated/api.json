@@ -1777,7 +1777,7 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
-                    "value": 20
+                    "value": 36
                   },
                   {
                     "name": "string.pattern",
