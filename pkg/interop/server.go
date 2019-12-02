@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"go.thethings.network/lorawan-stack/pkg/web/middleware"
@@ -99,7 +100,7 @@ type Server struct {
 const SenderClientCAsConfigurationName = "config.yml"
 
 // NewServer builds a new server.
-func NewServer(ctx context.Context, conf config.InteropServer) (*Server, error) {
+func NewServer(ctx context.Context, contextFiller fillcontext.Filler, conf config.InteropServer) (*Server, error) {
 	logger := log.FromContext(ctx).WithField("namespace", "interop")
 
 	decodeCerts := func(b []byte) (res []*x509.Certificate, err error) {
@@ -195,6 +196,9 @@ func NewServer(ctx context.Context, conf config.InteropServer) (*Server, error) 
 		echomiddleware.BodyLimit("16M"),
 		middleware.Recover(),
 	)
+	if contextFiller != nil {
+		server.Use(middleware.FillContext(contextFiller))
+	}
 
 	noop := &noopServer{}
 	s := &Server{

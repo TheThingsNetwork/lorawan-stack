@@ -90,7 +90,7 @@ func TestServeHTTP(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			s, err := NewServer(test.Context(), config.InteropServer{
+			s, err := NewServer(test.Context(), nil, config.InteropServer{
 				SenderClientCA: config.SenderClientCA{
 					Source:    "directory",
 					Directory: "testdata",
