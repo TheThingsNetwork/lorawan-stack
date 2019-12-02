@@ -480,7 +480,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				RawPayload:  append(b[:1], enc...),
 				SessionKeys: sessionKeys,
 			}
-			_, err = js.keys.SetByID(ctx, *dev.DevEUI, res.SessionKeys.SessionKeyID,
+			_, err = js.keys.SetByID(ctx, *dev.JoinEUI, *dev.DevEUI, res.SessionKeys.SessionKeyID,
 				[]string{
 					"session_key_id",
 					"f_nwk_s_int_key",
@@ -551,7 +551,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		return nil, err
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
+	ks, err := js.keys.GetByID(ctx, req.JoinEUI, req.DevEUI, req.SessionKeyID,
 		[]string{
 			"f_nwk_s_int_key",
 			"nwk_s_enc_key",
@@ -606,7 +606,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, err
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.DevEUI, req.SessionKeyID,
+	ks, err := js.keys.GetByID(ctx, req.JoinEUI, req.DevEUI, req.SessionKeyID,
 		[]string{
 			"app_s_key",
 		},

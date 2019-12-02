@@ -372,31 +372,31 @@ type KeyRegistry struct {
 	Redis *ttnredis.Client
 }
 
-func (r *KeyRegistry) idKey(devEUI types.EUI64, id []byte) string {
-	return r.Redis.Key("id", devEUI.String(), base64.RawStdEncoding.EncodeToString(id))
+func (r *KeyRegistry) idKey(joinEUI, devEUI types.EUI64, id []byte) string {
+	return r.Redis.Key("id", joinEUI.String(), devEUI.String(), base64.RawStdEncoding.EncodeToString(id))
 }
 
-// GetByID gets session keys by devEUI, id.
-func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.ContextualSessionKeys, error) {
-	if devEUI.IsZero() || len(id) == 0 {
+// GetByID gets session keys by joinEUI, devEUI, id.
+func (r *KeyRegistry) GetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+	if joinEUI.IsZero() || devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
 
 	defer trace.StartRegion(ctx, "get session keys").End()
 
 	pb := &ttnpb.SessionKeys{}
-	if err := ttnredis.GetProto(r.Redis, r.idKey(devEUI, id)).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.idKey(joinEUI, devEUI, id)).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return ttnpb.FilterGetSessionKeys(pb, paths...)
 }
 
-// SetByID sets session keys by devEUI, id.
-func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte, gets []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
-	if devEUI.IsZero() || len(id) == 0 {
+// SetByID sets session keys by joinEUI, devEUI, id.
+func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, gets []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
+	if joinEUI.IsZero() || devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
-	ik := r.idKey(devEUI, id)
+	ik := r.idKey(joinEUI, devEUI, id)
 
 	defer trace.StartRegion(ctx, "set session keys").End()
 

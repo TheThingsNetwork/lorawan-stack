@@ -1770,7 +1770,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		Name        string
 		ContextFunc func(context.Context) context.Context
 
-		GetByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
+		GetByID     func(context.Context, types.EUI64, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
 		KeyRequest  *ttnpb.SessionKeyRequest
 		KeyResponse *ttnpb.NwkSKeysResponse
 
@@ -1779,8 +1779,9 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "Registry error",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -1791,6 +1792,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				return nil, errTest
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
@@ -1806,8 +1808,9 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "No SNwkSIntKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -1821,6 +1824,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
@@ -1832,8 +1836,9 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "No NwkSEncKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -1847,6 +1852,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
@@ -1858,8 +1864,9 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "No FNwkSIntKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -1873,6 +1880,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
@@ -1884,8 +1892,9 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "Matching request",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -1909,6 +1918,7 @@ func TestGetNwkSKeys(t *testing.T) {
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
@@ -1965,7 +1975,7 @@ func TestGetAppSKey(t *testing.T) {
 		Name        string
 		ContextFunc func(context.Context) context.Context
 
-		GetKeyByID     func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
+		GetKeyByID     func(context.Context, types.EUI64, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
 		GetDeviceByEUI func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.ContextualEndDevice, error)
 		KeyRequest     *ttnpb.SessionKeyRequest
 		KeyResponse    *ttnpb.AppSKeyResponse
@@ -1975,8 +1985,9 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name:        "Registry error",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -1985,6 +1996,7 @@ func TestGetAppSKey(t *testing.T) {
 				return nil, errTest
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
@@ -2000,8 +2012,9 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name:        "Missing AppSKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -2010,6 +2023,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.SessionKeys{}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
@@ -2025,8 +2039,9 @@ func TestGetAppSKey(t *testing.T) {
 					CommonName: "other.hostname.local",
 				})
 			},
-			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -2073,8 +2088,9 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name:        "Matching request/cluster auth",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -2089,6 +2105,7 @@ func TestGetAppSKey(t *testing.T) {
 				}, nil
 			},
 			KeyRequest: &ttnpb.SessionKeyRequest{
+				JoinEUI:      types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				DevEUI:       types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 			},
@@ -2106,8 +2123,9 @@ func TestGetAppSKey(t *testing.T) {
 					CommonName: "as.test.org",
 				})
 			},
-			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -2155,8 +2173,9 @@ func TestGetAppSKey(t *testing.T) {
 					CommonName: "test-as-id",
 				})
 			},
-			GetKeyByID: func(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(devEUI, should.Resemble, types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 				a.So(id, should.Resemble, []byte{0x11, 0x22, 0x33, 0x44})
 				a.So(paths, should.HaveSameElementsDeep, []string{

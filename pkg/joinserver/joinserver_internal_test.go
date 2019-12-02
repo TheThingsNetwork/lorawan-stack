@@ -86,22 +86,22 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 }
 
 type MockKeyRegistry struct {
-	GetByIDFunc func(context.Context, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
-	SetByIDFunc func(context.Context, types.EUI64, []byte, []string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
+	GetByIDFunc func(context.Context, types.EUI64, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
+	SetByIDFunc func(context.Context, types.EUI64, types.EUI64, []byte, []string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
 }
 
 // GetByID calls GetByIDFunc if set and panics otherwise.
-func (m MockKeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+func (m MockKeyRegistry) GetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 	if m.GetByIDFunc == nil {
 		panic("GetByID called, but not set")
 	}
-	return m.GetByIDFunc(ctx, devEUI, id, paths)
+	return m.GetByIDFunc(ctx, joinEUI, devEUI, id, paths)
 }
 
 // SetByID calls SetByIDFunc if set and panics otherwise.
-func (m MockKeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
+func (m MockKeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
 	if m.SetByIDFunc == nil {
 		panic("SetByID called, but not set")
 	}
-	return m.SetByIDFunc(ctx, devEUI, id, paths, f)
+	return m.SetByIDFunc(ctx, joinEUI, devEUI, id, paths, f)
 }

@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Keep session keys separate by `JoinEUI` to avoid conditions where session keys are retrieved only by `DevEUI` and the session key identifier. This breaks retrieving session keys of devices that have been activated on a deployment running a previous version. Since the Application Server instances are currently in-cluster, there is no need for an Application Server to retrieve the `AppSKey` from the Join Server, making this breaking change ineffective.
+
 ## [3.3.1] - 2019-11-26
 
 ### Added
