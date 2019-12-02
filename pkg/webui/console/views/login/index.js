@@ -22,19 +22,25 @@ import { Container, Row, Col } from 'react-grid-system'
 
 import PropTypes from '../../../lib/prop-types'
 import { selectApplicationSiteName, selectApplicationRootPath } from '../../../lib/selectors/env'
+import { getBackendErrorName } from '../../../lib/errors/utils'
 import Button from '../../../components/button'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 
+import Notification from '../../../components/notification'
+import ErrorNotification from '../../../components/error-notification'
 import style from './login.styl'
 
 const m = defineMessages({
   welcome: 'Welcome to {siteName}',
-  loginSub: 'You need to be logged in to use this site',
+  loginSub: 'You need to be logged in to use this site.',
+  approvalPending:
+    'Your user account needs to be approved by an administrator. You will be notified via email upon approval.',
 })
 
 @connect(state => ({
+  error: state.user.error,
   user: state.user.user,
   siteName: selectApplicationSiteName(),
   appRoot: selectApplicationRootPath(),
@@ -43,18 +49,29 @@ const m = defineMessages({
 export default class Login extends React.PureComponent {
   static propTypes = {
     appRoot: PropTypes.string.isRequired,
+    error: PropTypes.error,
     siteName: PropTypes.string.isRequired,
     user: PropTypes.user,
   }
 
   static defaultProps = {
+    error: undefined,
     user: undefined,
   }
 
   render() {
-    const { user, appRoot, siteName } = this.props
+    const { error, user, appRoot, siteName } = this.props
     const { next } = Query.parse(location.search)
     const redirectAppend = next ? `?next=${next}` : ''
+    const unapprovedUser = getBackendErrorName(error) === 'user_requested'
+
+    const notification = error ? (
+      unapprovedUser ? (
+        <Notification className={style.loginNotification} error content={m.approvalPending} small />
+      ) : (
+        <ErrorNotification className={style.loginNotification} small content={error} />
+      )
+    ) : null
 
     // dont show the login page if the user is already logged in
     if (Boolean(user)) {
@@ -66,19 +83,22 @@ export default class Login extends React.PureComponent {
         <IntlHelmet title={sharedMessages.login} />
         <Container>
           <Row>
-            <Col>
-              <Message
-                className={style.loginHeader}
-                values={{ siteName }}
-                component="h2"
-                content={m.welcome}
-              />
-              <Message className={style.loginSub} content={m.loginSub} />
-              <Button.AnchorLink
-                className={style.loginButton}
-                message={sharedMessages.login}
-                href={`${appRoot}/login/ttn-stack${redirectAppend}`}
-              />
+            <Col sm={12} md={6}>
+              <div className={style.loginContainer}>
+                {notification}
+                <Message
+                  className={style.loginHeader}
+                  values={{ siteName }}
+                  component="h2"
+                  content={m.welcome}
+                />
+                <Message className={style.loginSub} content={m.loginSub} />
+                <Button.AnchorLink
+                  className={style.loginButton}
+                  message={sharedMessages.login}
+                  href={`${appRoot}/login/ttn-stack${redirectAppend}`}
+                />
+              </div>
             </Col>
           </Row>
         </Container>

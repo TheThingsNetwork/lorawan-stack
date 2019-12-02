@@ -16,6 +16,7 @@ import * as user from '../../actions/user'
 import * as init from '../../actions/init'
 import api from '../../../api'
 import * as accessToken from '../../../lib/access-token'
+import { isPermissionDeniedError } from '../../../../lib/errors/utils'
 import createRequestLogic from './lib'
 
 const consoleAppLogic = createRequestLogic({
@@ -42,9 +43,13 @@ const consoleAppLogic = createRequestLogic({
       try {
         const userId = info.data.oauth_access_token.user_ids.user_id
         const result = await api.users.get(userId)
-        dispatch(user.getUserMeSuccess(result.data))
+        if (isPermissionDeniedError(result)) {
+          throw result
+        } else {
+          dispatch(user.getUserMeSuccess(result.data))
+        }
       } catch (error) {
-        dispatch(user.getUserMeFailure())
+        dispatch(user.getUserMeFailure(error))
         accessToken.clear()
       }
     }
