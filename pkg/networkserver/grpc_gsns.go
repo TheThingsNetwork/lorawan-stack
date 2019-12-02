@@ -882,7 +882,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
 			CorrelationIDs:       up.CorrelationIDs,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-				FCnt:         stored.Session.LastFCntUp,
+				FCnt:         pld.FCnt,
 				FPort:        pld.FPort,
 				FRMPayload:   pld.FRMPayload,
 				RxMetadata:   up.RxMetadata,
