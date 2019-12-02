@@ -292,7 +292,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			"root_keys",
 			"used_dev_nonces",
 		},
-		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dn, ok := auth.X509DNFromContext(ctx); ok {
 				if dev.NetID == nil {
 					return nil, nil, errNoNetID
@@ -522,13 +522,12 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		if !handled {
 			logger.Info("Join not accepted")
 			return nil, err
-		} else {
-			logger.Error("Failed to update device")
-			return nil, errRegistryOperation.WithCause(err)
 		}
+		logger.Error("Failed to update device")
+		return nil, errRegistryOperation.WithCause(err)
 	}
 
-	registerAcceptJoin(ctx, dev, req)
+	registerAcceptJoin(dev.Context, dev.EndDevice, req)
 	return res, nil
 }
 

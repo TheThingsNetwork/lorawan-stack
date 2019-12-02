@@ -47,14 +47,14 @@ type NsJsServer = nsJsServer
 type JsDeviceServer = jsEndDeviceRegistryServer
 
 type MockDeviceRegistry struct {
-	GetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, error)
+	GetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.ContextualEndDevice, error)
 	GetByIDFunc  func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
-	SetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	SetByEUIFunc func(context.Context, types.EUI64, types.EUI64, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error)
 	SetByIDFunc  func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
 // GetByEUI calls GetByEUIFunc if set and panics otherwise.
-func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string) (*ttnpb.ContextualEndDevice, error) {
 	if m.GetByEUIFunc == nil {
 		panic("GetByEUI called, but not set")
 	}
@@ -70,7 +70,7 @@ func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.Application
 }
 
 // SetByEUI calls SetByEUIFunc if set and panics otherwise.
-func (m MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (m MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error) {
 	if m.SetByEUIFunc == nil {
 		panic("SetByEUI called, but not set")
 	}
