@@ -147,20 +147,3 @@ TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET=... # choose or generate a secret
 ```
 
 You will need the `TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET` again in a later step.
-
-## Command-line interface
-
-The command-line interface is configured to connect to `localhost` by default. In order to make it connect to `thethings.example.com`, you need to configure it with a configuration file. The recommended way to configure the CLI is with a `.ttn-lw-cli.yml` in your `$XDG_CONFIG_HOME` or `$HOME` directory. You can also put the config file in a different location, and pass it to the CLI as `-c path/to/config.yml`. Your config file should look like this:
-
-```yaml
-oauth-server-address: 'https://thethings.example.com/oauth'
-
-identity-server-grpc-address: 'thethings.example.com:8884'
-gateway-server-grpc-address: 'thethings.example.com:8884'
-network-server-grpc-address: 'thethings.example.com:8884'
-application-server-grpc-address: 'thethings.example.com:8884'
-join-server-grpc-address: 'thethings.example.com:8884'
-device-claiming-server-grpc-address: 'thethings.example.com:8884'
-device-template-converter-grpc-address: 'thethings.example.com:8884'
-qr-code-generator-grpc-address: 'thethings.example.com:8884'
-```
