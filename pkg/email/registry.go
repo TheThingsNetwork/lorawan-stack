@@ -70,17 +70,21 @@ func (r *TemplateRegistry) getTemplate(data MessageData) (m *MessageTemplate, er
 	}()
 
 	m = &MessageTemplate{Name: name}
-	var subject, html, text string
+	subject, html, text := data.DefaultTemplates()
+
 	if r.fetcher != nil {
 		subjectBytes, _ := r.fetcher.File(fmt.Sprintf("%s.subject.txt", name))
-		subject = string(subjectBytes)
+		if len(subjectBytes) > 0 {
+			subject = string(subjectBytes)
+		}
 		htmlBytes, _ := r.fetcher.File(fmt.Sprintf("%s.html", name))
-		html = string(htmlBytes)
+		if len(htmlBytes) > 0 {
+			html = string(htmlBytes)
+		}
 		textBytes, _ := r.fetcher.File(fmt.Sprintf("%s.txt", name))
-		text = string(textBytes)
-	}
-	if subject == "" || html == "" {
-		subject, html, text = data.DefaultTemplates()
+		if len(textBytes) > 0 {
+			text = string(textBytes)
+		}
 	}
 
 	template, err := r.shared.Clone()
