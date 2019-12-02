@@ -30,7 +30,7 @@ type TemplateRegistry struct {
 }
 
 // NewTemplateRegistry returns a new template registry that uses the given fetcher.
-func NewTemplateRegistry(fetcher fetch.Interface, includes ...string) *TemplateRegistry {
+func NewTemplateRegistry(fetcher fetch.Interface, includes ...string) (*TemplateRegistry, error) {
 	r := &TemplateRegistry{
 		fetcher: fetcher,
 		shared:  template.New("").Funcs(defaultFuncs),
@@ -38,15 +38,15 @@ func NewTemplateRegistry(fetcher fetch.Interface, includes ...string) *TemplateR
 	for _, include := range includes {
 		data, err := fetcher.File(include)
 		if err != nil {
-			continue
+			return nil, err
 		}
 		shared, err := r.shared.New(include).Parse(string(data))
 		if err != nil {
-			continue
+			return nil, err
 		}
 		r.shared = shared
 	}
-	return r
+	return r, nil
 }
 
 type registeredTemplate struct {
