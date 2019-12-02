@@ -87,7 +87,7 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
-func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.ContextualEndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
@@ -100,7 +100,14 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 	}).ScanProto(pb); err != nil {
 		return nil, err
 	}
-	return ttnpb.FilterGetEndDevice(pb, paths...)
+	filtered, err := ttnpb.FilterGetEndDevice(pb, paths...)
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.ContextualEndDevice{
+		Context:   ctx,
+		EndDevice: filtered,
+	}, nil
 }
 
 func equalEUI64(x, y *types.EUI64) bool {
@@ -110,7 +117,11 @@ func equalEUI64(x, y *types.EUI64) bool {
 	return x.Equal(*y)
 }
 
-func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error) {
+	ctx, err := unique.WithContext(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
 	uk := r.uidKey(uid)
 
 	cmd := ttnredis.GetProto(tx, uk)
@@ -122,7 +133,6 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 	}
 
 	var pb *ttnpb.EndDevice
-	var err error
 	if stored != nil {
 		pb = &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(pb); err != nil {
@@ -135,7 +145,7 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 	}
 
 	var sets []string
-	pb, sets, err = f(pb)
+	pb, sets, err = f(ctx, pb)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +160,14 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 		return nil, nil
 	}
 	if pb != nil && len(sets) == 0 {
-		return ttnpb.FilterGetEndDevice(stored, gets...)
+		filtered, err := ttnpb.FilterGetEndDevice(stored, gets...)
+		if err != nil {
+			return nil, err
+		}
+		return &ttnpb.ContextualEndDevice{
+			Context:   ctx,
+			EndDevice: filtered,
+		}, nil
 	}
 
 	var pipelined func(redis.Pipeliner) error
@@ -282,12 +299,15 @@ func (r *DeviceRegistry) set(tx *redis.Tx, uid string, gets []string, f func(pb 
 	if err != nil {
 		return nil, err
 	}
-	return pb, nil
+	return &ttnpb.ContextualEndDevice{
+		Context:   ctx,
+		EndDevice: pb,
+	}, nil
 }
 
 // SetByEUI sets device by joinEUI, devEUI.
 // SetByEUI will only succeed if the device is set via SetByID first.
-func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error) {
 	if joinEUI.IsZero() || devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
@@ -295,7 +315,7 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 
 	defer trace.StartRegion(ctx, "set end device by eui").End()
 
-	var pb *ttnpb.EndDevice
+	var pb *ttnpb.ContextualEndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		uid, err := tx.Get(ek).Result()
 		if err != nil {
@@ -304,7 +324,7 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 		if err := tx.Watch(r.uidKey(uid)).Err(); err != nil {
 			return ttnredis.ConvertError(err)
 		}
-		pb, err = r.set(tx, uid, gets, f)
+		pb, err = r.set(ctx, tx, uid, gets, f)
 		return err
 	}, ek)
 	if err != nil {
@@ -326,10 +346,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 	defer trace.StartRegion(ctx, "set end device by id").End()
 
-	var pb *ttnpb.EndDevice
+	var pb *ttnpb.ContextualEndDevice
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		var err error
-		pb, err = r.set(tx, uid, gets, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		pb, err = r.set(ctx, tx, uid, gets, func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			updated, sets, err := f(stored)
 			if err != nil {
 				return nil, nil, err
@@ -344,7 +364,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	if err != nil {
 		return nil, err
 	}
-	return pb, nil
+	return pb.EndDevice, nil
 }
 
 // KeyRegistry is an implementation of joinserver.KeyRegistry.
@@ -352,31 +372,31 @@ type KeyRegistry struct {
 	Redis *ttnredis.Client
 }
 
-func (r *KeyRegistry) idKey(devEUI types.EUI64, id []byte) string {
-	return r.Redis.Key("id", devEUI.String(), base64.RawStdEncoding.EncodeToString(id))
+func (r *KeyRegistry) idKey(joinEUI, devEUI types.EUI64, id []byte) string {
+	return r.Redis.Key("id", joinEUI.String(), devEUI.String(), base64.RawStdEncoding.EncodeToString(id))
 }
 
-// GetByID gets session keys by devEUI, id.
-func (r *KeyRegistry) GetByID(ctx context.Context, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
-	if devEUI.IsZero() || len(id) == 0 {
+// GetByID gets session keys by joinEUI, devEUI, id.
+func (r *KeyRegistry) GetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
+	if joinEUI.IsZero() || devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
 
 	defer trace.StartRegion(ctx, "get session keys").End()
 
 	pb := &ttnpb.SessionKeys{}
-	if err := ttnredis.GetProto(r.Redis, r.idKey(devEUI, id)).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(r.Redis, r.idKey(joinEUI, devEUI, id)).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return ttnpb.FilterGetSessionKeys(pb, paths...)
 }
 
-// SetByID sets session keys by devEUI, id.
-func (r *KeyRegistry) SetByID(ctx context.Context, devEUI types.EUI64, id []byte, gets []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
-	if devEUI.IsZero() || len(id) == 0 {
+// SetByID sets session keys by joinEUI, devEUI, id.
+func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, gets []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
+	if joinEUI.IsZero() || devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
-	ik := r.idKey(devEUI, id)
+	ik := r.idKey(joinEUI, devEUI, id)
 
 	defer trace.StartRegion(ctx, "set session keys").End()
 
