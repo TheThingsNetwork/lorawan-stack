@@ -318,6 +318,13 @@ message MACState {
   // Set to true every time an uplink is received.
   // Set to false every time a successful downlink scheduling attempt is made.
   bool rx_windows_available = 13;
+
+  // Recent data uplink messages sorted by time.
+  // The number of messages stored may depend on configuration.
+  repeated UplinkMessage recent_uplinks = 14;
+  // Recent data downlink messages sorted by time.
+  // The number of messages stored may depend on configuration.
+  repeated DownlinkMessage recent_downlinks = 15;
 }
 
 // Power state of the device.

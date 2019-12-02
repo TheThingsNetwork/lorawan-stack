@@ -8472,6 +8472,26 @@
               "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "recent_uplinks",
+              "description": "Recent data uplink messages sorted by time.\nThe number of messages stored may depend on configuration.",
+              "label": "repeated",
+              "type": "UplinkMessage",
+              "longType": "UplinkMessage",
+              "fullType": "ttn.lorawan.v3.UplinkMessage",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "recent_downlinks",
+              "description": "Recent data downlink messages sorted by time.\nThe number of messages stored may depend on configuration.",
+              "label": "repeated",
+              "type": "DownlinkMessage",
+              "longType": "DownlinkMessage",
+              "fullType": "ttn.lorawan.v3.DownlinkMessage",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },
