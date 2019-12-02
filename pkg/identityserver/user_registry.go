@@ -258,6 +258,32 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	return usr, nil
 }
 
+func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersRequest) (users *ttnpb.Users, err error) {
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	if err = is.RequireAdmin(ctx); err != nil {
+		return nil, err
+	}
+	var total uint64
+	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
+	defer func() {
+		if err == nil {
+			setTotalHeader(ctx, total)
+		}
+	}()
+	users = &ttnpb.Users{}
+	err = is.withDatabase(ctx, func(db *gorm.DB) error {
+		users.Users, err = store.GetUserStore(db).FindUsers(paginateCtx, nil, &req.FieldMask)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 var (
 	errUpdateUserPasswordRequest = errors.DefineInvalidArgument("password_in_update", "can not update password with regular user update request")
 	errUpdateUserAdminField      = errors.DefinePermissionDenied("user_update_admin_field", "only admins can update the `{field}` field")
@@ -578,6 +604,10 @@ type userRegistry struct {
 
 func (ur *userRegistry) Create(ctx context.Context, req *ttnpb.CreateUserRequest) (*ttnpb.User, error) {
 	return ur.createUser(ctx, req)
+}
+
+func (ur *userRegistry) List(ctx context.Context, req *ttnpb.ListUsersRequest) (*ttnpb.Users, error) {
+	return ur.listUsers(ctx, req)
 }
 
 func (ur *userRegistry) Get(ctx context.Context, req *ttnpb.GetUserRequest) (*ttnpb.User, error) {
