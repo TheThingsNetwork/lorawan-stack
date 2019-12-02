@@ -53,6 +53,32 @@ type DeviceInfo struct {
 	LastUplink LoRaUplink `json:"last_uplink"`
 }
 
+// DeviceUplinkResponse contains the uplink response and the error if applicable.
+type DeviceUplinkResponse struct {
+	Result UplinkResponse `json:"result"`
+	Error  string         `json:"error"`
+}
+
+// DeviceUplinkResponses maps the device EUIs to the DeviceUplinkResponse.
+type DeviceUplinkResponses map[EUI]DeviceUplinkResponse
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (d DeviceUplinkResponses) UnmarshalJSON(b []byte) error {
+	m := make(map[string]DeviceUplinkResponse)
+	err := json.Unmarshal(b, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		eui, err := toEUI(k)
+		if err != nil {
+			return err
+		}
+		d[eui] = v
+	}
+	return nil
+}
+
 // UplinkResponse contains the state changes and completed items due to an uplink message.
 type UplinkResponse struct {
 	File              *File            `json:"file"`
@@ -324,11 +350,11 @@ func (GetInfoRequestParam) isRequestParam() {}
 
 // SetConfRequestParam is the configuration request of a SetConf request.
 type SetConfRequestParam struct {
-	ADRMode  *uint8      `json:"adrmode,omitempty"`
-	JoinEUI  types.EUI64 `json:"joineui,omitempty"`
-	Interval *uint8      `json:"interval,omitempty"`
-	Region   *uint8      `json:"region,omitempty"`
-	OpMode   *uint32     `json:"opmode,omitempty"`
+	ADRMode  *uint8  `json:"adrmode,omitempty"`
+	JoinEUI  EUI     `json:"joineui,omitempty"`
+	Interval *uint8  `json:"interval,omitempty"`
+	Region   *uint8  `json:"region,omitempty"`
+	OpMode   *uint32 `json:"opmode,omitempty"`
 }
 
 func (SetConfRequestParam) isRequestParam() {}
@@ -376,6 +402,18 @@ type UploadSession struct {
 type StreamSession struct {
 	Port    uint8   `json:"port"`
 	Decoder *string `json:"decoder,omitempty"`
+}
+
+// DeviceUplinks maps device EUIs to LoRaUplink
+type DeviceUplinks map[EUI]LoRaUplink
+
+// MarshalJSON implements json.Marshaler.
+func (u DeviceUplinks) MarshalJSON() ([]byte, error) {
+	m := make(map[string]LoRaUplink)
+	for k, v := range u {
+		m[k.String()] = v
+	}
+	return json.Marshal(m)
 }
 
 // LoRaUplink encapsulates the information of a LoRa message.
@@ -449,5 +487,33 @@ func (h Hex) MarshalJSON() ([]byte, error) {
 func (h *Hex) UnmarshalJSON(b []byte) (err error) {
 	s := strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")
 	*h, err = hex.DecodeString(s)
+	return
+}
+
+// EUI represents a dash-separated EUI64.
+type EUI types.EUI64
+
+const (
+	hyphenatedEUIPattern = "\"%02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X\""
+	euiPattern           = "%02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X"
+)
+
+// MarshalJSON implements json.Marshaler.
+func (e EUI) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(hyphenatedEUIPattern, e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7])), nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (e *EUI) UnmarshalJSON(b []byte) error {
+	_, err := fmt.Sscanf(string(b), hyphenatedEUIPattern, &e[0], &e[1], &e[2], &e[3], &e[4], &e[5], &e[6], &e[7])
+	return err
+}
+
+func (e EUI) String() string {
+	return fmt.Sprintf(euiPattern, e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7])
+}
+
+func toEUI(s string) (e EUI, err error) {
+	_, err = fmt.Sscanf(s, euiPattern, &e[0], &e[1], &e[2], &e[3], &e[4], &e[5], &e[6], &e[7])
 	return
 }

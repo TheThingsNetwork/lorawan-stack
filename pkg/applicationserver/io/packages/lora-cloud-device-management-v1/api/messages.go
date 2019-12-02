@@ -27,6 +27,7 @@ const (
 	listOperation   = "list"
 	updateOperation = "update"
 	addOperation    = "add"
+	sendOperation   = "send"
 )
 
 type apiErrorDetail string

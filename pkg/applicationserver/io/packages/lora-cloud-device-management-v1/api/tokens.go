@@ -39,7 +39,7 @@ func (t *Tokens) List() ([]objects.TokenInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := t.client.Do(req)
+	resp, err := t.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (t *Tokens) Update(token, newName string, renew bool) (*objects.TokenInfo, 
 	if err != nil {
 		return nil, err
 	}
-	resp, err := t.client.Do(req)
+	resp, err := t.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (t *Tokens) Add(name string, capabilities ...string) (*objects.TokenInfo, e
 	if err != nil {
 		return nil, err
 	}
-	resp, err := t.client.Do(req)
+	resp, err := t.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (t *Tokens) Remove(token string) error {
 	if err != nil {
 		return err
 	}
-	resp, err := t.client.Do(req)
+	resp, err := t.Do(req)
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func (t *Tokens) Get(token string) (*objects.TokenInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := t.client.Do(req)
+	resp, err := t.Do(req)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/lora-cloud-device-management-v1/api/objects"
-	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
@@ -73,7 +72,7 @@ func TestRequestPolymorphism(t *testing.T) {
 				"type": "SETCONF",
 				"param": {
 					"adrmode": 12,
-					"joineui": "800000000000000C",
+					"joineui": "80-00-00-00-00-00-00-0C",
 					"interval": 23,
 					"region": 34,
 					"opmode": 456
@@ -83,7 +82,7 @@ func TestRequestPolymorphism(t *testing.T) {
 				Type: objects.SetConfRequestType,
 				Param: &objects.SetConfRequestParam{
 					ADRMode:  Uint8(12),
-					JoinEUI:  types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C},
+					JoinEUI:  objects.EUI{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C},
 					Interval: Uint8(23),
 					Region:   Uint8(34),
 					OpMode:   Uint32(456),
