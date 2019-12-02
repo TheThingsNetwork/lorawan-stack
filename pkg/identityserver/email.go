@@ -19,6 +19,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/pkg/email/smtp"
@@ -29,30 +30,57 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-func (is *IdentityServer) getEmailTemplates(ctx context.Context) (*email.TemplateRegistry, error) {
-	c := &is.configFromContext(ctx).Email.Templates
-	c.registryMu.Lock()
-	defer c.registryMu.Unlock()
-	if c.registry != nil {
-		return c.registry, nil
+type emailTemplatesConfig struct {
+	Source    string                `name:"source" description:"Source of the email template files (static, directory, url, blob)"`
+	Static    map[string][]byte     `name:"-"`
+	Directory string                `name:"directory" description:"Retrieve the email templates from the filesystem"`
+	URL       string                `name:"url" description:"Retrieve the email templates from a web server"`
+	Blob      config.BlobPathConfig `name:"blob"`
+
+	Includes []string `name:"includes" description:"The email templates that will be preloaded on startup"`
+}
+
+// Fetcher returns a fetch.Interface based on the configuration.
+// If no configuration source is set, this method returns nil, nil.
+func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobConfig) (fetch.Interface, error) {
+	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
+	if c.Source == "" {
+		switch {
+		case c.Static != nil:
+			c.Source = "static"
+		case c.Directory != "":
+			c.Source = "directory"
+		case c.URL != "":
+			c.Source = "url"
+		case !c.Blob.IsZero():
+			c.Source = "blob"
+		}
 	}
-	var fetcher fetch.Interface
-	switch {
-	case c.Static != nil:
-		fetcher = fetch.NewMemFetcher(c.Static)
-	case c.Directory != "":
-		fetcher = fetch.FromFilesystem(c.Directory)
-	case c.URL != "":
-		var err error
-		fetcher, err = fetch.FromHTTP(c.URL, true)
+	switch c.Source {
+	case "static":
+		return fetch.NewMemFetcher(c.Static), nil
+	case "directory":
+		return fetch.FromFilesystem(c.Directory), nil
+	case "url":
+		return fetch.FromHTTP(c.URL, true)
+	case "blob":
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
 		if err != nil {
 			return nil, err
 		}
+		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
 	default:
-		fetcher = nil
+		return nil, nil
 	}
-	c.registry = email.NewTemplateRegistry(fetcher, c.Includes...)
-	return c.registry, nil
+}
+
+func (is *IdentityServer) initEmailTemplates(ctx context.Context) (*email.TemplateRegistry, error) {
+	config := is.configFromContext(ctx).Email.Templates
+	fetcher, err := config.Fetcher(ctx, is.Component.GetBaseConfig(ctx).Blob)
+	if err != nil {
+		return nil, err
+	}
+	return email.NewTemplateRegistry(fetcher, config.Includes...)
 }
 
 // SendEmail sends an email.
@@ -77,11 +105,7 @@ func (is *IdentityServer) SendEmail(ctx context.Context, f func(emails.Data) ema
 		return nil
 	}
 
-	templates, err := is.getEmailTemplates(ctx)
-	if err != nil {
-		return err
-	}
-	message, err := templates.Render(messageData)
+	message, err := is.emailTemplates.Render(messageData)
 	if err != nil {
 		return err
 	}

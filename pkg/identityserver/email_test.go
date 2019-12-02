@@ -20,7 +20,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/email"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"google.golang.org/grpc"
 )
 
@@ -44,16 +43,7 @@ func (testEmail) DefaultTemplates() (subject, html, text string) {
 }
 
 func TestGetEmailTemplates(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
-
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		registry, err := is.getEmailTemplates(ctx)
-		if !a.So(err, should.BeNil) {
-			t.Fatalf("Failed to construct email template registry: %v", err)
-		}
-		a.So(registry, should.NotBeNil)
-
 		for _, tc := range []struct {
 			name    string
 			message *email.Message
@@ -89,7 +79,7 @@ func TestGetEmailTemplates(t *testing.T) {
 				email.User.Name = tc.message.RecipientName
 				email.User.Email = tc.message.RecipientAddress
 
-				message, err := registry.Render(email)
+				message, err := is.emailTemplates.Render(email)
 
 				a.So(err, should.BeNil)
 				a.So(message, should.Resemble, tc.message)
