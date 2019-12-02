@@ -2311,19 +2311,29 @@ func TestHandleUplink(t *testing.T) {
 
 				handleUplinkErrCh := handle(ctx, msg)
 
+				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
+					return []*ttnpb.UplinkMessage{
+						makeLegacyDataUplink(31, true),
+						makeLegacyDataUplink(32, true),
+					}
+				}
+
+				makeMACState := func() *ttnpb.MACState {
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+					macState.RecentUplinks = makeRecentUplinks()
+					return macState
+				}
+
 				rangeDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
 					FrequencyPlanID:      test.EUFrequencyPlanID,
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-					MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2),
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(31, true),
-						makeLegacyDataUplink(32, true),
-					},
-					Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
-					CreatedAt: start,
-					UpdatedAt: start,
+					MACState:             makeMACState(),
+					RecentUplinks:        makeRecentUplinks(),
+					Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
+					CreatedAt:            start,
+					UpdatedAt:            start,
 				}
 
 				var upCtx context.Context
@@ -2349,6 +2359,7 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Func(multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
+					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
 					a.So(req.Func(fCntTooHighDevice), should.BeTrue)
@@ -2385,16 +2396,11 @@ func TestHandleUplink(t *testing.T) {
 						"session",
 					})
 
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
-					macState.RxWindowsAvailable = true
-					macState.QueuedResponses = []*ttnpb.MACCommand{
-						MakeLinkCheckAns(mds...),
-					}
-					a.So(dev.MACState, should.Resemble, macState)
 					a.So(dev.PendingMACState, should.BeNil)
 					a.So(dev.PendingSession, should.BeNil)
 					a.So(dev.RecentADRUplinks, should.BeNil)
 					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
+
 					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
 						return false
 					}
@@ -2406,7 +2412,16 @@ func TestHandleUplink(t *testing.T) {
 					expectedUp.ReceivedAt = start
 					expectedUp.RxMetadata = recentUp.RxMetadata
 					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
+					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
+
+					macState := makeMACState()
+					macState.RecentUplinks = append(macState.RecentUplinks, expectedUp)
+					macState.RxWindowsAvailable = true
+					macState.QueuedResponses = []*ttnpb.MACCommand{
+						MakeLinkCheckAns(mds...),
+					}
+					a.So(dev.MACState, should.Resemble, macState)
+
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2414,7 +2429,7 @@ func TestHandleUplink(t *testing.T) {
 							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 							MACState:             macState,
-							RecentUplinks:        append(CopyUplinkMessages(rangeDevice.RecentUplinks...), recentUp),
+							RecentUplinks:        dev.RecentUplinks,
 							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
 							CreatedAt:            start,
 							UpdatedAt:            now,
@@ -2525,19 +2540,29 @@ func TestHandleUplink(t *testing.T) {
 
 				handleUplinkErrCh := handle(ctx, msg)
 
+				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
+					return []*ttnpb.UplinkMessage{
+						makeLegacyDataUplink(31, true),
+						makeLegacyDataUplink(32, true),
+					}
+				}
+
+				makeMACState := func() *ttnpb.MACState {
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+					macState.RecentUplinks = makeRecentUplinks()
+					return macState
+				}
+
 				rangeDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
 					FrequencyPlanID:      test.EUFrequencyPlanID,
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1),
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink(31, true),
-						makeDataUplink(32, true),
-					},
-					Session:   makeSession(ttnpb.MAC_V1_1, devAddr, 32),
-					CreatedAt: start,
-					UpdatedAt: start,
+					MACState:             makeMACState(),
+					RecentUplinks:        makeRecentUplinks(),
+					Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 32),
+					CreatedAt:            start,
+					UpdatedAt:            start,
 				}
 
 				var upCtx context.Context
@@ -2563,6 +2588,7 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Func(multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
+					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
 					a.So(req.Func(fCntTooHighDevice), should.BeTrue)
@@ -2599,16 +2625,11 @@ func TestHandleUplink(t *testing.T) {
 						"session",
 					})
 
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
-					macState.RxWindowsAvailable = true
-					macState.QueuedResponses = []*ttnpb.MACCommand{
-						MakeLinkCheckAns(mds...),
-					}
-					a.So(dev.MACState, should.Resemble, macState)
 					a.So(dev.PendingMACState, should.BeNil)
 					a.So(dev.PendingSession, should.BeNil)
 					a.So(dev.RecentADRUplinks, should.BeNil)
 					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_1, devAddr, 34))
+
 					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
 						return false
 					}
@@ -2620,7 +2641,16 @@ func TestHandleUplink(t *testing.T) {
 					expectedUp.ReceivedAt = start
 					expectedUp.RxMetadata = recentUp.RxMetadata
 					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
+					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
+
+					macState := makeMACState()
+					macState.RecentUplinks = append(macState.RecentUplinks, expectedUp)
+					macState.RxWindowsAvailable = true
+					macState.QueuedResponses = []*ttnpb.MACCommand{
+						MakeLinkCheckAns(mds...),
+					}
+					a.So(dev.MACState, should.Resemble, macState)
+
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2628,7 +2658,7 @@ func TestHandleUplink(t *testing.T) {
 							LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 							LoRaWANVersion:       ttnpb.MAC_V1_1,
 							MACState:             macState,
-							RecentUplinks:        append(CopyUplinkMessages(rangeDevice.RecentUplinks...), recentUp),
+							RecentUplinks:        dev.RecentUplinks,
 							Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 34),
 							CreatedAt:            start,
 							UpdatedAt:            now,
@@ -2739,19 +2769,29 @@ func TestHandleUplink(t *testing.T) {
 
 				handleUplinkErrCh := handle(ctx, msg)
 
+				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
+					return []*ttnpb.UplinkMessage{
+						makeLegacyDataUplink(31, true),
+						makeLegacyDataUplink(32, true),
+					}
+				}
+
+				makeMACState := func() *ttnpb.MACState {
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+					macState.RecentUplinks = makeRecentUplinks()
+					return macState
+				}
+
 				rangeDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
 					FrequencyPlanID:      test.EUFrequencyPlanID,
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-					MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2),
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(31, true),
-						makeLegacyDataUplink(32, true),
-					},
-					Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
-					CreatedAt: start,
-					UpdatedAt: start,
+					MACState:             makeMACState(),
+					RecentUplinks:        makeRecentUplinks(),
+					Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
+					CreatedAt:            start,
+					UpdatedAt:            start,
 				}
 
 				var upCtx context.Context
@@ -2777,6 +2817,7 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Func(multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
+					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
 					a.So(req.Func(fCntTooHighDevice), should.BeTrue)
@@ -2815,16 +2856,11 @@ func TestHandleUplink(t *testing.T) {
 						"session",
 					})
 
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
-					macState.RxWindowsAvailable = true
-					macState.QueuedResponses = []*ttnpb.MACCommand{
-						MakeLinkCheckAns(mds...),
-					}
-					a.So(dev.MACState, should.Resemble, macState)
 					a.So(dev.PendingMACState, should.BeNil)
 					a.So(dev.PendingSession, should.BeNil)
 					a.So(dev.RecentADRUplinks, should.BeNil)
 					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
+
 					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
 						return false
 					}
@@ -2836,7 +2872,16 @@ func TestHandleUplink(t *testing.T) {
 					expectedUp.ReceivedAt = start
 					expectedUp.RxMetadata = recentUp.RxMetadata
 					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
+					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(makeRecentUplinks(), expectedUp))
+
+					macState := makeMACState()
+					macState.RecentUplinks = append(macState.RecentUplinks, expectedUp)
+					macState.RxWindowsAvailable = true
+					macState.QueuedResponses = []*ttnpb.MACCommand{
+						MakeLinkCheckAns(mds...),
+					}
+					a.So(dev.MACState, should.Resemble, macState)
+
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2844,7 +2889,7 @@ func TestHandleUplink(t *testing.T) {
 							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 							MACState:             macState,
-							RecentUplinks:        append(CopyUplinkMessages(rangeDevice.RecentUplinks...), recentUp),
+							RecentUplinks:        dev.RecentUplinks,
 							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
 							CreatedAt:            start,
 							UpdatedAt:            now,
@@ -2955,10 +3000,19 @@ func TestHandleUplink(t *testing.T) {
 
 				handleUplinkErrCh := handle(ctx, msg)
 
+				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
+					return []*ttnpb.UplinkMessage{
+						makeLegacyDataUplink(31, true),
+						makeLegacyDataUplink(32, true),
+						makeLegacyDataUplink(34, true),
+					}
+				}
+
 				makeMACState := func() *ttnpb.MACState {
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
 					macState.CurrentParameters.ADRNbTrans = 2
 					macState.DesiredParameters.ADRNbTrans = 2
+					macState.RecentUplinks = makeRecentUplinks()
 					return macState
 				}
 
@@ -2968,14 +3022,10 @@ func TestHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 					MACState:             makeMACState(),
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(31, true),
-						makeLegacyDataUplink(32, true),
-						makeLegacyDataUplink(34, true),
-					},
-					Session:   makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
-					CreatedAt: start,
-					UpdatedAt: start,
+					RecentUplinks:        makeRecentUplinks(),
+					Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
+					CreatedAt:            start,
+					UpdatedAt:            start,
 				}
 
 				var upCtx context.Context
@@ -3037,16 +3087,11 @@ func TestHandleUplink(t *testing.T) {
 						"session",
 					})
 
-					macState := makeMACState()
-					macState.RxWindowsAvailable = true
-					macState.QueuedResponses = []*ttnpb.MACCommand{
-						MakeLinkCheckAns(mds...),
-					}
-					a.So(dev.MACState, should.Resemble, macState)
 					a.So(dev.PendingMACState, should.BeNil)
 					a.So(dev.PendingSession, should.BeNil)
 					a.So(dev.RecentADRUplinks, should.BeNil)
 					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
+
 					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
 						return false
 					}
@@ -3058,7 +3103,16 @@ func TestHandleUplink(t *testing.T) {
 					expectedUp.ReceivedAt = start
 					expectedUp.RxMetadata = recentUp.RxMetadata
 					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(rangeDevice.RecentUplinks...), expectedUp))
+					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
+
+					macState := makeMACState()
+					macState.RecentUplinks = append(macState.RecentUplinks, expectedUp)
+					macState.RxWindowsAvailable = true
+					macState.QueuedResponses = []*ttnpb.MACCommand{
+						MakeLinkCheckAns(mds...),
+					}
+					a.So(dev.MACState, should.Resemble, macState)
+
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -3066,7 +3120,7 @@ func TestHandleUplink(t *testing.T) {
 							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
 							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
 							MACState:             macState,
-							RecentUplinks:        append(CopyUplinkMessages(rangeDevice.RecentUplinks...), recentUp),
+							RecentUplinks:        dev.RecentUplinks,
 							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
 							CreatedAt:            start,
 							UpdatedAt:            now,

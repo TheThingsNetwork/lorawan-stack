@@ -267,8 +267,8 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
-	if dev.MACState.RxWindowsAvailable && len(dev.RecentUplinks) > 0 {
-		up = dev.RecentUplinks[len(dev.RecentUplinks)-1]
+	if dev.MACState.RxWindowsAvailable && len(dev.MACState.RecentUplinks) > 0 {
+		up = dev.MACState.RecentUplinks[len(dev.MACState.RecentUplinks)-1]
 		switch up.Payload.MHDR.MType {
 		case ttnpb.MType_UNCONFIRMED_UP:
 			if up.Payload.GetMACPayload().FCtrl.ADRAckReq {
@@ -862,6 +862,7 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genSta
 	}
 	dev.MACState.QueuedResponses = nil
 	dev.MACState.RxWindowsAvailable = false
+	dev.MACState.RecentDownlinks = appendRecentDownlink(dev.MACState.RecentDownlinks, down.Message, recentDownlinkCount)
 	dev.RecentDownlinks = appendRecentDownlink(dev.RecentDownlinks, down.Message, recentDownlinkCount)
 }
 
@@ -884,7 +885,7 @@ func (res downlinkAttemptResult) AppendApplicationUplinks(ups ...*ttnpb.Applicat
 func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, fp *frequencyplans.FrequencyPlan, maxUpLength uint16) downlinkAttemptResult {
 	var sets []string
 	logger := log.FromContext(ctx)
-	if len(dev.RecentUplinks) == 0 {
+	if len(dev.MACState.RecentUplinks) == 0 {
 		logger.Warn("Rx windows available, but no uplink present, skip class A downlink slot")
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
@@ -897,7 +898,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 
 	var rxDelay ttnpb.RxDelay
-	up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+	up := dev.MACState.RecentUplinks[len(dev.MACState.RecentUplinks)-1]
 	switch up.Payload.MHDR.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		rxDelay = dev.MACState.CurrentParameters.Rx1Delay
@@ -921,7 +922,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 	ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
 
-	rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
+	rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.MACState.RecentUplinks...)
 	if !rx1 && !rx2 {
 		logger.Warn("Rx1 and Rx2 are expired, skip class A downlink slot")
 		dev.MACState.QueuedResponses = nil
@@ -1060,6 +1061,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			"mac_state.pending_application_downlink",
 			"mac_state.pending_requests",
 			"mac_state.queued_responses",
+			"mac_state.recent_downlinks",
 			"mac_state.rx_windows_available",
 			"recent_downlinks",
 			"session",
@@ -1135,7 +1137,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 					rxDelay := ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
 
-					rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.RecentUplinks...)
+					rx1, rx2, paths := downlinkPathsForClassA(rxDelay, up)
 					if !rx1 && !rx2 {
 						logger.Warn("Rx1 and Rx2 are expired, skip downlink slot")
 						dev.PendingMACState.RxWindowsAvailable = false
@@ -1208,7 +1210,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 				var maxUpLength uint16 = math.MaxUint16
 				if dev.MACState.LoRaWANVersion == ttnpb.MAC_V1_1 {
-					maxUpLength = maximumUplinkLength(fp, phy, dev.RecentUplinks...)
+					maxUpLength = maximumUplinkLength(fp, phy, dev.MACState.RecentUplinks...)
 				}
 
 				var sets []string
@@ -1295,7 +1297,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						})
 					}
 				} else {
-					paths = downlinkPathsFromRecentUplinks(dev.RecentUplinks...)
+					paths = downlinkPathsFromRecentUplinks(dev.MACState.RecentUplinks...)
 					if len(paths) == 0 {
 						logger.Warn("No downlink path available, skip class B/C downlink slot")
 						queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, false)
@@ -1402,6 +1404,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					"mac_state.pending_application_downlink",
 					"mac_state.pending_requests",
 					"mac_state.queued_responses",
+					"mac_state.recent_downlinks",
 					"mac_state.rx_windows_available",
 					"recent_downlinks",
 					"session",

@@ -608,12 +608,21 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					MACState: func() *ttnpb.MACState {
 						macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 						macState.PendingApplicationDownlink = makeApplicationDownlink()
+						macState.RecentDownlinks = []*ttnpb.DownlinkMessage{
+							{
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_CONFIRMED_DOWN,
+									},
+									Payload: &ttnpb.Message_MACPayload{
+										MACPayload: &ttnpb.MACPayload{},
+									},
+								},
+							},
+						}
 						return macState
 					}(),
 					Session: makeSession(ttnpb.MAC_V1_1, devAddr, 10),
-					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						{},
-					},
 				},
 			},
 			DeviceAssertion: func(ctx context.Context, dev *matchedDevice, up *ttnpb.UplinkMessage) bool {
@@ -625,6 +634,18 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				}
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 				macState.RxWindowsAvailable = true
+				macState.RecentDownlinks = []*ttnpb.DownlinkMessage{
+					{
+						Payload: &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_CONFIRMED_DOWN,
+							},
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{},
+							},
+						},
+					},
+				}
 				expectedDev := &matchedDevice{
 					logger:              dev.logger,
 					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
@@ -638,9 +659,6 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						LoRaWANVersion:       ttnpb.MAC_V1_1,
 						MACState:             macState,
 						Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 12),
-						RecentDownlinks: []*ttnpb.DownlinkMessage{
-							{},
-						},
 					},
 					FCnt:    12,
 					NbTrans: 1,
