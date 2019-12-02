@@ -43,6 +43,12 @@ service UserRegistry {
     };
   };
 
+  rpc List(ListUsersRequest) returns (Users) {
+    option (google.api.http) = {
+      get: "/users"
+    };
+  };
+
   rpc Update(UpdateUserRequest) returns (User) {
     option (google.api.http) = {
       put: "/users/{user.ids.user_id}"
