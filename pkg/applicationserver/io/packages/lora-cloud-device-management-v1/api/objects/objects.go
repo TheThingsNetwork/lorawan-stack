@@ -135,7 +135,7 @@ type InfoFields struct {
 	} `json:"adrmode"`
 	JoinEUI *struct {
 		Timestamp float64 `json:"timestamp"`
-		Value     uint8   `json:"value"`
+		Value     EUI     `json:"value"`
 	} `json:"joineui"`
 	Interval *struct {
 		Timestamp float64 `json:"timestamp"`
@@ -159,7 +159,7 @@ type InfoFields struct {
 	} `json:"rstcount"`
 	DevEUI *struct {
 		Timestamp float64 `json:"timestamp"`
-		Value     string  `json:"value"`
+		Value     EUI     `json:"value"`
 	} `json:"deveui"`
 	FactRst *struct {
 		Timestamp float64 `json:"timestamp"`
@@ -426,10 +426,30 @@ type LoRaUplink struct {
 	Timestamp float64 `json:"timestamp"`
 }
 
+// Fields implements log.Fielder.
+func (u LoRaUplink) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"f_cnt":     u.FCnt,
+		"port":      u.Port,
+		"payload":   u.Payload,
+		"dr":        u.DR,
+		"frequency": u.Freq,
+		"timestamp": u.Timestamp,
+	}
+}
+
 // LoRaDnlink is a specification for a modem device.
 type LoRaDnlink struct {
 	Port    uint8 `json:"port"`
 	Payload Hex   `json:"payload"`
+}
+
+// Fields implements log.Fielder.
+func (u LoRaDnlink) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"port":    u.Port,
+		"payload": u.Payload,
+	}
 }
 
 // File carries the contents of an uploaded, defragmented file by a modem to the service.
@@ -481,6 +501,11 @@ type Hex []byte
 // MarshalJSON implements json.Marshaler.
 func (h Hex) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("\"%s\"", hex.EncodeToString(h))), nil
+}
+
+// String implements fmt.Stringer.
+func (h Hex) String() string {
+	return hex.EncodeToString(h)
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
