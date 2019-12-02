@@ -4,7 +4,6 @@ description: ""
 weight: 8
 ---
 
-
 ## Login
 
 The Console needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running, open `https://thethings.example.com` (replace with the URL of your deployment) in your browser.
@@ -15,7 +14,13 @@ You are now on the Console landing page. Click **Login with your The Things Stac
 
 {{< figure src="login.png" alt="Login" >}}
 
-After entering your credentials and logging in, you will reach the Console overview page. You can now fully use the capabilities of the Console.
+If you do not have an account yet, you can register one by clicking **Create an account**, filling your details and clicking **Register**.
+
+{{< figure src="register.png" alt="Create an account" >}}
+
+When you use a new account, you may not be able to continue until you have confirmed your email address or your account is approved by an admin user.
+
+After entering your credentials and logging in, you will reach the Console overview page.
 
 {{< figure src="overview.png" alt="Overview" >}}
 

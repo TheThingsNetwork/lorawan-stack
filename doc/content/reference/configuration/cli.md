@@ -27,7 +27,7 @@ By default the CLI uses JSON as the input and output format. It is also possible
 
 ## API Options
 
-The CLI needs to be configured with the addresses of the OAuth server. The [Getting Started guide]({{< ref "/guides/getting-started/configuration.md#command-line-interface" >}}) gives a good example configuration for a typical deployment.
+The CLI needs to be configured with the addresses of the OAuth server. The [Getting Started guide]({{< ref "/guides/getting-started/cli#configuration" >}}) gives a good example configuration for a typical deployment.
 
 - `oauth-server-address`: OAuth Server address
 - `identity-server-grpc-address`: Identity Server address

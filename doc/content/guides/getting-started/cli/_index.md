@@ -6,7 +6,22 @@ weight: 10
 
 ## Configuration
 
-If you have not configured the CLI yet, see the [**Configuration** step]({{< relref "../configuration.md#command-line-interface" >}}).
+The command-line needs to be configured to connect to your deployment on `thethings.example.com`. The recommended way to configure the CLI is with a `.ttn-lw-cli.yml` in your `$XDG_CONFIG_HOME` or `$HOME` directory.
+
+```yaml
+oauth-server-address: 'https://thethings.example.com/oauth'
+
+identity-server-grpc-address: 'thethings.example.com:8884'
+gateway-server-grpc-address: 'thethings.example.com:8884'
+network-server-grpc-address: 'thethings.example.com:8884'
+application-server-grpc-address: 'thethings.example.com:8884'
+join-server-grpc-address: 'thethings.example.com:8884'
+device-claiming-server-grpc-address: 'thethings.example.com:8884'
+device-template-converter-grpc-address: 'thethings.example.com:8884'
+qr-code-generator-grpc-address: 'thethings.example.com:8884'
+```
+
+If you did not put the configuration file in the recommended location, you need to point the CLI to that file every time you use the CLI. You can do that by passing the path to the config file as a command-line flag `-c /path/to/config.yml` or by setting an environment variable `export TTN_LW_CONFIG=/path/to/config.yml`.
 
 ## Login
 
@@ -16,9 +31,9 @@ The CLI needs to be logged on in order to create gateways, applications, devices
 $ ttn-lw-cli login
 ```
 
-This will open the OAuth login page where you can login with your credentials. Once you logged in in the browser, return to the terminal session to proceed.
+This will open a browser window with the OAuth login page where you can login with your credentials. This is also where you can create a new account if you do not already have one.
 
-If you run this command on a remote machine, pass `--callback=false` to get a link to login on your local machine.
+> During the login procedure, the CLI starts a webserver on `localhost` in order to receive the OAuth callback after login. If you are running the CLI on a machine that is not `localhost`, you can pass the `--callback=false` flag. This will allow you to perform part of the OAuth flow on a different machine, and copy-paste a code back into the CLI.
 
 ## Create Gateway
 
