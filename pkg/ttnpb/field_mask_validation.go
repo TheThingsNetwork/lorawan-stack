@@ -621,6 +621,7 @@ var AllowedFieldMaskPathsForRPC = map[string][]string{
 
 	// Users:
 	"/ttn.lorawan.v3.UserRegistry/Get":                 omitFields(UserFieldPathsNested, "password", "temporary_password"),
+	"/ttn.lorawan.v3.UserRegistry/List":                omitFields(UserFieldPathsNested, "password", "temporary_password"),
 	"/ttn.lorawan.v3.UserRegistry/Update":              omitFields(UserFieldPathsNested, "password", "password_updated_at"),
 	"/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers": omitFields(UserFieldPathsNested, "password", "temporary_password"),
 }

@@ -67,6 +67,19 @@ var GetUserRequestFieldPathsTopLevel = []string{
 	"field_mask",
 	"user_ids",
 }
+var ListUsersRequestFieldPathsNested = []string{
+	"field_mask",
+	"limit",
+	"order",
+	"page",
+}
+
+var ListUsersRequestFieldPathsTopLevel = []string{
+	"field_mask",
+	"limit",
+	"order",
+	"page",
+}
 var CreateUserRequestFieldPathsNested = []string{
 	"invitation_token",
 	"user",

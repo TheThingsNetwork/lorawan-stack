@@ -424,6 +424,7 @@
   - [Message `ListInvitationsRequest`](#ttn.lorawan.v3.ListInvitationsRequest)
   - [Message `ListUserAPIKeysRequest`](#ttn.lorawan.v3.ListUserAPIKeysRequest)
   - [Message `ListUserSessionsRequest`](#ttn.lorawan.v3.ListUserSessionsRequest)
+  - [Message `ListUsersRequest`](#ttn.lorawan.v3.ListUsersRequest)
   - [Message `SendInvitationRequest`](#ttn.lorawan.v3.SendInvitationRequest)
   - [Message `UpdateUserAPIKeyRequest`](#ttn.lorawan.v3.UpdateUserAPIKeyRequest)
   - [Message `UpdateUserPasswordRequest`](#ttn.lorawan.v3.UpdateUserPasswordRequest)
@@ -5915,6 +5916,21 @@ This service is not implemented on all deployments.
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
+### <a name="ttn.lorawan.v3.ListUsersRequest">Message `ListUsersRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
 ### <a name="ttn.lorawan.v3.SendInvitationRequest">Message `SendInvitationRequest`</a>
 
 | Field | Type | Label | Description |
@@ -6099,6 +6115,7 @@ User is the message that defines an user on the network.
 | ----------- | ------------ | ------------- | ------------|
 | `Create` | [`CreateUserRequest`](#ttn.lorawan.v3.CreateUserRequest) | [`User`](#ttn.lorawan.v3.User) | Register a new user. This method may be restricted by network settings. |
 | `Get` | [`GetUserRequest`](#ttn.lorawan.v3.GetUserRequest) | [`User`](#ttn.lorawan.v3.User) | Get the user with the given identifiers, selecting the fields given by the field mask. The method may return more or less fields, depending on the rights of the caller. |
+| `List` | [`ListUsersRequest`](#ttn.lorawan.v3.ListUsersRequest) | [`Users`](#ttn.lorawan.v3.Users) |  |
 | `Update` | [`UpdateUserRequest`](#ttn.lorawan.v3.UpdateUserRequest) | [`User`](#ttn.lorawan.v3.User) |  |
 | `CreateTemporaryPassword` | [`CreateTemporaryPasswordRequest`](#ttn.lorawan.v3.CreateTemporaryPasswordRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Create a temporary password that can be used for updating a forgotten password. The generated password is sent to the user's email address. |
 | `UpdatePassword` | [`UpdateUserPasswordRequest`](#ttn.lorawan.v3.UpdateUserPasswordRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
@@ -6110,6 +6127,7 @@ User is the message that defines an user on the network.
 | ----------- | ------ | ------- | ---- |
 | `Create` | `POST` | `/api/v3/users` | `*` |
 | `Get` | `GET` | `/api/v3/users/{user_ids.user_id}` |  |
+| `List` | `GET` | `/api/v3/users` |  |
 | `Update` | `PUT` | `/api/v3/users/{user.ids.user_id}` | `*` |
 | `CreateTemporaryPassword` | `POST` | `/api/v3/users/{user_ids.user_id}/temporary_password` |  |
 | `UpdatePassword` | `PUT` | `/api/v3/users/{user_ids.user_id}/password` | `*` |
