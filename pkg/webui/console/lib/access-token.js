@@ -21,19 +21,19 @@ export default async function() {
 
   if (!storedToken || Date.parse(storedToken.expiry) < Date.now()) {
     // If we don't have a token stored or it's expired, we want to retrieve it
+
+    // Remove stored, invalid token
+    clear()
+
+    // Retrieve new token and store it
     const response = await api.console.token()
     token = response.data
-  } else {
-    // If we have a stored token and its valid, we want to use it
-    return storedToken
-  }
-
-  // We want to make sure the stored token is the correct one
-  if (!storedToken || storedToken.access_token !== token.access_token) {
     cache.set('accessToken', token)
+    return token
   }
 
-  return token
+  // If we have a stored token and its valid, we want to use it
+  return storedToken
 }
 
 export function clear() {
