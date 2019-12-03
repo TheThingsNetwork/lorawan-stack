@@ -139,13 +139,13 @@ func lastUplink(ups ...*ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 }
 
 func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
-	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.RecentUplinks) == 0 {
+	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.MACState.RecentUplinks) == 0 {
 		return false
 	}
 	if len(dev.MACState.QueuedResponses) > 0 {
 		return true
 	}
-	up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+	up := lastUplink(dev.MACState.RecentUplinks...)
 	switch up.Payload.MHDR.MType {
 	case ttnpb.MType_UNCONFIRMED_UP:
 		if up.Payload.GetMACPayload().FCtrl.ADRAckReq {
@@ -161,10 +161,10 @@ func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time
 }
 
 func nextClassADataDownlinkSlot(dev *ttnpb.EndDevice) (time.Time, bool) {
-	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.RecentUplinks) == 0 {
+	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.MACState.RecentUplinks) == 0 {
 		return time.Time{}, false
 	}
-	rx1 := dev.RecentUplinks[len(dev.RecentUplinks)-1].ReceivedAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
+	rx1 := lastUplink(dev.MACState.RecentUplinks...).ReceivedAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
 	rx2 := rx1.Add(time.Second)
 	switch {
 	case rx2.Before(timeNow()):
@@ -183,8 +183,8 @@ func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSetti
 	if dev.GetMACState().GetRxWindowsAvailable() {
 		return time.Time{}
 	}
-	if len(dev.RecentUplinks) > 0 {
-		if dev.RecentUplinks[len(dev.RecentUplinks)-1].ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
+	if len(dev.MACState.RecentUplinks) > 0 {
+		if lastUplink(dev.MACState.RecentUplinks...).ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
 			return time.Time{}
 		}
 	}
