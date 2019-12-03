@@ -15,6 +15,7 @@
 package scheduling_test
 
 import (
+	"math"
 	"strconv"
 	"testing"
 	"time"
@@ -30,7 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestScheduleAt(t *testing.T) {
+func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 	fp := &frequencyplans.FrequencyPlan{
@@ -329,6 +330,89 @@ func TestScheduleAt(t *testing.T) {
 				}
 				return
 			}
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(em.Starts(), should.Equal, tc.ExpectedStarts)
+		})
+		if !tcok {
+			t.FailNow()
+		}
+	}
+}
+
+func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+	fp := &frequencyplans.FrequencyPlan{
+		BandID: band.EU_863_870,
+		SubBands: []frequencyplans.SubBandParameters{
+			{
+				MinFrequency: 0,
+				MaxFrequency: math.MaxUint64,
+				DutyCycle:    0,
+			},
+		},
+		TimeOffAir: frequencyplans.TimeOffAir{
+			Duration: time.Second,
+		},
+	}
+	timeSource := &mockTimeSource{
+		Time: time.Unix(0, 0),
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+	a.So(err, should.BeNil)
+
+	for i, tc := range []struct {
+		SyncWithGateway bool
+		PayloadSize     int
+		Settings        ttnpb.TxSettings
+		Priority        ttnpb.TxSchedulePriority
+		MaxRTT          *time.Duration
+		MedianRTT       *time.Duration
+		ExpectedToa     time.Duration
+		ExpectedStarts  scheduling.ConcentratorTime
+	}{
+		{
+			PayloadSize: 20,
+			Settings: ttnpb.TxSettings{
+				DataRate: ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_LoRa{
+						LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 12,
+						},
+					},
+				},
+				CodingRate: "4/5",
+				Frequency:  868100000,
+				Timestamp:  20000000,
+			},
+			Priority:       ttnpb.TxSchedulePriority_NORMAL,
+			ExpectedToa:    1318912 * time.Microsecond, // Normally violating duty-cycle limitation of 1% in 868.0 - 868.6.
+			ExpectedStarts: 20000000000,
+		},
+	} {
+		tcok := t.Run(strconv.Itoa(i), func(t *testing.T) {
+			a := assertions.New(t)
+			if tc.SyncWithGateway {
+				scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+			} else {
+				scheduler.Sync(0, timeSource.Time)
+			}
+			d, err := toa.Compute(tc.PayloadSize, tc.Settings)
+			a.So(err, should.BeNil)
+			a.So(d, should.Equal, tc.ExpectedToa)
+			rtts := &mockRTTs{}
+			if tc.MaxRTT != nil {
+				rtts.Max = *tc.MaxRTT
+				rtts.Count = 1
+			}
+			if tc.MedianRTT != nil {
+				rtts.Median = *tc.MedianRTT
+				rtts.Count = 1
+			}
+			em, err := scheduler.ScheduleAt(ctx, tc.PayloadSize, tc.Settings, rtts, tc.Priority)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

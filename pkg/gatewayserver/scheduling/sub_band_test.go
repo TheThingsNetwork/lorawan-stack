@@ -15,12 +15,12 @@
 package scheduling_test
 
 import (
+	"math"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -30,11 +30,13 @@ import (
 
 func TestSubBandScheduleUnrestricted(t *testing.T) {
 	ctx := test.Context()
-	band := band.SubBandParameters{
-		DutyCycle: 1,
+	params := scheduling.SubBandParameters{
+		MinFrequency: 0,
+		MaxFrequency: math.MaxUint64,
+		DutyCycle:    1,
 	}
 	clock := &mockClock{}
-	sb := scheduling.NewSubBand(ctx, band, clock, nil)
+	sb := scheduling.NewSubBand(ctx, params, clock, nil)
 	for i, tc := range []struct {
 		Starts            scheduling.ConcentratorTime
 		Duration          time.Duration
@@ -92,15 +94,17 @@ func TestSubBandScheduleUnrestricted(t *testing.T) {
 
 func TestSubBandScheduleRestricted(t *testing.T) {
 	ctx := test.Context()
-	band := band.SubBandParameters{
-		DutyCycle: 0.5,
+	params := scheduling.SubBandParameters{
+		MinFrequency: 0,
+		MaxFrequency: math.MaxUint64,
+		DutyCycle:    0.5,
 	}
 	clock := &mockClock{}
 	ceilings := map[ttnpb.TxSchedulePriority]float32{
 		ttnpb.TxSchedulePriority_NORMAL:  0.5, // Duty-cycle <= 0.25
 		ttnpb.TxSchedulePriority_HIGHEST: 1.0, // Duty-cycle <= 0.50
 	}
-	sb := scheduling.NewSubBand(ctx, band, clock, ceilings)
+	sb := scheduling.NewSubBand(ctx, params, clock, ceilings)
 	for i, tc := range []struct {
 		Starts            scheduling.ConcentratorTime
 		Duration          time.Duration
@@ -173,15 +177,17 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 func TestScheduleAnytimeRestricted(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	band := band.SubBandParameters{
-		DutyCycle: 0.5,
+	params := scheduling.SubBandParameters{
+		MinFrequency: 0,
+		MaxFrequency: math.MaxUint64,
+		DutyCycle:    0.5,
 	}
 	clock := &mockClock{}
 	ceilings := map[ttnpb.TxSchedulePriority]float32{
 		ttnpb.TxSchedulePriority_NORMAL:  0.5, // Duty-cycle <= 0.25
 		ttnpb.TxSchedulePriority_HIGHEST: 1.0, // Duty-cycle <= 0.50
 	}
-	sb := scheduling.NewSubBand(ctx, band, clock, ceilings)
+	sb := scheduling.NewSubBand(ctx, params, clock, ceilings)
 
 	for _, t := range []scheduling.ConcentratorTime{
 		scheduling.ConcentratorTime(6 * time.Second),

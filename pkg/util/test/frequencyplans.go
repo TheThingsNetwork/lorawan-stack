@@ -263,7 +263,6 @@ clock-source: 1`
 sub-bands:
 - min-frequency: 915000000
   max-frequency: 928000000
-  duty-cycle: 1
   max-eirp: 30
 uplink-channels:
 - frequency: 923200000

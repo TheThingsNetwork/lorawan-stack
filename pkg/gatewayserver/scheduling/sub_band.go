@@ -20,7 +20,6 @@ import (
 	"sync"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -44,24 +43,34 @@ var DefaultDutyCycleCeilings DutyCycleCeilings = map[ttnpb.TxSchedulePriority]fl
 	ttnpb.TxSchedulePriority_HIGHEST:      1.00,
 }
 
+// SubBandParameters defines the sub-band frequency bounds and duty-cycle value.
+type SubBandParameters struct {
+	MinFrequency,
+	MaxFrequency uint64
+	DutyCycle float32
+}
+
 // SubBand tracks the utilization and controls the duty-cycle of a sub-band.
 type SubBand struct {
-	band.SubBandParameters
+	SubBandParameters
 	mu        sync.RWMutex
 	clock     Clock
 	ceilings  DutyCycleCeilings
 	emissions Emissions
 }
 
-// NewSubBand returns a new SubBand for the given band's duty-cycle, clock and optionally duty-cycle ceilings.
-func NewSubBand(ctx context.Context, band band.SubBandParameters, clock Clock, ceilings DutyCycleCeilings) *SubBand {
+// NewSubBand returns a new SubBand considering the given duty-cycle, clock and optionally duty-cycle ceilings.
+func NewSubBand(ctx context.Context, params SubBandParameters, clock Clock, ceilings DutyCycleCeilings) *SubBand {
 	if ceilings == nil {
 		ceilings = DefaultDutyCycleCeilings
 	}
 	sb := &SubBand{
-		SubBandParameters: band,
+		SubBandParameters: params,
 		clock:             clock,
 		ceilings:          ceilings,
+	}
+	if sb.DutyCycle == 0 {
+		sb.DutyCycle = 1
 	}
 	go sb.gc(ctx)
 	return sb
@@ -89,6 +98,11 @@ func (sb *SubBand) gc(ctx context.Context) error {
 			sb.mu.Unlock()
 		}
 	}
+}
+
+// Comprises returns whether the given frequency falls in the sub-band.
+func (sb SubBandParameters) Comprises(frequency uint64) bool {
+	return frequency >= sb.MinFrequency && frequency <= sb.MaxFrequency
 }
 
 // sum returns the total emission durations in the given window.
