@@ -268,7 +268,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
 	if dev.MACState.RxWindowsAvailable && len(dev.MACState.RecentUplinks) > 0 {
-		up = dev.MACState.RecentUplinks[len(dev.MACState.RecentUplinks)-1]
+		up = lastUplink(dev.MACState.RecentUplinks...)
 		switch up.Payload.MHDR.MType {
 		case ttnpb.MType_UNCONFIRMED_UP:
 			if up.Payload.GetMACPayload().FCtrl.ADRAckReq {
@@ -689,6 +689,9 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 		paths []*ttnpb.DownlinkPath
 	}
 	attempts := make([]*attempt, 0, len(paths))
+	lastAttempt := func() *attempt {
+		return attempts[len(attempts)-1]
+	}
 
 	for _, path := range paths {
 		logger := logger.WithField(
@@ -702,8 +705,8 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 		}
 
 		var a *attempt
-		if len(attempts) > 0 && attempts[len(attempts)-1].peer == p {
-			a = attempts[len(attempts)-1]
+		if len(attempts) > 0 && lastAttempt().peer == p {
+			a = lastAttempt()
 		} else {
 			a = &attempt{
 				peer: p,
@@ -898,7 +901,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 
 	var rxDelay ttnpb.RxDelay
-	up := dev.MACState.RecentUplinks[len(dev.MACState.RecentUplinks)-1]
+	up := lastUplink(dev.MACState.RecentUplinks...)
 	switch up.Payload.MHDR.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		rxDelay = dev.MACState.CurrentParameters.Rx1Delay
@@ -1126,7 +1129,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						logger.Warn("No recent uplinks found, skip downlink slot")
 						return dev, nil, nil
 					}
-					up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+					up := lastUplink(dev.RecentUplinks...)
 					switch up.Payload.MHDR.MType {
 					case ttnpb.MType_JOIN_REQUEST, ttnpb.MType_REJOIN_REQUEST:
 					default:

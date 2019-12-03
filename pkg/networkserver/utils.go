@@ -134,6 +134,10 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 	return ok && t.After(statusAt)
 }
 
+func lastUplink(ups ...*ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
+	return ups[len(ups)-1]
+}
+
 func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
 	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.RecentUplinks) == 0 {
 		return false

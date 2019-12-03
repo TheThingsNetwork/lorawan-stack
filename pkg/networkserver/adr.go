@@ -91,7 +91,7 @@ func lossRate(nbTrans uint32, ups ...*ttnpb.UplinkMessage) float32 {
 	}
 
 	min := ups[0].Payload.GetMACPayload().FHDR.FCnt
-	max := ups[len(ups)-1].Payload.GetMACPayload().FHDR.FCnt
+	max := lastUplink(ups...).Payload.GetMACPayload().FHDR.FCnt
 
 	fCnt := min + 1
 	var fCntTrans uint32
@@ -152,7 +152,7 @@ func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 		return err
 	}
 
-	up := ups[len(ups)-1]
+	up := lastUplink(ups...)
 
 	dev.MACState.DesiredParameters.ADRDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
 	dev.MACState.DesiredParameters.ADRTxPowerIndex = dev.MACState.CurrentParameters.ADRTxPowerIndex
