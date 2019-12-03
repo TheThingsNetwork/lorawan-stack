@@ -21,8 +21,11 @@ export default [
   createRequestLogic({
     type: user.LOGOUT,
     async process() {
-      await api.console.logout()
-      accessToken.clear()
+      try {
+        await api.console.logout()
+      } finally {
+        accessToken.clear()
+      }
       return true
     },
   }),

@@ -151,7 +151,7 @@ type loginRequest struct {
 	Password string `json:"password" form:"password"`
 }
 
-var errIncorrectPasswordOrUserID = errors.DefineUnauthenticated("no_user_id_password_match", "incorrect password or user ID")
+var errIncorrectPasswordOrUserID = errors.DefineInvalidArgument("no_user_id_password_match", "incorrect password or user ID")
 
 func (s *server) doLogin(ctx context.Context, userID, password string) error {
 	ids := &ttnpb.UserIdentifiers{UserID: userID}

@@ -24,17 +24,19 @@
     background-size: 160vh
     background-position: 0 20vh
 
+  &-container
+    margin-top: 20vh
+    +media-query($bp.s)
+      margin-top: $ls.l
+
   &-button
     min-width: 5rem
 
   &-header
-    h2()
     margin-bottom: $cs.xs
-    margin-top: 20vh
-    +media-query($bp.s)
-      margin-top: $ls.l
 
   &-sub
     one-liner()
     display: block
     margin-bottom: $cs.xl
+
