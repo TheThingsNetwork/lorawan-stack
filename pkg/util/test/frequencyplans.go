@@ -31,6 +31,10 @@ const (
   name: US 902-928 MHz FSB2
   base-frequency: 915
   file: US_902_928_FSB_2.yml
+- id: AS_923_925_AU
+  name: Australia 923-925 MHz (AS923)
+  base-frequency: 915
+  file: AS_923_925_AU.yml
 - id: EXAMPLE
   name: Example 866.1 MHz
   base-frequency: 868
@@ -253,6 +257,94 @@ radios:
   rssi-offset: -166
 clock-source: 1`
 
+	// ASAUFrequencyPlanID is an AS923 for Australia frequency plan for testing.
+	ASAUFrequencyPlanID = "AS_923_925_AU"
+	asAUFrequencyPlan   = `band-id: AS_923
+sub-bands:
+- min-frequency: 915000000
+  max-frequency: 928000000
+  duty-cycle: 1
+  max-eirp: 30
+uplink-channels:
+- frequency: 923200000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 923400000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 923600000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 923800000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 924000000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 0
+- frequency: 924200000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 1
+- frequency: 924400000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 1
+- frequency: 924600000
+  min-data-rate: 0
+  max-data-rate: 5
+  radio: 1
+downlink-channels:
+- frequency: 923200000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 923400000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 923600000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 923800000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 924000000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 924200000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 924400000
+  min-data-rate: 0
+  max-data-rate: 5
+- frequency: 924600000
+  min-data-rate: 0
+  max-data-rate: 5
+lora-standard-channel:
+  frequency: 924500000
+  data-rate: 6
+  radio: 1
+fsk-channel:
+  frequency: 924800000
+  data-rate: 7
+  radio: 1
+radios:
+- enable: true
+  chip-type: SX1257
+  frequency: 923600000
+  rssi-offset: -166
+  tx:
+    min-frequency: 923200000
+    max-frequency: 925000000
+- enable: true
+  chip-type: SX1257
+  frequency: 924600000
+  rssi-offset: -166
+clock-source: 1`
+
 	// ExampleFrequencyPlanID is an example frequency plan.
 	ExampleFrequencyPlanID = "EXAMPLE"
 	exampleFrequencyPlan   = `band-id: EU_863_870
@@ -314,5 +406,6 @@ var FrequencyPlansFetcher = fetch.NewMemFetcher(map[string][]byte{
 	"EU_863_870.yml":       []byte(euFrequencyPlan),
 	"KR_920_923.yml":       []byte(krFrequencyPlan),
 	"US_902_928_FSB_2.yml": []byte(usFrequencyPlan),
+	"AS_923_925_AU.yml":    []byte(asAUFrequencyPlan),
 	"EXAMPLE.yml":          []byte(exampleFrequencyPlan),
 })

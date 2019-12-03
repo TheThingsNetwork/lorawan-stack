@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search is now also available to non-admin users.
 - Support for searching end devices within an application.
 - Notification during login informing users of unapproved user accounts.
+- Support maximum EIRP value from frequency plans sub-bands.
 
 ### Changed
 
