@@ -154,8 +154,10 @@ func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time
 	case ttnpb.MType_CONFIRMED_UP:
 		return true
 	}
-	if len(dev.QueuedApplicationDownlinks) > 0 && dev.QueuedApplicationDownlinks[0].GetClassBC() == nil {
-		return true
+	for _, down := range dev.QueuedApplicationDownlinks {
+		if down.GetClassBC() == nil {
+			return true
+		}
 	}
 	return deviceNeedsMACRequestsAt(ctx, dev, t, phy, defaults)
 }
