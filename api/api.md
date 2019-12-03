@@ -5676,6 +5676,9 @@ Right is the enum that defines all the different rights to do something in the n
 | `join_eui_contains` | [`string`](#string) |  | Find end devices where the (hexadecimal) JoinEUI contains this substring. |
 | `dev_addr_contains` | [`string`](#string) |  | Find end devices where the (hexadecimal) DevAddr contains this substring. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 #### Field Rules
 
@@ -5683,6 +5686,7 @@ Right is the enum that defines all the different rights to do something in the n
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
 | `attributes_contain` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchEndDevicesRequest.AttributesContainEntry">Message `SearchEndDevicesRequest.AttributesContainEntry`</a>
 
@@ -5702,12 +5706,16 @@ This message is used for finding entities in the EntityRegistrySearch service.
 | `description_contains` | [`string`](#string) |  | Find entities where the description contains this substring. |
 | `attributes_contain` | [`SearchEntitiesRequest.AttributesContainEntry`](#ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry) | repeated | Find entities where the given attributes contain these substrings. |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  |  |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `attributes_contain` | <p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SearchEntitiesRequest.AttributesContainEntry">Message `SearchEntitiesRequest.AttributesContainEntry`</a>
 

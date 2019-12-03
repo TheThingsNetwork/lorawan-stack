@@ -223,6 +223,35 @@ var (
 			return io.Write(os.Stdout, config.OutputFormat, res.EndDevices)
 		},
 	}
+	endDevicesSearchCommand = &cobra.Command{
+		Use:   "search [application-id]",
+		Short: "Search for end devices",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			forwardDeprecatedDeviceFlags(cmd.Flags())
+
+			appID := getApplicationID(cmd.Flags(), args)
+			if appID == nil {
+				return errNoApplicationID
+			}
+			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceListFlags)
+
+			req, opt, getTotal := getSearchEndDevicesRequest(cmd.Flags())
+			req.ApplicationIdentifiers = *appID
+			req.FieldMask.Paths = paths
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewEndDeviceRegistrySearchClient(is).SearchEndDevices(ctx, req, opt)
+			if err != nil {
+				return err
+			}
+			getTotal()
+
+			return io.Write(os.Stdout, config.OutputFormat, res.EndDevices)
+		},
+	}
 	endDevicesGetCommand = &cobra.Command{
 		Use:     "get [application-id] [device-id]",
 		Aliases: []string{"info"},
@@ -1031,6 +1060,10 @@ func init() {
 	endDevicesListCommand.Flags().AddFlagSet(selectEndDeviceListFlags)
 	endDevicesListCommand.Flags().AddFlagSet(paginationFlags())
 	endDevicesCommand.AddCommand(endDevicesListCommand)
+	endDevicesSearchCommand.Flags().AddFlagSet(applicationIDFlags())
+	endDevicesSearchCommand.Flags().AddFlagSet(searchEndDevicesFlags())
+	endDevicesSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
+	endDevicesCommand.AddCommand(endDevicesSearchCommand)
 	endDevicesGetCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesGetCommand.Flags().AddFlagSet(selectEndDeviceFlags)
 	endDevicesCommand.AddCommand(endDevicesGetCommand)

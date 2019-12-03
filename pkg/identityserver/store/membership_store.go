@@ -33,32 +33,39 @@ type membershipStore struct {
 	*store
 }
 
-func (s *membershipStore) FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]ttnpb.Identifiers, error) {
-	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships of %s", entityType, id.IDString())).End()
+func (s *membershipStore) queryMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) *gorm.DB {
 	accountQuery := s.query(ctx, Account{}).
 		Select(`"accounts"."id"`).
 		Where(fmt.Sprintf(`"accounts"."account_type" = '%s' AND "accounts"."uid" = ?`, id.EntityType()), id.IDString()).
 		QueryExpr()
-	query := s.query(ctx, modelForEntityType(entityType))
-	if entityType == "organization" {
-		query = query.Table("accounts").
-			Select(`DISTINCT "accounts"."uid" AS "friendly_id"`).
-			Joins(fmt.Sprintf(`JOIN "memberships" ON "memberships"."entity_type" = '%s' AND "memberships"."entity_id" = "accounts"."account_id"`, entityType))
+	organizationQuery := s.query(ctx, Account{}).
+		Select(`"accounts"."id"`).
+		Joins(`JOIN "memberships" ON "memberships"."entity_type" = "accounts"."account_type" AND "memberships"."entity_id" = "accounts"."account_id"`).
+		Where(`"memberships"."account_id" = (?)`, accountQuery).
+		QueryExpr()
+	query := s.query(ctx, &Membership{})
+	if includeIndirect && id.EntityType() == "user" && entityType != "organization" {
+		query = query.Where("entity_type = ? AND (account_id = (?) OR account_id IN (?))", entityType, accountQuery, organizationQuery)
 	} else {
-		query = query.
-			Select(fmt.Sprintf(`DISTINCT "%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType)).
-			Joins(fmt.Sprintf(`JOIN "memberships" ON "memberships"."entity_type" = '%[1]s' AND "memberships"."entity_id" = "%[1]ss"."id"`, entityType))
+		query = query.Where("entity_type = ? AND (account_id = (?))", entityType, accountQuery)
 	}
-	query = query.Order(`"friendly_id"`).
-		Where(fmt.Sprintf(`"memberships"."entity_type" = '%s' AND "memberships"."account_id" = (?)`, entityType), accountQuery)
-	if includeIndirect && id.EntityType() == "user" {
-		organizationQuery := s.query(ctx, Account{}).
-			Select(`"accounts"."id"`).
-			Joins(`JOIN "memberships" ON "memberships"."entity_type" = "accounts"."account_type" AND "memberships"."entity_id" = "accounts"."account_id"`).
-			Where(`"memberships"."account_id" IN (?)`, accountQuery).
-			QueryExpr()
-		query = query.Or(`"memberships"."account_id" IN (?)`, organizationQuery)
+	return query
+}
+
+func (s *membershipStore) FindMemberships(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]ttnpb.Identifiers, error) {
+	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships of %s", entityType, id.IDString())).End()
+	membershipsQuery := s.queryMemberships(ctx, id, entityType, includeIndirect).Select("entity_id").QueryExpr()
+	var query *gorm.DB
+	if entityType == "organization" {
+		query = s.query(ctx, &Account{}).
+			Select(`"accounts"."uid" AS "friendly_id"`).
+			Where(`"accounts"."account_type" = ? AND "accounts"."account_id" IN (?)`, entityType, membershipsQuery)
+	} else {
+		query = s.query(ctx, modelForEntityType(entityType)).
+			Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType)).
+			Where(fmt.Sprintf(`"%[1]ss"."id" IN (?)`, entityType), membershipsQuery)
 	}
+	query = query.Order(`"friendly_id"`)
 	page := query
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)

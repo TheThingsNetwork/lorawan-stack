@@ -6312,6 +6312,24 @@ SearchEndDevicesRequest:
       package: google.protobuf
       name: FieldMask
     default: {}
+  - name: order
+    comment: |2
+       Order the results by this field path (must be present in the field mask).
+       Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+    type: string
+    default: ""
+  - name: limit
+    comment: |2
+       Limit the number of results per page.
+    type: uint32
+    rules:
+      lte: 1000
+    default: 0
+  - name: page
+    comment: |2
+       Page number for pagination. 0 is interpreted as 1.
+    type: uint32
+    default: 0
 SearchEntitiesRequest:
   name: SearchEntitiesRequest
   comment: |2
@@ -6348,6 +6366,24 @@ SearchEntitiesRequest:
       package: google.protobuf
       name: FieldMask
     default: {}
+  - name: order
+    comment: |2
+       Order the results by this field path (must be present in the field mask).
+       Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+    type: string
+    default: ""
+  - name: limit
+    comment: |2
+       Limit the number of results per page.
+    type: uint32
+    rules:
+      lte: 1000
+    default: 0
+  - name: page
+    comment: |2
+       Page number for pagination. 0 is interpreted as 1.
+    type: uint32
+    default: 0
 SendInvitationRequest:
   name: SendInvitationRequest
   fields:

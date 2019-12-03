@@ -60,6 +60,36 @@ func (dst *SearchEntitiesRequest) SetFields(src *SearchEntitiesRequest, paths ..
 				var zero types.FieldMask
 				dst.FieldMask = zero
 			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -167,6 +197,36 @@ func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, path
 			} else {
 				var zero types.FieldMask
 				dst.FieldMask = zero
+			}
+		case "order":
+			if len(subs) > 0 {
+				return fmt.Errorf("'order' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Order = src.Order
+			} else {
+				var zero string
+				dst.Order = zero
+			}
+		case "limit":
+			if len(subs) > 0 {
+				return fmt.Errorf("'limit' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Limit = src.Limit
+			} else {
+				var zero uint32
+				dst.Limit = zero
+			}
+		case "page":
+			if len(subs) > 0 {
+				return fmt.Errorf("'page' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Page = src.Page
+			} else {
+				var zero uint32
+				dst.Page = zero
 			}
 
 		default:

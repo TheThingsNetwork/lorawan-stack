@@ -44,6 +44,14 @@ message SearchEntitiesRequest {
   reserved 5; // TODO: Add filter for approval state (admin only).
 
   google.protobuf.FieldMask field_mask = 6 [(gogoproto.nullable) = false];
+
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 7;
+  // Limit the number of results per page.
+  uint32 limit = 8 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 9;
 }
 
 // The EntityRegistrySearch service indexes entities in the various registries
@@ -101,6 +109,14 @@ message SearchEndDevicesRequest {
   string dev_addr_contains = 8 [(gogoproto.customname) = "DevAddrContains"];
 
   google.protobuf.FieldMask field_mask = 9 [(gogoproto.nullable) = false];
+
+  // Order the results by this field path (must be present in the field mask).
+  // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+  string order = 10;
+  // Limit the number of results per page.
+  uint32 limit = 11 [(validate.rules).uint32.lte = 1000];
+  // Page number for pagination. 0 is interpreted as 1.
+  uint32 page = 12;
 }
 
 // The EndDeviceRegistrySearch service indexes devices in the EndDeviceRegistry

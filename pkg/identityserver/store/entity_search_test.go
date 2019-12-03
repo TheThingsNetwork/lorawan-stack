@@ -45,6 +45,18 @@ func TestEntitySearch(t *testing.T) {
 				},
 			})
 
+			for _, devName := range []string{"baz", "qux"} {
+				store.createEntity(ctx, &EndDevice{
+					ApplicationID: fmt.Sprintf("the-%s-app", name),
+					DeviceID:      fmt.Sprintf("the-%s-device", devName),
+					Name:          fmt.Sprintf("The %s device in %s", devName, name),
+					Description:   fmt.Sprintf("This device does %s stuff for %s", devName, name),
+					Attributes: []Attribute{
+						{Key: "test", Value: devName},
+					},
+				})
+			}
+
 			store.createEntity(ctx, &Client{
 				ClientID:    fmt.Sprintf("the-%s-cli", name),
 				Name:        fmt.Sprintf("The %s client", name),
@@ -89,7 +101,7 @@ func TestEntitySearch(t *testing.T) {
 
 		for _, entityType := range []string{"application", "client", "gateway", "user", "organization"} {
 			t.Run(entityType, func(t *testing.T) {
-				ids, err := s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err := s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					IDContains:          "foo",
 					NameContains:        "foo",
 					DescriptionContains: "foo",
@@ -101,28 +113,28 @@ func TestEntitySearch(t *testing.T) {
 				a.So(err, should.BeNil)
 				a.So(ids, should.HaveLength, 1)
 
-				ids, err = s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					IDContains: "foo",
 				}, entityType)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.HaveLength, 1)
 
-				ids, err = s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					NameContains: "foo",
 				}, entityType)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.HaveLength, 1)
 
-				ids, err = s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					DescriptionContains: "foo",
 				}, entityType)
 
 				a.So(err, should.BeNil)
 				a.So(ids, should.HaveLength, 1)
 
-				ids, err = s.FindEntities(ctx, &ttnpb.SearchEntitiesRequest{
+				ids, err = s.FindEntities(ctx, nil, &ttnpb.SearchEntitiesRequest{
 					AttributesContain: map[string]string{
 						"test": "foo",
 					},
@@ -132,5 +144,54 @@ func TestEntitySearch(t *testing.T) {
 				a.So(ids, should.HaveLength, 1)
 			})
 		}
+
+		t.Run("end_device", func(t *testing.T) {
+			ids, err := s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				IDContains:             "baz",
+				NameContains:           "baz",
+				DescriptionContains:    "baz",
+				AttributesContain: map[string]string{
+					"test": "baz",
+				},
+			})
+
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 1)
+
+			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				IDContains:             "baz",
+			})
+
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 1)
+
+			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				NameContains:           "baz",
+			})
+
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 1)
+
+			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				DescriptionContains:    "baz",
+			})
+
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 1)
+
+			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "the-foo-app"},
+				AttributesContain: map[string]string{
+					"test": "baz",
+				},
+			})
+
+			a.So(err, should.BeNil)
+			a.So(ids, should.HaveLength, 1)
+		})
 	})
 }

@@ -209,7 +209,8 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterUserRegistryServer(s, &userRegistry{IdentityServer: is})
 	ttnpb.RegisterUserAccessServer(s, &userAccess{IdentityServer: is})
 	ttnpb.RegisterUserInvitationRegistryServer(s, &invitationRegistry{IdentityServer: is})
-	ttnpb.RegisterEntityRegistrySearchServer(s, &registrySearch{IdentityServer: is, adminOnly: true})
+	ttnpb.RegisterEntityRegistrySearchServer(s, &registrySearch{IdentityServer: is})
+	ttnpb.RegisterEndDeviceRegistrySearchServer(s, &registrySearch{IdentityServer: is})
 	ttnpb.RegisterOAuthAuthorizationRegistryServer(s, &oauthRegistry{IdentityServer: is})
 	ttnpb.RegisterContactInfoRegistryServer(s, &contactInfoRegistry{IdentityServer: is})
 }
@@ -230,6 +231,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterUserAccessHandler(is.Context(), s, conn)
 	ttnpb.RegisterUserInvitationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterEntityRegistrySearchHandler(is.Context(), s, conn)
+	ttnpb.RegisterEndDeviceRegistrySearchHandler(is.Context(), s, conn)
 	ttnpb.RegisterOAuthAuthorizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterContactInfoRegistryHandler(is.Context(), s, conn)
 }
