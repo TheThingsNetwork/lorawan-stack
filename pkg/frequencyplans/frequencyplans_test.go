@@ -124,7 +124,11 @@ uplink-channels:
 - frequency: 923000000
 `),
 		"US_915.yml": []byte(`invalid-yaml`),
-		"JP.yml": []byte(`listen-before-talk:
+		"JP.yml": []byte(`sub-bands:
+- min-frequency: 923000000
+  max-frequency: 923000000
+  max-eirp: 42
+listen-before-talk:
   rssi-target: 1.1
   rssi-offset: 2.2
   scan-time: 80
@@ -187,6 +191,11 @@ uplink-channels:
 		}
 
 		assertAS923Content(fp)
+		sb, ok := fp.FindSubBand(923000000)
+		if !a.So(ok, should.BeTrue) {
+			t.FailNow()
+		}
+		a.So(*sb.MaxEIRP, should.Equal, 42)
 		a.So(fp.LBT, should.NotBeNil)
 		a.So(fp.LBT.RSSIOffset, should.AlmostEqual, 2.2, 0.00001)
 		a.So(fp.LBT.ScanTime, should.Equal, 80)

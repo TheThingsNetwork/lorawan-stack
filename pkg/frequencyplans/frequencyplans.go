@@ -28,6 +28,33 @@ import (
 
 const yamlFetchErrorCache = 1 * time.Minute
 
+// SubBandParameters contains duty-cycle and maximum EIRP overrides for a sub-band.
+type SubBandParameters struct {
+	MinFrequency uint64 `yaml:"min-frequency,omitempty"`
+	MaxFrequency uint64 `yaml:"max-frequency,omitempty"`
+	// DutyCycle is a fraction. A value of 0 is interpreted as 1, i.e. no duty-cycle limitation.
+	DutyCycle float32  `yaml:"duty-cycle,omitempty"`
+	MaxEIRP   *float32 `yaml:"max-eirp,omitempty"`
+}
+
+// Clone returns a cloned SubBandParameters.
+func (sb *SubBandParameters) Clone() *SubBandParameters {
+	if sb == nil {
+		return nil
+	}
+	nsb := *sb
+	if sb.MaxEIRP != nil {
+		val := *sb.MaxEIRP
+		nsb.MaxEIRP = &val
+	}
+	return &nsb
+}
+
+// Comprises returns whether the given frequency falls in the sub-band.
+func (sb SubBandParameters) Comprises(frequency uint64) bool {
+	return frequency >= sb.MinFrequency && frequency <= sb.MaxFrequency
+}
+
 // LBT contains the listen-before-talk requirements for a region.
 type LBT struct {
 	RSSITarget float32       `yaml:"rssi-target"`
@@ -289,7 +316,8 @@ func (r Radio) ToConcentratorConfig() *ttnpb.GatewayRadio {
 
 // FrequencyPlan contains a frequency plan.
 type FrequencyPlan struct {
-	BandID string `yaml:"band-id,omitempty"`
+	BandID   string              `yaml:"band-id,omitempty"`
+	SubBands []SubBandParameters `yaml:"sub-bands,omitempty"`
 
 	UplinkChannels      []Channel            `yaml:"uplink-channels,omitempty"`
 	DownlinkChannels    []Channel            `yaml:"downlink-channels,omitempty"`
@@ -319,13 +347,13 @@ func (fp FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 		fp.BandID = ext.BandID
 	}
 	if channels := ext.UplinkChannels; len(channels) > 0 {
-		fp.UplinkChannels = []Channel{}
+		fp.UplinkChannels = make([]Channel, 0, len(channels))
 		for _, ch := range channels {
 			fp.UplinkChannels = append(fp.UplinkChannels, *ch.Clone())
 		}
 	}
 	if channels := ext.DownlinkChannels; len(channels) > 0 {
-		fp.DownlinkChannels = []Channel{}
+		fp.DownlinkChannels = make([]Channel, 0, len(channels))
 		for _, ch := range channels {
 			fp.DownlinkChannels = append(fp.DownlinkChannels, *ch.Clone())
 		}
@@ -346,7 +374,7 @@ func (fp FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 		fp.LBT = ext.LBT.Clone()
 	}
 	if radios := ext.Radios; len(radios) > 0 {
-		fp.Radios = []Radio{}
+		fp.Radios = make([]Radio, 0, len(radios))
 		for _, r := range radios {
 			fp.Radios = append(fp.Radios, *r.Clone())
 		}
@@ -367,6 +395,12 @@ func (fp FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
 		var i uint8
 		i = *ext.DefaultRx2DataRate
 		fp.DefaultRx2DataRate = &i
+	}
+	if subBands := ext.SubBands; len(subBands) > 0 {
+		fp.SubBands = make([]SubBandParameters, 0, len(subBands))
+		for _, sb := range subBands {
+			fp.SubBands = append(fp.SubBands, *sb.Clone())
+		}
 	}
 	if ext.MaxEIRP != nil {
 		val := *ext.MaxEIRP
@@ -457,6 +491,16 @@ func (fp *FrequencyPlan) ToConcentratorConfig() (*ttnpb.ConcentratorConfig, erro
 	}
 	cc.ClockSource = uint32(fp.ClockSource)
 	return cc, nil
+}
+
+// FindSubBand returns the sub-band by frequency, if any.
+func (fp *FrequencyPlan) FindSubBand(frequency uint64) (SubBandParameters, bool) {
+	for _, sb := range fp.SubBands {
+		if sb.Comprises(frequency) {
+			return sb, true
+		}
+	}
+	return SubBandParameters{}, false
 }
 
 // FrequencyPlanDescription describes a frequency plan in the YAML format.
