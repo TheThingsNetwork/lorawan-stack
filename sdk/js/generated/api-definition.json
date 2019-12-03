@@ -3132,6 +3132,40 @@
         "updated_at"
       ]
     },
+    "List": {
+      "file": "lorawan-stack/api/user_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/users",
+          "parameters": []
+        }
+      ],
+      "allowedFieldMaskPaths": [
+        "admin",
+        "attributes",
+        "contact_info",
+        "created_at",
+        "description",
+        "ids",
+        "ids.email",
+        "ids.user_id",
+        "name",
+        "password_updated_at",
+        "primary_email_address",
+        "primary_email_address_validated_at",
+        "profile_picture",
+        "profile_picture.embedded",
+        "profile_picture.embedded.data",
+        "profile_picture.embedded.mime_type",
+        "profile_picture.sizes",
+        "require_password_update",
+        "state",
+        "temporary_password_created_at",
+        "temporary_password_expires_at",
+        "updated_at"
+      ]
+    },
     "Update": {
       "file": "lorawan-stack/api/user_services.proto",
       "http": [
