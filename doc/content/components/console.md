@@ -8,6 +8,6 @@ The Console is the official management application of The Things Stack for LoRaW
 
 <!--more-->
 
-{{< figure src="console_overview.png" alt="The Things Stack for LoRaWAN Console" >}}
+{{< figure src="../console_overview.png" alt="The Things Stack for LoRaWAN Console" >}}
 
 See the [Console Getting Started page]({{< ref "/guides/getting-started/console" >}}), for detailed instructions regarding the Console.
