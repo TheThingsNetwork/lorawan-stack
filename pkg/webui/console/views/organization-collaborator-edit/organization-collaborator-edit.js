@@ -15,6 +15,7 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 
+import PageTitle from '../../../components/page-title'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import CollaboratorForm from '../../components/collaborator-form'
