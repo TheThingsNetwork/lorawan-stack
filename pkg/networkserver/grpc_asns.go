@@ -125,7 +125,7 @@ func validateApplicationDownlinks(session ttnpb.Session, macState *ttnpb.MACStat
 				macPayload := pld.GetMACPayload()
 				if macPayload.FPort > 0 && macPayload.FCnt >= minFCnt {
 					// NOTE: In an unlikely case all len(recentDowns) downlinks are FPort==0 or something unmatched in the switch (e.g. a proprietary downlink) minFCnt will
-					// not reflect the correct AFCntDown - that is fine, because this is AS's responsibilty and FCnt checking here is essentially just a sanity check.
+					// not reflect the correct AFCntDown - that is fine, because this is AS's responsibility and FCnt checking here is essentially just a sanity check.
 					minFCnt = macPayload.FCnt + 1
 					break outer
 				}
