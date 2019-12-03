@@ -16,14 +16,13 @@ import * as user from '../../actions/user'
 import * as init from '../../actions/init'
 import api from '../../../api'
 import * as accessToken from '../../../lib/access-token'
-import { isPermissionDeniedError } from '../../../../lib/errors/utils'
+import { getBackendErrorName } from '../../../../lib/errors/utils'
 import createRequestLogic from './lib'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
   async process(_, dispatch) {
     dispatch(user.getUserRights())
-    dispatch(user.getUserMe())
 
     let info
 
@@ -41,14 +40,15 @@ const consoleAppLogic = createRequestLogic({
 
     if (info) {
       try {
+        dispatch(user.getUserMe())
         const userId = info.data.oauth_access_token.user_ids.user_id
         const result = await api.users.get(userId)
-        if (isPermissionDeniedError(result)) {
-          throw result
-        } else {
-          dispatch(user.getUserMeSuccess(result.data))
-        }
+        dispatch(user.getUserMeSuccess(result.data))
       } catch (error) {
+        if (getBackendErrorName(error) === 'user_requested') {
+          // Log unapproved users out automatically, to avoid confusion
+          dispatch(user.logout())
+        }
         dispatch(user.getUserMeFailure(error))
         accessToken.clear()
       }
