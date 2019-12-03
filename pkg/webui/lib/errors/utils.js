@@ -127,6 +127,16 @@ export const getBackendErrorId = error => error.message.split(' ')[0]
  */
 
 export const getBackendErrorDetails = error => (error.details[0].cause ? error : undefined)
+
+/**
+ * Returns the name of the error extracted from the details array.
+ * @param {Object} error - The backend error object.
+ * @returns {string} - The error name.
+ */
+export const getBackendErrorName = error =>
+  error && error.details instanceof Array && error.details[0] && error.details[0].name
+    ? error.details[0].name
+    : undefined
 /**
  * Returns the default message of the error, used as fallback translation.
  * @param {Object} error - The backend error object.
