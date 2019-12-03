@@ -73,10 +73,16 @@ func init() {
 		// As per FCC Rules for Unlicensed Wireless Equipment operating in the ISM bands
 		SubBands: []SubBandParameters{
 			{
-				MinFrequency: 902000000,
-				MaxFrequency: 928000000,
+				MinFrequency: 902300000,
+				MaxFrequency: 914900000,
 				DutyCycle:    1,
-				MaxEIRP:      30.0 + eirpDelta,
+				MaxEIRP:      21.0 + eirpDelta,
+			},
+			{
+				MinFrequency: 923300000,
+				MaxFrequency: 927500000,
+				DutyCycle:    1,
+				MaxEIRP:      26.0 + eirpDelta,
 			},
 		},
 

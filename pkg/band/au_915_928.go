@@ -75,10 +75,10 @@ func init() {
 		// See Radiocommunications (Low Interference Potential Devices) Class Licence 2015
 		SubBands: []SubBandParameters{
 			{
-				MinFrequency: 902000000,
+				MinFrequency: 915000000,
 				MaxFrequency: 928000000,
 				DutyCycle:    1,
-				MaxEIRP:      14.0 + eirpDelta,
+				MaxEIRP:      30,
 			},
 		},
 

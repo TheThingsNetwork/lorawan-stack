@@ -316,9 +316,11 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if sb, ok := phy.FindSubBand(rx.frequency); ok {
 			eirp = sb.MaxEIRP
 		}
-		// TODO: Take frequency plan's sub-band MaxEIRP (https://github.com/TheThingsNetwork/lorawan-stack/issues/300)
 		if c.fp.MaxEIRP != nil {
 			eirp = *c.fp.MaxEIRP
+		}
+		if sb, ok := c.fp.FindSubBand(rx.frequency); ok && sb.MaxEIRP != nil {
+			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
 			DataRateIndex: rx.dataRateIndex,

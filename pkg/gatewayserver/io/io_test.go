@@ -37,7 +37,7 @@ var timeout = (1 << 3) * test.Delay
 
 func timePtr(t time.Time) *time.Time { return &t }
 
-func Test(t *testing.T) {
+func TestFlow(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
@@ -361,6 +361,120 @@ func Test(t *testing.T) {
 				return
 			} else if tc.ErrorAssertion != nil {
 				t.Fatal("Expected error but got none")
+			}
+
+			received++
+			select {
+			case msg := <-frontend.Down:
+				scheduled := msg.GetScheduled()
+				a.So(scheduled, should.NotBeNil)
+				a.So(scheduled.Downlink.TxPower, should.Equal, tc.ExpectedEIRP)
+			case <-time.After(timeout):
+				t.Fatalf("Expected downlink message timeout")
+			}
+			total, last, ok := conn.DownStats()
+			a.So(ok, should.BeTrue)
+			a.So(total, should.Equal, received)
+			a.So(time.Since(last), should.BeLessThan, timeout)
+		})
+	}
+}
+
+func TestSubBandEIRPOverride(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	c := componenttest.NewComponent(t, &component.Config{})
+	gs := mock.NewServer(c)
+
+	ids := ttnpb.GatewayIdentifiers{GatewayID: "bar-gateway"}
+	antennaGain := float32(3)
+	gtw := &ttnpb.Gateway{
+		GatewayIdentifiers: ids,
+		FrequencyPlanID:    "AS_923_925_AU", // Overrides maximum EIRP to 30 dBm in 915.0 – 928.0 MHz sub-band.
+		Antennas: []ttnpb.GatewayAntenna{
+			{
+				Gain: antennaGain,
+			},
+		},
+	}
+	gs.RegisterGateway(ctx, ids, gtw)
+
+	gtwCtx := rights.NewContext(ctx, rights.Rights{
+		GatewayRights: map[string]*ttnpb.Rights{
+			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK),
+		},
+	})
+	frontend, err := mock.ConnectFrontend(gtwCtx, ids, gs)
+	if err != nil {
+		panic(err)
+	}
+	conn := gs.GetConnection(ctx, ids)
+
+	a.So(conn.Context(), should.HaveParentContextOrEqual, gtwCtx)
+	a.So(time.Since(conn.ConnectTime()), should.BeLessThan, timeout)
+	a.So(conn.Gateway(), should.Resemble, gtw)
+	a.So(conn.Frontend().Protocol(), should.Equal, "mock")
+
+	// Sync the clock.
+	{
+		frontend.Up <- &ttnpb.UplinkMessage{
+			RxMetadata: []*ttnpb.RxMetadata{
+				{
+					AntennaIndex: 0,
+					Timestamp:    100,
+				},
+			},
+		}
+		select {
+		case up := <-conn.Up():
+			tokenIDs, timestamp, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
+			a.So(err, should.BeNil)
+			a.So(tokenIDs.GatewayIdentifiers, should.Resemble, ids)
+			a.So(tokenIDs.AntennaIndex, should.Equal, 0)
+			a.So(timestamp, should.Equal, 100)
+		case <-time.After(timeout):
+			t.Fatalf("Expected uplink message time-out")
+		}
+		total, t, ok := conn.UpStats()
+		a.So(ok, should.BeTrue)
+		a.So(total, should.Equal, 1)
+		a.So(time.Since(t), should.BeLessThan, timeout)
+	}
+
+	received := 0
+	for _, tc := range []struct {
+		Name         string
+		Path         *ttnpb.DownlinkPath
+		Message      *ttnpb.DownlinkMessage
+		ExpectedEIRP float32
+	}{
+		{
+			Name: "ValidClassA",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "bar-gateway"}}, 100),
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_A,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1DataRateIndex: 5,
+						Rx1Frequency:     923200000,
+					},
+				},
+			},
+			ExpectedEIRP: 30 - antennaGain,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			_, err := conn.ScheduleDown(tc.Path, tc.Message)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
 			}
 
 			received++

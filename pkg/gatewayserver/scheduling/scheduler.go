@@ -81,20 +81,37 @@ func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforce
 		timeSource:        timeSource,
 	}
 	if enforceDutyCycle {
-		band, err := band.GetByID(fp.BandID)
-		if err != nil {
-			return nil, err
-		}
-		for _, subBand := range band.SubBands {
-			sb := NewSubBand(ctx, subBand, s.clock, nil)
-			s.subBands = append(s.subBands, sb)
+		if subBands := fp.SubBands; len(subBands) > 0 {
+			for _, subBand := range subBands {
+				params := SubBandParameters{
+					MinFrequency: subBand.MinFrequency,
+					MaxFrequency: subBand.MaxFrequency,
+					DutyCycle:    subBand.DutyCycle,
+				}
+				sb := NewSubBand(ctx, params, s.clock, nil)
+				s.subBands = append(s.subBands, sb)
+			}
+		} else {
+			band, err := band.GetByID(fp.BandID)
+			if err != nil {
+				return nil, err
+			}
+			for _, subBand := range band.SubBands {
+				params := SubBandParameters{
+					MinFrequency: subBand.MinFrequency,
+					MaxFrequency: subBand.MaxFrequency,
+					DutyCycle:    subBand.DutyCycle,
+				}
+				sb := NewSubBand(ctx, params, s.clock, nil)
+				s.subBands = append(s.subBands, sb)
+			}
 		}
 	} else {
-		sb := NewSubBand(ctx, band.SubBandParameters{
+		noDutyCycleParams := SubBandParameters{
 			MinFrequency: 0,
 			MaxFrequency: math.MaxUint64,
-			DutyCycle:    1,
-		}, s.clock, nil)
+		}
+		sb := NewSubBand(ctx, noDutyCycleParams, s.clock, nil)
 		s.subBands = append(s.subBands, sb)
 	}
 	return s, nil

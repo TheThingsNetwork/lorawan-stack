@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search is now also available to non-admin users.
 - Support for searching end devices within an application.
 - Notification during login informing users of unapproved user accounts.
+- Support maximum EIRP value from frequency plans sub-bands.
+- Support duty-cycle value from frequency plans sub-bands.
 
 ### Changed
 
@@ -27,6 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix crashing of organization collaborator edit page.
+- Correct `AU_915_928` maximum EIRP value to 30 dBm in 915.0 – 928.0 MHz (was 16.15 dBm).
+- Correct `US_902_928` maximum EIRP value to 23.15 dBm in 902.3 – 914.9 MHz (was 32.15 dBm) and 28.15 dBm in 923.3 – 927.5 MHz (was 32.15 dBm). This aligns with US915 Hybrid Mode.
+- Correct `AS_923` maximum EIRP value to 16 dBm in 923.0 – 923.5 MHz (was 16.15 dBm).
 
 ### Security
 
