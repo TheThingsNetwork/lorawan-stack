@@ -51,9 +51,9 @@ instance.interceptors.response.use(
   },
   error => {
     if ('response' in error && error.response && 'data' in error.response) {
-      return error.response.data
+      throw error.response.data
     }
-    return error
+    throw error
   },
 )
 
