@@ -15,6 +15,7 @@
 package networkserver
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"time"
@@ -93,6 +94,26 @@ func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
 	return 0, errUplinkChannelNotFound.WithAttributes("frequency", freq)
 }
 
+func partitionDownlinks(p func(down *ttnpb.ApplicationDownlink) bool, downs ...*ttnpb.ApplicationDownlink) (t, f []*ttnpb.ApplicationDownlink) {
+	t, f = downs[:0:0], downs[:0:0]
+	for _, down := range downs {
+		if p(down) {
+			t = append(t, down)
+		} else {
+			f = append(f, down)
+		}
+	}
+	return t, f
+}
+
+func paritionDownlinksBySessionKeyID(p func([]byte) bool, downs ...*ttnpb.ApplicationDownlink) (t, f []*ttnpb.ApplicationDownlink) {
+	return partitionDownlinks(func(down *ttnpb.ApplicationDownlink) bool { return p(down.SessionKeyID) }, downs...)
+}
+
+func partitionDownlinksBySessionKeyIDEquality(id []byte, downs ...*ttnpb.ApplicationDownlink) (t, f []*ttnpb.ApplicationDownlink) {
+	return paritionDownlinksBySessionKeyID(func(downID []byte) bool { return bytes.Equal(downID, id) }, downs...)
+}
+
 func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
 	switch {
 	case deviceNeedsADRParamSetupReq(dev, phy),
@@ -113,14 +134,18 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 	return ok && t.After(statusAt)
 }
 
+func lastUplink(ups ...*ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
+	return ups[len(ups)-1]
+}
+
 func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
-	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.RecentUplinks) == 0 {
+	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.MACState.RecentUplinks) == 0 {
 		return false
 	}
 	if len(dev.MACState.QueuedResponses) > 0 {
 		return true
 	}
-	up := dev.RecentUplinks[len(dev.RecentUplinks)-1]
+	up := lastUplink(dev.MACState.RecentUplinks...)
 	switch up.Payload.MHDR.MType {
 	case ttnpb.MType_UNCONFIRMED_UP:
 		if up.Payload.GetMACPayload().FCtrl.ADRAckReq {
@@ -129,17 +154,19 @@ func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time
 	case ttnpb.MType_CONFIRMED_UP:
 		return true
 	}
-	if len(dev.QueuedApplicationDownlinks) > 0 && dev.QueuedApplicationDownlinks[0].GetClassBC() == nil {
-		return true
+	for _, down := range dev.QueuedApplicationDownlinks {
+		if down.GetClassBC() == nil {
+			return true
+		}
 	}
 	return deviceNeedsMACRequestsAt(ctx, dev, t, phy, defaults)
 }
 
 func nextClassADataDownlinkSlot(dev *ttnpb.EndDevice) (time.Time, bool) {
-	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.RecentUplinks) == 0 {
+	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.MACState.RecentUplinks) == 0 {
 		return time.Time{}, false
 	}
-	rx1 := dev.RecentUplinks[len(dev.RecentUplinks)-1].ReceivedAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
+	rx1 := lastUplink(dev.MACState.RecentUplinks...).ReceivedAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
 	rx2 := rx1.Add(time.Second)
 	switch {
 	case rx2.Before(timeNow()):
@@ -158,8 +185,8 @@ func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSetti
 	if dev.GetMACState().GetRxWindowsAvailable() {
 		return time.Time{}
 	}
-	if len(dev.RecentUplinks) > 0 {
-		if dev.RecentUplinks[len(dev.RecentUplinks)-1].ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
+	if len(dev.MACState.RecentUplinks) > 0 {
+		if lastUplink(dev.MACState.RecentUplinks...).ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
 			return time.Time{}
 		}
 	}

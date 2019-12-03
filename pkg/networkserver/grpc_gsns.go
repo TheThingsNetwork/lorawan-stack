@@ -194,20 +194,16 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 		if dev.Multicast {
 			continue
 		}
-		if pld.Ack && len(dev.RecentDownlinks) == 0 {
-			logger.Debug("Uplink contains ACK, but no downlink was sent to device, skip")
+
+		_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 			continue
 		}
 
 		drIdx, err := searchDataRate(up.Settings.DataRate, dev, ns.FrequencyPlans)
 		if err != nil {
 			logger.WithError(err).Debug("Failed to determine data rate index of uplink, skip")
-			continue
-		}
-
-		_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
-		if err != nil {
-			logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 			continue
 		}
 
@@ -251,6 +247,10 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 		if dev.Session == nil || dev.MACState == nil || dev.Session.DevAddr != pld.DevAddr {
 			continue
 		}
+		if pld.Ack && len(dev.MACState.RecentDownlinks) == 0 {
+			logger.Debug("Uplink contains ACK, but no downlink was sent to device, skip")
+			continue
+		}
 
 		supports32BitFCnt := true
 		if dev.GetMACSettings().GetSupports32BitFCnt() != nil {
@@ -277,13 +277,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 			"supports_32_bit_f_cnt", true,
 		))
 
-		if fCnt == dev.Session.LastFCntUp && len(dev.RecentUplinks) > 0 {
-			if maxNbTrans == 1 {
-				logger.Debug("Repeated FCnt value, but retransmissions are not allowed, skip")
-				continue
-			}
-
-			nbTrans, lastAt := transmissionNumber(macPayloadBytes, dev.RecentUplinks...)
+		if fCnt == dev.Session.LastFCntUp && len(dev.MACState.RecentUplinks) > 0 {
+			nbTrans, lastAt := transmissionNumber(macPayloadBytes, dev.MACState.RecentUplinks...)
 			logger = logger.WithFields(log.Fields(
 				"f_cnt_gap", 0,
 				"f_cnt_reset", false,
@@ -838,10 +833,13 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			stored = matched.Device
 			paths := matched.SetPaths
 
-			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
-			paths = append(paths, "recent_uplinks")
+			stored.MACState.RecentUplinks = appendRecentUplink(stored.MACState.RecentUplinks, up, recentUplinkCount)
+			paths = ttnpb.AddFields(paths, "mac_state.recent_uplinks")
 
-			paths = append(paths, "recent_adr_uplinks")
+			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
+			paths = ttnpb.AddFields(paths, "recent_uplinks")
+
+			paths = ttnpb.AddFields(paths, "recent_adr_uplinks")
 			if !pld.FHDR.ADR {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
@@ -884,7 +882,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
 			CorrelationIDs:       up.CorrelationIDs,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-				FCnt:         stored.Session.LastFCntUp,
+				FCnt:         pld.FCnt,
 				FPort:        pld.FPort,
 				FRMPayload:   pld.FRMPayload,
 				RxMetadata:   up.RxMetadata,

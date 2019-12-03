@@ -732,26 +732,18 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						{SessionKeyID: []byte("testSession"), FCnt: 5},
 					},
 				})
-				if !a.So(err, should.BeError) {
-					t.Error("Error was expected")
-					return nil, errors.New("Error was expected")
-				}
-				a.So(sets, should.BeNil)
-				a.So(dev, should.BeNil)
-				return nil, err
+				a.So(err, should.BeNil)
+				a.So(sets, should.Resemble, []string{
+					"queued_application_downlinks",
+				})
+				a.So(dev.QueuedApplicationDownlinks, should.BeNil)
+				return dev, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceID:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 				},
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				if !assertions.New(t).So(errors.IsFailedPrecondition(err), should.BeTrue) {
-					t.Errorf("Received error: %s", err)
-					return false
-				}
-				return true
 			},
 			SetByIDCalls: 1,
 		},
@@ -1652,7 +1644,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
-				if !assertions.New(t).So(errors.IsFailedPrecondition(err), should.BeTrue) {
+				if !assertions.New(t).So(errors.IsNotFound(err), should.BeTrue) {
 					t.Errorf("Received error: %s", err)
 					return false
 				}

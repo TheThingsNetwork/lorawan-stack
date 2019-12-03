@@ -1174,6 +1174,24 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				var zero bool
 				dst.RxWindowsAvailable = zero
 			}
+		case "recent_uplinks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'recent_uplinks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RecentUplinks = src.RecentUplinks
+			} else {
+				dst.RecentUplinks = nil
+			}
+		case "recent_downlinks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'recent_downlinks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RecentDownlinks = src.RecentDownlinks
+			} else {
+				dst.RecentDownlinks = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

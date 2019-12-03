@@ -105,67 +105,96 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 	return err
 }
 
-func validateApplicationDownlinks(macState ttnpb.MACState, session ttnpb.Session, downs ...*ttnpb.ApplicationDownlink) error {
-	var lastFCnt *uint32
-	if macState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-		lastFCnt = &session.LastNFCntDown
+func validateApplicationDownlinks(session ttnpb.Session, macState *ttnpb.MACState, multicast bool, queue []*ttnpb.ApplicationDownlink, downs ...*ttnpb.ApplicationDownlink) (unmatchedQueue, unmatchedDowns []*ttnpb.ApplicationDownlink, err error) {
+	queue, unmatchedQueue = partitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, queue...)
+	downs, unmatchedDowns = partitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, downs...)
+	switch {
+	case len(downs) == 0:
+		return unmatchedQueue, unmatchedDowns, nil
+	case len(downs) > 0 && macState == nil:
+		return unmatchedQueue, unmatchedDowns, errUnknownMACState
+	}
+
+	var minFCnt uint32
+	if macState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+	outer:
+		for i := len(macState.RecentDownlinks) - 1; i >= 0; i-- {
+			pld := macState.RecentDownlinks[i].Payload
+			switch pld.MType {
+			case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
+				macPayload := pld.GetMACPayload()
+				if macPayload.FPort > 0 && macPayload.FCnt >= minFCnt {
+					// NOTE: In an unlikely case all len(recentDowns) downlinks are FPort==0 or something unmatched in the switch (e.g. a proprietary downlink) minFCnt will
+					// not reflect the correct AFCntDown - that is fine, because this is AS's responsibility and FCnt checking here is essentially just a sanity check.
+					minFCnt = macPayload.FCnt + 1
+					break outer
+				}
+			}
+		}
+	} else if session.LastNFCntDown > 0 || session.LastNFCntDown == 0 && len(macState.RecentDownlinks) > 0 {
+		minFCnt = session.LastNFCntDown + 1
+	}
+	if len(queue) > 0 {
+		if fCnt := queue[len(queue)-1].FCnt; fCnt >= minFCnt {
+			minFCnt = fCnt + 1
+		}
 	}
 	for _, down := range downs {
-		if down.ClassBC != nil && macState.DeviceClass == ttnpb.CLASS_A {
-			return errClassBCForClassA
+		switch {
+		case len(down.FRMPayload) > 250:
+			return unmatchedQueue, unmatchedDowns, errApplicationDownlinkTooLong
+
+		case down.FCnt < minFCnt:
+			return unmatchedQueue, unmatchedDowns, errFCntTooLow
+
+		case !bytes.Equal(down.SessionKeyID, session.SessionKeyID):
+			return unmatchedQueue, unmatchedDowns, errUnknownSession
+
+		case multicast && down.Confirmed:
+			return unmatchedQueue, unmatchedDowns, errConfirmedMulticastDownlink
+
+		case multicast && len(down.GetClassBC().GetGateways()) == 0:
+			return unmatchedQueue, unmatchedDowns, errNoPath
+
+		case down.GetClassBC().GetAbsoluteTime() != nil && down.GetClassBC().GetAbsoluteTime().Before(timeNow()):
+			return unmatchedQueue, unmatchedDowns, errExpiredDownlink
 		}
-		if !bytes.Equal(down.SessionKeyID, session.SessionKeyID) {
-			return errUnknownSession
-		}
-		if lastFCnt != nil && down.FCnt <= *lastFCnt {
-			return errFCntTooLow
-		}
-		lastFCnt = &down.FCnt
+		minFCnt = down.FCnt + 1
 	}
-	return nil
+	return unmatchedQueue, unmatchedDowns, nil
 }
 
 // validateQueuedApplicationDownlinks validates the given end device's application downlink queue.
 // This function returns an error if any of the following checks fail:
-// - The device has neither MACState and Session, nor PendingMACState and PendingSession set.
-// - Items belong to different sessions;
-// - An item has ClassBC set, but device is in Class A mode.
-// - An item's FRMPayload is longer than 250.
-// - An item's session is neither the device's session or pending session;
 // - An item's FCnt is not higher than the previous for the corresponding session;
+// - An item's FRMPayload is longer than 250 bytes;
+// - An item's session is neither the device's active session, nor device's pending session;
+// - An item's session matches device's session, but corresponding MACState is missing;
 // - The LoRaWAN version is 1.0.x and an item's FCnt is not higher than the session's NFCntDown.
-func validateQueuedApplicationDownlinks(dev *ttnpb.EndDevice) error {
-	for _, down := range dev.QueuedApplicationDownlinks {
-		if dev.Multicast {
-			if down.Confirmed {
-				return errConfirmedMulticastDownlink
-			}
-			if len(down.GetClassBC().GetGateways()) == 0 {
-				return errNoPath
-			}
-		}
-		if absTime := down.GetClassBC().GetAbsoluteTime(); absTime != nil && absTime.Before(timeNow()) {
-			return errExpiredDownlink
-		}
-		if len(down.FRMPayload) > 250 {
-			return errInvalidPayload
+func validateQueuedApplicationDownlinks(dev *ttnpb.EndDevice, downs ...*ttnpb.ApplicationDownlink) error {
+	if len(downs) == 0 {
+		return nil
+	}
+
+	var err error
+	unmatchedDowns := downs
+	unmatchedQueue := dev.QueuedApplicationDownlinks
+	if dev.Session != nil {
+		unmatchedDowns, unmatchedQueue, err = validateApplicationDownlinks(*dev.Session, dev.MACState, dev.Multicast, unmatchedQueue, unmatchedDowns...)
+		if err != nil {
+			return err
 		}
 	}
-	hasActiveSession := dev.MACState != nil && dev.Session != nil
-	hasPendingSession := dev.PendingMACState != nil && dev.PendingSession != nil
-	switch {
-	case !hasActiveSession && !hasPendingSession:
-		return errUnknownMACState
-	case !hasPendingSession:
-		return validateApplicationDownlinks(*dev.MACState, *dev.Session, dev.QueuedApplicationDownlinks...)
-	case !hasActiveSession:
-		return validateApplicationDownlinks(*dev.PendingMACState, *dev.PendingSession, dev.QueuedApplicationDownlinks...)
-	default:
-		if validateApplicationDownlinks(*dev.PendingMACState, *dev.PendingSession, dev.QueuedApplicationDownlinks...) == nil {
-			return nil
+	if dev.PendingSession != nil {
+		unmatchedDowns, unmatchedQueue, err = validateApplicationDownlinks(*dev.PendingSession, dev.PendingMACState, dev.Multicast, unmatchedQueue, unmatchedDowns...)
+		if err != nil {
+			return err
 		}
-		return validateApplicationDownlinks(*dev.MACState, *dev.Session, dev.QueuedApplicationDownlinks...)
 	}
+	if len(unmatchedDowns) > 0 {
+		return errUnknownSession
+	}
+	return nil
 }
 
 // DownlinkQueueReplace is called by the Application Server to completely replace the downlink queue for a device.
@@ -199,10 +228,11 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
-			dev.QueuedApplicationDownlinks = req.Downlinks
-			if err := validateQueuedApplicationDownlinks(dev); err != nil {
+			dev.QueuedApplicationDownlinks = nil
+			if err := validateQueuedApplicationDownlinks(dev, req.Downlinks...); err != nil {
 				return nil, nil, err
 			}
+			dev.QueuedApplicationDownlinks = req.Downlinks
 			return dev, []string{"queued_application_downlinks"}, nil
 		},
 	)
@@ -240,6 +270,10 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 
 // DownlinkQueuePush is called by the Application Server to push a downlink to queue for a device.
 func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
+	if len(req.Downlinks) == 0 {
+		return ttnpb.Empty, nil
+	}
+
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
@@ -264,10 +298,10 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
-			dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
-			if err := validateQueuedApplicationDownlinks(dev); err != nil {
+			if err := validateQueuedApplicationDownlinks(dev, req.Downlinks...); err != nil {
 				return nil, nil, err
 			}
+			dev.QueuedApplicationDownlinks = append(dev.QueuedApplicationDownlinks, req.Downlinks...)
 			return dev, []string{"queued_application_downlinks"}, nil
 		},
 	)
@@ -279,7 +313,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 	logger = logger.WithField("queue_length", len(dev.QueuedApplicationDownlinks))
 	logger.Debug("Pushed application downlink to queue")
 
-	if len(dev.QueuedApplicationDownlinks) == 0 || dev.MACState == nil {
+	if dev.MACState == nil {
 		return ttnpb.Empty, nil
 	}
 

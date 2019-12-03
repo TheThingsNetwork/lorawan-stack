@@ -10238,6 +10238,20 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Whether or not Rx windows are expected to be open.\nSet to true every time an uplink is received.\nSet to false every time a successful downlink scheduling attempt is made."
+        },
+        "recent_uplinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3UplinkMessage"
+          },
+          "description": "Recent data uplink messages sorted by time.\nThe number of messages stored may depend on configuration."
+        },
+        "recent_downlinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3DownlinkMessage"
+          },
+          "description": "Recent data downlink messages sorted by time.\nThe number of messages stored may depend on configuration."
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server and is read only."

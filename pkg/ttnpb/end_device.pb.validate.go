@@ -1417,6 +1417,40 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 		case "rx_windows_available":
 			// no validation rules for RxWindowsAvailable
+		case "recent_uplinks":
+
+			for idx, item := range m.GetRecentUplinks() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return MACStateValidationError{
+							field:  fmt.Sprintf("recent_uplinks[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		case "recent_downlinks":
+
+			for idx, item := range m.GetRecentDownlinks() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return MACStateValidationError{
+							field:  fmt.Sprintf("recent_downlinks[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return MACStateValidationError{
 				field:  name,
