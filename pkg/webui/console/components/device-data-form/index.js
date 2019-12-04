@@ -177,13 +177,13 @@ class DeviceDataForm extends Component {
           required
         />
         <Form.Field
-          title={sharedMessages.fwdNtwkKey}
+          title={sharedMessages.nwkSKey}
           name="session.keys.f_nwk_s_int_key.key"
           type="byte"
           min={16}
           max={16}
           placeholder={m.leaveBlankPlaceholder}
-          description={m.fwdNtwkKeyDescription}
+          description={m.nwkSKeyDescription}
           component={Input}
         />
         <Form.Field
