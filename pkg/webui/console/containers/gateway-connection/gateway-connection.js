@@ -88,9 +88,11 @@ class GatewayConnection extends React.PureComponent {
     }
 
     return (
-      <Status className={style.status} status={statusIndicator} flipped>
+      <Status status={statusIndicator} flipped>
         <Message className={style.lastSeen} content={message} />
-        {statusIndicator === 'good' && lastSeen && <DateTime.Relative value={lastSeen} />}
+        {statusIndicator === 'good' && lastSeen && (
+          <DateTime.Relative className={style.dateTime} value={lastSeen} />
+        )}
       </Status>
     )
   }
@@ -122,7 +124,7 @@ class GatewayConnection extends React.PureComponent {
     const downlinkCount = parseInt(downlinks) || 0
 
     return (
-      <React.Fragment>
+      <div className={style.messages}>
         <span className={style.messageCount}>
           <Icon className={style.icon} icon="uplink" />
           <FormattedNumber value={uplinkCount} />
@@ -131,7 +133,7 @@ class GatewayConnection extends React.PureComponent {
           <Icon className={style.icon} icon="downlink" />
           <FormattedNumber value={downlinkCount} />
         </span>
-      </React.Fragment>
+      </div>
     )
   }
 
