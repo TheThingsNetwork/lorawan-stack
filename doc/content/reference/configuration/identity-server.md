@@ -39,7 +39,7 @@ Most emails contain the name of the network and links to the Identity Server or 
 - `is.email.network.identity-server-url`: The URL of the Identity Server
 - `is.email.network.console-url`: The URL of the Console
 
-Although The Things Stack comes with a number of builtin email templates, it is possible to override those with custom templates. You can specify the source where to load templates from, and options for that source. For more information on email templates, see the [email templates reference]({{< relref "../email-templates" >}}).
+Although {{% tts %}} comes with a number of builtin email templates, it is possible to override those with custom templates. You can specify the source where to load templates from, and options for that source. For more information on email templates, see the [email templates reference]({{< relref "../email-templates" >}}).
 
 - `is.email.templates.source`: Source of the email template files (directory, url, blob)
 - `is.email.templates.directory`: Directory on the filesystem where email templates are located
@@ -67,7 +67,7 @@ If page assets for the OAuth UI are served from a CDN or on a different path on 
 - `is.oauth.ui.assets-base-url`: The base URL to the page assets
 - `is.oauth.ui.branding-base-url`: The base URL to the branding assets
 
-The appearance of The Things Stack can optionally be customized.
+The appearance of {{% tts %}} can optionally be customized.
 
 - `is.oauth.ui.site-name`: The site name
 - `is.oauth.ui.title`: The page title

@@ -24,7 +24,7 @@ Many CLI commands names have aliases, which are different spellings or shorter v
 
 ## Input and Output Formats
 
-By default the CLI outputs results as one or more JSON objects. These JSON objects are equivalent to the JSON objects that would be returned when using the HTTP API of The Things Stack. Some commands accept one or more JSON objects as input. These JSON objects are equivalent to the JSON objects that can be sent to the HTTP API. This way of handling input and output is used by the [End Device Templates feature]({{< ref "/reference/end-device-templates" >}}).
+By default the CLI outputs results as one or more JSON objects. These JSON objects are equivalent to the JSON objects that would be returned when using the HTTP API of {{% tts %}}. Some commands accept one or more JSON objects as input. These JSON objects are equivalent to the JSON objects that can be sent to the HTTP API. This way of handling input and output is used by the [End Device Templates feature]({{< ref "/reference/end-device-templates" >}}).
 
 The `--output-format` flag allows you to specify a [Go template](https://golang.org/pkg/text/template/) that is executed for the result(s) of a command. The example below executes lists applications and outputs their IDs and names:
 

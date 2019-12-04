@@ -4,7 +4,7 @@ description: ""
 weight: 3
 ---
 
-The following email templates are currently used by The Things Stack:
+The following email templates are currently used by {{% tts %}}:
 
 Full Name | Identifier | Scope | Additional fields
 ----------|------------|-------|------------------

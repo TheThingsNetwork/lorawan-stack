@@ -4,4 +4,4 @@ description: ""
 weight: 15
 ---
 
-This section provides guides for connecting popular gateways to The Things Stack.
+This section provides guides for connecting popular gateways to {{% tts %}}.

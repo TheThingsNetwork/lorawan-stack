@@ -1,14 +1,14 @@
 ---
-title: "Running The Things Stack"
+title: "Running {{% tts %}}"
 description: ""
 weight: 4
 ---
 
-Now that all configuration is done, we're ready to initialize The Things Stack and start it. Open a terminal prompt in the same directory as your `docker-compose.yml` file.
+Now that all configuration is done, we're ready to initialize {{% tts %}} and start it. Open a terminal prompt in the same directory as your `docker-compose.yml` file.
 
 ## Initialization
 
-The first time The Things Stack is started, it requires some initialization. We'll start by pulling the Docker images:
+The first time {{% tts %}} is started, it requires some initialization. We'll start by pulling the Docker images:
 
 ```bash
 $ docker-compose pull
@@ -52,9 +52,9 @@ $ docker-compose run --rm stack is-db create-oauth-client \
   --redirect-uri "/console/oauth/callback"
 ```
 
-## Running The Things Stack
+## Running {{% tts %}}
 
-Now it's time to start The Things Stack:
+Now it's time to start {{% tts %}}:
 
 ```bash
 $ docker-compose up
@@ -62,4 +62,4 @@ $ docker-compose up
 
 This will start the stack and print logs to your terminal. You can also start the stack in detached mode by adding `-d` to the command above. In that case you can get logs with [`docker-compose logs`](https://docs.docker.com/compose/reference/logs/).
 
-With The Things Stack up and running, it's time to connect gateways, create devices and work with streaming data. See [Console]({{< relref "console" >}}) or [Command-line Interface]({{< relref "cli" >}}) to proceed.
+With {{% tts %}} up and running, it's time to connect gateways, create devices and work with streaming data. See [Console]({{< relref "console" >}}) or [Command-line Interface]({{< relref "cli" >}}) to proceed.

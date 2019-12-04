@@ -4,7 +4,7 @@ description: ""
 weight: 20
 ---
 
-The Things Stack generates lots of events that allow you to get insight in what is going on. You can subscribe to application, gateway, end device events, as well as to user, organization and OAuth client events.
+{{% tts %}} generates lots of events that allow you to get insight in what is going on. You can subscribe to application, gateway, end device events, as well as to user, organization and OAuth client events.
 
 This guide shows how to subscribe to events with the CLI and with the HTTP API.
 

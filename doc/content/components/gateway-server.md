@@ -22,7 +22,7 @@ Gateways can connect to a Gateway Server over [the UDP protocol](https://github.
 
 If a gateway is found in the Identity Server with this EUI, messages are correlated to this gateway. Otherwise, depending on network configuration, uplinks may routed or dropped. However, the network will not send downlinks to this gateway, given that its regional parameters cannot be identified.
 
-Many packet forwarders implementing the UDP protocol do not implement any queuing system for downlinks, resulting in packet loss since SX1301 concentrators cannot buffer multiple downlinks. The Things Stack therefore implements, for the UDP protocol, a delay to send downlinks to gateway just before they're meant to be emitted by the concentrator. You can disable this feature individually per gateway, for example if the RTT between your gateway and the Gateway Server is too high.
+Many packet forwarders implementing the UDP protocol do not implement any queuing system for downlinks, resulting in packet loss since SX1301 concentrators cannot buffer multiple downlinks. {{% tts %}} therefore implements, for the UDP protocol, a delay to send downlinks to gateway just before they're meant to be emitted by the concentrator. You can disable this feature individually per gateway, for example if the RTT between your gateway and the Gateway Server is too high.
 
 ### MQTT protocol
 

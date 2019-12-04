@@ -12,7 +12,7 @@ Under normal circumstances, only `info`, `warn` and `error` logs are printed to 
 
 ## TLS Options
 
-The Things Stack serves several endpoints using TLS. TLS certificates can come from different sources.
+{{% tts %}} serves several endpoints using TLS. TLS certificates can come from different sources.
 
 - `tls.source`: Source of the TLS certificate (file, acme, key-vault)
 
@@ -40,7 +40,7 @@ For client-side TLS, you may configure a Root CA and optionally disable verifica
 
 ## gRPC Options
 
-The `grpc` options configure how The Things Stack listens for gRPC connections. The format is `host:port`. When listening on TLS ports, it uses the global [TLS configuration]({{< ref "#tls-options" >}}).
+The `grpc` options configure how {{% tts %}} listens for gRPC connections. The format is `host:port`. When listening on TLS ports, it uses the global [TLS configuration]({{< ref "#tls-options" >}}).
 
 - `grpc.listen`: Address for the TCP gRPC server to listen on
 - `grpc.listen-tls`: Address for the TLS gRPC server to listen on
@@ -51,17 +51,17 @@ When running a cluster in a trusted network, you can allow sending credentials o
 
 ## HTTP Options
 
-The `http` options configure how The Things Stack listens for HTTP connections. The format is `host:port`. When listening on TLS ports, it uses the global [TLS configuration]({{< ref "#tls-options" >}}).
+The `http` options configure how {{% tts %}} listens for HTTP connections. The format is `host:port`. When listening on TLS ports, it uses the global [TLS configuration]({{< ref "#tls-options" >}}).
 
 - `http.listen`: Address for the HTTP server to listen on
 - `http.listen-tls`: Address for the HTTPS server to listen on
 
-The Things Stack uses secure cookies that are encrypted with a `block-key` and signed with a `hash-key`. In production deployments you'll want these to stay the same between restarts. The keys are encoded as hex.
+{{% tts %}} uses secure cookies that are encrypted with a `block-key` and signed with a `hash-key`. In production deployments you'll want these to stay the same between restarts. The keys are encoded as hex.
 
 - `http.cookie.block-key`: Key for cookie contents encryption (16, 24 or 32 bytes)
 - `http.cookie.hash-key`: Key for cookie contents verification (32 or 64 bytes)
 
-The Things Stack serves a number of internal endpoints for health, metrics and debugging. These will usually be disabled or password protected in production deployments.
+{{% tts %}} serves a number of internal endpoints for health, metrics and debugging. These will usually be disabled or password protected in production deployments.
 
 - `http.health.enable`: Enable health check endpoint on HTTP server
 - `http.health.password`: Password to protect health endpoint (username is health)
@@ -82,7 +82,7 @@ The HTTP server serves static files for the web UI. If these files are not in th
 
 ## Interoperability Options
 
-The Things Stack supports interoperability according to LoRaWAN Backend Interfaces specification. The following options are used to configure the server for this.
+{{% tts %}} supports interoperability according to LoRaWAN Backend Interfaces specification. The following options are used to configure the server for this.
 
 - `interop.listen-tls`: Address for the interop server to listen on
 
@@ -123,7 +123,7 @@ Or you can enable failover using [Redis Sentinel](https://redis.io/topics/sentin
 
 ## Blob Options
 
-The `blob` options configure how The Things Stack reads or writes files such as pictures, the frequency plans repository or files required for Backend Interfaces interoperability. The `provider` field selects the provider that is used, and which other options are read.
+The `blob` options configure how {{% tts %}} reads or writes files such as pictures, the frequency plans repository or files required for Backend Interfaces interoperability. The `provider` field selects the provider that is used, and which other options are read.
 
 - `blob.provider`: Blob store provider (local, aws, gcp) (default "local")
 
@@ -144,7 +144,7 @@ If the blob provider is `gcp`, you can specify the credentials with either the c
 
 ## Events Options
 
-The `events` options configure how events are shared between components. When using a single instance of The Things Stack, the `internal` backend is the best option. If you need to communicate in a cluster, you can use the `redis` or `cloud` backend.
+The `events` options configure how events are shared between components. When using a single instance of {{% tts %}}, the `internal` backend is the best option. If you need to communicate in a cluster, you can use the `redis` or `cloud` backend.
 
 - `events.backend`: Backend to use for events (internal, redis, cloud) (default "internal")
 
@@ -181,7 +181,7 @@ The `blob` source loads from the given path in a bucket. This requires the globa
 
 ## Cluster Options
 
-The `cluster` options configure how The Things Stack communicates with other components in the cluster. These options do not need to be set when running a single instance of The Things Stack. The most important options are the ones to configure the addresses of the other components in the cluster.
+The `cluster` options configure how {{% tts %}} communicates with other components in the cluster. These options do not need to be set when running a single instance of {{% tts %}}. The most important options are the ones to configure the addresses of the other components in the cluster.
 
 - `cluster.identity-server`: Address for the Identity Server
 - `cluster.gateway-server`: Address for the Gateway Server

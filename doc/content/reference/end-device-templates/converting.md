@@ -6,7 +6,7 @@ weight: 3
 
 {{< cli-only >}}
 
-You can convert data in various formats to device templates using formats supported by The Things Stack. Input formats can be vendor-specific information about devices or device data to migrate from another LoRaWAN server stack.
+You can convert data in various formats to device templates using formats supported by {{% tts %}}. Input formats can be vendor-specific information about devices or device data to migrate from another LoRaWAN server stack.
 
 Start with listing the supported formats:
 

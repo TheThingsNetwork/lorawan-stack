@@ -6,11 +6,11 @@ weight: 8
 
 ## Login
 
-The Console needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running, open `https://thethings.example.com` (replace with the URL of your deployment) in your browser.
+The Console needs to be logged on in order to create gateways, applications, devices and API keys. With {{% tts %}} running, open `https://thethings.example.com` (replace with the URL of your deployment) in your browser.
 
 {{< figure src="front.png" alt="Front page" >}}
 
-You are now on the Console landing page. Click **Login with your The Things Stack Account** in order to reach the login page.
+You are now on the Console landing page. Click **Login with your {{% tts %}} Account** in order to reach the login page.
 
 {{< figure src="login.png" alt="Login" >}}
 
@@ -34,11 +34,11 @@ Your gateway will be created and you will be redirected to the gateway overview 
 
 {{< figure src="gateway-overview.png" alt="Gateway overview" >}}
 
-You can now connect your gateway to The Things Stack.
+You can now connect your gateway to {{% tts %}}.
 
 ### Create Gateway API Key
 
-Some gateways require an API Key with Link Gateway Rights to be able to connect to The Things Stack. 
+Some gateways require an API Key with Link Gateway Rights to be able to connect to {{% tts %}}. 
 
 In order to do this, navigate the **API Keys** menu of your gateway and select **Add API Key**. Enter a name for your key, select the **Link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink** right and then press **Create API Key**.
 
@@ -108,6 +108,6 @@ You'll now reach the device overview page for your device. The end device should
 
 ## Working With Data
 
-With your The Things Stack setup, a gateway connected and a device registered on your network, it's time to start working with data.
+With your {{% tts %}} setup, a gateway connected and a device registered on your network, it's time to start working with data.
 
 Learn how to work with the [builtin MQTT server]({{< relref "../mqtt" >}}) and [HTTP webhooks]({{< relref "../webhooks" >}}).

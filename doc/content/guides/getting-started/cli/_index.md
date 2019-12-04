@@ -25,7 +25,7 @@ If you did not put the configuration file in the recommended location, you need 
 
 ## Login
 
-The CLI needs to be logged on in order to create gateways, applications, devices and API keys. With The Things Stack running in one terminal session, login with the following command:
+The CLI needs to be logged on in order to create gateways, applications, devices and API keys. With {{% tts %}} running in one terminal session, login with the following command:
 
 ```bash
 $ ttn-lw-cli login
@@ -53,13 +53,13 @@ $ ttn-lw-cli gateways create gtw1 \
   --enforce-duty-cycle
 ```
 
-This creates a gateway `gtw1` with user `admin` as collaborator, frequency plan `EU_863_870`, EUI `00800000A00009EF` and respecting duty-cycle limitations. You can now connect your gateway to The Things Stack.
+This creates a gateway `gtw1` with user `admin` as collaborator, frequency plan `EU_863_870`, EUI `00800000A00009EF` and respecting duty-cycle limitations. You can now connect your gateway to {{% tts %}}.
 
 >Note: The CLI returns the created and updated entities by default in JSON. This can be useful in scripts.
 
 ### Create Gateway API Key
 
-Some gateways require an API Key with Link Gateway Rights to be able to connect to The Things Stack.
+Some gateways require an API Key with Link Gateway Rights to be able to connect to {{% tts %}}.
 
 Create an API key for the gateway:
 
@@ -151,12 +151,12 @@ $ ttn-lw-cli end-devices create app1 dev2 \
   --session.keys.nwk-s-key.key B7F3E161BC9D4388E6C788A0C547F255
 ```
 
->Note: The `NwkSKey` is returned as `f_nwk_s_int_key` (The Things Stack uses LoRaWAN 1.1 terminology).
+>Note: The `NwkSKey` is returned as `f_nwk_s_int_key` ({{% tts %}} uses LoRaWAN 1.1 terminology).
 
 >Hint: You can also pass `--with-session` to have a session generated.
 
 ## Working With Data
 
-With your The Things Stack setup, a gateway connected and a device registered on your network, it's time to start working with data.
+With your {{% tts %}} setup, a gateway connected and a device registered on your network, it's time to start working with data.
 
 Learn how to work with the [builtin MQTT server]({{< relref "../mqtt" >}}) and [HTTP webhooks]({{< relref "../webhooks" >}}).

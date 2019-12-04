@@ -5,7 +5,7 @@ weight: 30
 ---
 
 
-The Things Stack keeps a queue of downlink messages per device. Applications can keep pushing downlink messages or replace the queue with a list of downlink messages.
+{{% tts %}} keeps a queue of downlink messages per device. Applications can keep pushing downlink messages or replace the queue with a list of downlink messages.
 
 You can schedule downlink using the CLI, MQTT or HTTP webhooks.
 
