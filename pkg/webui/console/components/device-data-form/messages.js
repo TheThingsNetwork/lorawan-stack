@@ -18,7 +18,8 @@ export default defineMessages({
   abp: 'Activation By Personalization (ABP)',
   activationMode: 'Activation Mode',
   activationSettings: 'Activation Settings',
-  appEUIDescription: 'AppEUI identifies the Join Server',
+  appEUIDescription:
+    'The AppEUI is a global application ID that uniquely identifies the owner of the ­device',
   appKeyDescription:
     'The root key to derive session keys to secure communication between the device and the application',
   appKeyNewDescription:
