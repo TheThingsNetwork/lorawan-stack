@@ -23998,6 +23998,65 @@
           ]
         },
         {
+          "name": "ListUsersRequest",
+          "longName": "ListUsersRequest",
+          "fullName": "ttn.lorawan.v3.ListUsersRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "field_mask",
+              "description": "",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "Order the results by this field path (must be present in the field mask).\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "SendInvitationRequest",
           "longName": "SendInvitationRequest",
           "fullName": "ttn.lorawan.v3.SendInvitationRequest",
@@ -24867,6 +24926,28 @@
                     {
                       "method": "GET",
                       "pattern": "/users/{user_ids.user_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List",
+              "description": "",
+              "requestType": "ListUsersRequest",
+              "requestLongType": "ListUsersRequest",
+              "requestFullType": "ttn.lorawan.v3.ListUsersRequest",
+              "requestStreaming": false,
+              "responseType": "Users",
+              "responseLongType": "Users",
+              "responseFullType": "ttn.lorawan.v3.Users",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/users"
                     }
                   ]
                 }

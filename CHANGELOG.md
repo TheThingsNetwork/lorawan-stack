@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Notification during login informing users of unapproved user accounts.
 - Support maximum EIRP value from frequency plans sub-bands.
 - Support duty-cycle value from frequency plans sub-bands.
+- `List` RPC in the user registry and related messages.
 
 ### Changed
 

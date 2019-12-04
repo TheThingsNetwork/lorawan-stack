@@ -34,7 +34,7 @@ import (
 
 var (
 	errUnauthenticated          = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
-	errUnsupportedAuthorization = errors.DefineUnauthenticated("unsupported_authorization", "Unsupported authorization method")
+	errUnsupportedAuthorization = errors.DefineUnauthenticated("unsupported_authorization", "unsupported authorization method")
 	errAPIKeyNotFound           = errors.DefineUnauthenticated("api_key_not_found", "API key not found")
 	errInvalidAuthorization     = errors.DefineUnauthenticated("invalid_authorization", "invalid authorization")
 	errTokenNotFound            = errors.DefineUnauthenticated("token_not_found", "access token not found")
@@ -44,6 +44,7 @@ var (
 	errUserSuspended            = errors.DefinePermissionDenied("user_suspended", "user account was suspended")
 	errOAuthClientRejected      = errors.DefinePermissionDenied("oauth_client_rejected", "OAuth client was rejected")
 	errOAuthClientSuspended     = errors.DefinePermissionDenied("oauth_client_suspended", "OAuth client was suspended")
+	errPermissionDenied         = errors.DefinePermissionDenied("permission_denied", "unauthorized request to restricted resource")
 )
 
 type requestAccessKeyType struct{}
@@ -307,6 +308,14 @@ func (is *IdentityServer) IsAdmin(ctx context.Context) bool {
 		return false
 	}
 	return authInfo.IsAdmin
+}
+
+// RequireAdmin returns an error when the caller is not an admin.
+func (is *IdentityServer) RequireAdmin(ctx context.Context) error {
+	if !is.IsAdmin(ctx) {
+		return errPermissionDenied
+	}
+	return nil
 }
 
 func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {

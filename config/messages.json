@@ -3986,6 +3986,15 @@
       "file": "user_registry.go"
     }
   },
+  "error:pkg/identityserver:permission_denied": {
+    "translations": {
+      "en": "unauthorized request to restricted resource"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "entity_access.go"
+    }
+  },
   "error:pkg/identityserver:search_forbidden": {
     "translations": {
       "en": "search is forbidden"
@@ -4042,7 +4051,7 @@
   },
   "error:pkg/identityserver:unsupported_authorization": {
     "translations": {
-      "en": "Unsupported authorization method"
+      "en": "unsupported authorization method"
     },
     "description": {
       "package": "pkg/identityserver",
