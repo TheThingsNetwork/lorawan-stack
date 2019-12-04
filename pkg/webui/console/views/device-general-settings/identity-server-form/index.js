@@ -29,7 +29,7 @@ import { parseLorawanMacVersion, hasExternalJs, isDeviceOTAA } from '../utils'
 import validationSchema from './validation-schema'
 
 const IdentityServerForm = React.memo(props => {
-  const { device, onSubmit, jsConfig } = props
+  const { device, onSubmit, onSubmitSuccess, jsConfig } = props
 
   const formRef = React.useRef(null)
   const [error, setError] = React.useState('')
@@ -118,12 +118,13 @@ const IdentityServerForm = React.memo(props => {
       try {
         await onSubmit(updatedValues)
         resetForm(castedValues)
+        onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
         setError(err)
       }
     },
-    [initialValues, onSubmit],
+    [initialValues, onSubmit, onSubmitSuccess],
   )
 
   const isOTAA = isDeviceOTAA(device)
@@ -237,6 +238,7 @@ IdentityServerForm.propTypes = {
   device: PropTypes.device.isRequired,
   jsConfig: PropTypes.stackComponent.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  onSubmitSuccess: PropTypes.func.isRequired,
 }
 
 export default IdentityServerForm

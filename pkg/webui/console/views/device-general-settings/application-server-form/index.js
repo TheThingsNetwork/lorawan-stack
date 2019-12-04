@@ -47,7 +47,7 @@ const validationSchema = Yup.object().shape({
 })
 
 const ApplicationServerForm = React.memo(props => {
-  const { device, onSubmit } = props
+  const { device, onSubmit, onSubmitSuccess } = props
 
   const [error, setError] = React.useState('')
 
@@ -78,12 +78,13 @@ const ApplicationServerForm = React.memo(props => {
       try {
         await onSubmit(updatedValues)
         resetForm(castedValues)
+        onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
         setError(err)
       }
     },
-    [initialValues, onSubmit],
+    [initialValues, onSubmit, onSubmitSuccess],
   )
 
   return (
@@ -122,6 +123,7 @@ const ApplicationServerForm = React.memo(props => {
 ApplicationServerForm.propTypes = {
   device: PropTypes.device.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  onSubmitSuccess: PropTypes.func.isRequired,
 }
 
 export default ApplicationServerForm

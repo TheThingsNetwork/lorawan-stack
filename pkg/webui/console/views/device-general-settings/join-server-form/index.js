@@ -92,12 +92,13 @@ const JoinServerForm = React.memo(props => {
       try {
         await onSubmit(updatedValues)
         resetForm(castedValues)
+        onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
         setError(err)
       }
     },
-    [initialValues, onSubmit],
+    [initialValues, onSubmit, onSubmitSuccess],
   )
 
   const nwkKeyHidden = isNwkKeyHidden(device)
@@ -208,6 +209,7 @@ const JoinServerForm = React.memo(props => {
 JoinServerForm.propTypes = {
   device: PropTypes.device.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  onSubmitSuccess: PropTypes.func.isRequired,
 }
 
 export default JoinServerForm

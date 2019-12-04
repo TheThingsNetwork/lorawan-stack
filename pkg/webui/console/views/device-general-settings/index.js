@@ -116,6 +116,21 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   @bind
+  async handleSubmitSuccess() {
+    const { device } = this.props
+
+    const {
+      ids: { device_id: deviceId },
+    } = device
+
+    toast({
+      title: deviceId,
+      message: m.updateSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }
+
+  @bind
   async handleDelete() {
     const { appId, device } = this.props
     const {
@@ -229,14 +244,23 @@ export default class DeviceGeneralSettings extends React.Component {
               <IdentityServerForm
                 device={device}
                 onSubmit={this.handleSubmit}
+                onSubmitSuccess={this.handleSubmitSuccess}
                 jsConfig={jsConfig}
               />
             </Collapse>
             <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
-              <NetworkServerForm device={device} onSubmit={this.handleSubmit} />
+              <NetworkServerForm
+                device={device}
+                onSubmit={this.handleSubmit}
+                onSubmitSuccess={this.handleSubmitSuccess}
+              />
             </Collapse>
             <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
-              <ApplicationServerForm device={device} onSubmit={this.handleSubmit} />
+              <ApplicationServerForm
+                device={device}
+                onSubmit={this.handleSubmit}
+                onSubmitSuccess={this.handleSubmitSuccess}
+              />
             </Collapse>
             <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
               <JoinServerForm

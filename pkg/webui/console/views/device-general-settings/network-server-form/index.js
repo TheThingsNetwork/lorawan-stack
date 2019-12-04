@@ -51,7 +51,7 @@ const lorawanPhyVersions = [
 ]
 
 const NetworkServerForm = React.memo(props => {
-  const { device, onSubmit } = props
+  const { device, onSubmit, onSubmitSuccess } = props
 
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
@@ -118,12 +118,13 @@ const NetworkServerForm = React.memo(props => {
       try {
         await onSubmit(updatedValues)
         resetForm(castedValues)
+        onSubmitSuccess()
       } catch (err) {
         setSubmitting(false)
         setError(err)
       }
     },
-    [initialValues, onSubmit],
+    [initialValues, onSubmit, onSubmitSuccess],
   )
 
   const handleResetsFCntChange = React.useCallback(evt => {
@@ -282,6 +283,7 @@ const NetworkServerForm = React.memo(props => {
 NetworkServerForm.propTypes = {
   device: PropTypes.device.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  onSubmitSuccess: PropTypes.func.isRequired,
 }
 
 export default NetworkServerForm
