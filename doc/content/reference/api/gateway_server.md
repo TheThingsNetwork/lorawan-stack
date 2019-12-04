@@ -4,7 +4,7 @@ description: ""
 weight: 6
 ---
 
-## The `Gs` service
+## <a name="Gs">The `Gs` service</a>
 
 {{< proto/method service="Gs" method="GetGatewayConnectionStats" >}}
 
