@@ -1,5 +1,5 @@
 ---
-title: "Running {{% tts %}}"
+title: "Running The Things Stack"
 description: ""
 weight: 4
 ---
