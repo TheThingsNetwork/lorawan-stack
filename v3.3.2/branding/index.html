@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Branding | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.3.2/branding/" />
+  <link rel="icon" type="image/png" href="/v3.3.2/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.3.2/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Branding">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Branding">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.3.2/branding/">
+  <meta name="twitter:title" content="Branding" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.3.2/">
+        <img src="/v3.3.2/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.3.2/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.3.2/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.3.2/components/">Components</a>
+        <a class="navbar-item" href="/v3.3.2/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.3.2/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">Branding</h1>
+
+<div class="content"><p>This reference gives details on how to customize the branding of the login pages and the Console.</p>
+
+<h2 id="title-subtitle-and-description">Title, Subtitle and Description</h2>
+
+<p>The title, subtitle and description of the login pages and the console can be changed using configuration options. See for details the <a href="https://thethingsstack.io/v3.3.2/reference/configuration/identity-server/#oauth-ui-options">Identity Server configuration reference</a> and the <a href="https://thethingsstack.io/v3.3.2/reference/configuration/console/">Console configuration reference</a>.</p>
+
+<h2 id="logos">Logos</h2>
+
+<p>It is possible to change the logos of the web UI by changing the &ldquo;branding base URL&rdquo; to a location that contains the following files:</p>
+
+<table>
+<thead>
+<tr>
+<th><strong>Filename</strong></th>
+<th><strong>Size</strong></th>
+<th><strong>Purpose</strong></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>console-favicon.ico</td>
+<td>multiple</td>
+<td>The logo for the console that is shown in browser tabs and bookmarks.</td>
+</tr>
+
+<tr>
+<td>console-og-image.png</td>
+<td>1200x600</td>
+<td>The logo for the console that is shown when sharing links on social media</td>
+</tr>
+
+<tr>
+<td>console-touch-icon.png</td>
+<td>400x400</td>
+<td>The logo for the console that is shown mobile devices</td>
+</tr>
+
+<tr>
+<td>console-logo.svg</td>
+<td>vector</td>
+<td>The logo for the console that is shown in the menu bar of the console</td>
+</tr>
+
+<tr>
+<td>oauth-favicon.ico</td>
+<td>multiple</td>
+<td>The logo for the login pages that is shown in browser tabs and bookmarks</td>
+</tr>
+
+<tr>
+<td>oauth-og-image.png</td>
+<td>1200x600</td>
+<td>The logo for the login pages that is shown when sharing links on social media</td>
+</tr>
+
+<tr>
+<td>oauth-touch-icon.png</td>
+<td>400x400</td>
+<td>The logo for the login pages that is shown mobile devices</td>
+</tr>
+</tbody>
+</table>
+
+<p>For the exact configuration options that are required to set a custom &ldquo;branding base URL&rdquo;, see the <a href="https://thethingsstack.io/v3.3.2/reference/configuration/identity-server/#oauth-ui-options">Identity Server configuration reference</a> and the <a href="https://thethingsstack.io/v3.3.2/reference/configuration/console/">Console configuration reference</a>.</p>
+
+<h4 id="hint">Hint</h4>
+
+<p>If you have your favicon as a PNG, use ImageMagick to convert it to ICO:
+\$ convert console-favicon.png -define icon:auto-resize=64,48,32,16 console-favicon.ico</p></div>
+
+
+<div class="is-clearfix">
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.3.2/guides/">Guides</a></p>
+        <p><a class="" href="/v3.3.2/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.3.2/components/">Components</a></p>
+        <p><a class="" href="/v3.3.2/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Kevin Schiffer on 27 Nov 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/5c3ff4594fb5b173d7f5ce673c6af5be954d35e2">
+      doc: Update documentation for custom branding
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/branding/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.3.2/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Identity Server Options | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.3.2/reference/configuration/identity-server/" />
+  <link rel="icon" type="image/png" href="/v3.3.2/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.3.2/css/theme.min.5540086e8a971e68797caea4bc4d0ea788de2e5022b55f4a899f7bc6815a3a13.css" integrity="sha256-VUAIboqXHmh5fK6kvE0Op4jeLlAitV9KiZ97xoFaOhM=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Identity Server Options">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Identity Server Options">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.3.2/reference/configuration/identity-server/">
+  <meta name="twitter:title" content="Identity Server Options" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.3.2/">
+        <img src="/v3.3.2/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.3.2/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.3.2/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.3.2/components/">Components</a>
+        <a class="navbar-item" href="/v3.3.2/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.3.2/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Configuration</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.3.2/reference/configuration/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/the-things-stack/" class="">Generic Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/identity-server/" class="is-active">Identity Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/gateway-server/" class="">Gateway Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/network-server/" class="">Network Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/application-server/" class="">Application Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/join-server/" class="">Join Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/console/" class="">Console Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/cli/" class="">Command-Line Interface Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.3.2/reference/configuration/gateway-configuration-server/" class="">Gateway Configuration Server Options</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Identity Server Options</h1>
+
+<div class="content">
+
+<h2 id="database-options">Database Options</h2>
+
+<p>The Identity Server needs to be connected to a PostgreSQL-compatible database. Details for the form of the URI can be found in the <a href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING">PostgreSQL documentation</a>.</p>
+
+<ul>
+<li><code>is.database-uri</code>: Database connection URI</li>
+</ul>
+
+<h2 id="email-options">Email Options</h2>
+
+<p>The Identity Server can be configured with different providers for sending emails. Currently the <code>sendgrid</code> and <code>smtp</code> providers are implemented.</p>
+
+<ul>
+<li><code>is.email.provider</code>: Email provider to use</li>
+</ul>
+
+<p>When <code>sendgrid</code> is used as provider, an API key is required. For testing, use the sandbox to prevent emails from actually being sent.</p>
+
+<ul>
+<li><code>is.email.sendgrid.api-key</code>: The SendGrid API key to use</li>
+<li><code>is.email.sendgrid.sandbox</code>: Use SendGrid sandbox mode for testing</li>
+</ul>
+
+<p>When <code>smtp</code> is used as provider, provide the address of the SMTP server (<code>host:port</code>), as well as the username and password for the SMTP server.</p>
+
+<ul>
+<li><code>is.email.smtp.address</code>: SMTP server address</li>
+<li><code>is.email.smtp.username</code>: Username to authenticate with</li>
+<li><code>is.email.smtp.password</code>: Password to authenticate with</li>
+<li><code>is.email.smtp.connections</code>: Maximum number of connections to the SMTP server</li>
+</ul>
+
+<p>The email address and name of the sender should be configured regardless of the provider that is used.</p>
+
+<ul>
+<li><code>is.email.sender-address</code>: The address of the sender</li>
+<li><code>is.email.sender-name</code>: The name of the sender</li>
+</ul>
+
+<p>Most emails contain the name of the network and links to the Identity Server or Console.</p>
+
+<ul>
+<li><code>is.email.network.name</code>: The name of the network</li>
+<li><code>is.email.network.identity-server-url</code>: The URL of the Identity Server</li>
+<li><code>is.email.network.console-url</code>: The URL of the Console</li>
+</ul>
+
+<p>Although The Things Stack comes with a number of builtin email templates, it is possible to override those with custom templates. You can specify the source where to load templates from, and options for that source. For more information on email templates, see the <a href="/v3.3.2/reference/email-templates/">email templates reference</a>.</p>
+
+<ul>
+<li><code>is.email.templates.source</code>: Source of the email template files (directory, url, blob)</li>
+<li><code>is.email.templates.directory</code>: Directory on the filesystem where email templates are located</li>
+<li><code>is.email.templates.url</code>: URL where email templates are located</li>
+<li><code>is.email.templates.blob.bucket</code>: Bucket where email templates are located</li>
+<li><code>is.email.templates.blob.path</code>: Path within the bucket.</li>
+</ul>
+
+<p>If your custom templates rely on other files, such as headers or footers, those files need to be included.</p>
+
+<ul>
+<li><code>is.email.templates.includes</code>: The email templates that will be preloaded on startup</li>
+</ul>
+
+<h2 id="oauth-ui-options">OAuth UI Options</h2>
+
+<p>The OAuth user interface needs to be configured with at least the canonical URL and the base URL of the Identity Server&rsquo;s HTTP API. The canonical URL needs to be the full URL of the UI, and looks like <code>https://thethings.example.com/oauth</code>. The base URL of the Identity Server&rsquo;s HTTP API looks like <code>https://thethings.example.com/api/v3</code>.</p>
+
+<ul>
+<li><code>is.oauth.ui.canonical-url</code>: The page canonical URL</li>
+<li><code>is.oauth.ui.is.base-url</code>: Base URL to the HTTP API</li>
+</ul>
+
+<p>If you do not want to serve the OAuth user interface on <code>/oauth</code>, you may customize the mount path.</p>
+
+<ul>
+<li><code>is.oauth.mount</code>: Path on the server where the OAuth server will be served</li>
+</ul>
+
+<p>If page assets for the OAuth UI are served from a CDN or on a different path on the server, the base URL needs to be customized as well. If you want to <a href="/v3.3.2/branding/">customize the branding</a> of the OAuth UI, you can set the base URL for where your branding assets are located.</p>
+
+<ul>
+<li><code>is.oauth.ui.assets-base-url</code>: The base URL to the page assets</li>
+<li><code>is.oauth.ui.branding-base-url</code>: The base URL to the branding assets</li>
+</ul>
+
+<p>The appearance of The Things Stack can optionally be customized.</p>
+
+<ul>
+<li><code>is.oauth.ui.site-name</code>: The site name</li>
+<li><code>is.oauth.ui.title</code>: The page title</li>
+<li><code>is.oauth.ui.sub-title</code>: The page sub-title</li>
+<li><code>is.oauth.ui.descriptions</code>: The page description</li>
+<li><code>is.oauth.ui.language</code>: The page language</li>
+<li><code>is.oauth.ui.theme-color</code>: The page theme color</li>
+</ul>
+
+<p>Further customization of the CSS files, JS files and icons is also possible:</p>
+
+<ul>
+<li><code>is.oauth.ui.css-file</code>: The names of the CSS files</li>
+<li><code>is.oauth.ui.js-file</code>: The names of the JS files</li>
+<li><code>is.oauth.ui.icon-prefix</code>: The prefix to put before the page icons (favicon.ico, touch-icon.png, og-image.png)</li>
+</ul>
+
+<h2 id="profile-picture-storage-options">Profile Picture Storage Options</h2>
+
+<p>The profile pictures that users upload for their accounts are stored in a blob bucket. The global <a href="/v3.3.2/reference/configuration/the-things-stack/#blob-options">blob configuration</a> is used for this. In addition to those options, specify the name of the bucket and the public URL to the bucket.</p>
+
+<ul>
+<li><code>is.profile-picture.bucket</code>: Bucket used for storing profile pictures</li>
+<li><code>is.profile-picture.bucket-url</code>: Base URL for public bucket access</li>
+</ul>
+
+<p>It is also possible to use <a href="https://gravatar.com">Gravatar</a> for profile pictures.</p>
+
+<ul>
+<li><code>is.profile-picture.use-gravatar</code>: Use Gravatar fallback for users without profile picture</li>
+</ul>
+
+<h2 id="end-device-picture-storage-options">End Device Picture Storage Options</h2>
+
+<p>Similar to profile pictures, end devices can have pictures associated with them.</p>
+
+<ul>
+<li><code>is.end-device-picture.bucket</code>: Bucket used for storing end device pictures</li>
+<li><code>is.end-device-picture.bucket-url</code>: Base URL for public bucket access</li>
+</ul>
+
+<h2 id="user-registration-options">User Registration Options</h2>
+
+<p>The user registration process can be customized by requiring approval by admin users, requiring email validation or by requiring new users to be invited by existing users.</p>
+
+<ul>
+<li><code>is.user-registration.admin-approval.required</code>: Require admin approval for new users</li>
+<li><code>is.user-registration.contact-info-validation.required</code>: Require contact info validation for new users</li>
+<li><code>is.user-registration.invitation.required</code>: Require invitations for new users</li>
+<li><code>is.user-registration.invitation.token-ttl</code>: TTL of user invitation tokens</li>
+</ul>
+
+<p>There are several options to customize the requirements for user passwords.</p>
+
+<ul>
+<li><code>is.user-registration.password-requirements.max-length</code>: Maximum password length</li>
+<li><code>is.user-registration.password-requirements.min-digits</code>: Minimum number of digits</li>
+<li><code>is.user-registration.password-requirements.min-length</code>: Minimum password length</li>
+<li><code>is.user-registration.password-requirements.min-special</code>: Minimum number of special characters</li>
+<li><code>is.user-registration.password-requirements.min-uppercase</code>: Minimum number of uppercase letters</li>
+</ul>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.3.2/reference/configuration/the-things-stack/">← Generic Server Options</a>
+<a class="button is-pulled-right" href="/v3.3.2/reference/configuration/gateway-server/">Gateway Server Options →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.3.2/guides/">Guides</a></p>
+        <p><a class="" href="/v3.3.2/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.3.2/components/">Components</a></p>
+        <p><a class="" href="/v3.3.2/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 02 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/42334996411338adf3c4925f0794a73f8d5d8635">
+      doc: Update reference for email template fetcher options
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/configuration/identity-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.3.2/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
