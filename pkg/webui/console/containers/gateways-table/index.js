@@ -33,26 +33,26 @@ const headers = [
   {
     name: 'ids.gateway_id',
     displayName: sharedMessages.id,
-    width: 25,
+    width: 24,
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
-    width: 25,
+    width: 24,
   },
   {
     name: 'ids.eui',
     displayName: sharedMessages.gatewayEUI,
-    width: 25,
+    width: 24,
   },
   {
     name: 'frequency_plan_id',
     displayName: sharedMessages.frequencyPlan,
-    width: 10,
+    width: 14,
   },
   {
     name: 'status',
-    width: 15,
+    width: 14,
     displayName: sharedMessages.status,
     render(status) {
       let indicator = 'unknown'
