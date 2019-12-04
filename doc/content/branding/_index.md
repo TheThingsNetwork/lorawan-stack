@@ -21,10 +21,12 @@ It is possible to change the logos of the web UI by changing the "branding base 
 | console-favicon.ico    | multiple | The logo for the console that is shown in browser tabs and bookmarks.         |
 | console-og-image.png   | 1200x600 | The logo for the console that is shown when sharing links on social media     |
 | console-touch-icon.png | 400x400  | The logo for the console that is shown mobile devices                         |
-| console-logo.svg       | vector   | The logo for the console that is shown in the menu bar of the console         |
+| logo.svg               | vector   | The logo for the console that is shown in the menu bar of the console         |
 | oauth-favicon.ico      | multiple | The logo for the login pages that is shown in browser tabs and bookmarks      |
 | oauth-og-image.png     | 1200x600 | The logo for the login pages that is shown when sharing links on social media |
 | oauth-touch-icon.png   | 400x400  | The logo for the login pages that is shown mobile devices                     |
+
+If the "branding base URL" option is set, "logo.svg" is used to display a secondary logo next to the logo of The Things Stack for LoRaWAN. It is recommended to use a logo with a wide (e.g. 5:1) or square (1:1) aspect ratio. Tall logos (e.g. 1:5; height larger than width) will be displayed very small, due to the limited height of the header bar.
 
 For the exact configuration options that are required to set a custom "branding base URL", see the [Identity Server configuration reference]({{< ref "/reference/configuration/identity-server#oauth-ui-options" >}}) and the [Console configuration reference]({{< ref "/reference/configuration/console" >}}).
 
