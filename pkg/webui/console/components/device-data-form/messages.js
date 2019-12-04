@@ -37,7 +37,7 @@ export default defineMessages({
   deviceDescDescription:
     'Optional device description; can also be used to save notes about the device',
   deviceDescPlaceholder: 'Description for my new device',
-  deviceEUIDescription: 'The DevEUI is the unique identifier for this device on the network',
+  deviceEUIDescription: 'The DevEUI is the unique identifier for this device',
   deviceIdPlaceholder: 'my-new-device',
   deviceNamePlaceholder: 'My New Device',
   external: 'External',
