@@ -6,7 +6,7 @@ weight: 3
 
 ## Interoperability Repository
 
-The Things Stack expects the root of interoperability repository to contain `config.yml`, which contains various interoperablity configuration options:
+{{% tts %}} expects the root of interoperability repository to contain `config.yml`, which contains various interoperablity configuration options:
 
 ```yml
 join-servers:                 # list of Join Server interoperability configurations,
@@ -20,7 +20,7 @@ All paths are relative to the file they are defined in, that is `example/js.yml`
 
 For `join-servers`, in case Join EUI prefixes overlap, the most specific prefix takes precedence.
 
-The Things Stack servers always first try cluster-local Join Server and if it's not found or the device is not found, fallback to the external one via interoperability.
+{{% tts %}} servers always first try cluster-local Join Server and if it's not found or the device is not found, fallback to the external one via interoperability.
 
 `0000000000000000/0` prefix matches all `JoinEUIs`, while being the least specific, hence it always matches last. Use this prefix if you wish to define a "fallback" Join Server interoperability configuration.
 

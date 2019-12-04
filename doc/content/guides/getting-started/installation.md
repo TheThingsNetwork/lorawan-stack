@@ -6,13 +6,13 @@ weight: 1
 
 ## Preparation
 
-Since we're going to install The Things Stack using Docker and Docker Compose, follow the guides to [install Docker](https://docs.docker.com/install/#supported-platforms) and to [install Docker Compose](https://docs.docker.com/compose/install/#install-compose).
+Since we're going to install {{% tts %}} using Docker and Docker Compose, follow the guides to [install Docker](https://docs.docker.com/install/#supported-platforms) and to [install Docker Compose](https://docs.docker.com/compose/install/#install-compose).
 
-Most releases contain an example `docker-compose.yml` file. You can also find this file [in the Github repository of The Things Stack]({{% repo-file-url "raw" "docker-compose.yml" %}}). In this guide we'll use that example `docker-compose.yml` for our deployment.
+Most releases contain an example `docker-compose.yml` file. You can also find this file [in the Github repository of {{% tts %}}]({{% repo-file-url "raw" "docker-compose.yml" %}}). In this guide we'll use that example `docker-compose.yml` for our deployment.
 
 ## Command-line Interface (optional)
 
-Although the web interface of The Things Stack (the Console) currently has support for all basic features of The Things Stack, for some actions, you need to use the command-line interface (CLI). The CLI allows you to manage all features of The Things Stack.
+Although the web interface of {{% tts %}} (the Console) currently has support for all basic features of {{% tts %}}, for some actions, you need to use the command-line interface (CLI). The CLI allows you to manage all features of {{% tts %}}.
 
 You can use the CLI on your local machine and on the server.
 

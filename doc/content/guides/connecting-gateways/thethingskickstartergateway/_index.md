@@ -4,11 +4,11 @@ description: ""
 weight: 1
 ---
 
-The Things Kickstarter Gateway is a LoRaWAN gateway, whose technical specifications can be found in [the official documentation](https://www.thethingsnetwork.org/docs/gateways/gateway/). This page guides you to connect it to The Things Stack.
+The Things Kickstarter Gateway is a LoRaWAN gateway, whose technical specifications can be found in [the official documentation](https://www.thethingsnetwork.org/docs/gateways/gateway/). This page guides you to connect it to {{% tts %}}.
 
 ## Prerequisites
 
-1. User account on The Things Stack with rights to create Gateways and API Keys.
+1. User account on {{% tts %}} with rights to create Gateways and API Keys.
 2. The Things Gateway running the latest firmware (a minimum of `v1.0.7` is necessary).
 
 ## Registration
@@ -36,12 +36,12 @@ Enter the following fields:
 
 Click the **Show Advanced Options** button and enter the following fields:
 
-1. **Account Server**: The URL of The Things Stack. If you followed the [Getting Started guide]({{< ref "/guides/getting-started" >}}) this is the same as what you use instead of `https://thethings.example.com`.
+1. **Account Server**: The URL of {{% tts %}}. If you followed the [Getting Started guide]({{< ref "/guides/getting-started" >}}) this is the same as what you use instead of `https://thethings.example.com`.
 2. **Gateway Key**: The API Key that you created earlier.
 3. Click **Save** when done.
 
-This will apply the setting and reboot the gateway. If all the steps have been followed correctly, your gateway will now connect to The Things Stack.
+This will apply the setting and reboot the gateway. If all the steps have been followed correctly, your gateway will now connect to {{% tts %}}.
 
 ## Troubleshooting
 
-If the gateway does not connect to the The Things Stack after a few minutes, disconnect and reconnect the power supply to power-cycle the gateway.
+If the gateway does not connect to the {{% tts %}} after a few minutes, disconnect and reconnect the power supply to power-cycle the gateway.

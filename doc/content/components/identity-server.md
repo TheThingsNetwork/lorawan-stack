@@ -10,7 +10,7 @@ The Identity Server provides the registries that store entities such as applicat
 
 ## Entity Registries
 
-The entity registries store common information about all major entities in The Things Stack. This includes a name, description, and attributes (user-defined key-value pairs).
+The entity registries store common information about all major entities in {{% tts %}}. This includes a name, description, and attributes (user-defined key-value pairs).
 
 ### Users
 
@@ -20,11 +20,11 @@ The user ID is the unique identifier of a user. User IDs are in the same namespa
 
 Users can be "admin", which gives them elevated privileges. The normal registration process does not allow users to register as admin, which is why the [Getting Started guide]({{< ref "/guides/getting-started" >}}) creates the admin user with a different command.
 
-Users can be in one of multiple states: requested, approved, rejected, suspended, etc. The state of a user determines if the user is able to perform actions, and which actions. Normally, users are in the "approved" state. If The Things Stack is configured to require admin approval for new users, users are initially in the "requested" state, and an admin user can update them to the "approved" or "rejected" state. Users can also be suspended by admins if they misbehave.
+Users can be in one of multiple states: requested, approved, rejected, suspended, etc. The state of a user determines if the user is able to perform actions, and which actions. Normally, users are in the "approved" state. If {{% tts %}} is configured to require admin approval for new users, users are initially in the "requested" state, and an admin user can update them to the "approved" or "rejected" state. Users can also be suspended by admins if they misbehave.
 
 ### Gateways
 
-Gateways can be registered by choosing an ID and optionally registering the EUI of the gateway. After registration, an API key can be created; the gateway can use its ID (or EUI) together with that API key to authenticate with the The Things Stack.
+Gateways can be registered by choosing an ID and optionally registering the EUI of the gateway. After registration, an API key can be created; the gateway can use its ID (or EUI) together with that API key to authenticate with the {{% tts %}}.
 
 For correct operation of the gateway, it is important to set the frequency plan ID and set whether the gateway needs to be compliant with a duty cycle.
 

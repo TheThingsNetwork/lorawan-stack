@@ -223,7 +223,7 @@ Please respect the following guidelines for content in our documentation site:
 - Paragraphs typically consist of at least two sentences.
 - Use an empty line between all blocks (headings, paragraphs, lists, ...).
 - Prefer text over bullet lists or enumerations. For bullets, use `-`, for enumerations `1.` etc.
-- Explicitly call this product "The Things Stack". Not "the stack" etc.
+- Explicitly call this product "The Things Stack". Not "the stack" etc. You can use the shortcode `{{% tts %}}` which will expand to "The Things Stack".
 - Avoid shortening, i.e. write "it is" instead of "it's".
 - Write guides as a goal-oriented journey.
 - Unless already clear from context, use a clearer term than "user", especially if there are multiple kinds (network operator, gateway owner, application developer, ...).

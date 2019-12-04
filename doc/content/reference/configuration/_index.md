@@ -4,7 +4,7 @@ description: ""
 weight: 2
 ---
 
-The Things Stack binary can be configured with many different options. Those options can be provided as command-line flags, environment variables or using a configuration file.
+{{% tts %}} binary can be configured with many different options. Those options can be provided as command-line flags, environment variables or using a configuration file.
 
 <!--more-->
 
@@ -34,7 +34,7 @@ TTN_LW_CONSOLE_UI_CANONICAL_URL="https://thethings.example.com/console"
 
 ### Configuration files
 
-You can also configure The Things Stack with a YAML configuration file. This is again similar to the command-line flags, except that each `.` represents a YAML node. This allows you to group related options together:
+You can also configure {{% tts %}} with a YAML configuration file. This is again similar to the command-line flags, except that each `.` represents a YAML node. This allows you to group related options together:
 
 ```yaml
 console:
@@ -44,17 +44,17 @@ console:
   # other console options
 ```
 
-You can specify the location of the YAML configuration file with the command-line flag `-c` or `--config`. If this flag is not present, The Things Stack will look for config files in the following locations:
+You can specify the location of the YAML configuration file with the command-line flag `-c` or `--config`. If this flag is not present, {{% tts %}} will look for config files in the following locations:
 
 - The current directory
 - The user's home directory (as [determined by Go](https://golang.org/pkg/os/#UserHomeDir))
 - The user's config directory (as [determined by Go](https://golang.org/pkg/os/#UserConfigDir))
 
-You can run The Things Stack with the `--help` flag, and check the description of the `--config` flag for the exact locations that are being checked.
+You can run {{% tts %}} with the `--help` flag, and check the description of the `--config` flag for the exact locations that are being checked.
 
 ### Defaults
 
-The Things Stack can be used for local testing purposes without any custom configuration.
+{{% tts %}} can be used for local testing purposes without any custom configuration.
 
 ## Printing the Current Configuration
 
