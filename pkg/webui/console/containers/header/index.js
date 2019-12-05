@@ -107,6 +107,11 @@ class Header extends Component {
 
     const dropdownItems = [
       {
+        title: sharedMessages.userManagement,
+        icon: 'user_management',
+        path: '/admin/user-management',
+      },
+      {
         title: sharedMessages.logout,
         icon: 'power_settings_new',
         action: handleLogout,
