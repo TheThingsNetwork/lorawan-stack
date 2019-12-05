@@ -79,6 +79,7 @@ export default {
         },
       })
     },
+    list: ttnClient.Users.getAll.bind(ttnClient.Users),
     async authInfo() {
       return instance.get(`${isBaseUrl}/auth_info`, {
         headers: {
