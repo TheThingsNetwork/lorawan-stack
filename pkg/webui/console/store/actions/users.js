@@ -12,26 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import user from './user'
-import users from './users'
-import init from './init'
-import applications from './applications'
-import devices from './devices'
-import device from './device'
-import gateways from './gateways'
-import configuration from './configuration'
-import organizations from './organizations'
-import js from './join-server'
+import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
 
-export default [
-  ...user,
-  ...users,
-  ...init,
-  ...applications,
-  ...devices,
-  ...device,
-  ...gateways,
-  ...configuration,
-  ...organizations,
-  ...js,
-]
+export const SHARED_NAME = 'USER'
+
+export const GET_USERS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
+export const [
+  { request: GET_USERS_LIST, success: GET_USERS_LIST_SUCCESS, failure: GET_USERS_LIST_FAILURE },
+  { request: getUsersList, success: getUsersSuccess, failure: getUsersFailure },
+] = createPaginationRequestActions(SHARED_NAME)
