@@ -68,11 +68,11 @@ Go to **Devices** in the left menu and click on **+ Add Device** to reach the en
 
 ### Over-The-Air-Activation (OTAA) Device
 
-After filling the fields in the "General Settings" section, scroll to the lower part of the device registration page and make sure that "Over The Air Activation (OTAA)" is selected. Fill the Join EUI (App EUI in LoRaWAN versions before 1.1), the Device EUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press **Create Device** to create the device.
+After filling the fields in the **General Settings** section, scroll to the lower part of the device registration page and make sure that "Over The Air Activation (OTAA)" is selected. Fill the JoinEUI (AppEUI in LoRaWAN versions before 1.1), the DevEUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press **Create Device** to create the device.
 
 {{< figure src="device-creation-otaa.png" alt="Creating an OTAA device" >}}
 
-You'll now reach the device overview page for your device. The end device should now be able to join the private network.
+You will now reach the device overview page for your device. The end device should now be able to join the private network.
 
 {{< figure src="device-otaa-created.png" alt="OTAA device overview" >}}
 
@@ -82,7 +82,7 @@ After filling the fields in the "General Settings" section, scroll to the lower 
 
 {{< figure src="device-creation-abp.png" alt="Creating an ABP device" >}}
 
-You'll now reach the device overview page for your device. The end device should now be able to communicate with the private network.
+You will now reach the device overview page for your device. The end device should now be able to communicate with the private network.
 
 {{< figure src="device-abp-created.png" alt="ABP device overview" >}}
 
