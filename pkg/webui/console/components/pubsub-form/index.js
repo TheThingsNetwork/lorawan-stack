@@ -343,6 +343,20 @@ export default class PubsubForm extends Component {
           placeholder={pathPlaceholder}
           component={Input.Toggled}
         />
+        <Form.Field
+          name="downlink_push"
+          type="toggled-input"
+          title={sharedMessages.downlinkPush}
+          placeholder={pathPlaceholder}
+          component={Input.Toggled}
+        />
+        <Form.Field
+          name="downlink_replace"
+          type="toggled-input"
+          title={sharedMessages.downlinkReplace}
+          placeholder={pathPlaceholder}
+          component={Input.Toggled}
+        />
         <SubmitBar>
           <Form.Submit
             component={SubmitButton}
@@ -357,7 +371,7 @@ export default class PubsubForm extends Component {
               message={m.deletePubsub}
               modalData={{
                 message: {
-                  values: { pubsubId: initialPubsubValue.ids.pubsub_id },
+                  values: { pubsubId: initialPubsubValue.ids.pub_sub_id },
                   ...m.modalWarning,
                 },
               }}

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Downlink queue operation topics in the PubSub integrations can now be configured using the Console.
+
 ### Changed
 
 ### Deprecated
@@ -16,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+
+- Fix the PubSub integration edit page in the Console.
 
 ### Security
 

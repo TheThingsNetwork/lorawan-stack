@@ -21,6 +21,7 @@ import { replace } from 'connected-react-router'
 
 import PropTypes from '../../../lib/prop-types'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import PageTitle from '../../../components/page-title'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import PubsubForm from '../../components/pubsub-form'
 import toast from '../../../components/toast'
@@ -49,14 +50,16 @@ const pubsubEntitySelector = [
   'format',
   'provider.nats',
   'provider.mqtt',
-  'uplink_message',
-  'join_accept',
   'downlink_ack',
-  'downlink_nack',
-  'downlink_sent',
   'downlink_failed',
+  'downlink_nack',
+  'downlink_push',
   'downlink_queued',
+  'downlink_replace',
+  'downlink_sent',
+  'join_accept',
   'location_solved',
+  'uplink_message',
 ]
 
 @connect(
