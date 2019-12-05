@@ -76,7 +76,7 @@ $ ttn-lw-cli end-devices create app1 mc1 \
   --supports-class-c
 ```
 
-Then, schedule the following message to the [MQTT server]({{< relref "../getting-started/mqtt" >}}) or [HTTP webhooks]({{< relref "../getting-started/webhooks" >}}):
+Then, schedule the following message to the [Application Server MQTT server]({{< ref "/reference/application-server-data/mqtt" >}}) or [HTTP webhooks]({{< ref "/reference/application-server-data/webhooks" >}}):
 
 ```json
 {

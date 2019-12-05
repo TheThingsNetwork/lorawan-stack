@@ -90,4 +90,4 @@ You'll now reach the device overview page for your device. The end device should
 
 With your {{% tts %}} setup, a gateway connected and a device registered on your network, it's time to start working with data.
 
-Learn how to work with the [builtin MQTT server]({{< relref "../mqtt" >}}) and [HTTP webhooks]({{< relref "../webhooks" >}}).
+Learn how to work with the [Application Server MQTT server]({{< ref "/reference/application-server-data/mqtt" >}}) and [HTTP webhooks]({{< ref "/reference/application-server-data/webhooks" >}}).
