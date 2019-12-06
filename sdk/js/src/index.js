@@ -36,7 +36,7 @@ class TtnLw {
     this.Js = new Js(this.api.Js)
     this.Ns = new Ns(this.api.Ns)
     this.Organizations = new Organizations(this.api)
-    this.Users = new Users(this.api.UserRegistry)
+    this.Users = new Users(this.api)
   }
 }
 

@@ -20,7 +20,16 @@ class Users {
   }
 
   async getAll(params, selector) {
-    const response = await this._api.List(undefined, {
+    const response = await this._api.UserRegistry.List(undefined, {
+      ...params,
+      ...Marshaler.selectorToFieldMask(selector),
+    })
+
+    return Marshaler.payloadListResponse('users', response)
+  }
+
+  async search(params, selector) {
+    const response = await this._api.EntityRegistrySearch.SearchUsers(undefined, {
       ...params,
       ...Marshaler.selectorToFieldMask(selector),
     })
@@ -30,7 +39,7 @@ class Users {
 
   async getById(id, selector) {
     const fieldMask = Marshaler.selectorToFieldMask(selector)
-    const response = await this._api.Get(
+    const response = await this._api.UserRegistry.Get(
       {
         routeParams: { 'user_ids.user_id': id },
       },
@@ -41,7 +50,7 @@ class Users {
   }
 
   async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
-    const response = await this._api.Update(
+    const response = await this._api.UserRegistry.Update(
       {
         routeParams: {
           'user.ids.user_id': id,
