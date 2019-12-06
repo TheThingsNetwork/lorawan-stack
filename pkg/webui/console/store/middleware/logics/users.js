@@ -37,6 +37,25 @@ const getUserLogic = createRequestLogic({
   },
 })
 
+const updateUserLogic = createRequestLogic({
+  type: users.UPDATE_USER,
+  async process({ action }, dispatch) {
+    const {
+      payload: { id, patch },
+    } = action
+
+    const res = await api.users.update(id, patch)
+
+    // Ensure to set STATE_REQUESTED, which gets stripped as null value from
+    // the backend response
+    if ('state' in patch && !('state' in res)) {
+      res.state = 'STATE_REQUESTED'
+    }
+
+    return res
+  },
+})
+
 const getUsersLogic = createRequestLogic({
   type: users.GET_USERS_LIST,
   async process({ action }) {
@@ -58,4 +77,4 @@ const getUsersLogic = createRequestLogic({
   },
 })
 
-export default [getUserLogic, getUsersLogic]
+export default [getUserLogic, getUsersLogic, updateUserLogic]

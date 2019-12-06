@@ -16,6 +16,7 @@ import { getUserId } from '../../../lib/selectors/id'
 import {
   GET_USERS_LIST_SUCCESS,
   GET_USER_SUCCESS,
+  UPDATE_USER_SUCCESS,
   GET_USER,
 } from '../actions/users'
 
@@ -38,6 +39,7 @@ const users = function(state = initialState, { type, payload, meta }) {
         ...state,
         selectedUser: payload.id,
       }
+    case UPDATE_USER_SUCCESS:
     case GET_USER_SUCCESS:
       const id = getUserId(payload)
 

@@ -28,3 +28,9 @@ export const [
   { request: GET_USERS_LIST, success: GET_USERS_LIST_SUCCESS, failure: GET_USERS_LIST_FAILURE },
   { request: getUsersList, success: getUsersSuccess, failure: getUsersFailure },
 ] = createPaginationRequestActions(SHARED_NAME)
+
+export const UPDATE_USER_BASE = 'UPDATE_USER'
+export const [
+  { request: UPDATE_USER, success: UPDATE_USER_SUCCESS, failure: UPDATE_USER_FAILURE },
+  { request: updateUser, success: updateUserSuccess, failure: updateUserFailure },
+] = createRequestActions(UPDATE_USER_BASE, (id, patch) => ({ id, patch }))
