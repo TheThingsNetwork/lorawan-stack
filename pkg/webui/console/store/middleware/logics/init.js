@@ -42,8 +42,8 @@ const consoleAppLogic = createRequestLogic({
       try {
         dispatch(user.getUserMe())
         const userId = info.data.oauth_access_token.user_ids.user_id
-        const result = await api.users.get(userId)
-        dispatch(user.getUserMeSuccess(result.data))
+        const userResult = await api.users.get(userId)
+        dispatch(user.getUserMeSuccess(userResult))
       } catch (error) {
         if (getBackendErrorName(error) === 'user_requested') {
           // Log unapproved users out automatically, to avoid confusion

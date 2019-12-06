@@ -17,6 +17,26 @@ import * as users from '../../actions/users'
 import api from '../../../api'
 import createRequestLogic from './lib'
 
+const getUserLogic = createRequestLogic({
+  type: users.GET_USER,
+  async process({ action }, dispatch) {
+    const {
+      payload: { id },
+      meta: { selector },
+    } = action
+
+    const res = await api.users.get(id, selector)
+
+    // Ensure to set STATE_REQUESTED, which gets stripped as null value from
+    // the backend response
+    if (selector.includes('state') && !('state' in res)) {
+      res.state = 'STATE_REQUESTED'
+    }
+
+    return res
+  },
+})
+
 const getUsersLogic = createRequestLogic({
   type: users.GET_USERS_LIST,
   async process({ action }) {
@@ -38,4 +58,4 @@ const getUsersLogic = createRequestLogic({
   },
 })
 
-export default [getUsersLogic]
+export default [getUserLogic, getUsersLogic]

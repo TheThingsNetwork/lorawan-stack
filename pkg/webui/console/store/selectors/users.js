@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_USERS_LIST_BASE } from '../actions/users'
+import { GET_USERS_LIST_BASE, GET_USER_BASE } from '../actions/users'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
@@ -25,10 +25,13 @@ const ENTITY = 'users'
 
 const selectUserStore = state => state.users
 
+// User
 export const selectUserEntitiesStore = state => selectUserStore(state).entities
 export const selectUserById = (state, id) => selectUserEntitiesStore(state)[id]
-export const selectSelectedUserId = state => selectUserStore(state).selectedUsers
+export const selectSelectedUserId = state => selectUserStore(state).selectedUser
 export const selectSelectedUser = state => selectUserById(state, selectSelectedUserId(state))
+export const selectUserFetching = createFetchingSelector(GET_USER_BASE)
+export const selectUserError = createErrorSelector(GET_USER_BASE)
 
 // Users
 const selectUsrsIds = createPaginationIdsSelectorByEntity(ENTITY)

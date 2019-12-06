@@ -13,7 +13,11 @@
 // limitations under the License.
 
 import { getUserId } from '../../../lib/selectors/id'
-import { GET_USERS_LIST_SUCCESS } from '../actions/users'
+import {
+  GET_USERS_LIST_SUCCESS,
+  GET_USER_SUCCESS,
+  GET_USER,
+} from '../actions/users'
 
 const initialState = {
   entities: {},
@@ -27,8 +31,23 @@ const user = function(state = {}, user) {
   }
 }
 
-const users = function(state = initialState, { type, payload }) {
+const users = function(state = initialState, { type, payload, meta }) {
   switch (type) {
+    case GET_USER:
+      return {
+        ...state,
+        selectedUser: payload.id,
+      }
+    case GET_USER_SUCCESS:
+      const id = getUserId(payload)
+
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [id]: user(state.entities[id], payload),
+        },
+      }
     case GET_USERS_LIST_SUCCESS:
       const entities = payload.entities.reduce(
         function(acc, app) {
