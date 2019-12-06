@@ -60,10 +60,20 @@ const getUsersLogic = createRequestLogic({
   type: users.GET_USERS_LIST,
   async process({ action }) {
     const {
-      params: { page, limit },
+      params: { page, limit, query },
     } = action.payload
     const { selectors } = action.meta
-    const data = await api.users.list({ page, limit }, selectors)
+
+    const data = query
+      ? await api.users.search(
+          {
+            page,
+            limit,
+            id_contains: query,
+          },
+          selectors,
+        )
+      : await api.users.list({ page, limit }, selectors)
 
     // Ensure to set STATE_REQUESTED, which gets stripped as null value from
     // the backend response
