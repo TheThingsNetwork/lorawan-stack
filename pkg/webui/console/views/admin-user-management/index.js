@@ -23,6 +23,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import NotFoundRoute from '../../../lib/components/not-found-route'
 
+import UserEdit from '../admin-user-management-edit'
 import UserManagement from './admin-user-management'
 
 @withBreadcrumb('admin.user-management', function() {
@@ -45,6 +46,7 @@ export default class UserManagementRouter extends Component {
         <IntlHelmet title={sharedMessages.userManagement} />
         <Switch>
           <Route exact path={`${match.path}`} component={UserManagement} />
+          <Route path={`${match.path}/:userId`} component={UserEdit} />
           <NotFoundRoute />
         </Switch>
       </BreadcrumbView>
