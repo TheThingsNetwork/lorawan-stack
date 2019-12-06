@@ -39,6 +39,21 @@ class Users {
 
     return Marshaler.payloadSingleResponse(response)
   }
+
+  async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+    const response = await this._api.Update(
+      {
+        routeParams: {
+          'user.ids.user_id': id,
+        },
+      },
+      {
+        user: patch,
+        field_mask: Marshaler.fieldMask(mask),
+      },
+    )
+    return Marshaler.unwrapUser(response)
+  }
 }
 
 export default Users
