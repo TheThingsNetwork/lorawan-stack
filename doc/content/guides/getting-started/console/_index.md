@@ -58,27 +58,7 @@ Your application will be created and you will be redirected to the application o
 
 {{< figure src="application-overview.png" alt="Application overview" >}}
 
-Devices are created within applications.
-
-### Link Application
-
-In order to send uplinks and receive downlinks from your device, you must link the Application Server to the Network Server. In order to do this, create an API key for the Application Server by going to **API keys** in the left menu of your application, and then clicking **+ Add API Key**.
-
-In the API Key creation screen, enter a name for your linking API key and select the **Link as Application to a Network Server** right, then press **Create API Key**.
-
-{{< figure src="api-key-creation.png" alt="Application API Key creation" >}}
-
-You will see a screen that shows your newly created API Key. You now can copy it in your clipboard by pressing the clipboard button. After saving the key in a safe place, press **I have copied the key**. You will not be able to see this key again in the future, but if you lose it, you can create a new one to replace it.
-
-{{< figure src="api-key-created.png" alt="Application API Key created" >}}
-
-Now go to **Link** in the left menu of the application and enter the API key you've just created. You can leave the Network Server address empty. Press **Save Changes** to save the link settings.
-
-{{< figure src="application-link-creation.png" alt="Application link creation" >}}
-
-You can now see the status of the linking process appear in the right part of your screen. This also shows the statistics of the link between the Application Server and the Network Server.
-
-Your application is now linked. You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic.
+You can now use the builtin MQTT server and webhooks to receive uplink traffic and send downlink traffic. End devices are created within applications. 
 
 ## Create End Device
 
@@ -88,11 +68,11 @@ Go to **Devices** in the left menu and click on **+ Add Device** to reach the en
 
 ### Over-The-Air-Activation (OTAA) Device
 
-After filling the fields in the "General Settings" section, scroll to the lower part of the device registration page and make sure that "Over The Air Activation (OTAA)" is selected. Fill the Join EUI (App EUI in LoRaWAN versions before 1.1), the Device EUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press **Create Device** to create the device.
+After filling the fields in the **General Settings** section, scroll to the lower part of the device registration page and make sure that "Over The Air Activation (OTAA)" is selected. Fill the JoinEUI (AppEUI in LoRaWAN versions before 1.1), the DevEUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press **Create Device** to create the device.
 
 {{< figure src="device-creation-otaa.png" alt="Creating an OTAA device" >}}
 
-You'll now reach the device overview page for your device. The end device should now be able to join the private network.
+You will now reach the device overview page for your device. The end device should now be able to join the private network.
 
 {{< figure src="device-otaa-created.png" alt="OTAA device overview" >}}
 
@@ -102,7 +82,7 @@ After filling the fields in the "General Settings" section, scroll to the lower 
 
 {{< figure src="device-creation-abp.png" alt="Creating an ABP device" >}}
 
-You'll now reach the device overview page for your device. The end device should now be able to communicate with the private network.
+You will now reach the device overview page for your device. The end device should now be able to communicate with the private network.
 
 {{< figure src="device-abp-created.png" alt="ABP device overview" >}}
 
@@ -110,4 +90,4 @@ You'll now reach the device overview page for your device. The end device should
 
 With your {{% tts %}} setup, a gateway connected and a device registered on your network, it's time to start working with data.
 
-Learn how to work with the [builtin MQTT server]({{< relref "../mqtt" >}}) and [HTTP webhooks]({{< relref "../webhooks" >}}).
+Learn how to work with the [Application Server MQTT server]({{< ref "/reference/application-server-data/mqtt" >}}) and [HTTP webhooks]({{< ref "/reference/application-server-data/webhooks" >}}).

@@ -1,22 +1,26 @@
 ---
 title: "MQTT Server"
 description: ""
-weight: 20
+weight: 10
 ---
 
-The Application Server exposes a MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API key to authenticate:
+The Application Server exposes a MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API key to authenticate.
 
-```bash
-$ ttn-lw-cli applications api-keys create \
-  --name mqtt-client \
-  --application-id app1 \
-  --right-application-traffic-read \
-  --right-application-traffic-down-write
-```
+<!--more-->
 
->Note: See `--help` to see more rights that your application may need.
+## Creating an API Key
 
-You can now login using an MQTT client with the application ID `app1` as user name and the newly generated API key as password.
+The Console provides the required connection information and can be used to create an API key for authentication. In your application select the **MQTT** submenu from the **Integrations** side menu.
+
+{{< figure src="mqtt-integration.png" alt="MQTT connection information" >}}
+
+You can now click on the **Generate new API key** button in order to generate an API key which can be used to send and receive traffic from MQTT.
+
+{{< figure src="mqtt-key-created.png" alt="MQTT API key created" >}}
+
+Make sure to copy your API key now, since it will no longer be visible after leaving the page for security reasons. You can now login using an MQTT client with the application ID `app1` as user name and the newly generated API key as password.
+
+## MQTT Clients
 
 There are many MQTT clients available. Great clients are `mosquitto_pub` and `mosquitto_sub`, part of [Mosquitto](https://mosquitto.org).
 
@@ -26,7 +30,7 @@ There are many MQTT clients available. Great clients are `mosquitto_pub` and `mo
 $ mosquitto_sub -h thethings.example.com -t "#" -u app1 -P "NNSXS.VEEBURF3KR77ZR.." -d
 ```
 
-## Subscribing to upstream traffic
+## Subscribing to Upstream Traffic
 
 The Application Server publishes on the following topics:
 
@@ -124,7 +128,7 @@ When the device sends an uplink message, a message will be published to the topi
 ```
 </details>
 
-## Publishing downlink traffic
+## Publishing Downlink Traffic
 
 Downlinks can be scheduled by publishing the message to the topic `v3/{application id}/devices/{device id}/down/push`.
 

@@ -11,11 +11,11 @@ The Things Network's development tooling uses [Mage](https://magefile.org/). Und
 - Follow [Yarn's installation guide](https://yarnpkg.com/en/docs/install) to install Yarn.
 - Follow the guides to [install Docker](https://docs.docker.com/install/#supported-platforms) and to [install Docker Compose](https://docs.docker.com/compose/install/#install-compose).
 
-## Cloning the repository
+## Cloning the Repository
 
 If you are unfamiliar with forking projects on GitHub or cloning them locally, please [see the GitHub documentation](https://help.github.com/articles/fork-a-repo/).
 
-## Getting started
+## Getting Started
 
 As most of the tasks will be managed by `make` and `mage` we will first initialize the tooling:
 
@@ -35,7 +35,7 @@ $ make dev.stack.init
 
 This starts a CockroachDB and Redis database in Docker containers, creates a database, migrates tables and creates a user `admin` with password `admin`.
 
-## Managing the development databases
+## Managing the Development Databases
 
 You can use the following commands to start, stop and erase databases.
 
@@ -199,7 +199,7 @@ Our editorconfig contains the following rules:
 - The `Makefile` and all `.make` files are indented using **tabs**
 - All other files are indented using **two spaces**
 
-### Line length
+### Line Length
 
 We don't have strict rules for line length, but in our experience the following guidelines result in nice and readable code:
 
@@ -218,6 +218,7 @@ We use [`revive`](http://github.com/mgechev/revive) to lint Go code and [`eslint
 Please respect the following guidelines for content in our documentation site:
 
 - The title of a doc page is already rendered by the build system as a h1, don't add an extra one.
+- Use title case for headings.
 - A documentation page starts with an introduction, and then the first heading. The first paragraph of the introduction is typically a summary of the page. Use a `<!--more-->` to indicate where the summary ends.
 - Since the title is a `h1`, everything in the content is at least `h2` (`##`).
 - Paragraphs typically consist of at least two sentences.

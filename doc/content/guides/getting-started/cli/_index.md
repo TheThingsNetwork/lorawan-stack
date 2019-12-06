@@ -154,9 +154,3 @@ $ ttn-lw-cli end-devices create app1 dev2 \
 >Note: The `NwkSKey` is returned as `f_nwk_s_int_key` ({{% tts %}} uses LoRaWAN 1.1 terminology).
 
 >Hint: You can also pass `--with-session` to have a session generated.
-
-## Working With Data
-
-With your {{% tts %}} setup, a gateway connected and a device registered on your network, it's time to start working with data.
-
-Learn how to work with the [builtin MQTT server]({{< relref "../mqtt" >}}) and [HTTP webhooks]({{< relref "../webhooks" >}}).
