@@ -27,6 +27,18 @@ class Users {
 
     return Marshaler.payloadListResponse('users', response)
   }
+
+  async getById(id, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const response = await this._api.Get(
+      {
+        routeParams: { 'user_ids.user_id': id },
+      },
+      fieldMask,
+    )
+
+    return Marshaler.payloadSingleResponse(response)
+  }
 }
 
 export default Users
