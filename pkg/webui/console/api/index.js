@@ -72,13 +72,7 @@ export default {
     },
   },
   users: {
-    async get(userId) {
-      return instance.get(`${isBaseUrl}/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${(await token()).access_token}`,
-        },
-      })
-    },
+    get: ttnClient.Users.getById.bind(ttnClient.Users),
     list: ttnClient.Users.getAll.bind(ttnClient.Users),
     async authInfo() {
       return instance.get(`${isBaseUrl}/auth_info`, {
