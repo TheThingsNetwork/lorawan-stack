@@ -114,6 +114,7 @@ export default class UsersTable extends Component {
         searchItemsAction={this.getUsersList}
         baseDataSelector={this.baseDataSelector}
         pageSize={pageSize}
+        searchable
       />
     )
   }
