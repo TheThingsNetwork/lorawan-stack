@@ -58,14 +58,18 @@ func (dst *RootKeys) SetFields(src *RootKeys, paths ...string) error {
 			}
 		case "app_key":
 			if len(subs) > 0 {
-				newDst := dst.AppKey
-				if newDst == nil {
-					newDst = &KeyEnvelope{}
-					dst.AppKey = newDst
+				var newDst, newSrc *KeyEnvelope
+				if (src == nil || src.AppKey == nil) && dst.AppKey == nil {
+					continue
 				}
-				var newSrc *KeyEnvelope
 				if src != nil {
 					newSrc = src.AppKey
+				}
+				if dst.AppKey != nil {
+					newDst = dst.AppKey
+				} else {
+					newDst = &KeyEnvelope{}
+					dst.AppKey = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -79,14 +83,18 @@ func (dst *RootKeys) SetFields(src *RootKeys, paths ...string) error {
 			}
 		case "nwk_key":
 			if len(subs) > 0 {
-				newDst := dst.NwkKey
-				if newDst == nil {
-					newDst = &KeyEnvelope{}
-					dst.NwkKey = newDst
+				var newDst, newSrc *KeyEnvelope
+				if (src == nil || src.NwkKey == nil) && dst.NwkKey == nil {
+					continue
 				}
-				var newSrc *KeyEnvelope
 				if src != nil {
 					newSrc = src.NwkKey
+				}
+				if dst.NwkKey != nil {
+					newDst = dst.NwkKey
+				} else {
+					newDst = &KeyEnvelope{}
+					dst.NwkKey = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -120,14 +128,18 @@ func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) error {
 			}
 		case "f_nwk_s_int_key":
 			if len(subs) > 0 {
-				newDst := dst.FNwkSIntKey
-				if newDst == nil {
-					newDst = &KeyEnvelope{}
-					dst.FNwkSIntKey = newDst
+				var newDst, newSrc *KeyEnvelope
+				if (src == nil || src.FNwkSIntKey == nil) && dst.FNwkSIntKey == nil {
+					continue
 				}
-				var newSrc *KeyEnvelope
 				if src != nil {
 					newSrc = src.FNwkSIntKey
+				}
+				if dst.FNwkSIntKey != nil {
+					newDst = dst.FNwkSIntKey
+				} else {
+					newDst = &KeyEnvelope{}
+					dst.FNwkSIntKey = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -141,14 +153,18 @@ func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) error {
 			}
 		case "s_nwk_s_int_key":
 			if len(subs) > 0 {
-				newDst := dst.SNwkSIntKey
-				if newDst == nil {
-					newDst = &KeyEnvelope{}
-					dst.SNwkSIntKey = newDst
+				var newDst, newSrc *KeyEnvelope
+				if (src == nil || src.SNwkSIntKey == nil) && dst.SNwkSIntKey == nil {
+					continue
 				}
-				var newSrc *KeyEnvelope
 				if src != nil {
 					newSrc = src.SNwkSIntKey
+				}
+				if dst.SNwkSIntKey != nil {
+					newDst = dst.SNwkSIntKey
+				} else {
+					newDst = &KeyEnvelope{}
+					dst.SNwkSIntKey = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -162,14 +178,18 @@ func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) error {
 			}
 		case "nwk_s_enc_key":
 			if len(subs) > 0 {
-				newDst := dst.NwkSEncKey
-				if newDst == nil {
-					newDst = &KeyEnvelope{}
-					dst.NwkSEncKey = newDst
+				var newDst, newSrc *KeyEnvelope
+				if (src == nil || src.NwkSEncKey == nil) && dst.NwkSEncKey == nil {
+					continue
 				}
-				var newSrc *KeyEnvelope
 				if src != nil {
 					newSrc = src.NwkSEncKey
+				}
+				if dst.NwkSEncKey != nil {
+					newDst = dst.NwkSEncKey
+				} else {
+					newDst = &KeyEnvelope{}
+					dst.NwkSEncKey = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -183,14 +203,18 @@ func (dst *SessionKeys) SetFields(src *SessionKeys, paths ...string) error {
 			}
 		case "app_s_key":
 			if len(subs) > 0 {
-				newDst := dst.AppSKey
-				if newDst == nil {
-					newDst = &KeyEnvelope{}
-					dst.AppSKey = newDst
+				var newDst, newSrc *KeyEnvelope
+				if (src == nil || src.AppSKey == nil) && dst.AppSKey == nil {
+					continue
 				}
-				var newSrc *KeyEnvelope
 				if src != nil {
 					newSrc = src.AppSKey
+				}
+				if dst.AppSKey != nil {
+					newDst = dst.AppSKey
+				} else {
+					newDst = &KeyEnvelope{}
+					dst.AppSKey = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

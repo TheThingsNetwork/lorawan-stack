@@ -33,14 +33,18 @@ func (dst *ApplicationLink) SetFields(src *ApplicationLink, paths ...string) err
 			}
 		case "default_formatters":
 			if len(subs) > 0 {
-				newDst := dst.DefaultFormatters
-				if newDst == nil {
-					newDst = &MessagePayloadFormatters{}
-					dst.DefaultFormatters = newDst
+				var newDst, newSrc *MessagePayloadFormatters
+				if (src == nil || src.DefaultFormatters == nil) && dst.DefaultFormatters == nil {
+					continue
 				}
-				var newSrc *MessagePayloadFormatters
 				if src != nil {
 					newSrc = src.DefaultFormatters
+				}
+				if dst.DefaultFormatters != nil {
+					newDst = dst.DefaultFormatters
+				} else {
+					newDst = &MessagePayloadFormatters{}
+					dst.DefaultFormatters = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -75,11 +79,11 @@ func (dst *GetApplicationLinkRequest) SetFields(src *GetApplicationLinkRequest, 
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -114,11 +118,11 @@ func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, 
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -132,11 +136,11 @@ func (dst *SetApplicationLinkRequest) SetFields(src *SetApplicationLinkRequest, 
 			}
 		case "link":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationLink
-				var newSrc *ApplicationLink
+				var newDst, newSrc *ApplicationLink
 				if src != nil {
 					newSrc = &src.ApplicationLink
 				}
+				newDst = &dst.ApplicationLink
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

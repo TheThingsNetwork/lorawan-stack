@@ -105,11 +105,11 @@ func (dst *GenerateEndDeviceQRCodeRequest) SetFields(src *GenerateEndDeviceQRCod
 			}
 		case "end_device":
 			if len(subs) > 0 {
-				newDst := &dst.EndDevice
-				var newSrc *EndDevice
+				var newDst, newSrc *EndDevice
 				if src != nil {
 					newSrc = &src.EndDevice
 				}
+				newDst = &dst.EndDevice
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -123,14 +123,18 @@ func (dst *GenerateEndDeviceQRCodeRequest) SetFields(src *GenerateEndDeviceQRCod
 			}
 		case "image":
 			if len(subs) > 0 {
-				newDst := dst.Image
-				if newDst == nil {
-					newDst = &GenerateEndDeviceQRCodeRequest_Image{}
-					dst.Image = newDst
+				var newDst, newSrc *GenerateEndDeviceQRCodeRequest_Image
+				if (src == nil || src.Image == nil) && dst.Image == nil {
+					continue
 				}
-				var newSrc *GenerateEndDeviceQRCodeRequest_Image
 				if src != nil {
 					newSrc = src.Image
+				}
+				if dst.Image != nil {
+					newDst = dst.Image
+				} else {
+					newDst = &GenerateEndDeviceQRCodeRequest_Image{}
+					dst.Image = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -165,14 +169,18 @@ func (dst *GenerateQRCodeResponse) SetFields(src *GenerateQRCodeResponse, paths 
 			}
 		case "image":
 			if len(subs) > 0 {
-				newDst := dst.Image
-				if newDst == nil {
-					newDst = &Picture{}
-					dst.Image = newDst
+				var newDst, newSrc *Picture
+				if (src == nil || src.Image == nil) && dst.Image == nil {
+					continue
 				}
-				var newSrc *Picture
 				if src != nil {
 					newSrc = src.Image
+				}
+				if dst.Image != nil {
+					newDst = dst.Image
+				} else {
+					newDst = &Picture{}
+					dst.Image = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

@@ -9,11 +9,11 @@ func (dst *ProcessUplinkMessageRequest) SetFields(src *ProcessUplinkMessageReque
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceIdentifiers
-				var newSrc *EndDeviceIdentifiers
+				var newDst, newSrc *EndDeviceIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceIdentifiers
 				}
+				newDst = &dst.EndDeviceIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -27,11 +27,11 @@ func (dst *ProcessUplinkMessageRequest) SetFields(src *ProcessUplinkMessageReque
 			}
 		case "end_device_version_ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceVersionIDs
-				var newSrc *EndDeviceVersionIdentifiers
+				var newDst, newSrc *EndDeviceVersionIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceVersionIDs
 				}
+				newDst = &dst.EndDeviceVersionIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -45,11 +45,11 @@ func (dst *ProcessUplinkMessageRequest) SetFields(src *ProcessUplinkMessageReque
 			}
 		case "message":
 			if len(subs) > 0 {
-				newDst := &dst.Message
-				var newSrc *ApplicationUplink
+				var newDst, newSrc *ApplicationUplink
 				if src != nil {
 					newSrc = &src.Message
 				}
+				newDst = &dst.Message
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -84,11 +84,11 @@ func (dst *ProcessDownlinkMessageRequest) SetFields(src *ProcessDownlinkMessageR
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceIdentifiers
-				var newSrc *EndDeviceIdentifiers
+				var newDst, newSrc *EndDeviceIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceIdentifiers
 				}
+				newDst = &dst.EndDeviceIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -102,11 +102,11 @@ func (dst *ProcessDownlinkMessageRequest) SetFields(src *ProcessDownlinkMessageR
 			}
 		case "end_device_version_ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceVersionIDs
-				var newSrc *EndDeviceVersionIdentifiers
+				var newDst, newSrc *EndDeviceVersionIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceVersionIDs
 				}
+				newDst = &dst.EndDeviceVersionIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -120,11 +120,11 @@ func (dst *ProcessDownlinkMessageRequest) SetFields(src *ProcessDownlinkMessageR
 			}
 		case "message":
 			if len(subs) > 0 {
-				newDst := &dst.Message
-				var newSrc *ApplicationDownlink
+				var newDst, newSrc *ApplicationDownlink
 				if src != nil {
 					newSrc = &src.Message
 				}
+				newDst = &dst.Message
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

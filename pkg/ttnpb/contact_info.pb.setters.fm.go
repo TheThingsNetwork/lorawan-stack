@@ -89,14 +89,18 @@ func (dst *ContactInfoValidation) SetFields(src *ContactInfoValidation, paths ..
 			}
 		case "entity":
 			if len(subs) > 0 {
-				newDst := dst.Entity
-				if newDst == nil {
-					newDst = &EntityIdentifiers{}
-					dst.Entity = newDst
+				var newDst, newSrc *EntityIdentifiers
+				if (src == nil || src.Entity == nil) && dst.Entity == nil {
+					continue
 				}
-				var newSrc *EntityIdentifiers
 				if src != nil {
 					newSrc = src.Entity
+				}
+				if dst.Entity != nil {
+					newDst = dst.Entity
+				} else {
+					newDst = &EntityIdentifiers{}
+					dst.Entity = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

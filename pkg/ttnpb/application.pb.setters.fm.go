@@ -14,11 +14,11 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -121,11 +121,11 @@ func (dst *GetApplicationRequest) SetFields(src *GetApplicationRequest, paths ..
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -160,14 +160,18 @@ func (dst *ListApplicationsRequest) SetFields(src *ListApplicationsRequest, path
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := dst.Collaborator
-				if newDst == nil {
-					newDst = &OrganizationOrUserIdentifiers{}
-					dst.Collaborator = newDst
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
 				}
-				var newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -232,11 +236,11 @@ func (dst *CreateApplicationRequest) SetFields(src *CreateApplicationRequest, pa
 		switch name {
 		case "application":
 			if len(subs) > 0 {
-				newDst := &dst.Application
-				var newSrc *Application
+				var newDst, newSrc *Application
 				if src != nil {
 					newSrc = &src.Application
 				}
+				newDst = &dst.Application
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -250,11 +254,11 @@ func (dst *CreateApplicationRequest) SetFields(src *CreateApplicationRequest, pa
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.Collaborator
-				var newSrc *OrganizationOrUserIdentifiers
+				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = &src.Collaborator
 				}
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -279,11 +283,11 @@ func (dst *UpdateApplicationRequest) SetFields(src *UpdateApplicationRequest, pa
 		switch name {
 		case "application":
 			if len(subs) > 0 {
-				newDst := &dst.Application
-				var newSrc *Application
+				var newDst, newSrc *Application
 				if src != nil {
 					newSrc = &src.Application
 				}
+				newDst = &dst.Application
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -318,11 +322,11 @@ func (dst *ListApplicationAPIKeysRequest) SetFields(src *ListApplicationAPIKeysR
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -367,11 +371,11 @@ func (dst *GetApplicationAPIKeyRequest) SetFields(src *GetApplicationAPIKeyReque
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -406,11 +410,11 @@ func (dst *CreateApplicationAPIKeyRequest) SetFields(src *CreateApplicationAPIKe
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -454,11 +458,11 @@ func (dst *UpdateApplicationAPIKeyRequest) SetFields(src *UpdateApplicationAPIKe
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -472,11 +476,11 @@ func (dst *UpdateApplicationAPIKeyRequest) SetFields(src *UpdateApplicationAPIKe
 			}
 		case "api_key":
 			if len(subs) > 0 {
-				newDst := &dst.APIKey
-				var newSrc *APIKey
+				var newDst, newSrc *APIKey
 				if src != nil {
 					newSrc = &src.APIKey
 				}
+				newDst = &dst.APIKey
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -501,11 +505,11 @@ func (dst *ListApplicationCollaboratorsRequest) SetFields(src *ListApplicationCo
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -550,11 +554,11 @@ func (dst *GetApplicationCollaboratorRequest) SetFields(src *GetApplicationColla
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -568,11 +572,11 @@ func (dst *GetApplicationCollaboratorRequest) SetFields(src *GetApplicationColla
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationOrUserIdentifiers
-				var newSrc *OrganizationOrUserIdentifiers
+				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationOrUserIdentifiers
 				}
+				newDst = &dst.OrganizationOrUserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -597,11 +601,11 @@ func (dst *SetApplicationCollaboratorRequest) SetFields(src *SetApplicationColla
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -615,11 +619,11 @@ func (dst *SetApplicationCollaboratorRequest) SetFields(src *SetApplicationColla
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.Collaborator
-				var newSrc *Collaborator
+				var newDst, newSrc *Collaborator
 				if src != nil {
 					newSrc = &src.Collaborator
 				}
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

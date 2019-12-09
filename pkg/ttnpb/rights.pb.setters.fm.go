@@ -99,11 +99,11 @@ func (dst *Collaborator) SetFields(src *Collaborator, paths ...string) error {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationOrUserIdentifiers
-				var newSrc *OrganizationOrUserIdentifiers
+				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationOrUserIdentifiers
 				}
+				newDst = &dst.OrganizationOrUserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -137,11 +137,11 @@ func (dst *GetCollaboratorResponse) SetFields(src *GetCollaboratorResponse, path
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationOrUserIdentifiers
-				var newSrc *OrganizationOrUserIdentifiers
+				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationOrUserIdentifiers
 				}
+				newDst = &dst.OrganizationOrUserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

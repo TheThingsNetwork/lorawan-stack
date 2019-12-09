@@ -21,14 +21,18 @@ func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...strin
 			}
 		case "lora_standard_channel":
 			if len(subs) > 0 {
-				newDst := dst.LoRaStandardChannel
-				if newDst == nil {
-					newDst = &ConcentratorConfig_LoRaStandardChannel{}
-					dst.LoRaStandardChannel = newDst
+				var newDst, newSrc *ConcentratorConfig_LoRaStandardChannel
+				if (src == nil || src.LoRaStandardChannel == nil) && dst.LoRaStandardChannel == nil {
+					continue
 				}
-				var newSrc *ConcentratorConfig_LoRaStandardChannel
 				if src != nil {
 					newSrc = src.LoRaStandardChannel
+				}
+				if dst.LoRaStandardChannel != nil {
+					newDst = dst.LoRaStandardChannel
+				} else {
+					newDst = &ConcentratorConfig_LoRaStandardChannel{}
+					dst.LoRaStandardChannel = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -42,14 +46,18 @@ func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...strin
 			}
 		case "fsk_channel":
 			if len(subs) > 0 {
-				newDst := dst.FSKChannel
-				if newDst == nil {
-					newDst = &ConcentratorConfig_FSKChannel{}
-					dst.FSKChannel = newDst
+				var newDst, newSrc *ConcentratorConfig_FSKChannel
+				if (src == nil || src.FSKChannel == nil) && dst.FSKChannel == nil {
+					continue
 				}
-				var newSrc *ConcentratorConfig_FSKChannel
 				if src != nil {
 					newSrc = src.FSKChannel
+				}
+				if dst.FSKChannel != nil {
+					newDst = dst.FSKChannel
+				} else {
+					newDst = &ConcentratorConfig_FSKChannel{}
+					dst.FSKChannel = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -63,14 +71,18 @@ func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...strin
 			}
 		case "lbt":
 			if len(subs) > 0 {
-				newDst := dst.LBT
-				if newDst == nil {
-					newDst = &ConcentratorConfig_LBTConfiguration{}
-					dst.LBT = newDst
+				var newDst, newSrc *ConcentratorConfig_LBTConfiguration
+				if (src == nil || src.LBT == nil) && dst.LBT == nil {
+					continue
 				}
-				var newSrc *ConcentratorConfig_LBTConfiguration
 				if src != nil {
 					newSrc = src.LBT
+				}
+				if dst.LBT != nil {
+					newDst = dst.LBT
+				} else {
+					newDst = &ConcentratorConfig_LBTConfiguration{}
+					dst.LBT = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -84,14 +96,18 @@ func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...strin
 			}
 		case "ping_slot":
 			if len(subs) > 0 {
-				newDst := dst.PingSlot
-				if newDst == nil {
-					newDst = &ConcentratorConfig_Channel{}
-					dst.PingSlot = newDst
+				var newDst, newSrc *ConcentratorConfig_Channel
+				if (src == nil || src.PingSlot == nil) && dst.PingSlot == nil {
+					continue
 				}
-				var newSrc *ConcentratorConfig_Channel
 				if src != nil {
 					newSrc = src.PingSlot
+				}
+				if dst.PingSlot != nil {
+					newDst = dst.PingSlot
+				} else {
+					newDst = &ConcentratorConfig_Channel{}
+					dst.PingSlot = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

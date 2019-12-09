@@ -13,11 +13,11 @@ func (dst *PullGatewayConfigurationRequest) SetFields(src *PullGatewayConfigurat
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

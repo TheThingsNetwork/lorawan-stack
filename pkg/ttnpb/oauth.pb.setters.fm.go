@@ -12,11 +12,11 @@ func (dst *OAuthClientAuthorizationIdentifiers) SetFields(src *OAuthClientAuthor
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIDs
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIDs
 				}
+				newDst = &dst.UserIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -30,11 +30,11 @@ func (dst *OAuthClientAuthorizationIdentifiers) SetFields(src *OAuthClientAuthor
 			}
 		case "client_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ClientIDs
-				var newSrc *ClientIdentifiers
+				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
 					newSrc = &src.ClientIDs
 				}
+				newDst = &dst.ClientIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -59,11 +59,11 @@ func (dst *OAuthClientAuthorization) SetFields(src *OAuthClientAuthorization, pa
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIDs
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIDs
 				}
+				newDst = &dst.UserIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -77,11 +77,11 @@ func (dst *OAuthClientAuthorization) SetFields(src *OAuthClientAuthorization, pa
 			}
 		case "client_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ClientIDs
-				var newSrc *ClientIdentifiers
+				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
 					newSrc = &src.ClientIDs
 				}
+				newDst = &dst.ClientIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -155,11 +155,11 @@ func (dst *ListOAuthClientAuthorizationsRequest) SetFields(src *ListOAuthClientA
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -214,11 +214,11 @@ func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths 
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIDs
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIDs
 				}
+				newDst = &dst.UserIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -232,11 +232,11 @@ func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths 
 			}
 		case "client_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ClientIDs
-				var newSrc *ClientIdentifiers
+				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
 					newSrc = &src.ClientIDs
 				}
+				newDst = &dst.ClientIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -320,11 +320,11 @@ func (dst *OAuthAccessTokenIdentifiers) SetFields(src *OAuthAccessTokenIdentifie
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIDs
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIDs
 				}
+				newDst = &dst.UserIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -338,11 +338,11 @@ func (dst *OAuthAccessTokenIdentifiers) SetFields(src *OAuthAccessTokenIdentifie
 			}
 		case "client_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ClientIDs
-				var newSrc *ClientIdentifiers
+				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
 					newSrc = &src.ClientIDs
 				}
+				newDst = &dst.ClientIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -377,11 +377,11 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIDs
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIDs
 				}
+				newDst = &dst.UserIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -395,11 +395,11 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 			}
 		case "client_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ClientIDs
-				var newSrc *ClientIdentifiers
+				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
 					newSrc = &src.ClientIDs
 				}
+				newDst = &dst.ClientIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -503,11 +503,11 @@ func (dst *ListOAuthAccessTokensRequest) SetFields(src *ListOAuthAccessTokensReq
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIDs
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIDs
 				}
+				newDst = &dst.UserIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -521,11 +521,11 @@ func (dst *ListOAuthAccessTokensRequest) SetFields(src *ListOAuthAccessTokensReq
 			}
 		case "client_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ClientIDs
-				var newSrc *ClientIdentifiers
+				var newDst, newSrc *ClientIdentifiers
 				if src != nil {
 					newSrc = &src.ClientIDs
 				}
+				newDst = &dst.ClientIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
