@@ -22,7 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
-func encrypt(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
+func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
 	k := len(payload) / aes.BlockSize
 	if len(payload)%aes.BlockSize != 0 {
 		k++
@@ -56,7 +56,7 @@ func encrypt(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, pa
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
 func EncryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
-	return encrypt(key, 0, addr, fCnt, payload)
+	return encryptMessage(key, 0, addr, fCnt, payload)
 }
 
 // DecryptUplink decrypts an uplink payload
@@ -64,7 +64,7 @@ func EncryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
 func DecryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
-	return encrypt(key, 0, addr, fCnt, payload)
+	return encryptMessage(key, 0, addr, fCnt, payload)
 }
 
 // EncryptDownlink encrypts a downlink payload
@@ -72,7 +72,7 @@ func DecryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
 func EncryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
-	return encrypt(key, 1, addr, fCnt, payload)
+	return encryptMessage(key, 1, addr, fCnt, payload)
 }
 
 // DecryptDownlink decrypts a downlink payload
@@ -80,7 +80,7 @@ func EncryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, paylo
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
 func DecryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte) ([]byte, error) {
-	return encrypt(key, 1, addr, fCnt, payload)
+	return encryptMessage(key, 1, addr, fCnt, payload)
 }
 
 func computeMIC(key types.AES128Key, dir uint8, confFCnt uint16, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
