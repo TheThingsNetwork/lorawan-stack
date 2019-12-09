@@ -43,6 +43,7 @@ const consoleAppLogic = createRequestLogic({
         dispatch(user.getUserMe())
         const userId = info.data.oauth_access_token.user_ids.user_id
         const userResult = await api.users.get(userId)
+        userResult.isAdmin = info.data.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))
       } catch (error) {
         if (getBackendErrorName(error) === 'user_requested') {
