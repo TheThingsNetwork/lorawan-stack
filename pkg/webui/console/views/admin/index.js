@@ -19,8 +19,10 @@ import PropTypes from '../../../lib/prop-types'
 import { selectApplicationSiteName } from '../../../lib/selectors/env'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import NotFoundRoute from '../../../lib/components/not-found-route'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import UserManagement from '../admin-user-management'
+import { mayPerformAdminActions } from '../../lib/feature-checks'
 
 const AdminView = ({ match }) => (
   <React.Fragment>
@@ -36,4 +38,4 @@ AdminView.propTypes = {
   match: PropTypes.match.isRequired,
 }
 
-export default AdminView
+export default withFeatureRequirement(mayPerformAdminActions, { redirect: '/' })(AdminView)

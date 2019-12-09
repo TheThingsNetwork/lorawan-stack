@@ -22,10 +22,13 @@ import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import NotFoundRoute from '../../../lib/components/not-found-route'
+import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
+import { mayManageUsers } from '../../lib/feature-checks'
 import UserEdit from '../admin-user-management-edit'
 import UserManagement from './admin-user-management'
 
+@withFeatureRequirement(mayManageUsers, { redirect: '/' })
 @withBreadcrumb('admin.user-management', function() {
   return (
     <Breadcrumb
