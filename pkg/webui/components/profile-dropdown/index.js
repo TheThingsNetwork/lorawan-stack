@@ -29,12 +29,14 @@ const dropdownItemsPropTypes = PropTypes.arrayOf(
       icon: PropTypes.string,
       path: PropTypes.string,
       action: PropTypes.func.isRequired,
+      hidden: PropTypes.bool,
     }),
     PropTypes.shape({
       title: PropTypes.message.isRequired,
       icon: PropTypes.string,
       path: PropTypes.string.isRequired,
       action: PropTypes.func,
+      hidden: PropTypes.bool,
     }),
   ]),
 ).isRequired
@@ -42,6 +44,7 @@ const dropdownItemsPropTypes = PropTypes.arrayOf(
 @bind
 export default class ProfileDropdown extends React.PureComponent {
   static propTypes = {
+    anchored: PropTypes.bool,
     /** The id of the current user */
     userId: PropTypes.string,
     /**
@@ -109,6 +112,8 @@ export default class ProfileDropdown extends React.PureComponent {
 const Dropdown = ({ items, anchored }) => (
   <ul className={styles.dropdown}>
     {items.map(function(item) {
+      if (item.hidden) return null
+
       const icon = item.icon && <Icon className={styles.icon} icon={item.icon} />
       const ItemElement = item.action ? (
         <button onClick={item.action} onKeyPress={item.action} role="tab" tabIndex="0">
