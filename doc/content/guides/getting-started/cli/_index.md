@@ -6,7 +6,11 @@ weight: 10
 
 ## Configuration
 
-The command-line needs to be configured to connect to your deployment on `thethings.example.com`. The recommended way to configure the CLI is with a `.ttn-lw-cli.yml` in your `$XDG_CONFIG_HOME` or `$HOME` directory.
+The command-line needs to be configured to connect to your deployment on `thethings.example.com`. You have multiple options to make the configuration file available to the CLI:
+
+1. Environment: `export TTN_LW_CONFIG=/path/to/ttn-lw-cli.yml`
+2. Command-line flag: `-c /path/to/ttn-lw-cli.yml`
+3. Save as `.ttn-lw-cli.yml` in `$XDG_CONFIG_HOME`, your home directory, or the working directory.
 
 ```yaml
 oauth-server-address: 'https://thethings.example.com/oauth'
@@ -21,7 +25,7 @@ device-template-converter-grpc-address: 'thethings.example.com:8884'
 qr-code-generator-grpc-address: 'thethings.example.com:8884'
 ```
 
-If you did not put the configuration file in the recommended location, you need to point the CLI to that file every time you use the CLI. You can do that by passing the path to the config file as a command-line flag `-c /path/to/config.yml` or by setting an environment variable `export TTN_LW_CONFIG=/path/to/config.yml`.
+For advanced options, see the [Configuration Reference]({{< ref "/reference/configuration/cli" >}}).
 
 ## Login
 
