@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix the PubSub integration edit page in the Console.
+- Fix updating and setting of webhook headers in the Console.
 
 ### Security
 
