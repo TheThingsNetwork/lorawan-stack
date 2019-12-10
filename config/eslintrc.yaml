@@ -45,6 +45,8 @@ rules:
   react/prop-types: warn
   # Enforce propTypes declarations alphabetical sorting
   react/sort-prop-types: warn
+  # Prevent undefined components
+  react/jsx-no-undef: error
   # Prevent vague prop types
   react/forbid-prop-types:
     - warn
