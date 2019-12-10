@@ -94,7 +94,7 @@ const webhookEntitySelector = [
 })
 @bind
 export default class ApplicationWebhookEdit extends Component {
-  async handleSubmit(webhook) {
+  async handleSubmit(updatedWebhook) {
     const {
       appId,
       match: {
@@ -102,7 +102,13 @@ export default class ApplicationWebhookEdit extends Component {
       },
       webhook: originalWebhook,
     } = this.props
-    const patch = diff(originalWebhook, webhook, ['ids'])
+    const patch = diff(originalWebhook, updatedWebhook, ['ids'])
+
+    // Ensure that the header prop is always patched fully, otherwise we loose
+    // old header entries.
+    if ('headers' in patch) {
+      patch.headers = updatedWebhook.headers
+    }
 
     await api.application.webhooks.update(appId, webhookId, patch)
   }
