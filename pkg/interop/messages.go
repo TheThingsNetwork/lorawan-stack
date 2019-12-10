@@ -292,7 +292,7 @@ func verifySenderID(getSenderClientCAs func(string) []*x509.Certificate) echo.Mi
 				}
 			}
 			// TODO: Check headers (https://github.com/TheThingsNetwork/lorawan-stack/issues/717)
-			return echo.NewHTTPError(http.StatusForbidden)
+			return ErrUnknownSender
 		}
 	}
 }
