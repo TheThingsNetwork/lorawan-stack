@@ -4,12 +4,11 @@ description: ""
 weight: 30
 ---
 
-
 {{% tts %}} keeps a queue of downlink messages per device. Applications can keep pushing downlink messages or replace the queue with a list of downlink messages.
 
 You can schedule downlink using the CLI, MQTT or HTTP webhooks.
 
-This guide shows how to interact with the downlink queue from the CLI.
+This guide shows how to interact with the downlink queue from the command-line interface (CLI).
 
 <!--more-->
 

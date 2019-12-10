@@ -1,7 +1,7 @@
 ---
 title: "Command-line Interface"
 description: ""
-weight: 7
+weight: 8
 ---
 
 The Command-line Interface (CLI) provides a cross-platform interface for managing components through the command-line.
