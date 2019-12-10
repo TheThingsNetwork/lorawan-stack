@@ -9,14 +9,18 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 		switch name {
 		case "universal_rights":
 			if len(subs) > 0 {
-				newDst := dst.UniversalRights
-				if newDst == nil {
-					newDst = &Rights{}
-					dst.UniversalRights = newDst
+				var newDst, newSrc *Rights
+				if (src == nil || src.UniversalRights == nil) && dst.UniversalRights == nil {
+					continue
 				}
-				var newSrc *Rights
 				if src != nil {
 					newSrc = src.UniversalRights
+				}
+				if dst.UniversalRights != nil {
+					newDst = dst.UniversalRights
+				} else {
+					newDst = &Rights{}
+					dst.UniversalRights = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -55,51 +59,69 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "api_key":
-					if _, ok := dst.AccessMethod.(*AuthInfoResponse_APIKey); !ok {
-						dst.AccessMethod = &AuthInfoResponse_APIKey{}
+					_, srcOk := src.AccessMethod.(*AuthInfoResponse_APIKey)
+					if !srcOk && src.AccessMethod != nil {
+						return fmt.Errorf("attempt to set oneof 'api_key', while different oneof is set in source")
+					}
+					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_APIKey)
+					if !dstOk && dst.AccessMethod != nil {
+						return fmt.Errorf("attempt to set oneof 'api_key', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						newDst := dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey
-						if newDst == nil {
-							newDst = &AuthInfoResponse_APIKeyAccess{}
-							dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = newDst
+						var newDst, newSrc *AuthInfoResponse_APIKeyAccess
+						if !srcOk && !dstOk {
+							continue
 						}
-						var newSrc *AuthInfoResponse_APIKeyAccess
-						if src != nil {
-							newSrc = src.GetAPIKey()
+						if srcOk {
+							newSrc = src.AccessMethod.(*AuthInfoResponse_APIKey).APIKey
+						}
+						if dstOk {
+							newDst = dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey
+						} else {
+							newDst = &AuthInfoResponse_APIKeyAccess{}
+							dst.AccessMethod = &AuthInfoResponse_APIKey{APIKey: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
 						if src != nil {
-							dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = src.GetAPIKey()
+							dst.AccessMethod = src.AccessMethod
 						} else {
-							dst.AccessMethod.(*AuthInfoResponse_APIKey).APIKey = nil
+							dst.AccessMethod = nil
 						}
 					}
 				case "oauth_access_token":
-					if _, ok := dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken); !ok {
-						dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{}
+					_, srcOk := src.AccessMethod.(*AuthInfoResponse_OAuthAccessToken)
+					if !srcOk && src.AccessMethod != nil {
+						return fmt.Errorf("attempt to set oneof 'oauth_access_token', while different oneof is set in source")
+					}
+					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken)
+					if !dstOk && dst.AccessMethod != nil {
+						return fmt.Errorf("attempt to set oneof 'oauth_access_token', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						newDst := dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken
-						if newDst == nil {
-							newDst = &OAuthAccessToken{}
-							dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = newDst
+						var newDst, newSrc *OAuthAccessToken
+						if !srcOk && !dstOk {
+							continue
 						}
-						var newSrc *OAuthAccessToken
-						if src != nil {
-							newSrc = src.GetOAuthAccessToken()
+						if srcOk {
+							newSrc = src.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken
+						}
+						if dstOk {
+							newDst = dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken
+						} else {
+							newDst = &OAuthAccessToken{}
+							dst.AccessMethod = &AuthInfoResponse_OAuthAccessToken{OAuthAccessToken: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
 						if src != nil {
-							dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = src.GetOAuthAccessToken()
+							dst.AccessMethod = src.AccessMethod
 						} else {
-							dst.AccessMethod.(*AuthInfoResponse_OAuthAccessToken).OAuthAccessToken = nil
+							dst.AccessMethod = nil
 						}
 					}
 
@@ -120,11 +142,11 @@ func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKey
 		switch name {
 		case "api_key":
 			if len(subs) > 0 {
-				newDst := &dst.APIKey
-				var newSrc *APIKey
+				var newDst, newSrc *APIKey
 				if src != nil {
 					newSrc = &src.APIKey
 				}
+				newDst = &dst.APIKey
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -138,11 +160,11 @@ func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKey
 			}
 		case "entity_ids":
 			if len(subs) > 0 {
-				newDst := &dst.EntityIDs
-				var newSrc *EntityIdentifiers
+				var newDst, newSrc *EntityIdentifiers
 				if src != nil {
 					newSrc = &src.EntityIDs
 				}
+				newDst = &dst.EntityIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

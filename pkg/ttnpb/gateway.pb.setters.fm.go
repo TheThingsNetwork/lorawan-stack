@@ -197,14 +197,18 @@ func (dst *GatewayRadio) SetFields(src *GatewayRadio, paths ...string) error {
 			}
 		case "tx_configuration":
 			if len(subs) > 0 {
-				newDst := dst.TxConfiguration
-				if newDst == nil {
-					newDst = &GatewayRadio_TxConfiguration{}
-					dst.TxConfiguration = newDst
+				var newDst, newSrc *GatewayRadio_TxConfiguration
+				if (src == nil || src.TxConfiguration == nil) && dst.TxConfiguration == nil {
+					continue
 				}
-				var newSrc *GatewayRadio_TxConfiguration
 				if src != nil {
 					newSrc = src.TxConfiguration
+				}
+				if dst.TxConfiguration != nil {
+					newDst = dst.TxConfiguration
+				} else {
+					newDst = &GatewayRadio_TxConfiguration{}
+					dst.TxConfiguration = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -229,11 +233,11 @@ func (dst *GatewayVersion) SetFields(src *GatewayVersion, paths ...string) error
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayVersionIdentifiers
-				var newSrc *GatewayVersionIdentifiers
+				var newDst, newSrc *GatewayVersionIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayVersionIdentifiers
 				}
+				newDst = &dst.GatewayVersionIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -286,11 +290,11 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -362,11 +366,11 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 			}
 		case "version_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayVersionIdentifiers
-				var newSrc *GatewayVersionIdentifiers
+				var newDst, newSrc *GatewayVersionIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayVersionIdentifiers
 				}
+				newDst = &dst.GatewayVersionIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -510,11 +514,11 @@ func (dst *GetGatewayRequest) SetFields(src *GetGatewayRequest, paths ...string)
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -570,14 +574,18 @@ func (dst *ListGatewaysRequest) SetFields(src *ListGatewaysRequest, paths ...str
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := dst.Collaborator
-				if newDst == nil {
-					newDst = &OrganizationOrUserIdentifiers{}
-					dst.Collaborator = newDst
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
 				}
-				var newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -642,11 +650,11 @@ func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...s
 		switch name {
 		case "gateway":
 			if len(subs) > 0 {
-				newDst := &dst.Gateway
-				var newSrc *Gateway
+				var newDst, newSrc *Gateway
 				if src != nil {
 					newSrc = &src.Gateway
 				}
+				newDst = &dst.Gateway
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -660,11 +668,11 @@ func (dst *CreateGatewayRequest) SetFields(src *CreateGatewayRequest, paths ...s
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.Collaborator
-				var newSrc *OrganizationOrUserIdentifiers
+				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = &src.Collaborator
 				}
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -689,11 +697,11 @@ func (dst *UpdateGatewayRequest) SetFields(src *UpdateGatewayRequest, paths ...s
 		switch name {
 		case "gateway":
 			if len(subs) > 0 {
-				newDst := &dst.Gateway
-				var newSrc *Gateway
+				var newDst, newSrc *Gateway
 				if src != nil {
 					newSrc = &src.Gateway
 				}
+				newDst = &dst.Gateway
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -728,11 +736,11 @@ func (dst *ListGatewayAPIKeysRequest) SetFields(src *ListGatewayAPIKeysRequest, 
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -777,11 +785,11 @@ func (dst *GetGatewayAPIKeyRequest) SetFields(src *GetGatewayAPIKeyRequest, path
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -816,11 +824,11 @@ func (dst *CreateGatewayAPIKeyRequest) SetFields(src *CreateGatewayAPIKeyRequest
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -864,11 +872,11 @@ func (dst *UpdateGatewayAPIKeyRequest) SetFields(src *UpdateGatewayAPIKeyRequest
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -882,11 +890,11 @@ func (dst *UpdateGatewayAPIKeyRequest) SetFields(src *UpdateGatewayAPIKeyRequest
 			}
 		case "api_key":
 			if len(subs) > 0 {
-				newDst := &dst.APIKey
-				var newSrc *APIKey
+				var newDst, newSrc *APIKey
 				if src != nil {
 					newSrc = &src.APIKey
 				}
+				newDst = &dst.APIKey
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -911,11 +919,11 @@ func (dst *ListGatewayCollaboratorsRequest) SetFields(src *ListGatewayCollaborat
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -960,11 +968,11 @@ func (dst *GetGatewayCollaboratorRequest) SetFields(src *GetGatewayCollaboratorR
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -978,11 +986,11 @@ func (dst *GetGatewayCollaboratorRequest) SetFields(src *GetGatewayCollaboratorR
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationOrUserIdentifiers
-				var newSrc *OrganizationOrUserIdentifiers
+				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationOrUserIdentifiers
 				}
+				newDst = &dst.OrganizationOrUserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1007,11 +1015,11 @@ func (dst *SetGatewayCollaboratorRequest) SetFields(src *SetGatewayCollaboratorR
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1025,11 +1033,11 @@ func (dst *SetGatewayCollaboratorRequest) SetFields(src *SetGatewayCollaboratorR
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.Collaborator
-				var newSrc *Collaborator
+				var newDst, newSrc *Collaborator
 				if src != nil {
 					newSrc = &src.Collaborator
 				}
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1064,11 +1072,11 @@ func (dst *GatewayAntenna) SetFields(src *GatewayAntenna, paths ...string) error
 			}
 		case "location":
 			if len(subs) > 0 {
-				newDst := &dst.Location
-				var newSrc *Location
+				var newDst, newSrc *Location
 				if src != nil {
 					newSrc = &src.Location
 				}
+				newDst = &dst.Location
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1206,14 +1214,18 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 			}
 		case "last_status":
 			if len(subs) > 0 {
-				newDst := dst.LastStatus
-				if newDst == nil {
-					newDst = &GatewayStatus{}
-					dst.LastStatus = newDst
+				var newDst, newSrc *GatewayStatus
+				if (src == nil || src.LastStatus == nil) && dst.LastStatus == nil {
+					continue
 				}
-				var newSrc *GatewayStatus
 				if src != nil {
 					newSrc = src.LastStatus
+				}
+				if dst.LastStatus != nil {
+					newDst = dst.LastStatus
+				} else {
+					newDst = &GatewayStatus{}
+					dst.LastStatus = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1265,14 +1277,18 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 			}
 		case "round_trip_times":
 			if len(subs) > 0 {
-				newDst := dst.RoundTripTimes
-				if newDst == nil {
-					newDst = &GatewayConnectionStats_RoundTripTimes{}
-					dst.RoundTripTimes = newDst
+				var newDst, newSrc *GatewayConnectionStats_RoundTripTimes
+				if (src == nil || src.RoundTripTimes == nil) && dst.RoundTripTimes == nil {
+					continue
 				}
-				var newSrc *GatewayConnectionStats_RoundTripTimes
 				if src != nil {
 					newSrc = src.RoundTripTimes
+				}
+				if dst.RoundTripTimes != nil {
+					newDst = dst.RoundTripTimes
+				} else {
+					newDst = &GatewayConnectionStats_RoundTripTimes{}
+					dst.RoundTripTimes = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

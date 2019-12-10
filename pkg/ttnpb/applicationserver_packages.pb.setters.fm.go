@@ -65,11 +65,11 @@ func (dst *ApplicationPackageAssociationIdentifiers) SetFields(src *ApplicationP
 		switch name {
 		case "end_device_ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceIdentifiers
-				var newSrc *EndDeviceIdentifiers
+				var newDst, newSrc *EndDeviceIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceIdentifiers
 				}
+				newDst = &dst.EndDeviceIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -104,11 +104,11 @@ func (dst *ApplicationPackageAssociation) SetFields(src *ApplicationPackageAssoc
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationPackageAssociationIdentifiers
-				var newSrc *ApplicationPackageAssociationIdentifiers
+				var newDst, newSrc *ApplicationPackageAssociationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationPackageAssociationIdentifiers
 				}
+				newDst = &dst.ApplicationPackageAssociationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -192,11 +192,11 @@ func (dst *GetApplicationPackageAssociationRequest) SetFields(src *GetApplicatio
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationPackageAssociationIdentifiers
-				var newSrc *ApplicationPackageAssociationIdentifiers
+				var newDst, newSrc *ApplicationPackageAssociationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationPackageAssociationIdentifiers
 				}
+				newDst = &dst.ApplicationPackageAssociationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -231,11 +231,11 @@ func (dst *ListApplicationPackageAssociationRequest) SetFields(src *ListApplicat
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceIdentifiers
-				var newSrc *EndDeviceIdentifiers
+				var newDst, newSrc *EndDeviceIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceIdentifiers
 				}
+				newDst = &dst.EndDeviceIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -290,11 +290,11 @@ func (dst *SetApplicationPackageAssociationRequest) SetFields(src *SetApplicatio
 		switch name {
 		case "association":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationPackageAssociation
-				var newSrc *ApplicationPackageAssociation
+				var newDst, newSrc *ApplicationPackageAssociation
 				if src != nil {
 					newSrc = &src.ApplicationPackageAssociation
 				}
+				newDst = &dst.ApplicationPackageAssociation
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

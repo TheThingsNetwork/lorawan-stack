@@ -13,11 +13,11 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 		switch name {
 		case "target_application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.TargetApplicationIDs
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.TargetApplicationIDs
 				}
+				newDst = &dst.TargetApplicationIDs
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -125,40 +125,54 @@ func (dst *ClaimEndDeviceRequest) SetFields(src *ClaimEndDeviceRequest, paths ..
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "authenticated_identifiers":
-					if _, ok := dst.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_); !ok {
-						dst.SourceDevice = &ClaimEndDeviceRequest_AuthenticatedIdentifiers_{}
+					_, srcOk := src.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_)
+					if !srcOk && src.SourceDevice != nil {
+						return fmt.Errorf("attempt to set oneof 'authenticated_identifiers', while different oneof is set in source")
+					}
+					_, dstOk := dst.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_)
+					if !dstOk && dst.SourceDevice != nil {
+						return fmt.Errorf("attempt to set oneof 'authenticated_identifiers', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						newDst := dst.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_).AuthenticatedIdentifiers
-						if newDst == nil {
-							newDst = &ClaimEndDeviceRequest_AuthenticatedIdentifiers{}
-							dst.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_).AuthenticatedIdentifiers = newDst
+						var newDst, newSrc *ClaimEndDeviceRequest_AuthenticatedIdentifiers
+						if !srcOk && !dstOk {
+							continue
 						}
-						var newSrc *ClaimEndDeviceRequest_AuthenticatedIdentifiers
-						if src != nil {
-							newSrc = src.GetAuthenticatedIdentifiers()
+						if srcOk {
+							newSrc = src.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_).AuthenticatedIdentifiers
+						}
+						if dstOk {
+							newDst = dst.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_).AuthenticatedIdentifiers
+						} else {
+							newDst = &ClaimEndDeviceRequest_AuthenticatedIdentifiers{}
+							dst.SourceDevice = &ClaimEndDeviceRequest_AuthenticatedIdentifiers_{AuthenticatedIdentifiers: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
 						if src != nil {
-							dst.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_).AuthenticatedIdentifiers = src.GetAuthenticatedIdentifiers()
+							dst.SourceDevice = src.SourceDevice
 						} else {
-							dst.SourceDevice.(*ClaimEndDeviceRequest_AuthenticatedIdentifiers_).AuthenticatedIdentifiers = nil
+							dst.SourceDevice = nil
 						}
 					}
 				case "qr_code":
-					if _, ok := dst.SourceDevice.(*ClaimEndDeviceRequest_QRCode); !ok {
-						dst.SourceDevice = &ClaimEndDeviceRequest_QRCode{}
+					_, srcOk := src.SourceDevice.(*ClaimEndDeviceRequest_QRCode)
+					if !srcOk && src.SourceDevice != nil {
+						return fmt.Errorf("attempt to set oneof 'qr_code', while different oneof is set in source")
+					}
+					_, dstOk := dst.SourceDevice.(*ClaimEndDeviceRequest_QRCode)
+					if !dstOk && dst.SourceDevice != nil {
+						return fmt.Errorf("attempt to set oneof 'qr_code', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						return fmt.Errorf("'qr_code' has no subfields, but %s were specified", oneofSubs)
 					}
 					if src != nil {
-						dst.SourceDevice.(*ClaimEndDeviceRequest_QRCode).QRCode = src.GetQRCode()
+						dst.SourceDevice = src.SourceDevice
 					} else {
-						dst.SourceDevice.(*ClaimEndDeviceRequest_QRCode).QRCode = nil
+						dst.SourceDevice = nil
 					}
 
 				default:
@@ -178,11 +192,11 @@ func (dst *AuthorizeApplicationRequest) SetFields(src *AuthorizeApplicationReque
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

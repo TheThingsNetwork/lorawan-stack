@@ -14,11 +14,11 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -186,14 +186,18 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 			}
 		case "profile_picture":
 			if len(subs) > 0 {
-				newDst := dst.ProfilePicture
-				if newDst == nil {
-					newDst = &Picture{}
-					dst.ProfilePicture = newDst
+				var newDst, newSrc *Picture
+				if (src == nil || src.ProfilePicture == nil) && dst.ProfilePicture == nil {
+					continue
 				}
-				var newSrc *Picture
 				if src != nil {
 					newSrc = src.ProfilePicture
+				}
+				if dst.ProfilePicture != nil {
+					newDst = dst.ProfilePicture
+				} else {
+					newDst = &Picture{}
+					dst.ProfilePicture = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -238,11 +242,11 @@ func (dst *GetUserRequest) SetFields(src *GetUserRequest, paths ...string) error
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -328,11 +332,11 @@ func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string)
 		switch name {
 		case "user":
 			if len(subs) > 0 {
-				newDst := &dst.User
-				var newSrc *User
+				var newDst, newSrc *User
 				if src != nil {
 					newSrc = &src.User
 				}
+				newDst = &dst.User
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -367,11 +371,11 @@ func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string)
 		switch name {
 		case "user":
 			if len(subs) > 0 {
-				newDst := &dst.User
-				var newSrc *User
+				var newDst, newSrc *User
 				if src != nil {
 					newSrc = &src.User
 				}
+				newDst = &dst.User
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -406,11 +410,11 @@ func (dst *CreateTemporaryPasswordRequest) SetFields(src *CreateTemporaryPasswor
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -435,11 +439,11 @@ func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, 
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -494,11 +498,11 @@ func (dst *ListUserAPIKeysRequest) SetFields(src *ListUserAPIKeysRequest, paths 
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -543,11 +547,11 @@ func (dst *GetUserAPIKeyRequest) SetFields(src *GetUserAPIKeyRequest, paths ...s
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -582,11 +586,11 @@ func (dst *CreateUserAPIKeyRequest) SetFields(src *CreateUserAPIKeyRequest, path
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -630,11 +634,11 @@ func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, path
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -648,11 +652,11 @@ func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, path
 			}
 		case "api_key":
 			if len(subs) > 0 {
-				newDst := &dst.APIKey
-				var newSrc *APIKey
+				var newDst, newSrc *APIKey
 				if src != nil {
 					newSrc = &src.APIKey
 				}
+				newDst = &dst.APIKey
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -736,14 +740,18 @@ func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
 			}
 		case "accepted_by":
 			if len(subs) > 0 {
-				newDst := dst.AcceptedBy
-				if newDst == nil {
-					newDst = &UserIdentifiers{}
-					dst.AcceptedBy = newDst
+				var newDst, newSrc *UserIdentifiers
+				if (src == nil || src.AcceptedBy == nil) && dst.AcceptedBy == nil {
+					continue
 				}
-				var newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = src.AcceptedBy
+				}
+				if dst.AcceptedBy != nil {
+					newDst = dst.AcceptedBy
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.AcceptedBy = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -861,11 +869,11 @@ func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths 
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -900,11 +908,11 @@ func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -988,11 +996,11 @@ func (dst *ListUserSessionsRequest) SetFields(src *ListUserSessionsRequest, path
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
-				newDst := &dst.UserIdentifiers
-				var newSrc *UserIdentifiers
+				var newDst, newSrc *UserIdentifiers
 				if src != nil {
 					newSrc = &src.UserIdentifiers
 				}
+				newDst = &dst.UserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

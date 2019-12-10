@@ -23,14 +23,18 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			}
 		case "payload":
 			if len(subs) > 0 {
-				newDst := dst.Payload
-				if newDst == nil {
-					newDst = &Message{}
-					dst.Payload = newDst
+				var newDst, newSrc *Message
+				if (src == nil || src.Payload == nil) && dst.Payload == nil {
+					continue
 				}
-				var newSrc *Message
 				if src != nil {
 					newSrc = src.Payload
+				}
+				if dst.Payload != nil {
+					newDst = dst.Payload
+				} else {
+					newDst = &Message{}
+					dst.Payload = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -74,11 +78,11 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			}
 		case "downlink_settings":
 			if len(subs) > 0 {
-				newDst := &dst.DownlinkSettings
-				var newSrc *DLSettings
+				var newDst, newSrc *DLSettings
 				if src != nil {
 					newSrc = &src.DownlinkSettings
 				}
+				newDst = &dst.DownlinkSettings
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -102,14 +106,18 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			}
 		case "cf_list":
 			if len(subs) > 0 {
-				newDst := dst.CFList
-				if newDst == nil {
-					newDst = &CFList{}
-					dst.CFList = newDst
+				var newDst, newSrc *CFList
+				if (src == nil || src.CFList == nil) && dst.CFList == nil {
+					continue
 				}
-				var newSrc *CFList
 				if src != nil {
 					newSrc = src.CFList
+				}
+				if dst.CFList != nil {
+					newDst = dst.CFList
+				} else {
+					newDst = &CFList{}
+					dst.CFList = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -152,11 +160,11 @@ func (dst *JoinResponse) SetFields(src *JoinResponse, paths ...string) error {
 			}
 		case "session_keys":
 			if len(subs) > 0 {
-				newDst := &dst.SessionKeys
-				var newSrc *SessionKeys
+				var newDst, newSrc *SessionKeys
 				if src != nil {
 					newSrc = &src.SessionKeys
 				}
+				newDst = &dst.SessionKeys
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

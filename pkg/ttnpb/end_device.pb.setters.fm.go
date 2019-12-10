@@ -25,11 +25,11 @@ func (dst *Session) SetFields(src *Session, paths ...string) error {
 			}
 		case "keys":
 			if len(subs) > 0 {
-				newDst := &dst.SessionKeys
-				var newSrc *SessionKeys
+				var newDst, newSrc *SessionKeys
 				if src != nil {
 					newSrc = &src.SessionKeys
 				}
+				newDst = &dst.SessionKeys
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -291,14 +291,18 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			}
 		case "adr_ack_limit_exponent":
 			if len(subs) > 0 {
-				newDst := dst.ADRAckLimitExponent
-				if newDst == nil {
-					newDst = &ADRAckLimitExponentValue{}
-					dst.ADRAckLimitExponent = newDst
+				var newDst, newSrc *ADRAckLimitExponentValue
+				if (src == nil || src.ADRAckLimitExponent == nil) && dst.ADRAckLimitExponent == nil {
+					continue
 				}
-				var newSrc *ADRAckLimitExponentValue
 				if src != nil {
 					newSrc = src.ADRAckLimitExponent
+				}
+				if dst.ADRAckLimitExponent != nil {
+					newDst = dst.ADRAckLimitExponent
+				} else {
+					newDst = &ADRAckLimitExponentValue{}
+					dst.ADRAckLimitExponent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -312,14 +316,18 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 			}
 		case "adr_ack_delay_exponent":
 			if len(subs) > 0 {
-				newDst := dst.ADRAckDelayExponent
-				if newDst == nil {
-					newDst = &ADRAckDelayExponentValue{}
-					dst.ADRAckDelayExponent = newDst
+				var newDst, newSrc *ADRAckDelayExponentValue
+				if (src == nil || src.ADRAckDelayExponent == nil) && dst.ADRAckDelayExponent == nil {
+					continue
 				}
-				var newSrc *ADRAckDelayExponentValue
 				if src != nil {
 					newSrc = src.ADRAckDelayExponent
+				}
+				if dst.ADRAckDelayExponent != nil {
+					newDst = dst.ADRAckDelayExponent
+				} else {
+					newDst = &ADRAckDelayExponentValue{}
+					dst.ADRAckDelayExponent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -486,11 +494,11 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceVersionIdentifiers
-				var newSrc *EndDeviceVersionIdentifiers
+				var newDst, newSrc *EndDeviceVersionIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceVersionIdentifiers
 				}
+				newDst = &dst.EndDeviceVersionIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -563,14 +571,18 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 			}
 		case "default_mac_settings":
 			if len(subs) > 0 {
-				newDst := dst.DefaultMACSettings
-				if newDst == nil {
-					newDst = &MACSettings{}
-					dst.DefaultMACSettings = newDst
+				var newDst, newSrc *MACSettings
+				if (src == nil || src.DefaultMACSettings == nil) && dst.DefaultMACSettings == nil {
+					continue
 				}
-				var newSrc *MACSettings
 				if src != nil {
 					newSrc = src.DefaultMACSettings
+				}
+				if dst.DefaultMACSettings != nil {
+					newDst = dst.DefaultMACSettings
+				} else {
+					newDst = &MACSettings{}
+					dst.DefaultMACSettings = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -624,11 +636,11 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 			}
 		case "default_formatters":
 			if len(subs) > 0 {
-				newDst := &dst.DefaultFormatters
-				var newSrc *MessagePayloadFormatters
+				var newDst, newSrc *MessagePayloadFormatters
 				if src != nil {
 					newSrc = &src.DefaultFormatters
 				}
+				newDst = &dst.DefaultFormatters
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -662,14 +674,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "ping_slot_periodicity":
 			if len(subs) > 0 {
-				newDst := dst.PingSlotPeriodicity
-				if newDst == nil {
-					newDst = &PingSlotPeriodValue{}
-					dst.PingSlotPeriodicity = newDst
+				var newDst, newSrc *PingSlotPeriodValue
+				if (src == nil || src.PingSlotPeriodicity == nil) && dst.PingSlotPeriodicity == nil {
+					continue
 				}
-				var newSrc *PingSlotPeriodValue
 				if src != nil {
 					newSrc = src.PingSlotPeriodicity
+				}
+				if dst.PingSlotPeriodicity != nil {
+					newDst = dst.PingSlotPeriodicity
+				} else {
+					newDst = &PingSlotPeriodValue{}
+					dst.PingSlotPeriodicity = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -683,14 +699,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "ping_slot_data_rate_index":
 			if len(subs) > 0 {
-				newDst := dst.PingSlotDataRateIndex
-				if newDst == nil {
-					newDst = &DataRateIndexValue{}
-					dst.PingSlotDataRateIndex = newDst
+				var newDst, newSrc *DataRateIndexValue
+				if (src == nil || src.PingSlotDataRateIndex == nil) && dst.PingSlotDataRateIndex == nil {
+					continue
 				}
-				var newSrc *DataRateIndexValue
 				if src != nil {
 					newSrc = src.PingSlotDataRateIndex
+				}
+				if dst.PingSlotDataRateIndex != nil {
+					newDst = dst.PingSlotDataRateIndex
+				} else {
+					newDst = &DataRateIndexValue{}
+					dst.PingSlotDataRateIndex = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -722,14 +742,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "rx1_delay":
 			if len(subs) > 0 {
-				newDst := dst.Rx1Delay
-				if newDst == nil {
-					newDst = &RxDelayValue{}
-					dst.Rx1Delay = newDst
+				var newDst, newSrc *RxDelayValue
+				if (src == nil || src.Rx1Delay == nil) && dst.Rx1Delay == nil {
+					continue
 				}
-				var newSrc *RxDelayValue
 				if src != nil {
 					newSrc = src.Rx1Delay
+				}
+				if dst.Rx1Delay != nil {
+					newDst = dst.Rx1Delay
+				} else {
+					newDst = &RxDelayValue{}
+					dst.Rx1Delay = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -752,14 +776,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "rx2_data_rate_index":
 			if len(subs) > 0 {
-				newDst := dst.Rx2DataRateIndex
-				if newDst == nil {
-					newDst = &DataRateIndexValue{}
-					dst.Rx2DataRateIndex = newDst
+				var newDst, newSrc *DataRateIndexValue
+				if (src == nil || src.Rx2DataRateIndex == nil) && dst.Rx2DataRateIndex == nil {
+					continue
 				}
-				var newSrc *DataRateIndexValue
 				if src != nil {
 					newSrc = src.Rx2DataRateIndex
+				}
+				if dst.Rx2DataRateIndex != nil {
+					newDst = dst.Rx2DataRateIndex
+				} else {
+					newDst = &DataRateIndexValue{}
+					dst.Rx2DataRateIndex = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -791,14 +819,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "max_duty_cycle":
 			if len(subs) > 0 {
-				newDst := dst.MaxDutyCycle
-				if newDst == nil {
-					newDst = &AggregatedDutyCycleValue{}
-					dst.MaxDutyCycle = newDst
+				var newDst, newSrc *AggregatedDutyCycleValue
+				if (src == nil || src.MaxDutyCycle == nil) && dst.MaxDutyCycle == nil {
+					continue
 				}
-				var newSrc *AggregatedDutyCycleValue
 				if src != nil {
 					newSrc = src.MaxDutyCycle
+				}
+				if dst.MaxDutyCycle != nil {
+					newDst = dst.MaxDutyCycle
+				} else {
+					newDst = &AggregatedDutyCycleValue{}
+					dst.MaxDutyCycle = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -866,14 +898,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "desired_rx1_delay":
 			if len(subs) > 0 {
-				newDst := dst.DesiredRx1Delay
-				if newDst == nil {
-					newDst = &RxDelayValue{}
-					dst.DesiredRx1Delay = newDst
+				var newDst, newSrc *RxDelayValue
+				if (src == nil || src.DesiredRx1Delay == nil) && dst.DesiredRx1Delay == nil {
+					continue
 				}
-				var newSrc *RxDelayValue
 				if src != nil {
 					newSrc = src.DesiredRx1Delay
+				}
+				if dst.DesiredRx1Delay != nil {
+					newDst = dst.DesiredRx1Delay
+				} else {
+					newDst = &RxDelayValue{}
+					dst.DesiredRx1Delay = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -896,14 +932,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "desired_rx2_data_rate_index":
 			if len(subs) > 0 {
-				newDst := dst.DesiredRx2DataRateIndex
-				if newDst == nil {
-					newDst = &DataRateIndexValue{}
-					dst.DesiredRx2DataRateIndex = newDst
+				var newDst, newSrc *DataRateIndexValue
+				if (src == nil || src.DesiredRx2DataRateIndex == nil) && dst.DesiredRx2DataRateIndex == nil {
+					continue
 				}
-				var newSrc *DataRateIndexValue
 				if src != nil {
 					newSrc = src.DesiredRx2DataRateIndex
+				}
+				if dst.DesiredRx2DataRateIndex != nil {
+					newDst = dst.DesiredRx2DataRateIndex
+				} else {
+					newDst = &DataRateIndexValue{}
+					dst.DesiredRx2DataRateIndex = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -926,14 +966,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "desired_max_duty_cycle":
 			if len(subs) > 0 {
-				newDst := dst.DesiredMaxDutyCycle
-				if newDst == nil {
-					newDst = &AggregatedDutyCycleValue{}
-					dst.DesiredMaxDutyCycle = newDst
+				var newDst, newSrc *AggregatedDutyCycleValue
+				if (src == nil || src.DesiredMaxDutyCycle == nil) && dst.DesiredMaxDutyCycle == nil {
+					continue
 				}
-				var newSrc *AggregatedDutyCycleValue
 				if src != nil {
 					newSrc = src.DesiredMaxDutyCycle
+				}
+				if dst.DesiredMaxDutyCycle != nil {
+					newDst = dst.DesiredMaxDutyCycle
+				} else {
+					newDst = &AggregatedDutyCycleValue{}
+					dst.DesiredMaxDutyCycle = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -947,14 +991,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "desired_adr_ack_limit_exponent":
 			if len(subs) > 0 {
-				newDst := dst.DesiredADRAckLimitExponent
-				if newDst == nil {
-					newDst = &ADRAckLimitExponentValue{}
-					dst.DesiredADRAckLimitExponent = newDst
+				var newDst, newSrc *ADRAckLimitExponentValue
+				if (src == nil || src.DesiredADRAckLimitExponent == nil) && dst.DesiredADRAckLimitExponent == nil {
+					continue
 				}
-				var newSrc *ADRAckLimitExponentValue
 				if src != nil {
 					newSrc = src.DesiredADRAckLimitExponent
+				}
+				if dst.DesiredADRAckLimitExponent != nil {
+					newDst = dst.DesiredADRAckLimitExponent
+				} else {
+					newDst = &ADRAckLimitExponentValue{}
+					dst.DesiredADRAckLimitExponent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -968,14 +1016,18 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			}
 		case "desired_adr_ack_delay_exponent":
 			if len(subs) > 0 {
-				newDst := dst.DesiredADRAckDelayExponent
-				if newDst == nil {
-					newDst = &ADRAckDelayExponentValue{}
-					dst.DesiredADRAckDelayExponent = newDst
+				var newDst, newSrc *ADRAckDelayExponentValue
+				if (src == nil || src.DesiredADRAckDelayExponent == nil) && dst.DesiredADRAckDelayExponent == nil {
+					continue
 				}
-				var newSrc *ADRAckDelayExponentValue
 				if src != nil {
 					newSrc = src.DesiredADRAckDelayExponent
+				}
+				if dst.DesiredADRAckDelayExponent != nil {
+					newDst = dst.DesiredADRAckDelayExponent
+				} else {
+					newDst = &ADRAckDelayExponentValue{}
+					dst.DesiredADRAckDelayExponent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1000,11 +1052,11 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 		switch name {
 		case "current_parameters":
 			if len(subs) > 0 {
-				newDst := &dst.CurrentParameters
-				var newSrc *MACParameters
+				var newDst, newSrc *MACParameters
 				if src != nil {
 					newSrc = &src.CurrentParameters
 				}
+				newDst = &dst.CurrentParameters
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1018,11 +1070,11 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			}
 		case "desired_parameters":
 			if len(subs) > 0 {
-				newDst := &dst.DesiredParameters
-				var newSrc *MACParameters
+				var newDst, newSrc *MACParameters
 				if src != nil {
 					newSrc = &src.DesiredParameters
 				}
+				newDst = &dst.DesiredParameters
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1085,14 +1137,18 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			}
 		case "pending_application_downlink":
 			if len(subs) > 0 {
-				newDst := dst.PendingApplicationDownlink
-				if newDst == nil {
-					newDst = &ApplicationDownlink{}
-					dst.PendingApplicationDownlink = newDst
+				var newDst, newSrc *ApplicationDownlink
+				if (src == nil || src.PendingApplicationDownlink == nil) && dst.PendingApplicationDownlink == nil {
+					continue
 				}
-				var newSrc *ApplicationDownlink
 				if src != nil {
 					newSrc = src.PendingApplicationDownlink
+				}
+				if dst.PendingApplicationDownlink != nil {
+					newDst = dst.PendingApplicationDownlink
+				} else {
+					newDst = &ApplicationDownlink{}
+					dst.PendingApplicationDownlink = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1124,14 +1180,18 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			}
 		case "queued_join_accept":
 			if len(subs) > 0 {
-				newDst := dst.QueuedJoinAccept
-				if newDst == nil {
-					newDst = &MACState_JoinAccept{}
-					dst.QueuedJoinAccept = newDst
+				var newDst, newSrc *MACState_JoinAccept
+				if (src == nil || src.QueuedJoinAccept == nil) && dst.QueuedJoinAccept == nil {
+					continue
 				}
-				var newSrc *MACState_JoinAccept
 				if src != nil {
 					newSrc = src.QueuedJoinAccept
+				}
+				if dst.QueuedJoinAccept != nil {
+					newDst = dst.QueuedJoinAccept
+				} else {
+					newDst = &MACState_JoinAccept{}
+					dst.QueuedJoinAccept = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1145,14 +1205,18 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			}
 		case "pending_join_request":
 			if len(subs) > 0 {
-				newDst := dst.PendingJoinRequest
-				if newDst == nil {
-					newDst = &JoinRequest{}
-					dst.PendingJoinRequest = newDst
+				var newDst, newSrc *JoinRequest
+				if (src == nil || src.PendingJoinRequest == nil) && dst.PendingJoinRequest == nil {
+					continue
 				}
-				var newSrc *JoinRequest
 				if src != nil {
 					newSrc = src.PendingJoinRequest
+				}
+				if dst.PendingJoinRequest != nil {
+					newDst = dst.PendingJoinRequest
+				} else {
+					newDst = &JoinRequest{}
+					dst.PendingJoinRequest = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1244,11 +1308,11 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceIdentifiers
-				var newSrc *EndDeviceIdentifiers
+				var newDst, newSrc *EndDeviceIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceIdentifiers
 				}
+				newDst = &dst.EndDeviceIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1311,14 +1375,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "version_ids":
 			if len(subs) > 0 {
-				newDst := dst.VersionIDs
-				if newDst == nil {
-					newDst = &EndDeviceVersionIdentifiers{}
-					dst.VersionIDs = newDst
+				var newDst, newSrc *EndDeviceVersionIdentifiers
+				if (src == nil || src.VersionIDs == nil) && dst.VersionIDs == nil {
+					continue
 				}
-				var newSrc *EndDeviceVersionIdentifiers
 				if src != nil {
 					newSrc = src.VersionIDs
+				}
+				if dst.VersionIDs != nil {
+					newDst = dst.VersionIDs
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.VersionIDs = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1411,14 +1479,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "picture":
 			if len(subs) > 0 {
-				newDst := dst.Picture
-				if newDst == nil {
-					newDst = &Picture{}
-					dst.Picture = newDst
+				var newDst, newSrc *Picture
+				if (src == nil || src.Picture == nil) && dst.Picture == nil {
+					continue
 				}
-				var newSrc *Picture
 				if src != nil {
 					newSrc = src.Picture
+				}
+				if dst.Picture != nil {
+					newDst = dst.Picture
+				} else {
+					newDst = &Picture{}
+					dst.Picture = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1522,14 +1594,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "root_keys":
 			if len(subs) > 0 {
-				newDst := dst.RootKeys
-				if newDst == nil {
-					newDst = &RootKeys{}
-					dst.RootKeys = newDst
+				var newDst, newSrc *RootKeys
+				if (src == nil || src.RootKeys == nil) && dst.RootKeys == nil {
+					continue
 				}
-				var newSrc *RootKeys
 				if src != nil {
 					newSrc = src.RootKeys
+				}
+				if dst.RootKeys != nil {
+					newDst = dst.RootKeys
+				} else {
+					newDst = &RootKeys{}
+					dst.RootKeys = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1552,14 +1628,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "mac_settings":
 			if len(subs) > 0 {
-				newDst := dst.MACSettings
-				if newDst == nil {
-					newDst = &MACSettings{}
-					dst.MACSettings = newDst
+				var newDst, newSrc *MACSettings
+				if (src == nil || src.MACSettings == nil) && dst.MACSettings == nil {
+					continue
 				}
-				var newSrc *MACSettings
 				if src != nil {
 					newSrc = src.MACSettings
+				}
+				if dst.MACSettings != nil {
+					newDst = dst.MACSettings
+				} else {
+					newDst = &MACSettings{}
+					dst.MACSettings = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1573,14 +1653,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "mac_state":
 			if len(subs) > 0 {
-				newDst := dst.MACState
-				if newDst == nil {
-					newDst = &MACState{}
-					dst.MACState = newDst
+				var newDst, newSrc *MACState
+				if (src == nil || src.MACState == nil) && dst.MACState == nil {
+					continue
 				}
-				var newSrc *MACState
 				if src != nil {
 					newSrc = src.MACState
+				}
+				if dst.MACState != nil {
+					newDst = dst.MACState
+				} else {
+					newDst = &MACState{}
+					dst.MACState = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1594,14 +1678,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "pending_mac_state":
 			if len(subs) > 0 {
-				newDst := dst.PendingMACState
-				if newDst == nil {
-					newDst = &MACState{}
-					dst.PendingMACState = newDst
+				var newDst, newSrc *MACState
+				if (src == nil || src.PendingMACState == nil) && dst.PendingMACState == nil {
+					continue
 				}
-				var newSrc *MACState
 				if src != nil {
 					newSrc = src.PendingMACState
+				}
+				if dst.PendingMACState != nil {
+					newDst = dst.PendingMACState
+				} else {
+					newDst = &MACState{}
+					dst.PendingMACState = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1615,14 +1703,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "session":
 			if len(subs) > 0 {
-				newDst := dst.Session
-				if newDst == nil {
-					newDst = &Session{}
-					dst.Session = newDst
+				var newDst, newSrc *Session
+				if (src == nil || src.Session == nil) && dst.Session == nil {
+					continue
 				}
-				var newSrc *Session
 				if src != nil {
 					newSrc = src.Session
+				}
+				if dst.Session != nil {
+					newDst = dst.Session
+				} else {
+					newDst = &Session{}
+					dst.Session = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1636,14 +1728,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "pending_session":
 			if len(subs) > 0 {
-				newDst := dst.PendingSession
-				if newDst == nil {
-					newDst = &Session{}
-					dst.PendingSession = newDst
+				var newDst, newSrc *Session
+				if (src == nil || src.PendingSession == nil) && dst.PendingSession == nil {
+					continue
 				}
-				var newSrc *Session
 				if src != nil {
 					newSrc = src.PendingSession
+				}
+				if dst.PendingSession != nil {
+					newDst = dst.PendingSession
+				} else {
+					newDst = &Session{}
+					dst.PendingSession = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1780,14 +1876,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "formatters":
 			if len(subs) > 0 {
-				newDst := dst.Formatters
-				if newDst == nil {
-					newDst = &MessagePayloadFormatters{}
-					dst.Formatters = newDst
+				var newDst, newSrc *MessagePayloadFormatters
+				if (src == nil || src.Formatters == nil) && dst.Formatters == nil {
+					continue
 				}
-				var newSrc *MessagePayloadFormatters
 				if src != nil {
 					newSrc = src.Formatters
+				}
+				if dst.Formatters != nil {
+					newDst = dst.Formatters
+				} else {
+					newDst = &MessagePayloadFormatters{}
+					dst.Formatters = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1830,14 +1930,18 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			}
 		case "claim_authentication_code":
 			if len(subs) > 0 {
-				newDst := dst.ClaimAuthenticationCode
-				if newDst == nil {
-					newDst = &EndDeviceAuthenticationCode{}
-					dst.ClaimAuthenticationCode = newDst
+				var newDst, newSrc *EndDeviceAuthenticationCode
+				if (src == nil || src.ClaimAuthenticationCode == nil) && dst.ClaimAuthenticationCode == nil {
+					continue
 				}
-				var newSrc *EndDeviceAuthenticationCode
 				if src != nil {
 					newSrc = src.ClaimAuthenticationCode
+				}
+				if dst.ClaimAuthenticationCode != nil {
+					newDst = dst.ClaimAuthenticationCode
+				} else {
+					newDst = &EndDeviceAuthenticationCode{}
+					dst.ClaimAuthenticationCode = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -1882,11 +1986,11 @@ func (dst *CreateEndDeviceRequest) SetFields(src *CreateEndDeviceRequest, paths 
 		switch name {
 		case "end_device":
 			if len(subs) > 0 {
-				newDst := &dst.EndDevice
-				var newSrc *EndDevice
+				var newDst, newSrc *EndDevice
 				if src != nil {
 					newSrc = &src.EndDevice
 				}
+				newDst = &dst.EndDevice
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1911,11 +2015,11 @@ func (dst *UpdateEndDeviceRequest) SetFields(src *UpdateEndDeviceRequest, paths 
 		switch name {
 		case "end_device":
 			if len(subs) > 0 {
-				newDst := &dst.EndDevice
-				var newSrc *EndDevice
+				var newDst, newSrc *EndDevice
 				if src != nil {
 					newSrc = &src.EndDevice
 				}
+				newDst = &dst.EndDevice
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1950,11 +2054,11 @@ func (dst *GetEndDeviceRequest) SetFields(src *GetEndDeviceRequest, paths ...str
 		switch name {
 		case "end_device_ids":
 			if len(subs) > 0 {
-				newDst := &dst.EndDeviceIdentifiers
-				var newSrc *EndDeviceIdentifiers
+				var newDst, newSrc *EndDeviceIdentifiers
 				if src != nil {
 					newSrc = &src.EndDeviceIdentifiers
 				}
+				newDst = &dst.EndDeviceIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2020,11 +2124,11 @@ func (dst *ListEndDevicesRequest) SetFields(src *ListEndDevicesRequest, paths ..
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2089,11 +2193,11 @@ func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...str
 		switch name {
 		case "end_device":
 			if len(subs) > 0 {
-				newDst := &dst.EndDevice
-				var newSrc *EndDevice
+				var newDst, newSrc *EndDevice
 				if src != nil {
 					newSrc = &src.EndDevice
 				}
+				newDst = &dst.EndDevice
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2128,11 +2232,11 @@ func (dst *EndDeviceTemplate) SetFields(src *EndDeviceTemplate, paths ...string)
 		switch name {
 		case "end_device":
 			if len(subs) > 0 {
-				newDst := &dst.EndDevice
-				var newSrc *EndDevice
+				var newDst, newSrc *EndDevice
 				if src != nil {
 					newSrc = &src.EndDevice
 				}
+				newDst = &dst.EndDevice
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2337,11 +2441,11 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 			}
 		case "request":
 			if len(subs) > 0 {
-				newDst := &dst.Request
-				var newSrc *JoinRequest
+				var newDst, newSrc *JoinRequest
 				if src != nil {
 					newSrc = &src.Request
 				}
+				newDst = &dst.Request
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2355,11 +2459,11 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 			}
 		case "keys":
 			if len(subs) > 0 {
-				newDst := &dst.Keys
-				var newSrc *SessionKeys
+				var newDst, newSrc *SessionKeys
 				if src != nil {
 					newSrc = &src.Keys
 				}
+				newDst = &dst.Keys
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

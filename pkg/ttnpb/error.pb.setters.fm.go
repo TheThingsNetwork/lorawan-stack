@@ -58,14 +58,18 @@ func (dst *ErrorDetails) SetFields(src *ErrorDetails, paths ...string) error {
 			}
 		case "cause":
 			if len(subs) > 0 {
-				newDst := dst.Cause
-				if newDst == nil {
-					newDst = &ErrorDetails{}
-					dst.Cause = newDst
+				var newDst, newSrc *ErrorDetails
+				if (src == nil || src.Cause == nil) && dst.Cause == nil {
+					continue
 				}
-				var newSrc *ErrorDetails
 				if src != nil {
 					newSrc = src.Cause
+				}
+				if dst.Cause != nil {
+					newDst = dst.Cause
+				} else {
+					newDst = &ErrorDetails{}
+					dst.Cause = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

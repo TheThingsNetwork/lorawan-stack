@@ -9,11 +9,11 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {
-				newDst := &dst.GatewayIdentifiers
-				var newSrc *GatewayIdentifiers
+				var newDst, newSrc *GatewayIdentifiers
 				if src != nil {
 					newSrc = &src.GatewayIdentifiers
 				}
+				newDst = &dst.GatewayIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -144,14 +144,18 @@ func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
 			}
 		case "location":
 			if len(subs) > 0 {
-				newDst := dst.Location
-				if newDst == nil {
-					newDst = &Location{}
-					dst.Location = newDst
+				var newDst, newSrc *Location
+				if (src == nil || src.Location == nil) && dst.Location == nil {
+					continue
 				}
-				var newSrc *Location
 				if src != nil {
 					newSrc = src.Location
+				}
+				if dst.Location != nil {
+					newDst = dst.Location
+				} else {
+					newDst = &Location{}
+					dst.Location = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

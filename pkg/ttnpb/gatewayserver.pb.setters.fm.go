@@ -21,14 +21,18 @@ func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) error {
 			}
 		case "gateway_status":
 			if len(subs) > 0 {
-				newDst := dst.GatewayStatus
-				if newDst == nil {
-					newDst = &GatewayStatus{}
-					dst.GatewayStatus = newDst
+				var newDst, newSrc *GatewayStatus
+				if (src == nil || src.GatewayStatus == nil) && dst.GatewayStatus == nil {
+					continue
 				}
-				var newSrc *GatewayStatus
 				if src != nil {
 					newSrc = src.GatewayStatus
+				}
+				if dst.GatewayStatus != nil {
+					newDst = dst.GatewayStatus
+				} else {
+					newDst = &GatewayStatus{}
+					dst.GatewayStatus = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -42,14 +46,18 @@ func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) error {
 			}
 		case "tx_acknowledgment":
 			if len(subs) > 0 {
-				newDst := dst.TxAcknowledgment
-				if newDst == nil {
-					newDst = &TxAcknowledgment{}
-					dst.TxAcknowledgment = newDst
+				var newDst, newSrc *TxAcknowledgment
+				if (src == nil || src.TxAcknowledgment == nil) && dst.TxAcknowledgment == nil {
+					continue
 				}
-				var newSrc *TxAcknowledgment
 				if src != nil {
 					newSrc = src.TxAcknowledgment
+				}
+				if dst.TxAcknowledgment != nil {
+					newDst = dst.TxAcknowledgment
+				} else {
+					newDst = &TxAcknowledgment{}
+					dst.TxAcknowledgment = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -74,14 +82,18 @@ func (dst *GatewayDown) SetFields(src *GatewayDown, paths ...string) error {
 		switch name {
 		case "downlink_message":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkMessage
-				if newDst == nil {
-					newDst = &DownlinkMessage{}
-					dst.DownlinkMessage = newDst
+				var newDst, newSrc *DownlinkMessage
+				if (src == nil || src.DownlinkMessage == nil) && dst.DownlinkMessage == nil {
+					continue
 				}
-				var newSrc *DownlinkMessage
 				if src != nil {
 					newSrc = src.DownlinkMessage
+				}
+				if dst.DownlinkMessage != nil {
+					newDst = dst.DownlinkMessage
+				} else {
+					newDst = &DownlinkMessage{}
+					dst.DownlinkMessage = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

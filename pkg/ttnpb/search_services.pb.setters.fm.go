@@ -103,11 +103,11 @@ func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, path
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

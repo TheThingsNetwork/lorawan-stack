@@ -9,14 +9,18 @@ func (dst *Picture) SetFields(src *Picture, paths ...string) error {
 		switch name {
 		case "embedded":
 			if len(subs) > 0 {
-				newDst := dst.Embedded
-				if newDst == nil {
-					newDst = &Picture_Embedded{}
-					dst.Embedded = newDst
+				var newDst, newSrc *Picture_Embedded
+				if (src == nil || src.Embedded == nil) && dst.Embedded == nil {
+					continue
 				}
-				var newSrc *Picture_Embedded
 				if src != nil {
 					newSrc = src.Embedded
+				}
+				if dst.Embedded != nil {
+					newDst = dst.Embedded
+				} else {
+					newDst = &Picture_Embedded{}
+					dst.Embedded = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

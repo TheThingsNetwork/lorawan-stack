@@ -78,14 +78,18 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 			}
 		case "visibility":
 			if len(subs) > 0 {
-				newDst := dst.Visibility
-				if newDst == nil {
-					newDst = &Rights{}
-					dst.Visibility = newDst
+				var newDst, newSrc *Rights
+				if (src == nil || src.Visibility == nil) && dst.Visibility == nil {
+					continue
 				}
-				var newSrc *Rights
 				if src != nil {
 					newSrc = src.Visibility
+				}
+				if dst.Visibility != nil {
+					newDst = dst.Visibility
+				} else {
+					newDst = &Rights{}
+					dst.Visibility = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err

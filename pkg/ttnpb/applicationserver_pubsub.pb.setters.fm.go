@@ -14,11 +14,11 @@ func (dst *ApplicationPubSubIdentifiers) SetFields(src *ApplicationPubSubIdentif
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -53,11 +53,11 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationPubSubIdentifiers
-				var newSrc *ApplicationPubSubIdentifiers
+				var newDst, newSrc *ApplicationPubSubIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationPubSubIdentifiers
 				}
+				newDst = &dst.ApplicationPubSubIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -111,14 +111,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "downlink_push":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkPush
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.DownlinkPush = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.DownlinkPush == nil) && dst.DownlinkPush == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.DownlinkPush
+				}
+				if dst.DownlinkPush != nil {
+					newDst = dst.DownlinkPush
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkPush = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -132,14 +136,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "downlink_replace":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkReplace
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.DownlinkReplace = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.DownlinkReplace == nil) && dst.DownlinkReplace == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.DownlinkReplace
+				}
+				if dst.DownlinkReplace != nil {
+					newDst = dst.DownlinkReplace
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkReplace = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -153,14 +161,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "uplink_message":
 			if len(subs) > 0 {
-				newDst := dst.UplinkMessage
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.UplinkMessage = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.UplinkMessage == nil) && dst.UplinkMessage == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.UplinkMessage
+				}
+				if dst.UplinkMessage != nil {
+					newDst = dst.UplinkMessage
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.UplinkMessage = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -174,14 +186,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "join_accept":
 			if len(subs) > 0 {
-				newDst := dst.JoinAccept
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.JoinAccept = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.JoinAccept == nil) && dst.JoinAccept == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.JoinAccept
+				}
+				if dst.JoinAccept != nil {
+					newDst = dst.JoinAccept
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.JoinAccept = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -195,14 +211,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "downlink_ack":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkAck
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.DownlinkAck = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.DownlinkAck == nil) && dst.DownlinkAck == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.DownlinkAck
+				}
+				if dst.DownlinkAck != nil {
+					newDst = dst.DownlinkAck
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkAck = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -216,14 +236,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "downlink_nack":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkNack
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.DownlinkNack = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.DownlinkNack == nil) && dst.DownlinkNack == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.DownlinkNack
+				}
+				if dst.DownlinkNack != nil {
+					newDst = dst.DownlinkNack
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkNack = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -237,14 +261,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "downlink_sent":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkSent
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.DownlinkSent = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.DownlinkSent == nil) && dst.DownlinkSent == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.DownlinkSent
+				}
+				if dst.DownlinkSent != nil {
+					newDst = dst.DownlinkSent
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkSent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -258,14 +286,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "downlink_failed":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkFailed
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.DownlinkFailed = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.DownlinkFailed == nil) && dst.DownlinkFailed == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.DownlinkFailed
+				}
+				if dst.DownlinkFailed != nil {
+					newDst = dst.DownlinkFailed
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkFailed = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -279,14 +311,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "downlink_queued":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkQueued
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.DownlinkQueued = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.DownlinkQueued == nil) && dst.DownlinkQueued == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.DownlinkQueued
+				}
+				if dst.DownlinkQueued != nil {
+					newDst = dst.DownlinkQueued
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.DownlinkQueued = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -300,14 +336,18 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			}
 		case "location_solved":
 			if len(subs) > 0 {
-				newDst := dst.LocationSolved
-				if newDst == nil {
-					newDst = &ApplicationPubSub_Message{}
-					dst.LocationSolved = newDst
+				var newDst, newSrc *ApplicationPubSub_Message
+				if (src == nil || src.LocationSolved == nil) && dst.LocationSolved == nil {
+					continue
 				}
-				var newSrc *ApplicationPubSub_Message
 				if src != nil {
 					newSrc = src.LocationSolved
+				}
+				if dst.LocationSolved != nil {
+					newDst = dst.LocationSolved
+				} else {
+					newDst = &ApplicationPubSub_Message{}
+					dst.LocationSolved = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -336,51 +376,69 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "nats":
-					if _, ok := dst.Provider.(*ApplicationPubSub_NATS); !ok {
-						dst.Provider = &ApplicationPubSub_NATS{}
+					_, srcOk := src.Provider.(*ApplicationPubSub_NATS)
+					if !srcOk && src.Provider != nil {
+						return fmt.Errorf("attempt to set oneof 'nats', while different oneof is set in source")
+					}
+					_, dstOk := dst.Provider.(*ApplicationPubSub_NATS)
+					if !dstOk && dst.Provider != nil {
+						return fmt.Errorf("attempt to set oneof 'nats', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						newDst := dst.Provider.(*ApplicationPubSub_NATS).NATS
-						if newDst == nil {
-							newDst = &ApplicationPubSub_NATSProvider{}
-							dst.Provider.(*ApplicationPubSub_NATS).NATS = newDst
+						var newDst, newSrc *ApplicationPubSub_NATSProvider
+						if !srcOk && !dstOk {
+							continue
 						}
-						var newSrc *ApplicationPubSub_NATSProvider
-						if src != nil {
-							newSrc = src.GetNATS()
+						if srcOk {
+							newSrc = src.Provider.(*ApplicationPubSub_NATS).NATS
+						}
+						if dstOk {
+							newDst = dst.Provider.(*ApplicationPubSub_NATS).NATS
+						} else {
+							newDst = &ApplicationPubSub_NATSProvider{}
+							dst.Provider = &ApplicationPubSub_NATS{NATS: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
 						if src != nil {
-							dst.Provider.(*ApplicationPubSub_NATS).NATS = src.GetNATS()
+							dst.Provider = src.Provider
 						} else {
-							dst.Provider.(*ApplicationPubSub_NATS).NATS = nil
+							dst.Provider = nil
 						}
 					}
 				case "mqtt":
-					if _, ok := dst.Provider.(*ApplicationPubSub_MQTT); !ok {
-						dst.Provider = &ApplicationPubSub_MQTT{}
+					_, srcOk := src.Provider.(*ApplicationPubSub_MQTT)
+					if !srcOk && src.Provider != nil {
+						return fmt.Errorf("attempt to set oneof 'mqtt', while different oneof is set in source")
+					}
+					_, dstOk := dst.Provider.(*ApplicationPubSub_MQTT)
+					if !dstOk && dst.Provider != nil {
+						return fmt.Errorf("attempt to set oneof 'mqtt', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						newDst := dst.Provider.(*ApplicationPubSub_MQTT).MQTT
-						if newDst == nil {
-							newDst = &ApplicationPubSub_MQTTProvider{}
-							dst.Provider.(*ApplicationPubSub_MQTT).MQTT = newDst
+						var newDst, newSrc *ApplicationPubSub_MQTTProvider
+						if !srcOk && !dstOk {
+							continue
 						}
-						var newSrc *ApplicationPubSub_MQTTProvider
-						if src != nil {
-							newSrc = src.GetMQTT()
+						if srcOk {
+							newSrc = src.Provider.(*ApplicationPubSub_MQTT).MQTT
+						}
+						if dstOk {
+							newDst = dst.Provider.(*ApplicationPubSub_MQTT).MQTT
+						} else {
+							newDst = &ApplicationPubSub_MQTTProvider{}
+							dst.Provider = &ApplicationPubSub_MQTT{MQTT: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
 						if src != nil {
-							dst.Provider.(*ApplicationPubSub_MQTT).MQTT = src.GetMQTT()
+							dst.Provider = src.Provider
 						} else {
-							dst.Provider.(*ApplicationPubSub_MQTT).MQTT = nil
+							dst.Provider = nil
 						}
 					}
 
@@ -441,11 +499,11 @@ func (dst *GetApplicationPubSubRequest) SetFields(src *GetApplicationPubSubReque
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationPubSubIdentifiers
-				var newSrc *ApplicationPubSubIdentifiers
+				var newDst, newSrc *ApplicationPubSubIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationPubSubIdentifiers
 				}
+				newDst = &dst.ApplicationPubSubIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -480,11 +538,11 @@ func (dst *ListApplicationPubSubsRequest) SetFields(src *ListApplicationPubSubsR
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -519,11 +577,11 @@ func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubReque
 		switch name {
 		case "pubsub":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationPubSub
-				var newSrc *ApplicationPubSub
+				var newDst, newSrc *ApplicationPubSub
 				if src != nil {
 					newSrc = &src.ApplicationPubSub
 				}
+				newDst = &dst.ApplicationPubSub
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

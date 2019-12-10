@@ -14,11 +14,11 @@ func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdent
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -135,11 +135,11 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationWebhookTemplateIdentifiers
-				var newSrc *ApplicationWebhookTemplateIdentifiers
+				var newDst, newSrc *ApplicationWebhookTemplateIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationWebhookTemplateIdentifiers
 				}
+				newDst = &dst.ApplicationWebhookTemplateIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -241,14 +241,18 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			}
 		case "uplink_message":
 			if len(subs) > 0 {
-				newDst := dst.UplinkMessage
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplate_Message{}
-					dst.UplinkMessage = newDst
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.UplinkMessage == nil) && dst.UplinkMessage == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplate_Message
 				if src != nil {
 					newSrc = src.UplinkMessage
+				}
+				if dst.UplinkMessage != nil {
+					newDst = dst.UplinkMessage
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.UplinkMessage = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -262,14 +266,18 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			}
 		case "join_accept":
 			if len(subs) > 0 {
-				newDst := dst.JoinAccept
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplate_Message{}
-					dst.JoinAccept = newDst
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.JoinAccept == nil) && dst.JoinAccept == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplate_Message
 				if src != nil {
 					newSrc = src.JoinAccept
+				}
+				if dst.JoinAccept != nil {
+					newDst = dst.JoinAccept
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.JoinAccept = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -283,14 +291,18 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			}
 		case "downlink_ack":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkAck
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplate_Message{}
-					dst.DownlinkAck = newDst
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.DownlinkAck == nil) && dst.DownlinkAck == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplate_Message
 				if src != nil {
 					newSrc = src.DownlinkAck
+				}
+				if dst.DownlinkAck != nil {
+					newDst = dst.DownlinkAck
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkAck = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -304,14 +316,18 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			}
 		case "downlink_nack":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkNack
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplate_Message{}
-					dst.DownlinkNack = newDst
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.DownlinkNack == nil) && dst.DownlinkNack == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplate_Message
 				if src != nil {
 					newSrc = src.DownlinkNack
+				}
+				if dst.DownlinkNack != nil {
+					newDst = dst.DownlinkNack
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkNack = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -325,14 +341,18 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			}
 		case "downlink_sent":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkSent
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplate_Message{}
-					dst.DownlinkSent = newDst
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.DownlinkSent == nil) && dst.DownlinkSent == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplate_Message
 				if src != nil {
 					newSrc = src.DownlinkSent
+				}
+				if dst.DownlinkSent != nil {
+					newDst = dst.DownlinkSent
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkSent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -346,14 +366,18 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			}
 		case "downlink_failed":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkFailed
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplate_Message{}
-					dst.DownlinkFailed = newDst
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.DownlinkFailed == nil) && dst.DownlinkFailed == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplate_Message
 				if src != nil {
 					newSrc = src.DownlinkFailed
+				}
+				if dst.DownlinkFailed != nil {
+					newDst = dst.DownlinkFailed
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkFailed = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -367,14 +391,18 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			}
 		case "downlink_queued":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkQueued
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplate_Message{}
-					dst.DownlinkQueued = newDst
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.DownlinkQueued == nil) && dst.DownlinkQueued == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplate_Message
 				if src != nil {
 					newSrc = src.DownlinkQueued
+				}
+				if dst.DownlinkQueued != nil {
+					newDst = dst.DownlinkQueued
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.DownlinkQueued = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -388,14 +416,18 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			}
 		case "location_solved":
 			if len(subs) > 0 {
-				newDst := dst.LocationSolved
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplate_Message{}
-					dst.LocationSolved = newDst
+				var newDst, newSrc *ApplicationWebhookTemplate_Message
+				if (src == nil || src.LocationSolved == nil) && dst.LocationSolved == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplate_Message
 				if src != nil {
 					newSrc = src.LocationSolved
+				}
+				if dst.LocationSolved != nil {
+					newDst = dst.LocationSolved
+				} else {
+					newDst = &ApplicationWebhookTemplate_Message{}
+					dst.LocationSolved = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -440,11 +472,11 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationWebhookIdentifiers
-				var newSrc *ApplicationWebhookIdentifiers
+				var newDst, newSrc *ApplicationWebhookIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationWebhookIdentifiers
 				}
+				newDst = &dst.ApplicationWebhookIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -507,14 +539,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "template_ids":
 			if len(subs) > 0 {
-				newDst := dst.ApplicationWebhookTemplateIdentifiers
-				if newDst == nil {
-					newDst = &ApplicationWebhookTemplateIdentifiers{}
-					dst.ApplicationWebhookTemplateIdentifiers = newDst
+				var newDst, newSrc *ApplicationWebhookTemplateIdentifiers
+				if (src == nil || src.ApplicationWebhookTemplateIdentifiers == nil) && dst.ApplicationWebhookTemplateIdentifiers == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhookTemplateIdentifiers
 				if src != nil {
 					newSrc = src.ApplicationWebhookTemplateIdentifiers
+				}
+				if dst.ApplicationWebhookTemplateIdentifiers != nil {
+					newDst = dst.ApplicationWebhookTemplateIdentifiers
+				} else {
+					newDst = &ApplicationWebhookTemplateIdentifiers{}
+					dst.ApplicationWebhookTemplateIdentifiers = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -537,14 +573,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "uplink_message":
 			if len(subs) > 0 {
-				newDst := dst.UplinkMessage
-				if newDst == nil {
-					newDst = &ApplicationWebhook_Message{}
-					dst.UplinkMessage = newDst
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.UplinkMessage == nil) && dst.UplinkMessage == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhook_Message
 				if src != nil {
 					newSrc = src.UplinkMessage
+				}
+				if dst.UplinkMessage != nil {
+					newDst = dst.UplinkMessage
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.UplinkMessage = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -558,14 +598,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "join_accept":
 			if len(subs) > 0 {
-				newDst := dst.JoinAccept
-				if newDst == nil {
-					newDst = &ApplicationWebhook_Message{}
-					dst.JoinAccept = newDst
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.JoinAccept == nil) && dst.JoinAccept == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhook_Message
 				if src != nil {
 					newSrc = src.JoinAccept
+				}
+				if dst.JoinAccept != nil {
+					newDst = dst.JoinAccept
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.JoinAccept = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -579,14 +623,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "downlink_ack":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkAck
-				if newDst == nil {
-					newDst = &ApplicationWebhook_Message{}
-					dst.DownlinkAck = newDst
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.DownlinkAck == nil) && dst.DownlinkAck == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhook_Message
 				if src != nil {
 					newSrc = src.DownlinkAck
+				}
+				if dst.DownlinkAck != nil {
+					newDst = dst.DownlinkAck
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkAck = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -600,14 +648,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "downlink_nack":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkNack
-				if newDst == nil {
-					newDst = &ApplicationWebhook_Message{}
-					dst.DownlinkNack = newDst
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.DownlinkNack == nil) && dst.DownlinkNack == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhook_Message
 				if src != nil {
 					newSrc = src.DownlinkNack
+				}
+				if dst.DownlinkNack != nil {
+					newDst = dst.DownlinkNack
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkNack = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -621,14 +673,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "downlink_sent":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkSent
-				if newDst == nil {
-					newDst = &ApplicationWebhook_Message{}
-					dst.DownlinkSent = newDst
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.DownlinkSent == nil) && dst.DownlinkSent == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhook_Message
 				if src != nil {
 					newSrc = src.DownlinkSent
+				}
+				if dst.DownlinkSent != nil {
+					newDst = dst.DownlinkSent
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkSent = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -642,14 +698,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "downlink_failed":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkFailed
-				if newDst == nil {
-					newDst = &ApplicationWebhook_Message{}
-					dst.DownlinkFailed = newDst
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.DownlinkFailed == nil) && dst.DownlinkFailed == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhook_Message
 				if src != nil {
 					newSrc = src.DownlinkFailed
+				}
+				if dst.DownlinkFailed != nil {
+					newDst = dst.DownlinkFailed
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkFailed = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -663,14 +723,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "downlink_queued":
 			if len(subs) > 0 {
-				newDst := dst.DownlinkQueued
-				if newDst == nil {
-					newDst = &ApplicationWebhook_Message{}
-					dst.DownlinkQueued = newDst
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.DownlinkQueued == nil) && dst.DownlinkQueued == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhook_Message
 				if src != nil {
 					newSrc = src.DownlinkQueued
+				}
+				if dst.DownlinkQueued != nil {
+					newDst = dst.DownlinkQueued
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.DownlinkQueued = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -684,14 +748,18 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			}
 		case "location_solved":
 			if len(subs) > 0 {
-				newDst := dst.LocationSolved
-				if newDst == nil {
-					newDst = &ApplicationWebhook_Message{}
-					dst.LocationSolved = newDst
+				var newDst, newSrc *ApplicationWebhook_Message
+				if (src == nil || src.LocationSolved == nil) && dst.LocationSolved == nil {
+					continue
 				}
-				var newSrc *ApplicationWebhook_Message
 				if src != nil {
 					newSrc = src.LocationSolved
+				}
+				if dst.LocationSolved != nil {
+					newDst = dst.LocationSolved
+				} else {
+					newDst = &ApplicationWebhook_Message{}
+					dst.LocationSolved = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -756,11 +824,11 @@ func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookReq
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationWebhookIdentifiers
-				var newSrc *ApplicationWebhookIdentifiers
+				var newDst, newSrc *ApplicationWebhookIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationWebhookIdentifiers
 				}
+				newDst = &dst.ApplicationWebhookIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -795,11 +863,11 @@ func (dst *ListApplicationWebhooksRequest) SetFields(src *ListApplicationWebhook
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationIdentifiers
-				var newSrc *ApplicationIdentifiers
+				var newDst, newSrc *ApplicationIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationIdentifiers
 				}
+				newDst = &dst.ApplicationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -834,11 +902,11 @@ func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookReq
 		switch name {
 		case "webhook":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationWebhook
-				var newSrc *ApplicationWebhook
+				var newDst, newSrc *ApplicationWebhook
 				if src != nil {
 					newSrc = &src.ApplicationWebhook
 				}
+				newDst = &dst.ApplicationWebhook
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -873,11 +941,11 @@ func (dst *GetApplicationWebhookTemplateRequest) SetFields(src *GetApplicationWe
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.ApplicationWebhookTemplateIdentifiers
-				var newSrc *ApplicationWebhookTemplateIdentifiers
+				var newDst, newSrc *ApplicationWebhookTemplateIdentifiers
 				if src != nil {
 					newSrc = &src.ApplicationWebhookTemplateIdentifiers
 				}
+				newDst = &dst.ApplicationWebhookTemplateIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}

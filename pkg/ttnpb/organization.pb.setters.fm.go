@@ -14,11 +14,11 @@ func (dst *Organization) SetFields(src *Organization, paths ...string) error {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -121,11 +121,11 @@ func (dst *GetOrganizationRequest) SetFields(src *GetOrganizationRequest, paths 
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -160,14 +160,18 @@ func (dst *ListOrganizationsRequest) SetFields(src *ListOrganizationsRequest, pa
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := dst.Collaborator
-				if newDst == nil {
-					newDst = &OrganizationOrUserIdentifiers{}
-					dst.Collaborator = newDst
+				var newDst, newSrc *OrganizationOrUserIdentifiers
+				if (src == nil || src.Collaborator == nil) && dst.Collaborator == nil {
+					continue
 				}
-				var newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = src.Collaborator
+				}
+				if dst.Collaborator != nil {
+					newDst = dst.Collaborator
+				} else {
+					newDst = &OrganizationOrUserIdentifiers{}
+					dst.Collaborator = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
@@ -232,11 +236,11 @@ func (dst *CreateOrganizationRequest) SetFields(src *CreateOrganizationRequest, 
 		switch name {
 		case "organization":
 			if len(subs) > 0 {
-				newDst := &dst.Organization
-				var newSrc *Organization
+				var newDst, newSrc *Organization
 				if src != nil {
 					newSrc = &src.Organization
 				}
+				newDst = &dst.Organization
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -250,11 +254,11 @@ func (dst *CreateOrganizationRequest) SetFields(src *CreateOrganizationRequest, 
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.Collaborator
-				var newSrc *OrganizationOrUserIdentifiers
+				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = &src.Collaborator
 				}
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -279,11 +283,11 @@ func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, 
 		switch name {
 		case "organization":
 			if len(subs) > 0 {
-				newDst := &dst.Organization
-				var newSrc *Organization
+				var newDst, newSrc *Organization
 				if src != nil {
 					newSrc = &src.Organization
 				}
+				newDst = &dst.Organization
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -318,11 +322,11 @@ func (dst *ListOrganizationAPIKeysRequest) SetFields(src *ListOrganizationAPIKey
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -367,11 +371,11 @@ func (dst *GetOrganizationAPIKeyRequest) SetFields(src *GetOrganizationAPIKeyReq
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -406,11 +410,11 @@ func (dst *CreateOrganizationAPIKeyRequest) SetFields(src *CreateOrganizationAPI
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -454,11 +458,11 @@ func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPI
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -472,11 +476,11 @@ func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPI
 			}
 		case "api_key":
 			if len(subs) > 0 {
-				newDst := &dst.APIKey
-				var newSrc *APIKey
+				var newDst, newSrc *APIKey
 				if src != nil {
 					newSrc = &src.APIKey
 				}
+				newDst = &dst.APIKey
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -501,11 +505,11 @@ func (dst *ListOrganizationCollaboratorsRequest) SetFields(src *ListOrganization
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -550,11 +554,11 @@ func (dst *GetOrganizationCollaboratorRequest) SetFields(src *GetOrganizationCol
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -568,11 +572,11 @@ func (dst *GetOrganizationCollaboratorRequest) SetFields(src *GetOrganizationCol
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationOrUserIdentifiers
-				var newSrc *OrganizationOrUserIdentifiers
+				var newDst, newSrc *OrganizationOrUserIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationOrUserIdentifiers
 				}
+				newDst = &dst.OrganizationOrUserIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -597,11 +601,11 @@ func (dst *SetOrganizationCollaboratorRequest) SetFields(src *SetOrganizationCol
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
-				newDst := &dst.OrganizationIdentifiers
-				var newSrc *OrganizationIdentifiers
+				var newDst, newSrc *OrganizationIdentifiers
 				if src != nil {
 					newSrc = &src.OrganizationIdentifiers
 				}
+				newDst = &dst.OrganizationIdentifiers
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -615,11 +619,11 @@ func (dst *SetOrganizationCollaboratorRequest) SetFields(src *SetOrganizationCol
 			}
 		case "collaborator":
 			if len(subs) > 0 {
-				newDst := &dst.Collaborator
-				var newSrc *Collaborator
+				var newDst, newSrc *Collaborator
 				if src != nil {
 					newSrc = &src.Collaborator
 				}
+				newDst = &dst.Collaborator
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
