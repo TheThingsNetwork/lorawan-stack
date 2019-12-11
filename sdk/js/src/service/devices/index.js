@@ -143,6 +143,31 @@ class Devices {
       delete requestTree.js
     }
 
+    if (!create) {
+      const { network_server_address, application_server_address } = await this._getDevice(
+        appId,
+        devId,
+        [['application_server_address'], ['network_server_address']],
+        false,
+      )
+
+      try {
+        const nsHost = new URL(this._stackConfig.ns).hostname
+
+        if (network_server_address !== nsHost) {
+          delete requestTree.as
+        }
+      } catch (e) {}
+
+      try {
+        const asHost = new URL(this._stackConfig.as).hostname
+
+        if (application_server_address !== asHost) {
+          delete requestTree.as
+        }
+      } catch (e) {}
+    }
+
     // Retrieve necessary EUIs in case of a join server query being necessary
     if ('js' in requestTree) {
       if (!create && (!ids || !ids.join_eui || !ids.dev_eui)) {
