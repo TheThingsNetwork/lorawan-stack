@@ -18,6 +18,7 @@ import {
   GET_USER_SUCCESS,
   UPDATE_USER_SUCCESS,
   GET_USER,
+  DELETE_USER_SUCCESS,
 } from '../actions/users'
 
 const initialState = {
@@ -64,6 +65,13 @@ const users = function(state = initialState, { type, payload, meta }) {
       return {
         ...state,
         entities,
+      }
+    case DELETE_USER_SUCCESS:
+      const { [payload.id]: deleted, ...rest } = state.entities
+
+      return {
+        selectedUser: null,
+        entities: rest,
       }
     default:
       return state

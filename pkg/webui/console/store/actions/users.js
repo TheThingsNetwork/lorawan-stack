@@ -34,3 +34,9 @@ export const [
   { request: UPDATE_USER, success: UPDATE_USER_SUCCESS, failure: UPDATE_USER_FAILURE },
   { request: updateUser, success: updateUserSuccess, failure: updateUserFailure },
 ] = createRequestActions(UPDATE_USER_BASE, (id, patch) => ({ id, patch }))
+
+export const DELETE_USER_BASE = 'DELETE_USER'
+export const [
+  { request: DELETE_USER, success: DELETE_USER_SUCCESS, failure: DELETE_USER_FAILURE },
+  { request: deleteUser, success: deleteUserSuccess, failure: deleteUserFailure },
+] = createRequestActions(DELETE_USER_BASE, id => ({ id }))

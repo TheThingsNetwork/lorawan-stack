@@ -56,6 +56,19 @@ const updateUserLogic = createRequestLogic({
   },
 })
 
+const deleteUserLogic = createRequestLogic({
+  type: users.DELETE_USER,
+  async process({ action }, dispatch) {
+    const {
+      payload: { id },
+    } = action
+
+    await api.users.delete(id)
+
+    return { id }
+  },
+})
+
 const getUsersLogic = createRequestLogic({
   type: users.GET_USERS_LIST,
   async process({ action }) {
@@ -87,4 +100,4 @@ const getUsersLogic = createRequestLogic({
   },
 })
 
-export default [getUserLogic, getUsersLogic, updateUserLogic]
+export default [getUserLogic, getUsersLogic, updateUserLogic, deleteUserLogic]
