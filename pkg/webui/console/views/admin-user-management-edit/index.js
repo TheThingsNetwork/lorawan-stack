@@ -17,6 +17,7 @@ import { connect } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
+import { replace } from 'connected-react-router'
 
 import PropTypes from '../../../lib/prop-types'
 import toast from '../../../components/toast'
@@ -29,12 +30,14 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 
 import diff from '../../../lib/diff'
 import { selectSelectedUser } from '../../store/selectors/users'
-import { getUser, updateUser } from '../../store/actions/users'
+import { getUser, updateUser, deleteUser } from '../../store/actions/users'
 import { attachPromise } from '../../store/actions/lib'
 
 const m = defineMessages({
   updateSuccess: 'User updated successfully',
   updateFailure: 'There was a problem updating the user',
+  deleteFailure: 'There was a problem deleting the user',
+  deleteSuccess: 'User deleted successfully',
 })
 
 @connect(
@@ -45,6 +48,8 @@ const m = defineMessages({
   {
     getUser,
     updateUser: attachPromise(updateUser),
+    deleteUser: attachPromise(deleteUser),
+    navigateToList: () => replace(`/admin/user-management`),
   },
 )
 @withRequest(
@@ -62,10 +67,13 @@ const m = defineMessages({
 })
 export default class UserManagementEdit extends Component {
   static propTypes = {
+    deleteUser: PropTypes.func.isRequired,
+    navigateToList: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
     user: PropTypes.user.isRequired,
     userId: PropTypes.string.isRequired,
   }
+
   @bind
   onSubmit(values) {
     const { userId, user, updateUser } = this.props
@@ -94,6 +102,37 @@ export default class UserManagementEdit extends Component {
     })
   }
 
+  @bind
+  onDelete() {
+    const { userId, deleteUser } = this.props
+
+    return deleteUser(userId)
+  }
+
+  @bind
+  onDeleteSuccess() {
+    const { userId, navigateToList } = this.props
+
+    toast({
+      title: userId,
+      message: m.deleteSuccess,
+      type: toast.types.SUCCESS,
+    })
+
+    navigateToList()
+  }
+
+  @bind
+  onDeleteFailure() {
+    const { userId } = this.props
+
+    toast({
+      title: userId,
+      message: m.deleteFailure,
+      type: toast.types.ERROR,
+    })
+  }
+
   render() {
     const { user } = this.props
     return (
@@ -107,6 +146,9 @@ export default class UserManagementEdit extends Component {
               onSubmit={this.onSubmit}
               onSubmitSuccess={this.onSubmitSuccess}
               onSubmitFailure={this.onSubmitFailure}
+              onDelete={this.onDelete}
+              onDeleteSuccess={this.onDeleteSuccess}
+              onDeleteFailure={this.onDeleteFailure}
             />
           </Col>
         </Row>
