@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { merge } from 'lodash'
 import { GET_DEV_SUCCESS, UPDATE_DEV_SUCCESS } from '../actions/device'
 
 const defaultState = {
@@ -21,20 +22,8 @@ const defaultState = {
 const device = function(state = defaultState, { type, payload }) {
   switch (type) {
     case UPDATE_DEV_SUCCESS:
-      const currentRootKeys = state.device.root_keys || {}
-      const updatedRootKeys = payload.root_keys || {}
-
-      return {
-        ...state,
-        device: {
-          ...state.device,
-          ...payload,
-          root_keys: {
-            ...currentRootKeys,
-            ...updatedRootKeys,
-          },
-        },
-      }
+      const mergedDevice = merge({}, state.device, payload)
+      return { device: mergedDevice }
     case GET_DEV_SUCCESS:
       return {
         ...state,
