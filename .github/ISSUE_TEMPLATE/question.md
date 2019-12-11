@@ -8,7 +8,7 @@ about: We do not accept questions on Github. Raise your question on our forum or
 
 Please raise your question on our community platforms:
 
-- Forum: https://www.thethingsnetwork.org/forum/  
+- Forum: https://www.thethingsnetwork.org/forum/
   We have a special category for The Things Stack: https://www.thethingsnetwork.org/forum/c/network-and-routing/v3
-- Slack: https://thethingsnetwork.slack.com  
+- Slack: https://thethingsnetwork.slack.com
   We have a special channel for The Things Stack: #the-things-stack
