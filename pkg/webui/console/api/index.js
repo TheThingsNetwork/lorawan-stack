@@ -75,6 +75,7 @@ export default {
     get: ttnClient.Users.getById.bind(ttnClient.Users),
     list: ttnClient.Users.getAll.bind(ttnClient.Users),
     update: ttnClient.Users.updateById.bind(ttnClient.Users),
+    delete: ttnClient.Users.deleteById.bind(ttnClient.Users),
     search: ttnClient.Users.search.bind(ttnClient.Users),
     async authInfo() {
       return instance.get(`${isBaseUrl}/auth_info`, {
