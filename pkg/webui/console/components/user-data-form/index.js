@@ -52,12 +52,13 @@ const m = defineMessages({
   emailPlaceholder: 'mail@example.com',
   emailAddressDescription:
     'Primary email address used for logging in; this address is not publicly visible',
+  modalWarning:
+    'Are you sure you want to delete the user "{userId}". This action cannot be undone!',
 })
 
 class UserForm extends React.Component {
   static propTypes = {
     error: PropTypes.error,
-    formRef: Form.propTypes.formikRef,
     initialValues: PropTypes.shape({
       ids: PropTypes.shape({
         user_id: PropTypes.string.isRequired,
@@ -65,6 +66,9 @@ class UserForm extends React.Component {
       name: PropTypes.string,
       description: PropTypes.string,
     }).isRequired,
+    onDelete: PropTypes.func.isRequired,
+    onDeleteFailure: PropTypes.func,
+    onDeleteSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func,
@@ -74,7 +78,8 @@ class UserForm extends React.Component {
     error: '',
     onSubmitFailure: () => null,
     onSubmitSuccess: () => null,
-    formRef: undefined,
+    onDeleteFailure: () => null,
+    onDeleteSuccess: () => null,
   }
 
   @bind
@@ -92,8 +97,20 @@ class UserForm extends React.Component {
     }
   }
 
+  @bind
+  async handleDelete() {
+    const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
+    try {
+      await onDelete()
+      onDeleteSuccess()
+    } catch (error) {
+      await this.setState({ error })
+      onDeleteFailure()
+    }
+  }
+
   render() {
-    const { error, initialValues, formRef } = this.props
+    const { error, initialValues } = this.props
 
     return (
       <Form
@@ -101,7 +118,6 @@ class UserForm extends React.Component {
         onSubmit={this.handleSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
-        formikRef={formRef}
       >
         <Form.Field
           title={sharedMessages.userId}
@@ -148,7 +164,7 @@ class UserForm extends React.Component {
             message={sharedMessages.userDelete}
             modalData={{
               message: {
-                values: { orgName: initialValues.name || initialValues.ids.user_id },
+                values: { userId: initialValues.name || initialValues.ids.user_id },
                 ...m.modalWarning,
               },
             }}
