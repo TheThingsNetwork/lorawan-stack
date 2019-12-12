@@ -339,6 +339,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			settings.Downlink.InvertPolarization = true
 		}
 		var f func(context.Context, int, ttnpb.TxSettings, scheduling.RTTs, ttnpb.TxSchedulePriority) (scheduling.Emission, error)
+		settings.Time = nil
 		switch request.Class {
 		case ttnpb.CLASS_A:
 			f = c.scheduler.ScheduleAt
@@ -362,7 +363,6 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			rxErrs = append(rxErrs, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
 			continue
 		}
-		settings.Time = nil
 		settings.Timestamp = uint32(time.Duration(em.Starts()) / time.Microsecond)
 		msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &settings,
