@@ -38,6 +38,7 @@ const hardcoded = {
   general_settings: 'settings',
   location: 'place',
   user: 'person',
+  user_management: 'people',
   event: 'info',
   event_create: 'add_circle',
   event_delete: 'remove_circle',

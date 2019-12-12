@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import user from './user'
+import users from './users'
 import init from './init'
 import applications from './applications'
 import devices from './devices'
@@ -24,6 +25,7 @@ import js from './join-server'
 
 export default [
   ...user,
+  ...users,
   ...init,
   ...applications,
   ...devices,

@@ -22,8 +22,15 @@ import {
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateways'
 import { SHARED_NAME as ORGANIZATION_SHARED_NAME } from '../actions/organizations'
 import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
-import { getApplicationId, getGatewayId, getOrganizationId } from '../../../lib/selectors/id'
+import { SHARED_NAME as USER_SHARED_NAME } from '../actions/users'
+import {
+  getUserId,
+  getApplicationId,
+  getGatewayId,
+  getOrganizationId,
+} from '../../../lib/selectors/id'
 import user from './user'
+import users from './users'
 import init from './init'
 import applications from './applications'
 import devices from './devices'
@@ -54,6 +61,7 @@ import gatewayStatus from './gateway-status'
 export default history =>
   combineReducers({
     user,
+    users,
     init,
     applications,
     link,
@@ -104,6 +112,7 @@ export default history =>
       applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
       gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
       organizations: createNamedPaginationReducer(ORGANIZATION_SHARED_NAME, getOrganizationId),
+      users: createNamedPaginationReducer(USER_SHARED_NAME, getUserId),
     }),
     router: connectRouter(history),
     js,

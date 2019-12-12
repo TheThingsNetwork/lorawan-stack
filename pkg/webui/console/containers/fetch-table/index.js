@@ -103,7 +103,11 @@ class FetchTable extends Component {
     const filters = { ...this.state, limit: pageSize }
 
     if (filters.query) {
-      dispatch(searchItemsAction(filters))
+      if (searchItemsAction) {
+        dispatch(searchItemsAction(filters))
+      } else {
+        dispatch(getItemsAction(filters))
+      }
     } else {
       dispatch(getItemsAction(filters))
     }
@@ -244,6 +248,7 @@ class FetchTable extends Component {
                 icon="search"
                 loading={fetchingSearch}
                 onChange={this.onQueryChange}
+                placeholder={sharedMessages.searchById}
               />
             )}
             {actionItems}

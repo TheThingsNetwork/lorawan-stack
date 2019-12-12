@@ -107,6 +107,10 @@ class Marshaler {
     return this.payloadSingleResponse(result, transform)
   }
 
+  static unwrapUser(result, transform) {
+    return this.payloadSingleResponse(result, transform)
+  }
+
   static fieldMaskFromPatch(patch, whitelist, remaps) {
     let paths = []
 

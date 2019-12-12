@@ -20,6 +20,7 @@ import Overview from '../overview'
 import Applications from '../applications'
 import Gateways from '../gateways'
 import Organizations from '../organizations'
+import Admin from '../admin'
 import { ToastContainer } from '../../../components/toast'
 import { FullViewErrorInner } from '../error'
 
@@ -38,6 +39,7 @@ export default class Landing extends React.PureComponent {
             <Route path="/applications" component={Applications} />
             <Route path="/gateways" component={Gateways} />
             <Route path="/organizations" component={Organizations} />
+            <Route path="/admin" component={Admin} />
             <Route component={GenericNotFound} />
           </Switch>
         </WithAuth>

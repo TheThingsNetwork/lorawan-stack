@@ -12,20 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const selectUserStore = state => state.user
+import React, { Component } from 'react'
+import { Container, Col, Row } from 'react-grid-system'
 
-export const selectUser = state => selectUserStore(state).user
+import UsersTable from '../../containers/users-table'
+import sharedMessages from '../../../lib/shared-messages'
+import IntlHelmet from '../../../lib/components/intl-helmet'
 
-export const selectUserId = function(state) {
-  const user = selectUser(state)
-  const { ids = {} } = user
+import PAGE_SIZES from '../../constants/page-sizes'
 
-  return ids.user_id
+export default class UserManagement extends Component {
+  render() {
+    return (
+      <Container>
+        <Row>
+          <Col>
+            <IntlHelmet title={sharedMessages.userManagement} />
+            <UsersTable pageSize={PAGE_SIZES.REGULAR} />
+          </Col>
+        </Row>
+      </Container>
+    )
+  }
 }
-
-export const selectUserIsAdmin = function(state) {
-  const user = selectUser(state)
-  return user.isAdmin
-}
-
-export const selectUserRights = state => selectUserStore(state).rights

@@ -16,7 +16,7 @@ import { selectStackConfig } from '../../lib/selectors/env'
 import { selectApplicationRights } from '../store/selectors/applications'
 import { selectGatewayRights } from '../store/selectors/gateways'
 import { selectOrganizationRights } from '../store/selectors/organizations'
-import { selectUserRights } from '../store/selectors/user'
+import { selectUserRights, selectUserIsAdmin } from '../store/selectors/user'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
@@ -183,6 +183,18 @@ export const mayViewGatewaysOfOrganization = {
 export const mayAddOrganizationAsCollaborator = {
   rightsSelector: selectOrganizationRights,
   check: rights => rights.includes('RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR'),
+}
+
+// Admin features
+
+export const mayPerformAdminActions = {
+  rightsSelector: selectUserIsAdmin,
+  check: isAdmin => isAdmin,
+}
+
+export const mayManageUsers = {
+  rightsSelector: selectUserIsAdmin,
+  check: mayPerformAdminActions.check,
 }
 
 // Composite
