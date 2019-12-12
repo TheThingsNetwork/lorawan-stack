@@ -115,6 +115,16 @@ $table-foot-cell-border-width: 0;
   &.is-fullwidth {
     width: 100%;
   }
+
+  .card-content{
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+  }
+
+  .buttons{
+    margin-top: auto;
+  }
 }
 
 .hero {
