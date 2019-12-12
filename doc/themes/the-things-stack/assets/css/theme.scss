@@ -30,6 +30,8 @@ $title-family: "Manrope", $family-sans-serif;
 // Colors
 
 $blue: #2380ff;
+$white-bis: #fbfbfb;
+$white-ter : #ececec;
 
 $code: $blue;
 $link-hover: darken($blue, 20%);
@@ -46,8 +48,12 @@ $navbar-height: 4rem;
 
 $card-shadow: 0 10px 20px 0 rgba($black, 0.1);
 
-$table-head-cell-border-width: 0;
-$table-foot-cell-border-width: 0;
+$border: $white-ter;
+$table-head-cell-border-width: 1px 1px 1px;
+$table-foot-cell-border-width: 1px 1px 1px;
+$table-cell-border: 1px solid $white-ter;
+$table-cell-border-width: 1px 1px 1px;
+$table-cell-padding: 1.2em 0.75em;
 
 @import "bulma/sass/utilities/functions.sass";
 @import "bulma/sass/utilities/derived-variables.sass";
@@ -106,6 +112,10 @@ $table-foot-cell-border-width: 0;
 
 .is-not-wrapped {
   white-space: nowrap;
+}
+
+.is-borderless{
+  border: 0 !important
 }
 
 .card {
@@ -182,6 +192,14 @@ body {
   flex-direction: column;
   main {
     flex: 1;
+  }
+
+  table{
+    margin-top:100px;
+  }
+
+  tbody{
+    border: 1px solid $white-ter;
   }
 }
 
