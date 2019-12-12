@@ -13,23 +13,39 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
 import SubmitButton from '../../../../components/submit-button'
 import SubmitBar from '../../../../components/submit-bar'
 import Input from '../../../../components/input'
 import Form from '../../../../components/form'
 import Checkbox from '../../../../components/checkbox'
+import ModalButton from '../../../../components/button/modal-button'
 
 import diff from '../../../../lib/diff'
 import m from '../../../components/device-data-form/messages'
 import PropTypes from '../../../../lib/prop-types'
 import sharedMessages from '../../../../lib/shared-messages'
-
 import { parseLorawanMacVersion, hasExternalJs, isDeviceOTAA } from '../utils'
 import validationSchema from './validation-schema'
 
+const messages = defineMessages({
+  deleteDevice: 'Delete End Device',
+  deleteWarning:
+    'Are you sure you want to delete "{deviceId}"? Deleting an end device cannot be undone!',
+})
+
 const IdentityServerForm = React.memo(props => {
-  const { device, onSubmit, onSubmitSuccess, jsConfig } = props
+  const {
+    device,
+    onSubmit,
+    onSubmitSuccess,
+    jsConfig,
+    onDelete,
+    onDeleteSuccess,
+    onDeleteFailure,
+  } = props
+  const { name, ids } = device
 
   const formRef = React.useRef(null)
   const [error, setError] = React.useState('')
@@ -126,6 +142,15 @@ const IdentityServerForm = React.memo(props => {
     },
     [initialValues, onSubmit, onSubmitSuccess],
   )
+
+  const onDeviceDelete = React.useCallback(async () => {
+    try {
+      await onDelete()
+      onDeleteSuccess()
+    } catch (error) {
+      onDeleteFailure()
+    }
+  }, [onDelete, onDeleteFailure, onDeleteSuccess])
 
   const isOTAA = isDeviceOTAA(device)
   const isNewLorawanVersion = parseLorawanMacVersion(device.lorawan_version) >= 110
@@ -229,6 +254,16 @@ const IdentityServerForm = React.memo(props => {
       )}
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
+        <ModalButton
+          type="button"
+          icon="delete"
+          message={messages.deleteDevice}
+          modalData={{
+            message: { values: { deviceId: name || ids.device_id }, ...messages.deleteWarning },
+          }}
+          onApprove={onDeviceDelete}
+          danger
+        />
       </SubmitBar>
     </Form>
   )
@@ -237,6 +272,9 @@ const IdentityServerForm = React.memo(props => {
 IdentityServerForm.propTypes = {
   device: PropTypes.device.isRequired,
   jsConfig: PropTypes.stackComponent.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onDeleteFailure: PropTypes.func.isRequired,
+  onDeleteSuccess: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
 }

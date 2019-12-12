@@ -45,7 +45,6 @@ import IdentityServerForm from './identity-server-form'
 import ApplicationServerForm from './application-server-form'
 import JoinServerForm from './join-server-form'
 import NetworkServerForm from './network-server-form'
-import DeleteSection from './delete-section'
 import Collapse from './collapse'
 
 import style from './device-general-settings.styl'
@@ -245,6 +244,9 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                onDelete={this.handleDelete}
+                onDeleteSuccess={this.handleDeleteSuccess}
+                onDeleteFailure={this.handleDeleteFailure}
                 jsConfig={jsConfig}
               />
             </Collapse>
@@ -267,14 +269,6 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
-              />
-            </Collapse>
-            <Collapse title={m.consoleTitle} description={m.consoleDescription}>
-              <DeleteSection
-                device={device}
-                onDelete={this.handleDelete}
-                onDeleteSuccess={this.handleDeleteSuccess}
-                onDeleteFailure={this.handleDeleteFailure}
               />
             </Collapse>
           </Col>
