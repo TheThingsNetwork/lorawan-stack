@@ -47,6 +47,7 @@ $navbar-item-active-background-color: $white-bis;
 $navbar-height: 4rem;
 
 $card-shadow: 0 10px 20px 0 rgba($black, 0.1);
+$card-content-padding:2rem;
 
 $border: $white-ter;
 $table-head-cell-border-width: 1px 1px 1px;
@@ -69,7 +70,7 @@ $table-cell-padding: 1.2em 0.75em;
 @import "bulma/sass/elements/container.sass";
 @import "bulma/sass/elements/content.sass";
 @import "bulma/sass/elements/icon.sass";
-// @import "bulma/sass/elements/image.sass";
+@import "bulma/sass/elements/image.sass";
 @import "bulma/sass/elements/notification.sass";
 // @import "bulma/sass/elements/progress.sass";
 @import "bulma/sass/elements/table.sass";
@@ -146,6 +147,11 @@ $table-cell-padding: 1.2em 0.75em;
 .has-vertical-space {
   margin-top: 3rem;
   margin-bottom: 3rem;
+}
+
+.has-image-centered {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .columns.has-same-height .column {
