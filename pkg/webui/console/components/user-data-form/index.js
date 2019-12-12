@@ -14,7 +14,7 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { defineMessages } from 'react-intl'
+import { defineMessages, injectIntl } from 'react-intl'
 import * as Yup from 'yup'
 
 import Form from '../../../components/form'
@@ -27,12 +27,14 @@ import ModalButton from '../../../components/button/modal-button'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 
+const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
+
 const approvalStates = [
-  { value: 'STATE_REQUESTED', label: sharedMessages.stateRequested },
-  { value: 'STATE_APPROVED', label: sharedMessages.stateApproved },
-  { value: 'STATE_REJECTED', label: sharedMessages.stateRejected },
-  { value: 'STATE_SUSPENDED', label: sharedMessages.stateSuspended },
-  { value: 'STATE_FLAGGED', label: sharedMessages.stateFlagged },
+  'STATE_REQUESTED',
+  'STATE_APPROVED',
+  'STATE_REJECTED',
+  'STATE_FLAGGED',
+  'STATE_SUSPENDED',
 ]
 
 const validationSchema = Yup.object().shape({
@@ -40,7 +42,7 @@ const validationSchema = Yup.object().shape({
     .min(2, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong),
   primary_email_address: Yup.string().email(sharedMessages.validateEmail),
-  state: Yup.string().oneOf(approvalStates.map(s => s.value)),
+  state: Yup.string().oneOf(approvalStates),
   description: Yup.string().max(2000, sharedMessages.validateTooLong),
 })
 
@@ -56,6 +58,7 @@ const m = defineMessages({
     'Are you sure you want to delete the user "{userId}". This action cannot be undone!',
 })
 
+@injectIntl
 class UserForm extends React.Component {
   static propTypes = {
     error: PropTypes.error,
@@ -65,6 +68,9 @@ class UserForm extends React.Component {
       }).isRequired,
       name: PropTypes.string,
       description: PropTypes.string,
+    }).isRequired,
+    intl: PropTypes.shape({
+      formatMessage: PropTypes.func.isRequired,
     }).isRequired,
     onDelete: PropTypes.func.isRequired,
     onDeleteFailure: PropTypes.func,
@@ -110,7 +116,16 @@ class UserForm extends React.Component {
   }
 
   render() {
-    const { error, initialValues } = this.props
+    const {
+      error,
+      initialValues,
+      intl: { formatMessage },
+    } = this.props
+
+    const approvalStateOptions = approvalStates.map(state => ({
+      value: state,
+      label: capitalize(formatMessage({ id: `enum:${state}` })),
+    }))
 
     return (
       <Form
@@ -152,7 +167,7 @@ class UserForm extends React.Component {
           title={sharedMessages.state}
           name="state"
           component={Select}
-          options={approvalStates}
+          options={approvalStateOptions}
         />
         <SubmitBar>
           <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
