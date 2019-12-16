@@ -36,6 +36,7 @@ var ApplicationWebhookTemplateFieldFieldPathsTopLevel = []string{
 }
 var ApplicationWebhookTemplateFieldPathsNested = []string{
 	"base_url",
+	"create_downlink_api_key",
 	"description",
 	"documentation_url",
 	"downlink_ack",
@@ -66,6 +67,7 @@ var ApplicationWebhookTemplateFieldPathsNested = []string{
 
 var ApplicationWebhookTemplateFieldPathsTopLevel = []string{
 	"base_url",
+	"create_downlink_api_key",
 	"description",
 	"documentation_url",
 	"downlink_ack",
@@ -96,6 +98,7 @@ var ApplicationWebhookFieldPathsNested = []string{
 	"created_at",
 	"downlink_ack",
 	"downlink_ack.path",
+	"downlink_api_key",
 	"downlink_failed",
 	"downlink_failed.path",
 	"downlink_nack",
@@ -126,6 +129,7 @@ var ApplicationWebhookFieldPathsTopLevel = []string{
 	"base_url",
 	"created_at",
 	"downlink_ack",
+	"downlink_api_key",
 	"downlink_failed",
 	"downlink_nack",
 	"downlink_queued",
@@ -183,6 +187,7 @@ var SetApplicationWebhookRequestFieldPathsNested = []string{
 	"webhook.created_at",
 	"webhook.downlink_ack",
 	"webhook.downlink_ack.path",
+	"webhook.downlink_api_key",
 	"webhook.downlink_failed",
 	"webhook.downlink_failed.path",
 	"webhook.downlink_nack",

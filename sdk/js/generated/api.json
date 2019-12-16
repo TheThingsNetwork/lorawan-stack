@@ -3102,6 +3102,16 @@
               "defaultValue": ""
             },
             {
+              "name": "downlink_api_key",
+              "description": "The API key to be used for downlink queue operations.\nThe field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "uplink_message",
               "description": "",
               "label": "",
@@ -3543,6 +3553,16 @@
               "type": "ApplicationWebhookTemplateField",
               "longType": "ApplicationWebhookTemplateField",
               "fullType": "ttn.lorawan.v3.ApplicationWebhookTemplateField",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "create_downlink_api_key",
+              "description": "Control the creation of the downlink queue operations API key.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
             },

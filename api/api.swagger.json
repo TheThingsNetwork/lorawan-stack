@@ -7853,6 +7853,10 @@
           },
           "description": "The value of the fields used by the template. Maps field.id to the value."
         },
+        "downlink_api_key": {
+          "type": "string",
+          "description": "The API key to be used for downlink queue operations.\nThe field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged)."
+        },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
         },
@@ -7951,6 +7955,11 @@
           "items": {
             "$ref": "#/definitions/v3ApplicationWebhookTemplateField"
           }
+        },
+        "create_downlink_api_key": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Control the creation of the downlink queue operations API key."
         },
         "uplink_message": {
           "$ref": "#/definitions/v3ApplicationWebhookTemplateMessage"

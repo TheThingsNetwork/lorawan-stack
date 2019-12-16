@@ -66,6 +66,9 @@ message ApplicationWebhookTemplate {
 
   repeated ApplicationWebhookTemplateField fields = 10;
 
+  // Control the creation of the downlink queue operations API key.
+  bool create_downlink_api_key = 19 [(gogoproto.customname) = "CreateDownlinkAPIKey"];
+
   message Message {
     // Path to append to the base URL. Can contain template fields, in RFC 6570 format.
     string path = 1;
@@ -101,6 +104,10 @@ message ApplicationWebhook {
   ApplicationWebhookTemplateIdentifiers template_ids = 15 [(gogoproto.embed) = true];
   // The value of the fields used by the template. Maps field.id to the value.
   map<string,string> template_fields = 16;
+
+  // The API key to be used for downlink queue operations.
+  // The field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged).
+  string downlink_api_key = 17 [(gogoproto.customname) = "DownlinkAPIKey"];
 
   message Message {
     // Path to append to the base URL.
