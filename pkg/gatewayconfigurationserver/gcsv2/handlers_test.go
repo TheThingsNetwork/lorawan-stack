@@ -15,191 +15,200 @@
 package gcsv2
 
 import (
-	"fmt"
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
+	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
+	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-const (
-	testFirmwarePath  = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
-	testUpdateChannel = "stable"
-)
+type mockGatewayRegistryClient struct {
+	ttnpb.GatewayRegistryClient
 
-func TestAdaptUpdateChannel(t *testing.T) {
-	var conf Config
-	conf.Default.UpdateChannel = testUpdateChannel
-	conf.Default.FirmwareURL = testFirmwarePath
-	s, err := conf.NewServer(componenttest.NewComponent(t, &component.Config{}))
-	if err != nil {
-		t.Error(err)
+	ctx context.Context
+	in  *ttnpb.GetGatewayRequest
+
+	out *ttnpb.Gateway
+	err error
+}
+
+func (c *mockGatewayRegistryClient) Get(ctx context.Context, in *ttnpb.GetGatewayRequest, _ ...grpc.CallOption) (*ttnpb.Gateway, error) {
+	c.ctx, c.in = ctx, in
+	return c.out, c.err
+}
+
+func TestGetGateway(t *testing.T) {
+	a := assertions.New(t)
+
+	reg := &mockGatewayRegistryClient{}
+	auth := func(ctx context.Context) grpc.CallOption {
+		return grpc.PerRPCCredentials(nil)
 	}
+	c := componenttest.NewComponent(t, &component.Config{})
+	s := New(c, WithRegistry(reg), WithAuth(auth))
+
+	mockRightsFetcher := rights.FetcherFunc(func(ctx context.Context, ids ttnpb.Identifiers) (*ttnpb.Rights, error) {
+		md := rpcmetadata.FromIncomingContext(ctx)
+		if strings.ToLower(md.AuthType) == "bearer" {
+			return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO), nil
+		}
+		return nil, rights.ErrNoGatewayRights
+	})
+
+	e := echo.New()
 
 	for _, tt := range []struct {
-		Name            string
-		Channel         string
-		ExpectedChannel string
+		Name           string
+		StoreSetup     func(*mockGatewayRegistryClient)
+		RequestSetup   func(*http.Request)
+		AssertError    func(actual interface{}, expected ...interface{}) string
+		AssertStore    func(*assertions.Assertion, *mockGatewayRegistryClient)
+		AssertResponse func(*assertions.Assertion, *httptest.ResponseRecorder)
 	}{
 		{
-			Name:            "Empty channel",
-			Channel:         "",
-			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "stable"),
+			Name: "Gateway Not Found",
+			StoreSetup: func(reg *mockGatewayRegistryClient) {
+				reg.out, reg.err = nil, status.Error(codes.NotFound, "not found")
+			},
+			AssertError: should.NotBeNil,
 		},
 		{
-			Name:            "Default stable channel",
-			Channel:         "stable",
-			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "stable"),
+			Name: "Gateway With Key",
+			StoreSetup: func(reg *mockGatewayRegistryClient) {
+				reg.out, reg.err = &ttnpb.Gateway{
+					Description: "Gateway Description",
+					Attributes: map[string]string{
+						"key": "some-key",
+					},
+					FrequencyPlanID:      "EU_863_870",
+					GatewayServerAddress: "gatewayserver",
+					Antennas: []ttnpb.GatewayAntenna{
+						{Location: ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 90}},
+					},
+				}, nil
+			},
+			AssertError: should.BeNil,
+			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
+				body := rec.Body.String()
+				a.So(body, assertions.ShouldContainSubstring, `"attributes":{"description":"Gateway Description"}`)
+				a.So(body, assertions.ShouldContainSubstring, `"frequency_plan":"EU_863_870"`)
+				a.So(body, assertions.ShouldContainSubstring, `"frequency_plan_url":"http://example.com/api/v2/frequency-plans/EU_863_870"`)
+				a.So(body, assertions.ShouldContainSubstring, `"router":{"id":"gatewayserver","mqtt_address":"mqtts://gatewayserver:8881"}`)
+				a.So(body, assertions.ShouldContainSubstring, `"antenna_location":{"latitude":12.34,"longitude":56.78,"altitude":90}`)
+			},
 		},
 		{
-			Name:            "Default beta channel",
-			Channel:         "beta",
-			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "beta"),
-		},
-		{
-			Name:            "Custom update channel",
-			Channel:         "http://example.com/fake-firmware",
-			ExpectedChannel: "http://example.com/fake-firmware",
-		},
-		{
-			Name:            "Channel URL misspell",
-			Channel:         "htp://example.com/stable",
-			ExpectedChannel: "htp://example.com/stable",
+			Name: "Same but as TTKG",
+			RequestSetup: func(req *http.Request) {
+				req.Header.Set("User-Agent", "TTNGateway")
+			},
+			AssertError: should.BeNil,
+			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
+				body := rec.Body.String()
+				a.So(body, assertions.ShouldNotContainSubstring, `"attributes"`)
+				a.So(body, assertions.ShouldContainSubstring, `"router":{"mqtt_address":"mqtts://gatewayserver:8881"}`)
+			},
 		},
 	} {
-		t.Run(tt.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			a.So(s.adaptUpdateChannel(tt.Channel), assertions.ShouldEqual, tt.ExpectedChannel)
-		})
+		if tt.StoreSetup != nil {
+			tt.StoreSetup(reg)
+		}
+		req := httptest.NewRequest(http.MethodGet, "/api/v2/gateways/foo-gtw", nil)
+		ctx := test.Context()
+		ctx = log.NewContext(ctx, test.GetLogger(t))
+		ctx = rights.NewContextWithFetcher(ctx, mockRightsFetcher)
+		req = req.WithContext(ctx)
+		req.Header.Set(echo.HeaderAuthorization, "key some-key")
+		if tt.RequestSetup != nil {
+			tt.RequestSetup(req)
+		}
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/api/v2/gateways/:gateway_id")
+		c.SetParamNames("gateway_id")
+		c.SetParamValues("foo-gtw")
+		err := s.normalizeAuthorization(s.handleGetGateway)(c)
+		if tt.AssertError != nil {
+			a.So(err, tt.AssertError)
+		}
+		if tt.AssertResponse != nil {
+			tt.AssertResponse(a, rec)
+		}
+		if tt.AssertStore != nil {
+			tt.AssertStore(a, reg)
+		}
 	}
 }
 
-func TestAdaptGatewayAddress(t *testing.T) {
-	for _, tt := range []struct {
-		Name    string
-		Address string
-		Assert  func(*assertions.Assertion, string, error)
-	}{
-		{
-			Name:    "Empty address",
-			Address: "",
-			Assert: func(a *assertions.Assertion, address string, err error) {
-				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "")
-			},
-		},
-		{
-			Name:    "Only host, no port or scheme",
-			Address: "localhost",
-			Assert: func(a *assertions.Assertion, address string, err error) {
-				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "mqtts://localhost:8881")
-			},
-		},
-		{
-			Name:    "Host and MQTT port, no scheme",
-			Address: "localhost:1881",
-			Assert: func(a *assertions.Assertion, address string, err error) {
-				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "mqtt://localhost:1881")
-			},
-		},
-		{
-			Name:    "Host and MQTTS port, no scheme",
-			Address: "localhost:8881",
-			Assert: func(a *assertions.Assertion, address string, err error) {
-				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "mqtts://localhost:8881")
-			},
-		},
-		{
-			Name:    "Full mqtts address",
-			Address: "mqtts://localhost:8871",
-			Assert: func(a *assertions.Assertion, address string, err error) {
-				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "mqtts://localhost:8871")
-			},
-		},
-		{
-			Name:    "Full mqtt address",
-			Address: "mqtt://localhost:1871",
-			Assert: func(a *assertions.Assertion, address string, err error) {
-				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "mqtt://localhost:1871")
-			},
-		},
-		{
-			Name:    "Full http address",
-			Address: "http://localhost",
-			Assert: func(a *assertions.Assertion, address string, err error) {
-				a.So(err, assertions.ShouldBeNil)
-				a.So(address, assertions.ShouldEqual, "http://localhost")
-			},
-		},
-		{
-			Name:    "Invalid port format",
-			Address: "localhost::zzz",
-			Assert: func(a *assertions.Assertion, address string, err error) {
-				a.So(err, assertions.ShouldNotBeNil)
-				a.So(address, assertions.ShouldEqual, "")
-			},
-		},
-	} {
-		t.Run(tt.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			address, err := adaptGatewayAddress(tt.Address)
-			tt.Assert(a, address, err)
-		})
-	}
-}
+func TestGetFrequencyPlan(t *testing.T) {
+	a := assertions.New(t)
 
-func TestAdaptAuthorization(t *testing.T) {
+	c := componenttest.NewComponent(t, &component.Config{})
+	c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
+	s := New(c)
+
+	e := echo.New()
+
 	for _, tt := range []struct {
-		Name          string
-		Authorization string
-		Assert        func(*assertions.Assertion, string)
+		Name           string
+		RequestSetup   func(*http.Request)
+		AssertError    func(actual interface{}, expected ...interface{}) string
+		AssertResponse func(*assertions.Assertion, *httptest.ResponseRecorder)
 	}{
 		{
-			Name:          "Empty Authorization",
-			Authorization: "",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "")
+			Name:        "Regular Request",
+			AssertError: should.BeNil,
+			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
+				body := rec.Body.String()
+				a.So(body, assertions.ShouldContainSubstring, `"SX1301_conf"`)
+				a.So(body, assertions.ShouldContainSubstring, `"chan_multiSF_0"`)
+				a.So(body, assertions.ShouldContainSubstring, `"tx_lut_0"`)
 			},
 		},
 		{
-			Name:          "Key formatted authorization",
-			Authorization: "Key asd",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "asd")
+			Name: "Same but as TTKG",
+			RequestSetup: func(req *http.Request) {
+				req.Header.Set("User-Agent", "TTNGateway")
 			},
-		},
-		{
-			Name:          "Bearer formatted authorization",
-			Authorization: "Bearer efg",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "efg")
-			},
-		},
-		{
-			Name:          "Direct API Key",
-			Authorization: "InvalidKeyFormat",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "InvalidKeyFormat")
-			},
-		},
-		{
-			Name:          "Esoteric authorization",
-			Authorization: "APIKey asd",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "asd")
+			AssertError: should.BeNil,
+			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
+				body := rec.Body.String()
+				a.So(body, assertions.ShouldNotContainSubstring, `"tx_lut_0"`)
 			},
 		},
 	} {
-		t.Run(tt.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			auth := adaptAuthorization(tt.Authorization)
-			tt.Assert(a, auth)
-		})
+		req := httptest.NewRequest(http.MethodGet, "/api/v2/frequency-plans/EU_863_870", nil)
+		ctx := test.Context()
+		ctx = log.NewContext(ctx, test.GetLogger(t))
+		req = req.WithContext(ctx)
+		if tt.RequestSetup != nil {
+			tt.RequestSetup(req)
+		}
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/api/v2/frequency-plans/:frequency_plan_id")
+		c.SetParamNames("frequency_plan_id")
+		c.SetParamValues("EU_863_870")
+		err := s.normalizeAuthorization(s.handleGetFrequencyPlan)(c)
+		if tt.AssertError != nil {
+			a.So(err, tt.AssertError)
+		}
+		if tt.AssertResponse != nil {
+			tt.AssertResponse(a, rec)
+		}
 	}
 }
