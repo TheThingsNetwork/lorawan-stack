@@ -38,7 +38,7 @@ import {
   selectJsConfig,
   selectNsConfig,
 } from '../../../lib/selectors/env'
-import { hasExternalJs, isDeviceOTAA } from './utils'
+import { hasExternalJs, isDeviceOTAA, isDeviceJoined } from './utils'
 import m from './messages'
 
 import IdentityServerForm from './identity-server-form'
@@ -185,17 +185,18 @@ export default class DeviceGeneralSettings extends React.Component {
     }
 
     // 1. Disable the section if AS is not in cluster.
-    // 2. Disable the section if the device is OTAA, since no OTAA related fields are stored in the AS.
+    // 2. Disable the section if the device is OTAA and joined since no fields are stored in the AS.
     // 3. Disable the section if NS is not in cluster, since activation mode is unknown.
-    // 4. Disable the seciton if `application_server_address` is not equal to the cluster AS address
+    // 4. Disable the seciton if `application_server_address` is not equal to the cluster AS address.
     const sameAsAddress = getComponentBaseUrl(asConfig) === device.application_server_address
-    const asDisabled = !asEnabled || isOTAA || !nsEnabled || !sameAsAddress
+    const isJoined = isDeviceJoined(device)
+    const asDisabled = !asEnabled || (isOTAA && !isJoined) || !nsEnabled || !sameAsAddress
     let asDescription = m.asDescription
     if (!asEnabled) {
       asDescription = m.asDescriptionMissing
     } else if (!nsEnabled) {
       asDescription = m.activationModeUnknown
-    } else if (isOTAA) {
+    } else if (isOTAA && !isJoined) {
       asDescription = m.asDescriptionOTAA
     } else if (!sameAsAddress) {
       asDescription = m.notInCluster
@@ -204,8 +205,8 @@ export default class DeviceGeneralSettings extends React.Component {
     // 1. Disable the section if JS is not in cluster.
     // 2. Disable the section if the device is ABP/Multicast, since JS does not store ABP/Multicast
     // devices.
-    // 3. Disable the seciton if `join_server_address` is not equal to the cluster JS address
-    // 4. Disable the seciton if an external JS is used
+    // 3. Disable the seciton if `join_server_address` is not equal to the cluster JS address.
+    // 4. Disable the seciton if an external JS is used.
     const sameJsAddress = getComponentBaseUrl(jsConfig) === device.join_server_address
     const externalJs = hasExternalJs(device)
     const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress || externalJs
@@ -219,7 +220,7 @@ export default class DeviceGeneralSettings extends React.Component {
     }
 
     // 1. Disable the section if NS is not in cluster.
-    // 2. Disable the seciton if `network_server_address` is not equal to the cluster NS address
+    // 2. Disable the seciton if `network_server_address` is not equal to the cluster NS address.
     const sameNsAddress = getComponentBaseUrl(nsConfig) === device.network_server_address
     const nsDisabled = !nsEnabled || !sameNsAddress
     let nsDescription = m.nsDescription

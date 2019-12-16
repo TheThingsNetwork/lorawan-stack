@@ -91,6 +91,13 @@ export const hasExternalJs = device => {
   return jsEnabled && noRootKeys
 }
 
+export const isDeviceJoined = device =>
+  Boolean(device) &&
+  Boolean(device.session) &&
+  Boolean(device.session.dev_addr) &&
+  Boolean(device.session.keys) &&
+  Boolean(Object.keys(device.session.keys).length)
+
 export const ACTIVATION_MODES = Object.freeze({
   OTAA: 'otaa',
   ABP: 'abp',

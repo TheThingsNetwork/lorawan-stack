@@ -35,6 +35,8 @@ import {
   isDeviceMulticast,
   ACTIVATION_MODES,
   hasExternalJs,
+  isDeviceJoined,
+  isDeviceOTAA,
 } from '../utils'
 import validationSchema from './validation-schema'
 
@@ -61,6 +63,7 @@ const NetworkServerForm = React.memo(props => {
 
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
+  const isJoinedOTAA = isDeviceOTAA(device) && isDeviceJoined(device)
 
   const formRef = React.useRef(null)
 
@@ -242,7 +245,7 @@ const NetworkServerForm = React.memo(props => {
         <Radio label={m.abp} value={ACTIVATION_MODES.ABP} />
         <Radio label={m.multicast} value={ACTIVATION_MODES.MULTICAST} />
       </Form.Field>
-      {(isABP || isMulticast) && (
+      {(isABP || isMulticast || isJoinedOTAA) && (
         <>
           <DevAddrInput
             title={sharedMessages.devAddr}
@@ -285,7 +288,7 @@ const NetworkServerForm = React.memo(props => {
               component={Input}
             />
           )}
-          {!isMulticast && (
+          {!isMulticast && !isJoinedOTAA && (
             <Form.Field
               title={m.resetsFCnt}
               onChange={handleResetsFCntChange}
