@@ -123,6 +123,17 @@ func TestGetGateway(t *testing.T) {
 				a.So(body, assertions.ShouldContainSubstring, `"router":{"mqtt_address":"mqtts://gatewayserver:8881"}`)
 			},
 		},
+		{
+			Name: "Same but without Auth",
+			RequestSetup: func(req *http.Request) {
+				req.Header.Del(echo.HeaderAuthorization)
+			},
+			AssertError: should.BeNil,
+			AssertResponse: func(a *assertions.Assertion, rec *httptest.ResponseRecorder) {
+				body := rec.Body.String()
+				a.So(body, assertions.ShouldNotContainSubstring, `"router":{"mqtt_address":"mqtts://gatewayserver:8881"}`)
+			},
+		},
 	} {
 		if tt.StoreSetup != nil {
 			tt.StoreSetup(reg)

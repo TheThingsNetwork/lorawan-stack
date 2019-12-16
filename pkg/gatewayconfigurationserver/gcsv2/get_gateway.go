@@ -58,8 +58,8 @@ type gatewayInfoResponse struct {
 	FirmwareURL      string           `json:"firmware_url,omitempty"`
 	AntennaLocation  *antennaLocation `json:"antenna_location,omitempty"`
 	Token            *oauth2Token     `json:"token,omitempty"`
-	Router           router           `json:"router"`
-	FallbackRouters  []router         `json:"fallback_routers,omitempty"`
+	Router           *router          `json:"router,omitempty"`
+	FallbackRouters  []*router        `json:"fallback_routers,omitempty"`
 }
 
 var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
@@ -106,17 +106,20 @@ func (s *Server) handleGetGateway(c echo.Context) error {
 			return errUnauthenticated
 		}
 	default:
-		return errUnauthenticated
+		gateway = gateway.PublicSafe()
 	}
 
 	freqPlanURL := s.inferServerAddress(c) + compatAPIPrefix + "/frequency-plans/" + gateway.FrequencyPlanID
 
-	rtr := router{
-		ID: gateway.GatewayServerAddress,
-	}
-	rtr.MQTTAddress, err = s.inferMQTTAddress(gateway.GatewayServerAddress)
-	if err != nil {
-		return err
+	var rtr *router
+	if gateway.GatewayServerAddress != "" {
+		rtr = &router{
+			ID: gateway.GatewayServerAddress,
+		}
+		rtr.MQTTAddress, err = s.inferMQTTAddress(gateway.GatewayServerAddress)
+		if err != nil {
+			return err
+		}
 	}
 
 	response := &gatewayInfoResponse{
@@ -124,8 +127,11 @@ func (s *Server) handleGetGateway(c echo.Context) error {
 		FrequencyPlan:    gateway.FrequencyPlanID,
 		FrequencyPlanURL: freqPlanURL,
 		AutoUpdate:       gateway.AutoUpdate,
-		Router:           rtr,
-		FallbackRouters:  []router{rtr},
+	}
+
+	if rtr != nil {
+		response.Router = rtr
+		response.FallbackRouters = []*router{rtr}
 	}
 
 	if gateway.Description != "" {
