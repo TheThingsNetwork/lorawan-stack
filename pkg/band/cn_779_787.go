@@ -36,7 +36,7 @@ func init() {
 		{Frequency: 780700000, MinDataRate: 0, MaxDataRate: 5},
 		{Frequency: 780900000, MinDataRate: 0, MaxDataRate: 5},
 	}
-	cnBeaconChannel := uint32(785000000)
+	const cnBeaconChannel = 785000000
 
 	downlinkDRTable := [8][6]ttnpb.DataRateIndex{
 		{0, 0, 0, 0, 0, 0},
@@ -148,7 +148,7 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    3,
 			CodingRate:       "4/5",
-			BroadcastChannel: func(_ float64) uint32 { return cnBeaconChannel },
+			BroadcastChannel: func(_ float64) uint64 { return cnBeaconChannel },
 			PingSlotChannel:  uint64Ptr(cnBeaconChannel),
 		},
 

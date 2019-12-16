@@ -160,10 +160,9 @@ func init() {
 	All[CN_470_510] = cn_470_510
 }
 
-var cn470BeaconFrequencies = func() [8]uint32 {
-	freqs := [8]uint32{}
+var cn470BeaconFrequencies = func() (freqs [8]uint64) {
 	for i := 0; i < 8; i++ {
-		freqs[i] = 508300000 + uint32(i*200000)
+		freqs[i] = 508300000 + uint64(i*200000)
 	}
 	return freqs
 }()

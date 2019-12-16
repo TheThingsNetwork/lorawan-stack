@@ -33,7 +33,8 @@ func init() {
 		{Frequency: 865402500, MinDataRate: 0, MaxDataRate: 5},
 		{Frequency: 865985000, MinDataRate: 0, MaxDataRate: 5},
 	}
-	inBeaconChannel := uint32(866500000)
+	const inBeaconChannel = 866500000
+
 	in_865_867 = Band{
 		ID: IN_865_867,
 
@@ -141,7 +142,7 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    4,
 			CodingRate:       "4/5",
-			BroadcastChannel: func(_ float64) uint32 { return inBeaconChannel },
+			BroadcastChannel: func(_ float64) uint64 { return inBeaconChannel },
 			PingSlotChannel:  uint64Ptr(inBeaconChannel),
 		},
 
