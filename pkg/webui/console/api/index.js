@@ -77,13 +77,7 @@ export default {
     update: ttnClient.Users.updateById.bind(ttnClient.Users),
     delete: ttnClient.Users.deleteById.bind(ttnClient.Users),
     search: ttnClient.Users.search.bind(ttnClient.Users),
-    async authInfo() {
-      return instance.get(`${isBaseUrl}/auth_info`, {
-        headers: {
-          Authorization: `Bearer ${(await token()).access_token}`,
-        },
-      })
-    },
+    authInfo: ttnClient.Auth.getAuthInfo.bind(ttnClient.Auth),
   },
   applications: {
     list: ttnClient.Applications.getAll.bind(ttnClient.Applications),
