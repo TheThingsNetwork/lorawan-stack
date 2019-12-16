@@ -17,10 +17,13 @@ import { toast as t } from 'react-toastify'
 
 import Notification from '../notification'
 
+import diff from '../../lib/diff'
+
 import style from './toast.styl'
 
 const createToast = function() {
   const queue = []
+  let lastMessage = undefined
   let toastId = null
   let firstDispatched = false
 
@@ -53,11 +56,22 @@ const createToast = function() {
     if (!hasNext) {
       firstDispatched = false
     } else if (hasNext && !t.isActive(toastId)) {
-      show(queue.shift())
+      const message = queue.shift()
+      lastMessage = message
+      show(message)
     }
   }
 
   const toast = function(options) {
+    // Prevent flooding of identical messages (if wished)
+    if (
+      options.preventConsecutive &&
+      lastMessage &&
+      Object.keys(diff(lastMessage, options)).length === 0
+    ) {
+      return
+    }
+
     queue.push(options)
 
     if (!firstDispatched) {
