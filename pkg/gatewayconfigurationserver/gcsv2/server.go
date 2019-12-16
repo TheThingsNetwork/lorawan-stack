@@ -17,15 +17,14 @@ package gcsv2
 import (
 	"context"
 
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
+	"google.golang.org/grpc"
 )
 
-// Config is the configuration of the The Things Gateay CUPS.
-type Config struct {
+// TheThingsGatewayConfig is the configuration for The Things Gateway.
+type TheThingsGatewayConfig struct {
 	Default struct {
 		UpdateChannel string `name:"update-channel" description:"The default update channel that the gateways should use"`
 		MQTTServer    string `name:"mqtt-server" description:"The default MQTT server that the gateways should use"`
@@ -33,34 +32,14 @@ type Config struct {
 	} `name:"default" description:"Default gateway settings"`
 }
 
-var (
-	errNoDefaultFirmwarePath  = errors.Define("no_default_firmware_path", "no default firmware path specified")
-	errNoDefaultUpdateChannel = errors.Define("no_default_update_channel", "no default update channel specified")
-)
-
-// NewServer returns a new CUPS from this config on top of the component.
-func (conf Config) NewServer(c *component.Component, customOpts ...Option) (*Server, error) {
-	opts := []Option{
-		WithConfig(conf),
-	}
-	if conf.Default.FirmwareURL == "" {
-		return nil, errNoDefaultFirmwarePath
-	}
-	if conf.Default.UpdateChannel == "" {
-		return nil, errNoDefaultUpdateChannel
-	}
-	s := NewServer(c, append(opts, customOpts...)...)
-	c.RegisterWeb(s)
-	return s, nil
-}
-
 // Server implements the CUPS endpoints used by The Things Gateway.
 type Server struct {
 	component *component.Component
 
-	registry ttnpb.GatewayRegistryClient
+	ttgConfig TheThingsGatewayConfig
 
-	config Config
+	registry ttnpb.GatewayRegistryClient
+	auth     func(context.Context) grpc.CallOption
 }
 
 func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
@@ -74,41 +53,34 @@ func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	return ttnpb.NewGatewayRegistryClient(cc), nil
 }
 
-// Option configures the CUPS.
+func (s *Server) getAuth(ctx context.Context) grpc.CallOption {
+	if s.auth != nil {
+		return s.auth(ctx)
+	}
+	return s.component.WithClusterAuth()
+}
+
+// Option configures the Server.
 type Option func(s *Server)
 
-// WithRegistry overrides the CUPS gateway registry.
+// WithRegistry overrides the Server's gateway registry.
 func WithRegistry(registry ttnpb.GatewayRegistryClient) Option {
 	return func(s *Server) {
 		s.registry = registry
 	}
 }
 
-// WithConfig overrides the CUPS configuration.
-func WithConfig(conf Config) Option {
+// WithAuth overrides the Server's auth func.
+func WithAuth(auth func(ctx context.Context) grpc.CallOption) Option {
 	return func(s *Server) {
-		s.config = conf
+		s.auth = auth
 	}
 }
 
-// WithDefaultUpdateChannel overrides the default CUPS gateway update channel.
-func WithDefaultUpdateChannel(channel string) Option {
+// WithTheThingsGatewayConfig overrides the Server's configuration for The Things Gateway.
+func WithTheThingsGatewayConfig(config TheThingsGatewayConfig) Option {
 	return func(s *Server) {
-		s.config.Default.UpdateChannel = channel
-	}
-}
-
-// WithDefaultMQTTServer overrides the default CUPS gateway MQTT server.
-func WithDefaultMQTTServer(server string) Option {
-	return func(s *Server) {
-		s.config.Default.MQTTServer = server
-	}
-}
-
-// WithDefaultFirmwareURL overrides the default CUPS firmware base URL.
-func WithDefaultFirmwareURL(url string) Option {
-	return func(s *Server) {
-		s.config.Default.FirmwareURL = url
+		s.ttgConfig = config
 	}
 }
 
@@ -121,13 +93,14 @@ func (s *Server) RegisterRoutes(srv *web.Server) {
 	group.GET("/frequency-plans/:frequency_plan_id", s.handleGetFrequencyPlan)
 }
 
-// NewServer returns a new CUPS on top of the given gateway registry.
-func NewServer(c *component.Component, options ...Option) *Server {
+// New returns a new v2 GCS on top of the given gateway registry.
+func New(c *component.Component, options ...Option) *Server {
 	s := &Server{
 		component: c,
 	}
 	for _, opt := range options {
 		opt(s)
 	}
+	c.RegisterWeb(s)
 	return s
 }

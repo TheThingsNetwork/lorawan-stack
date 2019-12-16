@@ -15,31 +15,54 @@
 package gcsv2
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"net/http"
-	"net/url"
 	"strings"
+	"time"
 
 	"github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
-// gatewayInfoResponse represents a minimal gateway info response for The Things Gateway.
-type gatewayInfoResponse struct {
-	FrequencyPlanID  string `json:"frequency_plan"`
-	FrequencyPlanURL string `json:"frequency_plan_url"`
-	FirmwareURL      string `json:"firmware_url"`
-	Router           struct {
-		MQTTAddress string `json:"mqtt_address"`
-	} `json:"router"`
-	AutoUpdate bool `json:"auto_update"`
+type antennaLocation struct {
+	Latitude  float64 `json:"latitude,omitempty"`
+	Longitude float64 `json:"longitude,omitempty"`
+	Altitude  int32   `json:"altitude,omitempty"`
 }
+
+type oauth2Token struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   uint32 `json:"expires_in"`
+}
+
+type attributes struct {
+	Description string `json:"description"`
+}
+
+type router struct {
+	ID          string `json:"id,omitempty"`
+	MQTTAddress string `json:"mqtt_address"`
+}
+
+type gatewayInfoResponse struct {
+	ID               string           `json:"id,omitempty"`
+	Attributes       *attributes      `json:"attributes,omitempty"`
+	FrequencyPlan    string           `json:"frequency_plan"`
+	FrequencyPlanURL string           `json:"frequency_plan_url"`
+	AutoUpdate       bool             `json:"auto_update"`
+	FirmwareURL      string           `json:"firmware_url,omitempty"`
+	AntennaLocation  *antennaLocation `json:"antenna_location,omitempty"`
+	Token            *oauth2Token     `json:"token,omitempty"`
+	Router           router           `json:"router"`
+	FallbackRouters  []router         `json:"fallback_routers,omitempty"`
+}
+
+var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
 
 func (s *Server) handleGetGateway(c echo.Context) error {
 	ctx := c.Request().Context()
@@ -55,70 +78,121 @@ func (s *Server) handleGetGateway(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if gateway, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
+	gateway, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIdentifiers: gatewayIDs,
 		FieldMask: types.FieldMask{Paths: []string{
+			"description",
+			"attributes",
 			"frequency_plan_id",
-			"gateway_server_address",
-			"update_channel",
 			"auto_update",
+			"update_channel",
+			"antennas",
+			"gateway_server_address",
 		}},
-	}, s.getAuth(c)); err != nil {
+	}, s.getAuth(ctx))
+	if err != nil {
 		return err
-	} else {
-		scheme := c.Scheme()
-		hostport := c.Request().Host
-		if host, port, err := net.SplitHostPort(hostport); err == nil {
-			switch port {
-			case "80":
-				scheme = "http"
-				hostport = host
-			case "1885":
-				scheme = "http"
-			case "443":
-				scheme = "https"
-				hostport = host
-			case "8885":
-				scheme = "https"
-			default:
-				scheme = "https"
-			}
-		}
-		freqPlanURL := &url.URL{
-			Scheme: scheme,
-			Host:   hostport,
-			Path:   fmt.Sprintf("%v/frequency-plans/%v", compatAPIPrefix, gateway.FrequencyPlanID),
-		}
-		response := &gatewayInfoResponse{
-			FrequencyPlanID:  gateway.FrequencyPlanID,
-			FrequencyPlanURL: freqPlanURL.String(),
-			FirmwareURL:      s.adaptUpdateChannel(gateway.UpdateChannel),
-			AutoUpdate:       gateway.AutoUpdate,
-		}
-		response.Router.MQTTAddress, err = adaptGatewayAddress(gateway.GatewayServerAddress)
-		if err != nil {
+	}
+
+	md := rpcmetadata.FromIncomingContext(ctx)
+	switch md.AuthType {
+	case "bearer":
+		if err := rights.RequireGateway(ctx, gatewayIDs, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, response)
+	case "key":
+		keyAttr, ok := gateway.Attributes["key"]
+		if !ok || md.AuthValue != keyAttr {
+			return errUnauthenticated
+		}
+	default:
+		return errUnauthenticated
 	}
+
+	freqPlanURL := s.inferServerAddress(c) + compatAPIPrefix + "/frequency-plans/" + gateway.FrequencyPlanID
+
+	rtr := router{
+		ID: gateway.GatewayServerAddress,
+	}
+	rtr.MQTTAddress, err = s.inferMQTTAddress(gateway.GatewayServerAddress)
+	if err != nil {
+		return err
+	}
+
+	response := &gatewayInfoResponse{
+		ID:               gateway.GatewayID,
+		FrequencyPlan:    gateway.FrequencyPlanID,
+		FrequencyPlanURL: freqPlanURL,
+		AutoUpdate:       gateway.AutoUpdate,
+		Router:           rtr,
+		FallbackRouters:  []router{rtr},
+	}
+
+	if gateway.Description != "" {
+		response.Attributes = &attributes{
+			Description: gateway.Description,
+		}
+	}
+
+	if len(gateway.Antennas) > 0 {
+		response.AntennaLocation = &antennaLocation{
+			Latitude:  gateway.Antennas[0].Location.Latitude,
+			Longitude: gateway.Antennas[0].Location.Longitude,
+			Altitude:  gateway.Antennas[0].Location.Altitude,
+		}
+	}
+
+	if c.Request().Header.Get("User-Agent") == "TTNGateway" {
+		s.setTTKGFirmwareURL(response, gateway)
+	}
+
+	if token, ok := gateway.Attributes["token"]; ok {
+		response.Token = &oauth2Token{
+			AccessToken: token,
+			ExpiresIn:   uint32((24 * time.Hour).Seconds()),
+		}
+		if tokenExpires, ok := gateway.Attributes["token_expires"]; ok {
+			if t, err := time.Parse(time.RFC3339, tokenExpires); err == nil {
+				response.Token.ExpiresIn = uint32(time.Until(t).Seconds())
+			}
+		}
+	}
+
+	if c.Request().Header.Get("User-Agent") == "TTNGateway" {
+		// Filter out fields to reduce response size.
+		response.ID = ""
+		response.Attributes = nil
+		response.AntennaLocation = nil
+		response.Token = nil
+		response.FallbackRouters = nil
+		response.Router.ID = ""
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
-// adaptUpdateChannel prepends the default firmware path if the channel itself is not an URL.
-func (s *Server) adaptUpdateChannel(channel string) string {
-	if channel == "" {
-		channel = s.config.Default.UpdateChannel
+func (s *Server) setTTKGFirmwareURL(res *gatewayInfoResponse, gtw *ttnpb.Gateway) {
+	updateChannel := gtw.UpdateChannel
+	if updateChannel == "" {
+		updateChannel = s.ttgConfig.Default.UpdateChannel
 	}
-	if _, err := url.ParseRequestURI(channel); err != nil {
-		return fmt.Sprintf("%v/%v", s.config.Default.FirmwareURL, channel)
+	if updateChannel == "" {
+		updateChannel = "stable"
 	}
-	return channel
+	if strings.HasPrefix(updateChannel, "http") {
+		res.FirmwareURL = updateChannel
+		return
+	}
+	firmwareBaseURL := s.ttgConfig.Default.FirmwareURL
+	if firmwareBaseURL == "" {
+		firmwareBaseURL = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
+	}
+	res.FirmwareURL = fmt.Sprintf("%s/%s", firmwareBaseURL, updateChannel)
 }
 
-// adaptGatewayAddress infers the scheme and port for the gateway address if not
-// already present.
-func adaptGatewayAddress(address string) (result string, err error) {
+func (s *Server) inferMQTTAddress(address string) (result string, err error) {
 	if address == "" {
-		return address, nil
+		return s.ttgConfig.Default.MQTTServer, nil
 	}
 	if strings.Contains(address, "://") {
 		return address, nil
@@ -144,33 +218,30 @@ func adaptGatewayAddress(address string) (result string, err error) {
 	return fmt.Sprintf("%s:%s", host, port), nil
 }
 
-// adaptAuthorization removes the Authorization prefix.
-func adaptAuthorization(originalAuth string) string {
-	if originalAuth == "" {
-		return originalAuth
+func (s *Server) inferServerAddress(c echo.Context) string {
+	scheme := c.Scheme()
+	if forwardedProto := c.Request().Header.Get("X-Forwarded-Proto"); forwardedProto != "" {
+		scheme = forwardedProto
 	}
-	var prefix, key string
-	if _, err := fmt.Sscanf(originalAuth, "%v %v", &prefix, &key); err != nil {
-		return originalAuth
+	hostport := c.Request().Host
+	if forwardedHost := c.Request().Header.Get("X-Forwarded-Host"); forwardedHost != "" {
+		hostport = forwardedHost
 	}
-	return key
-}
-
-func (s *Server) getContext(c echo.Context) context.Context {
-	ctx := c.Request().Context()
-	md := metadata.New(map[string]string{
-		"authorization": c.Request().Header.Get(echo.HeaderAuthorization),
-	})
-	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
-		md = metadata.Join(ctxMd, md)
+	if host, port, err := net.SplitHostPort(hostport); err == nil {
+		switch port {
+		case "80":
+			scheme = "http"
+			hostport = host
+		case "1885":
+			scheme = "http"
+		case "443":
+			scheme = "https"
+			hostport = host
+		case "8885":
+			scheme = "https"
+		default:
+			scheme = "https"
+		}
 	}
-	return metadata.NewIncomingContext(ctx, md)
-}
-
-func (s *Server) getAuth(c echo.Context) grpc.CallOption {
-	return grpc.PerRPCCredentials(rpcmetadata.MD{
-		AuthType:      "bearer",
-		AuthValue:     adaptAuthorization(c.Request().Header.Get(echo.HeaderAuthorization)),
-		AllowInsecure: s.component.AllowInsecureForCredentials(),
-	})
+	return fmt.Sprintf("%s://%s", scheme, hostport)
 }

@@ -36,7 +36,7 @@ type Config struct {
 	// BasicStation defines the configuration for the BasicStation CUPS.
 	BasicStation bscups.ServerConfig `name:"basic-station" description:"BasicStation CUPS configuration."`
 	// TheThingsGateway defines the configuration for The Things Gateway CUPS.
-	TheThingsGateway gcsv2.Config `name:"the-things-gateway" description:"The Things Gateway CUPS configuration."`
+	TheThingsGateway gcsv2.TheThingsGatewayConfig `name:"the-things-gateway" description:"The Things Gateway CUPS configuration."`
 	// RequreAuth defines if the HTTP endpoints should require authentication or not.
 	RequireAuth bool `name:"require-auth" description:"Require authentication for the HTTP endpoints."`
 }
@@ -80,11 +80,8 @@ func New(c *component.Component, conf *Config) (*GatewayConfigurationServer, err
 	bsCUPS := conf.BasicStation.NewServer(c)
 	_ = bsCUPS
 
-	v2CUPS, err := conf.TheThingsGateway.NewServer(c)
-	if err != nil {
-		return nil, err
-	}
-	_ = v2CUPS
+	v2GCS := gcsv2.New(c, gcsv2.WithTheThingsGatewayConfig(conf.TheThingsGateway))
+	_ = v2GCS
 
 	c.RegisterGRPC(gcs)
 	c.RegisterWeb(gcs)
