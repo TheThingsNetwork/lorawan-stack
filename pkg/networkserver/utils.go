@@ -387,6 +387,8 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		macState.CurrentParameters.PingSlotFrequency = dev.MACSettings.PingSlotFrequency.Value
 	} else if defaults.PingSlotFrequency != nil && defaults.PingSlotFrequency.Value != 0 {
 		macState.CurrentParameters.PingSlotFrequency = defaults.PingSlotFrequency.Value
+	} else if phy.Beacon.PingSlotChannel != nil {
+		macState.CurrentParameters.PingSlotFrequency = *phy.Beacon.PingSlotChannel
 	}
 	macState.DesiredParameters.PingSlotFrequency = macState.CurrentParameters.PingSlotFrequency
 	if fp.PingSlot != nil && fp.PingSlot.Frequency != 0 {
