@@ -182,7 +182,6 @@ func init() {
 			DataRateIndex:    8,
 			CodingRate:       "4/5",
 			BroadcastChannel: beaconChannelFromFrequencies(usAuBeaconFrequencies),
-			PingSlotChannels: usAuBeaconFrequencies[:],
 		},
 
 		regionalParameters1_0:       bandIdentity,

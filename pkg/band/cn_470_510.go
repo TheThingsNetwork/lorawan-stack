@@ -142,7 +142,6 @@ func init() {
 			DataRateIndex:    2,
 			CodingRate:       "4/5",
 			BroadcastChannel: beaconChannelFromFrequencies(cn470BeaconFrequencies),
-			PingSlotChannels: cn470BeaconFrequencies[:],
 		},
 
 		LoRaCodingRate: "4/5",

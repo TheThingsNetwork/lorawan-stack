@@ -109,7 +109,7 @@ type Beacon struct {
 	//
 	// beaconTime is the integer value, converted in float64, of the 4 bytes “Time” field of the beacon frame.
 	BroadcastChannel func(beaconTime float64) uint32
-	PingSlotChannels []uint32
+	PingSlotChannel  *uint64
 }
 
 // ChMaskCntlPair pairs a ChMaskCntl with a mask.
@@ -543,4 +543,8 @@ func generateChMask96(mask []bool) ([]ChMaskCntlPair, error) {
 		}
 	}
 	return []ChMaskCntlPair{{Cntl: 6, Mask: [16]bool{}}}, nil
+}
+
+func uint64Ptr(v uint64) *uint64 {
+	return &v
 }

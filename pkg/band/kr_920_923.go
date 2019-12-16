@@ -135,8 +135,8 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    3,
 			CodingRate:       "4/5",
-			PingSlotChannels: []uint32{krBeaconChannel},
 			BroadcastChannel: func(_ float64) uint32 { return krBeaconChannel },
+			PingSlotChannel:  uint64Ptr(krBeaconChannel),
 		},
 
 		// No LoRaWAN 1.0

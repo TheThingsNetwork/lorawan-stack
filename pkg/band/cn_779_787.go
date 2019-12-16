@@ -148,8 +148,8 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    3,
 			CodingRate:       "4/5",
-			PingSlotChannels: []uint32{cnBeaconChannel},
 			BroadcastChannel: func(_ float64) uint32 { return cnBeaconChannel },
+			PingSlotChannel:  uint64Ptr(cnBeaconChannel),
 		},
 
 		regionalParameters1_0:       bandIdentity,
