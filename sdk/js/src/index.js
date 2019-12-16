@@ -22,6 +22,7 @@ import Js from './service/join-server'
 import Ns from './service/network-server'
 import Organizations from './service/organizations'
 import Users from './service/users'
+import EventHandler from './util/events'
 
 class TtnLw {
   constructor(token, { stackConfig, connectionType, defaultUserId, proxy, axiosConfig }) {
@@ -37,6 +38,9 @@ class TtnLw {
     this.Ns = new Ns(this.api.Ns)
     this.Organizations = new Organizations(this.api)
     this.Users = new Users(this.api)
+
+    this.subscribe = EventHandler.subscribe
+    this.unsubscribe = EventHandler.unsubscribe
   }
 }
 
