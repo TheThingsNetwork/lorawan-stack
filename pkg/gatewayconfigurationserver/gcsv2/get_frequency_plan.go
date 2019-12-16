@@ -31,7 +31,10 @@ func (s *Server) handleGetFrequencyPlan(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	config.TxLUTConfigs = config.TxLUTConfigs[:0]
+	if c.Request().Header.Get("User-Agent") == "TTNGateway" {
+		// Filter out fields to reduce response size.
+		config.TxLUTConfigs = nil
+	}
 	return c.JSON(http.StatusOK, struct {
 		SX1301Conf *shared.SX1301Config `json:"SX1301_conf"`
 	}{
