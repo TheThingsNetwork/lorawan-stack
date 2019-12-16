@@ -213,10 +213,10 @@ export default class DeviceGeneralSettings extends React.Component {
     let jsDescription = m.jsDescription
     if (!jsEnabled) {
       jsDescription = m.jsDescriptionMissing
-    } else if (!isOTAA) {
-      jsDescription = m.jsDescriptionOTAA
     } else if (!sameJsAddress || externalJs) {
       jsDescription = m.notInCluster
+    } else if (nsEnabled && !isOTAA) {
+      jsDescription = m.jsDescriptionOTAA
     }
 
     // 1. Disable the section if NS is not in cluster.
