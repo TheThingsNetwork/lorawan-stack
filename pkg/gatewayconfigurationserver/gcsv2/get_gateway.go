@@ -24,7 +24,6 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -95,24 +94,6 @@ func (s *Server) handleGatewayInfo(c echo.Context) error {
 		}
 		return c.JSON(http.StatusOK, response)
 	}
-}
-
-func (s *Server) handleFreqPlanInfo(c echo.Context) error {
-	freqPlanID := c.Param(frequencyPlanIDKey)
-	plan, err := s.component.FrequencyPlans.GetByID(freqPlanID)
-	if err != nil {
-		return err
-	}
-	config, err := shared.BuildSX1301Config(plan)
-	if err != nil {
-		return err
-	}
-	config.TxLUTConfigs = config.TxLUTConfigs[:0]
-	return c.JSON(http.StatusOK, struct {
-		SX1301Conf *shared.SX1301Config `json:"SX1301_conf"`
-	}{
-		SX1301Conf: config,
-	})
 }
 
 // adaptUpdateChannel prepends the default firmware path if the channel itself is not an URL.
