@@ -212,11 +212,11 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 }
 
 func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest) (usr *ttnpb.User, err error) {
-	if err = is.RequireAuthenticated(ctx); err != nil {
-		return nil, err
-	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	if err = rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_INFO); err != nil {
+		if err := is.RequireAuthenticated(ctx); err != nil {
+			return nil, err
+		}
 		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicUserFields...) {
 			defer func() { usr = usr.PublicSafe() }()
 		} else {
