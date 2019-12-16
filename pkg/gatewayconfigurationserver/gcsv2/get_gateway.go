@@ -41,9 +41,16 @@ type gatewayInfoResponse struct {
 	AutoUpdate bool `json:"auto_update"`
 }
 
-func (s *Server) handleGatewayInfo(c echo.Context) error {
-	ctx := s.getContext(c)
-	gatewayIDs := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
+func (s *Server) handleGetGateway(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	gatewayIDs := ttnpb.GatewayIdentifiers{
+		GatewayID: c.Param("gateway_id"),
+	}
+	if err := gatewayIDs.ValidateContext(ctx); err != nil {
+		return err
+	}
+
 	registry, err := s.getRegistry(ctx, &gatewayIDs)
 	if err != nil {
 		return err

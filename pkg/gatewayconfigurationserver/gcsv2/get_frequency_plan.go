@@ -21,9 +21,9 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
 )
 
-func (s *Server) handleFreqPlanInfo(c echo.Context) error {
-	freqPlanID := c.Param(frequencyPlanIDKey)
-	plan, err := s.component.FrequencyPlans.GetByID(freqPlanID)
+func (s *Server) handleGetFrequencyPlan(c echo.Context) error {
+	frequencyPlanID := c.Param("frequency_plan_id")
+	plan, err := s.component.FrequencyPlans.GetByID(frequencyPlanID)
 	if err != nil {
 		return err
 	}

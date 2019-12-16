@@ -15,44 +15,46 @@
 package gcsv2
 
 import (
+	"fmt"
+	"strings"
+
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/auth"
+	"google.golang.org/grpc/metadata"
 )
 
-const (
-	gatewayIDKey       = "gateway_id"
-	frequencyPlanIDKey = "frequency_plan_id"
-)
+func (s *Server) normalizeAuthorization(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
 
-var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
-
-// validateAndFillGatewayIDs checks if the request contains a valid gateway ID.
-func (s *Server) validateAndFillGatewayIDs() echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			gatewayIDs := ttnpb.GatewayIdentifiers{
-				GatewayID: c.Param(gatewayIDKey),
-			}
-			if err := gatewayIDs.ValidateContext(c.Request().Context()); err != nil {
-				return err
-			}
-			c.Set(gatewayIDKey, gatewayIDs)
-
+		authorization := c.Request().Header.Get(echo.HeaderAuthorization)
+		if authorization == "" {
 			return next(c)
 		}
-	}
-}
-
-// requireAuth checks if the request contains the Authorization header.
-func (s *Server) requireAuth() echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			authHeader := c.Request().Header.Get(echo.HeaderAuthorization)
-			if authHeader == "" {
-				return errUnauthenticated
-			}
-			return next(c)
+		authorizationParts := strings.SplitN(authorization, " ", 2)
+		if len(authorizationParts) != 2 {
+			return errUnauthenticated
 		}
+		authType, authValue := strings.ToLower(authorizationParts[0]), authorizationParts[1]
+		switch authType {
+		case "bearer", "key":
+			tokenType, _, _, err := auth.SplitToken(authValue)
+			if err == nil && (tokenType == auth.APIKey || tokenType == auth.AccessToken) {
+				authType = "bearer"
+			} else {
+				authType = "key"
+			}
+		default:
+			return errUnauthenticated
+		}
+		md := metadata.New(map[string]string{
+			"authorization": fmt.Sprintf("%s %s", authType, authValue),
+		})
+		if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+			md = metadata.Join(ctxMd, md)
+		}
+		ctx = metadata.NewIncomingContext(ctx, md)
+		c.SetRequest(c.Request().WithContext(ctx))
+		return next(c)
 	}
 }

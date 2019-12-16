@@ -116,16 +116,9 @@ const compatAPIPrefix = "/api/v2"
 
 // RegisterRoutes implements the web.Registerer interface.
 func (s *Server) RegisterRoutes(srv *web.Server) {
-	group := srv.Group(compatAPIPrefix)
-	group.GET("/gateways/:gateway_id", func(c echo.Context) error {
-		return s.handleGatewayInfo(c)
-	}, []echo.MiddlewareFunc{
-		s.validateAndFillGatewayIDs(),
-		s.requireAuth(),
-	}...)
-	group.GET("/frequency-plans/:frequency_plan_id", func(c echo.Context) error {
-		return s.handleFreqPlanInfo(c)
-	})
+	group := srv.Group(compatAPIPrefix, s.normalizeAuthorization)
+	group.GET("/gateways/:gateway_id", s.handleGetGateway)
+	group.GET("/frequency-plans/:frequency_plan_id", s.handleGetFrequencyPlan)
 }
 
 // NewServer returns a new CUPS on top of the given gateway registry.
