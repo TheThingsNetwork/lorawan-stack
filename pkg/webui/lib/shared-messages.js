@@ -227,6 +227,7 @@ export default defineMessages({
   validateTooLong: 'Too long',
   validateTooShort: 'Too short',
   validateUrl: 'Invalid URL format',
+  validateIdFormat: 'IDs can only contain lowercase letters, numbers and dashes (-)',
   webhookBaseUrl: 'Base URL',
   webhookFormat: 'Webhook Format',
   webhookId: 'Webhook ID',

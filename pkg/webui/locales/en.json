@@ -497,6 +497,7 @@
   "lib.shared-messages.validateTooLong": "Too long",
   "lib.shared-messages.validateTooShort": "Too short",
   "lib.shared-messages.validateUrl": "Invalid URL format",
+  "lib.shared-messages.validateIdFormat": "IDs can only contain lowercase letters, numbers and dashes (-)",
   "lib.shared-messages.webhookBaseUrl": "Base URL",
   "lib.shared-messages.webhookFormat": "Webhook Format",
   "lib.shared-messages.webhookId": "Webhook ID",

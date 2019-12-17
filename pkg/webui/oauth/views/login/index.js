@@ -33,6 +33,7 @@ import SubmitButton from '../../../components/submit-button'
 import Logo from '../../../containers/logo'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import Message from '../../../lib/components/message'
+import { id as userRegexp } from '../../../lib/regexp'
 
 import style from './login.styl'
 
@@ -43,7 +44,11 @@ const m = defineMessages({
 })
 
 const validationSchema = Yup.object().shape({
-  user_id: Yup.string().required(sharedMessages.validateRequired),
+  user_id: Yup.string()
+    .min(3, sharedMessages.validateTooShort)
+    .max(36, sharedMessages.validateTooLong)
+    .matches(userRegexp, sharedMessages.validateIdFormat)
+    .required(sharedMessages.validateRequired),
   password: Yup.string().required(sharedMessages.validateRequired),
 })
 

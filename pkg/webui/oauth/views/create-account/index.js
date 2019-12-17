@@ -25,6 +25,7 @@ import queryString from 'query-string'
 import api from '../../api'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
+import { id as userRegexp } from '../../../lib/regexp'
 import Button from '../../../components/button'
 import Input from '../../../components/input'
 import Form from '../../../components/form'
@@ -46,8 +47,9 @@ const m = defineMessages({
 
 const validationSchema = Yup.object().shape({
   user_id: Yup.string()
-    .min(2)
-    .max(36)
+    .min(3, sharedMessages.validateTooShort)
+    .max(36, sharedMessages.validateTooLong)
+    .matches(userRegexp, sharedMessages.validateIdFormat)
     .required(sharedMessages.validateRequired),
   name: Yup.string()
     .min(3, sharedMessages.validateTooShort)
