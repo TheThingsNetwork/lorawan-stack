@@ -28,6 +28,7 @@ import withFeatureRequirement from '../../lib/components/with-feature-requiremen
 
 import { mayViewOrEditGatewayApiKeys } from '../../lib/feature-checks'
 import { selectSelectedGatewayId } from '../../store/selectors/gateways'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(state => ({ gtwId: selectSelectedGatewayId(state) }))
 @withFeatureRequirement(mayViewOrEditGatewayApiKeys, {
@@ -41,6 +42,10 @@ import { selectSelectedGatewayId } from '../../store/selectors/gateways'
   />
 ))
 export default class GatewayApiKeys extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   render() {
     const { match } = this.props
 

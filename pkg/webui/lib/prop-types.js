@@ -162,6 +162,14 @@ PropTypes.device = PropTypes.shape({
   ids: PropTypes.shape({
     device_id: PropTypes.string.isRequired,
   }).isRequired,
+  name: PropTypes.string,
+  created_at: PropTypes.string,
+  updated_at: PropTypes.string,
+  description: PropTypes.string,
+  lorawan_phy_version: PropTypes.string,
+  lorawan_version: PropTypes.string,
+  supports_join: PropTypes.bool,
+  frequency_plan_id: PropTypes.string,
 })
 
 PropTypes.organization = PropTypes.shape({
@@ -205,5 +213,19 @@ PropTypes.rights = PropTypes.arrayOf(PropTypes.right)
 
 PropTypes.component = PropTypes.oneOf(components)
 PropTypes.components = PropTypes.arrayOf(PropTypes.component)
+
+PropTypes.webhook = PropTypes.shape({
+  base_url: PropTypes.string.isRequired,
+  created_at: PropTypes.string.isRequired,
+  format: PropTypes.oneOf(['json', 'protobuf']).isRequired,
+  ids: PropTypes.shape({
+    application_ids: PropTypes.shape({
+      application_id: PropTypes.string,
+    }).isRequired,
+    webhook_id: PropTypes.string.isRequired,
+  }).isRequired,
+  updated_at: PropTypes.string,
+})
+PropTypes.webhooks = PropTypes.arrayOf(PropTypes.webhook)
 
 export default PropTypes

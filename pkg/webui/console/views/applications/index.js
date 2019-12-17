@@ -25,12 +25,17 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { mayViewApplications } from '../../lib/feature-checks'
+import PropTypes from '../../../lib/prop-types'
 
 @withFeatureRequirement(mayViewApplications, { redirect: '/' })
 @withBreadcrumb('apps', function(props) {
   return <Breadcrumb path="/applications" content={sharedMessages.applications} />
 })
 export default class Applications extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   render() {
     const { path } = this.props.match
     return (

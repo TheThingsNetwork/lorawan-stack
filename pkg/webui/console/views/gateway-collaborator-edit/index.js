@@ -40,6 +40,7 @@ import {
 } from '../../store/selectors/gateways'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   function(state, props) {
@@ -106,6 +107,14 @@ import api from '../../api'
 export default class GatewayCollaboratorEdit extends React.Component {
   state = {
     error: '',
+  }
+
+  static propTypes = {
+    collaborator: PropTypes.collaborator.isRequired,
+    gtwId: PropTypes.string.isRequired,
+    pseudoRights: PropTypes.rights.isRequired,
+    redirectToList: PropTypes.func.isRequired,
+    rights: PropTypes.rights.isRequired,
   }
 
   handleSubmit(updatedCollaborator) {

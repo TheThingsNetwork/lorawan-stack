@@ -27,6 +27,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 import { mayViewApplicationDevices } from '../../lib/feature-checks'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))
 @withFeatureRequirement(mayViewApplicationDevices, {
@@ -36,6 +37,10 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
   return <Breadcrumb path={`/applications/${appId}/devices`} content={sharedMessages.devices} />
 })
 export default class Devices extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   render() {
     const { path } = this.props.match
     return (

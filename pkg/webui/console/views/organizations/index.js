@@ -25,12 +25,17 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { mayViewOrganizationsOfUser } from '../../lib/feature-checks'
+import PropTypes from '../../../lib/prop-types'
 
 @withFeatureRequirement(mayViewOrganizationsOfUser, { redirect: '/' })
 @withBreadcrumb('orgs', function(props) {
   return <Breadcrumb path="/organizations" content={sharedMessages.organizations} />
 })
 class Organizations extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   render() {
     const { path } = this.props.match
     return (

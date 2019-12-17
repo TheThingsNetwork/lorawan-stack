@@ -40,6 +40,7 @@ import {
   selectGetDeviceError,
 } from '../../store/selectors/device'
 
+import PropTypes from '../../../lib/prop-types'
 import style from './device.styl'
 
 @connect(
@@ -106,10 +107,21 @@ import style from './device.styl'
 })
 @withEnv
 export default class Device extends React.Component {
+  static propTypes = {
+    devId: PropTypes.string.isRequired,
+    device: PropTypes.device.isRequired,
+    env: PropTypes.env,
+    location: PropTypes.location.isRequired,
+    match: PropTypes.match.isRequired,
+    stopStream: PropTypes.func.isRequired,
+  }
+  static defaultProps = {
+    env: undefined,
+  }
   componentWillUnmount() {
-    const { devIds, stopStream } = this.props
+    const { device, stopStream } = this.props
 
-    stopStream(devIds)
+    stopStream(device.ids)
   }
 
   render() {

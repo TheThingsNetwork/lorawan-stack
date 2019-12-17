@@ -34,6 +34,7 @@ import {
 } from '../../store/selectors/applications'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   state => ({
@@ -64,6 +65,13 @@ export default class ApplicationApiKeyAdd extends React.Component {
     super(props)
 
     this.createApplicationKey = key => api.application.apiKeys.create(props.appId, key)
+  }
+
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    navigateToList: PropTypes.func.isRequired,
+    pseudoRights: PropTypes.rights.isRequired,
+    rights: PropTypes.rights.isRequired,
   }
 
   handleApprove() {

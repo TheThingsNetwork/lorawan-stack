@@ -24,6 +24,7 @@ import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import DeviceEvents from '../../containers/device-events'
 
 import { getDeviceId } from '../../../lib/selectors/id'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(function({ device, application }, props) {
   return {
@@ -45,15 +46,21 @@ import { getDeviceId } from '../../../lib/selectors/id'
 })
 @bind
 export default class Data extends React.Component {
+  static propTypes = {
+    device: PropTypes.device.isRequired,
+  }
+
   render() {
-    const { devIds } = this.props
+    const {
+      device: { ids },
+    } = this.props
 
     return (
       <Container>
         <IntlHelmet hideHeading title={sharedMessages.data} />
         <Row>
           <Col>
-            <DeviceEvents devIds={devIds} />
+            <DeviceEvents devIds={ids} />
           </Col>
         </Row>
       </Container>

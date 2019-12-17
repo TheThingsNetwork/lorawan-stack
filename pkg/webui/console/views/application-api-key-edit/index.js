@@ -38,6 +38,7 @@ import {
 } from '../../store/selectors/applications'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   function(state, props) {
@@ -87,6 +88,15 @@ export default class ApplicationApiKeyEdit extends React.Component {
 
     this.deleteApplicationKey = id => api.application.apiKeys.delete(props.appId, id)
     this.editApplicationKey = key => api.application.apiKeys.update(props.appId, props.keyId, key)
+  }
+
+  static propTypes = {
+    apiKey: PropTypes.apiKey.isRequired,
+    appId: PropTypes.string.isRequired,
+    deleteSuccess: PropTypes.func.isRequired,
+    keyId: PropTypes.string.isRequired,
+    pseudoRights: PropTypes.rights.isRequired,
+    rights: PropTypes.rights.isRequired,
   }
 
   onDeleteSuccess() {

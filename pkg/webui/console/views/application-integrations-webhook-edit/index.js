@@ -37,6 +37,7 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { getWebhook } from '../../store/actions/webhook'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   editWebhook: 'Edit Webhook',
@@ -94,6 +95,13 @@ const webhookEntitySelector = [
 })
 @bind
 export default class ApplicationWebhookEdit extends Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    match: PropTypes.match.isRequired,
+    navigateToList: PropTypes.func.isRequired,
+    webhook: PropTypes.webhook.isRequired,
+  }
+
   async handleSubmit(updatedWebhook) {
     const {
       appId,

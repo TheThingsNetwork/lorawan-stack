@@ -38,6 +38,7 @@ import {
 } from '../../store/selectors/gateways'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   function(state, props) {
@@ -86,6 +87,15 @@ export default class GatewayApiKeyEdit extends React.Component {
 
     this.deleteGatewayKey = id => api.gateway.apiKeys.delete(props.gtwId, id)
     this.editGatewayKey = key => api.gateway.apiKeys.update(props.gtwId, props.keyId, key)
+  }
+
+  static propTypes = {
+    apiKey: PropTypes.apiKey.isRequired,
+    deleteSuccess: PropTypes.func.isRequired,
+    gtwId: PropTypes.string.isRequired,
+    keyId: PropTypes.string.isRequired,
+    pseudoRights: PropTypes.rights.isRequired,
+    rights: PropTypes.rights.isRequired,
   }
 
   onDeleteSuccess() {

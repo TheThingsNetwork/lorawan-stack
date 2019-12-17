@@ -36,6 +36,7 @@ import {
   longitude as longitudeRegexp,
   int32 as int32Regexp,
 } from '../../lib/regexp'
+import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   setGatewayLocation: 'Set gateway antenna location',
@@ -88,6 +89,11 @@ const getRegistryLocation = function(antennas) {
 })
 @bind
 export default class GatewayLocation extends React.Component {
+  static propTypes = {
+    gateway: PropTypes.gateway.isRequired,
+    gtwId: PropTypes.string.isRequired,
+    updateGateway: PropTypes.func.isRequired,
+  }
   async handleSubmit(values) {
     const { gateway, gtwId, updateGateway } = this.props
 

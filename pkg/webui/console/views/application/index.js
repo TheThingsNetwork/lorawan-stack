@@ -62,6 +62,7 @@ import {
 } from '../../lib/feature-checks'
 
 import Devices from '../devices'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   function(state, props) {
@@ -196,6 +197,18 @@ import Devices from '../devices'
 })
 @withEnv
 export default class Application extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    application: PropTypes.application.isRequired,
+    env: PropTypes.env,
+    match: PropTypes.match.isRequired,
+    stopStream: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    env: undefined,
+  }
+
   componentWillUnmount() {
     const { appId, stopStream } = this.props
 

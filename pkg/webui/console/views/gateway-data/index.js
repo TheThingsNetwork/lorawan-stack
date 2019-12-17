@@ -27,6 +27,7 @@ import withFeatureRequirement from '../../lib/components/with-feature-requiremen
 import { selectSelectedGatewayId } from '../../store/selectors/gateways'
 import { mayViewGatewayEvents } from '../../lib/feature-checks'
 
+import PropTypes from '../../../lib/prop-types'
 import style from './gateway-data.styl'
 
 const m = defineMessages({
@@ -41,6 +42,10 @@ const m = defineMessages({
   <Breadcrumb path={`/gateways/${gtwId}/data`} icon="data" content={sharedMessages.data} />
 ))
 export default class Data extends React.Component {
+  static propTypes = {
+    gtwId: PropTypes.string.isRequired,
+  }
+
   render() {
     const { gtwId } = this.props
 

@@ -34,6 +34,7 @@ import {
 
 import { getGatewaysRightsList } from '../../store/actions/gateways'
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   function(state, props) {
@@ -74,6 +75,13 @@ import api from '../../api'
 export default class GatewayCollaboratorAdd extends React.Component {
   state = {
     error: '',
+  }
+
+  static propTypes = {
+    gtwId: PropTypes.string.isRequired,
+    pseudoRights: PropTypes.rights.isRequired,
+    redirectToList: PropTypes.func.isRequired,
+    rights: PropTypes.rights.isRequired,
   }
 
   handleSubmit(collaborator) {

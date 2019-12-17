@@ -34,6 +34,7 @@ import {
 
 import statusCodeMessages from '../../../lib/errors/status-code-messages'
 
+import PropTypes from '../../../lib/prop-types'
 import style from './error.styl'
 
 const reload = () => location.reload()
@@ -92,6 +93,19 @@ const FullViewError = function({ error }) {
       <Footer />
     </div>
   )
+}
+
+FullViewErrorInner.propTypes = {
+  env: PropTypes.env,
+  error: PropTypes.error.isRequired,
+}
+
+FullViewError.propTypes = {
+  error: PropTypes.error.isRequired,
+}
+
+FullViewErrorInner.defaultProps = {
+  env: undefined,
 }
 
 export { FullViewError as default, FullViewErrorInnerWithEnv as FullViewErrorInner }

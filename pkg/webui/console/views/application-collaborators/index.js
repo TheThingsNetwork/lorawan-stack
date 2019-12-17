@@ -29,6 +29,7 @@ import ApplicationCollaboratorEdit from '../application-collaborator-edit'
 
 import { mayViewOrEditApplicationCollaborators } from '../../lib/feature-checks'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))
 @withFeatureRequirement(mayViewOrEditApplicationCollaborators, {
@@ -42,6 +43,9 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
   />
 ))
 export default class ApplicationCollaborators extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
   render() {
     const { match } = this.props
 
