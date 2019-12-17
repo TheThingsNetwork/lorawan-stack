@@ -293,6 +293,20 @@ class Devices {
     return this._responseTransform(response, false)
   }
 
+  async search(applicationId, params, selector) {
+    const response = await this._api.EndDeviceRegistrySearch.SearchEndDevices(
+      {
+        routeParams: { 'application_ids.application_id': applicationId },
+      },
+      {
+        ...params,
+        ...Marshaler.selectorToFieldMask(selector),
+      },
+    )
+
+    return Marshaler.payloadListResponse('end_devices', response)
+  }
+
   async getById(applicationId, deviceId, selector = [['ids']], { ignoreNotFound = false } = {}) {
     const response = await this._getDevice(
       applicationId,
