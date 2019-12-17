@@ -497,6 +497,7 @@
   "lib.shared-messages.validateTooLong": "Xxx xxxx",
   "lib.shared-messages.validateTooShort": "Xxx xxxxx",
   "lib.shared-messages.validateUrl": "Xxxxxxx XXX xxxxxx",
+  "lib.shared-messages.validateIdFormat": "XXx xxx xxxx xxxxxxx xxxxxxxxx xxxxxxx, xxxxxxx xxx xxxxxx (-)",
   "lib.shared-messages.webhookBaseUrl": "Xxxx XXX",
   "lib.shared-messages.webhookFormat": "Xxxxxxx Xxxxxx",
   "lib.shared-messages.webhookId": "Xxxxxxx XX",
