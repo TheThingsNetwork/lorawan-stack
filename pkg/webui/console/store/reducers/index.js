@@ -21,7 +21,7 @@ import {
 } from '../actions/applications'
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateways'
 import { SHARED_NAME as ORGANIZATION_SHARED_NAME } from '../actions/organizations'
-import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
+import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/devices'
 import { SHARED_NAME as USER_SHARED_NAME } from '../actions/users'
 import {
   getUserId,
@@ -35,7 +35,6 @@ import users from './users'
 import init from './init'
 import applications from './applications'
 import devices from './devices'
-import device from './device'
 import gateways from './gateways'
 import configuration from './configuration'
 import createNamedApiKeysReducer from './api-keys'
@@ -67,7 +66,6 @@ export default history =>
     applications,
     link,
     devices,
-    device,
     gateways,
     webhook,
     webhooks,

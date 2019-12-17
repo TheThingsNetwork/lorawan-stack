@@ -33,7 +33,7 @@ import {
   selectApplicationLinkFetching,
   selectSelectedApplicationId,
 } from '../../store/selectors/applications'
-import { selectSelectedDeviceId } from '../../store/selectors/device'
+import { selectSelectedDeviceId } from '../../store/selectors/devices'
 
 import PropTypes from '../../../lib/prop-types'
 import style from './device-payload-formatters.styl'

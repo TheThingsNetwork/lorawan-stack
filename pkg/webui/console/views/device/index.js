@@ -32,13 +32,13 @@ import DeviceGeneralSettings from '../device-general-settings'
 import DeviceLocation from '../device-location'
 import DevicePayloadFormatters from '../device-payload-formatters'
 
-import { getDevice, stopDeviceEventsStream } from '../../store/actions/device'
+import { getDevice, stopDeviceEventsStream } from '../../store/actions/devices'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
   selectSelectedDevice,
   selectDeviceFetching,
   selectDeviceError,
-} from '../../store/selectors/device'
+} from '../../store/selectors/devices'
 
 import PropTypes from '../../../lib/prop-types'
 import style from './device.styl'

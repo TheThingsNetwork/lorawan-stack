@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_DEV_BASE } from '../actions/device'
-import { GET_DEVICES_LIST_BASE } from '../actions/devices'
+import { GET_DEV_BASE, GET_DEVICES_LIST_BASE } from '../actions/devices'
 
 import {
   createEventsSelector,

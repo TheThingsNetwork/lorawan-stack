@@ -34,7 +34,7 @@ import {
   selectDevicesTotalCount,
   selectDevicesFetching,
   selectDevicesError,
-} from '../../store/selectors/device'
+} from '../../store/selectors/devices'
 import {
   checkFromState,
   mayCreateOrEditApplicationDevices,

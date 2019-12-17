@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { merge } from 'lodash'
 import { getDeviceId } from '../../../lib/selectors/id'
-import { GET_DEVICES_LIST_SUCCESS } from '../actions/devices'
+import {
+  GET_DEV,
+  GET_DEVICES_LIST_SUCCESS,
+  GET_DEV_SUCCESS,
+  UPDATE_DEV_SUCCESS,
+} from '../actions/devices'
 
 const defaultState = {
   entities: {},
@@ -30,12 +36,13 @@ const devices = function(state = defaultState, { type, payload }) {
     case UPDATE_DEV_SUCCESS:
     case GET_DEV_SUCCESS:
       const id = getDeviceId(payload)
+      const mergedDevice = merge({}, state.entities[id], payload)
 
       return {
         ...state,
         entities: {
           ...state.entities,
-          [id]: payload,
+          [id]: mergedDevice,
         },
       }
     case GET_DEVICES_LIST_SUCCESS:

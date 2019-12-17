@@ -24,7 +24,7 @@ import {
   selectApplicationLinkIndicator,
   selectApplicationLinkFetching,
 } from '../../store/selectors/applications'
-import { selectDevicesTotalCount, selectDevicesFetching } from '../../store/selectors/device'
+import { selectDevicesTotalCount, selectDevicesFetching } from '../../store/selectors/devices'
 import {
   getApplicationCollaboratorsList,
   getApplicationApiKeysList,

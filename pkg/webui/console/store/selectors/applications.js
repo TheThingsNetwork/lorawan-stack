@@ -22,7 +22,6 @@ import {
   GET_APP_COLLABORATORS_LIST_BASE,
 } from '../actions/applications'
 import { GET_APP_LINK_BASE } from '../actions/link'
-import { GET_DEVICES_LIST_BASE } from '../actions/devices'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,

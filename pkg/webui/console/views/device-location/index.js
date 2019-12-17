@@ -20,16 +20,16 @@ import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
-import { getDeviceId } from '../../../lib/selectors/id'
 
 import LocationForm from '../../../components/location-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 
-import { updateDevice } from '../../store/actions/device'
+import { updateDevice } from '../../store/actions/devices'
 import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
 
 import {
   latitude as latitudeRegexp,
