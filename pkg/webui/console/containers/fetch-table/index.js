@@ -300,6 +300,7 @@ class FetchTable extends Component {
                 loading={fetchingSearch}
                 onChange={this.onQueryChange}
                 placeholder={sharedMessages.searchById}
+                className={style.searchBar}
               />
             )}
             {actionItems}
