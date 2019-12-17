@@ -12,30 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_DEV_BASE, UPDATE_DEV_BASE } from '../actions/device'
-import { getDeviceId } from '../../../lib/selectors/id'
+import { GET_DEV_BASE } from '../actions/device'
+import { GET_DEVICES_LIST_BASE } from '../actions/devices'
 
 import {
   createEventsSelector,
   createEventsErrorSelector,
   createEventsStatusSelector,
 } from './events'
+import {
+  createPaginationIdsSelectorByEntity,
+  createPaginationTotalCountSelectorByEntity,
+} from './pagination'
 
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
 const ENTITY = 'devices'
 
-const selectDeviceStore = store => store.device
-
-// Device Entity
-export const selectSelectedDevice = state => selectDeviceStore(state).device
-export const selectSelectedDeviceId = state => getDeviceId(selectSelectedDevice(state))
-export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
-export const selectGetDeviceError = createErrorSelector(GET_DEV_BASE)
-export const selectUpdateDeviceError = createErrorSelector(UPDATE_DEV_BASE)
-export const selectDeviceError = createErrorSelector([GET_DEV_BASE, UPDATE_DEV_BASE])
+// Device
+export const selectDeviceStore = state => state.devices
+export const selectDeviceEntitiesStore = state => selectDeviceStore(state).entities
+export const selectDeviceById = (state, id) => selectDeviceEntitiesStore(state)[id]
+export const selectSelectedDeviceId = state => selectDeviceStore(state).selectedDevice
+export const selectSelectedDevice = state => selectDeviceById(state, selectSelectedDeviceId(state))
 export const selectSelectedDeviceFormatters = state => selectSelectedDevice(state).formatters
+export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
+export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
+
+// Devices
+const selectDevsIds = createPaginationIdsSelectorByEntity(ENTITY)
+const selectDevsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
+const selectDevsFetching = createFetchingSelector(GET_DEVICES_LIST_BASE)
+const selectDevsError = createErrorSelector(GET_DEVICES_LIST_BASE)
+
+export const selectDevices = state => selectDevsIds(state).map(id => selectDeviceById(state, id))
+export const selectDevicesTotalCount = state => selectDevsTotalCount(state)
+export const selectDevicesFetching = state => selectDevsFetching(state)
+export const selectDevicesError = state => selectDevsError(state)
 
 // Events
 export const selectDeviceEvents = createEventsSelector(ENTITY)

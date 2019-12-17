@@ -73,13 +73,6 @@ export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
 export const selectApplicationsFetching = state => selectAppsFetching(state)
 export const selectApplicationsError = state => selectAppsError(state)
 
-// Devices
-export const selectSelectedApplicationDevices = state => state.devices
-export const selectSelectedApplicationDevicesTotalCount = state => state.devices.totalCount
-export const selectSelectedApplicationDevicesFetching = createFetchingSelector(
-  GET_DEVICES_LIST_BASE,
-)
-
 // Events
 export const selectApplicationEvents = createEventsSelector(ENTITY)
 export const selectApplicationEventsError = createEventsErrorSelector(ENTITY)

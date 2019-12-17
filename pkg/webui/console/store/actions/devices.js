@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createRequestActions } from './lib'
+import { createPaginationByIdRequestActions } from './pagination'
 
+export const SHARED_NAME = 'DEVICE'
 export const GET_DEVICES_LIST_BASE = 'GET_DEVICES_LIST'
+
 export const [
   {
     request: GET_DEVICES_LIST,
@@ -22,8 +24,4 @@ export const [
     failure: GET_DEVICES_LIST_FAILURE,
   },
   { request: getDevicesList, success: getDevicesListSuccess, failure: getDevicesListFailure },
-] = createRequestActions(
-  GET_DEVICES_LIST_BASE,
-  (appId, { page, limit } = {}) => ({ appId, params: { page, limit } }),
-  (appId, { page, limit } = {}, selectors = []) => ({ selectors }),
-)
+] = createPaginationByIdRequestActions(SHARED_NAME)

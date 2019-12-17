@@ -28,6 +28,7 @@ import {
   getApplicationId,
   getGatewayId,
   getOrganizationId,
+  getDeviceId,
 } from '../../../lib/selectors/id'
 import user from './user'
 import users from './users'
@@ -110,6 +111,7 @@ export default history =>
     }),
     pagination: combineReducers({
       applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
+      devices: createNamedPaginationReducer(DEVICE_SHARED_NAME, getDeviceId),
       gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
       organizations: createNamedPaginationReducer(ORGANIZATION_SHARED_NAME, getOrganizationId),
       users: createNamedPaginationReducer(USER_SHARED_NAME, getUserId),
