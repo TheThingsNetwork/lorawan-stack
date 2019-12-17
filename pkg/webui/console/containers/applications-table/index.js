@@ -75,8 +75,8 @@ export default class ApplicationsTable extends Component {
         addMessage={sharedMessages.addApplication}
         tableTitle={<Message content={sharedMessages.applications} />}
         getItemsAction={this.getApplicationsList}
-        searchItemsAction={this.getApplicationsList}
         baseDataSelector={this.baseDataSelector}
+        searchable
         {...this.props}
       />
     )
