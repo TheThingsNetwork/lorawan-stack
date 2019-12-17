@@ -12,6 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable import/prefer-default-export */
-
 export const url = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi
+export const id = /^[a-z0-9](?:[-]?[a-z0-9]){2,}$/
