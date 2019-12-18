@@ -96,6 +96,19 @@ func FieldMaskFlags(v interface{}, prefix ...string) *pflag.FlagSet {
 	return fieldMaskFlags(prefix, t, true)
 }
 
+func isStopType(t reflect.Type, maskOnly bool) bool {
+	switch t.PkgPath() {
+	case "github.com/gogo/protobuf/types":
+		switch t.Name() {
+		case
+			// Struct is a standalone type and should not be parsed further for field mask purposes.
+			"Struct":
+			return true
+		}
+	}
+	return false
+}
+
 func isAtomicType(t reflect.Type, maskOnly bool) bool {
 	switch t.PkgPath() {
 	case "time":
@@ -368,6 +381,9 @@ func fieldMaskFlags(prefix []string, t reflect.Type, maskOnly bool) *pflag.FlagS
 			continue
 		}
 		if !maskOnly && !isSettableField(name) {
+			continue
+		}
+		if isStopType(t, maskOnly) {
 			continue
 		}
 		addField(flagSet, name, fieldType, maskOnly)

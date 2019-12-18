@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/io"
 	"go.thethings.network/lorawan-stack/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -198,13 +199,27 @@ var (
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageAssociationsFlags, headersFlags())
+			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageAssociationsFlags)
 
 			var association ttnpb.ApplicationPackageAssociation
 			if err = util.SetFields(&association, setApplicationPackageAssociationsFlags); err != nil {
 				return err
 			}
 			association.ApplicationPackageAssociationIdentifiers = *assocID
+
+			reader, err := getDataReader("data", cmd.Flags())
+			if err != nil {
+				logger.WithError(err).Warn("Package data not available")
+			} else {
+				var st types.Struct
+				err := jsonpb.TTN().NewDecoder(reader).Decode(&st)
+				if err != nil {
+					return err
+				}
+
+				association.Data = &st
+				paths = append(paths, "data")
+			}
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -257,6 +272,7 @@ func init() {
 	applicationsPackagesAssociationsCommand.AddCommand(applicationsPackageAssociationsListCommand)
 	applicationsPackageAssociationSetCommand.Flags().AddFlagSet(applicationPackageAssociationIDFlags())
 	applicationsPackageAssociationSetCommand.Flags().AddFlagSet(setApplicationPackageAssociationsFlags)
+	applicationsPackageAssociationSetCommand.Flags().AddFlagSet(dataFlags("data", "package data"))
 	applicationsPackagesAssociationsCommand.AddCommand(applicationsPackageAssociationSetCommand)
 	applicationsPackageAssociationDeleteCommand.Flags().AddFlagSet(applicationPackageAssociationIDFlags())
 	applicationsPackagesAssociationsCommand.AddCommand(applicationsPackageAssociationDeleteCommand)
