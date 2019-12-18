@@ -310,7 +310,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			paths := make([]string, 0, 3)
 
 			dn := uint32(binary.BigEndian.Uint16(pld.DevNonce[:]))
-			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_0_3) >= 0 {
+			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) == 0 {
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
 						return nil, nil, errDevNonceTooSmall
