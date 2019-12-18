@@ -53,7 +53,7 @@ const m = defineMessages({
   },
 )
 @withRequest(
-  ({ userId, getUser }) => getUser(userId, ['name', 'primary_email_address', 'state']),
+  ({ userId, getUser }) => getUser(userId, ['name', 'primary_email_address', 'state', 'admin']),
   ({ fetching, user }) => fetching || !Boolean(user),
 )
 @withBreadcrumb('admin.user-management.edit', function({ userId }) {
