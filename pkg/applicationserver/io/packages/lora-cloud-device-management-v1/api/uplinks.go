@@ -24,7 +24,7 @@ import (
 
 // Uplinks is an API client for the Uplink API.
 type Uplinks struct {
-	*Client
+	cl *Client
 }
 
 const (
@@ -38,11 +38,7 @@ func (u *Uplinks) Send(uplinks objects.DeviceUplinks) (objects.DeviceUplinkRespo
 	if err != nil {
 		return nil, err
 	}
-	req, err := u.newRequest(http.MethodPost, uplinkEntity, "", sendOperation, buffer)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := u.Do(req)
+	resp, err := u.cl.Do(http.MethodPost, uplinkEntity, "", sendOperation, buffer)
 	if err != nil {
 		return nil, err
 	}

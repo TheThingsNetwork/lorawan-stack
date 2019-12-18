@@ -24,7 +24,7 @@ import (
 
 // Tokens is an API client for the Token Management API.
 type Tokens struct {
-	*Client
+	cl *Client
 }
 
 const (
@@ -35,11 +35,11 @@ const (
 
 // List returns the tokens.
 func (t *Tokens) List() ([]objects.TokenInfo, error) {
-	req, err := t.newRequest(http.MethodGet, tokenEntity, "", listOperation, nil)
+	req, err := t.cl.newRequest(http.MethodGet, tokenEntity, "", listOperation, nil)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := t.Do(req)
+	resp, err := t.cl.cl.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,7 @@ func (t *Tokens) Update(token, newName string, renew bool) (*objects.TokenInfo, 
 	if renew {
 		params = append(params, queryParam{renewParam, ""})
 	}
-	req, err := t.newRequest(http.MethodPut, tokenEntity, token, updateOperation, nil, params...)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := t.Do(req)
+	resp, err := t.cl.Do(http.MethodPut, tokenEntity, token, updateOperation, nil, params...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,11 +84,7 @@ func (t *Tokens) Add(name string, capabilities ...string) (*objects.TokenInfo, e
 	if err != nil {
 		return nil, err
 	}
-	req, err := t.newRequest(http.MethodPost, tokenEntity, "", addOperation, buffer)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := t.Do(req)
+	resp, err := t.cl.Do(http.MethodPost, tokenEntity, "", addOperation, buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -107,11 +99,7 @@ func (t *Tokens) Add(name string, capabilities ...string) (*objects.TokenInfo, e
 
 // Remove removes the given token.
 func (t *Tokens) Remove(token string) error {
-	req, err := t.newRequest(http.MethodDelete, tokenEntity, token, "", nil)
-	if err != nil {
-		return err
-	}
-	resp, err := t.Do(req)
+	resp, err := t.cl.Do(http.MethodDelete, tokenEntity, token, "", nil)
 	if err != nil {
 		return err
 	}
@@ -125,11 +113,7 @@ func (t *Tokens) Remove(token string) error {
 
 // Get returns the contents of the given token.
 func (t *Tokens) Get(token string) (*objects.TokenInfo, error) {
-	req, err := t.newRequest(http.MethodGet, tokenEntity, token, "", nil)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := t.Do(req)
+	resp, err := t.cl.Do(http.MethodGet, tokenEntity, token, "", nil)
 	if err != nil {
 		return nil, err
 	}

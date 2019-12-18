@@ -37,7 +37,7 @@ func (f OptionFunc) apply(c *Client) { f(c) }
 // Client is an API client for the LoRa Cloud Device Management v1 service.
 type Client struct {
 	token string
-	*http.Client
+	cl    *http.Client
 
 	Tokens  *Tokens
 	Uplinks *Uplinks
@@ -79,6 +79,15 @@ func (c *Client) newRequest(method, category, entity, operation string, body io.
 	return req, nil
 }
 
+// Do executes a new HTTP request with the given paramters and body and returns the response.
+func (c *Client) Do(method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Response, error) {
+	req, err := c.newRequest(method, category, entity, operation, body, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	return c.cl.Do(req)
+}
+
 // WithToken uses the given authentication token in the client.
 func WithToken(token string) Option {
 	return OptionFunc(func(c *Client) {
@@ -89,7 +98,7 @@ func WithToken(token string) Option {
 // New creates a new Client with the given options.
 func New(cl *http.Client, opts ...Option) (*Client, error) {
 	client := &Client{
-		Client: cl,
+		cl: cl,
 	}
 	client.Tokens = &Tokens{client}
 	client.Uplinks = &Uplinks{client}
