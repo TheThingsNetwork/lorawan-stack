@@ -368,8 +368,8 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	return conf, nil
 }
 
-// DefaultGatewayServerPort is the default port used for connecting to Gateway Server.
-const DefaultGatewayServerPort = 1700
+// DefaultGatewayServerUDPPort is the default port used for connecting to Gateway Server.
+const DefaultGatewayServerUDPPort = 1700
 
 var (
 	errEmptyGatewayServerAddress   = errors.DefineInvalidArgument("empty_gateway_server_address", "gateway server address is empty")
@@ -377,7 +377,7 @@ var (
 )
 
 // ParseGatewayServerAddress parses gateway server address s into hostname and port,
-// port is equal to the port contained in s or DefaultGatewayServerPort otherwise.
+// port is equal to the port contained in s or DefaultGatewayServerUDPPort otherwise.
 func ParseGatewayServerAddress(s string) (string, uint16, error) {
 	host, portStr, err := net.SplitHostPort(s)
 	if err != nil {

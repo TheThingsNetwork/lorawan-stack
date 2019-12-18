@@ -17,7 +17,10 @@ package gatewayconfigurationserver_test
 import (
 	"bytes"
 	"context"
+	"encoding"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -28,8 +31,12 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/fetch"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/pfconfig/cpf"
+	"go.thethings.network/lorawan-stack/pkg/pfconfig/semtechudp"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -72,14 +79,17 @@ func TestWeb(t *testing.T) {
 	}
 
 	httpAddress := "0.0.0.0:8098"
+	fpConf := config.FrequencyPlansConfig{
+		URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
+	}
+	fps := frequencyplans.NewStore(test.Must(fpConf.Fetcher(ctx, config.BlobConfig{})).(fetch.Interface))
+
 	conf := &component.Config{
 		ServiceBase: config.ServiceBase{
 			HTTP: config.HTTP{
 				Listen: httpAddress,
 			},
-			FrequencyPlans: config.FrequencyPlansConfig{
-				URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
-			},
+			FrequencyPlans: fpConf,
 			Cluster: config.Cluster{
 				IdentityServer: isAddr,
 			},
@@ -99,6 +109,23 @@ func TestWeb(t *testing.T) {
 	defer c.Close()
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+	mustMarshal := func(b []byte, err error) []byte { return test.Must(b, err).([]byte) }
+	marshalJSON := func(v interface{}) string {
+		return string(mustMarshal(json.MarshalIndent(v, "", "\t")))
+	}
+	marshalText := func(v encoding.TextMarshaler) string {
+		return string(mustMarshal(v.MarshalText()))
+	}
+	semtechUDPConfig := func(gtw *ttnpb.Gateway) string {
+		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)).(*semtechudp.Config))
+	}
+	cpfLoradConfig := func(gtw *ttnpb.Gateway) string {
+		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)).(*cpf.LoradConfig))
+	}
+	cpfLorafwdConfig := func(gtw *ttnpb.Gateway) string {
+		return marshalText(test.Must(cpf.BuildLorafwd(gtw)).(*cpf.LorafwdConfig))
+	}
 
 	t.Run("Authorization", func(t *testing.T) {
 		for _, tc := range []struct {
@@ -127,20 +154,89 @@ func TestWeb(t *testing.T) {
 			},
 		} {
 			t.Run(tc.Name, func(t *testing.T) {
-				a := assertions.New(t)
-				url := fmt.Sprintf(
-					"/api/v3/gcs/gateways/%s/semtechudp/global_conf.json",
-					tc.ID.GatewayID,
-				)
-				body := bytes.NewReader([]byte(`{"downlinks":[]}`))
-				req := httptest.NewRequest(http.MethodGet, url, body)
-				req = req.WithContext(test.Context())
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
-				rec := httptest.NewRecorder()
-				c.ServeHTTP(rec, req)
-				res := rec.Result()
-				a.So(res.StatusCode, should.Equal, tc.ExpectCode)
+				t.Run("semtechudp/global_conf.json", func(t *testing.T) {
+					a := assertions.New(t)
+					url := fmt.Sprintf(
+						"/api/v3/gcs/gateways/%s/semtechudp/global_conf.json",
+						tc.ID.GatewayID,
+					)
+					body := bytes.NewReader([]byte(`{"downlinks":[]}`))
+					req := httptest.NewRequest(http.MethodGet, url, body)
+					req = req.WithContext(test.Context())
+					req.Header.Set("Content-Type", "application/json")
+					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
+					rec := httptest.NewRecorder()
+					c.ServeHTTP(rec, req)
+					res := rec.Result()
+					if !a.So(res.StatusCode, should.Equal, tc.ExpectCode) {
+						t.FailNow()
+					}
+					switch res.StatusCode {
+					case http.StatusOK:
+						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/json; charset=UTF-8") {
+							t.FailNow()
+						}
+						b, err := ioutil.ReadAll(res.Body)
+						if err != nil {
+							t.Fatalf("Failed to read response body: %s", err)
+						}
+						a.So(string(b), should.Equal, semtechUDPConfig(is.res.Get)+"\n")
+					}
+				})
+				t.Run("cpf/lorad/lorad.json", func(t *testing.T) {
+					a := assertions.New(t)
+					url := fmt.Sprintf(
+						"/api/v3/gcs/gateways/%s/cpf/lorad/lorad.json",
+						tc.ID.GatewayID,
+					)
+					req := httptest.NewRequest(http.MethodGet, url, nil)
+					req = req.WithContext(test.Context())
+					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
+					rec := httptest.NewRecorder()
+					c.ServeHTTP(rec, req)
+					res := rec.Result()
+					if !a.So(res.StatusCode, should.Equal, tc.ExpectCode) {
+						t.FailNow()
+					}
+					switch res.StatusCode {
+					case http.StatusOK:
+						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/json; charset=UTF-8") {
+							t.FailNow()
+						}
+						b, err := ioutil.ReadAll(res.Body)
+						if err != nil {
+							t.Fatalf("Failed to read response body: %s", err)
+						}
+						a.So(string(b), should.Equal, cpfLoradConfig(is.res.Get)+"\n")
+					}
+				})
+				t.Run("cpf/lorafwd/lorafwd.toml", func(t *testing.T) {
+					a := assertions.New(t)
+					url := fmt.Sprintf(
+						"/api/v3/gcs/gateways/%s/cpf/lorafwd/lorafwd.toml",
+						tc.ID.GatewayID,
+					)
+					req := httptest.NewRequest(http.MethodGet, url, nil)
+					req = req.WithContext(test.Context())
+					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.Key))
+					rec := httptest.NewRecorder()
+					c.ServeHTTP(rec, req)
+					res := rec.Result()
+					if !a.So(res.StatusCode, should.Equal, tc.ExpectCode) {
+						t.FailNow()
+					}
+					switch res.StatusCode {
+					case http.StatusOK:
+						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/toml") {
+							t.FailNow()
+						}
+						b, err := ioutil.ReadAll(res.Body)
+						if err != nil {
+							t.Fatalf("Failed to read response body: %s", err)
+						}
+						a.So(string(b), should.Equal, cpfLorafwdConfig(is.res.Get))
+					}
+				})
 			})
 		}
 	})
