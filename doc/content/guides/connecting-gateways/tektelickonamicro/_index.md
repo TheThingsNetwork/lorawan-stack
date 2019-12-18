@@ -47,6 +47,8 @@ If your configuration was successful, your gateway will connect to {{% tts %}} a
 
 ## Configuration using the GUI (Windows Only)
 
+> TODO: [Document using GUI](https://github.com/TheThingsNetwork/lorawan-stack/issues/1140)
+
 ## Troubleshooting
 
 If the gateway does not connect to {{% tts %}} after a few minutes, disconnect and reconnect the power supply to power-cycle the gateway. Packet forwarder logs can be observed by ssh-ing into the gateway and using
