@@ -2,12 +2,11 @@
 title: "Email Templates"
 description: ""
 weight: 15
-summary: Email templates define the contents of the emails that The Things Stack sends to its users. They allow network operators to override the default contents of the emails with their own custom contents.
 ---
 
-## What is it?
-
 Email templates define the contents of the emails that {{% tts %}} sends to its users. They allow network operators to override the default contents of the emails with their own custom contents.
+
+<!--more-->
 
 ## Who is it for?
 
