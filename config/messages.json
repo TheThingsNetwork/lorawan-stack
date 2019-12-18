@@ -5525,6 +5525,24 @@
       "file": "server.go"
     }
   },
+  "error:pkg/pfconfig/shared:empty_gateway_server_address": {
+    "translations": {
+      "en": "gateway server address is empty"
+    },
+    "description": {
+      "package": "pkg/pfconfig/shared",
+      "file": "shared.go"
+    }
+  },
+  "error:pkg/pfconfig/shared:invalid_gateway_server_address": {
+    "translations": {
+      "en": "gateway server address is invalid"
+    },
+    "description": {
+      "package": "pkg/pfconfig/shared",
+      "file": "shared.go"
+    }
+  },
   "error:pkg/pfconfig/shared:invalid_key": {
     "translations": {
       "en": "key `{key}` invalid"
