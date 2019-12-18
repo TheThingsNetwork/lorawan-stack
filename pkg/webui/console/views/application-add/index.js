@@ -82,6 +82,12 @@ const validationSchema = Yup.object().shape({
   }),
 )
 export default class Add extends React.Component {
+  static propTypes = {
+    navigateToApplication: PropTypes.func.isRequired,
+    rights: PropTypes.rights.isRequired,
+    userId: PropTypes.string.isRequired,
+  }
+
   constructor(props) {
     super(props)
     const { rights } = this.props
@@ -89,12 +95,6 @@ export default class Add extends React.Component {
       error: '',
       link: mayLinkApplication.check(rights),
     }
-  }
-
-  static propTypes = {
-    navigateToApplication: PropTypes.func.isRequired,
-    rights: PropTypes.rights.isRequired,
-    userId: PropTypes.string.isRequired,
   }
 
   @bind

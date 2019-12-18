@@ -73,15 +73,15 @@ import PropTypes from '../../../lib/prop-types'
 })
 @bind
 export default class GatewayCollaboratorAdd extends React.Component {
-  state = {
-    error: '',
-  }
-
   static propTypes = {
     gtwId: PropTypes.string.isRequired,
     pseudoRights: PropTypes.rights.isRequired,
     redirectToList: PropTypes.func.isRequired,
     rights: PropTypes.rights.isRequired,
+  }
+
+  state = {
+    error: '',
   }
 
   handleSubmit(collaborator) {

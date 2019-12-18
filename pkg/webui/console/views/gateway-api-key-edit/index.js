@@ -82,13 +82,6 @@ import PropTypes from '../../../lib/prop-types'
 })
 @bind
 export default class GatewayApiKeyEdit extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.deleteGatewayKey = id => api.gateway.apiKeys.delete(props.gtwId, id)
-    this.editGatewayKey = key => api.gateway.apiKeys.update(props.gtwId, props.keyId, key)
-  }
-
   static propTypes = {
     apiKey: PropTypes.apiKey.isRequired,
     deleteSuccess: PropTypes.func.isRequired,
@@ -96,6 +89,13 @@ export default class GatewayApiKeyEdit extends React.Component {
     keyId: PropTypes.string.isRequired,
     pseudoRights: PropTypes.rights.isRequired,
     rights: PropTypes.rights.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.deleteGatewayKey = id => api.gateway.apiKeys.delete(props.gtwId, id)
+    this.editGatewayKey = key => api.gateway.apiKeys.update(props.gtwId, props.keyId, key)
   }
 
   onDeleteSuccess() {

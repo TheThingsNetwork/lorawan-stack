@@ -61,12 +61,6 @@ import PropTypes from '../../../lib/prop-types'
 })
 @bind
 export default class GatewayApiKeyAdd extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.createGatewayKey = key => api.gateway.apiKeys.create(props.gtwId, key)
-  }
-
   static propTypes = {
     gtwId: PropTypes.string.isRequired,
     navigateToList: PropTypes.func.isRequired,
@@ -74,6 +68,11 @@ export default class GatewayApiKeyAdd extends React.Component {
     rights: PropTypes.rights.isRequired,
   }
 
+  constructor(props) {
+    super(props)
+
+    this.createGatewayKey = key => api.gateway.apiKeys.create(props.gtwId, key)
+  }
   handleApprove() {
     const { navigateToList, gtwId } = this.props
 

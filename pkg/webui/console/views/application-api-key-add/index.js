@@ -61,17 +61,17 @@ import PropTypes from '../../../lib/prop-types'
 })
 @bind
 export default class ApplicationApiKeyAdd extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.createApplicationKey = key => api.application.apiKeys.create(props.appId, key)
-  }
-
   static propTypes = {
     appId: PropTypes.string.isRequired,
     navigateToList: PropTypes.func.isRequired,
     pseudoRights: PropTypes.rights.isRequired,
     rights: PropTypes.rights.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.createApplicationKey = key => api.application.apiKeys.create(props.appId, key)
   }
 
   handleApprove() {

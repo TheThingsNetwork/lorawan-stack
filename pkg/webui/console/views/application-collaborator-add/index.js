@@ -68,15 +68,15 @@ import PropTypes from '../../../lib/prop-types'
 })
 @bind
 export default class ApplicationCollaboratorAdd extends React.Component {
-  state = {
-    error: '',
-  }
-
   static propTypes = {
     appId: PropTypes.string.isRequired,
     pseudoRights: PropTypes.rights.isRequired,
     redirectToList: PropTypes.func.isRequired,
     rights: PropTypes.rights.isRequired,
+  }
+
+  state = {
+    error: '',
   }
 
   async handleSubmit(collaborator) {

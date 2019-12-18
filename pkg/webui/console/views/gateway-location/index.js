@@ -94,6 +94,7 @@ export default class GatewayLocation extends React.Component {
     gtwId: PropTypes.string.isRequired,
     updateGateway: PropTypes.func.isRequired,
   }
+
   async handleSubmit(values) {
     const { gateway, gtwId, updateGateway } = this.props
 

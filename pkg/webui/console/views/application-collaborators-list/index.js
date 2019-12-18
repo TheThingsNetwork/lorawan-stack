@@ -31,16 +31,16 @@ import {
 import PAGE_SIZES from '../../constants/page-sizes'
 
 export default class ApplicationCollaborators extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
     const { appId } = props.match.params
     this.getApplicationCollaboratorsList = filters =>
       getApplicationCollaboratorsList(appId, filters)
-  }
-
-  static propTypes = {
-    match: PropTypes.match.isRequired,
   }
 
   @bind
