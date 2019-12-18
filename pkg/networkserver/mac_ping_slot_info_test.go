@@ -55,7 +55,7 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 					QueuedResponses: []*ttnpb.MACCommand{
 						ttnpb.CID_PING_SLOT_INFO.MACCommand(),
 					},
-					PingSlotPeriodicity: 42,
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: 42},
 				},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
@@ -87,7 +87,7 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 						{},
 						ttnpb.CID_PING_SLOT_INFO.MACCommand(),
 					},
-					PingSlotPeriodicity: 42,
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: 42},
 				},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{

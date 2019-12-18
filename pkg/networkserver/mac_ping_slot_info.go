@@ -31,7 +31,7 @@ func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		return nil, errNoPayload
 	}
 
-	dev.MACState.PingSlotPeriodicity = pld.Period
+	dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{Value: pld.Period}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ttnpb.CID_PING_SLOT_INFO.MACCommand())
 	return []events.DefinitionDataClosure{
 		evtReceivePingSlotInfoRequest.BindData(pld),
