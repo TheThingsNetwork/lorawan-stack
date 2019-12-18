@@ -767,6 +767,11 @@ func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, 
 			"rx2_frequency", req.Rx2Frequency,
 		)
 	}
+	if req.AbsoluteTime != nil {
+		pairs = append(pairs,
+			"absolute_time", *req.AbsoluteTime,
+		)
+	}
 	return logger.WithFields(log.Fields(pairs...))
 }
 
