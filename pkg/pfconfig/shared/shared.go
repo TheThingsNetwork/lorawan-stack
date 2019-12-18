@@ -19,6 +19,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -364,4 +366,32 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	conf.TxLUTConfigs = defaultTxLUTConfigs
 
 	return conf, nil
+}
+
+// DefaultGatewayServerPort is the default port used for connecting to Gateway Server.
+const DefaultGatewayServerPort = 1700
+
+var (
+	errEmptyGatewayServerAddress   = errors.DefineInvalidArgument("empty_gateway_server_address", "gateway server address is empty")
+	errInvalidGatewayServerAddress = errors.DefineInvalidArgument("invalid_gateway_server_address", "gateway server address is invalid")
+)
+
+// ParseGatewayServerAddress parses gateway server address s into hostname and port,
+// port is equal to the port contained in s or DefaultGatewayServerPort otherwise.
+func ParseGatewayServerAddress(s string) (string, uint16, error) {
+	host, portStr, err := net.SplitHostPort(s)
+	if err != nil {
+		if host, _, err := net.SplitHostPort(fmt.Sprintf("%s:1700", s)); err == nil && host != "" {
+			return host, 1700, nil
+		}
+		return "", 0, errInvalidGatewayServerAddress.WithCause(err)
+	}
+	if host == "" {
+		return "", 0, errInvalidGatewayServerAddress.WithCause(errEmptyGatewayServerAddress)
+	}
+	port, err := strconv.ParseUint(portStr, 10, 16)
+	if err != nil {
+		return "", 0, errInvalidGatewayServerAddress.WithCause(err)
+	}
+	return host, uint16(port), nil
 }
