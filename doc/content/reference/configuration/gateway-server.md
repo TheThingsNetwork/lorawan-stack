@@ -8,7 +8,7 @@ weight: 3
 
 The Gateway Server forwards traffic to upstream hosts based on the `gs.forward` parameter.
 
-- `gs.forward`: Forward the DevAddr prefixes to the specified hosts (default "=00000000/0")
+- `gs.forward`: Forward the DevAddr prefixes to the specified hosts. This parameter accepts a string in the format `name=devaddrprefixes` (default "=00000000/0")
 
 ## Security Options
 
@@ -18,10 +18,12 @@ The Gateway Server forwards traffic to upstream hosts based on the `gs.forward` 
 
 The Gateway Server supports connection of gateways using the Basic Station protocol.
 
-- `gs.basic-station.fallback-frequency-plan-id`: Fallback frequency plan ID for non-registered gateways
 - `gs.basic-station.listen`: Address for the Basic Station frontend to listen on (default ":1887")
 - `gs.basic-station.listen-tls`: Address for the Basic Station frontend to listen on (with TLS) (default ":8887")
 - `gs.basic-station.use-traffic-tls-address`: Use WSS for the traffic address regardless of the TLS setting (default "false")
+
+The frequency plan to use for unregistered gateways can be set using `gs.basic-station.fallback-frequency-plan-id`. Note that `gs.require-registered-gateways` must be set to false for this to take effect.
+- `gs.basic-station.fallback-frequency-plan-id`: Fallback frequency plan ID for non-registered gateways
 
 ## MQTT Options
 
@@ -45,7 +47,7 @@ The Gateway Server exposes an second MQTT server for connecting gateways that us
 
 The Gateway Server supports the connection of gateways using the Semtech UDP protocol.
 
-- `gs.udp.listeners`: Listen addresses with (optional) fallback frequency plan ID for non-registered gateways (default ":1700=")
+- `gs.udp.listeners`: Listen addresses with (optional) fallback frequency plan ID for non-registered gateways. This parameter accepts as string in the format `port=frequency-plan-id`(default ":1700=")
 - `gs.udp.schedule-late-time`: Time in advance to send downlink to the gateway when scheduling late (default "800ms")
 
 Options are available to configure connection behavior of UDP gateways.
