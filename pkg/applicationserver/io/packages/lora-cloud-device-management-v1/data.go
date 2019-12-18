@@ -22,17 +22,17 @@ import (
 )
 
 type packageData struct {
-	apiKey string
+	token string
 }
 
-const apiKeyField = "api_key"
+const tokenField = "token"
 
 func (d packageData) toStruct() *types.Struct {
 	var st types.Struct
 	st.Fields = make(map[string]*types.Value)
-	st.Fields[apiKeyField] = &types.Value{
+	st.Fields[tokenField] = &types.Value{
 		Kind: &types.Value_StringValue{
-			StringValue: d.apiKey,
+			StringValue: d.token,
 		},
 	}
 	return &st
@@ -45,17 +45,17 @@ var (
 
 func (d *packageData) fromStruct(st *types.Struct) error {
 	fields := st.GetFields()
-	value, ok := fields[apiKeyField]
+	value, ok := fields[tokenField]
 	if !ok {
-		return errFieldNotFound.WithAttributes("field", apiKeyField)
+		return errFieldNotFound.WithAttributes("field", tokenField)
 	}
 	stringValue, ok := value.GetKind().(*types.Value_StringValue)
 	if !ok {
 		return errInvalidFieldType.WithAttributes(
-			"field", apiKeyField,
+			"field", tokenField,
 			"type", fmt.Sprintf("%T", value),
 		)
 	}
-	d.apiKey = stringValue.StringValue
+	d.token = stringValue.StringValue
 	return nil
 }

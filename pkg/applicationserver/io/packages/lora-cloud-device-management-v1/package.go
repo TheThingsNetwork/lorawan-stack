@@ -81,7 +81,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.App
 		return err
 	}
 
-	client, err := api.New(http.DefaultClient, api.WithToken(data.apiKey))
+	client, err := api.New(http.DefaultClient, api.WithToken(data.token))
 	if err != nil {
 		return err
 	}

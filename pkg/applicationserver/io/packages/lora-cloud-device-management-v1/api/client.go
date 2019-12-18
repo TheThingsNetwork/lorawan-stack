@@ -79,7 +79,7 @@ func (c *Client) newRequest(method, category, entity, operation string, body io.
 	return req, nil
 }
 
-// Do executes a new HTTP request with the given paramters and body and returns the response.
+// Do executes a new HTTP request with the given parameters and body and returns the response.
 func (c *Client) Do(method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Response, error) {
 	req, err := c.newRequest(method, category, entity, operation, body, queryParams...)
 	if err != nil {
