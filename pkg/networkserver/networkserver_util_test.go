@@ -210,16 +210,16 @@ func MakeEU868Channels(chs ...*ttnpb.MACParameters_Channel) []*ttnpb.MACParamete
 
 func MakeDefaultEU868MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
-		DeviceClass:         class,
-		LoRaWANVersion:      ver,
-		PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_1S},
+		DeviceClass:    class,
+		LoRaWANVersion: ver,
 		CurrentParameters: ttnpb.MACParameters{
 			ADRAckDelayExponent:    &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
 			ADRAckLimitExponent:    &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 			ADRNbTrans:             1,
 			MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:                16,
-			PingSlotDataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_0},
+			PingSlotDataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
+			PingSlotFrequency:      869525000,
 			RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
 			RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
 			Rx1Delay:               ttnpb.RX_DELAY_1,
@@ -233,7 +233,8 @@ func MakeDefaultEU868MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MA
 			ADRNbTrans:             1,
 			MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:                16,
-			PingSlotDataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_0},
+			PingSlotDataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
+			PingSlotFrequency:      869525000,
 			RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
 			RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
 			Rx1Delay:               ttnpb.RX_DELAY_1,
@@ -306,16 +307,15 @@ func MakeUS915Channels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultUS915MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
-		DeviceClass:         class,
-		LoRaWANVersion:      ver,
-		PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_1S},
+		DeviceClass:    class,
+		LoRaWANVersion: ver,
 		CurrentParameters: ttnpb.MACParameters{
 			ADRAckDelayExponent:    &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
 			ADRAckLimitExponent:    &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 			ADRNbTrans:             1,
 			MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:                30,
-			PingSlotDataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_0},
+			PingSlotDataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
 			RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
 			RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
 			Rx1Delay:               ttnpb.RX_DELAY_1,
@@ -329,7 +329,7 @@ func MakeDefaultUS915MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MA
 			ADRNbTrans:             1,
 			MaxDutyCycle:           ttnpb.DUTY_CYCLE_1,
 			MaxEIRP:                30,
-			PingSlotDataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_0},
+			PingSlotDataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
 			RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_16,
 			RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_0,
 			Rx1Delay:               ttnpb.RX_DELAY_1,
