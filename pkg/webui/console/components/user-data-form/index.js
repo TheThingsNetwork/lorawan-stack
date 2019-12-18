@@ -20,6 +20,7 @@ import * as Yup from 'yup'
 import Form from '../../../components/form'
 import Input from '../../../components/input'
 import Select from '../../../components/select'
+import Checkbox from '../../../components/checkbox'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import ModalButton from '../../../components/button/modal-button'
@@ -47,6 +48,8 @@ const validationSchema = Yup.object().shape({
 })
 
 const m = defineMessages({
+  admin: 'Admin',
+  adminLabel: 'Administrator',
   userDescPlaceholder: 'Description for my new user',
   userDescDescription: 'Optional user description; can also be used to save notes about the user',
   userIdPlaceholder: 'jane-doe',
@@ -169,6 +172,7 @@ class UserForm extends React.Component {
           component={Select}
           options={approvalStateOptions}
         />
+        <Form.Field title={m.admin} name="admin" component={Checkbox} label={m.adminLabel} />
         <SubmitBar>
           <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
           <ModalButton
