@@ -408,6 +408,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
 				sets = append(sets, "ids.dev_addr")
 			}
+			_, _, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+			if err != nil {
+				return nil, nil, err
+			}
 			return &req.EndDevice, sets, nil
 		}
 
@@ -419,6 +423,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"supports_join",
 		); err != nil {
 			return nil, nil, errInvalidFieldMask.WithCause(err)
+		}
+
+		_, _, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
+		if err != nil {
+			return nil, nil, err
 		}
 
 		if ttnpb.HasAnyField(sets, "supports_class_b") && req.EndDevice.SupportsClassB {
