@@ -425,18 +425,25 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 
-		_, _, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
+		_, phy, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			return nil, nil, err
 		}
 
 		if ttnpb.HasAnyField(sets, "supports_class_b") && req.EndDevice.SupportsClassB {
-			if err := ttnpb.RequireFields(sets,
-				"mac_settings.ping_slot_date_rate_index",
-				"mac_settings.ping_slot_frequency",
-				"mac_settings.ping_slot_periodicity",
-			); err != nil {
-				return nil, nil, errInvalidFieldMask.WithCause(err)
+			if ns.defaultMACSettings.PingSlotFrequency == nil && phy.Beacon.PingSlotChannel == nil {
+				if err := ttnpb.RequireFields(sets,
+					"mac_settings.ping_slot_frequency.value",
+				); err != nil {
+					return nil, nil, errInvalidFieldMask.WithCause(err)
+				}
+			}
+			if ns.defaultMACSettings.PingSlotPeriodicity == nil && ttnpb.HasAnyField(req.FieldMask.Paths, "multicast") && req.EndDevice.Multicast {
+				if err := ttnpb.RequireFields(sets,
+					"mac_settings.ping_slot_periodicity.value",
+				); err != nil {
+					return nil, nil, errInvalidFieldMask.WithCause(err)
+				}
 			}
 		}
 
