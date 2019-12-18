@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"google.golang.org/grpc"
 )
@@ -38,6 +38,9 @@ func UnaryServerInterceptor(ctx context.Context, opts ...Option) grpc.UnaryServe
 			logFields = append(logFields, logFieldsForError(err)...)
 		}
 		level := o.levelFunc(grpc.Code(err))
+		if err == context.Canceled {
+			level = log.InfoLevel
+		}
 		entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
 		if err != nil {
 			entry = entry.WithError(err)
@@ -64,6 +67,9 @@ func StreamServerInterceptor(ctx context.Context, opts ...Option) grpc.StreamSer
 			logFields = append(logFields, logFieldsForError(err)...)
 		}
 		level := o.levelFunc(grpc.Code(err))
+		if err == context.Canceled {
+			level = log.InfoLevel
+		}
 		entry := log.FromContext(newCtx).WithFields(log.Fields(logFields...))
 		if err != nil {
 			entry = entry.WithError(err)
