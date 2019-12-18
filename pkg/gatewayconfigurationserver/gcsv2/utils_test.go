@@ -12,73 +12,75 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cups
+package gcsv2
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-const (
-	testFirmwarePath  = "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1"
-	testUpdateChannel = "stable"
-)
-
-func TestAdaptUpdateChannel(t *testing.T) {
-	var conf Config
-	conf.Default.UpdateChannel = testUpdateChannel
-	conf.Default.FirmwareURL = testFirmwarePath
-	s, err := conf.NewServer(componenttest.NewComponent(t, &component.Config{}))
-	if err != nil {
-		t.Error(err)
+func TestSetTTKGFirmwareURL(t *testing.T) {
+	buildConfig := func(firmwareURL, channel string) TheThingsGatewayConfig {
+		var c TheThingsGatewayConfig
+		c.Default.FirmwareURL = firmwareURL
+		c.Default.UpdateChannel = channel
+		return c
 	}
 
 	for _, tt := range []struct {
-		Name            string
-		Channel         string
-		ExpectedChannel string
+		Name          string
+		Config        TheThingsGatewayConfig
+		UpdateChannel string
+		ExpectedURL   string
 	}{
 		{
-			Name:            "Empty channel",
-			Channel:         "",
-			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "stable"),
+			Name:          "No config, no channel",
+			UpdateChannel: "",
+			ExpectedURL:   "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1/stable",
 		},
 		{
-			Name:            "Default stable channel",
-			Channel:         "stable",
-			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "stable"),
+			Name:          "No config, beta channel",
+			UpdateChannel: "beta",
+			ExpectedURL:   "https://thethingsproducts.blob.core.windows.net/the-things-gateway/v1/beta",
 		},
 		{
-			Name:            "Default beta channel",
-			Channel:         "beta",
-			ExpectedChannel: fmt.Sprintf("%v/%v", testFirmwarePath, "beta"),
+			Name:          "Config with defaults, no channel",
+			Config:        buildConfig("https://firmware.net/the-things-gateway/v1", "channel"),
+			UpdateChannel: "",
+			ExpectedURL:   "https://firmware.net/the-things-gateway/v1/channel",
 		},
 		{
-			Name:            "Custom update channel",
-			Channel:         "http://example.com/fake-firmware",
-			ExpectedChannel: "http://example.com/fake-firmware",
+			Name:          "Config with defaults, beta channel",
+			Config:        buildConfig("https://firmware.net/the-things-gateway/v1", "channel"),
+			UpdateChannel: "beta",
+			ExpectedURL:   "https://firmware.net/the-things-gateway/v1/beta",
 		},
 		{
-			Name:            "Channel URL misspell",
-			Channel:         "htp://example.com/stable",
-			ExpectedChannel: "htp://example.com/stable",
+			Name:          "No config, full URL",
+			UpdateChannel: "https://firmware.net/the-things-gateway/v1/channel",
+			ExpectedURL:   "https://firmware.net/the-things-gateway/v1/channel",
 		},
 	} {
 		t.Run(tt.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			a.So(s.adaptUpdateChannel(tt.Channel), assertions.ShouldEqual, tt.ExpectedChannel)
+			s := New(componenttest.NewComponent(t, &component.Config{}), WithTheThingsGatewayConfig(tt.Config))
+			var res gatewayInfoResponse
+			s.setTTKGFirmwareURL(&res, &ttnpb.Gateway{UpdateChannel: tt.UpdateChannel})
+			a.So(res.FirmwareURL, should.Equal, tt.ExpectedURL)
 		})
 	}
 }
 
-func TestAdaptGatewayAddress(t *testing.T) {
+func TestInferMQTTAddress(t *testing.T) {
 	for _, tt := range []struct {
 		Name    string
 		Address string
+		Config  TheThingsGatewayConfig
 		Assert  func(*assertions.Assertion, string, error)
 	}{
 		{
@@ -148,58 +150,9 @@ func TestAdaptGatewayAddress(t *testing.T) {
 	} {
 		t.Run(tt.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			address, err := adaptGatewayAddress(tt.Address)
+			s := New(componenttest.NewComponent(t, &component.Config{}), WithTheThingsGatewayConfig(tt.Config))
+			address, err := s.inferMQTTAddress(tt.Address)
 			tt.Assert(a, address, err)
-		})
-	}
-}
-
-func TestAdaptAuthorization(t *testing.T) {
-	for _, tt := range []struct {
-		Name          string
-		Authorization string
-		Assert        func(*assertions.Assertion, string)
-	}{
-		{
-			Name:          "Empty Authorization",
-			Authorization: "",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "")
-			},
-		},
-		{
-			Name:          "Key formatted authorization",
-			Authorization: "Key asd",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "asd")
-			},
-		},
-		{
-			Name:          "Bearer formatted authorization",
-			Authorization: "Bearer efg",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "efg")
-			},
-		},
-		{
-			Name:          "Direct API Key",
-			Authorization: "InvalidKeyFormat",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "InvalidKeyFormat")
-			},
-		},
-		{
-			Name:          "Esoteric authorization",
-			Authorization: "APIKey asd",
-			Assert: func(a *assertions.Assertion, auth string) {
-				a.So(auth, assertions.ShouldEqual, "asd")
-			},
-		},
-	} {
-		t.Run(tt.Name, func(t *testing.T) {
-			a := assertions.New(t)
-			auth := adaptAuthorization(tt.Authorization)
-			tt.Assert(a, auth)
 		})
 	}
 }

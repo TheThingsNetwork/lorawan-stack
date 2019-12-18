@@ -3050,6 +3050,15 @@
       "file": "frequencyplans.go"
     }
   },
+  "error:pkg/gatewayconfigurationserver/gcsv2:unauthenticated": {
+    "translations": {
+      "en": "call was not authenticated"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/gcsv2",
+      "file": "get_gateway.go"
+    }
+  },
   "error:pkg/gatewayserver/io/basicstationlns/messages:data_rate": {
     "translations": {
       "en": "data rate not found"
@@ -5658,33 +5667,6 @@
     "description": {
       "package": "pkg/scripting/javascript",
       "file": "javascript.go"
-    }
-  },
-  "error:pkg/thethingsgateway/cups:no_default_firmware_path": {
-    "translations": {
-      "en": "no default firmware path specified"
-    },
-    "description": {
-      "package": "pkg/thethingsgateway/cups",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/thethingsgateway/cups:no_default_update_channel": {
-    "translations": {
-      "en": "no default update channel specified"
-    },
-    "description": {
-      "package": "pkg/thethingsgateway/cups",
-      "file": "server.go"
-    }
-  },
-  "error:pkg/thethingsgateway/cups:unauthenticated": {
-    "translations": {
-      "en": "call was not authenticated"
-    },
-    "description": {
-      "package": "pkg/thethingsgateway/cups",
-      "file": "middleware.go"
     }
   },
   "error:pkg/toa:bandwidth": {
