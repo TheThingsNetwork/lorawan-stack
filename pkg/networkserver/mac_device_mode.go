@@ -31,9 +31,15 @@ func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 		return nil, errNoPayload
 	}
 
-	dev.MACState.DeviceClass = pld.Class
+	switch {
+	case pld.Class == ttnpb.CLASS_C && dev.SupportsClassC:
+		dev.MACState.DeviceClass = ttnpb.CLASS_C
+
+	case pld.Class == ttnpb.CLASS_A:
+		dev.MACState.DeviceClass = ttnpb.CLASS_A
+	}
 	conf := &ttnpb.MACCommand_DeviceModeConf{
-		Class: pld.Class,
+		Class: dev.MACState.DeviceClass,
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, conf.MACCommand())
 	return []events.DefinitionDataClosure{
