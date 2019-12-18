@@ -88,7 +88,8 @@ export default class UsersTable extends Component {
   constructor(props) {
     super(props)
 
-    this.getUsersList = params => getUsersList(params, ['name', 'primary_email_address', 'state'])
+    this.getUsersList = params =>
+      getUsersList(params, ['name', 'primary_email_address', 'state', 'admin'])
   }
 
   baseDataSelector(state) {
