@@ -140,7 +140,7 @@
   "console.components.user-data-form.index.userNamePlaceholder": "Xxxx Xxx",
   "console.components.user-data-form.index.emailPlaceholder": "xxxx@xxxxxxx.xxx",
   "console.components.user-data-form.index.emailAddressDescription": "Xxxxxxx xxxxx xxxxxxx xxxx xxx xxxxxxx xx; xxxx xxxxxxx xx xxx xxxxxxxx xxxxxxx",
-  "console.components.user-data-form.index.modalWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx xxx xxxx \"{userId}\". Xxxx xxxxxx xxxxxx xx xxxxxx!",
+  "console.components.user-data-form.index.modalWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx xxx xxxx \"{userId}\". Xxxx xxxxxx xxxxxx xx xxxxxx xxx xx xxxx xxx xx xxxxxxxx xx xxxxx xxx xxxx XX!",
   "console.components.webhook-form.index.idPlaceholder": "xx-xxx-xxxxxxx",
   "console.components.webhook-form.index.messageInfo": "Xxx xxxx xxxxxxx xxxxxxx xxxx, xxx xxx xxx xx xxxxxxxx xxxx xxxx xxxx xx xxxxxxxx xx xxx xxxx XXX.",
   "console.components.webhook-form.index.deleteWebhook": "Xxxxxx Xxxxxxx",

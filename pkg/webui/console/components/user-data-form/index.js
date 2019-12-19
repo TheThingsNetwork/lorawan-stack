@@ -57,7 +57,7 @@ const m = defineMessages({
   emailAddressDescription:
     'Primary email address used for logging in; this address is not publicly visible',
   modalWarning:
-    'Are you sure you want to delete the user "{userId}". This action cannot be undone!',
+    'Are you sure you want to delete the user "{userId}". This action cannot be undone and it will not be possible to reuse the user ID!',
 })
 
 @injectIntl
