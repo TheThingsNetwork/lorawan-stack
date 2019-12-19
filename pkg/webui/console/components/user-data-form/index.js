@@ -48,7 +48,6 @@ const validationSchema = Yup.object().shape({
 })
 
 const m = defineMessages({
-  admin: 'Admin',
   adminLabel: 'Administrator',
   userDescPlaceholder: 'Description for my new user',
   userDescDescription: 'Optional user description; can also be used to save notes about the user',
@@ -177,7 +176,12 @@ class UserForm extends React.Component {
           component={Select}
           options={approvalStateOptions}
         />
-        <Form.Field title={m.admin} name="admin" component={Checkbox} label={m.adminLabel} />
+        <Form.Field
+          title={sharedMessages.admin}
+          name="admin"
+          component={Checkbox}
+          label={m.adminLabel}
+        />
         <SubmitBar>
           <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
           <ModalButton
