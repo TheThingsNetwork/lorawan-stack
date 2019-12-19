@@ -20,6 +20,7 @@ import * as Yup from 'yup'
 import Form from '../../../components/form'
 import Input from '../../../components/input'
 import Select from '../../../components/select'
+import Checkbox from '../../../components/checkbox'
 import SubmitBar from '../../../components/submit-bar'
 import SubmitButton from '../../../components/submit-button'
 import ModalButton from '../../../components/button/modal-button'
@@ -47,6 +48,7 @@ const validationSchema = Yup.object().shape({
 })
 
 const m = defineMessages({
+  adminLabel: 'Administrator',
   userDescPlaceholder: 'Description for my new user',
   userDescDescription: 'Optional user description; can also be used to save notes about the user',
   userIdPlaceholder: 'jane-doe',
@@ -118,7 +120,7 @@ class UserForm extends React.Component {
   render() {
     const {
       error,
-      initialValues,
+      initialValues: values,
       intl: { formatMessage },
     } = this.props
 
@@ -126,6 +128,11 @@ class UserForm extends React.Component {
       value: state,
       label: capitalize(formatMessage({ id: `enum:${state}` })),
     }))
+
+    const initialValues = {
+      admin: false,
+      ...values,
+    }
 
     return (
       <Form
@@ -168,6 +175,12 @@ class UserForm extends React.Component {
           name="state"
           component={Select}
           options={approvalStateOptions}
+        />
+        <Form.Field
+          title={sharedMessages.admin}
+          name="admin"
+          component={Checkbox}
+          label={m.adminLabel}
         />
         <SubmitBar>
           <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />

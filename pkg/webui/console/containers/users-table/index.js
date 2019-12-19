@@ -18,6 +18,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import Status from '../../../components/status'
+import Icon from '../../../components/icon'
 
 import FetchTable from '../fetch-table'
 
@@ -29,16 +30,18 @@ import {
   selectUsersError,
 } from '../../store/selectors/users'
 
+import style from './users-table.styl'
+
 const headers = [
   {
     name: 'ids.user_id',
     displayName: sharedMessages.id,
-    width: 33,
+    width: 28,
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
-    width: 24,
+    width: 22,
   },
   {
     name: 'primary_email_address',
@@ -78,6 +81,18 @@ const headers = [
       return <Status status={indicator} label={label} pulse={false} />
     },
   },
+  {
+    name: 'admin',
+    displayName: sharedMessages.admin,
+    width: 7,
+    render(isAdmin) {
+      if (isAdmin) {
+        return <Icon className={style.icon} icon="check" />
+      }
+
+      return null
+    },
+  },
 ]
 
 export default class UsersTable extends Component {
@@ -88,7 +103,8 @@ export default class UsersTable extends Component {
   constructor(props) {
     super(props)
 
-    this.getUsersList = params => getUsersList(params, ['name', 'primary_email_address', 'state'])
+    this.getUsersList = params =>
+      getUsersList(params, ['name', 'primary_email_address', 'state', 'admin'])
   }
 
   baseDataSelector(state) {
