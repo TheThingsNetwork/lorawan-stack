@@ -28,6 +28,7 @@ export default defineMessages({
   address: 'Address',
   addressPlaceholder: 'host',
   addWebhook: 'Add Webhook',
+  admin: 'Admin',
   all: 'All',
   altitude: 'Altitude',
   altitudeDesc: 'The altitude in meters, where 0 means sea level',
