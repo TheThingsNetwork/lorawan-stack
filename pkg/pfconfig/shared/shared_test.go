@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package shared
+package shared_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	. "go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
 )
 
 func TestSX1301Conf(t *testing.T) {
@@ -158,6 +161,54 @@ func TestSX1301Conf(t *testing.T) {
 			}
 			if !(a.So(unmarshaledCfg, should.Resemble, *cfg)) {
 				t.Fatalf("Invalid config after unmarshaling: %v", cfg)
+			}
+		})
+	}
+}
+
+func TestParseGatewayServerAddress(t *testing.T) {
+	for _, tc := range []struct {
+		Address        string
+		Host           string
+		Port           uint16
+		ErrorAssertion func(t *testing.T, err error) bool
+	}{
+		{
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
+		{
+			Address: ":1701",
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				a := assertions.New(t)
+				return a.So(err, should.BeError) && a.So(errors.IsInvalidArgument(err), should.BeTrue)
+			},
+		},
+		{
+			Address: "test.example.com",
+			Host:    "test.example.com",
+			Port:    1700,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Address: "test.example.com:1701",
+			Host:    "test.example.com",
+			Port:    1701,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("address:'%s'", tc.Address), func(t *testing.T) {
+			a := assertions.New(t)
+			host, port, err := ParseGatewayServerAddress(tc.Address)
+			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(host, should.Equal, tc.Host)
+				a.So(port, should.Equal, tc.Port)
 			}
 		})
 	}

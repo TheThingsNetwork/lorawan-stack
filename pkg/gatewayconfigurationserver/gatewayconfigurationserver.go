@@ -16,6 +16,7 @@ package gatewayconfigurationserver
 
 import (
 	"context"
+	"encoding"
 	"net/http"
 
 	"github.com/gogo/protobuf/types"
@@ -24,6 +25,7 @@ import (
 	bscups "go.thethings.network/lorawan-stack/pkg/basicstation/cups"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver/gcsv2"
+	"go.thethings.network/lorawan-stack/pkg/pfconfig/cpf"
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/semtechudp"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -47,6 +49,56 @@ type GatewayConfigurationServer struct {
 	config *Config
 }
 
+func (gcs *GatewayConfigurationServer) makeHandler(f func(context.Context, echo.Context, *ttnpb.Gateway) error) func(echo.Context) error {
+	return func(c echo.Context) error {
+		ctx := gcs.getContext(c)
+		gtwID := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
+		cc, err := gcs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+		if err != nil {
+			return err
+		}
+		client := ttnpb.NewGatewayRegistryClient(cc)
+		gtw, err := client.Get(ctx, &ttnpb.GetGatewayRequest{
+			GatewayIdentifiers: gtwID,
+			FieldMask: types.FieldMask{
+				Paths: []string{
+					"antennas",
+					"frequency_plan_id",
+					"gateway_server_address",
+				},
+			},
+		}, gcs.WithClusterAuth())
+		if err != nil {
+			return err
+		}
+		return f(ctx, c, gtw)
+	}
+}
+
+func (gcs *GatewayConfigurationServer) makeJSONHandler(f func(context.Context, *ttnpb.Gateway) (interface{}, error)) func(echo.Context) error {
+	return gcs.makeHandler(func(ctx context.Context, c echo.Context, gtw *ttnpb.Gateway) error {
+		msg, err := f(ctx, gtw)
+		if err != nil {
+			return err
+		}
+		return c.JSONPretty(http.StatusOK, msg, "\t")
+	})
+}
+
+func (gcs *GatewayConfigurationServer) makeTextMarshalerHandler(contentType string, f func(context.Context, *ttnpb.Gateway) (encoding.TextMarshaler, error)) func(echo.Context) error {
+	return gcs.makeHandler(func(ctx context.Context, c echo.Context, gtw *ttnpb.Gateway) error {
+		msg, err := f(ctx, gtw)
+		if err != nil {
+			return err
+		}
+		b, err := msg.MarshalText()
+		if err != nil {
+			return err
+		}
+		return c.Blob(http.StatusOK, contentType, b)
+	})
+}
+
 // Roles returns the roles that the Gateway Configuration Server fulfills.
 func (gcs *GatewayConfigurationServer) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_GATEWAY_CONFIGURATION_SERVER}
@@ -67,7 +119,15 @@ func (gcs *GatewayConfigurationServer) RegisterRoutes(server *web.Server) {
 		middleware = append(middleware, gcs.requireGatewayRights(ttnpb.RIGHT_GATEWAY_INFO))
 	}
 	group := server.Group(ttnpb.HTTPAPIPrefix+"/gcs/gateways/:gateway_id", middleware...)
-	group.GET("/semtechudp/global_conf.json", gcs.handleGetGlobalConfig)
+	group.GET("/semtechudp/global_conf.json", gcs.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
+		return semtechudp.Build(gtw, gcs.FrequencyPlans)
+	}))
+	group.GET("/cpf/lorad/lorad.json", gcs.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
+		return cpf.BuildLorad(gtw, gcs.FrequencyPlans)
+	}))
+	group.GET("/cpf/lorafwd/lorafwd.toml", gcs.makeTextMarshalerHandler("application/toml", func(ctx context.Context, gtw *ttnpb.Gateway) (encoding.TextMarshaler, error) {
+		return cpf.BuildLorafwd(gtw)
+	}))
 }
 
 // New returns new *GatewayConfigurationServer.
@@ -86,33 +146,6 @@ func New(c *component.Component, conf *Config) (*GatewayConfigurationServer, err
 	c.RegisterGRPC(gcs)
 	c.RegisterWeb(gcs)
 	return gcs, nil
-}
-
-func (gcs *GatewayConfigurationServer) handleGetGlobalConfig(c echo.Context) error {
-	ctx := gcs.getContext(c)
-	gtwID := c.Get(gatewayIDKey).(ttnpb.GatewayIdentifiers)
-	cc, err := gcs.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	if err != nil {
-		return err
-	}
-	client := ttnpb.NewGatewayRegistryClient(cc)
-	gtw, err := client.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIdentifiers: gtwID,
-		FieldMask: types.FieldMask{
-			Paths: []string{
-				"gateway_server_address",
-				"frequency_plan_id",
-			},
-		},
-	}, gcs.WithClusterAuth())
-	if err != nil {
-		return err
-	}
-	config, err := semtechudp.Build(gtw, gcs.FrequencyPlans)
-	if err != nil {
-		return err
-	}
-	return c.JSONPretty(http.StatusOK, config, "\t")
 }
 
 func (gcs *GatewayConfigurationServer) getContext(c echo.Context) context.Context {

@@ -16,9 +16,6 @@
 package semtechudp
 
 import (
-	"net"
-	"strconv"
-
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -43,12 +40,7 @@ type GatewayConf struct {
 func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error) {
 	var c Config
 
-	host, portStr, err := net.SplitHostPort(gateway.GatewayServerAddress)
-	if err != nil {
-		host = gateway.GatewayServerAddress
-		portStr = "1700"
-	}
-	port, err := strconv.Atoi(portStr)
+	host, port, err := shared.ParseGatewayServerAddress(gateway.GatewayServerAddress)
 	if err != nil {
 		return nil, err
 	}
