@@ -16,7 +16,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import bind from 'autobind-decorator'
 
-import Steps from '.'
+import Stepper from '.'
 
 const steps = [
   { title: 'Step 1', description: 'Here is a description.' },
@@ -58,11 +58,11 @@ class InteractiveExample extends React.Component {
 
     return (
       <div style={{ width: '100%' }}>
-        <Steps currentStep={step} status={error ? 'failure' : 'current'} {...this.props}>
+        <Stepper currentStep={step} status={error ? 'failure' : 'current'} {...this.props}>
           {steps.map(({ title, description }) => (
-            <Steps.Step title={title} description={description} key={title} />
+            <Stepper.Step title={title} description={description} key={title} />
           ))}
-        </Steps>
+        </Stepper>
         <div style={{ marginTop: '50px', textAlign: 'center' }}>
           <button onClick={this.previousStep} disabled={isPrevDisabled}>
             Previous
@@ -79,34 +79,34 @@ class InteractiveExample extends React.Component {
   }
 }
 
-storiesOf('Steps', module)
+storiesOf('Stepper', module)
   .add('Default', () => (
-    <Steps currentStep={2}>
-      <Steps.Step stepNumber={1} title="Step 1" description="Here is a description." />
-      <Steps.Step stepNumber={2} title="Step 2" description="Here is a description." />
-      <Steps.Step stepNumber={3} title="Step 3" description="Here is a description." />
-    </Steps>
+    <Stepper currentStep={2}>
+      <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
+      <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
+      <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
+    </Stepper>
   ))
   .add('Default (Error)', () => (
-    <Steps status="failure" currentStep={2}>
-      <Steps.Step stepNumber={1} title="Step 1" description="Here is a description." />
-      <Steps.Step stepNumber={2} title="Step 2" description="Here is a description." />
-      <Steps.Step stepNumber={3} title="Step 3" description="Here is a description." />
-    </Steps>
+    <Stepper status="failure" currentStep={2}>
+      <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
+      <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
+      <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
+    </Stepper>
   ))
   .add('Default (Interactive)', () => <InteractiveExample />)
   .add('Vertical', () => (
-    <Steps currentStep={2} vertical>
-      <Steps.Step stepNumber={1} title="Step 1" description="Here is a description." />
-      <Steps.Step stepNumber={2} title="Step 2" description="Here is a description." />
-      <Steps.Step stepNumber={3} title="Step 3" description="Here is a description." />
-    </Steps>
+    <Stepper currentStep={2} vertical>
+      <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
+      <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
+      <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
+    </Stepper>
   ))
   .add('Vertical (Error)', () => (
-    <Steps status="failure" currentStep={2} vertical>
-      <Steps.Step stepNumber={1} title="Step 1" description="Here is a description." />
-      <Steps.Step stepNumber={2} title="Step 2" description="Here is a description." />
-      <Steps.Step stepNumber={3} title="Step 3" description="Here is a description." />
-    </Steps>
+    <Stepper status="failure" currentStep={2} vertical>
+      <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
+      <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
+      <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
+    </Stepper>
   ))
   .add('Vertical (Interactive)', () => <InteractiveExample vertical />)

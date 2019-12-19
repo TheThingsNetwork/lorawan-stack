@@ -17,12 +17,12 @@ import classnames from 'classnames'
 
 import PropTypes from '../../lib/prop-types'
 
-import style from './steps.styl'
+import style from './stepper.styl'
 
-const Steps = props => {
+const Stepper = props => {
   const { className, children, stepCountStart, currentStep, status, vertical } = props
 
-  const cls = classnames(className, style.steps, {
+  const cls = classnames(className, style.stepper, {
     [style.vertical]: vertical,
   })
   const steps = React.Children.map(children, (child, index) => {
@@ -57,7 +57,7 @@ const Steps = props => {
   return <ol className={cls}>{steps}</ol>
 }
 
-Steps.propTypes = {
+Stepper.propTypes = {
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
   className: PropTypes.string,
   currentStep: PropTypes.number.isRequired,
@@ -66,7 +66,7 @@ Steps.propTypes = {
   vertical: PropTypes.bool,
 }
 
-Steps.defaultProps = {
+Stepper.defaultProps = {
   className: undefined,
   stepCountStart: 1,
   status: 'current',
@@ -74,4 +74,4 @@ Steps.defaultProps = {
   vertical: false,
 }
 
-export default Steps
+export default Stepper
