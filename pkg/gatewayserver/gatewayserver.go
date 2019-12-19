@@ -105,7 +105,7 @@ var (
 	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
 	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{hostname}`")
 	errUpstreamType        = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{name}` not implemented")
-	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}`is invalid")
+	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}` is invalid")
 )
 
 // New returns new *GatewayServer.

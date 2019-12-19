@@ -3502,7 +3502,7 @@
   },
   "error:pkg/gatewayserver:invalid_upstream_name": {
     "translations": {
-      "en": "upstream `{name}`is invalid"
+      "en": "upstream `{name}` is invalid"
     },
     "description": {
       "package": "pkg/gatewayserver",
