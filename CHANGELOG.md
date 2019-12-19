@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Downlink queue operation topics in the PubSub integrations can now be configured using the Console.
+- `List` RPC in the user registry and related messages.
 - User management for admins in the Console.
+- User list command in the CLI.
 
 ### Changed
 
@@ -38,7 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Notification during login informing users of unapproved user accounts.
 - Support maximum EIRP value from frequency plans sub-bands.
 - Support duty-cycle value from frequency plans sub-bands.
-- `List` RPC in the user registry and related messages.
 
 ### Changed
 

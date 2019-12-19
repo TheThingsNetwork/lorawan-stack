@@ -66,6 +66,31 @@ var (
 		Aliases: []string{"user", "usr", "u"},
 		Short:   "User commands",
 	}
+	usersListCommand = &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "List users",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			limit, page, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewUserRegistryClient(is).List(ctx, &ttnpb.ListUsersRequest{
+				FieldMask: types.FieldMask{Paths: paths},
+				Limit:     limit,
+				Page:      page,
+			}, opt)
+			if err != nil {
+				return err
+			}
+			getTotal()
+
+			return io.Write(os.Stdout, config.OutputFormat, res.Users)
+		},
+	}
 	usersSearchCommand = &cobra.Command{
 		Use:   "search",
 		Short: "Search for users",
@@ -329,6 +354,9 @@ var (
 func init() {
 	profilePictureFlags.String("profile_picture", "", "upload the profile picture from this file")
 
+	usersListCommand.Flags().AddFlagSet(selectUserFlags)
+	usersListCommand.Flags().AddFlagSet(paginationFlags())
+	usersCommand.AddCommand(usersListCommand)
 	usersSearchCommand.Flags().AddFlagSet(searchFlags())
 	usersSearchCommand.Flags().AddFlagSet(selectUserFlags)
 	usersCommand.AddCommand(usersSearchCommand)
