@@ -121,7 +121,7 @@ class UserForm extends React.Component {
   render() {
     const {
       error,
-      initialValues,
+      initialValues: values,
       intl: { formatMessage },
     } = this.props
 
@@ -129,6 +129,11 @@ class UserForm extends React.Component {
       value: state,
       label: capitalize(formatMessage({ id: `enum:${state}` })),
     }))
+
+    const initialValues = {
+      admin: false,
+      ...values,
+    }
 
     return (
       <Form
