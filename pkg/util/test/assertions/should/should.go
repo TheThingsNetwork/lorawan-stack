@@ -63,6 +63,8 @@ var (
 	EndWith = assertions.ShouldEndWith
 	// Equal receives exactly two parameters and does an equality check using the following semantics: 1. If the expected and actual values implement an Equal method in the form `func (this T) Equal(that T) bool` then call the method. If true, they are equal. 2. The expected and actual values are judged equal or not by oglematchers.Equals.
 	Equal = assertions.ShouldEqual
+	// EqualJSON receives exactly two parameters and does an equality check by marshalling to JSON.
+	EqualJSON = assertions.ShouldEqualJSON
 	// EqualTrimSpace receives exactly 2 string parameters and ensures that the first is equal to the second after removing all leading and trailing whitespace using strings.TrimSpace(first).
 	EqualTrimSpace = assertions.ShouldEqualTrimSpace
 	// EqualWithout receives exactly 3 string parameters and ensures that the first is equal to the second after removing all instances of the third from the first using strings.Replace(first, third, "", -1).
@@ -95,12 +97,18 @@ var (
 	NotBeBetweenOrEqual = assertions.ShouldNotBeBetweenOrEqual
 	// NotBeBlank receives exactly 1 string parameter and ensures that it is equal to "".
 	NotBeBlank = assertions.ShouldNotBeBlank
+	// NotBeChronological receives a []time.Time slice and asserts that they are
+	// NOT in chronological order.
+	NotBeChronological = assertions.ShouldNotBeChronological
 	// NotBeEmpty receives a single parameter (actual) and determines whether or not calling len(actual) would return a value greater than zero. It obeys the rules specified by the `len` function for determining length: http:// golang.org/pkg/builtin/#len
 	NotBeEmpty = assertions.ShouldNotBeEmpty
 	// NotBeIn receives at least 2 parameters. The first is a proposed member of the collection that is passed in either as the second parameter, or of the collection that is comprised of all the remaining parameters. This assertion ensures that the proposed member is NOT in the collection (usingEqual).
 	NotBeIn = assertions.ShouldNotBeIn
 	// NotBeNil receives a single parameter and ensures that it is not nil.
 	NotBeNil = assertions.ShouldNotBeNil
+	// NotBeZeroValue receives a single parameter and ensures that it is NOT
+	// the Go equivalent of the default value, or "zero" value.
+	NotBeZeroValue = assertions.ShouldNotBeZeroValue
 	// NotContain receives exactly two parameters. The first is a slice and the second is a proposed member. Membership is determinied usingEqual.
 	NotContain = assertions.ShouldNotContain
 	// NotContainKey receives exactly two parameters. The first is a map and the second is a proposed absent key. Keys are compared with a simple '=='.
