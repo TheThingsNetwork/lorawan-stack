@@ -25,12 +25,17 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
 import { mayViewGateways } from '../../lib/feature-checks'
+import PropTypes from '../../../lib/prop-types'
 
 @withFeatureRequirement(mayViewGateways, { redirect: '/' })
 @withBreadcrumb('gateways', function(props) {
   return <Breadcrumb path="/gateways" content={sharedMessages.gateways} />
 })
 export default class Gateways extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   render() {
     const { path } = this.props.match
 

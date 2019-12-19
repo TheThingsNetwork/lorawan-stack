@@ -36,6 +36,7 @@ import {
   longitude as longitudeRegexp,
   int32 as int32Regexp,
 } from '../../lib/regexp'
+import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   setDeviceLocation: 'Set Device Location',
@@ -86,6 +87,13 @@ const getRegistryLocation = function(locations) {
 })
 @bind
 export default class DeviceGeneralSettings extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    devId: PropTypes.string.isRequired,
+    device: PropTypes.device.isRequired,
+    updateDevice: PropTypes.func.isRequired,
+  }
+
   async handleSubmit(values) {
     const { device, appId, devId, updateDevice } = this.props
 

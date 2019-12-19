@@ -35,6 +35,7 @@ import {
 import { mayViewOrEditGatewayApiKeys } from '../../lib/feature-checks'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   (state, props) => ({
@@ -60,12 +61,18 @@ import api from '../../api'
 })
 @bind
 export default class GatewayApiKeyAdd extends React.Component {
+  static propTypes = {
+    gtwId: PropTypes.string.isRequired,
+    navigateToList: PropTypes.func.isRequired,
+    pseudoRights: PropTypes.rights.isRequired,
+    rights: PropTypes.rights.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
     this.createGatewayKey = key => api.gateway.apiKeys.create(props.gtwId, key)
   }
-
   handleApprove() {
     const { navigateToList, gtwId } = this.props
 

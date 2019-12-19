@@ -46,6 +46,7 @@ import ServerIcon from '../../../assets/auxiliary-icons/server.svg'
 import AppAnimation from '../../../assets/animations/illustrations/app.json'
 import GatewayAnimation from '../../../assets/animations/illustrations/gateway.json'
 
+import PropTypes from '../../../lib/prop-types'
 import style from './overview.styl'
 
 const m = defineMessages({
@@ -97,6 +98,25 @@ const componentMap = {
 @withEnv
 @bind
 export default class Overview extends React.Component {
+  static propTypes = {
+    applicationCount: PropTypes.number,
+    env: PropTypes.env,
+    fetching: PropTypes.bool.isRequired,
+    gatewayCount: PropTypes.number,
+    loadData: PropTypes.func.isRequired,
+    mayCreateApplications: PropTypes.bool.isRequired,
+    mayCreateGateways: PropTypes.bool.isRequired,
+    mayViewApplications: PropTypes.bool.isRequired,
+    mayViewGateways: PropTypes.bool.isRequired,
+    userId: PropTypes.string.isRequired,
+  }
+
+  static defaultProps = {
+    applicationCount: 0,
+    env: undefined,
+    gatewayCount: 0,
+  }
+
   constructor(props) {
     super(props)
 
@@ -264,4 +284,10 @@ const ComponentCard = function({ name, enabled, host }) {
       </div>
     </div>
   )
+}
+
+ComponentCard.propTypes = {
+  enabled: PropTypes.bool.isRequired,
+  host: PropTypes.string.isRequired,
+  name: PropTypes.message.isRequired,
 }

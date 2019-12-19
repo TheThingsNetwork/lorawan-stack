@@ -27,6 +27,7 @@ import withFeatureRequirement from '../../lib/components/with-feature-requiremen
 import { mayViewApplicationEvents } from '../../lib/feature-checks'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
+import PropTypes from '../../../lib/prop-types'
 import style from './application-data.styl'
 
 const m = defineMessages({
@@ -47,6 +48,10 @@ const m = defineMessages({
   )
 })
 export default class Data extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+  }
+
   render() {
     const { appId } = this.props
 

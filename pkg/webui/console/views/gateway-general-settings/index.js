@@ -80,7 +80,7 @@ const m = defineMessages({
 export default class GatewayGeneralSettings extends React.Component {
   static propTypes = {
     deleteGateway: PropTypes.func.isRequired,
-    gateway: PropTypes.object.isRequired,
+    gateway: PropTypes.gateway.isRequired,
     gtwId: PropTypes.string.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     updateGateway: PropTypes.func.isRequired,

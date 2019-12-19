@@ -38,6 +38,7 @@ import {
 } from '../../store/selectors/applications'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   function(state, props) {
@@ -82,6 +83,15 @@ import api from '../../api'
 })
 @bind
 export default class ApplicationApiKeyEdit extends React.Component {
+  static propTypes = {
+    apiKey: PropTypes.apiKey.isRequired,
+    appId: PropTypes.string.isRequired,
+    deleteSuccess: PropTypes.func.isRequired,
+    keyId: PropTypes.string.isRequired,
+    pseudoRights: PropTypes.rights.isRequired,
+    rights: PropTypes.rights.isRequired,
+  }
+
   constructor(props) {
     super(props)
 

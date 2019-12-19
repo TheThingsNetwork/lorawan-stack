@@ -71,10 +71,10 @@ export default class OfflineStatus extends Component {
     window.removeEventListener('offline', this.handleOffline)
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(_prevProps, prevState) {
     const { showWarnings } = this.props
     const { online } = this.state
-    if (showWarnings && online && !prevProps.online) {
+    if (showWarnings && online && !prevState.online) {
       this.handleMessage(m.online, toast.types.INFO)
     } else if (showWarnings && !online) {
       this.handleMessage(m.offline, toast.types.ERROR)

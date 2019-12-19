@@ -28,6 +28,7 @@ import ApplicationApiKeyAdd from '../application-api-key-add'
 
 import { mayViewOrEditApplicationApiKeys } from '../../lib/feature-checks'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))
 @withFeatureRequirement(mayViewOrEditApplicationApiKeys, {
@@ -41,6 +42,10 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
   />
 ))
 export default class ApplicationAccess extends React.Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   render() {
     const { match } = this.props
     return (

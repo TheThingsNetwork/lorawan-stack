@@ -21,8 +21,13 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
 
 import PAGE_SIZES from '../../constants/page-sizes'
+import PropTypes from '../../../lib/prop-types'
 
 export default class ApplicationWebhooksList extends Component {
+  static propTypes = {
+    match: PropTypes.match.isRequired,
+  }
+
   render() {
     const { appId } = this.props.match.params
 

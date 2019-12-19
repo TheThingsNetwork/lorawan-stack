@@ -54,6 +54,7 @@ import {
   mayViewOrEditGatewayApiKeys,
   mayEditBasicGatewayInformation,
 } from '../../lib/feature-checks'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   function(state, props) {
@@ -150,6 +151,17 @@ import {
 })
 @withEnv
 export default class Gateway extends React.Component {
+  static propTypes = {
+    env: PropTypes.env,
+    gateway: PropTypes.gateway.isRequired,
+    gtwId: PropTypes.string.isRequired,
+    match: PropTypes.match.isRequired,
+  }
+
+  static defaultProps = {
+    env: undefined,
+  }
+
   render() {
     const { match, gateway, gtwId, env } = this.props
 

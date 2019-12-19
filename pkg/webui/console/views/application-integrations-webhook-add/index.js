@@ -28,6 +28,7 @@ import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   state => ({
@@ -49,6 +50,11 @@ import api from '../../api'
 })
 @bind
 export default class ApplicationWebhookAdd extends Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    navigateToList: PropTypes.func.isRequired,
+  }
+
   async handleSubmit(webhook) {
     const { appId } = this.props
 

@@ -33,6 +33,7 @@ import {
 } from '../../store/selectors/applications'
 
 import api from '../../api'
+import PropTypes from '../../../lib/prop-types'
 
 @connect(
   function(state) {
@@ -67,6 +68,13 @@ import api from '../../api'
 })
 @bind
 export default class ApplicationCollaboratorAdd extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+    pseudoRights: PropTypes.rights.isRequired,
+    redirectToList: PropTypes.func.isRequired,
+    rights: PropTypes.rights.isRequired,
+  }
+
   state = {
     error: '',
   }
