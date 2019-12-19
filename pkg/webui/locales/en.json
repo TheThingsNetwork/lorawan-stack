@@ -140,7 +140,7 @@
   "console.components.user-data-form.index.userNamePlaceholder": "Jane Doe",
   "console.components.user-data-form.index.emailPlaceholder": "mail@example.com",
   "console.components.user-data-form.index.emailAddressDescription": "Primary email address used for logging in; this address is not publicly visible",
-  "console.components.user-data-form.index.modalWarning": "Are you sure you want to delete the user \"{userId}\". This action cannot be undone!",
+  "console.components.user-data-form.index.modalWarning": "Are you sure you want to delete the user \"{userId}\". This action cannot be undone and it will not be possible to reuse the user ID!",
   "console.components.webhook-form.index.idPlaceholder": "my-new-webhook",
   "console.components.webhook-form.index.messageInfo": "For each enabled message type, you can set an optional path that will be appended to the base URL.",
   "console.components.webhook-form.index.deleteWebhook": "Delete Webhook",
