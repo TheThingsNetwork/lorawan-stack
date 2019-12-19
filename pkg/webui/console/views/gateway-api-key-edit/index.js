@@ -25,17 +25,19 @@ import sharedMessages from '../../../lib/shared-messages'
 import { ApiKeyEditForm } from '../../components/api-key-form'
 import withRequest from '../../../lib/components/with-request'
 
-import { getGatewayApiKey } from '../../store/actions/gateways'
+import { getApiKey } from '../../store/actions/api-keys'
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
   selectGatewayPseudoRights,
   selectGatewayRightsError,
   selectGatewayRightsFetching,
-  selectGatewayApiKey,
-  selectGatewayApiKeyError,
-  selectGatewayApiKeyFetching,
 } from '../../store/selectors/gateways'
+import {
+  selectSelectedApiKey,
+  selectApiKeyError,
+  selectApiKeyFetching,
+} from '../../store/selectors/api-keys'
 
 import api from '../../api'
 import PropTypes from '../../../lib/prop-types'
@@ -43,15 +45,15 @@ import PropTypes from '../../../lib/prop-types'
 @connect(
   function(state, props) {
     const apiKeyId = props.match.params.apiKeyId
-    const keyFetching = selectGatewayApiKeyFetching(state)
+    const keyFetching = selectApiKeyFetching(state)
     const rightsFetching = selectGatewayRightsFetching(state)
-    const keyError = selectGatewayApiKeyError(state)
+    const keyError = selectApiKeyError(state)
     const rightsError = selectGatewayRightsError(state)
 
     return {
       keyId: apiKeyId,
       gtwId: selectSelectedGatewayId(state),
-      apiKey: selectGatewayApiKey(state),
+      apiKey: selectSelectedApiKey(state),
       rights: selectGatewayRights(state),
       pseudoRights: selectGatewayPseudoRights(state),
       fetching: keyFetching || rightsFetching,
@@ -59,14 +61,14 @@ import PropTypes from '../../../lib/prop-types'
     }
   },
   dispatch => ({
-    getGatewayApiKey(gtwId, apiKeyId) {
-      dispatch(getGatewayApiKey(gtwId, apiKeyId))
+    getApiKey(gtwId, apiKeyId) {
+      dispatch(getApiKey('gateway', gtwId, apiKeyId))
     },
     deleteSuccess: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
   }),
 )
 @withRequest(
-  ({ gtwId, keyId, getGatewayApiKey }) => getGatewayApiKey(gtwId, keyId),
+  ({ gtwId, keyId, getApiKey }) => getApiKey(gtwId, keyId),
   ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
 )
 @withBreadcrumb('gtws.single.api-keys.edit', function(props) {

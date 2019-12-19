@@ -21,6 +21,7 @@ import gateways from './gateways'
 import configuration from './configuration'
 import organizations from './organizations'
 import js from './join-server'
+import apiKeys from './api-keys'
 
 export default [
   ...user,
@@ -32,4 +33,5 @@ export default [
   ...configuration,
   ...organizations,
   ...js,
+  ...apiKeys,
 ]

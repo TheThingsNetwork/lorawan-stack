@@ -19,8 +19,6 @@ import {
   createPaginationDeleteBaseActionType,
   createPaginationDeleteActions,
 } from './pagination'
-import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
-import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 import {
   createGetCollaboratorsListRequestActions,
   createGetCollaboratorsListActionType,
@@ -94,30 +92,6 @@ export const [
     failure: getApplicationsRightsListFailure,
   },
 ] = createGetRightsListRequestActions(SHARED_NAME)
-
-export const GET_APP_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME_SINGLE)
-export const [
-  { request: GET_APP_API_KEY, success: GET_APP_API_KEY_SUCCESS, failure: GET_APP_API_KEY_FAILURE },
-  {
-    request: getApplicationApiKey,
-    success: getApplicationApiKeySuccess,
-    failure: getApplicationApiKeyFailure,
-  },
-] = createApiKeyRequestActions(SHARED_NAME_SINGLE)
-
-export const GET_APP_API_KEYS_LIST_BASE = createGetApiKeysListActionType(SHARED_NAME_SINGLE)
-export const [
-  {
-    request: GET_APP_API_KEYS_LIST,
-    success: GET_APP_API_KEYS_LIST_SUCCESS,
-    failure: GET_APP_API_KEYS_LIST_FAILURE,
-  },
-  {
-    request: getApplicationApiKeysList,
-    success: getApplicationApiKeysListSuccess,
-    failure: getApplicationApiKeysListFailure,
-  },
-] = createApiKeysRequestActions(SHARED_NAME_SINGLE)
 
 export const GET_APP_COLLABORATOR_BASE = createGetCollaboratorActionType(SHARED_NAME_SINGLE)
 export const [

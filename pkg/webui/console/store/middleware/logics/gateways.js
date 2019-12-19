@@ -230,23 +230,6 @@ const updateGatewayStatisticsLogic = createRequestLogic({
   },
 })
 
-const getGatewayApiKeysLogic = createRequestLogic({
-  type: gateways.GET_GTW_API_KEYS_LIST,
-  async process({ action }) {
-    const { id: gtwId, params } = action.payload
-    const res = await api.gateway.apiKeys.list(gtwId, params)
-    return { ...res, id: gtwId }
-  },
-})
-
-const getGatewayApiKeyLogic = createRequestLogic({
-  type: gateways.GET_GTW_API_KEY,
-  async process({ action }) {
-    const { id: gtwId, keyId } = action.payload
-    return api.gateway.apiKeys.get(gtwId, keyId)
-  },
-})
-
 export default [
   getGatewayLogic,
   updateGatewayLogic,
@@ -258,6 +241,4 @@ export default [
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
   ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', api.gateway.eventsSubscribe),
-  getGatewayApiKeysLogic,
-  getGatewayApiKeyLogic,
 ]

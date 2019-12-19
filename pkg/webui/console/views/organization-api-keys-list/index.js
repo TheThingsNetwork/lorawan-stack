@@ -19,14 +19,14 @@ import bind from 'autobind-decorator'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../containers/api-keys-table'
-import { getOrganizationApiKeysList } from '../../store/actions/organizations'
+import { getApiKeysList } from '../../store/actions/api-keys'
 import PropTypes from '../../../lib/prop-types'
 
 import {
-  selectOrganizationApiKeys,
-  selectOrganizationApiKeysTotalCount,
-  selectOrganizationApiKeysFetching,
-} from '../../store/selectors/organizations'
+  selectApiKeys,
+  selectApiKeysTotalCount,
+  selectApiKeysFetching,
+} from '../../store/selectors/api-keys'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
@@ -39,7 +39,7 @@ class OrganizationApiKeysList extends React.Component {
     super(props)
 
     const { orgId } = props.match.params
-    this.getOrganizationApiKeysList = filters => getOrganizationApiKeysList(orgId, filters)
+    this.getApiKeysList = filters => getApiKeysList('organization', orgId, filters)
   }
 
   @bind
@@ -48,9 +48,9 @@ class OrganizationApiKeysList extends React.Component {
 
     const id = { id: orgId }
     return {
-      keys: selectOrganizationApiKeys(state, id),
-      totalCount: selectOrganizationApiKeysTotalCount(state, id),
-      fetching: selectOrganizationApiKeysFetching(state),
+      keys: selectApiKeys(state, id),
+      totalCount: selectApiKeysTotalCount(state, id),
+      fetching: selectApiKeysFetching(state),
     }
   }
 
@@ -63,7 +63,7 @@ class OrganizationApiKeysList extends React.Component {
             <ApiKeysTable
               pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={this.baseDataSelector}
-              getItemsAction={this.getOrganizationApiKeysList}
+              getItemsAction={this.getApiKeysList}
             />
           </Col>
         </Row>

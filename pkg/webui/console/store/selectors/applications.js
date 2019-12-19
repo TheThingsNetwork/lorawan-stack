@@ -16,8 +16,6 @@ import {
   GET_APPS_LIST_BASE,
   GET_APPS_RIGHTS_LIST_BASE,
   GET_APP_BASE,
-  GET_APP_API_KEY_BASE,
-  GET_APP_API_KEYS_LIST_BASE,
   GET_APP_COLLABORATOR_BASE,
   GET_APP_COLLABORATORS_LIST_BASE,
 } from '../actions/applications'
@@ -38,11 +36,6 @@ import {
   createUserCollaboratorSelector,
   createOrganizationCollaboratorSelector,
 } from './collaborators'
-import {
-  createApiKeysSelector,
-  createTotalCountSelector as createApiKeysTotalCountSelector,
-} from './api-keys'
-import { createApiKeySelector } from './api-key'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
@@ -82,15 +75,6 @@ export const selectApplicationRights = createRightsSelector(ENTITY)
 export const selectApplicationPseudoRights = createPseudoRightsSelector(ENTITY)
 export const selectApplicationRightsError = createErrorSelector(GET_APPS_RIGHTS_LIST_BASE)
 export const selectApplicationRightsFetching = createFetchingSelector(GET_APPS_RIGHTS_LIST_BASE)
-
-// Api Keys
-export const selectApplicationApiKeys = createApiKeysSelector(ENTITY)
-export const selectApplicationApiKeysTotalCount = createApiKeysTotalCountSelector(ENTITY)
-export const selectApplicationApiKeysError = createErrorSelector(GET_APP_API_KEYS_LIST_BASE)
-export const selectApplicationApiKeysFetching = createFetchingSelector(GET_APP_API_KEYS_LIST_BASE)
-export const selectApplicationApiKey = createApiKeySelector(ENTITY_SINGLE)
-export const selectApplicationApiKeyFetching = createFetchingSelector(GET_APP_API_KEY_BASE)
-export const selectApplicationApiKeyError = createErrorSelector(GET_APP_API_KEY_BASE)
 
 // Link
 const selectLinkStore = state => state.link

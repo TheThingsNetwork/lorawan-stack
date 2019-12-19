@@ -14,18 +14,15 @@
 
 import { connect } from 'react-redux'
 
-import {
-  getOrganizationCollaboratorsList,
-  getOrganizationApiKeysList,
-} from '../../store/actions/organizations'
+import { getOrganizationCollaboratorsList } from '../../store/actions/organizations'
+import { getApiKeysList } from '../../store/actions/api-keys'
 import {
   selectSelectedOrganization,
   selectSelectedOrganizationId,
   selectOrganizationCollaboratorsTotalCount,
-  selectOrganizationApiKeysTotalCount,
-  selectOrganizationApiKeysFetching,
   selectOrganizationCollaboratorsFetching,
 } from '../../store/selectors/organizations'
+import { selectApiKeysTotalCount, selectApiKeysFetching } from '../../store/selectors/api-keys'
 
 import {
   checkFromState,
@@ -36,7 +33,7 @@ import {
 const mapStateToProps = state => {
   const orgId = selectSelectedOrganizationId(state)
   const collaboratorsTotalCount = selectOrganizationCollaboratorsTotalCount(state, { id: orgId })
-  const apiKeysTotalCount = selectOrganizationApiKeysTotalCount(state, { id: orgId })
+  const apiKeysTotalCount = selectApiKeysTotalCount(state, { id: orgId })
   const mayViewOrganizationApiKeys = checkFromState(mayViewOrEditOrganizationApiKeys, state)
   const mayViewOrganizationCollaborators = checkFromState(
     mayViewOrEditOrganizationCollaborators,
@@ -46,8 +43,7 @@ const mapStateToProps = state => {
     (mayViewOrganizationCollaborators && collaboratorsTotalCount === undefined) ||
     selectOrganizationCollaboratorsFetching(state)
   const apiKeysFetching =
-    (mayViewOrganizationApiKeys && apiKeysTotalCount === undefined) ||
-    selectOrganizationApiKeysFetching(state)
+    (mayViewOrganizationApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
 
   return {
     orgId,
@@ -56,15 +52,14 @@ const mapStateToProps = state => {
     apiKeysTotalCount,
     mayViewOrganizationApiKeys,
     mayViewOrganizationCollaborators,
-    statusBarFetching:
-      apiKeysFetching || collaboratorsFetching || selectOrganizationCollaboratorsFetching(state),
+    statusBarFetching: apiKeysFetching || collaboratorsFetching,
   }
 }
 
 const mapDispatchToProps = dispatch => ({
   loadData(mayViewOrganizationCollaborators, mayViewOrganizationApiKeys, orgId) {
     if (mayViewOrganizationCollaborators) dispatch(getOrganizationCollaboratorsList(orgId))
-    if (mayViewOrganizationApiKeys) dispatch(getOrganizationApiKeysList(orgId))
+    if (mayViewOrganizationApiKeys) dispatch(getApiKeysList('organization', orgId))
   },
 })
 

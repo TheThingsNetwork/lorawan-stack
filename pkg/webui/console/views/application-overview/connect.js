@@ -19,16 +19,13 @@ import {
   selectSelectedApplicationId,
   selectApplicationCollaboratorsTotalCount,
   selectApplicationCollaboratorsFetching,
-  selectApplicationApiKeysTotalCount,
-  selectApplicationApiKeysFetching,
   selectApplicationLinkIndicator,
   selectApplicationLinkFetching,
 } from '../../store/selectors/applications'
+import { selectApiKeysTotalCount, selectApiKeysFetching } from '../../store/selectors/api-keys'
 import { selectDevicesTotalCount, selectDevicesFetching } from '../../store/selectors/devices'
-import {
-  getApplicationCollaboratorsList,
-  getApplicationApiKeysList,
-} from '../../store/actions/applications'
+import { getApplicationCollaboratorsList } from '../../store/actions/applications'
+import { getApiKeysList } from '../../store/actions/api-keys'
 import { getApplicationLink } from '../../store/actions/link'
 
 import {
@@ -42,7 +39,7 @@ import {
 const mapStateToProps = (state, props) => {
   const appId = selectSelectedApplicationId(state)
   const collaboratorsTotalCount = selectApplicationCollaboratorsTotalCount(state, { id: appId })
-  const apiKeysTotalCount = selectApplicationApiKeysTotalCount(state, { id: appId })
+  const apiKeysTotalCount = selectApiKeysTotalCount(state)
   const devicesTotalCount = selectDevicesTotalCount(state)
   const mayViewApplicationApiKeys = checkFromState(mayViewOrEditApplicationApiKeys, state)
   const mayViewApplicationCollaborators = checkFromState(
@@ -55,8 +52,7 @@ const mapStateToProps = (state, props) => {
     (mayViewApplicationCollaborators && collaboratorsTotalCount === undefined) ||
     selectApplicationCollaboratorsFetching(state)
   const apiKeysFetching =
-    (mayViewApplicationApiKeys && apiKeysTotalCount === undefined) ||
-    selectApplicationApiKeysFetching(state)
+    (mayViewApplicationApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
   const devicesFetching =
     (mayViewDevices && devicesTotalCount === undefined) || selectDevicesFetching(state)
 
@@ -87,7 +83,7 @@ const mapDispatchToProps = dispatch => ({
     appId,
   ) {
     if (mayViewApplicationCollaborators) dispatch(getApplicationCollaboratorsList(appId))
-    if (mayViewApplicationApiKeys) dispatch(getApplicationApiKeysList(appId))
+    if (mayViewApplicationApiKeys) dispatch(getApiKeysList('application', appId))
     if (mayViewApplicationLink) dispatch(getApplicationLink(appId))
   },
 })

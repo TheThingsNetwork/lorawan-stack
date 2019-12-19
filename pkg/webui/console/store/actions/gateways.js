@@ -13,8 +13,6 @@
 // limitations under the License.
 
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
-import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
-import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 import {
   createGetCollaboratorsListRequestActions,
   createGetCollaboratorsListActionType,
@@ -100,26 +98,6 @@ export const [
     failure: updateGatewayStatisticsFailure,
   },
 ] = createRequestActions(UPDATE_GTW_STATS_BASE, id => ({ id }))
-
-export const GET_GTW_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME)
-export const [
-  { request: GET_GTW_API_KEY, success: GET_GTW_API_KEY_SUCCESS, failure: GET_GTW_API_KEY_FAILURE },
-  { request: getGatewayApiKey, success: getGatewayApiKeySuccess, failure: getGatewayApiKeyFailure },
-] = createApiKeyRequestActions(SHARED_NAME)
-
-export const GET_GTW_API_KEYS_LIST_BASE = createGetApiKeysListActionType(SHARED_NAME)
-export const [
-  {
-    request: GET_GTW_API_KEYS_LIST,
-    success: GET_GTW_API_KEYS_LIST_SUCCESS,
-    failure: GET_GTW_API_KEYS_LIST_FAILURE,
-  },
-  {
-    request: getGatewayApiKeysList,
-    success: getGatewayApiKeysListSuccess,
-    failure: getGatewayApiKeysListFailure,
-  },
-] = createApiKeysRequestActions(SHARED_NAME)
 
 export const GET_GTW_COLLABORATOR_BASE = createGetCollaboratorActionType(SHARED_NAME)
 export const [

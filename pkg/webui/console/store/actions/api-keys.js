@@ -12,12 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createPaginationByParentRequestActions } from './pagination'
 import { createRequestActions } from './lib'
 
-export const createGetApiKeysListActionType = name => `GET_${name}_API_KEYS_LIST`
+export const SHARED_NAME = 'API_KEYS'
 
-export default name =>
-  createRequestActions(createGetApiKeysListActionType(name), (id, { page, limit } = {}) => ({
-    id,
-    params: { page, limit },
-  }))
+export const GET_API_KEY_BASE = 'GET_API_KEY'
+export const [
+  { request: GET_API_KEY, success: GET_API_KEY_SUCCESS, failure: GET_API_KEY_FAILURE },
+  { request: getApiKey, success: getApiKeySuccess, failure: getApiKeyFailure },
+] = createRequestActions(
+  GET_API_KEY_BASE,
+  (parentType, parentId, keyId) => ({ parentType, parentId, keyId }),
+  (parentType, parentId, keyId, selector) => ({ selector }),
+)
+
+export const GET_API_KEYS_LIST_BASE = 'GET_API_KEYS_LIST'
+export const [
+  {
+    request: GET_API_KEYS_LIST,
+    success: GET_API_KEYS_LIST_SUCCESS,
+    failure: GET_API_KEYS_LIST_FAILURE,
+  },
+  { request: getApiKeysList, success: getApiKeysListSuccess, failure: getApiKeysListFailure },
+] = createPaginationByParentRequestActions(SHARED_NAME)

@@ -31,8 +31,6 @@ import {
   clearEvents,
   createClearEventsActionType,
 } from './events'
-import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
-import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 import {
   createGetCollaboratorsListRequestActions,
@@ -78,30 +76,6 @@ export const [
     failure: updateOrganizationFailure,
   },
 ] = createRequestActions(UPDATE_ORG_BASE, (id, patch) => ({ id, patch }))
-
-export const GET_ORG_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME)
-export const [
-  { request: GET_ORG_API_KEY, success: GET_ORG_API_KEY_SUCCESS, failure: GET_ORG_API_KEY_FAILURE },
-  {
-    request: getOrganizationApiKey,
-    success: getOrganizationApiKeySuccess,
-    failure: getOrganizationApiKeyFailure,
-  },
-] = createApiKeyRequestActions(SHARED_NAME)
-
-export const GET_ORG_API_KEYS_LIST_BASE = createGetApiKeysListActionType(SHARED_NAME)
-export const [
-  {
-    request: GET_ORG_API_KEYS_LIST,
-    success: GET_ORG_API_KEYS_LIST_SUCCESS,
-    failure: GET_ORG_API_KEYS_LIST_FAILURE,
-  },
-  {
-    request: getOrganizationApiKeysList,
-    success: getOrganizationApiKeysListSuccess,
-    failure: getOrganizationApiKeysListFailure,
-  },
-] = createApiKeysRequestActions(SHARED_NAME)
 
 export const GET_ORGS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [

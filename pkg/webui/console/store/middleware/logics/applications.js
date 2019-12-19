@@ -95,26 +95,6 @@ const getApplicationsRightsLogic = createRequestLogic({
   },
 })
 
-const getApplicationApiKeysLogic = createRequestLogic({
-  type: applications.GET_APP_API_KEYS_LIST,
-  async process({ getState, action }) {
-    const {
-      id: appId,
-      params: { page, limit },
-    } = action.payload
-    const res = await api.application.apiKeys.list(appId, { limit, page })
-    return { ...res, id: appId }
-  },
-})
-
-const getApplicationApiKeyLogic = createRequestLogic({
-  type: applications.GET_APP_API_KEY,
-  async process({ action }) {
-    const { id: appId, keyId } = action.payload
-    return api.application.apiKeys.get(appId, keyId)
-  },
-})
-
 const getApplicationCollaboratorLogic = createRequestLogic({
   type: applications.GET_APP_COLLABORATOR,
   async process({ action }) {
@@ -243,8 +223,6 @@ export default [
   deleteApplicationLogic,
   getApplicationsLogic,
   getApplicationsRightsLogic,
-  getApplicationApiKeysLogic,
-  getApplicationApiKeyLogic,
   getApplicationCollaboratorLogic,
   getApplicationCollaboratorsLogic,
   getWebhooksLogic,
