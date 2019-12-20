@@ -4,9 +4,10 @@ description: ""
 weight: 20
 ---
 
-## Interoperability Repository
 
-{{% tts %}} expects the root of interoperability repository to contain `config.yml`, which contains various interoperablity configuration options:
+{{% tts %}} expects the root of interoperability repository to contain `config.yml`, which contains various interoperablity configuration options.
+
+<!--more-->
 
 ```yml
 join-servers:                 # list of Join Server interoperability configurations,
