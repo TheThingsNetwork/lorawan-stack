@@ -17,6 +17,7 @@ package events_test
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -68,6 +69,8 @@ func TestChannelReceive(t *testing.T) {
 	eventChan.Notify(events.New(test.Context(), "evt", nil, nil))
 	eventChan.Notify(events.New(test.Context(), "evt", nil, nil))
 	eventChan.Notify(events.New(test.Context(), "overflow", nil, nil))
+
+	runtime.Gosched()
 
 	ctx, cancel := context.WithCancel(test.Context())
 
