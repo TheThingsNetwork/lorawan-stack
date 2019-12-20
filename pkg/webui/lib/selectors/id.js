@@ -80,6 +80,10 @@ export const getWebhookId = function(webhook = {}) {
   return getByPath(webhook, 'ids.webhook_id')
 }
 
+export const getPubsubId = function(pubsub = {}) {
+  return getByPath(pubsub, 'ids.pub_sub_id')
+}
+
 export const getUserId = function(user = {}) {
   return getByPath(user, 'ids.user_id')
 }

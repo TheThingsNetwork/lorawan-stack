@@ -15,8 +15,6 @@
 import * as applications from '../../actions/applications'
 import * as link from '../../actions/link'
 import * as webhookFormats from '../../actions/webhook-formats'
-import * as pubsubs from '../../actions/pubsubs'
-import * as pubsub from '../../actions/pubsub'
 import * as pubsubFormats from '../../actions/pubsub-formats'
 
 import api from '../../../api'
@@ -128,26 +126,6 @@ const getWebhookFormatsLogic = createRequestLogic({
   },
 })
 
-const getPubsubLogic = createRequestLogic({
-  type: pubsub.GET_PUBSUB,
-  async process({ action }) {
-    const {
-      payload: { appId, pubsubId },
-      meta: { selector },
-    } = action
-    return api.application.pubsubs.get(appId, pubsubId, selector)
-  },
-})
-
-const getPubsubsLogic = createRequestLogic({
-  type: pubsubs.GET_PUBSUBS_LIST,
-  async process({ action }) {
-    const { appId } = action.payload
-    const res = await api.application.pubsubs.list(appId)
-    return { pubsubs: res.pubsubs, totalCount: res.totalCount }
-  },
-})
-
 const getPubsubFormatsLogic = createRequestLogic({
   type: pubsubFormats.GET_PUBSUB_FORMATS,
   async process() {
@@ -163,8 +141,6 @@ export default [
   getApplicationsLogic,
   getApplicationsRightsLogic,
   getWebhookFormatsLogic,
-  getPubsubLogic,
-  getPubsubsLogic,
   getPubsubFormatsLogic,
   getApplicationLinkLogic,
   ...createEventsConnectLogics(

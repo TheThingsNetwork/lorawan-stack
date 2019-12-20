@@ -14,6 +14,16 @@
 
 import { createRequestActions } from './lib'
 
+export const GET_PUBSUB_BASE = 'GET_PUBSUB'
+export const [
+  { request: GET_PUBSUB, success: GET_PUBSUB_SUCCESS, failure: GET_PUBSUB_FAILURE },
+  { request: getPubsub, success: getPubsubSuccess, failure: getPubsubFailure },
+] = createRequestActions(
+  GET_PUBSUB_BASE,
+  (appId, pubsubId) => ({ appId, pubsubId }),
+  (appId, pubsubId, selector) => ({ selector }),
+)
+
 export const GET_PUBSUBS_LIST_BASE = 'GET_PUBSUBS_LIST'
 export const [
   {

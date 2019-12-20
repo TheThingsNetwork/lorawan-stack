@@ -24,6 +24,7 @@ import js from './join-server'
 import apiKeys from './api-keys'
 import collaborators from './collaborators'
 import webhooks from './webhooks'
+import pubsubs from './pubsubs'
 
 export default [
   ...user,
@@ -38,4 +39,5 @@ export default [
   ...apiKeys,
   ...collaborators,
   ...webhooks,
+  ...pubsubs,
 ]

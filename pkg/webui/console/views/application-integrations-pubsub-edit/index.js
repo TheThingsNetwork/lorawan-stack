@@ -33,9 +33,9 @@ import {
   selectSelectedPubsub,
   selectPubsubFetching,
   selectPubsubError,
-} from '../../store/selectors/pubsub'
+} from '../../store/selectors/pubsubs'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { getPubsub } from '../../store/actions/pubsub'
+import { getPubsub } from '../../store/actions/pubsubs'
 
 import api from '../../api'
 

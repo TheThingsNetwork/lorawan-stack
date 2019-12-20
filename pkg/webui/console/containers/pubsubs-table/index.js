@@ -22,6 +22,11 @@ import Message from '../../../lib/components/message'
 import sharedMessages from '../../../lib/shared-messages'
 
 import { getPubsubsList } from '../../../console/store/actions/pubsubs'
+import {
+  selectPubsubs,
+  selectPubsubsTotalCount,
+  selectPubsubsFetching,
+} from '../../../console/store/selectors/pubsubs'
 import { natsUrl as natsUrlRegexp } from '../../lib/regexp'
 
 const m = defineMessages({
@@ -83,8 +88,12 @@ export default class PubsubsTable extends React.Component {
     this.getPubsubsList = () => getPubsubsList(appId)
   }
 
-  baseDataSelector({ pubsubs }) {
-    return pubsubs
+  baseDataSelector(state) {
+    return {
+      pubsubs: selectPubsubs(state),
+      totalCount: selectPubsubsTotalCount(state),
+      fetching: selectPubsubsFetching(state),
+    }
   }
 
   render() {
