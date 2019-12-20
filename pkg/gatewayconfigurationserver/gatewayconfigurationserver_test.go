@@ -186,7 +186,7 @@ func TestWeb(t *testing.T) {
 				t.Run("cpf/lorad/lorad.json", func(t *testing.T) {
 					a := assertions.New(t)
 					url := fmt.Sprintf(
-						"/api/v3/gcs/gateways/%s/cpf/lorad/lorad.json",
+						"/api/v3/gcs/gateways/%s/kerlink-cpf/lorad/lorad.json",
 						tc.ID.GatewayID,
 					)
 					req := httptest.NewRequest(http.MethodGet, url, nil)
@@ -213,7 +213,7 @@ func TestWeb(t *testing.T) {
 				t.Run("cpf/lorafwd/lorafwd.toml", func(t *testing.T) {
 					a := assertions.New(t)
 					url := fmt.Sprintf(
-						"/api/v3/gcs/gateways/%s/cpf/lorafwd/lorafwd.toml",
+						"/api/v3/gcs/gateways/%s/kerlink-cpf/lorafwd/lorafwd.toml",
 						tc.ID.GatewayID,
 					)
 					req := httptest.NewRequest(http.MethodGet, url, nil)
