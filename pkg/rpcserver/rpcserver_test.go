@@ -16,6 +16,7 @@ package rpcserver_test
 
 import (
 	"context"
+	"runtime"
 	"testing"
 
 	"github.com/gogo/protobuf/types"
@@ -105,6 +106,8 @@ func TestNewRPCServer(t *testing.T) {
 		})
 		a.So(mock.pushCtx.Value(&mockKey2{}), should.Resemble, "bar")
 
+		runtime.Gosched()
+
 		a.So(logHandler.entries, should.HaveLength, 1)
 	})
 
@@ -129,6 +132,8 @@ func TestNewRPCServer(t *testing.T) {
 			"grpc.request.foo":    "bar",
 		})
 		a.So(mock.subCtx.Value(&mockKey2{}), should.Resemble, "foo")
+
+		runtime.Gosched()
 
 		a.So(logHandler.entries, should.HaveLength, 2)
 	})
