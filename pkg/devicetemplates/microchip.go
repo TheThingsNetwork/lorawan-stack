@@ -277,7 +277,7 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 		}
 		cnParts := strings.SplitN(cert.Subject.CommonName, " ", 3)
 		if len(cnParts) != 3 {
-			return errMicrochipData.WithCause(err)
+			return errMicrochipData
 		}
 		var devEUI types.EUI64
 		if err := devEUI.UnmarshalText([]byte(cnParts[1])); err != nil {
