@@ -1,10 +1,18 @@
-# The Things Stack Networking
+---
+title: "Networking"
+description: ""
+weight: 20
+---
 
-The Things Stack uses a port per protocol, with a TLS counterpart when applicable. Ports can be shared by multiple services using the same protocol, i.e. gRPC services sharing management, data and events services.
+{{% tts %}} uses a port per protocol, with a TLS counterpart when applicable. Ports can be shared by multiple services using the same protocol, i.e. gRPC services sharing management, data and events services.
+
+<!--more-->
 
 ## Port Allocations
 
-| Purpose | Protocol | Authentication | Port | Port (TLS) |
+The following table lists the default ports used.
+
+| **Purpose** | **Protocol** | **Authentication** | **Port** | **Port (TLS)** |
 | --- | --- | --- | --- | --- | 
 | Gateway data | [Semtech Packet Forwarder](https://github.com/Lora-net/packet_forwarder/blob/master/PROTOCOL.TXT) | None | 1700 (UDP) | N/A |
 | Gateway data | MQTT (V2) | API key, token | 1881 | 8881 |
