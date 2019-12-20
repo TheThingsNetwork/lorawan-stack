@@ -19,12 +19,6 @@ import {
   createPaginationDeleteBaseActionType,
   createPaginationDeleteActions,
 } from './pagination'
-import {
-  createGetCollaboratorsListRequestActions,
-  createGetCollaboratorsListActionType,
-  createGetCollaboratorRequestActions,
-  createGetCollaboratorActionType,
-} from './collaborators'
 import { createRequestActions } from './lib'
 
 import {
@@ -92,36 +86,6 @@ export const [
     failure: getApplicationsRightsListFailure,
   },
 ] = createGetRightsListRequestActions(SHARED_NAME)
-
-export const GET_APP_COLLABORATOR_BASE = createGetCollaboratorActionType(SHARED_NAME_SINGLE)
-export const [
-  {
-    request: GET_APP_COLLABORATOR,
-    success: GET_APP_COLLABORATOR_SUCCESS,
-    failure: GET_APP_COLLABORATOR_FAILURE,
-  },
-  {
-    request: getApplicationCollaborator,
-    success: getApplicationCollaboratorSuccess,
-    failure: getApplicationCollaboratorFailure,
-  },
-] = createGetCollaboratorRequestActions(SHARED_NAME_SINGLE)
-
-export const GET_APP_COLLABORATORS_LIST_BASE = createGetCollaboratorsListActionType(
-  SHARED_NAME_SINGLE,
-)
-export const [
-  {
-    request: GET_APP_COLLABORATORS_LIST,
-    success: GET_APP_COLLABORATORS_LIST_SUCCESS,
-    failure: GET_APP_COLLABORATORS_LIST_FAILURE,
-  },
-  {
-    request: getApplicationCollaboratorsList,
-    success: getApplicationCollaboratorsListSuccess,
-    failure: getApplicationCollaboratorsListFailure,
-  },
-] = createGetCollaboratorsListRequestActions(SHARED_NAME_SINGLE)
 
 export const START_APP_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME_SINGLE)
 export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(

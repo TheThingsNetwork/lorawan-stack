@@ -95,45 +95,6 @@ const getApplicationsRightsLogic = createRequestLogic({
   },
 })
 
-const getApplicationCollaboratorLogic = createRequestLogic({
-  type: applications.GET_APP_COLLABORATOR,
-  async process({ action }) {
-    const { id: appId, collaboratorId, isUser } = action.payload
-
-    const collaborator = isUser
-      ? await api.application.collaborators.getUser(appId, collaboratorId)
-      : await api.application.collaborators.getOrganization(appId, collaboratorId)
-
-    const { ids, ...rest } = collaborator
-
-    return {
-      id: collaboratorId,
-      isUser,
-      ...rest,
-    }
-  },
-})
-
-const getApplicationCollaboratorsLogic = createRequestLogic({
-  type: applications.GET_APP_COLLABORATORS_LIST,
-  async process({ action }) {
-    const { id: appId, params } = action.payload
-    const res = await api.application.collaborators.list(appId, params)
-    const collaborators = res.collaborators.map(function(collaborator) {
-      const { ids, ...rest } = collaborator
-      const isUser = !!ids.user_ids
-      const collaboratorId = isUser ? ids.user_ids.user_id : ids.organization_ids.organization_id
-
-      return {
-        id: collaboratorId,
-        isUser,
-        ...rest,
-      }
-    })
-    return { id: appId, collaborators, totalCount: res.totalCount }
-  },
-})
-
 const getApplicationLinkLogic = createRequestLogic({
   type: link.GET_APP_LINK,
   async process({ action }, dispatch, done) {
@@ -223,8 +184,6 @@ export default [
   deleteApplicationLogic,
   getApplicationsLogic,
   getApplicationsRightsLogic,
-  getApplicationCollaboratorLogic,
-  getApplicationCollaboratorsLogic,
   getWebhooksLogic,
   getWebhookLogic,
   getWebhookFormatsLogic,

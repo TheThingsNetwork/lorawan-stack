@@ -22,6 +22,7 @@ import configuration from './configuration'
 import organizations from './organizations'
 import js from './join-server'
 import apiKeys from './api-keys'
+import collaborators from './collaborators'
 
 export default [
   ...user,
@@ -34,4 +35,5 @@ export default [
   ...organizations,
   ...js,
   ...apiKeys,
+  ...collaborators,
 ]

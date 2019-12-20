@@ -12,45 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const selectCollaboratorsStore = (state, entity) => state.collaborators[entity]
+import { GET_COLLABORATOR_BASE, GET_COLLABORATORS_LIST_BASE } from '../actions/collaborators'
+import { createFetchingSelector } from './fetching'
+import { createErrorSelector } from './error'
+import {
+  createPaginationIdsSelectorByEntity,
+  createPaginationTotalCountSelectorByEntity,
+} from './pagination'
 
-export const createCollaboratorSelector = entity =>
-  function(state) {
-    const store = selectCollaboratorsStore(state, entity)
+const ENTITY = 'collaborators'
 
-    return store.collaborator
+// Collaborator
+export const selectCollaboratorsStore = state => state.collaborators || {}
+export const selectCollaboratorsEntitiesStore = state => selectCollaboratorsStore(state).entities
+export const selectCollaboratorById = (state, id) => selectCollaboratorsEntitiesStore(state)[id]
+export const selectSelectedCollaboratorId = state =>
+  selectCollaboratorsStore(state).selectedCollaborator
+export const selectSelectedCollaborator = state =>
+  selectCollaboratorById(state, selectSelectedCollaboratorId(state))
+export const selectCollaboratorFetching = createFetchingSelector(GET_COLLABORATOR_BASE)
+export const selectCollaboratorError = createErrorSelector(GET_COLLABORATOR_BASE)
+export const selectUserCollaborator = function(state) {
+  const collaborator = selectSelectedCollaborator(state)
+
+  if (collaborator && 'user_ids' in collaborator.ids) {
+    return collaborator
   }
+}
+export const selectOrganizationCollaborator = function(state) {
+  const collaborator = selectSelectedCollaborator(state)
 
-export const createUserCollaboratorSelector = entity =>
-  function(state) {
-    const store = selectCollaboratorsStore(state, entity)
-    const collaborator = store.collaborator
-
-    if (Boolean(collaborator) && collaborator.isUser) {
-      return collaborator
-    }
+  if (collaborator && 'organization_ids' in collaborator.ids) {
+    return collaborator
   }
+}
 
-export const createOrganizationCollaboratorSelector = entity =>
-  function(state) {
-    const store = selectCollaboratorsStore(state, entity)
-    const collaborator = store.collaborator
+// Collaborators
+const createSelectCollaboratorsIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
+const createSelectCollaboratorsTotalCountSelector = createPaginationTotalCountSelectorByEntity(
+  ENTITY,
+)
+const createSelectCollaboratorsFetchingSelector = createFetchingSelector(
+  GET_COLLABORATORS_LIST_BASE,
+)
+const createSelectCollaboratorsErrorSelector = createErrorSelector(GET_COLLABORATORS_LIST_BASE)
 
-    if (Boolean(collaborator) && !collaborator.isUser) {
-      return collaborator
-    }
-  }
-
-export const createCollaboratorsSelector = entity =>
-  function(state, props) {
-    const store = selectCollaboratorsStore(state, entity)[props.id] || {}
-
-    return store.collaborators ? store.collaborators : []
-  }
-
-export const createTotalCountSelector = entity =>
-  function(state, props) {
-    const store = selectCollaboratorsStore(state, entity)[props.id] || {}
-
-    return store.totalCount
-  }
+export const selectCollaborators = state =>
+  createSelectCollaboratorsIdsSelector(state).map(id => selectCollaboratorById(state, id))
+export const selectCollaboratorsTotalCount = state =>
+  createSelectCollaboratorsTotalCountSelector(state)
+export const selectCollaboratorsFetching = state => createSelectCollaboratorsFetchingSelector(state)
+export const selectCollaboratorsError = state => createSelectCollaboratorsErrorSelector(state)

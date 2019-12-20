@@ -14,15 +14,17 @@
 
 import { connect } from 'react-redux'
 
-import { getOrganizationCollaboratorsList } from '../../store/actions/organizations'
+import { getCollaboratorsList } from '../../store/actions/collaborators'
 import { getApiKeysList } from '../../store/actions/api-keys'
 import {
   selectSelectedOrganization,
   selectSelectedOrganizationId,
-  selectOrganizationCollaboratorsTotalCount,
-  selectOrganizationCollaboratorsFetching,
 } from '../../store/selectors/organizations'
 import { selectApiKeysTotalCount, selectApiKeysFetching } from '../../store/selectors/api-keys'
+import {
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+} from '../../store/selectors/collaborators'
 
 import {
   checkFromState,
@@ -32,8 +34,8 @@ import {
 
 const mapStateToProps = state => {
   const orgId = selectSelectedOrganizationId(state)
-  const collaboratorsTotalCount = selectOrganizationCollaboratorsTotalCount(state, { id: orgId })
-  const apiKeysTotalCount = selectApiKeysTotalCount(state, { id: orgId })
+  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state)
+  const apiKeysTotalCount = selectApiKeysTotalCount(state)
   const mayViewOrganizationApiKeys = checkFromState(mayViewOrEditOrganizationApiKeys, state)
   const mayViewOrganizationCollaborators = checkFromState(
     mayViewOrEditOrganizationCollaborators,
@@ -41,7 +43,7 @@ const mapStateToProps = state => {
   )
   const collaboratorsFetching =
     (mayViewOrganizationCollaborators && collaboratorsTotalCount === undefined) ||
-    selectOrganizationCollaboratorsFetching(state)
+    selectCollaboratorsFetching(state)
   const apiKeysFetching =
     (mayViewOrganizationApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
 
@@ -58,7 +60,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   loadData(mayViewOrganizationCollaborators, mayViewOrganizationApiKeys, orgId) {
-    if (mayViewOrganizationCollaborators) dispatch(getOrganizationCollaboratorsList(orgId))
+    if (mayViewOrganizationCollaborators) dispatch(getCollaboratorsList('organization', orgId))
     if (mayViewOrganizationApiKeys) dispatch(getApiKeysList('organization', orgId))
   },
 })

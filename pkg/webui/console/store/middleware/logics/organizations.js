@@ -89,45 +89,6 @@ const getOrganizationsRightsLogic = createRequestLogic({
   },
 })
 
-const getOrganizationCollaboratorLogic = createRequestLogic({
-  type: organizations.GET_ORG_COLLABORATOR,
-  async process({ action }) {
-    const { id: orgId, collaboratorId, isUser } = action.payload
-
-    const collaborator = isUser
-      ? await api.organization.collaborators.getUser(orgId, collaboratorId)
-      : await api.organization.collaborators.getOrganization(orgId, collaboratorId)
-
-    const { ids, ...rest } = collaborator
-
-    return {
-      id: collaboratorId,
-      isUser,
-      ...rest,
-    }
-  },
-})
-
-const getOrganizationCollaboratorsLogic = createRequestLogic({
-  type: organizations.GET_ORG_COLLABORATORS_LIST,
-  async process({ action }) {
-    const { id, params } = action.payload
-    const res = await api.organization.collaborators.list(id, params)
-    const collaborators = res.collaborators.map(function(collaborator) {
-      const { ids, ...rest } = collaborator
-      const isUser = !!ids.user_ids
-      const collaboratorId = isUser ? ids.user_ids.user_id : ids.organization_ids.organization_id
-
-      return {
-        id: collaboratorId,
-        isUser,
-        ...rest,
-      }
-    })
-    return { id, collaborators, totalCount: res.totalCount }
-  },
-})
-
 export default [
   getOrganizationLogic,
   getOrganizationsLogic,
@@ -135,8 +96,6 @@ export default [
   updateOrganizationLogic,
   deleteOrganizationLogic,
   getOrganizationsRightsLogic,
-  getOrganizationCollaboratorLogic,
-  getOrganizationCollaboratorsLogic,
   ...createEventsConnectLogics(
     organizations.SHARED_NAME,
     'organizations',

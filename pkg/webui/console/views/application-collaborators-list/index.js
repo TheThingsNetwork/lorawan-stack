@@ -21,12 +21,12 @@ import CollaboratorsTable from '../../containers/collaborators-table'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 
-import { getApplicationCollaboratorsList } from '../../store/actions/applications'
+import { getCollaboratorsList } from '../../store/actions/collaborators'
 import {
-  selectApplicationCollaborators,
-  selectApplicationCollaboratorsTotalCount,
-  selectApplicationCollaboratorsFetching,
-} from '../../store/selectors/applications'
+  selectCollaborators,
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+} from '../../store/selectors/collaborators'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
@@ -39,8 +39,7 @@ export default class ApplicationCollaborators extends React.Component {
     super(props)
 
     const { appId } = props.match.params
-    this.getApplicationCollaboratorsList = filters =>
-      getApplicationCollaboratorsList(appId, filters)
+    this.getCollaboratorsList = filters => getCollaboratorsList('application', appId, filters)
   }
 
   @bind
@@ -49,9 +48,9 @@ export default class ApplicationCollaborators extends React.Component {
     const id = { id: appId }
 
     return {
-      collaborators: selectApplicationCollaborators(state, id),
-      fetching: selectApplicationCollaboratorsFetching(state),
-      totalCount: selectApplicationCollaboratorsTotalCount(state, id),
+      collaborators: selectCollaborators(state, id),
+      fetching: selectCollaboratorsFetching(state),
+      totalCount: selectCollaboratorsTotalCount(state, id),
     }
   }
 
@@ -64,7 +63,7 @@ export default class ApplicationCollaborators extends React.Component {
             <CollaboratorsTable
               pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={this.baseDataSelector}
-              getItemsAction={this.getApplicationCollaboratorsList}
+              getItemsAction={this.getCollaboratorsList}
             />
           </Col>
         </Row>

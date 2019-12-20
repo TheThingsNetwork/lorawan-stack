@@ -25,12 +25,12 @@ import PAGE_SIZES from '../../constants/page-sizes'
 
 class OrganizationCollaboratorsList extends React.Component {
   static propTypes = {
-    getOrganizationCollaboratorsList: PropTypes.func.isRequired,
+    getCollaboratorsList: PropTypes.func.isRequired,
     selectTableData: PropTypes.func.isRequired,
   }
 
   render() {
-    const { getOrganizationCollaboratorsList, selectTableData } = this.props
+    const { getCollaboratorsList, selectTableData } = this.props
 
     return (
       <Container>
@@ -40,7 +40,7 @@ class OrganizationCollaboratorsList extends React.Component {
             <CollaboratorsTable
               pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={selectTableData}
-              getItemsAction={getOrganizationCollaboratorsList}
+              getItemsAction={getCollaboratorsList}
             />
           </Col>
         </Row>

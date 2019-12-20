@@ -26,21 +26,24 @@ import CollaboratorForm from '../../components/collaborator-form'
 import toast from '../../../components/toast'
 import withRequest from '../../../lib/components/with-request'
 
-import { getApplicationCollaborator } from '../../store/actions/applications'
+import { getCollaborator } from '../../store/actions/collaborators'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationPseudoRights,
   selectApplicationRightsFetching,
   selectApplicationRightsError,
-  selectApplicationUserCollaborator,
-  selectApplicationOrganizationCollaborator,
-  selectApplicationCollaboratorFetching,
-  selectApplicationCollaboratorError,
 } from '../../store/selectors/applications'
-
+import {
+  selectUserCollaborator,
+  selectOrganizationCollaborator,
+  selectCollaboratorFetching,
+  selectCollaboratorError,
+} from '../../store/selectors/collaborators'
 import api from '../../api'
 import PropTypes from '../../../lib/prop-types'
+
+const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
 
 @connect(
   function(state, props) {
@@ -50,11 +53,10 @@ import PropTypes from '../../../lib/prop-types'
 
     const collaborator =
       collaboratorType === 'user'
-        ? selectApplicationUserCollaborator(state)
-        : selectApplicationOrganizationCollaborator(state)
-    const fetching =
-      selectApplicationRightsFetching(state) || selectApplicationCollaboratorFetching(state)
-    const error = selectApplicationRightsError(state) || selectApplicationCollaboratorError(state)
+        ? selectUserCollaborator(state)
+        : selectOrganizationCollaborator(state)
+    const fetching = selectApplicationRightsFetching(state) || selectCollaboratorFetching(state)
+    const error = selectApplicationRightsError(state) || selectCollaboratorError(state)
 
     return {
       collaboratorId,
@@ -68,8 +70,8 @@ import PropTypes from '../../../lib/prop-types'
     }
   },
   (dispatch, ownProps) => ({
-    getApplicationCollaborator(appId, collaboratorId, isUser) {
-      dispatch(getApplicationCollaborator(appId, collaboratorId, isUser))
+    getCollaborator(appId, collaboratorId, isUser) {
+      dispatch(getCollaborator('application', appId, collaboratorId, isUser))
     },
     redirectToList(appId) {
       dispatch(replace(`/applications/${appId}/collaborators`))
@@ -79,8 +81,8 @@ import PropTypes from '../../../lib/prop-types'
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    getApplicationCollaborator: () =>
-      dispatchProps.getApplicationCollaborator(
+    getCollaborator: () =>
+      dispatchProps.getCollaborator(
         stateProps.appId,
         stateProps.collaboratorId,
         stateProps.collaboratorType === 'user',
@@ -89,7 +91,7 @@ import PropTypes from '../../../lib/prop-types'
   }),
 )
 @withRequest(
-  ({ getApplicationCollaborator }) => getApplicationCollaborator(),
+  ({ getCollaborator }) => getCollaborator(),
   ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
 )
 @withBreadcrumb('apps.single.collaborators.edit', function(props) {
@@ -131,12 +133,12 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   async handleDelete() {
-    const { collaborator, redirectToList, appId } = this.props
-    const collaborator_type = collaborator.isUser ? 'user' : 'organization'
+    const { collaborator, collaboratorId, redirectToList, appId } = this.props
+    const collaborator_type = isUser(collaborator) ? 'user' : 'organization'
 
     const collaborator_ids = {
       [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaborator.id,
+        [`${collaborator_type}_id`]: collaboratorId,
       },
     }
     const updatedCollaborator = {
@@ -156,14 +158,11 @@ export default class ApplicationCollaboratorEdit extends React.Component {
   }
 
   render() {
-    const { collaborator, rights, pseudoRights, redirectToList } = this.props
+    const { collaborator, collaboratorId, rights, pseudoRights, redirectToList } = this.props
 
     return (
       <Container>
-        <PageTitle
-          title={sharedMessages.collaboratorEdit}
-          values={{ collaboratorId: collaborator.id }}
-        />
+        <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
         <Row>
           <Col lg={8} md={12}>
             <CollaboratorForm

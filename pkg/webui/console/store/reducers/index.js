@@ -24,6 +24,7 @@ import { SHARED_NAME as ORGANIZATION_SHARED_NAME } from '../actions/organization
 import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/devices'
 import { SHARED_NAME as USER_SHARED_NAME } from '../actions/users'
 import { SHARED_NAME as API_KEYS_SHARED_NAME } from '../actions/api-keys'
+import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '../actions/collaborators'
 import {
   getUserId,
   getApplicationId,
@@ -31,6 +32,7 @@ import {
   getOrganizationId,
   getDeviceId,
   getApiKeyId,
+  getCollaboratorId,
 } from '../../../lib/selectors/id'
 import user from './user'
 import users from './users'
@@ -41,8 +43,7 @@ import gateways from './gateways'
 import configuration from './configuration'
 import apiKeys from './api-keys'
 import createNamedRightsReducer from './rights'
-import createNamedCollaboratorsReducer from './collaborators'
-import createNamedCollaboratorReducer from './collaborator'
+import collaborators from './collaborators'
 import createNamedEventsReducer from './events'
 import link from './link'
 import fetching from './ui/fetching'
@@ -78,18 +79,11 @@ export default history =>
     configuration,
     organizations,
     apiKeys,
+    collaborators,
     rights: combineReducers({
       applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
       gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
       organizations: createNamedRightsReducer(ORGANIZATION_SHARED_NAME),
-    }),
-    collaborators: combineReducers({
-      application: createNamedCollaboratorReducer(APPLICATION_SHARED_NAME),
-      applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),
-      gateway: createNamedCollaboratorReducer(GATEWAY_SHARED_NAME),
-      gateways: createNamedCollaboratorsReducer(GATEWAY_SHARED_NAME),
-      organization: createNamedCollaboratorReducer(ORGANIZATION_SHARED_NAME),
-      organizations: createNamedCollaboratorsReducer(ORGANIZATION_SHARED_NAME),
     }),
     events: combineReducers({
       applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
@@ -104,6 +98,7 @@ export default history =>
     pagination: combineReducers({
       applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
       apiKeys: createNamedPaginationReducer(API_KEYS_SHARED_NAME, getApiKeyId),
+      collaborators: createNamedPaginationReducer(COLLABORATORS_SHARED_NAME, getCollaboratorId),
       devices: createNamedPaginationReducer(DEVICE_SHARED_NAME, getDeviceId),
       gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
       organizations: createNamedPaginationReducer(ORGANIZATION_SHARED_NAME, getOrganizationId),

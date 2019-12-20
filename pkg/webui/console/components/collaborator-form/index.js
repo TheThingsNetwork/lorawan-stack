@@ -18,6 +18,7 @@ import bind from 'autobind-decorator'
 
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
+import { getCollaboratorId } from '../../../lib/selectors/id'
 import { id as collaboratorIdRegexp } from '../../lib/regexp'
 
 import Form from '../../../components/form'
@@ -37,6 +38,8 @@ const validationSchema = Yup.object().shape({
   collaborator_type: Yup.string().required(sharedMessages.validateRequired),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
+
+const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
 
 @bind
 export default class CollaboratorForm extends Component {
@@ -100,11 +103,11 @@ export default class CollaboratorForm extends Component {
 
   async handleDelete() {
     const { collaborator, onDelete, onDeleteSuccess, onDeleteFailure } = this.props
-    const collaborator_type = collaborator.isUser ? 'user' : 'organization'
+    const collaborator_type = isUser(collaborator) ? 'user' : 'organization'
 
     const collaborator_ids = {
       [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaborator.id,
+        [`${collaborator_type}_id`]: getCollaboratorId(collaborator),
       },
     }
     const updatedCollaborator = {
@@ -136,8 +139,8 @@ export default class CollaboratorForm extends Component {
     }
 
     return {
-      collaborator_id: collaborator.id,
-      collaborator_type: collaborator.isUser ? 'user' : 'organization',
+      collaborator_id: getCollaboratorId(collaborator),
+      collaborator_type: isUser(collaborator) ? 'user' : 'organization',
       rights: [...collaborator.rights],
     }
   }
@@ -201,7 +204,7 @@ export default class CollaboratorForm extends Component {
               message={sharedMessages.removeCollaborator}
               modalData={{
                 message: {
-                  values: { collaboratorId: collaborator.id },
+                  values: { collaboratorId: getCollaboratorId(collaborator) },
                   ...sharedMessages.collaboratorModalWarning,
                 },
               }}

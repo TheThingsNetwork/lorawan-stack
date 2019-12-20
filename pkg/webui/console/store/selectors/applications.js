@@ -16,8 +16,6 @@ import {
   GET_APPS_LIST_BASE,
   GET_APPS_RIGHTS_LIST_BASE,
   GET_APP_BASE,
-  GET_APP_COLLABORATOR_BASE,
-  GET_APP_COLLABORATORS_LIST_BASE,
 } from '../actions/applications'
 import { GET_APP_LINK_BASE } from '../actions/link'
 import {
@@ -30,17 +28,10 @@ import {
   createEventsStatusSelector,
 } from './events'
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
-import {
-  createCollaboratorsSelector,
-  createTotalCountSelector as createCollaboratorsTotalCountSelector,
-  createUserCollaboratorSelector,
-  createOrganizationCollaboratorSelector,
-} from './collaborators'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
 const ENTITY = 'applications'
-const ENTITY_SINGLE = 'application'
 
 // Application
 export const selectApplicationStore = state => state.applications
@@ -101,20 +92,3 @@ export const selectApplicationIsLinked = function(state) {
 
   return hasBase && !hasError && isLinked && hasStats
 }
-
-// Collaborators
-export const selectApplicationCollaborators = createCollaboratorsSelector(ENTITY)
-export const selectApplicationCollaboratorsTotalCount = createCollaboratorsTotalCountSelector(
-  ENTITY,
-)
-export const selectApplicationCollaboratorsFetching = createFetchingSelector(
-  GET_APP_COLLABORATORS_LIST_BASE,
-)
-export const selectApplicationUserCollaborator = createUserCollaboratorSelector(ENTITY_SINGLE)
-export const selectApplicationOrganizationCollaborator = createOrganizationCollaboratorSelector(
-  ENTITY_SINGLE,
-)
-export const selectApplicationCollaboratorFetching = createFetchingSelector(
-  GET_APP_COLLABORATOR_BASE,
-)
-export const selectApplicationCollaboratorError = createErrorSelector(GET_APP_COLLABORATOR_BASE)

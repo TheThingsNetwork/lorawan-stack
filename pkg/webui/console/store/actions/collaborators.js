@@ -12,18 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { createPaginationByParentRequestActions } from './pagination'
 import { createRequestActions } from './lib'
 
-export const createGetCollaboratorsListActionType = name => `GET_${name}_COLLABORATORS_LIST`
-export const createGetCollaboratorsListRequestActions = name =>
-  createRequestActions(createGetCollaboratorsListActionType(name), (id, { page, limit } = {}) => ({
-    id,
-    params: { page, limit },
-  }))
+export const SHARED_NAME = 'COLLABORATORS'
 
-export const createGetCollaboratorActionType = name => `GET_${name}_COLLABORATOR`
-export const createGetCollaboratorRequestActions = name =>
-  createRequestActions(
-    createGetCollaboratorActionType(name),
-    (parentId, collaboratorId, isUser) => ({ id: parentId, collaboratorId, isUser }),
-  )
+export const GET_COLLABORATOR_BASE = 'GET_COLLABORATOR'
+export const [
+  {
+    request: GET_COLLABORATOR,
+    success: GET_COLLABORATOR_SUCCESS,
+    failure: GET_COLLABORATOR_FAILURE,
+  },
+  { request: getCollaborator, success: getCollaboratorSuccess, failure: getCollaboratorFailure },
+] = createRequestActions(
+  GET_COLLABORATOR_BASE,
+  (parentType, parentId, collaboratorId, isUser) => ({
+    parentType,
+    parentId,
+    collaboratorId,
+    isUser,
+  }),
+  (parentType, parentId, collaboratorId, isUser, selector) => ({ selector }),
+)
+
+export const GET_COLLABORATORS_LIST_BASE = 'GET_COLLABORATORS_LIST'
+export const [
+  {
+    request: GET_COLLABORATORS_LIST,
+    success: GET_COLLABORATORS_LIST_SUCCESS,
+    failure: GET_COLLABORATORS_LIST_FAILURE,
+  },
+  {
+    request: getCollaboratorsList,
+    success: getCollaboratorsListSuccess,
+    failure: getCollaboratorsListFailure,
+  },
+] = createPaginationByParentRequestActions(SHARED_NAME)

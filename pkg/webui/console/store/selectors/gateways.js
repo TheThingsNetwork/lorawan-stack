@@ -18,8 +18,6 @@ import {
   UPDATE_GTW_STATS_BASE,
   GET_GTWS_RIGHTS_LIST_BASE,
   START_GTW_STATS_BASE,
-  GET_GTW_COLLABORATOR_BASE,
-  GET_GTW_COLLABORATORS_LIST_BASE,
 } from '../actions/gateways'
 
 import {
@@ -33,17 +31,10 @@ import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
 } from './pagination'
-import {
-  createCollaboratorsSelector,
-  createTotalCountSelector as createCollaboratorsTotalCountSelector,
-  createUserCollaboratorSelector,
-  createOrganizationCollaboratorSelector,
-} from './collaborators'
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
 const ENTITY = 'gateways'
-const ENTITY_SINGLE = 'gateway'
 
 // Gateway Entity
 export const selectGatewayStore = state => state.gateways
@@ -98,16 +89,3 @@ export const selectGatewayStatistics = function(state) {
 
   return statistics.stats
 }
-
-// Collaborators
-export const selectGatewayCollaborators = createCollaboratorsSelector(ENTITY)
-export const selectGatewayCollaboratorsTotalCount = createCollaboratorsTotalCountSelector(ENTITY)
-export const selectGatewayCollaboratorsFetching = createFetchingSelector(
-  GET_GTW_COLLABORATORS_LIST_BASE,
-)
-export const selectGatewayUserCollaborator = createUserCollaboratorSelector(ENTITY_SINGLE)
-export const selectGatewayOrganizationCollaborator = createOrganizationCollaboratorSelector(
-  ENTITY_SINGLE,
-)
-export const selectGatewayCollaboratorFetching = createFetchingSelector(GET_GTW_COLLABORATOR_BASE)
-export const selectGatewayCollaboratorError = createErrorSelector(GET_GTW_COLLABORATOR_BASE)

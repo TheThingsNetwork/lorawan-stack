@@ -12,53 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createGetCollaboratorsListActionType } from '../actions/collaborators'
-import { createRequestActions } from '../actions/lib'
+import {
+  GET_COLLABORATORS_LIST_SUCCESS,
+  GET_COLLABORATOR_SUCCESS,
+  GET_COLLABORATOR,
+} from '../actions/collaborators'
+import { getCollaboratorId } from '../../../lib/selectors/id'
 
 const defaultState = {
-  collaborators: [],
-  totalCount: 0,
+  entities: {},
+  selectedCollaborator: null,
 }
 
-const createNamedCollaboratorReducer = function(reducerName = '') {
-  const GET_LIST_BASE = createGetCollaboratorsListActionType(reducerName)
-  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
+const collaborator = (state = {}, collaborator) => ({
+  ...state,
+  ...collaborator,
+})
 
-  return function(state = defaultState, { type, payload }) {
-    switch (type) {
-      case GET_LIST_SUCCESS:
-        return {
-          ...state,
-          collaborators: payload.collaborators,
-          totalCount: payload.totalCount,
-        }
-      default:
-        return state
-    }
-  }
-}
-
-const createNamedCollaboratorsReducer = function(reducerName = '') {
-  const GET_LIST_BASE = createGetCollaboratorsListActionType(reducerName)
-  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
-  const collaborators = createNamedCollaboratorReducer(reducerName)
-
-  return function(state = {}, action) {
-    const { payload, type } = action
-    if (!payload || !payload.id) {
+const collaborators = function(state = defaultState, { type, payload }) {
+  switch (type) {
+    case GET_COLLABORATOR:
+      return {
+        ...state,
+        selectedCollaborator: payload.collaboratorId,
+      }
+    case GET_COLLABORATOR_SUCCESS:
+      const id = getCollaboratorId(payload)
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [id]: collaborator(state.entities[id], payload),
+        },
+      }
+    case GET_COLLABORATORS_LIST_SUCCESS:
+      return {
+        ...state,
+        entities: {
+          ...payload.entities.reduce(
+            (acc, col) => {
+              const id = getCollaboratorId(col)
+              acc[id] = collaborator(state.entities[id], col)
+              return acc
+            },
+            { ...state.entities },
+          ),
+        },
+      }
+    default:
       return state
-    }
-
-    switch (type) {
-      case GET_LIST_SUCCESS:
-        return {
-          ...state,
-          [payload.id]: collaborators(state[payload.id], action),
-        }
-      default:
-        return state
-    }
   }
 }
 
-export default createNamedCollaboratorsReducer
+export default collaborators

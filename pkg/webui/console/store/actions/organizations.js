@@ -32,12 +32,6 @@ import {
   createClearEventsActionType,
 } from './events'
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
-import {
-  createGetCollaboratorsListRequestActions,
-  createGetCollaboratorsListActionType,
-  createGetCollaboratorRequestActions,
-  createGetCollaboratorActionType,
-} from './collaborators'
 
 export const SHARED_NAME = 'ORGANIZATION'
 
@@ -100,34 +94,6 @@ export const [
     failure: deleteORganizationFailure,
   },
 ] = createPaginationDeleteActions(SHARED_NAME, id => ({ id }))
-
-export const GET_ORG_COLLABORATOR_BASE = createGetCollaboratorActionType(SHARED_NAME)
-export const [
-  {
-    request: GET_ORG_COLLABORATOR,
-    success: GET_ORG_COLLABORATOR_SUCCESS,
-    failure: GET_ORG_COLLABORATOR_FAILURE,
-  },
-  {
-    request: getOrganizationCollaborator,
-    success: getOrganizationCollaboratorSuccess,
-    failure: getOrganizationCollaboratorFailure,
-  },
-] = createGetCollaboratorRequestActions(SHARED_NAME)
-
-export const GET_ORG_COLLABORATORS_LIST_BASE = createGetCollaboratorsListActionType(SHARED_NAME)
-export const [
-  {
-    request: GET_ORG_COLLABORATORS_LIST,
-    success: GET_ORG_COLLABORATORS_LIST_SUCCESS,
-    failure: GET_ORG_COLLABORATORS_LIST_FAILURE,
-  },
-  {
-    request: getOrganizationCollaboratorsList,
-    success: getOrganizationCollaboratorsListSuccess,
-    failure: getOrganizationCollaboratorsListFailure,
-  },
-] = createGetCollaboratorsListRequestActions(SHARED_NAME)
 
 export const START_ORG_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_ORG_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
