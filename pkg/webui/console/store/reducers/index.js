@@ -48,7 +48,6 @@ import createNamedEventsReducer from './events'
 import link from './link'
 import fetching from './ui/fetching'
 import error from './ui/error'
-import webhook from './webhook'
 import webhooks from './webhooks'
 import webhookFormats from './webhook-formats'
 import pubsub from './pubsub'
@@ -69,7 +68,6 @@ export default history =>
     link,
     devices,
     gateways,
-    webhook,
     webhooks,
     webhookFormats,
     deviceTemplateFormats,

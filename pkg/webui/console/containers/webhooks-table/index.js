@@ -22,6 +22,11 @@ import Message from '../../../lib/components/message'
 import sharedMessages from '../../../lib/shared-messages'
 
 import { getWebhooksList } from '../../../console/store/actions/webhooks'
+import {
+  selectWebhooks,
+  selectWebhooksTotalCount,
+  selectWebhooksFetching,
+} from '../../../console/store/selectors/webhooks'
 
 const m = defineMessages({
   format: 'Format',
@@ -55,8 +60,12 @@ export default class WebhooksTable extends React.Component {
     this.getWebhooksList = () => getWebhooksList(appId)
   }
 
-  baseDataSelector({ webhooks }) {
-    return webhooks
+  baseDataSelector(state) {
+    return {
+      webhooks: selectWebhooks(state),
+      totalCount: selectWebhooksTotalCount(state),
+      fetching: selectWebhooksFetching(state),
+    }
   }
 
   render() {

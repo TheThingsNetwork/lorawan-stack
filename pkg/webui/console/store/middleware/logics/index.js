@@ -23,6 +23,7 @@ import organizations from './organizations'
 import js from './join-server'
 import apiKeys from './api-keys'
 import collaborators from './collaborators'
+import webhooks from './webhooks'
 
 export default [
   ...user,
@@ -36,4 +37,5 @@ export default [
   ...js,
   ...apiKeys,
   ...collaborators,
+  ...webhooks,
 ]

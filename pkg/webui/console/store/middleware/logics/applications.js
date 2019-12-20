@@ -14,8 +14,6 @@
 
 import * as applications from '../../actions/applications'
 import * as link from '../../actions/link'
-import * as webhooks from '../../actions/webhooks'
-import * as webhook from '../../actions/webhook'
 import * as webhookFormats from '../../actions/webhook-formats'
 import * as pubsubs from '../../actions/pubsubs'
 import * as pubsub from '../../actions/pubsub'
@@ -122,26 +120,6 @@ const getApplicationLinkLogic = createRequestLogic({
   },
 })
 
-const getWebhookLogic = createRequestLogic({
-  type: webhook.GET_WEBHOOK,
-  async process({ action }) {
-    const {
-      payload: { appId, webhookId },
-      meta: { selector },
-    } = action
-    return api.application.webhooks.get(appId, webhookId, selector)
-  },
-})
-
-const getWebhooksLogic = createRequestLogic({
-  type: webhooks.GET_WEBHOOKS_LIST,
-  async process({ action }) {
-    const { appId } = action.payload
-    const res = await api.application.webhooks.list(appId)
-    return { webhooks: res.webhooks, totalCount: res.totalCount }
-  },
-})
-
 const getWebhookFormatsLogic = createRequestLogic({
   type: webhookFormats.GET_WEBHOOK_FORMATS,
   async process() {
@@ -184,8 +162,6 @@ export default [
   deleteApplicationLogic,
   getApplicationsLogic,
   getApplicationsRightsLogic,
-  getWebhooksLogic,
-  getWebhookLogic,
   getWebhookFormatsLogic,
   getPubsubLogic,
   getPubsubsLogic,
