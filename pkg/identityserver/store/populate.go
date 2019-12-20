@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 
 	"github.com/jinzhu/gorm"
@@ -35,6 +36,7 @@ func NewPopulator(size int, seed int64) *Populator {
 	}
 	for i := 0; i < size; i++ {
 		application := ttnpb.NewPopulatedApplication(randy, false)
+		application.Description = fmt.Sprintf("Random Application %d", i+1)
 		applicationID := application.EntityIdentifiers()
 		p.Applications = append(p.Applications, application)
 		p.APIKeys[applicationID] = append(
@@ -45,8 +47,10 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		client := ttnpb.NewPopulatedClient(randy, false)
+		client.Description = fmt.Sprintf("Random Client %d", i+1)
 		p.Clients = append(p.Clients, client)
 		gateway := ttnpb.NewPopulatedGateway(randy, false)
+		gateway.Description = fmt.Sprintf("Random Gateway %d", i+1)
 		gatewayID := gateway.EntityIdentifiers()
 		p.Gateways = append(p.Gateways, gateway)
 		p.APIKeys[gatewayID] = append(
@@ -57,6 +61,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		organization := ttnpb.NewPopulatedOrganization(randy, false)
+		organization.Description = fmt.Sprintf("Random Organization %d", i+1)
 		organizationID := organization.EntityIdentifiers()
 		p.Organizations = append(p.Organizations, organization)
 		p.APIKeys[organizationID] = append(
@@ -67,6 +72,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			},
 		)
 		user := ttnpb.NewPopulatedUser(randy, false)
+		user.Description = fmt.Sprintf("Random User %d", i+1)
 		userID := user.EntityIdentifiers()
 		p.Users = append(p.Users, user)
 		p.APIKeys[userID] = append(

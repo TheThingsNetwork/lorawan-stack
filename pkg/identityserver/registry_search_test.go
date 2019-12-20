@@ -35,8 +35,8 @@ func TestRegistrySearch(t *testing.T) {
 		cli := ttnpb.NewEntityRegistrySearchClient(cc)
 
 		apps, err := cli.SearchApplications(ctx, &ttnpb.SearchEntitiesRequest{
-			NameContains: "%",
-			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
+			DescriptionContains: "random",
+			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -45,8 +45,8 @@ func TestRegistrySearch(t *testing.T) {
 		}
 
 		clis, err := cli.SearchClients(ctx, &ttnpb.SearchEntitiesRequest{
-			NameContains: "%",
-			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
+			DescriptionContains: "random",
+			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -55,8 +55,8 @@ func TestRegistrySearch(t *testing.T) {
 		}
 
 		gtws, err := cli.SearchGateways(ctx, &ttnpb.SearchEntitiesRequest{
-			NameContains: "%",
-			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
+			DescriptionContains: "random",
+			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -65,8 +65,8 @@ func TestRegistrySearch(t *testing.T) {
 		}
 
 		orgs, err := cli.SearchOrganizations(ctx, &ttnpb.SearchEntitiesRequest{
-			NameContains: "%",
-			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
+			DescriptionContains: "random",
+			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -75,8 +75,8 @@ func TestRegistrySearch(t *testing.T) {
 		}
 
 		usrs, err := cli.SearchUsers(ctx, &ttnpb.SearchEntitiesRequest{
-			NameContains: "%",
-			FieldMask:    types.FieldMask{Paths: []string{"ids"}},
+			DescriptionContains: "random",
+			FieldMask:           types.FieldMask{Paths: []string{"ids"}},
 		}, creds)
 
 		a.So(err, should.BeNil)
