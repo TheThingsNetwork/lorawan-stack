@@ -4,7 +4,7 @@ description: ""
 weight: 7
 ---
 
-End devices are registered in multiple registries. The Identity Server has a registry with end device metadata, the Network Server's registry contains the MAC configuration and MAC state (including network session keys), the Application Server keeps payload formatters and application session keys, the Join Server keeps the root keys.
+End devices are registered in multiple registries. The Identity Server has a registry with end device metadata, the Network Server's registry contains the MAC configuration, MAC state and network session keys, the Application Server keeps payload formatters and application session keys, the Join Server keeps the root keys.
 
 When registering end devices, we recommend registering them in the following order:
 
@@ -17,7 +17,7 @@ When deleting end devices, we recommend deleting them in the reverse order
 
 ## The `EndDeviceRegistry` service
 
-The Identity Server's `EndDeviceRegistry` is the first place to register an end device. This registry stores the following [EndDevice fields](#message:EndDevice):
+The Identity Server's `EndDeviceRegistry` is the first service, where end device is registered. The following [EndDevice fields](#message:EndDevice) are registered in this registry:
 
 - `ids` (with subfields)
 - `name`
@@ -43,7 +43,7 @@ The Identity Server's `EndDeviceRegistry` is the first place to register an end 
 
 ## The `JsEndDeviceRegistry` service
 
-OTAA devices are registered in the Join Server's `JsEndDeviceRegistry`. This registry stores the following [EndDevice fields](#message:EndDevice):
+OTAA devices are registered in the Join Server's `JsEndDeviceRegistry`. The following [EndDevice fields](#message:EndDevice) are registered in this registry:
 
 - `ids` (with subfields)
 - `provisioner_id` (when provisioning with secure elements)
@@ -61,6 +61,8 @@ OTAA devices are registered in the Join Server's `JsEndDeviceRegistry`. This reg
 - `application_server_kek_label`
 - `claim_authentication_code` (when using [end device claiming]({{< relref "end_device_claiming.md" >}}))
 
+See the [EndDevice message](#message:EndDevice) and its sub-messages for additional fields that can be read from the Join Server's `JsEndDeviceRegistry`.
+
 {{< proto/method service="JsEndDeviceRegistry" method="Set" >}}
 
 {{< proto/method service="JsEndDeviceRegistry" method="Get" >}}
@@ -69,7 +71,7 @@ OTAA devices are registered in the Join Server's `JsEndDeviceRegistry`. This reg
 
 ## The `NsEndDeviceRegistry` service
 
-The Network Server's `NsEndDeviceRegistry` stores the following [EndDevice fields](#message:EndDevice):
+The following [EndDevice fields](#message:EndDevice) are registered in the Network Server's `NsEndDeviceRegistry`:
 
 - `ids` (with subfields)
 - `frequency_plan_id`
@@ -88,6 +90,8 @@ The Network Server's `NsEndDeviceRegistry` stores the following [EndDevice field
   - `s_nwk_s_int_key`
   - `nwk_s_enc_key`
 
+See the [EndDevice message](#message:EndDevice) and its sub-messages for additional fields that can be read from the Network Server's `NsEndDeviceRegistry`.
+
 {{< proto/method service="NsEndDeviceRegistry" method="Set" >}}
 
 {{< proto/method service="NsEndDeviceRegistry" method="Get" >}}
@@ -96,7 +100,7 @@ The Network Server's `NsEndDeviceRegistry` stores the following [EndDevice field
 
 ## The `AsEndDeviceRegistry` service
 
-The Network Server's `NsEndDeviceRegistry` stores the following [EndDevice fields](#message:EndDevice):
+The following [EndDevice fields](#message:EndDevice) are registered in the Application Server's `AsEndDeviceRegistry`:
 
 - `ids` (with subfields)
 - `formatters`:
@@ -108,6 +112,8 @@ The Network Server's `NsEndDeviceRegistry` stores the following [EndDevice field
 - `session.keys`:
   - `session_key_id`
   - `app_s_key`
+
+See the [EndDevice message](#message:EndDevice) and its sub-messages for additional fields that can be read from the Application Server's `AsEndDeviceRegistry`.
 
 {{< proto/method service="AsEndDeviceRegistry" method="Set" >}}
 
