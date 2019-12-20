@@ -3869,6 +3869,15 @@
       "file": "client_registry.go"
     }
   },
+  "error:pkg/identityserver:db_needs_migration": {
+    "translations": {
+      "en": "the database needs to be migrated"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "identityserver.go"
+    }
+  },
   "error:pkg/identityserver:invalid_authorization": {
     "translations": {
       "en": "invalid authorization"

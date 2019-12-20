@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/pkg/email/smtp"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/oauth"
@@ -115,6 +116,8 @@ func (is *IdentityServer) configFromContext(ctx context.Context) *Config {
 	return is.config
 }
 
+var errDBNeedsMigration = errors.Define("db_needs_migration", "the database needs to be migrated")
+
 // New returns new *IdentityServer.
 func New(c *component.Component, config *Config) (is *IdentityServer, err error) {
 	is = &IdentityServer{
@@ -130,7 +133,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		is.db = is.db.Debug()
 	}
 	if err = store.Check(is.db); err != nil {
-		return nil, err
+		return nil, errDBNeedsMigration.WithCause(err)
 	}
 	go func() {
 		<-is.Context().Done()
