@@ -3716,6 +3716,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/identityserver/store:database_table_column": {
+    "translations": {
+      "en": "column `{column}` does not exist in database table `{table}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/identityserver/store:end_device_not_found": {
     "translations": {
       "en": "end device `{application_id}:{device_id}` not found"
