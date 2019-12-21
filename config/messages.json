@@ -2681,6 +2681,15 @@
       "file": "devicetemplateconverter.go"
     }
   },
+  "error:pkg/devicetemplates:microchip_certificate_san": {
+    "translations": {
+      "en": "invalid Microchip certificate Subject Alternate Name"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "microchip.go"
+    }
+  },
   "error:pkg/devicetemplates:microchip_data": {
     "translations": {
       "en": "invalid Microchip data"
@@ -2690,9 +2699,27 @@
       "file": "microchip.go"
     }
   },
+  "error:pkg/devicetemplates:microchip_no_certificate": {
+    "translations": {
+      "en": "no Microchip certificate found"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "microchip.go"
+    }
+  },
   "error:pkg/devicetemplates:microchip_public_key": {
     "translations": {
       "en": "unknown Microchip public key ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "microchip.go"
+    }
+  },
+  "error:pkg/devicetemplates:microchip_unknown_dev_eui": {
+    "translations": {
+      "en": "unknown Microchip DevEUI"
     },
     "description": {
       "package": "pkg/devicetemplates",
