@@ -122,10 +122,10 @@ func (gcs *GatewayConfigurationServer) RegisterRoutes(server *web.Server) {
 	group.GET("/semtechudp/global_conf.json", gcs.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
 		return semtechudp.Build(gtw, gcs.FrequencyPlans)
 	}))
-	group.GET("/cpf/lorad/lorad.json", gcs.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
+	group.GET("/kerlink-cpf/lorad/lorad.json", gcs.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
 		return cpf.BuildLorad(gtw, gcs.FrequencyPlans)
 	}))
-	group.GET("/cpf/lorafwd/lorafwd.toml", gcs.makeTextMarshalerHandler("application/toml", func(ctx context.Context, gtw *ttnpb.Gateway) (encoding.TextMarshaler, error) {
+	group.GET("/kerlink-cpf/lorafwd/lorafwd.toml", gcs.makeTextMarshalerHandler("application/toml", func(ctx context.Context, gtw *ttnpb.Gateway) (encoding.TextMarshaler, error) {
 		return cpf.BuildLorafwd(gtw)
 	}))
 }
