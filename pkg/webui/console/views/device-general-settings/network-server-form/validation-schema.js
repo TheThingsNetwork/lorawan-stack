@@ -19,7 +19,7 @@ import sharedMessages from '../../../../lib/shared-messages'
 
 import m from '../../../components/device-data-form/messages'
 
-import { parseLorawanMacVersion } from '../utils'
+import { parseLorawanMacVersion, ACTIVATION_MODES } from '../utils'
 
 const random16BytesString = () => randomByteString(32)
 const toUndefined = value => (!Boolean(value) ? undefined : value)
@@ -30,7 +30,7 @@ const validationSchema = Yup.object().shape({
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   _activation_mode: Yup.string(),
   session: Yup.object().when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
-    if (mode === 'abp') {
+    if (mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.MULTICAST) {
       const isNewVersion = parseLorawanMacVersion(version) >= 110
       return schema.shape({
         dev_addr: Yup.string()
@@ -78,9 +78,9 @@ const validationSchema = Yup.object().shape({
     return schema.strip()
   }),
   root_keys: Yup.object().when(
-    ['_external_js', 'lorawan_version', '_supports_join', '_activation_mode'],
-    (externalJs, version, supportsJoin, mode, schema) => {
-      if (mode === 'otaa') {
+    ['_external_js', 'lorawan_version', '_activation_mode'],
+    (externalJs, version, mode, schema) => {
+      if (mode === ACTIVATION_MODES.OTAA) {
         const strippedSchema = Yup.object().strip()
         const keySchema = Yup.lazy(() => {
           return !externalJs
@@ -92,10 +92,6 @@ const validationSchema = Yup.object().shape({
               })
             : strippedSchema
         })
-
-        if (!supportsJoin) {
-          return schema.strip()
-        }
 
         if (externalJs) {
           return schema.shape({

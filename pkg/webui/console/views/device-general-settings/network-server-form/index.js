@@ -108,7 +108,6 @@ const NetworkServerForm = React.memo(props => {
       _activation_mode,
       mac_settings,
       root_keys,
-      _supports_join: supports_join,
       _external_js: extJs,
     }
   }, [device])
@@ -119,11 +118,7 @@ const NetworkServerForm = React.memo(props => {
       const isOTAA = initialValues._activation_mode === ACTIVATION_MODES.OTAA
 
       const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, [
-        '_activation_mode',
-        '_external_js',
-        '_supports_join',
-      ])
+      const updatedValues = diff(initialValues, castedValues, ['_activation_mode', '_external_js'])
 
       if (isABP) {
         // Do not reset session keys
