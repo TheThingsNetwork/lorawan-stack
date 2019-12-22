@@ -187,23 +187,23 @@ class DeviceDataForm extends Component {
           component={Input}
         />
         <Form.Field
-          title={sharedMessages.sNtwkSIKey}
+          title={sharedMessages.sNwkSIKey}
           name="session.keys.s_nwk_s_int_key.key"
           type="byte"
           min={16}
           max={16}
           placeholder={m.leaveBlankPlaceholder}
-          description={m.sNtwkSIKeyDescription}
+          description={m.sNwkSIKeyDescription}
           component={Input}
         />
         <Form.Field
-          title={sharedMessages.ntwkSEncKey}
+          title={sharedMessages.nwkSEncKey}
           name="session.keys.nwk_s_enc_key.key"
           type="byte"
           min={16}
           max={16}
           placeholder={m.leaveBlankPlaceholder}
-          description={m.ntwkSEncKeyDescription}
+          description={m.nwkSEncKeyDescription}
           component={Input}
         />
         <Form.Field
