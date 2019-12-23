@@ -20,11 +20,13 @@ import classnames from 'classnames'
 
 import debounce from '../../../lib/debounce'
 
+import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import Tabular from '../../../components/table'
 import Input from '../../../components/input'
 import Button from '../../../components/button'
 import Tabs from '../../../components/tabs'
+import PAGE_SIZES from '../../constants/page-sizes'
 
 import style from './fetch-table.styl'
 
@@ -62,6 +64,58 @@ const filterValidator = function(filters) {
 })
 @bind
 class FetchTable extends Component {
+  static propTypes = {
+    addMessage: PropTypes.message,
+    baseDataSelector: PropTypes.func.isRequired,
+    fetching: PropTypes.bool,
+    fetchingSearch: PropTypes.bool,
+    handlesPagination: PropTypes.bool,
+    headers: PropTypes.arrayOf(
+      PropTypes.shape({
+        displayName: PropTypes.message.isRequired,
+        getValue: PropTypes.func,
+        name: PropTypes.string,
+        render: PropTypes.func,
+        centered: PropTypes.bool,
+        sortable: PropTypes.bool,
+        width: PropTypes.number,
+      }),
+    ),
+    itemPathPrefix: PropTypes.string,
+    items: PropTypes.arrayOf(PropTypes.shape({})),
+    mayAdd: PropTypes.bool,
+    pageSize: PropTypes.number,
+    pathname: PropTypes.string.isRequired,
+    searchable: PropTypes.bool,
+    tableTitle: PropTypes.message,
+    tabs: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.message.isRequired,
+        name: PropTypes.string.isRequired,
+        icon: PropTypes.string,
+        disabled: PropTypes.bool,
+      }),
+    ),
+    totalCount: PropTypes.number,
+  }
+
+  static defaultProps = {
+    pageSize: PAGE_SIZES.REGULAR,
+    filterValidator,
+    itemPathPrefix: '',
+    mayAdd: false,
+    searchable: false,
+    handlesPagination: false,
+    fetching: false,
+    totalCount: 0,
+    items: [],
+    headers: [],
+    fetchingSearch: false,
+    addMessage: undefined,
+    tableTitle: undefined,
+    tabs: [],
+  }
+
   constructor(props) {
     super(props)
 
@@ -278,12 +332,6 @@ class FetchTable extends Component {
       </div>
     )
   }
-}
-
-FetchTable.defaultProps = {
-  pageSize: 20,
-  filterValidator,
-  itemPathPrefix: '',
 }
 
 export default FetchTable

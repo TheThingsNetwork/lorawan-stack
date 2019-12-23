@@ -28,6 +28,7 @@ import {
   selectPubsubsFetching,
 } from '../../../console/store/selectors/pubsubs'
 import { natsUrl as natsUrlRegexp } from '../../lib/regexp'
+import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   format: 'Format',
@@ -81,6 +82,10 @@ const getItemPathPrefix = item => `/${item.ids.pub_sub_id}`
 
 @bind
 export default class PubsubsTable extends React.Component {
+  static propTypes = {
+    appId: PropTypes.string.isRequired,
+  }
+
   constructor(props) {
     super(props)
 

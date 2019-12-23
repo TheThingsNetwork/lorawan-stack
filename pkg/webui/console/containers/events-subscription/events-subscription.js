@@ -20,6 +20,24 @@ import PropTypes from '../../../lib/prop-types'
 const { Widget } = Events
 
 class EventsSubscription extends React.Component {
+  static propTypes = {
+    error: PropTypes.error,
+    events: PropTypes.events,
+    id: PropTypes.string.isRequired,
+    onClear: PropTypes.func,
+    onRestart: PropTypes.func.isRequired,
+    toAllUrl: PropTypes.string,
+    widget: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    widget: false,
+    onClear: () => null,
+    toAllUrl: undefined,
+    events: [],
+    error: undefined,
+  }
+
   render() {
     const { id, widget, events, onClear, toAllUrl, onRestart, error } = this.props
 
@@ -45,24 +63,6 @@ class EventsSubscription extends React.Component {
       />
     )
   }
-}
-
-EventsSubscription.propTypes = {
-  error: PropTypes.error,
-  events: PropTypes.events,
-  id: PropTypes.string.isRequired,
-  onClear: PropTypes.func,
-  onRestart: PropTypes.func.isRequired,
-  toAllUrl: PropTypes.string,
-  widget: PropTypes.bool,
-}
-
-EventsSubscription.defaultProps = {
-  widget: false,
-  onClear: () => null,
-  toAllUrl: null,
-  events: [],
-  error: undefined,
 }
 
 export default EventsSubscription

@@ -63,22 +63,26 @@ const DevAddrField = function(props) {
 }
 
 DevAddrField.propTypes = {
-  className: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  title: PropTypes.message.isRequired,
-  placeholder: PropTypes.message,
-  description: PropTypes.message,
-  fetching: PropTypes.bool.isRequired,
-  error: PropTypes.error,
-  disabled: PropTypes.bool,
-  required: PropTypes.bool,
   autoFocus: PropTypes.bool,
-  horizontal: PropTypes.bool,
-  onDevAddrGenerate: PropTypes.func.isRequired,
+  className: PropTypes.string,
+  description: PropTypes.message,
+  disabled: PropTypes.bool,
+  error: PropTypes.error,
+  fetching: PropTypes.bool.isRequired,
   generatedDevAddr: PropTypes.string.isRequired,
+  horizontal: PropTypes.bool,
+  name: PropTypes.string.isRequired,
+  onDevAddrGenerate: PropTypes.func.isRequired,
+  placeholder: PropTypes.message,
+  required: PropTypes.bool,
+  title: PropTypes.message.isRequired,
 }
 
 DevAddrField.defaultProps = {
+  className: undefined,
+  description: undefined,
+  error: undefined,
+  placeholder: undefined,
   disabled: false,
   required: false,
   autoFocus: false,
