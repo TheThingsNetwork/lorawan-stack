@@ -191,14 +191,6 @@ const JoinServerForm = React.memo(props => {
         component={Input}
         disabled={externalJs}
       />
-      <Form.Field
-        title={sharedMessages.macVersion}
-        name="_lorawan_version"
-        component={Input}
-        type="hidden"
-        hidden
-        disabled
-      />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       </SubmitBar>
