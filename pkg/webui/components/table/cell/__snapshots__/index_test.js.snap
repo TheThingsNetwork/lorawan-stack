@@ -2,8 +2,11 @@
 
 exports[`DataCell should match snapshot 1`] = `
 <Cell
+  centered={false}
   className="cellData"
+  colSpan={1}
   component="td"
+  small={false}
 >
   Data entry
 </Cell>
@@ -11,8 +14,11 @@ exports[`DataCell should match snapshot 1`] = `
 
 exports[`HeadCell should match snapshot 1`] = `
 <Cell
+  centered={false}
   className="cellHead"
+  colSpan={1}
   component="th"
+  small={false}
 >
   <Message
     content="Head cell"

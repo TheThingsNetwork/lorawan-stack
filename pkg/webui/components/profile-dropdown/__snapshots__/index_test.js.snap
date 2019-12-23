@@ -15,6 +15,10 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
   </span>
   <Icon
     icon="arrow_drop_down"
+    large={false}
+    nudgeDown={false}
+    nudgeUp={false}
+    small={false}
   />
   <Dropdown
     items={
@@ -50,6 +54,10 @@ exports[`Profile Dropdown is in initial state should match snapshot 1`] = `
   </span>
   <Icon
     icon="arrow_drop_down"
+    large={false}
+    nudgeDown={false}
+    nudgeUp={false}
+    small={false}
   />
 </div>
 `;

@@ -11,6 +11,10 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
       <Icon
         className="icon"
         icon="application"
+        large={false}
+        nudgeDown={false}
+        nudgeUp={false}
+        small={false}
       />
       <Message
         className="message"
@@ -18,6 +22,8 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
       />
     </div>
     <SideNavigationList
+      depth={0}
+      isExpanded={false}
       isMinimized={false}
       items={
         Array [
@@ -63,6 +69,10 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
       <Icon
         className="icon"
         icon="application"
+        large={false}
+        nudgeDown={false}
+        nudgeUp={false}
+        small={false}
       />
       <Message
         className="message"
@@ -70,6 +80,8 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
       />
     </div>
     <SideNavigationList
+      depth={0}
+      isExpanded={false}
       isMinimized={false}
       items={
         Array [

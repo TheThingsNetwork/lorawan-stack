@@ -45,7 +45,7 @@ class Pagination extends React.PureComponent {
      */
     marginPagesDisplayed: PropTypes.number,
     /** An onClick handler that gets called with the new page number */
-    onPageChange: PropTypes.func.isRequired,
+    onPageChange: PropTypes.func,
     /** The total number of pages */
     pageCount: PropTypes.number.isRequired,
     /**
@@ -61,6 +61,7 @@ class Pagination extends React.PureComponent {
     hideIfOnlyOnePage: true,
     initialPage: 1,
     marginPagesDisplayed: 1,
+    onPageChange: () => null,
     pageRangeDisplayed: 1,
   }
 
@@ -116,6 +117,5 @@ class Pagination extends React.PureComponent {
     )
   }
 }
-
 
 export default Pagination

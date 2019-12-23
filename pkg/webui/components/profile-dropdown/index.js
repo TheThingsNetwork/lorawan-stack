@@ -99,7 +99,7 @@ export default class ProfileDropdown extends React.PureComponent {
 }
 
 ProfileDropdown.propTypes = {
-  anchored: PropTypes.bool.isRequired,
+  anchored: PropTypes.bool,
   /**
    * A list of items for the dropdown component
    * See `<Dropdown />`'s `items` proptypes for details
@@ -108,6 +108,10 @@ ProfileDropdown.propTypes = {
   dropdownItems: dropdownItemsPropTypes,
   /** The id of the current user */
   userId: PropTypes.string.isRequired,
+}
+
+ProfileDropdown.defaultProps = {
+  anchored: undefined,
 }
 
 const Dropdown = ({ items, anchored }) => (
@@ -143,7 +147,7 @@ const Dropdown = ({ items, anchored }) => (
 
 Dropdown.propTypes = {
   /** Flag identifying whether link should be rendered as plain anchor link */
-  anchored: PropTypes.bool.isRequired,
+  anchored: PropTypes.bool,
   /**
    * A list of items for the dropdown
    * @param {(string|Object)} title - The title to be displayed
@@ -153,6 +157,10 @@ Dropdown.propTypes = {
    */
   // eslint-disable-next-line react/require-default-props
   items: dropdownItemsPropTypes,
+}
+
+Dropdown.defaultProps = {
+  anchored: undefined,
 }
 
 export { Dropdown }
