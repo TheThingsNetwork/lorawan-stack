@@ -3743,6 +3743,15 @@
       "file": "registry.go"
     }
   },
+  "error:pkg/identityserver/store:database_table_column": {
+    "translations": {
+      "en": "column `{column}` does not exist in database table `{table}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/identityserver/store:end_device_not_found": {
     "translations": {
       "en": "end device `{application_id}:{device_id}` not found"
@@ -3894,6 +3903,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "client_registry.go"
+    }
+  },
+  "error:pkg/identityserver:db_needs_migration": {
+    "translations": {
+      "en": "the database needs to be migrated"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "identityserver.go"
     }
   },
   "error:pkg/identityserver:invalid_authorization": {
