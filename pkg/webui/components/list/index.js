@@ -25,6 +25,38 @@ import style from './list.styl'
 
 @bind
 class List extends React.PureComponent {
+  static propTypes = {
+    bordered: PropTypes.bool,
+    children: PropTypes.node,
+    className: PropTypes.string,
+    component: PropTypes.oneOf(['ol', 'ul']),
+    emptyMessage: PropTypes.message,
+    emptyMessageValues: PropTypes.shape({}),
+    footer: PropTypes.node,
+    header: PropTypes.node,
+    items: PropTypes.arrayOf(PropTypes.shape({})),
+    listClassName: PropTypes.string,
+    renderItem: PropTypes.func,
+    rowKey: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+    size: PropTypes.oneOf(['small', 'default', 'large', 'none']),
+  }
+
+  static defaultProps = {
+    children: undefined,
+    className: undefined,
+    component: 'ol',
+    size: 'default',
+    items: [],
+    bordered: false,
+    emptyMessage: sharedMessages.noMatch,
+    emptyMessageValues: {},
+    header: null,
+    renderItem: () => null,
+    footer: null,
+    listClassName: undefined,
+    rowKey: undefined,
+  }
+
   renderItem(item, index) {
     const { rowKey, renderItem, size } = this.props
 
@@ -109,32 +141,6 @@ class List extends React.PureComponent {
       </div>
     )
   }
-}
-
-List.propTypes = {
-  size: PropTypes.oneOf(['small', 'default', 'large', 'none']),
-  renderItem: PropTypes.func,
-  items: PropTypes.array,
-  rowKey: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-  component: PropTypes.oneOf(['ol', 'ul']),
-  bordered: PropTypes.bool,
-  emptyMessage: PropTypes.message,
-  emptyMessageValues: PropTypes.object,
-  header: PropTypes.node,
-  listClassName: PropTypes.string,
-  footer: PropTypes.node,
-}
-
-List.defaultProps = {
-  component: 'ol',
-  size: 'default',
-  items: [],
-  bordered: false,
-  emptyMessage: sharedMessages.noMatch,
-  emptyMessageValues: {},
-  header: null,
-  renderItem: () => null,
-  footer: null,
 }
 
 List.Item = ListItem

@@ -40,18 +40,6 @@ const validationSchema = Yup.object().shape({
 
 @bind
 export default class CollaboratorForm extends Component {
-  static defaultProps = {
-    onSubmitSuccess: () => null,
-    onSubmitFailure: () => null,
-    onDelete: () => null,
-    onDeleteSuccess: () => null,
-    onDeleteFailure: () => null,
-    pseudoRights: [],
-    error: '',
-    collaborator: undefined,
-    update: false,
-  }
-
   static propTypes = {
     collaborator: PropTypes.collaborator,
     error: PropTypes.error,
@@ -64,6 +52,18 @@ export default class CollaboratorForm extends Component {
     rights: PropTypes.rights.isRequired,
     pseudoRights: PropTypes.rights,
     update: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    onSubmitSuccess: () => null,
+    onSubmitFailure: () => null,
+    onDelete: () => null,
+    onDeleteSuccess: () => null,
+    onDeleteFailure: () => null,
+    pseudoRights: [],
+    error: '',
+    collaborator: undefined,
+    update: false,
   }
 
   state = {

@@ -80,15 +80,14 @@ class Entry extends React.Component {
 }
 
 Entry.propTypes = {
-  className: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  value: PropTypes.object.isRequired,
-  keyPlaceholder: PropTypes.message.isRequired,
-  valuePlaceholder: PropTypes.message.isRequired,
   index: PropTypes.number.isRequired,
-  onRemoveButtonClick: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired,
+  keyPlaceholder: PropTypes.message.isRequired,
+  name: PropTypes.string.isRequired,
   onBlur: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onRemoveButtonClick: PropTypes.func.isRequired,
+  value: PropTypes.shape({ key: PropTypes.string, value: PropTypes.string }).isRequired,
+  valuePlaceholder: PropTypes.message.isRequired,
 }
 
 export default Entry

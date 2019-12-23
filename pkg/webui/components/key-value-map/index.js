@@ -29,6 +29,25 @@ const m = defineMessages({
 
 @bind
 class KeyValueMap extends React.PureComponent {
+  static propTypes = {
+    addMessage: PropTypes.message,
+    className: PropTypes.string,
+    keyPlaceholder: PropTypes.message.isRequired,
+    name: PropTypes.string.isRequired,
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    value: PropTypes.arrayOf(PropTypes.shape({ key: PropTypes.string, value: PropTypes.string })),
+    valuePlaceholder: PropTypes.message.isRequired,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    onBlur: () => null,
+    onChange: () => null,
+    value: [],
+    addMessage: m.addEntry,
+  }
+
   handleEntryChange(index, newValues) {
     const { onChange, value } = this.props
     onChange(value.map((kv, i) => (index !== i ? kv : { ...kv, ...newValues })))
@@ -85,22 +104,6 @@ class KeyValueMap extends React.PureComponent {
       </div>
     )
   }
-}
-
-KeyValueMap.propTypes = {
-  className: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  value: PropTypes.array,
-  keyPlaceholder: PropTypes.message.isRequired,
-  valuePlaceholder: PropTypes.message.isRequired,
-  addMessage: PropTypes.message,
-  onChange: PropTypes.func,
-  onBlur: PropTypes.func,
-}
-
-KeyValueMap.defaultProps = {
-  value: [],
-  addMessage: m.addEntry,
 }
 
 export default KeyValueMap

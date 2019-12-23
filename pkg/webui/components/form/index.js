@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable react/sort-prop-types */
 import React from 'react'
 import { Formik } from 'formik'
 import bind from 'autobind-decorator'
@@ -27,8 +28,25 @@ import FormInfoField from './field/info'
 import FormSubmit from './submit'
 
 import style from './form.styl'
-
 class InnerForm extends React.PureComponent {
+  static propTypes = {
+    children: PropTypes.node.isRequired,
+    className: PropTypes.string,
+    formError: PropTypes.error,
+    formInfo: PropTypes.string,
+    handleSubmit: PropTypes.func.isRequired,
+    horizontal: PropTypes.bool,
+    isSubmitting: PropTypes.bool.isRequired,
+    isValid: PropTypes.bool.isRequired,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    formError: '',
+    formInfo: '',
+    horizontal: true,
+  }
+
   constructor(props) {
     super(props)
     this.notificationRef = React.createRef()
@@ -87,9 +105,9 @@ class InnerForm extends React.PureComponent {
 }
 
 const formRenderer = ({ children, ...rest }) =>
-  function(props) {
+  function(renderProps) {
     const { className, horizontal, error, info, disabled } = rest
-    const { handleSubmit, ...restFormikProps } = props
+    const { handleSubmit, ...restFormikProps } = renderProps
 
     return (
       <InnerForm
@@ -108,6 +126,25 @@ const formRenderer = ({ children, ...rest }) =>
 
 @bind
 class Form extends React.PureComponent {
+  static propTypes = {
+    formikRef: PropTypes.shape({ current: PropTypes.any }),
+    initialValues: PropTypes.shape({}),
+    isInitialValid: PropTypes.bool,
+    onReset: PropTypes.func,
+    onSubmit: PropTypes.func.isRequired,
+    validateOnBlur: PropTypes.bool,
+    validateOnChange: PropTypes.bool,
+    validationSchema: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.func]),
+  }
+  static defaultProps = {
+    formikRef: undefined,
+    initialValues: undefined,
+    isInitialValid: false,
+    onReset: () => null,
+    validateOnBlur: true,
+    validateOnChange: false,
+    validationSchema: undefined,
+  }
   render() {
     const {
       onSubmit,
@@ -120,6 +157,7 @@ class Form extends React.PureComponent {
       formikRef,
       ...rest
     } = this.props
+
     return (
       <Formik
         ref={formikRef}
@@ -134,36 +172,6 @@ class Form extends React.PureComponent {
       />
     )
   }
-}
-
-Form.propTypes = {
-  // formik props
-  onSubmit: PropTypes.func.isRequired,
-  onReset: PropTypes.func,
-  initialValues: PropTypes.object.isRequired,
-  validateOnBlur: PropTypes.bool,
-  validateOnChange: PropTypes.bool,
-  validationSchema: PropTypes.object,
-  isInitialValid: PropTypes.bool,
-  formikRef: PropTypes.shape({ current: PropTypes.instanceOf(Formik) }),
-  // custom props
-  horizontal: PropTypes.bool,
-  className: PropTypes.string,
-  error: PropTypes.error,
-  disabled: PropTypes.bool,
-}
-
-Form.defaultProps = {
-  className: null,
-  submitEnabledWhenInvalid: false,
-  validateOnBlur: true,
-  validateOnChange: false,
-  validationSchema: {},
-  isInitialValid: false,
-  onReset: () => null,
-  error: '',
-  horizontal: true,
-  disabled: false,
 }
 
 Form.Field = FormField

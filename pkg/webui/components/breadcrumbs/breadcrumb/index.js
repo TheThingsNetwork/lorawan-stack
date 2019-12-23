@@ -22,7 +22,7 @@ import PropTypes from '../../../lib/prop-types'
 
 import style from './breadcrumb.styl'
 
-const Breadcrumb = function({ className, path, content, icon = null, isLast = false }) {
+const Breadcrumb = function({ className, path, content, icon, isLast }) {
   const isRawText = typeof content === 'string' || typeof content === 'number'
   let Component
   let componentProps
@@ -43,14 +43,21 @@ const Breadcrumb = function({ className, path, content, icon = null, isLast = fa
 }
 
 Breadcrumb.propTypes = {
-  /** The path for a breadcrumb */
-  path: PropTypes.string.isRequired,
-  /** The name of the icon to display within the breadcrumb */
-  icon: PropTypes.string,
+  className: PropTypes.string,
   /** The content of the breadcrumb */
   content: PropTypes.message.isRequired,
+  /** The name of the icon to display within the breadcrumb */
+  icon: PropTypes.string,
   /** The flag for rendering last breadcrumb as plain text */
   isLast: PropTypes.bool,
+  /** The path for a breadcrumb */
+  path: PropTypes.string.isRequired,
+}
+
+Breadcrumb.defaultProps = {
+  className: undefined,
+  icon: null,
+  isLast: false,
 }
 
 export default Breadcrumb

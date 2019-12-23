@@ -25,6 +25,21 @@ import style from './crud.styl'
 import { getEventActionByName } from '..'
 
 class CRUDEvent extends React.PureComponent {
+  static propTypes = {
+    className: PropTypes.string,
+    event: PropTypes.event.isRequired,
+    expandedClassName: PropTypes.string,
+    overviewClassName: PropTypes.string,
+    widget: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    className: PropTypes.string,
+    expandedClassName: PropTypes.string,
+    overviewClassName: PropTypes.string,
+    widget: false,
+  }
+
   render() {
     const { className, event, widget, overviewClassName, expandedClassName } = this.props
 
@@ -59,15 +74,6 @@ class CRUDEvent extends React.PureComponent {
       />
     )
   }
-}
-
-CRUDEvent.propTypes = {
-  event: PropTypes.event.isRequired,
-  widget: PropTypes.bool,
-}
-
-CRUDEvent.defaultProps = {
-  widget: false,
 }
 
 export default CRUDEvent

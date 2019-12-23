@@ -26,6 +26,50 @@ import style from './item.styl'
 
 @bind
 class SideNavigationItem extends React.PureComponent {
+  static propTypes = {
+    className: PropTypes.string,
+    depth: PropTypes.number,
+    /** A flag specifying whether the path of the linkable item should be matched exactly or not */
+    exact: PropTypes.bool,
+    /** The name of the icon for the side navigation item */
+    icon: PropTypes.string,
+    /** A flag specifying whether the side navigation item is active or not */
+    isActive: PropTypes.bool.isRequired,
+    /**
+     * A flag specifying whether the side navigation item is composed of multiple
+     * entries and is collapsable/expandable
+     */
+    isCollapsable: PropTypes.bool,
+    /** A flag specifying whether the side navigation item is expanded */
+    isExpanded: PropTypes.bool.isRequired,
+    /** A flag specifying whether the side navigation item is minimized or not */
+    isMinimized: PropTypes.bool.isRequired,
+    /** Sub-items of a collapsible side navigation item */
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        icon: PropTypes.string,
+        path: PropTypes.string,
+        title: PropTypes.message,
+      }),
+    ),
+    /** Function to be called when the item gets selected */
+    onExpand: PropTypes.func.isRequired,
+    /** The path of the linkable side navigation item */
+    path: PropTypes.string,
+    /** The title of the side navigation item */
+    title: PropTypes.message.isRequired,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    exact: true,
+    icon: undefined,
+    isCollapsable: false,
+    items: undefined,
+    depth: undefined,
+    path: undefined,
+  }
+
   onExpandCollapsableItem() {
     this.props.onExpand(false)
   }
@@ -39,11 +83,11 @@ class SideNavigationItem extends React.PureComponent {
       className,
       title,
       depth,
-      icon = null,
-      path = null,
-      exact = true,
+      icon,
+      path,
+      exact,
       onExpand,
-      isCollapsable = false,
+      isCollapsable,
       isMinimized,
       isExpanded,
       isActive,
@@ -122,6 +166,28 @@ const CollapsableItem = ({
   </Fragment>
 )
 
+CollapsableItem.propTypes = {
+  depth: PropTypes.number.isRequired,
+  icon: PropTypes.string,
+  isActive: PropTypes.bool.isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+  isMinimized: PropTypes.bool.isRequired,
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      icon: PropTypes.string,
+      path: PropTypes.string,
+      title: PropTypes.message,
+    }),
+  ).isRequired,
+  onClick: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired,
+  title: PropTypes.message.isRequired,
+}
+
+CollapsableItem.defaultProps = {
+  icon: undefined,
+}
+
 const LinkItem = ({ title, icon, exact, path, onExpand }) => (
   <NavigationLink
     className={style.link}
@@ -136,28 +202,17 @@ const LinkItem = ({ title, icon, exact, path, onExpand }) => (
   </NavigationLink>
 )
 
-SideNavigationItem.propTypes = {
-  /** The title of the side navigation item */
-  title: PropTypes.message.isRequired,
-  /** The name of the icon for the side navigation item */
+LinkItem.propTypes = {
+  exact: PropTypes.bool.isRequired,
   icon: PropTypes.string,
-  /** The path of the linkable side navigation item */
-  path: PropTypes.string,
-  /** A flag specifying whether the path of the linkable item should be matched exactly or not */
-  exact: PropTypes.bool,
-  /** A flag specifying whether the side navigation item is active or not */
-  isActive: PropTypes.bool.isRequired,
-  /** A flag specifying whether the side navigation item is minimized or not */
-  isMinimized: PropTypes.bool.isRequired,
-  /**
-   * A flag specifying whether the side navigation item is composed of multiple
-   * entries and is collapsable/expandable
-   */
-  isCollapsable: PropTypes.bool.isRequired,
-  /** A flag specifying whether the side navigation item is expanded */
-  isExpanded: PropTypes.bool.isRequired,
-  /** Function to be called when the item gets selected */
   onExpand: PropTypes.func.isRequired,
+  path: PropTypes.string,
+  title: PropTypes.message.isRequired,
+}
+
+LinkItem.defaultProps = {
+  icon: undefined,
+  path: undefined,
 }
 
 export default SideNavigationItem

@@ -17,6 +17,8 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
 import Button from '../../button'
+
+import PropTypes from '../../../lib/prop-types'
 import style from './details.styl'
 
 const m = defineMessages({
@@ -26,6 +28,10 @@ const m = defineMessages({
 
 @bind
 export default class Details extends React.PureComponent {
+  static propTypes = {
+    details: PropTypes.oneOfType([PropTypes.string, PropTypes.error]).isRequired,
+  }
+
   state = {
     expanded: false,
     buttonIcon: 'arrow_drop_down',

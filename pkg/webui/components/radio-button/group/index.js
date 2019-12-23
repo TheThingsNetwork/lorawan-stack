@@ -102,17 +102,21 @@ class RadioGroup extends React.Component {
 }
 
 RadioGroup.propTypes = {
-  name: PropTypes.string.isRequired,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+  className: PropTypes.string,
   disabled: PropTypes.bool,
   horizontal: PropTypes.bool,
-  value: PropTypes.string,
   initialValue: PropTypes.string,
+  name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+  value: PropTypes.string,
 }
 
 RadioGroup.defaultProps = {
+  className: undefined,
   disabled: false,
+  initialValue: undefined,
+  value: undefined,
   horizontal: false,
   onChange: () => null,
 }

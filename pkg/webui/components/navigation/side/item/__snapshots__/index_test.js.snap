@@ -6,7 +6,6 @@ exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
 >
   <CollapsableItem
     depth={0}
-    icon={null}
     isActive={false}
     isExpanded={true}
     isMinimized={false}
@@ -36,7 +35,6 @@ exports[`SideNavigationItem is flat should match snapshot 1`] = `
   <LinkItem
     depth={0}
     exact={true}
-    icon={null}
     onExpand={[Function]}
     path="/test-title"
     title="test-title"

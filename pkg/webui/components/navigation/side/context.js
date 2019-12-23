@@ -14,11 +14,20 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
+import PropTypes from '../../../lib/prop-types'
 
 const { Provider, Consumer } = React.createContext()
 
 @bind
 class SideNavigationProvider extends React.Component {
+  static propTypes = {
+    children: PropTypes.node,
+  }
+
+  static defaultProps = {
+    children: undefined,
+  }
+
   state = {
     header: undefined,
     entries: undefined,
@@ -50,6 +59,11 @@ const withSideNavigation = selectData =>
   function(Component) {
     @bind
     class WithSideNavigation extends React.Component {
+      static propTypes = {
+        remove: PropTypes.func.isRequired,
+        set: PropTypes.func.isRequired,
+      }
+
       constructor(props) {
         super(props)
 

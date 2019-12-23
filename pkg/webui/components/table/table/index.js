@@ -22,6 +22,7 @@ import SortButton from '../sort-button'
 import Row from '../row'
 import { HeadCell, DataCell } from '../cell'
 
+import PropTypes from '../../../lib/prop-types'
 import style from './table.styl'
 
 /* Empty message to render when no entries provided */
@@ -32,6 +33,18 @@ const Empty = ({ className, colSpan, message }) => (
     </DataCell>
   </Row>
 )
+
+Empty.propTypes = {
+  className: PropTypes.string,
+  colSpan: PropTypes.number,
+  message: PropTypes.message,
+}
+
+Empty.defaultProps = {
+  className: undefined,
+  colSpan: 1,
+  message: undefined,
+}
 
 @bind
 class Table extends React.Component {
@@ -53,6 +66,16 @@ class Table extends React.Component {
       </table>
     )
   }
+}
+
+Table.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+}
+
+Table.defaultProps = {
+  className: undefined,
+  children: undefined,
 }
 
 export default Table

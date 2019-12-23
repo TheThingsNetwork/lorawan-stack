@@ -13,6 +13,7 @@ exports[`Table has clickable rows should match snapshot 1`] = `
           clickable={true}
           footer={false}
           head={false}
+          onClick={[Function]}
         >
           <HeadCell
             content="test-column-display"
@@ -91,6 +92,7 @@ exports[`Table has no data provided should match snapshot 1`] = `
           clickable={true}
           footer={false}
           head={false}
+          onClick={[Function]}
         >
           <HeadCell
             content="test-column-display"
@@ -129,6 +131,7 @@ exports[`Table is paginated should match snapshot 1`] = `
           clickable={true}
           footer={false}
           head={false}
+          onClick={[Function]}
         >
           <HeadCell
             content="test-column-display"
@@ -150,6 +153,7 @@ exports[`Table is paginated should match snapshot 1`] = `
           head={false}
           id={0}
           key="0"
+          onClick={[Function]}
         >
           <DataCell
             key="0"
@@ -171,6 +175,7 @@ exports[`Table is paginated should match snapshot 1`] = `
           head={false}
           id={1}
           key="1"
+          onClick={[Function]}
         >
           <DataCell
             key="0"
@@ -192,6 +197,7 @@ exports[`Table is paginated should match snapshot 1`] = `
           clickable={true}
           footer={false}
           head={false}
+          onClick={[Function]}
         >
           <DataCell
             className="paginationCell"
@@ -201,6 +207,7 @@ exports[`Table is paginated should match snapshot 1`] = `
             <Pagination
               className="pagination"
               disableInitialCallback={true}
+              forcePage={0}
               hideIfOnlyOnePage={true}
               initialPage={0}
               marginPagesDisplayed={1}
@@ -229,6 +236,7 @@ exports[`Table is sortable should match snapshot 1`] = `
           clickable={true}
           footer={false}
           head={false}
+          onClick={[Function]}
         >
           <HeadCell
             key="0"
@@ -267,6 +275,7 @@ exports[`Table is sortable should match snapshot 1`] = `
           head={false}
           id={0}
           key="0"
+          onClick={[Function]}
         >
           <DataCell
             key="0"
@@ -294,6 +303,7 @@ exports[`Table is sortable should match snapshot 1`] = `
           head={false}
           id={1}
           key="1"
+          onClick={[Function]}
         >
           <DataCell
             key="0"

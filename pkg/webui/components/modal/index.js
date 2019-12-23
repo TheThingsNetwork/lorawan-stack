@@ -27,6 +27,44 @@ import style from './modal.styl'
 
 @bind
 class Modal extends React.PureComponent {
+  static propTypes = {
+    approval: PropTypes.bool,
+    bottomLine: PropTypes.oneOfType([PropTypes.element, PropTypes.message]),
+    buttonMessage: PropTypes.message,
+    buttonName: PropTypes.message,
+    cancelButtonMessage: PropTypes.message,
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element]),
+    danger: PropTypes.bool,
+    formName: PropTypes.string,
+    inline: PropTypes.bool,
+    logo: PropTypes.bool,
+    message: PropTypes.message,
+    method: PropTypes.string,
+    name: PropTypes.string,
+    onComplete: PropTypes.func,
+    subtitle: PropTypes.message,
+    title: PropTypes.message,
+  }
+
+  static defaultProps = {
+    bottomLine: undefined,
+    buttonMessage: undefined,
+    buttonName: undefined,
+    cancelButtonMessage: sharedMessages.cancel,
+    children: undefined,
+    danger: false,
+    formName: undefined,
+    logo: false,
+    message: undefined,
+    method: undefined,
+    onComplete: () => null,
+    inline: false,
+    approval: true,
+    subtitle: undefined,
+    title: undefined,
+    name: undefined,
+  }
+
   handleApprove() {
     this.handleComplete(true)
   }
@@ -43,6 +81,8 @@ class Modal extends React.PureComponent {
 
   render() {
     const {
+      buttonName,
+      buttonMessage,
       title,
       subtitle,
       children,
@@ -50,8 +90,7 @@ class Modal extends React.PureComponent {
       logo,
       approval,
       formName,
-      buttonMessage = this.props.approval ? sharedMessages.approve : sharedMessages.ok,
-      cancelButtonMessage = sharedMessages.cancel,
+      cancelButtonMessage,
       onComplete,
       bottomLine,
       inline,
@@ -69,9 +108,15 @@ class Modal extends React.PureComponent {
     const messageElement = <Message content={message} className={style.message} />
     const bottomLineElement = <Message content={bottomLine} />
 
+    const approveButtonMessage =
+      buttonMessage !== undefined
+        ? buttonMessage
+        : approval
+        ? sharedMessages.approve
+        : sharedMessages.ok
     let buttons = (
       <div>
-        <Button message={buttonMessage} onClick={this.handleApprove} icon="check" />
+        <Button message={approveButtonMessage} onClick={this.handleApprove} icon="check" />
       </div>
     )
 
@@ -88,7 +133,7 @@ class Modal extends React.PureComponent {
             {...name}
           />
           <Button
-            message={buttonMessage}
+            message={approveButtonMessage}
             onClick={this.handleApprove}
             name={formName}
             icon="check"
@@ -125,27 +170,6 @@ class Modal extends React.PureComponent {
       </React.Fragment>
     )
   }
-}
-
-Modal.defaultProps = {
-  onComplete: () => null,
-  inline: false,
-  approval: true,
-}
-
-Modal.propTypes = {
-  title: PropTypes.message,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element]),
-  message: PropTypes.message,
-  subtitle: PropTypes.message,
-  bottomLine: PropTypes.oneOfType([PropTypes.element, PropTypes.message]),
-  approval: PropTypes.bool,
-  buttonMessage: PropTypes.message,
-  cancelButtonMessage: PropTypes.message,
-  method: PropTypes.string,
-  buttonName: PropTypes.message,
-  inline: PropTypes.bool,
-  danger: PropTypes.bool,
 }
 
 export default Modal

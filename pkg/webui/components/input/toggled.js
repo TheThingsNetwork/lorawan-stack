@@ -69,22 +69,33 @@ class Toggled extends Component {
 }
 
 Toggled.propTypes = {
-  value: PropTypes.object,
-  enabledMessage: PropTypes.message,
   className: PropTypes.string,
-  icon: PropTypes.string,
-  placeholder: PropTypes.string,
-  error: PropTypes.bool,
-  warning: PropTypes.bool,
-  valid: PropTypes.bool,
   disabled: PropTypes.bool,
-  readOnly: PropTypes.bool,
+  enabledMessage: PropTypes.message,
+  error: PropTypes.bool,
+  icon: PropTypes.string,
   label: PropTypes.string,
   loading: PropTypes.bool,
+  placeholder: PropTypes.string,
+  readOnly: PropTypes.bool,
+  valid: PropTypes.bool,
+  value: PropTypes.shape({}),
+  warning: PropTypes.bool,
 }
 
 Toggled.defaultProps = {
+  className: undefined,
+  disabled: false,
   enabledMessage: sharedMessages.enabled,
+  error: false,
+  icon: undefined,
+  label: undefined,
+  loading: false,
+  placeholder: undefined,
+  readOnly: false,
+  valid: false,
+  value: undefined,
+  warning: false,
 }
 
 export default Toggled

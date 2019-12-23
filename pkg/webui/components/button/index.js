@@ -187,6 +187,22 @@ const commonPropTypes = {
   title: PropTypes.message,
 }
 
+buttonChildren.propTypes = {
+  /**
+   * Possible children components of the button:
+   * Spinner, Icon, and/or Message
+   */
+  busy: commonPropTypes.busy,
+  icon: commonPropTypes.icon,
+  message: commonPropTypes.message,
+}
+
+buttonChildren.defaultProps = {
+  busy: undefined,
+  icon: undefined,
+  message: undefined,
+}
+
 Button.propTypes = {
   /**
    * A click listener to be called when the button is pressed.

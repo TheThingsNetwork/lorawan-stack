@@ -81,6 +81,9 @@ Status.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   flipped: PropTypes.bool,
+  intl: PropTypes.shape({
+    formatMessage: PropTypes.func,
+  }).isRequired,
   label: PropTypes.message,
   labelValues: PropTypes.shape({}),
   pulse: PropTypes.bool,

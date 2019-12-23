@@ -56,15 +56,35 @@ const NavigationAnchorLink = function({ className, children, path, ...rest }) {
 }
 
 NavigationLink.propTypes = {
-  /** The path for a link */
-  path: PropTypes.string.isRequired,
-  /** The name of a css class to be applied on the active tab */
   activeClassName: PropTypes.string,
+  children: PropTypes.node,
+  className: PropTypes.string,
   /**
    * Boolean flag identifying whether the path should
    * be matched exactly
    */
   exact: PropTypes.bool.isRequired,
+  onClick: PropTypes.func,
+  /** The path for a link */
+  path: PropTypes.string.isRequired,
+  /** The name of a css class to be applied on the active tab */
 }
 
+NavigationLink.defaultProps = {
+  activeClassName: undefined,
+  children: undefined,
+  className: undefined,
+  onClick: () => null,
+}
+
+NavigationAnchorLink.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  path: PropTypes.string.isRequired,
+}
+
+NavigationAnchorLink.defaultProps = {
+  className: undefined,
+  children: undefined,
+}
 export { NavigationLink as default, NavigationAnchorLink }

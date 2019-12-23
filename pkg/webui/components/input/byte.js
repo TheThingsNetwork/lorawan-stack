@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import MaskedInput from 'react-text-mask'
+
+import PropTypes from '../../lib/prop-types'
 
 import style from './input.styl'
 
@@ -58,7 +59,7 @@ const clean = function(str) {
 }
 
 const Placeholder = function(props) {
-  const { min = 0, max = 256, value = '', placeholder, showPerChar = false } = props
+  const { min, max, value, placeholder, showPerChar } = props
 
   if (placeholder || Boolean(value)) {
     return null
@@ -83,19 +84,39 @@ const Placeholder = function(props) {
   return <div className={style.placeholder}>{content}</div>
 }
 
+Placeholder.propTypes = {
+  max: PropTypes.number,
+  min: PropTypes.number,
+  placeholder: PropTypes.message,
+  showPerChar: PropTypes.bool,
+  value: PropTypes.string,
+}
+
+Placeholder.defaultProps = {
+  min: 0,
+  max: 256,
+  value: '',
+  placeholder: undefined,
+  showPerChar: false,
+}
+
 @bind
 export default class ByteInput extends React.Component {
   static propTypes = {
+    className: PropTypes.string,
     max: PropTypes.number,
     min: PropTypes.number,
-    onChange: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
+    placeholder: PropTypes.message,
     showPerChar: PropTypes.bool,
-    value: PropTypes.string,
+    value: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
+    className: undefined,
     min: 0,
     max: 256,
+    placeholder: undefined,
     showPerChar: false,
   }
 
@@ -108,18 +129,7 @@ export default class ByteInput extends React.Component {
   }
 
   render() {
-    const {
-      value,
-      className,
-      min,
-      max,
-      onChange,
-      valid,
-      placeholder,
-      type,
-      showPerChar,
-      ...rest
-    } = this.props
+    const { value, className, min, max, onChange, placeholder, showPerChar, ...rest } = this.props
 
     return [
       <Placeholder

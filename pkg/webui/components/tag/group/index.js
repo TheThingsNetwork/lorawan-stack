@@ -36,6 +36,16 @@ const TAG_SPACE_WIDTH = 3
 
 @bind
 class TagGroup extends React.Component {
+  static propTypes = {
+    className: PropTypes.string,
+    tagMaxWidth: PropTypes.number.isRequired,
+    tags: PropTypes.arrayOf(PropTypes.any).isRequired,
+  }
+
+  static defaultProps = {
+    className: undefined,
+  }
+
   constructor(props) {
     super(props)
 
@@ -101,11 +111,6 @@ class TagGroup extends React.Component {
       </div>
     )
   }
-}
-
-TagGroup.propTypes = {
-  tagMaxWidth: PropTypes.number.isRequired,
-  tags: PropTypes.arrayOf(PropTypes.any).isRequired,
 }
 
 export default TagGroup

@@ -75,6 +75,7 @@ const DataSheet = function({ className, data }) {
 }
 
 DataSheet.propTypes = {
+  className: PropTypes.string,
   /** A list of entries for the sheet */
   data: PropTypes.arrayOf(
     PropTypes.shape({
@@ -97,7 +98,11 @@ DataSheet.propTypes = {
         }),
       ),
     }),
-  ),
+  ).isRequired,
+}
+
+DataSheet.defaultProps = {
+  className: undefined,
 }
 
 const DataSheetRow = function({ item, sub }) {
@@ -127,6 +132,27 @@ const DataSheetRow = function({ item, sub }) {
       </td>
     </tr>
   )
+}
+
+DataSheetRow.propTypes = {
+  item: PropTypes.shape({
+    /** The key of the item */
+    key: PropTypes.message,
+    /** The value of the item */
+    value: PropTypes.message,
+    /** The type of the item, 'code', 'byte' or 'text' (default) */
+    type: PropTypes.string,
+    /** Whether this 'code' or 'byte' item should be hidden by default */
+    sensitive: PropTypes.bool,
+    /** Optional subitems of this item (same shape as item, but no deeper
+     * hierarchies) */
+    subItems: PropTypes.arrayOf(PropTypes.object),
+  }).isRequired,
+  sub: PropTypes.bool,
+}
+
+DataSheetRow.defaultProps = {
+  sub: false,
 }
 
 export default DataSheet

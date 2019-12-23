@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import PropTypes from '../../lib/prop-types'
 import style from './tag.styl'
 
 const Tag = function(props) {
@@ -23,4 +24,12 @@ const Tag = function(props) {
   return <div className={classnames(className, style.tag)}>{content}</div>
 }
 
+Tag.propTypes = {
+  className: PropTypes.string,
+  content: PropTypes.string.isRequired,
+}
+
+Tag.defaultProps = {
+  className: undefined,
+}
 export default Tag

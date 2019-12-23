@@ -24,6 +24,29 @@ export const CheckboxGroupContext = React.createContext()
 
 @bind
 class CheckboxGroup extends React.Component {
+  static propTypes = {
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+    className: PropTypes.string,
+    disabled: PropTypes.bool,
+    horizontal: PropTypes.bool,
+    initialValue: PropTypes.shape({}),
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    onFocus: PropTypes.func,
+    value: PropTypes.shape({}),
+  }
+
+  static defaultProps = {
+    className: undefined,
+    disabled: false,
+    initialValue: undefined,
+    value: {},
+    horizontal: false,
+    onChange: () => null,
+    onBlur: () => null,
+    onFocus: () => null,
+  }
+
   constructor(props) {
     super(props)
 
@@ -88,27 +111,6 @@ class CheckboxGroup extends React.Component {
       </div>
     )
   }
-}
-
-CheckboxGroup.propTypes = {
-  className: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
-  horizontal: PropTypes.bool,
-  value: PropTypes.object,
-  initialValue: PropTypes.object,
-  onChange: PropTypes.func,
-  onBlur: PropTypes.func,
-  onFocus: PropTypes.func,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
-}
-
-CheckboxGroup.defaultProps = {
-  disabled: false,
-  horizontal: false,
-  onChange: () => null,
-  onBlur: () => null,
-  onFocus: () => null,
 }
 
 export default CheckboxGroup
