@@ -36,6 +36,23 @@ const m = defineMessages({
 
 @bind
 class Events extends React.Component {
+  static propTypes = {
+    className: PropTypes.string,
+    emitterId: PropTypes.string.isRequired,
+    error: PropTypes.error,
+    events: PropTypes.arrayOf(PropTypes.event),
+    limit: PropTypes.number,
+    onClear: PropTypes.func.isRequired,
+    onRestart: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    events: [],
+    limit: 100,
+    error: undefined,
+  }
+
   state = {
     paused: false,
   }
@@ -143,19 +160,6 @@ class Events extends React.Component {
   }
 }
 
-Events.propTypes = {
-  emitterId: PropTypes.string.isRequired,
-  events: PropTypes.arrayOf(PropTypes.event),
-  limit: PropTypes.number,
-  onClear: PropTypes.func.isRequired,
-  onRestart: PropTypes.func.isRequired,
-}
-
-Events.defaultProps = {
-  events: [],
-  limit: 100,
-}
-
 Events.Widget = EventsWidget
 
 const Header = function(props) {
@@ -179,6 +183,18 @@ const Header = function(props) {
   )
 }
 
+Header.propTypes = {
+  onClear: PropTypes.func,
+  onPause: PropTypes.func,
+  paused: PropTypes.bool,
+}
+
+Header.defaultProps = {
+  paused: false,
+  onPause: () => null,
+  onClear: () => null,
+}
+
 const Footer = function(props) {
   const { truncated } = props
 
@@ -198,6 +214,14 @@ const Footer = function(props) {
       )}
     </div>
   )
+}
+
+Footer.propTypes = {
+  truncated: PropTypes.bool,
+}
+
+Footer.defaultProps = {
+  truncated: false,
 }
 
 export default Events

@@ -26,6 +26,34 @@ import style from './radio-button.styl'
 class RadioButton extends React.PureComponent {
   static contextType = RadioGroupContext
 
+  static propTypes = {
+    autoFocus: PropTypes.bool,
+    checked: PropTypes.bool,
+    className: PropTypes.string,
+    disabled: PropTypes.bool,
+    label: PropTypes.message,
+    name: PropTypes.string,
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    onFocus: PropTypes.func,
+    readOnly: PropTypes.bool,
+    value: PropTypes.string,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    checked: false,
+    disabled: false,
+    label: undefined,
+    name: undefined,
+    readOnly: false,
+    value: undefined,
+    autoFocus: false,
+    onChange: () => null,
+    onBlur: () => null,
+    onFocus: () => null,
+  }
+
   constructor(props) {
     super(props)
 
@@ -107,29 +135,6 @@ class RadioButton extends React.PureComponent {
       </label>
     )
   }
-}
-
-RadioButton.propTypes = {
-  className: PropTypes.string,
-  label: PropTypes.message,
-  name: PropTypes.string,
-  value: PropTypes.string,
-  checked: PropTypes.bool,
-  disabled: PropTypes.bool,
-  readOnly: PropTypes.bool,
-  autoFocus: PropTypes.bool,
-  onChange: PropTypes.func,
-  onBlur: PropTypes.func,
-  onFocus: PropTypes.func,
-}
-
-RadioButton.defaultProps = {
-  disabled: false,
-  readOnly: false,
-  autoFocus: false,
-  onChange: () => null,
-  onBlur: () => null,
-  onFocus: () => null,
 }
 
 export default RadioButton

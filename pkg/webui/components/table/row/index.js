@@ -72,15 +72,17 @@ class Row extends React.Component {
 }
 
 Row.propTypes = {
-  /** A flag indicating whether the row is wrapping the head of a table */
-  head: PropTypes.bool,
   /** A flag indicating whether the row is wrapping the body of a table */
   body: PropTypes.bool,
-  /** A flag indicating whether the row is wrapping the footer of a table */
-  footer: PropTypes.bool,
+  children: PropTypes.node,
+  className: PropTypes.string,
   /** A flag indicating whether the row is clickable */
   clickable: PropTypes.bool,
-  /** The idenntifier of the row */
+  /** A flag indicating whether the row is wrapping the footer of a table */
+  footer: PropTypes.bool,
+  /** A flag indicating whether the row is wrapping the head of a table */
+  head: PropTypes.bool,
+  /** The identifier of the row */
   id: PropTypes.number,
   /**
    * Function to be called when the row gets clicked. The identifier of the row
@@ -90,10 +92,14 @@ Row.propTypes = {
 }
 
 Row.defaultProps = {
+  children: undefined,
+  className: undefined,
   clickable: true,
   head: false,
   body: true,
   footer: false,
+  onClick: () => null,
+  id: undefined,
 }
 
 export default Row

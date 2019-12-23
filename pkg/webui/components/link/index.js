@@ -67,8 +67,18 @@ const Link = function(props) {
 }
 
 Link.propTypes = {
-  title: PropTypes.message,
+  children: PropTypes.node,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
   id: PropTypes.string,
+  intl: PropTypes.shape({
+    formatMessage: PropTypes.func,
+  }).isRequired,
+  replace: PropTypes.bool,
+  showVisited: PropTypes.bool,
+  target: PropTypes.string,
+  title: PropTypes.message,
+  titleValues: PropTypes.shape({}),
   to: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.shape({
@@ -78,14 +88,18 @@ Link.propTypes = {
       state: PropTypes.object,
     }),
   ]).isRequired,
-  replace: PropTypes.bool,
-  target: PropTypes.string,
-  showVisited: PropTypes.bool,
 }
 
 Link.defaultProps = {
-  replace: false,
+  children: undefined,
+  className: undefined,
+  disabled: false,
+  id: undefined,
   showVisited: false,
+  replace: false,
+  target: undefined,
+  title: undefined,
+  titleValues: undefined,
 }
 
 const AnchorLink = function(props) {
@@ -121,12 +135,12 @@ const AnchorLink = function(props) {
 }
 
 AnchorLink.propTypes = {
-  title: PropTypes.string,
-  id: PropTypes.string,
   href: PropTypes.string.isRequired,
-  target: PropTypes.string,
-  showVisited: PropTypes.bool,
+  id: PropTypes.string,
   name: PropTypes.string,
+  showVisited: PropTypes.bool,
+  target: PropTypes.string,
+  title: PropTypes.string,
 }
 
 AnchorLink.defaultProps = {

@@ -26,10 +26,14 @@ const ListItem = function(props) {
 }
 
 ListItem.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
   component: PropTypes.string,
 }
 
 ListItem.defaultProps = {
+  children: undefined,
+  className: undefined,
   component: 'li',
 }
 

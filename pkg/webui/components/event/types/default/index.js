@@ -20,6 +20,21 @@ import PropTypes from '../../../../lib/prop-types'
 import { getEntityId } from '../../../../lib/selectors/id'
 
 class DefaultEvent extends React.PureComponent {
+  static propTypes = {
+    className: PropTypes.string,
+    event: PropTypes.event.isRequired,
+    expandedClassName: PropTypes.string,
+    overviewClassName: PropTypes.string,
+    widget: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    overviewClassName: undefined,
+    expandedClassName: undefined,
+    widget: false,
+  }
+
   render() {
     const { className, event, widget, overviewClassName, expandedClassName } = this.props
 
@@ -39,15 +54,6 @@ class DefaultEvent extends React.PureComponent {
       />
     )
   }
-}
-
-DefaultEvent.propTypes = {
-  event: PropTypes.event.isRequired,
-  widget: PropTypes.bool,
-}
-
-DefaultEvent.defaultProps = {
-  widget: false,
 }
 
 export default DefaultEvent

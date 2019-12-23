@@ -35,6 +35,27 @@ Leaflet.Icon.Default.mergeOptions({
 })
 
 export default class Map extends React.Component {
+  static propTypes = {
+    // Id is a string used to give the map a unique ID.
+    id: PropTypes.string.isRequired,
+    // LeafletConfig is an object which can contain any number of properties defined by the leaflet plugin and is used to overwrite the default configuration of leaflet.
+    leafletConfig: PropTypes.shape({}),
+    // Markers is an array of objects containing a specific properties
+    markers: PropTypes.arrayOf(
+      // Position is a object containing two properties latitude and longitude which are both numbers.
+      PropTypes.shape({
+        position: PropTypes.objectOf(PropTypes.number),
+      }),
+    ).isRequired,
+    // Widget is a boolean used to add a class name to the map container div for styling.
+    widget: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    leafletConfig: {},
+    widget: false,
+  }
+
   getMapCenter(markers) {
     // This will calculate zoom and map center long/lang based on all markers provided.
     // Currently it just returns the first marker.
@@ -84,25 +105,4 @@ export default class Map extends React.Component {
       </div>
     )
   }
-}
-
-Map.propTypes = {
-  // Id is a string used to give the map a unique ID.
-  id: PropTypes.string.isRequired,
-  // LeafletConfig is an object which can contain any number of properties defined by the leaflet plugin and is used to overwrite the default configuration of leaflet.
-  leafletConfig: PropTypes.shape({}),
-  // Markers is an array of objects containing a specific properties
-  markers: PropTypes.arrayOf(
-    // Position is a object containing two properties latitude and longitude which are both numbers.
-    PropTypes.shape({
-      position: PropTypes.objectOf(PropTypes.number),
-    }),
-  ).isRequired,
-  // Widget is a boolean used to add a class name to the map container div for styling.
-  widget: PropTypes.bool,
-}
-
-Map.defaultProps = {
-  leafletConfig: {},
-  widget: false,
 }

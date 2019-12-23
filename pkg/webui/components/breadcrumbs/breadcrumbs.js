@@ -33,6 +33,12 @@ const Breadcrumbs = ({ className, breadcrumbs }) => (
 Breadcrumbs.propTypes = {
   /** A list of breadcrumb elements */
   breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.element])),
+  className: PropTypes.string,
+}
+
+Breadcrumbs.defaultProps = {
+  breadcrumbs: undefined,
+  className: undefined,
 }
 
 export default Breadcrumbs

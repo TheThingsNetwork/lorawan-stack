@@ -23,6 +23,51 @@ import style from './list.styl'
 
 @bind
 class SideNavigationList extends React.Component {
+  static propTypes = {
+    className: PropTypes.string,
+    /** The depth of the current list starting at 0 for the root list */
+    depth: PropTypes.number,
+    /**
+     * A flag specifying whether the side navigation list is expanded or not.
+     * Applicable to nested lists.
+     */
+    isExpanded: PropTypes.bool,
+    /** A flag specifying whether the side navigation list of items is minimized or not */
+    isMinimized: PropTypes.bool.isRequired,
+    /** A list of items to be displayed within the side navigation list */
+    items: PropTypes.arrayOf(
+      PropTypes.oneOfType([
+        PropTypes.link,
+        PropTypes.shape({
+          title: PropTypes.message.isRequired,
+          icon: PropTypes.string,
+          nested: PropTypes.bool.isRequired,
+          items: PropTypes.arrayOf(PropTypes.link).isRequired,
+          hidden: PropTypes.bool,
+        }),
+      ]),
+    ).isRequired,
+    itemsExpanded: PropTypes.shape({}),
+    /** Function to be called when an side navigation item gets selected */
+    onItemExpand: PropTypes.func,
+    /**
+     * A map of expanded items, where:
+     *  - The key: index of the item
+     *  - The value: an object consisting of:
+     *    - isOpen - boolean flag specifying whether the item is opened or not
+     *    - isLink - boolean flag specifying whether a link is selected within
+     *                this opened item
+     */
+  }
+
+  static defaultProps = {
+    className: undefined,
+    depth: 0,
+    itemsExpanded: {},
+    isExpanded: false,
+    onItemExpand: () => null,
+  }
+
   onRootExpand(index) {
     const { onItemExpand } = this.props
 
@@ -36,9 +81,9 @@ class SideNavigationList extends React.Component {
       className,
       items,
       isMinimized,
-      onItemExpand = () => null,
-      isExpanded = false,
-      depth = 0,
+      onItemExpand,
+      isExpanded,
+      depth,
       itemsExpanded = {},
     } = this.props
 
@@ -82,42 +127,6 @@ class SideNavigationList extends React.Component {
       </ul>
     )
   }
-}
-
-SideNavigationList.propTypes = {
-  /** A flag specifying whether the side navigation list of items is minimized or not */
-  isMinimized: PropTypes.bool.isRequired,
-  /**
-   * A flag specifying whether the side navigation list is expanded or not.
-   * Applicable to nested lists.
-   */
-  isExpanded: PropTypes.bool,
-  /** The depth of the current list starting at 0 for the root list */
-  depth: PropTypes.number,
-  /** Function to be called when an side navigation item gets selected */
-  onItemExpand: PropTypes.func,
-  /** A list of items to be displayed within the side navigation list */
-  items: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.link,
-      PropTypes.shape({
-        title: PropTypes.message.isRequired,
-        icon: PropTypes.string,
-        nested: PropTypes.bool.isRequired,
-        items: PropTypes.arrayOf(PropTypes.link).isRequired,
-        hidden: PropTypes.bool,
-      }),
-    ]),
-  ).isRequired,
-  /**
-   * A map of expanded items, where:
-   *  - The key: index of the item
-   *  - The value: an object consisting of:
-   *    - isOpen - boolean flag specifying whether the item is opened or not
-   *    - isLink - boolean flag specifying whether a link is selected within
-   *                this opened item
-   */
-  itemsExpanded: PropTypes.object,
 }
 
 export default SideNavigationList

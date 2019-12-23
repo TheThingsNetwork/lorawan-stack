@@ -27,6 +27,56 @@ import style from './code-editor.styl'
 
 @bind
 class CodeEditor extends React.Component {
+  static propTypes = {
+    className: PropTypes.string,
+    /** New commands to add to the editor, see official docs */
+    commands: PropTypes.arrayOf(PropTypes.shape({})),
+    /** see https://github.com/ajaxorg/ace/wiki/Configuring-Ace */
+    editorOptions: PropTypes.shape({}),
+    /** The height of the editor */
+    height: PropTypes.string,
+    /** The language to highlight */
+    language: PropTypes.oneOf(['javascript', 'json']),
+    /** Maximum lines of code allowed */
+    maxLines: PropTypes.number,
+    /** Minimum lines of code allowed */
+    minLines: PropTypes.number,
+    /** The name of the editor (should be unique) */
+    name: PropTypes.string.isRequired,
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    onFocus: PropTypes.func,
+    /** The default value of the editor */
+    placeholder: PropTypes.string,
+    /** A flag identifying whether the editor is editable */
+    readOnly: PropTypes.bool,
+    /** A flag indicating whether the editor should scroll to the bottom when the
+     * value has been updated, useful for logging use cases.
+     */
+    scrollToBottom: PropTypes.bool,
+    showGutter: PropTypes.bool,
+    /** The current value of the editor */
+    value: PropTypes.string,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    commands: undefined,
+    editorOptions: undefined,
+    height: '30rem',
+    language: 'javascript',
+    maxLines: Infinity,
+    minLines: 1,
+    onBlur: undefined,
+    onChange: undefined,
+    onFocus: undefined,
+    placeholder: '',
+    readOnly: false,
+    scrollToBottom: false,
+    showGutter: true,
+    value: '',
+  }
+
   constructor(props) {
     super(props)
 
@@ -66,17 +116,17 @@ class CodeEditor extends React.Component {
   render() {
     const {
       className,
-      language = 'javascript',
+      language,
       name,
       onChange,
       value,
       placeholder,
-      readOnly = false,
+      readOnly,
       editorOptions,
-      height = '30rem',
-      showGutter = true,
-      minLines = 1,
-      maxLines = Infinity,
+      height,
+      showGutter,
+      minLines,
+      maxLines,
       commands,
     } = this.props
 
@@ -132,38 +182,6 @@ class CodeEditor extends React.Component {
       </div>
     )
   }
-}
-
-CodeEditor.propTypes = {
-  /** The language to highlight */
-  language: PropTypes.oneOf(['javascript', 'json']),
-  /** The name of the editor (should be unique) */
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
-  /** The current value of the editor */
-  value: PropTypes.string,
-  /** The default value of the editor */
-  placeholder: PropTypes.string,
-  /** A flag identifying whether the editor is editable */
-  readOnly: PropTypes.bool,
-  /** see https://github.com/ajaxorg/ace/wiki/Configuring-Ace */
-  editorOptions: PropTypes.object,
-  /** The height of the editor */
-  height: PropTypes.string,
-  /** A flag indicating whether the editor should scroll to the bottom when the
-   * value has been updated, useful for logging use cases.
-   */
-  scrollToBottom: PropTypes.bool,
-  /** A flag identifying whether  */
-  showGutter: PropTypes.bool,
-  /** Minimum lines of code allowed */
-  minLines: PropTypes.number,
-  /** Maximum lines of code allowed */
-  maxLines: PropTypes.number,
-  /** New commands to add to the editor, see official docs */
-  commands: PropTypes.array,
 }
 
 export default CodeEditor

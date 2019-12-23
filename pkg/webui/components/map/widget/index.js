@@ -23,6 +23,20 @@ import Map from '../../map'
 import style from './widget.styl'
 
 export default class MapWidget extends React.Component {
+  static propTypes = {
+    // Id is a string used to give the map a unique ID.
+    id: PropTypes.string.isRequired,
+    // Markers is an array of objects containing a specific properties
+    markers: PropTypes.arrayOf(
+      // Position is a object containing two properties latitude and longitude which are both numbers.
+      PropTypes.shape({
+        position: PropTypes.objectOf(PropTypes.number),
+      }),
+    ).isRequired,
+    // Path is a string that is required to show the link at location form.
+    path: PropTypes.string.isRequired,
+  }
+
   get Map() {
     const { id, markers } = this.props
 
@@ -58,18 +72,4 @@ export default class MapWidget extends React.Component {
       </aside>
     )
   }
-}
-
-MapWidget.propTypes = {
-  // Id is a string used to give the map a unique ID.
-  id: PropTypes.string.isRequired,
-  // Markers is an array of objects containing a specific properties
-  markers: PropTypes.arrayOf(
-    // Position is a object containing two properties latitude and longitude which are both numbers.
-    PropTypes.shape({
-      position: PropTypes.objectOf(PropTypes.number),
-    }),
-  ).isRequired,
-  // Path is a string that is required to show the link at location form.
-  path: PropTypes.string.isRequired,
 }

@@ -54,6 +54,7 @@ const isValueEmpty = function(value) {
 @bind
 class FormField extends React.Component {
   static contextType = FormContext
+
   static propTypes = {
     className: PropTypes.string,
     component: PropTypes.oneOfType([
@@ -72,6 +73,7 @@ class FormField extends React.Component {
   }
 
   static defaultProps = {
+    className: undefined,
     onChange: () => null,
     warning: '',
     description: '',

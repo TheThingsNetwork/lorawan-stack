@@ -27,6 +27,35 @@ import style from './checkbox.styl'
 class Checkbox extends React.PureComponent {
   static contextType = CheckboxGroupContext
 
+  static propTypes = {
+    autoFocus: PropTypes.bool,
+    checked: PropTypes.bool,
+    className: PropTypes.string,
+    disabled: PropTypes.bool,
+    indeterminate: PropTypes.bool,
+    label: PropTypes.message,
+    name: PropTypes.string.isRequired,
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    onFocus: PropTypes.func,
+    readOnly: PropTypes.bool,
+    value: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
+  }
+
+  static defaultProps = {
+    checked: false,
+    className: undefined,
+    label: sharedMessages.enabled,
+    disabled: false,
+    readOnly: false,
+    autoFocus: false,
+    onChange: () => null,
+    onBlur: () => null,
+    onFocus: () => null,
+    indeterminate: false,
+    value: false,
+  }
+
   constructor(props) {
     super(props)
 
@@ -34,8 +63,6 @@ class Checkbox extends React.PureComponent {
     let value
     if ('value' in props && this.context) {
       value = props.value[name]
-    } else if ('value' in props) {
-      value = props.value
     } else {
       value = false
     }
@@ -135,32 +162,6 @@ class Checkbox extends React.PureComponent {
       </label>
     )
   }
-}
-
-Checkbox.propTypes = {
-  className: PropTypes.string,
-  label: PropTypes.message,
-  name: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
-  checked: PropTypes.bool,
-  disabled: PropTypes.bool,
-  readOnly: PropTypes.bool,
-  autoFocus: PropTypes.bool,
-  onChange: PropTypes.func,
-  onBlur: PropTypes.func,
-  onFocus: PropTypes.func,
-  indeterminate: PropTypes.bool,
-}
-
-Checkbox.defaultProps = {
-  label: sharedMessages.enabled,
-  disabled: false,
-  readOnly: false,
-  autoFocus: false,
-  onChange: () => null,
-  onBlur: () => null,
-  onFocus: () => null,
-  indeterminate: false,
 }
 
 export default Checkbox

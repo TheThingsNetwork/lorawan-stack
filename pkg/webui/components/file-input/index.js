@@ -37,18 +37,6 @@ const dataTransform = function(content) {
 }
 
 export default class FileInput extends Component {
-  constructor(props) {
-    super(props)
-
-    this.reader = new FileReader()
-    this.reader.onload = this.handleFileRead
-    this.fileInputRef = React.createRef()
-
-    this.state = {
-      filename: '',
-    }
-  }
-
   static propTypes = {
     accept: PropTypes.string,
     dataTransform: PropTypes.func,
@@ -69,6 +57,18 @@ export default class FileInput extends Component {
     maxSize: 10 * 1024 * 1024, // 10 MB
     providedMessage: m.fileProvided,
     value: undefined,
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.reader = new FileReader()
+    this.reader.onload = this.handleFileRead
+    this.fileInputRef = React.createRef()
+
+    this.state = {
+      filename: '',
+    }
   }
 
   @bind

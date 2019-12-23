@@ -30,8 +30,15 @@ const Section = function({ className, component: Component, children, ...rest })
 }
 
 Section.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
   /** The html name of the section component */
   component: PropTypes.oneOf(['thead', 'tbody', 'tfoot']).isRequired,
+}
+
+Section.defaultProps = {
+  children: undefined,
+  className: undefined,
 }
 
 export default Section

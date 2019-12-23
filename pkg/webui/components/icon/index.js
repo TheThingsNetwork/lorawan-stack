@@ -49,15 +49,7 @@ const hardcoded = {
   collaborators: 'people',
 }
 
-const Icon = function({
-  icon = '',
-  className,
-  nudgeUp = false,
-  nudgeDown = false,
-  small = false,
-  large = false,
-  ...rest
-}) {
+const Icon = function({ icon, className, nudgeUp, nudgeDown, small, large, ...rest }) {
   const classname = classnames(style.icon, className, {
     [style.nudgeUp]: nudgeUp,
     [style.nudgeDown]: nudgeDown,
@@ -73,16 +65,25 @@ const Icon = function({
 }
 
 Icon.propTypes = {
+  className: PropTypes.string,
   /** Which icon to display, using google material icon set */
   icon: PropTypes.string.isRequired,
-  /** Nudges the icon up by one pixel using position: relative */
-  nudgeUp: PropTypes.bool,
-  /** Nudges the icon down by one pixel using position: relative */
-  nudgeDown: PropTypes.bool,
-  /** Renders a smaller icon */
-  small: PropTypes.bool,
   /** Renders a bigger icon */
   large: PropTypes.bool,
+  /** Nudges the icon down by one pixel using position: relative */
+  nudgeDown: PropTypes.bool,
+  /** Nudges the icon up by one pixel using position: relative */
+  nudgeUp: PropTypes.bool,
+  /** Renders a smaller icon */
+  small: PropTypes.bool,
+}
+
+Icon.defaultProps = {
+  className: undefined,
+  large: false,
+  nudgeDown: false,
+  nudgeUp: false,
+  small: false,
 }
 
 export default Icon

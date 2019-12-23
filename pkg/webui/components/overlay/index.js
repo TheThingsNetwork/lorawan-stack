@@ -22,7 +22,7 @@ import Message from '../../lib/components/message'
 
 import style from './overlay.styl'
 
-const Overlay = ({ className, visible, loading = false, children }) => (
+const Overlay = ({ className, visible, loading, children }) => (
   <div className={classnames(className, style.overlayWrapper)}>
     <div
       className={classnames(style.overlay, {
@@ -39,12 +39,19 @@ const Overlay = ({ className, visible, loading = false, children }) => (
 )
 
 Overlay.propTypes = {
-  /** A flag specifying whether the overlay is visible or not */
-  visible: PropTypes.bool.isRequired,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
   /**
-   * A flag specifying whether the overlay should displat the loading spinner
+   * A flag specifying whether the overlay should display the loading spinner
    */
   loading: PropTypes.bool,
+  /** A flag specifying whether the overlay is visible or not */
+  visible: PropTypes.bool.isRequired,
+}
+
+Overlay.defaultProps = {
+  className: undefined,
+  loading: false,
 }
 
 export default Overlay

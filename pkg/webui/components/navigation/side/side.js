@@ -32,6 +32,13 @@ const m = defineMessages({
 @withRouter
 @bind
 class SideNavigation extends Component {
+  static defaultProps = {
+    className: undefined,
+    entries: undefined,
+    header: undefined,
+    location: undefined,
+  }
+
   state = {
     /** A flag specifying whether the side navigation is minimized or not */
     isMinimized: false,
@@ -44,6 +51,21 @@ class SideNavigation extends Component {
      *                this opened item
      */
     itemsExpanded: {},
+  }
+
+  static propTypes = {
+    className: PropTypes.string,
+    /**
+     * A list of entry objects for the side navigation
+     * See `<SideNavigationList/>`'s `items` proptypes for details
+     */
+    entries: SideNavigationList.propTypes.items,
+    /** The header for the side navigation */
+    header: PropTypes.shape({
+      title: PropTypes.string,
+      icon: PropTypes.string,
+    }),
+    location: PropTypes.location,
   }
 
   onToggle() {
@@ -95,11 +117,11 @@ class SideNavigation extends Component {
 
   componentDidMount() {
     const { location, entries } = this.props
-    for (let i in entries) {
+    for (const i in entries) {
       if (entries[i].path) {
         if (location.pathname === entries[i].path) break
       } else if (entries[i].nested) {
-        for (let j in entries[i].items) {
+        for (const j in entries[i].items) {
           if (location.pathname === entries[i].items[j].path) {
             const itemsExpanded = { [i]: { isOpen: true, isLink: true } }
             this.setState({ itemsExpanded })
@@ -147,19 +169,6 @@ class SideNavigation extends Component {
       </nav>
     )
   }
-}
-
-SideNavigation.propTypes = {
-  /**
-   * A list of entry objects for the side navigation
-   * See `<SideNavigationList/>`'s `items` proptypes for details
-   */
-  entries: SideNavigationList.propTypes.items,
-  /** The header for the side navigation */
-  header: PropTypes.shape({
-    title: PropTypes.string,
-    icon: PropTypes.string,
-  }),
 }
 
 export default SideNavigation

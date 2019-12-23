@@ -35,6 +35,30 @@ const m = defineMessages({
 
 @bind
 class EventsWidget extends React.PureComponent {
+  static propTypes = {
+    className: PropTypes.string,
+    /** An entity identifer. */
+    emitterId: PropTypes.node.isRequired,
+    error: PropTypes.error,
+    /**
+     * A list of events to be displayed in the widget. Events are expected
+     * to be sorted in the descending order by their time.
+     */
+    events: PropTypes.events,
+    /** The number of events to displayed in the widget. */
+    limit: PropTypes.number,
+    onRestart: PropTypes.func.isRequired,
+    /** A url to the page with full version of the events component. */
+    toAllUrl: PropTypes.string.isRequired,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    events: [],
+    limit: 5,
+    error: undefined,
+  }
+
   renderEvent(event) {
     const { component: Component, type } = getEventComponentByName(event.name)
 
@@ -86,30 +110,6 @@ class EventsWidget extends React.PureComponent {
       </aside>
     )
   }
-}
-
-EventsWidget.propTypes = {
-  className: PropTypes.string,
-  /** An entity identifer. */
-  emitterId: PropTypes.node.isRequired,
-  error: PropTypes.error,
-  /**
-   * A list of events to be displayed in the widget. Events are expected
-   * to be sorted in the descending order by their time.
-   */
-  events: PropTypes.events,
-  /** The number of events to displayed in the widget. */
-  limit: PropTypes.number,
-  onRestart: PropTypes.func.isRequired,
-  /** A url to the page with full version of the events component. */
-  toAllUrl: PropTypes.string.isRequired,
-}
-
-EventsWidget.defaultProps = {
-  className: undefined,
-  events: [],
-  limit: 5,
-  error: undefined,
 }
 
 export default EventsWidget

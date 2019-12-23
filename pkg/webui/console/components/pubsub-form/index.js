@@ -39,23 +39,6 @@ const pathPlaceholder = '/sub-topic'
 
 @bind
 export default class PubsubForm extends Component {
-  constructor(props) {
-    super(props)
-
-    this.form = React.createRef()
-
-    const { initialPubsubValue, update } = this.props
-
-    const initialIsMqtt = update && 'mqtt' in initialPubsubValue
-    const initialMqttSecure = initialIsMqtt ? initialPubsubValue.mqtt.use_tls : false
-
-    this.state = {
-      error: '',
-      isMqtt: initialIsMqtt,
-      mqttSecure: initialMqttSecure,
-    }
-  }
-
   static propTypes = {
     appId: PropTypes.string.isRequired,
     initialPubsubValue: PropTypes.pubsub,
@@ -75,6 +58,23 @@ export default class PubsubForm extends Component {
     onDeleteSuccess: () => null,
     onDeleteFailure: () => null,
     onDelete: () => null,
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.form = React.createRef()
+
+    const { initialPubsubValue, update } = this.props
+
+    const initialIsMqtt = update && 'mqtt' in initialPubsubValue
+    const initialMqttSecure = initialIsMqtt ? initialPubsubValue.mqtt.use_tls : false
+
+    this.state = {
+      error: '',
+      isMqtt: initialIsMqtt,
+      mqttSecure: initialMqttSecure,
+    }
   }
 
   async handleSubmit(values, { setSubmitting, resetForm }) {

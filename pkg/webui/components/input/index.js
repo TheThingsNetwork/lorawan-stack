@@ -32,10 +32,15 @@ class Input extends React.Component {
     action: PropTypes.shape({
       ...Button.propTypes,
     }),
+    className: PropTypes.string,
     code: PropTypes.bool,
+    component: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     disabled: PropTypes.bool,
     error: PropTypes.bool,
     icon: PropTypes.string,
+    intl: PropTypes.shape({
+      formatMessage: PropTypes.func,
+    }).isRequired,
     label: PropTypes.string,
     loading: PropTypes.bool,
     onBlur: PropTypes.func,
@@ -45,18 +50,33 @@ class Input extends React.Component {
     placeholder: PropTypes.message,
     readOnly: PropTypes.bool,
     title: PropTypes.message,
-    type: PropTypes.string.isRequired,
+    type: PropTypes.string,
     valid: PropTypes.bool,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     warning: PropTypes.bool,
   }
 
   static defaultProps = {
+    action: undefined,
+    className: undefined,
+    code: false,
+    component: 'input',
+    disabled: false,
+    error: false,
+    icon: undefined,
+    label: undefined,
+    loading: false,
     onFocus: () => null,
     onBlur: () => null,
     onChange: () => null,
     onEnter: () => null,
+    placeholder: undefined,
+    readOnly: false,
+    title: undefined,
     type: 'text',
+    valid: false,
+    value: '',
+    warning: false,
   }
 
   state = {
@@ -84,7 +104,7 @@ class Input extends React.Component {
   render() {
     const {
       icon,
-      value = '',
+      value,
       error,
       warning,
       valid,
@@ -98,7 +118,7 @@ class Input extends React.Component {
       onEnter,
       className,
       label,
-      component = 'input',
+      component,
       loading,
       title,
       intl,

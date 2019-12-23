@@ -46,7 +46,7 @@ class Tabular extends React.Component {
     this.props.onSortRequest('asc', newOrderBy)
   }
 
-  handlePagination(items = []) {
+  handlePagination(items) {
     const { pageSize, page, handlesPagination, paginated } = this.props
 
     if (paginated && handlesPagination) {
@@ -62,16 +62,16 @@ class Tabular extends React.Component {
   render() {
     const {
       className,
-      loading = false,
-      small = false,
+      loading,
+      small,
       onRowClick,
       page,
-      order = undefined,
-      orderBy = undefined,
+      order,
+      orderBy,
       totalCount,
       pageSize,
-      initialPage = 1,
-      paginated = false,
+      initialPage,
+      paginated,
       data,
       headers,
       emptyMessage,
@@ -155,42 +155,18 @@ class Tabular extends React.Component {
 }
 
 Tabular.propTypes = {
-  /** The current page of the pagination*/
-  page: PropTypes.number,
-  /** The initial page of pagination */
-  initialPage: PropTypes.number,
-  /** The total number of available entries */
-  totalCount: PropTypes.number,
-  /** The number of entries to display per page */
-  pageSize: PropTypes.number,
-  /** A flag identifying whether the table should have pagination */
-  paginated: PropTypes.bool,
-  /** A flag specifying the height of data cells */
-  small: PropTypes.bool,
-  /** The current order of the table */
-  order: PropTypes.string,
-  /** The name of the column that the table is sorted according to */
-  orderBy: PropTypes.string,
+  className: PropTypes.string,
+  /** A list of data entries to display within the table body */
+  data: PropTypes.arrayOf(PropTypes.shape({})),
   /** The empty message to be displayed when no data provided */
   emptyMessage: PropTypes.oneOfType([PropTypes.message, PropTypes.string]).isRequired,
-  /** Function to be called when the table row gets clicked */
-  onRowClick: PropTypes.func,
   /**
-   * Function to be called when the page is changed. Passes the new
-   * page number as an argument [1...pageCount - 1].
+   * A flag specifying whether the table should paginate entries.
+   * If true the component makes sure that the items are paginated, otherwise
+   * the user is responsible for passing the right number of items.
    */
-  onPageChange: PropTypes.func,
-  /**
-   * Function to be called when the table should be sorted. Passes
-   * the new ordering type and the name of the head cell that the
-   * table should sorted according to.
-   */
-  onSortRequest: PropTypes.func,
-  /** A flag specifying whether the table should covered with the loading overlay */
-  loading: PropTypes.bool,
-  /** A list of data entries to display within the table body */
-  data: PropTypes.arrayOf(PropTypes.object),
-  /** A list of head entries to displat within the table head */
+  handlesPagination: PropTypes.bool,
+  /** A list of head entries to display within the table head */
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       displayName: PropTypes.message.isRequired,
@@ -202,12 +178,56 @@ Tabular.propTypes = {
       width: PropTypes.number,
     }),
   ),
+  /** The initial page of pagination */
+  initialPage: PropTypes.number,
+  /** A flag specifying whether the table should covered with the loading overlay */
+  loading: PropTypes.bool,
   /**
-   * A flag specifying whether the table should paginate entries.
-   * If true the component makes sure that the items are paginated, otherwise
-   * the user is responsible for passing the right number of items.
+   * Function to be called when the page is changed. Passes the new
+   * page number as an argument [1...pageCount - 1].
    */
-  handlesPagination: PropTypes.bool,
+  onPageChange: PropTypes.func,
+  /** Function to be called when the table row gets clicked */
+  onRowClick: PropTypes.func,
+  /**
+   * Function to be called when the table should be sorted. Passes
+   * the new ordering type and the name of the head cell that the
+   * table should sorted according to.
+   */
+  onSortRequest: PropTypes.func,
+  /** The current order of the table */
+  order: PropTypes.string,
+  /** The name of the column that the table is sorted according to */
+  orderBy: PropTypes.string,
+  /** The current page of the pagination*/
+  page: PropTypes.number,
+  /** The number of entries to display per page */
+  pageSize: PropTypes.number,
+  /** A flag identifying whether the table should have pagination */
+  paginated: PropTypes.bool,
+  /** A flag specifying the height of data cells */
+  small: PropTypes.bool,
+  /** The total number of available entries */
+  totalCount: PropTypes.number,
+}
+
+Tabular.defaultProps = {
+  className: undefined,
+  data: [],
+  handlesPagination: false,
+  headers: [],
+  loading: false,
+  onRowClick: () => null,
+  onPageChange: () => null,
+  onSortRequest: () => null,
+  small: false,
+  order: undefined,
+  orderBy: undefined,
+  initialPage: 1,
+  paginated: false,
+  totalCount: 0,
+  page: 0,
+  pageSize: undefined,
 }
 
 export { Tabular as default, Table }

@@ -26,6 +26,22 @@ import style from './message.styl'
 
 @bind
 class MessageEvent extends React.PureComponent {
+  static propTypes = {
+    className: PropTypes.string,
+    event: PropTypes.event.isRequired,
+    expandedClassName: PropTypes.string,
+    overviewClassName: PropTypes.string,
+    type: PropTypes.oneOf(['downlink', 'uplink']).isRequired,
+    widget: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    expandedClassName: undefined,
+    overviewClassName: undefined,
+    widget: false,
+  }
+
   render() {
     const { className, event, type, widget, overviewClassName, expandedClassName } = this.props
 
@@ -50,16 +66,6 @@ class MessageEvent extends React.PureComponent {
       />
     )
   }
-}
-
-MessageEvent.propTypes = {
-  event: PropTypes.event.isRequired,
-  type: PropTypes.oneOf(['downlink', 'uplink']),
-  widget: PropTypes.bool,
-}
-
-MessageEvent.defaultProps = {
-  widget: false,
 }
 
 export default MessageEvent

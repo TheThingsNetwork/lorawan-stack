@@ -24,6 +24,46 @@ import style from './pagination.styl'
 
 @bind
 class Pagination extends React.PureComponent {
+  static propTypes = {
+    className: PropTypes.string,
+    /** Page to be displayed immediately */
+    forcePage: PropTypes.number,
+    /** A flag indicating whether the pagination should be hidden when there is
+     * only one page.
+     */
+    hideIfOnlyOnePage: PropTypes.bool,
+    /** The initial page number to be selected when the component
+     * gets rendered for the first time. Is 1-based.
+     */
+    initialPage: PropTypes.number,
+    /**
+     * The number of pages to be displayed in the beginning/end of
+     * the component. For example, marginPagesDisplayed = 2, then the
+     * component will display at most two pages as margins:
+     * [<][1][2]...[10]...[19][20][>]
+     *
+     */
+    marginPagesDisplayed: PropTypes.number,
+    /** An onClick handler that gets called with the new page number */
+    onPageChange: PropTypes.func.isRequired,
+    /** The total number of pages */
+    pageCount: PropTypes.number.isRequired,
+    /**
+     * The number of pages to be displayed. If is bigger than
+     * pageCount, then all pages will be displayed without gaps.
+     */
+    pageRangeDisplayed: PropTypes.number,
+  }
+
+  static defaultProps = {
+    className: undefined,
+    forcePage: 1,
+    hideIfOnlyOnePage: true,
+    initialPage: 1,
+    marginPagesDisplayed: 1,
+    pageRangeDisplayed: 1,
+  }
+
   onPageChange(page) {
     this.props.onPageChange(page.selected + 1)
   }
@@ -31,8 +71,8 @@ class Pagination extends React.PureComponent {
   render() {
     const {
       className,
-      forcePage = 1,
-      initialPage = 1,
+      forcePage,
+      initialPage,
       pageRangeDisplayed,
       marginPagesDisplayed,
       hideIfOnlyOnePage,
@@ -77,42 +117,5 @@ class Pagination extends React.PureComponent {
   }
 }
 
-Pagination.propTypes = {
-  /** The total number of pages */
-  pageCount: PropTypes.number.isRequired,
-  /**
-   * The number of pages to be displayed. If is bigger than
-   * pageCount, then all pages will be displayed without gaps.
-   */
-  pageRangeDisplayed: PropTypes.number,
-  /** Page to be displayed immediately */
-  forcePage: PropTypes.number,
-  /**
-   * The number of pages to be displayed in the beginning/end of
-   * the component. For example, marginPagesDisplayed = 2, then the
-   * component will display at most two pages as margins:
-   * [<][1][2]...[10]...[19][20][>]
-   *
-   */
-  marginPagesDisplayed: PropTypes.number,
-  /** The initial page number to be selected when the component
-   * gets rendered for the first time. Is 1-based.
-   */
-  initialPage: PropTypes.number,
-  /** An onClick handler that gets called with the new page number */
-  onPageChange: PropTypes.func.isRequired,
-  /** A flag indicating whether the pagination should be hidden when there is
-   * only one page.
-   */
-  hideIfOnlyOnePage: PropTypes.bool,
-}
-
-Pagination.defaultProps = {
-  onPageChange: () => null,
-  pageRangeDisplayed: 1,
-  marginPagesDisplayed: 1,
-  initialPage: 1,
-  hideIfOnlyOnePage: true,
-}
 
 export default Pagination

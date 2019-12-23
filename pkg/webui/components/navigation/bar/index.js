@@ -50,6 +50,9 @@ const NavigationBar = function({ className, entries, anchored }) {
 }
 
 NavigationBar.propTypes = {
+  /** Flag identifying whether links should be rendered as plain anchor link */
+  anchored: PropTypes.bool,
+  className: PropTypes.string,
   /**
    * A list of navigation bar entries.
    * @param {(string|Object)} title - The title to be displayed
@@ -58,12 +61,12 @@ NavigationBar.propTypes = {
    * @param {boolean} exact - Flag identifying whether the path should be matched exactly
    */
   entries: PropTypes.arrayOf(PropTypes.link),
-  /** Flag identifying whether links should be rendered as plain anchor link */
-  anchored: PropTypes.bool,
 }
 
 NavigationBar.defaultProps = {
+  className: undefined,
   entries: [],
+  anchored: false,
 }
 
 export default NavigationBar
