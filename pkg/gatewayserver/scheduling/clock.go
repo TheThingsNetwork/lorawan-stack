@@ -82,7 +82,7 @@ func (c *RolloverClock) FromGatewayTime(gateway time.Time) (ConcentratorTime, bo
 // FromTimestampTime implements Clock.
 func (c *RolloverClock) FromTimestampTime(timestamp uint32) ConcentratorTime {
 	passed := int64(timestamp) - int64(c.relative)
-	if passed < 0 {
+	if passed < -math.MaxUint32/2 {
 		passed += math.MaxUint32
 	}
 	return c.absolute + ConcentratorTime(time.Duration(passed)*time.Microsecond)
