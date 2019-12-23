@@ -58,7 +58,7 @@ const m = defineMessages({
 const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),
   application_id: Yup.string()
-    .matches(applicationIdRegexp, sharedMessages.validateAlphanum)
+    .matches(applicationIdRegexp, sharedMessages.validateIdFormat)
     .min(2, sharedMessages.validateTooShort)
     .max(25, sharedMessages.validateTooLong)
     .required(sharedMessages.validateRequired),

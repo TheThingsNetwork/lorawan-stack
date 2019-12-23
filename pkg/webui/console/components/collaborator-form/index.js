@@ -33,7 +33,7 @@ import RightsGroup from '../../components/rights-group'
 
 const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()
-    .matches(collaboratorIdRegexp, sharedMessages.validateAlphanum)
+    .matches(collaboratorIdRegexp, sharedMessages.validateIdFormat)
     .required(sharedMessages.validateRequired),
   collaborator_type: Yup.string().required(sharedMessages.validateRequired),
   rights: Yup.array().min(1, sharedMessages.validateRights),
@@ -52,8 +52,8 @@ export default class CollaboratorForm extends Component {
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func,
-    rights: PropTypes.rights.isRequired,
     pseudoRights: PropTypes.rights,
+    rights: PropTypes.rights.isRequired,
     update: PropTypes.bool,
   }
 
