@@ -11325,6 +11325,10 @@
           "format": "date-time",
           "description": "Time when the downlink message should be transmitted.\nThis value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots.\nThis requires the gateway to have GPS time sychronization.\nIf the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations."
         },
+        "frequency_plan_id": {
+          "type": "string",
+          "description": "Frequency plan ID from which the frequencies in this message are retrieved."
+        },
         "advanced": {
           "type": "object",
           "title": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case"
