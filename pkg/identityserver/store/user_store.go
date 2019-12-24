@@ -93,6 +93,7 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 	}
 	query := s.query(ctx, User{}, withUserID(idStrings...))
 	query = selectUserFields(ctx, query, fieldMask)
+	query = query.Order(orderFromContext(ctx, "users", `"accounts"."uid"`, "ASC"))
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(User{}))
 		query = query.Limit(limit).Offset(offset)

@@ -56,6 +56,7 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 	defer trace.StartRegion(ctx, "find invitations").End()
 	var invitationModels []Invitation
 	query := s.query(ctx, Invitation{})
+	query = query.Order(orderFromContext(ctx, "invitations", "id", "ASC"))
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(&Invitation{}))
 		query = query.Limit(limit).Offset(offset)

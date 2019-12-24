@@ -89,12 +89,13 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 	}
 	query := s.query(ctx, Organization{}, withOrganizationID(idStrings...))
 	query = selectOrganizationFields(ctx, query, fieldMask)
+	query = query.Order(orderFromContext(ctx, "organizations", `"accounts"."uid"`, "ASC"))
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(Organization{}))
 		query = query.Limit(limit).Offset(offset)
 	}
 	var orgModels []Organization
-	query = query.Find(&orgModels)
+	query = query.Preload("Account").Find(&orgModels)
 	setTotal(ctx, uint64(len(orgModels)))
 	if query.Error != nil {
 		return nil, query.Error

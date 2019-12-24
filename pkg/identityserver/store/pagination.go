@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -72,4 +73,32 @@ func limitAndOffsetFromContext(ctx context.Context) (limit, offset uint32) {
 		return opts.limit, opts.offset
 	}
 	return
+}
+
+// WithOrder instructs the store to sort the results by the given field and order (ASC or DESC).
+func WithOrder(ctx context.Context, field, order string) context.Context {
+	return context.WithValue(ctx, orderOptionsKey, orderOptions{
+		field: field,
+		order: order,
+	})
+}
+
+type orderOptionsKeyType struct{}
+
+var orderOptionsKey orderOptionsKeyType
+
+type orderOptions struct {
+	field string
+	order string
+}
+
+func orderFromContext(ctx context.Context, table, defaultTableField, defaultOrder string) string {
+	if opts, ok := ctx.Value(orderOptionsKey).(orderOptions); ok && opts.field != "" {
+		order := opts.order
+		if order == "" {
+			order = "ASC"
+		}
+		return fmt.Sprintf(`"%s"."%s" %s`, table, opts.field, order)
+	}
+	return fmt.Sprintf("%s %s", defaultTableField, defaultOrder)
 }
