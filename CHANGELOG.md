@@ -9,12 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Downlink queue operation topics in the PubSub integrations can now be configured using the Console.
-- `List` RPC in the user registry and related messages.
-- User management for admins in the Console.
-- User list command in the CLI.
-- Support for Microchip ATECC608A-TNGLORA-C manifest files in device template conversion.
-
 ### Changed
 
 ### Deprecated
@@ -23,10 +17,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Security
+
+## [3.4.0] (2019-12-24)
+
+### Added
+
+- Downlink queue operation topics in the PubSub integrations can now be configured using the Console.
+- `List` RPC in the user registry and related messages.
+- User management for admins in the Console.
+- `users list` command in the CLI.
+- Support for getting Kerlink CPF configurations from Gateway Configuration Server.
+- Support for Microchip ATECC608A-TNGLORA-C manifest files in device template conversion.
+
+### Fixed
+
 - Fix the PubSub integration edit page in the Console.
 - Fix updating and setting of webhook headers in the Console.
-
-### Security
+- Fix DevNonce checks for LoRaWAN 1.0.3.
 
 ## [3.3.2] (2019-12-04)
 
@@ -483,7 +491,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.2...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.0...HEAD
+[3.4.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.2...v3.4.0
 [3.3.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.1...v3.3.2
 [3.3.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.2.6...v3.3.0
