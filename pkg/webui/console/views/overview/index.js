@@ -55,7 +55,7 @@ const m = defineMessages({
   gotoApplications: 'Go to applications',
   gotoGateways: 'Go to gateways',
   welcome: 'Welcome to the Console!',
-  welcomeBack: 'Welcome back, {userId} 👋!',
+  welcomeBack: 'Welcome back, {userId}! 👋',
   getStarted: 'Get started right away by creating an application or registering a gateway.',
   continueWorking: 'Walk right through to your applications and/or gateways.',
   componentStatus: 'Component Status',

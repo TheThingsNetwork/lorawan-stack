@@ -257,7 +257,7 @@
   "console.views.overview.index.gotoApplications": "Go to applications",
   "console.views.overview.index.gotoGateways": "Go to gateways",
   "console.views.overview.index.welcome": "Welcome to the Console!",
-  "console.views.overview.index.welcomeBack": "Welcome back, {userId} 👋!",
+  "console.views.overview.index.welcomeBack": "Welcome back, {userId}! 👋",
   "console.views.overview.index.getStarted": "Get started right away by creating an application or registering a gateway.",
   "console.views.overview.index.continueWorking": "Walk right through to your applications and/or gateways.",
   "console.views.overview.index.componentStatus": "Component Status",
