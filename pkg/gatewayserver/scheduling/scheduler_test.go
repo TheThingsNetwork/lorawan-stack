@@ -51,15 +51,15 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
-		SyncWithGateway bool
-		PayloadSize     int
-		Settings        ttnpb.TxSettings
-		Priority        ttnpb.TxSchedulePriority
-		MaxRTT          *time.Duration
-		MedianRTT       *time.Duration
-		ExpectedToa     time.Duration
-		ExpectedStarts  scheduling.ConcentratorTime
-		ExpectedError   *errors.Definition
+		SyncWithGatewayAbsolute bool
+		PayloadSize             int
+		Settings                ttnpb.TxSettings
+		Priority                ttnpb.TxSchedulePriority
+		MaxRTT                  *time.Duration
+		MedianRTT               *time.Duration
+		ExpectedToa             time.Duration
+		ExpectedStarts          scheduling.ConcentratorTime
+		ExpectedError           *errors.Definition
 	}{
 		{
 			PayloadSize: 10,
@@ -82,8 +82,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			ExpectedError: &scheduling.ErrTooLate,
 		},
 		{
-			SyncWithGateway: true,
-			PayloadSize:     51,
+			SyncWithGatewayAbsolute: true,
+			PayloadSize:             51,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_LoRa{
@@ -124,8 +124,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			ExpectedError: &scheduling.ErrTooLate,
 		},
 		{
-			SyncWithGateway: true,
-			PayloadSize:     51,
+			SyncWithGatewayAbsolute: true,
+			PayloadSize:             51,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_LoRa{
@@ -186,8 +186,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			ExpectedStarts: 1000000000 - 200000000/2 - 51456000,
 		},
 		{
-			SyncWithGateway: true,
-			PayloadSize:     16,
+			SyncWithGatewayAbsolute: true,
+			PayloadSize:             16,
 			Settings: ttnpb.TxSettings{
 				DataRate: ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_LoRa{
@@ -306,8 +306,8 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	} {
 		tcok := t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			if tc.SyncWithGateway {
-				scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+			if tc.SyncWithGatewayAbsolute {
+				scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 			} else {
 				scheduler.Sync(0, timeSource.Time)
 			}
@@ -364,14 +364,14 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
-		SyncWithGateway bool
-		PayloadSize     int
-		Settings        ttnpb.TxSettings
-		Priority        ttnpb.TxSchedulePriority
-		MaxRTT          *time.Duration
-		MedianRTT       *time.Duration
-		ExpectedToa     time.Duration
-		ExpectedStarts  scheduling.ConcentratorTime
+		SyncWithGatewayAbsolute bool
+		PayloadSize             int
+		Settings                ttnpb.TxSettings
+		Priority                ttnpb.TxSchedulePriority
+		MaxRTT                  *time.Duration
+		MedianRTT               *time.Duration
+		ExpectedToa             time.Duration
+		ExpectedStarts          scheduling.ConcentratorTime
 	}{
 		{
 			PayloadSize: 20,
@@ -395,8 +395,8 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 	} {
 		tcok := t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			if tc.SyncWithGateway {
-				scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+			if tc.SyncWithGatewayAbsolute {
+				scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 			} else {
 				scheduler.Sync(0, timeSource.Time)
 			}
@@ -439,7 +439,7 @@ func TestScheduleAnytime(t *testing.T) {
 	}
 	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil)
 	a.So(err, should.BeNil)
-	scheduler.SyncWithGateway(0, time.Now(), time.Unix(0, 0))
+	scheduler.SyncWithGatewayAbsolute(0, time.Now(), time.Unix(0, 0))
 
 	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
@@ -552,7 +552,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		}
 		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 		a.So(err, should.BeNil)
-		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
 		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeLong)
@@ -565,7 +565,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		}
 		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 		a.So(err, should.BeNil)
-		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		rtts := &mockRTTs{
 			Max:   40 * time.Millisecond,
 			Count: 1,
@@ -582,7 +582,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		}
 		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 		a.So(err, should.BeNil)
-		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 100*1000), nil, ttnpb.TxSchedulePriority_NORMAL)
 		a.So(err, should.BeNil)
 		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeShort)
@@ -595,7 +595,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		}
 		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
 		a.So(err, should.BeNil)
-		scheduler.SyncWithGateway(0, timeSource.Time, time.Unix(0, 0))
+		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		rtts := &mockRTTs{
 			Max:   40 * time.Millisecond,
 			Count: 1,

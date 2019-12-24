@@ -59,44 +59,53 @@ func TestRolloverClock(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			serverTime := time.Unix(0, 0).Add(time.Duration(stc.Absolute))
-			clock.Sync(stc.Relative, serverTime)
+			// Run twice; once synchronizing with rollover detection, and once synchronizing with the known concentrator time.
+			for i := 0; i < 2; i++ {
+				t.Run([]string{"DetectRollover", "ResetAbsolute"}[i], func(t *testing.T) {
+					if i == 0 {
+						clock.Sync(stc.Relative, serverTime)
+					} else {
+						clock.SyncWithGatewayConcentrator(stc.Relative, serverTime, stc.Absolute)
+					}
 
-			for _, tc := range []struct {
-				D        time.Duration
-				Rollover bool
-			}{
-				{
-					D:        -5 * time.Second,
-					Rollover: false,
-				},
-				{
-					D:        5 * time.Second,
-					Rollover: false,
-				},
-				{
-					D:        30 * time.Minute,
-					Rollover: false,
-				},
-				{
-					D:        2 * time.Hour,
-					Rollover: true,
-				},
-			} {
-				t.Run(tc.D.String(), func(t *testing.T) {
-					a := assertions.New(t)
+					for _, tc := range []struct {
+						D        time.Duration
+						Rollover bool
+					}{
+						{
+							D:        -5 * time.Second,
+							Rollover: false,
+						},
+						{
+							D:        5 * time.Second,
+							Rollover: false,
+						},
+						{
+							D:        30 * time.Minute,
+							Rollover: false,
+						},
+						{
+							D:        2 * time.Hour,
+							Rollover: true,
+						},
+					} {
+						t.Run(tc.D.String(), func(t *testing.T) {
+							a := assertions.New(t)
 
-					v, ok := clock.FromServerTime(serverTime.Add(tc.D))
-					a.So(ok, should.BeTrue)
-					a.So(v, should.Equal, stc.Absolute+ConcentratorTime(tc.D))
+							v, ok := clock.FromServerTime(serverTime.Add(tc.D))
+							a.So(ok, should.BeTrue)
+							a.So(v, should.Equal, stc.Absolute+ConcentratorTime(tc.D))
 
-					d := tc.D / time.Microsecond
-					rollover := d > math.MaxUint32/2 || d < -math.MaxUint32/2
-					a.So(rollover, should.Equal, tc.Rollover)
+							d := tc.D / time.Microsecond
+							rollover := d > math.MaxUint32/2 || d < -math.MaxUint32/2
+							a.So(rollover, should.Equal, tc.Rollover)
 
-					if !rollover {
-						ts := uint32(time.Duration(stc.Relative) + tc.D/time.Microsecond)
-						v = clock.FromTimestampTime(ts)
-						a.So(v, should.Equal, stc.Absolute+ConcentratorTime(tc.D))
+							if !rollover {
+								ts := uint32(time.Duration(stc.Relative) + tc.D/time.Microsecond)
+								v = clock.FromTimestampTime(ts)
+								a.So(v, should.Equal, stc.Absolute+ConcentratorTime(tc.D))
+							}
+						})
 					}
 				})
 			}

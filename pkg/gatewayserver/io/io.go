@@ -130,7 +130,7 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
 func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	if up.Settings.Time != nil {
-		c.scheduler.SyncWithGateway(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
+		c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"server_time", up.ReceivedAt,
@@ -450,6 +450,12 @@ func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 
 // FrequencyPlan returns the frequency plan for the gateway.
 func (c *Connection) FrequencyPlan() *frequencyplans.FrequencyPlan { return c.fp }
+
+// SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
+// relative gateway time that corresponds to the given timestamp.
+func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator scheduling.ConcentratorTime) {
+	c.scheduler.SyncWithGatewayConcentrator(timestamp, server, concentrator)
+}
 
 // TimeFromTimestampTime returns the concentrator time by the given timestamp.
 // This method returns false if the clock is not synced with the server.

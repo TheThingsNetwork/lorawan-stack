@@ -61,11 +61,21 @@ func (c *RolloverClock) Sync(timestamp uint32, server time.Time) {
 	c.synced = true
 }
 
-// SyncWithGateway synchronizes the clock with the given concentrator timestamp, the server time and the gateway time that
-// corresponds to the given timestamp.
-func (c *RolloverClock) SyncWithGateway(timestamp uint32, server, gateway time.Time) {
+// SyncWithGatewayAbsolute synchronizes the clock with the given concentrator timestamp, the server time and the
+// absolute gateway time that corresponds to the given timestamp.
+func (c *RolloverClock) SyncWithGatewayAbsolute(timestamp uint32, server, gateway time.Time) {
 	c.Sync(timestamp, server)
 	c.gateway = &gateway
+}
+
+// SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
+// relative gateway time that corresponds to the given timestamp.
+func (c *RolloverClock) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator ConcentratorTime) {
+	c.absolute = concentrator
+	c.relative = timestamp
+	c.server = &server
+	c.gateway = nil
+	c.synced = true
 }
 
 // FromServerTime implements Clock.

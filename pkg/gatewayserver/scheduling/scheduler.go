@@ -320,11 +320,19 @@ func (s *Scheduler) Sync(v uint32, server time.Time) {
 	s.mu.Unlock()
 }
 
-// SyncWithGateway synchronizes the clock with the given concentrator time v, the server time and the gateway time that
-// corresponds to the given v.
-func (s *Scheduler) SyncWithGateway(v uint32, server, gateway time.Time) {
+// SyncWithGatewayAbsolute synchronizes the clock with the given concentrator timestamp, the server time and the
+// absolute gateway time that corresponds to the given timestamp.
+func (s *Scheduler) SyncWithGatewayAbsolute(timestamp uint32, server, gateway time.Time) {
 	s.mu.Lock()
-	s.clock.SyncWithGateway(v, server, gateway)
+	s.clock.SyncWithGatewayAbsolute(timestamp, server, gateway)
+	s.mu.Unlock()
+}
+
+// SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
+// relative gateway time that corresponds to the given timestamp.
+func (s *Scheduler) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator ConcentratorTime) {
+	s.mu.Lock()
+	s.clock.SyncWithGatewayConcentrator(timestamp, server, concentrator)
 	s.mu.Unlock()
 }
 
