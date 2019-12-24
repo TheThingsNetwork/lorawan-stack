@@ -21,11 +21,18 @@ const defaultState = {
 const device = function(state = defaultState, { type, payload }) {
   switch (type) {
     case UPDATE_DEV_SUCCESS:
+      const currentRootKeys = state.device.root_keys || {}
+      const updatedRootKeys = payload.root_keys || {}
+
       return {
         ...state,
         device: {
           ...state.device,
           ...payload,
+          root_keys: {
+            ...currentRootKeys,
+            ...updatedRootKeys,
+          },
         },
       }
     case GET_DEV_SUCCESS:
