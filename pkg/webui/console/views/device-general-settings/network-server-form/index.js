@@ -29,7 +29,13 @@ import m from '../../../components/device-data-form/messages'
 import sharedMessages from '../../../../lib/shared-messages'
 import PropTypes from '../../../../lib/prop-types'
 
-import { parseLorawanMacVersion, isDeviceABP, isDeviceMulticast, ACTIVATION_MODES } from '../utils'
+import {
+  parseLorawanMacVersion,
+  isDeviceABP,
+  isDeviceMulticast,
+  ACTIVATION_MODES,
+  hasExternalJs,
+} from '../utils'
 import validationSchema from './validation-schema'
 
 const lorawanVersions = [
@@ -67,6 +73,7 @@ const NetworkServerForm = React.memo(props => {
   )
 
   const initialValues = React.useMemo(() => {
+    const extJs = hasExternalJs(device)
     const {
       lorawan_version,
       lorawan_phy_version,
@@ -76,6 +83,10 @@ const NetworkServerForm = React.memo(props => {
       multicast = false,
       session,
       mac_settings = {},
+      root_keys = {
+        nwk_key: {},
+        app_key: {},
+      },
     } = device
 
     let _activation_mode = ACTIVATION_MODES.ABP
@@ -93,15 +104,23 @@ const NetworkServerForm = React.memo(props => {
       session,
       _activation_mode,
       mac_settings,
+      root_keys,
+      _supports_join: supports_join,
+      _external_js: extJs,
     }
   }, [device])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const isABP = initialValues._activation_mode === ACTIVATION_MODES.ABP
+      const isOTAA = initialValues._activation_mode === ACTIVATION_MODES.OTAA
 
       const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, ['_activation_mode', '_external_js'])
+      const updatedValues = diff(initialValues, castedValues, [
+        '_activation_mode',
+        '_external_js',
+        '_supports_join',
+      ])
 
       if (isABP) {
         // Do not reset session keys
@@ -111,6 +130,10 @@ const NetworkServerForm = React.memo(props => {
 
         if (Object.keys(updatedValues.session).length === 0) {
           delete updatedValues.session
+        }
+      } else if (isOTAA) {
+        if (updatedValues.root_keys && Object.keys(updatedValues.root_keys).length === 0) {
+          delete updatedValues.root_keys
         }
       }
 

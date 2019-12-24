@@ -77,6 +77,49 @@ const validationSchema = Yup.object().shape({
 
     return schema.strip()
   }),
+  root_keys: Yup.object().when(
+    ['_external_js', 'lorawan_version', '_supports_join', '_activation_mode'],
+    (externalJs, version, supportsJoin, mode, schema) => {
+      if (mode === 'otaa') {
+        const strippedSchema = Yup.object().strip()
+        const keySchema = Yup.lazy(() => {
+          return !externalJs
+            ? Yup.object().shape({
+                key: Yup.string()
+                  .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                  .transform(toUndefined)
+                  .default(random16BytesString),
+              })
+            : strippedSchema
+        })
+
+        if (!supportsJoin) {
+          return schema.strip()
+        }
+
+        if (externalJs) {
+          return schema.shape({
+            nwk_key: strippedSchema,
+            app_key: strippedSchema,
+          })
+        }
+
+        if (parseLorawanMacVersion(version) < 110) {
+          return schema.shape({
+            nwk_key: strippedSchema,
+            app_key: keySchema,
+          })
+        }
+
+        return schema.shape({
+          nwk_key: keySchema,
+          app_key: keySchema,
+        })
+      }
+
+      return schema.strip()
+    },
+  ),
 })
 
 export default validationSchema
