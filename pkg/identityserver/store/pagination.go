@@ -17,6 +17,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -75,8 +76,18 @@ func limitAndOffsetFromContext(ctx context.Context) (limit, offset uint32) {
 	return
 }
 
-// WithOrder instructs the store to sort the results by the given field and order (ASC or DESC).
-func WithOrder(ctx context.Context, field, order string) context.Context {
+// WithOrder instructs the store to sort the results by the given field.
+// If the field is prefixed with a minus, the order is reversed.
+func WithOrder(ctx context.Context, spec string) context.Context {
+	if spec == "" {
+		return ctx
+	}
+	field := spec
+	order := "ASC"
+	if strings.HasPrefix(spec, "-") {
+		field = strings.TrimPrefix(spec, "-")
+		order = "DESC"
+	}
 	return context.WithValue(ctx, orderOptionsKey, orderOptions{
 		field: field,
 		order: order,
