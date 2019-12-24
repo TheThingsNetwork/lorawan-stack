@@ -363,11 +363,11 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.WithError(err).Debug("Failed to parse join-request message")
 					return nil
 				}
+				atomic.StoreInt32(&sessionID, int32(jreq.UpInfo.XTime>>48))
 				if err := conn.HandleUp(up); err != nil {
 					logger.WithError(err).Warn("Failed to handle uplink message")
 				}
 				recordRTT(conn, receivedAt, jreq.RefTime)
-				atomic.StoreInt32(&sessionID, int32(jreq.UpInfo.XTime>>48))
 
 			case messages.TypeUpstreamUplinkDataFrame:
 				var updf messages.UplinkDataFrame
@@ -380,11 +380,11 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.WithError(err).Debug("Failed to parse uplink data frame")
 					return nil
 				}
+				atomic.StoreInt32(&sessionID, int32(updf.UpInfo.XTime>>48))
 				if err := conn.HandleUp(up); err != nil {
 					logger.WithError(err).Warn("Failed to handle uplink message")
 				}
 				recordRTT(conn, receivedAt, updf.RefTime)
-				atomic.StoreInt32(&sessionID, int32(updf.UpInfo.XTime>>48))
 
 			case messages.TypeUpstreamTxConfirmation:
 				var txConf messages.TxConfirmation
@@ -408,7 +408,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			default:
 				logger.WithField("message_type", typ).Debug("Unknown message type")
 			}
-
 		}
 	}
 }
