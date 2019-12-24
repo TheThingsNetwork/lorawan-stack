@@ -79,6 +79,7 @@ var (
 				FieldMask:    types.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
+				Order:        getOrder(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -250,6 +251,7 @@ func init() {
 	applicationsListCommand.Flags().AddFlagSet(collaboratorFlags())
 	applicationsListCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsListCommand.Flags().AddFlagSet(paginationFlags())
+	applicationsListCommand.Flags().AddFlagSet(orderFlags())
 	applicationsCommand.AddCommand(applicationsListCommand)
 	applicationsSearchCommand.Flags().AddFlagSet(searchFlags())
 	applicationsSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
