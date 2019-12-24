@@ -141,6 +141,7 @@ var DownlinkMessageFieldPathsNested = []string{
 	"settings.request.advanced",
 	"settings.request.class",
 	"settings.request.downlink_paths",
+	"settings.request.frequency_plan_id",
 	"settings.request.priority",
 	"settings.request.rx1_data_rate_index",
 	"settings.request.rx1_delay",

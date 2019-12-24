@@ -83,6 +83,7 @@ var GatewayDownFieldPathsNested = []string{
 	"downlink_message.settings.request.advanced",
 	"downlink_message.settings.request.class",
 	"downlink_message.settings.request.downlink_paths",
+	"downlink_message.settings.request.frequency_plan_id",
 	"downlink_message.settings.request.priority",
 	"downlink_message.settings.request.rx1_data_rate_index",
 	"downlink_message.settings.request.rx1_delay",
