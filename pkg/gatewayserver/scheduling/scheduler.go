@@ -159,6 +159,7 @@ var (
 	errTooLate               = errors.DefineFailedPrecondition("too_late", "too late to transmission scheduled time (delta is `{delta}`)")
 	errNoClockSync           = errors.DefineUnavailable("no_clock_sync", "no clock sync")
 	errNoAbsoluteGatewayTime = errors.DefineAborted("no_absolute_gateway_time", "no absolute gateway time")
+	errNoServerTime          = errors.DefineAborted("no_server_time", "no server time")
 )
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
@@ -180,13 +181,17 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 		}
 	}
 	var starts ConcentratorTime
-	now := s.clock.FromServerTime(s.timeSource.Now())
+	now, ok := s.clock.FromServerTime(s.timeSource.Now())
 	if settings.Time != nil {
 		var ok bool
 		starts, ok = s.clock.FromGatewayTime(*settings.Time)
 		if !ok {
 			if medianRTT != nil {
-				starts = s.clock.FromServerTime(*settings.Time) - ConcentratorTime(*medianRTT/2)
+				serverTime, ok := s.clock.FromServerTime(*settings.Time)
+				if !ok {
+					return Emission{}, errNoServerTime
+				}
+				starts = serverTime - ConcentratorTime(*medianRTT/2)
 			} else {
 				return Emission{}, errNoAbsoluteGatewayTime
 			}
@@ -200,8 +205,10 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 	} else {
 		starts = s.clock.FromTimestampTime(settings.Timestamp)
 	}
-	if delta := time.Duration(starts - now); delta < minScheduleTime {
-		return Emission{}, errTooLate.WithAttributes("delta", delta)
+	if ok {
+		if delta := time.Duration(starts - now); delta < minScheduleTime {
+			return Emission{}, errTooLate.WithAttributes("delta", delta)
+		}
 	}
 	sb, err := s.findSubBand(settings.Frequency)
 	if err != nil {
@@ -246,7 +253,10 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 		}
 	}
 	var starts ConcentratorTime
-	now := s.clock.FromServerTime(s.timeSource.Now())
+	now, ok := s.clock.FromServerTime(s.timeSource.Now())
+	if !ok {
+		return Emission{}, errNoServerTime
+	}
 	if settings.Timestamp == 0 {
 		starts = now + ConcentratorTime(ScheduleTimeLong)
 		settings.Timestamp = uint32(time.Duration(starts) / time.Microsecond)
@@ -326,7 +336,7 @@ func (s *Scheduler) Now() (ConcentratorTime, bool) {
 	if !s.clock.IsSynced() {
 		return 0, false
 	}
-	return s.clock.FromServerTime(s.timeSource.Now()), true
+	return s.clock.FromServerTime(s.timeSource.Now())
 }
 
 // TimeFromTimestampTime returns the concentrator time by the given timestamp.
