@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Networking | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.0/reference/networking/" />
+  <link rel="icon" type="image/png" href="/v3.4.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.0/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Networking">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Networking">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.0/reference/networking/">
+  <meta name="twitter:title" content="Networking" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.0/">
+        <img src="/v3.4.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Networking</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.4.0/reference/networking/" class="is-active">Overview</a>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Networking</h1>
+
+<div class="content"><p>The Things Stack uses a port per protocol, with a TLS counterpart when applicable. Ports can be shared by multiple services using the same protocol, i.e. gRPC services sharing management, data and events services.</p>
+
+<h2 id="port-allocations">Port Allocations</h2>
+
+<p>The following table lists the default ports used.</p>
+
+<table>
+<thead>
+<tr>
+<th><strong>Purpose</strong></th>
+<th><strong>Protocol</strong></th>
+<th><strong>Authentication</strong></th>
+<th><strong>Port</strong></th>
+<th><strong>Port (TLS)</strong></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Gateway data</td>
+<td><a href="https://github.com/Lora-net/packet_forwarder/blob/master/PROTOCOL.TXT">Semtech Packet Forwarder</a></td>
+<td>None</td>
+<td>1700 (UDP)</td>
+<td>N/A</td>
+</tr>
+
+<tr>
+<td>Gateway data</td>
+<td>MQTT (V2)</td>
+<td>API key, token</td>
+<td>1881</td>
+<td>8881</td>
+</tr>
+
+<tr>
+<td>Gateway data</td>
+<td>MQTT</td>
+<td>API key, token</td>
+<td>1882</td>
+<td>8882</td>
+</tr>
+
+<tr>
+<td>Application data, events</td>
+<td>MQTT</td>
+<td>API key, token</td>
+<td>1883</td>
+<td>8883</td>
+</tr>
+
+<tr>
+<td>Management, data, events</td>
+<td>gRPC</td>
+<td>API key, token</td>
+<td>1884</td>
+<td>8884</td>
+</tr>
+
+<tr>
+<td>Management</td>
+<td>HTTP</td>
+<td>API key, token</td>
+<td>1885</td>
+<td>8885</td>
+</tr>
+
+<tr>
+<td>Backend Interfaces</td>
+<td>HTTP</td>
+<td>Custom</td>
+<td>N/A</td>
+<td>8886</td>
+</tr>
+
+<tr>
+<td>Basic Station LNS</td>
+<td>HTTP</td>
+<td>Auth Token, Custom</td>
+<td>1887</td>
+<td>8887</td>
+</tr>
+</tbody>
+</table></div>
+
+
+<div class="is-clearfix">
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.0/components/">Components</a></p>
+        <p><a class="" href="/v3.4.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by KrishnaIyer on 20 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/04d76535a6099e2f0056af93e2ccbf33d7a0c74d">
+      doc: Move networking to reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/networking/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Application Server Options | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.0/reference/configuration/application-server/" />
+  <link rel="icon" type="image/png" href="/v3.4.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.0/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Application Server Options">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Application Server Options">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.0/reference/configuration/application-server/">
+  <meta name="twitter:title" content="Application Server Options" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.0/">
+        <img src="/v3.4.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Configuration</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.4.0/reference/configuration/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/the-things-stack/" class="">Generic Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/identity-server/" class="">Identity Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/gateway-server/" class="">Gateway Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/network-server/" class="">Network Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/application-server/" class="is-active">Application Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/join-server/" class="">Join Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/console/" class="">Console Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/cli/" class="">Command-Line Interface Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.0/reference/configuration/gateway-configuration-server/" class="">Gateway Configuration Server Options</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Application Server Options</h1>
+
+<div class="content">
+
+<h2 id="linking-options">Linking Options</h2>
+
+<p>The Application Server links to a Network Server. The <code>link-mode</code> configures how linking occurs.</p>
+
+<ul>
+<li><code>as.link-mode</code>: Mode to link applications to their Network Server (all, explicit) (default &ldquo;all&rdquo;)</li>
+</ul>
+
+<h2 id="security-options">Security Options</h2>
+
+<ul>
+<li><code>as.device-kek-label</code>: Label of KEK used to encrypt device keys at rest</li>
+</ul>
+
+<h2 id="interoperability-options">Interoperability Options</h2>
+
+<p>The <code>as.interop</code> options configure how Application Server performs interoperability with other LoRaWAN Backend Interfaces-compliant servers.</p>
+
+<ul>
+<li><code>as.interop.id</code>: AS-ID used for interoperability</li>
+<li><code>as.interop.config-source</code>: Source of the interoperability client configuration (directory, url, blob)</li>
+<li><code>as.interop.blob.bucket</code>: Blob bucket, which contains interoperability client configuration</li>
+<li><code>as.interop.blob.path</code>: Blob path, which contains interoperability client configuration</li>
+<li><code>as.interop.directory</code>: OS filesystem directory, which contains interoperability client configuration</li>
+<li><code>as.interop.url</code>: URL, which contains interoperability client configuration</li>
+</ul>
+
+<h2 id="mqtt-options">MQTT Options</h2>
+
+<p>Application Server exposes an MQTT server for streaming data.</p>
+
+<ul>
+<li><code>as.mqtt.listen</code>: Address for the MQTT frontend to listen on (default &ldquo;:1883&rdquo;)</li>
+<li><code>as.mqtt.listen-tls</code>: Address for the MQTTS frontend to listen on (default &ldquo;:8883&rdquo;)</li>
+<li><code>as.mqtt.public-address</code>: Public address of the MQTT frontend (default &ldquo;localhost:1883&rdquo;)</li>
+<li><code>as.mqtt.public-tls-address</code>: Public address of the MQTTs frontend (default &ldquo;localhost:8883&rdquo;)</li>
+</ul>
+
+<h2 id="http-webhooks-options">HTTP Webhooks Options</h2>
+
+<p>Application Server has an internal queue with worker routines for outgoing requests. When remote endpoints are not fast enough and queue (with <code>queue-size</code>) gets full, new traffic gets discarded. You can tune these parameters for optimal performance, considering memory consumption with a large queue size and number of workers.</p>
+
+<ul>
+<li><code>as.webhooks.queue-size</code>: Number of requests to queue (default 16)</li>
+<li><code>as.webhooks.target</code>: Target of the integration (direct) (default &ldquo;direct&rdquo;)</li>
+<li><code>as.webhooks.timeout</code>: Wait timeout of the target to process the request (default 5s)</li>
+<li><code>as.webhooks.workers</code>: Number of workers to process requests (default 16)</li>
+</ul>
+
+<p>Application Server supports templates for webhooks that can be loaded from a <code>directory</code> or <code>url</code>.</p>
+
+<ul>
+<li><code>as.webhooks.templates.directory</code>: Retrieve the webhook templates from the filesystem</li>
+<li><code>as.webhooks.templates.url</code>: Retrieve the webhook templates from a web server</li>
+<li><code>as.webhooks.templates.logo-base-url</code>: The base URL for the logo storage</li>
+</ul>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.0/reference/configuration/network-server/">← Network Server Options</a>
+<a class="button is-pulled-right" href="/v3.4.0/reference/configuration/join-server/">Join Server Options →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.0/components/">Components</a></p>
+        <p><a class="" href="/v3.4.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Johan Stokking on 05 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/ee092b4e8a0e3cce88e6be1c36f88b3f20db1a4c">
+      doc: Document Application Server options
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/configuration/application-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Gateway Server | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.0/components/gateway-server/" />
+  <link rel="icon" type="image/png" href="/v3.4.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.0/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Gateway Server">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Gateway Server">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.0/components/gateway-server/">
+  <meta name="twitter:title" content="Gateway Server" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.0/">
+        <img src="/v3.4.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">Gateway Server</h1>
+
+<div class="content"><p>The Gateway Server maintains connections with gateways supporting the Basic Station, UDP, MQTT and gRPC protocols. It forwards uplink traffic to Network Servers directly or indirectly, and schedules downlink traffic on gateways.</p>
+
+<h2 id="connectivity">Connectivity</h2>
+
+<p>Gateways can connect to Gateway Servers over multiple protocols.</p>
+
+<h3 id="basic-station-protocol">Basic Station Protocol</h3>
+
+<p>Gateways can connect to a Gateway Server using the <a href="https://doc.sm.tc/station/index.html">Basic Station</a> LNS protocol. This is the recommended protocol for connecting gateways.</p>
+
+<h3 id="udp-protocol">UDP Protocol</h3>
+
+<p>Gateways can connect to a Gateway Server over <a href="https://github.com/Lora-net/packet_forwarder/blob/master/PROTOCOL.TXT">the UDP protocol</a>. The EUI that is sent with every message is used to identify the gateway.</p>
+
+<p>If a gateway is found in the Identity Server with this EUI, messages are correlated to this gateway. Otherwise, depending on network configuration, uplinks may routed or dropped. However, the network will not send downlinks to this gateway, given that its regional parameters cannot be identified.</p>
+
+<p>Older versions of packet forwarders implementing the UDP protocol do not implement any queuing system for downlinks, resulting in packet loss since SX130x concentrators do not buffer multiple downlinks. The Things Stack therefore implements, for the UDP protocol, a delay to send downlinks to gateway just before they&rsquo;re meant to be emitted by the concentrator. You can disable this feature individually per gateway, for example if the RTT between your gateway and the Gateway Server is too high.</p>
+
+<h3 id="mqtt-protocol">MQTT Protocol</h3>
+
+<p>Gateways can connect to a Gateway Server by exchanging <a href="https://developers.google.com/protocol-buffers">protocol buffers</a> over MQTT. MQTT is available over TLS, providing confidentiality of messages exchanged between the gateway and the network. The encoding with protocol buffers reduces bandwidth usage compared to the UDP protocol, which uses JSON encoding.</p>
+
+<p>Packet forwarders implementing the MQTT protocols are specific for The Things Stack.</p>
+
+<h2 id="gateway-information">Gateway Information</h2>
+
+<p>While a gateway is connected, the Gateway Server collects statistics about the messages exchanged with the gateway, and about the status messages sent by the gateway. Those statistics can be retrieved from the Gateway Server using its gRPC and HTTP APIs. See <a href="https://thethingsstack.io/v3.4.0/reference/api/gateway_server/#Gs"><code>Gs</code> service</a>.</p>
+
+<h2 id="communication-with-network-server">Communication with Network Server</h2>
+
+<p>The main function of the Gateway Server is to maintain connections with gateways, and to serve as a relay between those gateways and the Network Servers.</p>
+
+<h3 id="uplink-messages">Uplink Messages</h3>
+
+<p>When receiving a data uplink message, the Gateway Server decides which Network Server to send it to based on the <code>DevAddr</code> of the device and the configured forwarding table with endpoints. Join-requests are routed to all configured endpoints. An endpoint can be the cluster&rsquo;s Network Server over gRPC, or an intermediate traffic routing mechanism.</p>
+
+<h3 id="downlink-messages">Downlink Messages</h3>
+
+<p>Network Servers can request transmission for downlink messages. The Gateway Server attempts to schedule the message based on the selected gateways, time to send the message and LoRaWAN settings (downlink class, RX1 delay and RX1/RX2 data rates and frequencies).</p>
+
+<p>The Gateway Server keeps track of all downlinks emitted and to be emitted by gateways connected to it, including the exact time-on-air based on message size and data rate. This allows The Things Stack to do smart scheduling. Besides timing and LoRaWAN settings, the Gateway Server takes applicable limitations into account, including:</p>
+
+<ul>
+<li><strong>Scheduling conflicts</strong>: If the emission of a downlink overlaps the emission of another downlink, the downlink is refused.</li>
+<li><strong>Time-off-air</strong>: Some bands and frequency plans have time-off-air constraints, meaning a gateway must not emit for a certain period of time after emitting a downlink.</li>
+<li><strong>Duty-cycle</strong>: Some countries, such as European countries, have <strong>duty-cycle restrictions</strong>, prohibiting a device for emitting for more than a certain percentage of time on a certain band.</li>
+<li><strong>Dwell time</strong>: Some countries, such as the United States, are subject to <strong>dwell time regulations</strong>, meaning the duration of a transmission cannot exceed a certain limit.</li>
+</ul></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.0/components/identity-server/">← Identity Server</a>
+<a class="button is-pulled-right" href="/v3.4.0/components/network-server/">Network Server →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.0/components/">Components</a></p>
+        <p><a class="" href="/v3.4.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Johan Stokking on 04 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/1201c76ce9a32f2eae1560aa48cb56b103a66bd8">
+      doc: Clarify Gateway Server documentation
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/components/gateway-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
