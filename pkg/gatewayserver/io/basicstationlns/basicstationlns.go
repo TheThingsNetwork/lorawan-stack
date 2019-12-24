@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
+	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -278,6 +279,22 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		}
 	}()
 
+	var syncedConcentratorTime bool
+	recordXTime := func(timestamp int64, server time.Time) {
+		// The session is the 16 MSB.
+		atomic.StoreInt32(&sessionID, int32(timestamp>>48))
+		if !syncedConcentratorTime {
+			conn.SyncWithGatewayConcentrator(
+				// The concentrator timestamp is the 32 LSB.
+				uint32(timestamp&0xFFFFFFFF),
+				server,
+				// The Basic Station epoch is the 48 LSB.
+				scheduling.ConcentratorTime(timestamp&0xFFFFFFFFFF),
+			)
+			syncedConcentratorTime = true
+		}
+	}
+
 	for {
 		select {
 		case <-conn.Context().Done():
@@ -363,7 +380,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.WithError(err).Debug("Failed to parse join-request message")
 					return nil
 				}
-				atomic.StoreInt32(&sessionID, int32(jreq.UpInfo.XTime>>48))
+				recordXTime(jreq.UpInfo.XTime, up.ReceivedAt)
 				if err := conn.HandleUp(up); err != nil {
 					logger.WithError(err).Warn("Failed to handle uplink message")
 				}
@@ -380,7 +397,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.WithError(err).Debug("Failed to parse uplink data frame")
 					return nil
 				}
-				atomic.StoreInt32(&sessionID, int32(updf.UpInfo.XTime>>48))
+				recordXTime(updf.UpInfo.XTime, up.ReceivedAt)
 				if err := conn.HandleUp(up); err != nil {
 					logger.WithError(err).Warn("Failed to handle uplink message")
 				}
