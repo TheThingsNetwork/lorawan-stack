@@ -56,7 +56,7 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 		return nil, err
 	}
 	query := s.query(ctx, UserSession{}).Where(UserSession{UserID: user.PrimaryKey()})
-	query = query.Order(orderFromContext(ctx, "user_sessions", "id", "ASC"))
+	query = query.Order(orderFromContext(ctx, "user_sessions", "created_at", "DESC"))
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(UserSession{}))
 		query = query.Limit(limit).Offset(offset)
