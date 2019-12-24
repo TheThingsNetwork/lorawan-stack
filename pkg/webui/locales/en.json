@@ -353,6 +353,7 @@
   "lib.shared-messages.devices": "Devices",
   "lib.shared-messages.devID": "Device ID",
   "lib.shared-messages.devName": "Device Name",
+  "lib.shared-messages.disabled": "Disabled",
   "lib.shared-messages.disconnected": "Disconnected",
   "lib.shared-messages.downlink": "Downlink",
   "lib.shared-messages.downlinkAck": "Downlink Ack",
