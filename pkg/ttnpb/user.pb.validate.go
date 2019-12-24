@@ -572,7 +572,14 @@ func (m *ListUsersRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "order":
-			// no validation rules for Order
+
+			if _, ok := _ListUsersRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListUsersRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ user_id -user_id name -name primary_email_address -primary_email_address state -state admin -admin created_at -created_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -647,6 +654,22 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListUsersRequestValidationError{}
+
+var _ListUsersRequest_Order_InLookup = map[string]struct{}{
+	"":                       {},
+	"user_id":                {},
+	"-user_id":               {},
+	"name":                   {},
+	"-name":                  {},
+	"primary_email_address":  {},
+	"-primary_email_address": {},
+	"state":                  {},
+	"-state":                 {},
+	"admin":                  {},
+	"-admin":                 {},
+	"created_at":             {},
+	"-created_at":            {},
+}
 
 // ValidateFields checks the field values on CreateUserRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -2495,7 +2518,14 @@ func (m *ListUserSessionsRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "order":
-			// no validation rules for Order
+
+			if _, ok := _ListUserSessionsRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListUserSessionsRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ created_at -created_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -2572,3 +2602,9 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListUserSessionsRequestValidationError{}
+
+var _ListUserSessionsRequest_Order_InLookup = map[string]struct{}{
+	"":            {},
+	"created_at":  {},
+	"-created_at": {},
+}

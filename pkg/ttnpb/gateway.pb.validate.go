@@ -1141,7 +1141,14 @@ func (m *ListGatewaysRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "order":
-			// no validation rules for Order
+
+			if _, ok := _ListGatewaysRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListGatewaysRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -1218,6 +1225,18 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListGatewaysRequestValidationError{}
+
+var _ListGatewaysRequest_Order_InLookup = map[string]struct{}{
+	"":             {},
+	"gateway_id":   {},
+	"-gateway_id":  {},
+	"gateway_eui":  {},
+	"-gateway_eui": {},
+	"name":         {},
+	"-name":        {},
+	"created_at":   {},
+	"-created_at":  {},
+}
 
 // ValidateFields checks the field values on CreateGatewayRequest with the
 // rules defined in the proto definition for this message. If any rules are

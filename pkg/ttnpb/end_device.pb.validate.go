@@ -2723,7 +2723,14 @@ func (m *ListEndDevicesRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "order":
-			// no validation rules for Order
+
+			if _, ok := _ListEndDevicesRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListEndDevicesRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -2800,6 +2807,22 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListEndDevicesRequestValidationError{}
+
+var _ListEndDevicesRequest_Order_InLookup = map[string]struct{}{
+	"":             {},
+	"device_id":    {},
+	"-device_id":   {},
+	"join_eui":     {},
+	"-join_eui":    {},
+	"dev_eui":      {},
+	"-dev_eui":     {},
+	"name":         {},
+	"-name":        {},
+	"description":  {},
+	"-description": {},
+	"created_at":   {},
+	"-created_at":  {},
+}
 
 // ValidateFields checks the field values on SetEndDeviceRequest with the rules
 // defined in the proto definition for this message. If any rules are
