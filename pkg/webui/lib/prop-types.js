@@ -135,7 +135,7 @@ PropTypes.user = PropTypes.shape({
 
 PropTypes.stackComponent = PropTypes.shape({
   enabled: PropTypes.bool.isRequired,
-  base_url: PropTypes.string.isRequired,
+  base_url: PropTypes.string,
 })
 
 PropTypes.env = PropTypes.shape({

@@ -55,7 +55,7 @@ const m = defineMessages({
   gotoApplications: 'Go to applications',
   gotoGateways: 'Go to gateways',
   welcome: 'Welcome to the Console!',
-  welcomeBack: 'Welcome back, {userId} 👋!',
+  welcomeBack: 'Welcome back, {userId}! 👋',
   getStarted: 'Get started right away by creating an application or registering a gateway.',
   continueWorking: 'Walk right through to your applications and/or gateways.',
   componentStatus: 'Component Status',
@@ -251,7 +251,7 @@ export default class Overview extends React.Component {
                 }
                 const component = stackConfig[componentKey]
                 const name = componentMap[componentKey]
-                const host = new URL(component.base_url).host
+                const host = component.enabled ? new URL(component.base_url).host : undefined
                 return (
                   <ComponentCard
                     key={componentKey}
@@ -275,11 +275,10 @@ const ComponentCard = function({ name, enabled, host }) {
       <img src={ServerIcon} className={style.componentCardIcon} />
       <div className={style.componentCardDesc}>
         <div className={style.componentCardName}>
-          <Status status={enabled ? 'good' : 'bad'} />
-          <Message content={name} />
+          <Status label={name} status={enabled ? 'good' : 'unknown'} flipped />
         </div>
         <span className={style.componentCardHost} title={host}>
-          {host}
+          {enabled ? host : <Message content={sharedMessages.disabled} />}
         </span>
       </div>
     </div>
@@ -288,6 +287,10 @@ const ComponentCard = function({ name, enabled, host }) {
 
 ComponentCard.propTypes = {
   enabled: PropTypes.bool.isRequired,
-  host: PropTypes.string.isRequired,
+  host: PropTypes.string,
   name: PropTypes.message.isRequired,
+}
+
+ComponentCard.defaultProps = {
+  host: undefined,
 }
