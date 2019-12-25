@@ -36,15 +36,7 @@ const messages = defineMessages({
 })
 
 const IdentityServerForm = React.memo(props => {
-  const {
-    device,
-    onSubmit,
-    onSubmitSuccess,
-    jsConfig,
-    onDelete,
-    onDeleteSuccess,
-    onDeleteFailure,
-  } = props
+  const { device, onSubmit, onSubmitSuccess, onDelete, onDeleteSuccess, onDeleteFailure } = props
   const { name, ids } = device
 
   const formRef = React.useRef(null)
@@ -52,83 +44,38 @@ const IdentityServerForm = React.memo(props => {
   const [externalJs, setExternaljs] = React.useState(hasExternalJs(device))
 
   const initialValues = React.useMemo(() => {
-    const extJs = hasExternalJs(device)
-    const {
-      ids,
-      name,
-      description,
-      network_server_address,
-      application_server_address,
-      join_server_address,
-      lorawan_version,
-      // JS form fields that should be reset when provisioning devices on an external JS.
-      resets_join_nonces,
-      root_keys = {
-        nwk_key: {},
-        app_key: {},
-      },
-    } = device
-
-    return {
-      name,
-      description,
-      application_server_address,
-      network_server_address,
-      _lorawan_version: lorawan_version,
-      join_server_address: extJs ? undefined : join_server_address,
-      _external_js: extJs,
-      ids,
-      // JS form fields that should be reset when provisioning devices on an external JS.
-      root_keys,
-      resets_join_nonces,
+    const initialValues = {
+      ...device,
+      _external_js: hasExternalJs(device),
+      _lorawan_version: device.lorawan_version,
+      _supports_join: device.supports_join,
     }
+
+    return validationSchema.cast(initialValues)
   }, [device])
 
-  const handleExternalJsChange = React.useCallback(
-    evt => {
-      const { checked: externalJsChecked } = evt.target
-      const { setValues, state: formState } = formRef.current
+  const handleExternalJsChange = React.useCallback(evt => {
+    const { checked: externalJsChecked } = evt.target
+    const { setValues, state } = formRef.current
 
-      setExternaljs(externalJsChecked)
+    setExternaljs(externalJsChecked)
 
-      // Note: If the end device is provisioned on an external JS, we reset `root_keys` and
-      // `resets_join_nonces` fields.
-      if (externalJsChecked) {
-        setValues({
-          ...formState.values,
-          root_keys: {
-            nwk_key: {},
-            app_key: {},
-          },
-          resets_join_nonces: false,
-          join_server_address: '',
-          _external_js: externalJsChecked,
-        })
-      } else {
-        let { join_server_address } = initialValues
-        const { resets_join_nonces, root_keys } = initialValues
-        // if JS address is not set, always fallback to the default js address
-        // when resetting from the 'provisioned by external js' option.
-        if (!Boolean(join_server_address)) {
-          join_server_address = new URL(jsConfig.base_url).hostname || ''
-        }
+    const values = {
+      ...state.values,
+      _external_js: externalJsChecked,
+    }
 
-        setValues({
-          ...formState.values,
-          join_server_address,
-          root_keys,
-          _external_js: externalJsChecked,
-          resets_join_nonces,
-        })
-      }
-    },
-    [initialValues, jsConfig.base_url],
-  )
+    setValues(validationSchema.cast(values))
+  }, [])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, ['_external_js', '_lorawan_version'])
+      const updatedValues = diff(initialValues, castedValues, [
+        '_external_js',
+        '_lorawan_version',
+        '_supports_join',
+      ])
 
       setError('')
       try {
@@ -271,7 +218,6 @@ const IdentityServerForm = React.memo(props => {
 
 IdentityServerForm.propTypes = {
   device: PropTypes.device.isRequired,
-  jsConfig: PropTypes.stackComponent.isRequired,
   onDelete: PropTypes.func.isRequired,
   onDeleteFailure: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,
