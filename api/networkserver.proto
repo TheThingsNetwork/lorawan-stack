@@ -25,9 +25,17 @@ package ttn.lorawan.v3;
 
 option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
 
-// The GsNs service connects a Gateway Server to a Network Server.
-service GsNs {
-  rpc HandleUplink(UplinkMessage) returns (google.protobuf.Empty);
+message GenerateDevAddrResponse {
+  bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
+}
+
+service Ns {
+  // GenerateDevAddr requests a device address assignment from the Network Server.
+  rpc GenerateDevAddr(google.protobuf.Empty) returns (GenerateDevAddrResponse) {
+    option (google.api.http) = {
+      get: "/ns/dev_addr"
+    };
+  };
 }
 
 // The AsNs service connects an Application Server to a Network Server.
@@ -36,6 +44,11 @@ service AsNs {
   rpc DownlinkQueueReplace(DownlinkQueueRequest) returns (google.protobuf.Empty);
   rpc DownlinkQueuePush(DownlinkQueueRequest) returns (google.protobuf.Empty);
   rpc DownlinkQueueList(EndDeviceIdentifiers) returns (ApplicationDownlinks);
+}
+
+// The GsNs service connects a Gateway Server to a Network Server.
+service GsNs {
+  rpc HandleUplink(UplinkMessage) returns (google.protobuf.Empty);
 }
 
 // The NsEndDeviceRegistry service allows clients to manage their end devices on the Network Server.
@@ -68,17 +81,3 @@ service NsEndDeviceRegistry {
     };
   };
 }
-
-message GenerateDevAddrResponse {
-  bytes dev_addr = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/pkg/types.DevAddr"];
-}
-
-service Ns {
-  // GenerateDevAddr requests a device address assignment from the Network Server.
-  rpc GenerateDevAddr(google.protobuf.Empty) returns (GenerateDevAddrResponse) {
-    option (google.api.http) = {
-      get: "/ns/dev_addr"
-    };
-  };
-}
-

@@ -3815,6 +3815,7 @@
     },
     "/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
+        "summary": "GenerateDevAddr requests a device address assignment from the Network Server.",
         "operationId": "Get",
         "responses": {
           "200": {
@@ -3880,6 +3881,7 @@
     },
     "/ns/dev_addr": {
       "get": {
+        "summary": "GenerateDevAddr requests a device address assignment from the Network Server.",
         "operationId": "GenerateDevAddr",
         "responses": {
           "200": {
