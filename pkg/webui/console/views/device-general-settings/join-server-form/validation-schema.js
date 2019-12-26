@@ -23,54 +23,64 @@ import { parseLorawanMacVersion } from '../utils'
 const random16BytesString = () => randomByteString(32)
 const toUndefined = value => (!Boolean(value) ? undefined : value)
 
-const validationSchema = Yup.object().shape({
-  net_id: Yup.nullableString().emptyOrLength(3 * 2, m.validate6), // 3 Byte hex
-  root_keys: Yup.object().when(
-    ['_external_js', '_lorawan_version'],
-    (externalJs, version, schema) => {
-      const strippedSchema = Yup.object().strip()
-      const keySchema = Yup.lazy(() => {
-        return !externalJs
-          ? Yup.object().shape({
-              key: Yup.string()
-                .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                .transform(toUndefined)
-                .default(random16BytesString),
-            })
-          : Yup.object().strip()
-      })
-
-      if (externalJs) {
-        return schema.shape({
-          nwk_key: strippedSchema,
-          app_key: strippedSchema,
+const validationSchema = Yup.object()
+  .shape({
+    net_id: Yup.nullableString()
+      .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
+      .default(''),
+    root_keys: Yup.object().when(
+      ['_external_js', '_lorawan_version'],
+      (externalJs, version, schema) => {
+        const strippedSchema = Yup.object().strip()
+        const keySchema = Yup.lazy(() => {
+          return !externalJs
+            ? Yup.object().shape({
+                key: Yup.string()
+                  .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                  .transform(toUndefined)
+                  .default(random16BytesString),
+              })
+            : Yup.object().strip()
         })
-      }
 
-      if (parseLorawanMacVersion(version) < 110) {
+        if (externalJs) {
+          return schema.shape({
+            nwk_key: strippedSchema,
+            app_key: strippedSchema,
+          })
+        }
+
+        if (parseLorawanMacVersion(version) < 110) {
+          return schema.shape({
+            nwk_key: strippedSchema,
+            app_key: keySchema,
+          })
+        }
+
         return schema.shape({
-          nwk_key: strippedSchema,
+          nwk_key: keySchema,
           app_key: keySchema,
         })
-      }
-
-      return schema.shape({
-        nwk_key: keySchema,
-        app_key: keySchema,
-      })
-    },
-  ),
-  resets_join_nonces: Yup.boolean().when('_lorawan_version', {
-    // Verify if lorawan version is 1.1.0 or higher.
-    is: version => parseLorawanMacVersion(version) >= 110,
-    then: schema => schema,
-    otherwise: schema => schema.strip(),
-  }),
-  application_server_id: Yup.string().max(100, sharedMessages.validateTooLong),
-  application_server_kek_label: Yup.string().max(2048, sharedMessages.validateTooLong),
-  network_server_kek_label: Yup.string().max(2048, sharedMessages.validateTooLong),
-  _external_js: Yup.boolean(),
-  _lorawan_version: Yup.string(),
-})
+      },
+    ),
+    resets_join_nonces: Yup.boolean().when('_lorawan_version', {
+      // Verify if lorawan version is 1.1.0 or higher.
+      is: version => parseLorawanMacVersion(version) >= 110,
+      then: schema => schema,
+      otherwise: schema => schema.strip(),
+    }),
+    application_server_id: Yup.string()
+      .max(100, sharedMessages.validateTooLong)
+      .default(''),
+    application_server_kek_label: Yup.string()
+      .max(2048, sharedMessages.validateTooLong)
+      .default(''),
+    network_server_kek_label: Yup.string()
+      .max(2048, sharedMessages.validateTooLong)
+      .default(''),
+    _external_js: Yup.boolean().default(false),
+    _lorawan_version: Yup.string().default('1.1.0'),
+  })
+  .noUnknown()
 
 export default validationSchema

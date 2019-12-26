@@ -50,29 +50,13 @@ const JoinServerForm = React.memo(props => {
 
   // Setup and memoize initial form state.
   const initialValues = React.useMemo(() => {
-    const {
-      root_keys = {
-        nwk_key: {},
-        app_key: {},
-      },
-      resets_join_nonces,
-      lorawan_version = '1.1.0',
-      net_id = '',
-      application_server_id = '',
-      application_server_kek_label = '',
-      network_server_kek_label = '',
-    } = device
-
-    return {
-      resets_join_nonces,
-      root_keys,
-      application_server_id,
-      application_server_kek_label,
-      network_server_kek_label,
+    const values = {
+      ...device,
       _external_js: hasExternalJs(device),
-      _lorawan_version: lorawan_version,
-      net_id,
+      _lorawan_version: device.lorawan_version,
     }
+
+    return validationSchema.cast(values)
   }, [device])
 
   // Setup and memoize callbacks for changes to `resets_join_nonces` for displaying the field warning.
