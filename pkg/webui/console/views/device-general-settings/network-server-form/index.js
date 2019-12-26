@@ -76,21 +76,7 @@ const NetworkServerForm = React.memo(props => {
   )
 
   const initialValues = React.useMemo(() => {
-    const extJs = hasExternalJs(device)
-    const {
-      lorawan_version,
-      lorawan_phy_version,
-      frequency_plan_id,
-      supports_class_c = false,
-      supports_join = false,
-      multicast = false,
-      session,
-      mac_settings = {},
-      root_keys = {
-        nwk_key: {},
-        app_key: {},
-      },
-    } = device
+    const { multicast = false, supports_join = false } = device
 
     let _activation_mode = ACTIVATION_MODES.ABP
     if (supports_join) {
@@ -99,17 +85,14 @@ const NetworkServerForm = React.memo(props => {
       _activation_mode = ACTIVATION_MODES.MULTICAST
     }
 
-    return {
-      lorawan_version,
-      lorawan_phy_version,
-      frequency_plan_id,
-      supports_class_c,
-      session,
+    const values = {
+      ...device,
       _activation_mode,
-      mac_settings,
-      root_keys,
-      _external_js: extJs,
+      _external_js: hasExternalJs(device),
+      _joined: isDeviceOTAA(device) && isDeviceJoined(device),
     }
+
+    return validationSchema.cast(values)
   }, [device])
 
   const onFormSubmit = React.useCallback(
@@ -118,7 +101,11 @@ const NetworkServerForm = React.memo(props => {
       const isOTAA = initialValues._activation_mode === ACTIVATION_MODES.OTAA
 
       const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, ['_activation_mode', '_external_js'])
+      const updatedValues = diff(initialValues, castedValues, [
+        '_activation_mode',
+        '_external_js',
+        '_joined',
+      ])
 
       if (isABP) {
         // Do not reset session keys
@@ -159,11 +146,9 @@ const NetworkServerForm = React.memo(props => {
       const isABP = initialValues._activation_mode === ACTIVATION_MODES.ABP
       const lwVersion = parseLorawanMacVersion(version)
       setLorawanVersion(lwVersion)
-
       const { setValues, state: formState } = formRef.current
       const { session = {} } = formState.values
       const { session: initialSession } = initialValues
-
       if (lwVersion >= 110) {
         const updatedSession = isABP
           ? {
@@ -176,7 +161,6 @@ const NetworkServerForm = React.memo(props => {
               },
             }
           : session
-
         setValues({
           ...formState.values,
           lorawan_version: version,
@@ -191,7 +175,6 @@ const NetworkServerForm = React.memo(props => {
               },
             }
           : session
-
         setValues({
           ...formState.values,
           lorawan_version: version,

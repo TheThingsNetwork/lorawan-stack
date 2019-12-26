@@ -24,98 +24,108 @@ import { parseLorawanMacVersion, ACTIVATION_MODES } from '../utils'
 const random16BytesString = () => randomByteString(32)
 const toUndefined = value => (!Boolean(value) ? undefined : value)
 
-const validationSchema = Yup.object().shape({
-  lorawan_version: Yup.string().required(sharedMessages.validateRequired),
-  lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
-  frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
-  _activation_mode: Yup.string(),
-  session: Yup.object().when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
-    if (mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.MULTICAST) {
-      const isNewVersion = parseLorawanMacVersion(version) >= 110
-      return schema.shape({
-        dev_addr: Yup.string()
-          .length(4 * 2, m.validate8) // 4 Byte hex
-          .required(sharedMessages.validateRequired),
-        keys: Yup.object().shape({
-          f_nwk_s_int_key: Yup.object().shape({
-            key: Yup.string()
-              .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-              .transform(toUndefined)
-              .default(random16BytesString),
-          }),
-          s_nwk_s_int_key: Yup.lazy(() =>
-            isNewVersion
-              ? Yup.object().shape({
-                  key: Yup.string()
-                    .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                    .transform(toUndefined)
-                    .default(random16BytesString),
-                })
-              : Yup.object().strip(),
-          ),
-          nwk_s_enc_key: Yup.lazy(() =>
-            isNewVersion
-              ? Yup.object().shape({
-                  key: Yup.string()
-                    .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                    .transform(toUndefined)
-                    .default(random16BytesString),
-                })
-              : Yup.object().strip(),
-          ),
-        }),
-      })
-    }
-    return schema.strip()
-  }),
-  mac_settings: Yup.object().when(['_activation_mode'], (mode, schema) => {
-    if (mode === 'abp') {
-      return schema.shape({
-        resets_f_cnt: Yup.boolean(),
-      })
-    }
-
-    return schema.strip()
-  }),
-  root_keys: Yup.object().when(
-    ['_external_js', 'lorawan_version', '_activation_mode'],
-    (externalJs, version, mode, schema) => {
-      if (mode === ACTIVATION_MODES.OTAA) {
-        const strippedSchema = Yup.object().strip()
-        const keySchema = Yup.lazy(() => {
-          return !externalJs
-            ? Yup.object().shape({
+const validationSchema = Yup.object()
+  .shape({
+    _external_js: Yup.boolean(),
+    _activation_mode: Yup.mixed().oneOf([
+      ACTIVATION_MODES.ABP,
+      ACTIVATION_MODES.OTAA,
+      ACTIVATION_MODES.MULTICAST,
+    ]),
+    lorawan_version: Yup.string().required(sharedMessages.validateRequired),
+    lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
+    frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
+    session: Yup.object().when(
+      ['_activation_mode', 'lorawan_version', '_joined'],
+      (mode, version, isJoined, schema) => {
+        if (mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.MULTICAST || isJoined) {
+          const isNewVersion = parseLorawanMacVersion(version) >= 110
+          return schema.shape({
+            dev_addr: Yup.string()
+              .length(4 * 2, m.validate8) // 4 Byte hex
+              .required(sharedMessages.validateRequired),
+            keys: Yup.object().shape({
+              f_nwk_s_int_key: Yup.object().shape({
                 key: Yup.string()
                   .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
                   .transform(toUndefined)
                   .default(random16BytesString),
-              })
-            : strippedSchema
-        })
-
-        if (externalJs) {
-          return schema.shape({
-            nwk_key: strippedSchema,
-            app_key: strippedSchema,
+              }),
+              s_nwk_s_int_key: Yup.lazy(() =>
+                isNewVersion
+                  ? Yup.object().shape({
+                      key: Yup.string()
+                        .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                        .transform(toUndefined)
+                        .default(random16BytesString),
+                    })
+                  : Yup.object().strip(),
+              ),
+              nwk_s_enc_key: Yup.lazy(() =>
+                isNewVersion
+                  ? Yup.object().shape({
+                      key: Yup.string()
+                        .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                        .transform(toUndefined)
+                        .default(random16BytesString),
+                    })
+                  : Yup.object().strip(),
+              ),
+            }),
           })
         }
-
-        if (parseLorawanMacVersion(version) < 110) {
-          return schema.shape({
-            nwk_key: strippedSchema,
-            app_key: keySchema,
-          })
-        }
-
+        return schema.strip()
+      },
+    ),
+    mac_settings: Yup.object().when(['_activation_mode'], (mode, schema) => {
+      if (mode === ACTIVATION_MODES.ABP) {
         return schema.shape({
-          nwk_key: keySchema,
-          app_key: keySchema,
+          resets_f_cnt: Yup.boolean(),
         })
       }
 
       return schema.strip()
-    },
-  ),
-})
+    }),
+    root_keys: Yup.object().when(
+      ['_external_js', 'lorawan_version', '_activation_mode'],
+      (externalJs, version, mode, schema) => {
+        if (mode === ACTIVATION_MODES.OTAA) {
+          const strippedSchema = Yup.object().strip()
+          const keySchema = Yup.lazy(() => {
+            return !externalJs
+              ? Yup.object().shape({
+                  key: Yup.string()
+                    .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                    .transform(toUndefined)
+                    .default(random16BytesString),
+                })
+              : strippedSchema
+          })
+
+          if (externalJs) {
+            return schema.shape({
+              nwk_key: strippedSchema,
+              app_key: strippedSchema,
+            })
+          }
+
+          if (parseLorawanMacVersion(version) < 110) {
+            return schema.shape({
+              nwk_key: strippedSchema,
+              app_key: keySchema,
+            })
+          }
+
+          return schema.shape({
+            nwk_key: keySchema,
+            app_key: keySchema,
+          })
+        }
+
+        return schema.strip()
+      },
+    ),
+  })
+  .noUnknown()
 
 export default validationSchema
