@@ -115,6 +115,7 @@ var (
 				FieldMask:    types.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
+				Order:        getOrder(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -404,6 +405,7 @@ func init() {
 	gatewaysListCommand.Flags().AddFlagSet(collaboratorFlags())
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysListCommand.Flags().AddFlagSet(paginationFlags())
+	gatewaysListCommand.Flags().AddFlagSet(orderFlags())
 	gatewaysCommand.AddCommand(gatewaysListCommand)
 	gatewaysSearchCommand.Flags().AddFlagSet(searchFlags())
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)

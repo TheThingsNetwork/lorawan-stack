@@ -49,3 +49,14 @@ func withPagination(flagSet *pflag.FlagSet) (limit, page uint32, opt grpc.CallOp
 	}
 	return
 }
+
+func orderFlags() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.String("order", "", "order by this field")
+	return flagSet
+}
+
+func getOrder(flagSet *pflag.FlagSet) string {
+	order, _ := flagSet.GetString("order")
+	return order
+}

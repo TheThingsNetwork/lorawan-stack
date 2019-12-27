@@ -79,6 +79,7 @@ var (
 				FieldMask:    types.FieldMask{Paths: paths},
 				Limit:        limit,
 				Page:         page,
+				Order:        getOrder(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -258,6 +259,7 @@ func init() {
 	clientsListCommand.Flags().AddFlagSet(collaboratorFlags())
 	clientsListCommand.Flags().AddFlagSet(selectClientFlags)
 	clientsListCommand.Flags().AddFlagSet(paginationFlags())
+	clientsListCommand.Flags().AddFlagSet(orderFlags())
 	clientsCommand.AddCommand(clientsListCommand)
 	clientsSearchCommand.Flags().AddFlagSet(searchFlags())
 	clientsSearchCommand.Flags().AddFlagSet(selectClientFlags)

@@ -140,6 +140,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	} else if orgIDs := req.Collaborator.GetOrganizationIDs(); orgIDs != nil {
 		return nil, errNestedOrganizations
 	}
+	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
 	defer func() {

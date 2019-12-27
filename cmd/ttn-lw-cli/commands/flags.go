@@ -136,6 +136,7 @@ func searchFlags() *pflag.FlagSet {
 	flagSet.String("description-contains", "", "")
 	flagSet.StringToString("attributes-contain", nil, "(key=value)")
 	flagSet.AddFlagSet(paginationFlags())
+	flagSet.AddFlagSet(orderFlags())
 	return flagSet
 }
 
@@ -152,6 +153,7 @@ func getSearchEntitiesRequest(flagSet *pflag.FlagSet) (req *ttnpb.SearchEntities
 		AttributesContain:   attributesContain,
 		Limit:               limit,
 		Page:                page,
+		Order:               getOrder(flagSet),
 	}, opt, getTotal
 }
 

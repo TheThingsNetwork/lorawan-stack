@@ -45,7 +45,7 @@ func withApplicationID(id ...string) func(*gorm.DB) *gorm.DB {
 			}
 			return db.Where("application_id = ?", id[0])
 		default:
-			return db.Where("application_id IN (?)", id).Order("application_id")
+			return db.Where("application_id IN (?)", id)
 		}
 	}
 }
@@ -58,7 +58,7 @@ func withClientID(id ...string) func(*gorm.DB) *gorm.DB {
 		case 1:
 			return db.Where("client_id = ?", id[0])
 		default:
-			return db.Where("client_id IN (?)", id).Order("client_id")
+			return db.Where("client_id IN (?)", id)
 		}
 	}
 }
@@ -74,7 +74,7 @@ func withDeviceID(id ...string) func(*gorm.DB) *gorm.DB {
 			}
 			return db.Where("device_id = ?", id[0])
 		default:
-			return db.Where("device_id IN (?)", id).Order("device_id")
+			return db.Where("device_id IN (?)", id)
 		}
 	}
 }
@@ -90,7 +90,7 @@ func withJoinEUI(eui ...EUI64) func(*gorm.DB) *gorm.DB {
 			}
 			return db.Where("join_eui = ?", eui[0])
 		default:
-			return db.Where("join_eui IN (?)", eui).Order("dev_eui")
+			return db.Where("join_eui IN (?)", eui)
 		}
 	}
 }
@@ -128,7 +128,7 @@ func withGatewayID(id ...string) func(*gorm.DB) *gorm.DB {
 			}
 			return db.Where("gateway_id = ?", id[0])
 		default:
-			return db.Where("gateway_id IN (?)", id).Order("gateway_id")
+			return db.Where("gateway_id IN (?)", id)
 		}
 	}
 }
@@ -144,7 +144,7 @@ func withGatewayEUI(eui ...EUI64) func(*gorm.DB) *gorm.DB {
 			}
 			return db.Where("gateway_eui = ?", eui[0])
 		default:
-			return db.Where("gateway_eui IN (?)", eui).Order("gateway_id")
+			return db.Where("gateway_eui IN (?)", eui)
 		}
 	}
 }
@@ -158,7 +158,7 @@ func withOrganizationID(id ...string) func(*gorm.DB) *gorm.DB {
 		case 1:
 			return db.Where("accounts.uid = ?", id[0])
 		default:
-			return db.Where("accounts.uid IN (?)", id).Order("accounts.uid")
+			return db.Where("accounts.uid IN (?)", id)
 		}
 	}
 }
@@ -172,7 +172,7 @@ func withUserID(id ...string) func(*gorm.DB) *gorm.DB {
 		case 1:
 			return db.Where("accounts.uid = ?", id[0])
 		default:
-			return db.Where("accounts.uid IN (?)", id).Order("accounts.uid")
+			return db.Where("accounts.uid IN (?)", id)
 		}
 	}
 }

@@ -600,6 +600,7 @@ where the user or organization is collaborator on.
 
 | Field | Validations |
 | ----- | ----------- |
+| `order` | <p>`string.in`: `[ application_id -application_id name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SetApplicationCollaboratorRequest">Message `SetApplicationCollaboratorRequest`</a>
@@ -1506,6 +1507,7 @@ where the user or organization is collaborator on.
 
 | Field | Validations |
 | ----- | ----------- |
+| `order` | <p>`string.in`: `[ client_id -client_id name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SetClientCollaboratorRequest">Message `SetClientCollaboratorRequest`</a>
@@ -2076,6 +2078,7 @@ Identifies an end device model with version information.
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.MACParameters">Message `MACParameters`</a>
@@ -2777,6 +2780,7 @@ where the user or organization is collaborator on.
 
 | Field | Validations |
 | ----- | ----------- |
+| `order` | <p>`string.in`: `[ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SetGatewayCollaboratorRequest">Message `SetGatewayCollaboratorRequest`</a>
@@ -4981,6 +4985,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `client_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest">Message `ListOAuthClientAuthorizationsRequest`</a>
@@ -4997,6 +5002,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Validations |
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.OAuthAccessToken">Message `OAuthAccessToken`</a>
@@ -5238,6 +5244,7 @@ where the user or organization is collaborator on.
 
 | Field | Validations |
 | ----- | ----------- |
+| `order` | <p>`string.in`: `[ organization_id -organization_id name -name created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.Organization">Message `Organization`</a>
@@ -5914,6 +5921,7 @@ This service is not implemented on all deployments.
 | Field | Validations |
 | ----- | ----------- |
 | `user_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.ListUsersRequest">Message `ListUsersRequest`</a>
@@ -5929,6 +5937,7 @@ This service is not implemented on all deployments.
 
 | Field | Validations |
 | ----- | ----------- |
+| `order` | <p>`string.in`: `[ user_id -user_id name -name primary_email_address -primary_email_address state -state admin -admin created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
 ### <a name="ttn.lorawan.v3.SendInvitationRequest">Message `SendInvitationRequest`</a>

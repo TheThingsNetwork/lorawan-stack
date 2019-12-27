@@ -214,6 +214,7 @@ var (
 				FieldMask:              pbtypes.FieldMask{Paths: paths},
 				Limit:                  limit,
 				Page:                   page,
+				Order:                  getOrder(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err
@@ -1059,6 +1060,7 @@ func init() {
 	endDevicesListCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesListCommand.Flags().AddFlagSet(selectEndDeviceListFlags)
 	endDevicesListCommand.Flags().AddFlagSet(paginationFlags())
+	endDevicesListCommand.Flags().AddFlagSet(orderFlags())
 	endDevicesCommand.AddCommand(endDevicesListCommand)
 	endDevicesSearchCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesSearchCommand.Flags().AddFlagSet(searchEndDevicesFlags())

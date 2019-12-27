@@ -45,7 +45,9 @@ message ListOAuthClientAuthorizationsRequest {
   UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 2;
+  string order = 2 [
+    (validate.rules).string = { in: ["", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 3 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
@@ -89,7 +91,9 @@ message ListOAuthAccessTokensRequest {
   ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs", (gogoproto.nullable) = false, (validate.rules).message.required = true];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 3;
+  string order = 3 [
+    (validate.rules).string = { in: ["", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.

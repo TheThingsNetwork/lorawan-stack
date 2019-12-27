@@ -87,6 +87,7 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 	}
 	query := s.query(ctx, Gateway{}, withGatewayID(idStrings...))
 	query = selectGatewayFields(ctx, query, fieldMask)
+	query = query.Order(orderFromContext(ctx, "gateways", "gateway_id", "ASC"))
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query.Model(Gateway{}))
 		query = query.Limit(limit).Offset(offset)

@@ -59,6 +59,7 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID ttnpb.Identifier
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
 	})
+	query = query.Order(orderFromContext(ctx, "api_keys", "api_key_id", "ASC"))
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		countTotal(ctx, query)
 		query = query.Limit(limit).Offset(offset)

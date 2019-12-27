@@ -450,7 +450,14 @@ func (m *ListApplicationsRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "order":
-			// no validation rules for Order
+
+			if _, ok := _ListApplicationsRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListApplicationsRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ application_id -application_id name -name created_at -created_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -527,6 +534,16 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListApplicationsRequestValidationError{}
+
+var _ListApplicationsRequest_Order_InLookup = map[string]struct{}{
+	"":                {},
+	"application_id":  {},
+	"-application_id": {},
+	"name":            {},
+	"-name":           {},
+	"created_at":      {},
+	"-created_at":     {},
+}
 
 // ValidateFields checks the field values on CreateApplicationRequest with the
 // rules defined in the proto definition for this message. If any rules are

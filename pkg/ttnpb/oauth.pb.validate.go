@@ -400,7 +400,14 @@ func (m *ListOAuthClientAuthorizationsRequest) ValidateFields(paths ...string) e
 			}
 
 		case "order":
-			// no validation rules for Order
+
+			if _, ok := _ListOAuthClientAuthorizationsRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListOAuthClientAuthorizationsRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ created_at -created_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -478,6 +485,12 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListOAuthClientAuthorizationsRequestValidationError{}
+
+var _ListOAuthClientAuthorizationsRequest_Order_InLookup = map[string]struct{}{
+	"":            {},
+	"created_at":  {},
+	"-created_at": {},
+}
 
 // ValidateFields checks the field values on OAuthAuthorizationCode with the
 // rules defined in the proto definition for this message. If any rules are
@@ -1005,7 +1018,14 @@ func (m *ListOAuthAccessTokensRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "order":
-			// no validation rules for Order
+
+			if _, ok := _ListOAuthAccessTokensRequest_Order_InLookup[m.GetOrder()]; !ok {
+				return ListOAuthAccessTokensRequestValidationError{
+					field:  "order",
+					reason: "value must be in list [ created_at -created_at]",
+				}
+			}
+
 		case "limit":
 
 			if m.GetLimit() > 1000 {
@@ -1083,3 +1103,9 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListOAuthAccessTokensRequestValidationError{}
+
+var _ListOAuthAccessTokensRequest_Order_InLookup = map[string]struct{}{
+	"":            {},
+	"created_at":  {},
+	"-created_at": {},
+}

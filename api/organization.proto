@@ -57,7 +57,9 @@ message ListOrganizationsRequest {
   google.protobuf.FieldMask field_mask = 2 [(gogoproto.nullable) = false];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
-  string order = 3;
+  string order = 3 [
+    (validate.rules).string = { in: ["", "organization_id", "-organization_id", "name", "-name", "created_at", "-created_at"] }
+  ];
   // Limit the number of results per page.
   uint32 limit = 4 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.

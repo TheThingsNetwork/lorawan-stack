@@ -111,7 +111,7 @@ func (s *entitySearch) FindEntities(ctx context.Context, member *ttnpb.Organizat
 
 	query = s.queryMetaFields(ctx, query, entityType, req)
 
-	query = query.Order(`"friendly_id"`)
+	query = query.Order(orderFromContext(ctx, fmt.Sprintf("%ss", entityType), "friendly_id", "ASC"))
 	page := query
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)
@@ -150,7 +150,7 @@ func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndD
 	}
 	// DevAddrContains
 
-	query = query.Order(`"friendly_id"`)
+	query = query.Order(orderFromContext(ctx, "end_devices", "device_id", "ASC"))
 	page := query
 	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)

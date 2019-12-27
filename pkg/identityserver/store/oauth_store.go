@@ -38,9 +38,15 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 		return nil, err
 	}
 	var authModels []ClientAuthorization
-	err = s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
+	query := s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
 		UserID: user.PrimaryKey(),
-	}).Preload("Client").Find(&authModels).Error
+	})
+	query = query.Order(orderFromContext(ctx, "client_authorizations", "created_at", "DESC"))
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		countTotal(ctx, query.Model(UserSession{}))
+		query = query.Limit(limit).Offset(offset)
+	}
+	err = query.Preload("Client").Find(&authModels).Error
 	if err != nil {
 		return nil, err
 	}
@@ -225,10 +231,16 @@ func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserId
 		return nil, err
 	}
 	var tokenModels []AccessToken
-	err = s.query(ctx, AccessToken{}).Where(AccessToken{
+	query := s.query(ctx, AccessToken{}).Where(AccessToken{
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
-	}).Find(&tokenModels).Error
+	})
+	query = query.Order(orderFromContext(ctx, "access_tokens", "created_at", "DESC"))
+	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+		countTotal(ctx, query.Model(UserSession{}))
+		query = query.Limit(limit).Offset(offset)
+	}
+	err = query.Find(&tokenModels).Error
 	if err != nil {
 		return nil, err
 	}
