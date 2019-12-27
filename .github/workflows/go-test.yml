@@ -73,4 +73,5 @@ jobs:
         SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
         REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
         TEST_REDIS: '1'
+        TEST_SLOWDOWN: '8'
       run: ./mage go:test
