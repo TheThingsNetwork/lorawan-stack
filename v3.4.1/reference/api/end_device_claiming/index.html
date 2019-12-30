@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>End Device Claiming APIs | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.1/reference/api/end_device_claiming/" />
+  <link rel="icon" type="image/png" href="/v3.4.1/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.1/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="End Device Claiming APIs">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="End Device Claiming APIs">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.1/reference/api/end_device_claiming/">
+  <meta name="twitter:title" content="End Device Claiming APIs" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.1/">
+        <img src="/v3.4.1/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.1/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.1/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.1/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.1/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.1/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">API</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.4.1/reference/api/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/authentication/" class="">Authentication</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/application/" class="">Application APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/application_server/" class="">Application Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/application_webhooks/" class="">Application Webhook APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/application_pub_sub/" class="">Application Pub-Sub APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/gateway/" class="">Gateway APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/gateway_server/" class="">Gateway Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/end_device/" class="">End Device APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/end_device_claiming/" class="is-active">End Device Claiming APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/network_server/" class="">Network Server APIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">End Device Claiming APIs</h1>
+
+<div class="content">
+
+<h2 id="the-enddeviceclaimingserver-service">The <code>EndDeviceClaimingServer</code> service</h2>
+
+
+<h3>Method <code>EndDeviceClaimingServer.AuthorizeApplication</code></h3>
+
+<p>
+  Request: <a href="#message:AuthorizeApplicationRequest"><code>AuthorizeApplicationRequest</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>POST</code> <code>/api/v3/edcs/applications/{application_ids.application_id}/authorize</code></p>
+
+
+
+<h3>Method <code>EndDeviceClaimingServer.UnauthorizeApplication</code></h3>
+
+<p>
+  Request: <a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>DELETE</code> <code>/api/v3/edcs/applications/{application_id}/authorize</code></p>
+
+
+
+<h3>Method <code>EndDeviceClaimingServer.Claim</code></h3>
+<p>Claims the end device by claim authentication code or QR code and transfers the device to the target application.</p>
+
+<p>
+  Request: <a href="#message:ClaimEndDeviceRequest"><code>ClaimEndDeviceRequest</code></a>
+  <br>
+  Response: <a href="#message:EndDeviceIdentifiers"><code>EndDeviceIdentifiers</code></a>
+</p>
+<p><code>POST</code> <code>/api/v3/edcs/claim</code></p>
+
+
+<h2 id="messages">Messages</h2>
+
+<h3 id="message:ApplicationIdentifiers">Message <code>ApplicationIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>application_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "application_id": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:AuthorizeApplicationRequest">Message <code>AuthorizeApplicationRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>api_key</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>min_len</code>: <code>1</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "application_ids": {},
+  "api_key": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:ClaimEndDeviceRequest">Message <code>ClaimEndDeviceRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>authenticated_identifiers</code>
+    (<a href="#message:ClaimEndDeviceRequest.AuthenticatedIdentifiers"><code>ClaimEndDeviceRequest.AuthenticatedIdentifiers</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>qr_code</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>1024</code></p>
+  </dd>
+  <dt>
+    <code>target_application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+      <p>Application identifiers of the target end device.</p>
+  </dd>
+  <dt>
+    <code>target_device_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$</code></p>
+      <p>End device ID of the target end device. If empty, use the source device ID.</p>
+  </dd>
+  <dt>
+    <code>target_network_server_address</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$</code></p>
+      <p>The address of the Network Server where the device will be registered.
+ If set and if the source device is currently registered on a Network Server, settings will be transferred.
+ If not set, the device shall not be registered on a Network Server.</p>
+  </dd>
+  <dt>
+    <code>target_network_server_kek_label</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2048</code></p>
+      <p>The KEK label of the Network Server to use for wrapping network session keys.</p>
+  </dd>
+  <dt>
+    <code>target_application_server_address</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$</code></p>
+      <p>The address of the Application Server where the device will be registered.
+ If set and if the source device is currently registered on an Application Server, settings will be transferred.
+ If not set, the device shall not be registered on an Application Server.</p>
+  </dd>
+  <dt>
+    <code>target_application_server_kek_label</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>2048</code></p>
+      <p>The KEK label of the Application Server to use for wrapping the application session key.</p>
+  </dd>
+  <dt>
+    <code>target_application_server_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>100</code></p>
+      <p>The AS-ID of the Application Server to use.</p>
+  </dd>
+  <dt>
+    <code>target_net_id</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>Home NetID.</p>
+  </dd>
+  <dt>
+    <code>invalidate_authentication_code</code>
+    (<code>bool</code>)
+  </dt>
+  <dd>
+      <p>If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests.</p>
+  </dd>
+</dl>
+  <p><code>source_device</code>: only one of <code>authenticated_identifiers</code>, <code>qr_code</code> can be set.</p>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "authenticated_identifiers": {},
+  "qr_code": "",
+  "target_application_ids": {},
+  "target_device_id": "",
+  "target_network_server_address": "",
+  "target_network_server_kek_label": "",
+  "target_application_server_address": "",
+  "target_application_server_kek_label": "",
+  "target_application_server_id": "",
+  "target_net_id": "",
+  "invalidate_authentication_code": false,
+}</code></pre>
+</details>
+
+
+<h3 id="message:ClaimEndDeviceRequest.AuthenticatedIdentifiers">Message <code>ClaimEndDeviceRequest.AuthenticatedIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>join_eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>dev_eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>authentication_code</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>pattern</code>: <code>^[A-Z0-9]{1,32}$</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "join_eui": "",
+  "dev_eui": "",
+  "authentication_code": "",
+}</code></pre>
+</details>
+
+
+<h3 id="message:EndDeviceIdentifiers">Message <code>EndDeviceIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>device_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>dev_eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN DevEUI.</p>
+  </dd>
+  <dt>
+    <code>join_eui</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).</p>
+  </dd>
+  <dt>
+    <code>dev_addr</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+      <p>The LoRaWAN DevAddr.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "device_id": "",
+  "application_ids": {},
+  "dev_eui": "",
+  "join_eui": "",
+  "dev_addr": "",
+}</code></pre>
+</details>
+
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.1/reference/api/end_device/">← End Device APIs</a>
+<a class="button is-pulled-right" href="/v3.4.1/reference/api/network_server/">Network Server APIs →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.1/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.1/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.1/components/">Components</a></p>
+        <p><a class="" href="/v3.4.1/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 27 Nov 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/53bba828f1409b15aa3903084c400e8f4969d45d">
+      doc: Add End Device Claiming API reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/api/end_device_claiming.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.1/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

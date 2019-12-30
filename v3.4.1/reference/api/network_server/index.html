@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Network Server APIs | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.1/reference/api/network_server/" />
+  <link rel="icon" type="image/png" href="/v3.4.1/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.1/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Network Server APIs">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Network Server APIs">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.1/reference/api/network_server/">
+  <meta name="twitter:title" content="Network Server APIs" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.1/">
+        <img src="/v3.4.1/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.1/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.1/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.1/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.1/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.1/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">API</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.4.1/reference/api/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/authentication/" class="">Authentication</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/application/" class="">Application APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/application_server/" class="">Application Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/application_webhooks/" class="">Application Webhook APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/application_pub_sub/" class="">Application Pub-Sub APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/gateway/" class="">Gateway APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/gateway_server/" class="">Gateway Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/end_device/" class="">End Device APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/end_device_claiming/" class="">End Device Claiming APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/api/network_server/" class="is-active">Network Server APIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Network Server APIs</h1>
+
+<div class="content">
+
+<h2 id="the-ns-service">The <code>Ns</code> service</h2>
+
+
+<h3>Method <code>Ns.GenerateDevAddr</code></h3>
+<p>GenerateDevAddr requests a device address assignment from the Network Server.</p>
+
+<p>
+  Request: <code>google.protobuf.Empty</code>
+  <br>
+  Response: <a href="#message:GenerateDevAddrResponse"><code>GenerateDevAddrResponse</code></a>
+</p>
+<p><code>GET</code> <code>/api/v3/ns/dev_addr</code></p>
+
+
+<h2 id="messages">Messages</h2>
+
+<h3 id="message:GenerateDevAddrResponse">Message <code>GenerateDevAddrResponse</code></h3>
+
+<dl>
+  <dt>
+    <code>dev_addr</code>
+    (<code>bytes</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "dev_addr": "",
+}</code></pre>
+</details>
+
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.1/reference/api/end_device_claiming/">← End Device Claiming APIs</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.1/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.1/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.1/components/">Components</a></p>
+        <p><a class="" href="/v3.4.1/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Roman Volosatovs on 23 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/c900ea0ac9212e0563fee26eb0c370bfad651f94">
+      doc: Add Network Server API reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/api/network_server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.1/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

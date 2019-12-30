@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Network Server Options | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.1/reference/configuration/network-server/" />
+  <link rel="icon" type="image/png" href="/v3.4.1/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.1/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Network Server Options">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Network Server Options">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.1/reference/configuration/network-server/">
+  <meta name="twitter:title" content="Network Server Options" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.1/">
+        <img src="/v3.4.1/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.1/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.1/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.1/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.1/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.1/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Configuration</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.4.1/reference/configuration/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/the-things-stack/" class="">Generic Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/identity-server/" class="">Identity Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/gateway-server/" class="">Gateway Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/network-server/" class="is-active">Network Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/application-server/" class="">Application Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/join-server/" class="">Join Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/console/" class="">Console Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/cli/" class="">Command-Line Interface Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.1/reference/configuration/gateway-configuration-server/" class="">Gateway Configuration Server Options</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Network Server Options</h1>
+
+<div class="content">
+
+<h2 id="general-options">General Options</h2>
+
+<ul>
+<li><code>ns.dev-addr-prefixes</code>: Device address prefixes of this Network Server</li>
+<li><code>ns.net-id</code>: NetID of this Network Server</li>
+</ul>
+
+<h2 id="uplink-options">Uplink Options</h2>
+
+<ul>
+<li><code>ns.cooldown-window</code>: Time window starting right after deduplication window, during which, duplicate messages are discarded</li>
+<li><code>ns.deduplication-window</code>: Time window during which, duplicate messages are collected for metadata</li>
+</ul>
+
+<h2 id="downlink-options">Downlink Options</h2>
+
+<p>The <code>ns.downlink-priorities</code> options configure priorities Network Server assigns downlinks when scheduling them on Gateway Server. In case when several downlinks are available for scheduling, Gateway Server will schedule higher priority downlink first.</p>
+
+<ul>
+<li><code>ns.downlink-priorities.join-accept</code>: Priority for join-accept messages (lowest, low, below_normal, normal, above_normal, high, highest)</li>
+<li><code>ns.downlink-priorities.mac-commands</code>: Priority for messages carrying MAC commands (lowest, low, below_normal, normal, above_normal, high, highest)</li>
+<li><code>ns.downlink-priorities.max-application-downlink</code>: Maximum priority for application downlink messages (lowest, low, below_normal, normal, above_normal, high, highest)</li>
+</ul>
+
+<h2 id="mac-options">MAC Options</h2>
+
+<p>The <code>ns.default-mac-settings</code> options configure default device MAC configuration parameters Network Server uses if not configured in device&rsquo;s MAC settings.</p>
+
+<ul>
+<li><code>ns.default-mac-settings.adr-margin</code>: The default margin Network Server should add in ADR requests</li>
+<li><code>ns.default-mac-settings.class-b-timeout</code>: Deadline for a device in class B mode to respond to requests from the Network Server</li>
+<li><code>ns.default-mac-settings.class-c-timeout</code>: Deadline for a device in class C mode to respond to requests from the Network Server</li>
+<li><code>ns.default-mac-settings.desired-rx1-delay</code>: Desired Rx1Delay value Network Server should use</li>
+<li><code>ns.default-mac-settings.status-count-periodicity</code>: Number of uplink messages after which a DevStatusReq MACCommand shall be sent by Network Server</li>
+<li><code>ns.default-mac-settings.status-time-periodicity</code>: The interval after which a DevStatusReq MACCommand shall be sent by Network Server</li>
+</ul>
+
+<h2 id="interoperability">Interoperability</h2>
+
+<p>The <code>ns.interop</code> options configure how Network Server performs interoperability with other LoRaWAN Backend Interfaces-compliant servers.</p>
+
+<ul>
+<li><code>ns.interop.config-source</code>: Source of the interoperability client configuration (directory, url, blob)</li>
+<li><code>ns.interop.blob.bucket</code>: Blob bucket, which contains interoperability client configuration</li>
+<li><code>ns.interop.blob.path</code>: Blob path, which contains interoperability client configuration</li>
+<li><code>ns.interop.directory</code>: OS filesystem directory, which contains interoperability client configuration</li>
+<li><code>ns.interop.url</code>: URL, which contains interoperability client configuration</li>
+</ul>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.1/reference/configuration/gateway-server/">← Gateway Server Options</a>
+<a class="button is-pulled-right" href="/v3.4.1/reference/configuration/application-server/">Application Server Options →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.1/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.1/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.1/components/">Components</a></p>
+        <p><a class="" href="/v3.4.1/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Roman Volosatovs on 31 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/7de7951adfd9da30d4463540a4e15fa712196766">
+      doc: Document Network Server options
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/configuration/network-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.1/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
