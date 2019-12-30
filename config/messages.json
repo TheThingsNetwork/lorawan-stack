@@ -3464,6 +3464,15 @@
       "file": "scheduler.go"
     }
   },
+  "error:pkg/gatewayserver/scheduling:no_server_time": {
+    "translations": {
+      "en": "no server time"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduler.go"
+    }
+  },
   "error:pkg/gatewayserver/scheduling:sub_band_not_found": {
     "translations": {
       "en": "sub-band not found for frequency `{frequency}` Hz"

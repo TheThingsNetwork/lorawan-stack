@@ -957,7 +957,7 @@ func TestGatewayServer(t *testing.T) {
 													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 														GatewayID: registeredGatewayID,
 													},
-												}, 100),
+												}, 10000000),
 											},
 										},
 									},
@@ -983,7 +983,7 @@ func TestGatewayServer(t *testing.T) {
 													GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 														GatewayID: registeredGatewayID,
 													},
-												}, 100),
+												}, 10000000),
 											},
 										},
 									},

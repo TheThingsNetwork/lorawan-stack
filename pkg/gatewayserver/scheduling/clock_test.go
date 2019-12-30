@@ -16,45 +16,99 @@ package scheduling_test
 
 import (
 	"math"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
+	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestConcentratorClock(t *testing.T) {
-	a := assertions.New(t)
-	clock := &scheduling.RolloverClock{}
+func TestRolloverClock(t *testing.T) {
+	clock := &RolloverClock{}
 
-	clock.SyncWithGateway(10000000, time.Unix(10, 0), time.Unix(0, 0)) // The gateway has no idea of time.
-	a.So(clock.FromServerTime(time.Unix(10, 100)), should.Equal, 10000000*time.Microsecond+100)
-	a.So(clock.ToServerTime(scheduling.ConcentratorTime(10000000*time.Microsecond+100)), should.Equal, time.Unix(10, 100))
+	for i, stc := range []struct {
+		Absolute ConcentratorTime
+		Relative uint32
+	}{
+		{
+			Absolute: ConcentratorTime(10 * time.Second),
+			Relative: uint32(10000000),
+		},
+		{
+			// 1 rollover.
+			Absolute: ConcentratorTime(1<<32*time.Microsecond) + ConcentratorTime(5*time.Second),
+			Relative: uint32(5000000),
+		},
+		{
+			// 3 rollovers (1 existing + 2 server time rollovers).
+			Absolute: ConcentratorTime(3<<32*time.Microsecond) + ConcentratorTime(10*time.Second),
+			Relative: uint32(10000000),
+		},
+		{
+			// 5 rollovers (3 existing + 1 concentrator timestamp rollover + 1 server time rollover).
+			Absolute: ConcentratorTime(5<<32*time.Microsecond) + ConcentratorTime(1*time.Second),
+			Relative: uint32(1000000),
+		},
+		{
+			// 5 rollovers (5 existing) and advance to end of concentrator time epoch.
+			Absolute: ConcentratorTime(6<<32*time.Microsecond) - ConcentratorTime(1*time.Second),
+			Relative: uint32(4293967296),
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			serverTime := time.Unix(0, 0).Add(time.Duration(stc.Absolute))
+			// Run twice; once synchronizing with rollover detection, and once synchronizing with the known concentrator time.
+			for i := 0; i < 2; i++ {
+				t.Run([]string{"DetectRollover", "ResetAbsolute"}[i], func(t *testing.T) {
+					if i == 0 {
+						clock.Sync(stc.Relative, serverTime)
+					} else {
+						clock.SyncWithGatewayConcentrator(stc.Relative, serverTime, stc.Absolute)
+					}
 
-	gatewayTime, ok := clock.FromGatewayTime(time.Unix(0, 100))
-	a.So(ok, should.BeTrue)
-	a.So(gatewayTime, should.Equal, 10000000*time.Microsecond+100)
+					for _, tc := range []struct {
+						D        time.Duration
+						Rollover bool
+					}{
+						{
+							D:        -5 * time.Second,
+							Rollover: false,
+						},
+						{
+							D:        5 * time.Second,
+							Rollover: false,
+						},
+						{
+							D:        30 * time.Minute,
+							Rollover: false,
+						},
+						{
+							D:        2 * time.Hour,
+							Rollover: true,
+						},
+					} {
+						t.Run(tc.D.String(), func(t *testing.T) {
+							a := assertions.New(t)
 
-	{
-		// Test first roll-over to 4299967295 us (math.MaxUint32 + 5000000).
-		passed := time.Microsecond * (math.MaxUint32 + 5000000)
-		clock.SyncWithGateway(5000000, time.Unix(10, 0).Add(passed), time.Unix(0, 0).Add(passed))
-		a.So(clock.FromServerTime(time.Unix(10, 100).Add(passed)), should.Equal, passed+100)
-	}
+							v, ok := clock.FromServerTime(serverTime.Add(tc.D))
+							a.So(ok, should.BeTrue)
+							a.So(v, should.Equal, stc.Absolute+ConcentratorTime(tc.D))
 
-	{
-		// Test second roll-over to 8589934590 us (2 * math.MaxUint32).
-		passed := time.Microsecond * 2 * math.MaxUint32
-		clock.SyncWithGateway(0, time.Unix(10, 0).Add(passed), time.Unix(0, 0).Add(passed))
-		a.So(clock.FromServerTime(time.Unix(10, 100).Add(passed)), should.Equal, passed+100)
-	}
+							d := tc.D / time.Microsecond
+							rollover := d > math.MaxUint32/2 || d < -math.MaxUint32/2
+							a.So(rollover, should.Equal, tc.Rollover)
 
-	{
-		// Test reset of gateway time.
-		passed := time.Microsecond * (2*math.MaxUint32 + 5000000)
-		clock.Sync(5000000, time.Unix(10, 0).Add(passed))
-		_, ok := clock.FromGatewayTime(time.Unix(0, 100))
-		a.So(ok, should.BeFalse)
+							if !rollover {
+								ts := uint32(time.Duration(stc.Relative) + tc.D/time.Microsecond)
+								v = clock.FromTimestampTime(ts)
+								a.So(v, should.Equal, stc.Absolute+ConcentratorTime(tc.D))
+							}
+						})
+					}
+				})
+			}
+		})
 	}
 }

@@ -57,10 +57,10 @@ type Config struct {
 var DefaultConfig = Config{
 	PacketHandlers:      10,
 	PacketBuffer:        50,
-	DownlinkPathExpires: 30 * time.Second,
-	ConnectionExpires:   5 * time.Minute,
+	DownlinkPathExpires: 15 * time.Second, // Expire downlink after missing typically 3 PULL_DATA messages.
+	ConnectionExpires:   1 * time.Minute,  // Expire connection after missing typically 2 status messages.
 	ScheduleLateTime:    800 * time.Millisecond,
-	AddrChangeBlock:     15 * time.Second, // Release source IP address after missing typically 3 PULL_DATA messages.
+	AddrChangeBlock:     1 * time.Minute, // Release address when the connection expires.
 }
 
 type srv struct {
