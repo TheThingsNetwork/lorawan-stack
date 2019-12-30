@@ -16,7 +16,7 @@ The list of users is shown immediately after going to **User Management** in the
 
 ## Searching for Users
 
-It is currently not possible to search for users in the Console, but you can [do this with the CLI]({{< relref "../cli#searching-for-users" >}}).
+You can search for users by ID using the search field above the list of users. It is currently not possible to search for users by other fields than the user ID using the Console, but you can [do this with the CLI]({{< relref "../cli#searching-for-users" >}}).
 
 ## Creating Users
 
