@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.4.1] (2019-12-30)
+
+### Added
+
 - Support for ordering in `List` RPCs.
 - Detect existing Basic Station time epoch when the gateway was already running long before it (re)connected to the Gateway Server.
 
@@ -18,15 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduce the connection expiry window to 1 minute.
 - Reduce default UDP address block time from 5 minutes to 1 minute. This allows for faster reconnecting if the gateway changes IP address. The downlink path and connection now expire before the UDP source address is released.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Fix class A downlink scheduling when an uplink message has been received between the triggering uplink message.
-
-### Security
 
 ## [3.4.0] (2019-12-24)
 
@@ -500,7 +508,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.0...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.1...HEAD
+[3.4.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.2...v3.4.0
 [3.3.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.1...v3.3.2
 [3.3.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.0...v3.3.1
