@@ -155,7 +155,11 @@ func (g Go) Unconvert() error {
 	if mg.Verbose() {
 		fmt.Printf("Removing unnecessary type conversions from %d Go packages\n", len(dirs))
 	}
-	return execGo("run", append([]string{"github.com/mdempsky/unconvert", "-safe", "-apply"}, dirs...)...)
+	args := []string{"github.com/mdempsky/unconvert", "-safe", "-apply"}
+	if goTags != "" {
+		args = append(args, "-tags", strings.Join(strings.Split(goTags, ","), " "))
+	}
+	return execGo("run", append(args, dirs...)...)
 }
 
 // Quality runs code quality checks on Go files.
