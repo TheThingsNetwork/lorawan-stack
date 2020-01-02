@@ -205,6 +205,7 @@ const NetworkServerForm = React.memo(props => {
       />
       <Form.Field
         title={sharedMessages.phyVersion}
+        description={m.lorawanPhyVersionDescription}
         name="lorawan_phy_version"
         component={Select}
         required

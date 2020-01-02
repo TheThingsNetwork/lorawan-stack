@@ -51,6 +51,7 @@ export default defineMessages({
   joinEUIDescription: 'JoinEUI identifies the Join Server',
   leaveBlankPlaceholder: 'Leave blank to generate automatically',
   lorawanVersionDescription: 'The LoRaWAN MAC Version of the end device',
+  lorawanPhyVersionDescription: 'The LoRaWAN PHY Version of the end device',
   multicast: 'Multicast',
   nsServerKekLabel: 'Network Server KEK Label',
   nsServerKekLabelDescription:
