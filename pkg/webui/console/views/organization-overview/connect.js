@@ -27,33 +27,62 @@ import {
   selectOrganizationCollaboratorsFetching,
 } from '../../store/selectors/organizations'
 
+import {
+  checkFromState,
+  mayViewOrEditOrganizationApiKeys,
+  mayViewOrEditOrganizationCollaborators,
+} from '../../lib/feature-checks'
+
 const mapStateToProps = state => {
   const orgId = selectSelectedOrganizationId(state)
   const collaboratorsTotalCount = selectOrganizationCollaboratorsTotalCount(state, { id: orgId })
   const apiKeysTotalCount = selectOrganizationApiKeysTotalCount(state, { id: orgId })
+  const mayViewOrganizationApiKeys = checkFromState(mayViewOrEditOrganizationApiKeys, state)
+  const mayViewOrganizationCollaborators = checkFromState(
+    mayViewOrEditOrganizationCollaborators,
+    state,
+  )
+  const collaboratorsFetching =
+    (mayViewOrganizationCollaborators && collaboratorsTotalCount === undefined) ||
+    selectOrganizationCollaboratorsFetching(state)
+  const apiKeysFetching =
+    (mayViewOrganizationApiKeys && apiKeysTotalCount === undefined) ||
+    selectOrganizationApiKeysFetching(state)
 
   return {
     orgId,
     organization: selectSelectedOrganization(state),
     collaboratorsTotalCount,
     apiKeysTotalCount,
+    mayViewOrganizationApiKeys,
+    mayViewOrganizationCollaborators,
     statusBarFetching:
-      collaboratorsTotalCount === undefined ||
-      apiKeysTotalCount === undefined ||
-      selectOrganizationApiKeysFetching(state) ||
-      selectOrganizationCollaboratorsFetching(state),
+      apiKeysFetching || collaboratorsFetching || selectOrganizationCollaboratorsFetching(state),
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-  loadData(orgId) {
-    dispatch(getOrganizationCollaboratorsList(orgId))
-    dispatch(getOrganizationApiKeysList(orgId))
+  loadData(mayViewOrganizationCollaborators, mayViewOrganizationApiKeys, orgId) {
+    if (mayViewOrganizationCollaborators) dispatch(getOrganizationCollaboratorsList(orgId))
+    if (mayViewOrganizationApiKeys) dispatch(getOrganizationApiKeysList(orgId))
   },
+})
+
+const mergeProps = (stateProps, dispatchProps, ownProps) => ({
+  ...stateProps,
+  ...dispatchProps,
+  ...ownProps,
+  loadData: () =>
+    dispatchProps.loadData(
+      stateProps.mayViewOrganizationCollaborators,
+      stateProps.mayViewOrganizationApiKeys,
+      stateProps.orgId,
+    ),
 })
 
 export default Overview =>
   connect(
     mapStateToProps,
     mapDispatchToProps,
+    mergeProps,
   )(Overview)
