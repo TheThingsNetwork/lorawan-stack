@@ -28,6 +28,7 @@ import { getGsFrequencyPlans, getNsFrequencyPlans } from '../../store/actions/co
 const m = defineMessages({
   title: 'Frequency Plan',
   warning: 'Could not retrieve the list of available frequency plans',
+  description: 'The frequency plan used by the end device',
 })
 
 const formatOptions = plans => plans.map(plan => ({ value: plan.id, label: plan.name }))
@@ -41,6 +42,7 @@ const CreateFrequencyPlansSelector = source =>
     defaultWarning: m.warning,
     defaultTitle: m.title,
     optionsFormatter: formatOptions,
+    defaultDescription: m.description,
   })
 
 export const GsFrequencyPlansSelect = CreateFrequencyPlansSelector('gs')
