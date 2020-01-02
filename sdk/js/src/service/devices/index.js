@@ -119,13 +119,15 @@ class Devices {
       : splitSetPaths(paths, mergeBase)
 
     // Retrieve join information if not present
-    if (!create && !('supports_join' in device)) {
-      const res = await this._getDevice(
-        appId,
-        devId,
-        [['supports_join'], ['join_server_address']],
-        true,
-      )
+    if (!create) {
+      const paths = [['application_server_address'], ['network_server_address']]
+
+      if (!('supports_join' in device)) {
+        paths.push(['supports_join'])
+        paths.push(['join_server_address'])
+      }
+
+      const res = await this._getDevice(appId, devId, paths, true)
       if ('supports_join' in res && res.supports_join) {
         // The NS registry entry exists
         device.supports_join = true
@@ -135,6 +137,26 @@ class Devices {
         // to the request tree to ensure that it will be set on creation
         device.supports_join = true
         requestTree.ns.push(['supports_join'])
+      }
+
+      try {
+        const nsHost = new URL(this._stackConfig.ns).hostname
+
+        if (res.network_server_address !== nsHost) {
+          delete requestTree.as
+        }
+      } catch (e) {
+        delete requestTree.as
+      }
+
+      try {
+        const asHost = new URL(this._stackConfig.as).hostname
+
+        if (res.application_server_address !== asHost) {
+          delete requestTree.as
+        }
+      } catch (e) {
+        delete requestTree.as
       }
     }
 

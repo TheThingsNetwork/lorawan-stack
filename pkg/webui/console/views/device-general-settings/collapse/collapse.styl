@@ -12,26 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { merge } from 'lodash'
-import { GET_DEV_SUCCESS, UPDATE_DEV_SUCCESS } from '../actions/device'
+.section:not(:last-child)
+  border-normal('bottom')
 
-const defaultState = {
-  device: undefined,
-}
+.header
+  display: block
+  position: relative
+  padding-right: $ls.xl
+  padding-top: $ls.s
+  padding-bottom: $ls.s
 
-const device = function(state = defaultState, { type, payload }) {
-  switch (type) {
-    case UPDATE_DEV_SUCCESS:
-      const mergedDevice = merge({}, state.device, payload)
-      return { device: mergedDevice }
-    case GET_DEV_SUCCESS:
-      return {
-        ...state,
-        device: payload,
-      }
-    default:
-      return state
-  }
-}
+  .title
+    margin-top:0
+    margin-bottom: $cs.xs
 
-export default device
+  .description
+    one-liner()
+
+.content
+  display: block
+
+.expand-button
+  position: absolute
+  right: 0
+  top: 50%
+  transform: translateY(-50%)

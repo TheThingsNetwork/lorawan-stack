@@ -169,13 +169,13 @@ class DeviceOverview extends React.Component {
           sensitive: true,
         },
         {
-          key: sharedMessages.sNtwkSIKey,
+          key: sharedMessages.sNwkSIKey,
           value: s_nwk_s_int_key.key,
           type: 'code',
           sensitive: true,
         },
         {
-          key: sharedMessages.ntwkSEncKey,
+          key: sharedMessages.nwkSEncKey,
           value: nwk_s_enc_key.key,
           type: 'code',
           sensitive: true,

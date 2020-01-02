@@ -12,26 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { merge } from 'lodash'
-import { GET_DEV_SUCCESS, UPDATE_DEV_SUCCESS } from '../actions/device'
-
-const defaultState = {
-  device: undefined,
-}
-
-const device = function(state = defaultState, { type, payload }) {
-  switch (type) {
-    case UPDATE_DEV_SUCCESS:
-      const mergedDevice = merge({}, state.device, payload)
-      return { device: mergedDevice }
-    case GET_DEV_SUCCESS:
-      return {
-        ...state,
-        device: payload,
-      }
-    default:
-      return state
-  }
-}
-
-export default device
+.container
+  margin-top: $ls.s * -1

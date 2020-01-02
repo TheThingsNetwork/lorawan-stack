@@ -31,6 +31,7 @@ export default function({
   defaultWarning,
   defaultTitle,
   optionsFormatter = formatOptions,
+  defaultDescription,
 }) {
   @storeConnect(
     function(state) {
@@ -45,6 +46,7 @@ export default function({
   class FetchSelect extends React.PureComponent {
     static propTypes = {
       autoFocus: PropTypes.bool,
+      description: PropTypes.message,
       error: PropTypes.error,
       fetchOptions: PropTypes.func.isRequired,
       fetching: PropTypes.bool,
@@ -61,6 +63,7 @@ export default function({
 
     static defaultProps = {
       autoFocus: false,
+      description: defaultDescription,
       menuPlacement: 'auto',
       error: undefined,
       fetching: false,
@@ -95,6 +98,7 @@ export default function({
         warning,
         title,
         options,
+        description,
       } = this.props
 
       return (
@@ -105,6 +109,7 @@ export default function({
           name={name}
           required={required}
           title={title}
+          description={description}
           autoFocus={autoFocus}
           isLoading={fetching}
           warning={Boolean(error) ? warning : undefined}
