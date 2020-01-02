@@ -147,6 +147,7 @@ const JoinServerForm = React.memo(props => {
       )}
       <Form.Field
         title={m.homeNetID}
+        description={m.homeNetIDDescription}
         name="net_id"
         type="byte"
         min={3}

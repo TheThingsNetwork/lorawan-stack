@@ -47,6 +47,7 @@ export default defineMessages({
   externalJoinServer: 'External Join Server',
   fNwkSIntKeyDescription: 'Forwarding Network Session Integrity Key',
   homeNetID: 'Home NetID',
+  homeNetIDDescription: 'ID to identify the LoRaWAN network',
   joinEUIDescription: 'JoinEUI identifies the Join Server',
   leaveBlankPlaceholder: 'Leave blank to generate automatically',
   multicast: 'Multicast',
