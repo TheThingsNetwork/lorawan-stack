@@ -196,6 +196,7 @@ const NetworkServerForm = React.memo(props => {
     >
       <Form.Field
         title={sharedMessages.macVersion}
+        description={m.lorawanVersionDescription}
         name="lorawan_version"
         component={Select}
         required

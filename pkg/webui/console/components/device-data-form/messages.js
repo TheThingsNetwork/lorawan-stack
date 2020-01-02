@@ -50,6 +50,7 @@ export default defineMessages({
   homeNetIDDescription: 'ID to identify the LoRaWAN network',
   joinEUIDescription: 'JoinEUI identifies the Join Server',
   leaveBlankPlaceholder: 'Leave blank to generate automatically',
+  lorawanVersionDescription: 'The LoRaWAN MAC Version of the end device',
   multicast: 'Multicast',
   nsServerKekLabel: 'Network Server KEK Label',
   nsServerKekLabelDescription:
