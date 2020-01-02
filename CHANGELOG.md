@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+- Fix selection of pseudo wildcard rights being possible (leading to crash) in the Console even when such right cannot be granted.
 
 ### Security
 
