@@ -31,6 +31,8 @@ export default defineMessages({
   asServerKekLabelDescription:
     'The KEK label of the Application Server to use for wrapping the application session key',
   createDevice: 'Create Device',
+  deviceAddrDescription:
+    'Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range',
   deleteDevice: 'Delete End Device',
   deleteSuccess: 'The end device has been deleted successfully',
   deleteWarning:
