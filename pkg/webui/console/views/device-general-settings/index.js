@@ -28,10 +28,10 @@ import PropTypes from '../../../lib/prop-types'
 import api from '../../api'
 import toast from '../../../components/toast'
 
-import { updateDevice } from '../../store/actions/device'
+import { updateDevice } from '../../store/actions/devices'
 import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/device'
+import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
 import {
   selectIsConfig,
   selectAsConfig,

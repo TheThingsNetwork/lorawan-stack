@@ -32,9 +32,9 @@ import {
   selectSelectedWebhook,
   selectWebhookFetching,
   selectWebhookError,
-} from '../../store/selectors/webhook'
+} from '../../store/selectors/webhooks'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { getWebhook } from '../../store/actions/webhook'
+import { getWebhook } from '../../store/actions/webhooks'
 
 import api from '../../api'
 import PropTypes from '../../../lib/prop-types'

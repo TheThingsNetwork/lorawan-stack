@@ -198,8 +198,6 @@ PropTypes.location = PropTypes.shape({
 })
 
 PropTypes.collaborator = PropTypes.shape({
-  isUser: PropTypes.boolean,
-  id: PropTypes.string.isRequired,
   rights: PropTypes.rights,
 })
 

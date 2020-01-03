@@ -12,20 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_DEVICES_LIST_SUCCESS } from '../actions/devices'
+import { merge } from 'lodash'
+
+import { getCombinedDeviceId, combineDeviceIds } from '../../../lib/selectors/id'
+import {
+  GET_DEV,
+  GET_DEVICES_LIST_SUCCESS,
+  GET_DEV_SUCCESS,
+  UPDATE_DEV_SUCCESS,
+} from '../actions/devices'
 
 const defaultState = {
-  devices: [],
-  totalCount: undefined,
+  entities: {},
+  selectedDevice: undefined,
 }
 
 const devices = function(state = defaultState, { type, payload }) {
   switch (type) {
-    case GET_DEVICES_LIST_SUCCESS:
+    case GET_DEV:
       return {
         ...state,
-        devices: payload.devices,
-        totalCount: payload.totalCount,
+        selectedDevice: combineDeviceIds(payload.appId, payload.deviceId),
+      }
+    case UPDATE_DEV_SUCCESS:
+    case GET_DEV_SUCCESS:
+      const id = getCombinedDeviceId(payload)
+      const mergedDevice = merge({}, state.entities[id], payload)
+
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [id]: mergedDevice,
+        },
+      }
+    case GET_DEVICES_LIST_SUCCESS:
+      const entities = payload.entities.reduce(
+        function(acc, dev) {
+          const id = getCombinedDeviceId(dev)
+
+          acc[id] = dev
+          return acc
+        },
+        { ...state.entities },
+      )
+
+      return {
+        ...state,
+        entities,
       }
     default:
       return state

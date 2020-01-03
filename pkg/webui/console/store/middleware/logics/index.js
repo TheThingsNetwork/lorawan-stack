@@ -17,11 +17,14 @@ import users from './users'
 import init from './init'
 import applications from './applications'
 import devices from './devices'
-import device from './device'
 import gateways from './gateways'
 import configuration from './configuration'
 import organizations from './organizations'
 import js from './join-server'
+import apiKeys from './api-keys'
+import collaborators from './collaborators'
+import webhooks from './webhooks'
+import pubsubs from './pubsubs'
 
 export default [
   ...user,
@@ -29,9 +32,12 @@ export default [
   ...init,
   ...applications,
   ...devices,
-  ...device,
   ...gateways,
   ...configuration,
   ...organizations,
   ...js,
+  ...apiKeys,
+  ...collaborators,
+  ...webhooks,
+  ...pubsubs,
 ]

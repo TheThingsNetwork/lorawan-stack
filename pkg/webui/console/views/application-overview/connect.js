@@ -17,19 +17,17 @@ import { connect } from 'react-redux'
 import {
   selectSelectedApplication,
   selectSelectedApplicationId,
-  selectApplicationCollaboratorsTotalCount,
-  selectApplicationCollaboratorsFetching,
-  selectApplicationApiKeysTotalCount,
-  selectApplicationApiKeysFetching,
-  selectSelectedApplicationDevicesTotalCount,
   selectApplicationLinkIndicator,
-  selectSelectedApplicationDevicesFetching,
   selectApplicationLinkFetching,
 } from '../../store/selectors/applications'
 import {
-  getApplicationCollaboratorsList,
-  getApplicationApiKeysList,
-} from '../../store/actions/applications'
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+} from '../../store/selectors/collaborators'
+import { selectApiKeysTotalCount, selectApiKeysFetching } from '../../store/selectors/api-keys'
+import { selectDevicesTotalCount, selectDevicesFetching } from '../../store/selectors/devices'
+import { getCollaboratorsList } from '../../store/actions/collaborators'
+import { getApiKeysList } from '../../store/actions/api-keys'
 import { getApplicationLink } from '../../store/actions/link'
 
 import {
@@ -42,9 +40,9 @@ import {
 
 const mapStateToProps = (state, props) => {
   const appId = selectSelectedApplicationId(state)
-  const collaboratorsTotalCount = selectApplicationCollaboratorsTotalCount(state, { id: appId })
-  const apiKeysTotalCount = selectApplicationApiKeysTotalCount(state, { id: appId })
-  const devicesTotalCount = selectSelectedApplicationDevicesTotalCount(state)
+  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: appId })
+  const apiKeysTotalCount = selectApiKeysTotalCount(state)
+  const devicesTotalCount = selectDevicesTotalCount(state)
   const mayViewApplicationApiKeys = checkFromState(mayViewOrEditApplicationApiKeys, state)
   const mayViewApplicationCollaborators = checkFromState(
     mayViewOrEditApplicationCollaborators,
@@ -54,13 +52,11 @@ const mapStateToProps = (state, props) => {
   const mayViewDevices = checkFromState(mayViewApplicationDevices, state)
   const collaboratorsFetching =
     (mayViewApplicationCollaborators && collaboratorsTotalCount === undefined) ||
-    selectApplicationCollaboratorsFetching(state)
+    selectCollaboratorsFetching(state)
   const apiKeysFetching =
-    (mayViewApplicationApiKeys && apiKeysTotalCount === undefined) ||
-    selectApplicationApiKeysFetching(state)
+    (mayViewApplicationApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
   const devicesFetching =
-    (mayViewDevices && devicesTotalCount === undefined) ||
-    selectSelectedApplicationDevicesFetching(state)
+    (mayViewDevices && devicesTotalCount === undefined) || selectDevicesFetching(state)
 
   return {
     appId,
@@ -88,8 +84,8 @@ const mapDispatchToProps = dispatch => ({
     mayViewApplicationLink,
     appId,
   ) {
-    if (mayViewApplicationCollaborators) dispatch(getApplicationCollaboratorsList(appId))
-    if (mayViewApplicationApiKeys) dispatch(getApplicationApiKeysList(appId))
+    if (mayViewApplicationCollaborators) dispatch(getCollaboratorsList('application', appId))
+    if (mayViewApplicationApiKeys) dispatch(getApiKeysList('application', appId))
     if (mayViewApplicationLink) dispatch(getApplicationLink(appId))
   },
 })

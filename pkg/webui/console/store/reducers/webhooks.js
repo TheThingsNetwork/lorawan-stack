@@ -12,20 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_WEBHOOKS_LIST_SUCCESS } from '../actions/webhooks'
+import { GET_WEBHOOK, GET_WEBHOOK_SUCCESS, GET_WEBHOOKS_LIST_SUCCESS } from '../actions/webhooks'
+import { getWebhookId } from '../../../lib/selectors/id'
 
 const defaultState = {
-  fetching: false,
-  error: undefined,
-  webhooks: undefined,
+  selectedWebhook: null,
+  totalCount: undefined,
+  entities: {},
 }
 
 const webhooks = function(state = defaultState, { type, payload }) {
   switch (type) {
+    case GET_WEBHOOK:
+      return {
+        ...state,
+        selectedWebhook: payload.webhookId,
+      }
+    case GET_WEBHOOK_SUCCESS:
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [getWebhookId(payload)]: payload,
+        },
+      }
     case GET_WEBHOOKS_LIST_SUCCESS:
       return {
         ...state,
-        webhooks: payload.webhooks,
+        entities: {
+          ...payload.entities.reduce((acc, webhook) => {
+            acc[getWebhookId(webhook)] = webhook
+            return acc
+          }, {}),
+        },
         totalCount: payload.totalCount,
       }
     default:

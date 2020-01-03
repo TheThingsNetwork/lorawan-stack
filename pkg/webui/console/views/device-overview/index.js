@@ -28,6 +28,8 @@ import DeviceEvents from '../../containers/device-events'
 import DeviceMap from '../../components/device-map'
 
 import PropTypes from '../../../lib/prop-types'
+import { selectSelectedDevice } from '../../store/selectors/devices'
+
 import style from './device-overview.styl'
 
 const m = defineMessages({
@@ -39,11 +41,9 @@ const m = defineMessages({
   keysNotExposed: 'Keys are not exposed',
 })
 
-@connect(function({ device }, props) {
-  return {
-    device: device.device,
-  }
-})
+@connect((state, props) => ({
+  device: selectSelectedDevice(state),
+}))
 @bind
 class DeviceOverview extends React.Component {
   static propTypes = {

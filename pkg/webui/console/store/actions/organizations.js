@@ -31,15 +31,7 @@ import {
   clearEvents,
   createClearEventsActionType,
 } from './events'
-import createApiKeysRequestActions, { createGetApiKeysListActionType } from './api-keys'
-import createApiKeyRequestActions, { createGetApiKeyActionType } from './api-key'
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
-import {
-  createGetCollaboratorsListRequestActions,
-  createGetCollaboratorsListActionType,
-  createGetCollaboratorRequestActions,
-  createGetCollaboratorActionType,
-} from './collaborators'
 
 export const SHARED_NAME = 'ORGANIZATION'
 
@@ -79,30 +71,6 @@ export const [
   },
 ] = createRequestActions(UPDATE_ORG_BASE, (id, patch) => ({ id, patch }))
 
-export const GET_ORG_API_KEY_BASE = createGetApiKeyActionType(SHARED_NAME)
-export const [
-  { request: GET_ORG_API_KEY, success: GET_ORG_API_KEY_SUCCESS, failure: GET_ORG_API_KEY_FAILURE },
-  {
-    request: getOrganizationApiKey,
-    success: getOrganizationApiKeySuccess,
-    failure: getOrganizationApiKeyFailure,
-  },
-] = createApiKeyRequestActions(SHARED_NAME)
-
-export const GET_ORG_API_KEYS_LIST_BASE = createGetApiKeysListActionType(SHARED_NAME)
-export const [
-  {
-    request: GET_ORG_API_KEYS_LIST,
-    success: GET_ORG_API_KEYS_LIST_SUCCESS,
-    failure: GET_ORG_API_KEYS_LIST_FAILURE,
-  },
-  {
-    request: getOrganizationApiKeysList,
-    success: getOrganizationApiKeysListSuccess,
-    failure: getOrganizationApiKeysListFailure,
-  },
-] = createApiKeysRequestActions(SHARED_NAME)
-
 export const GET_ORGS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [
   {
@@ -126,34 +94,6 @@ export const [
     failure: deleteORganizationFailure,
   },
 ] = createPaginationDeleteActions(SHARED_NAME, id => ({ id }))
-
-export const GET_ORG_COLLABORATOR_BASE = createGetCollaboratorActionType(SHARED_NAME)
-export const [
-  {
-    request: GET_ORG_COLLABORATOR,
-    success: GET_ORG_COLLABORATOR_SUCCESS,
-    failure: GET_ORG_COLLABORATOR_FAILURE,
-  },
-  {
-    request: getOrganizationCollaborator,
-    success: getOrganizationCollaboratorSuccess,
-    failure: getOrganizationCollaboratorFailure,
-  },
-] = createGetCollaboratorRequestActions(SHARED_NAME)
-
-export const GET_ORG_COLLABORATORS_LIST_BASE = createGetCollaboratorsListActionType(SHARED_NAME)
-export const [
-  {
-    request: GET_ORG_COLLABORATORS_LIST,
-    success: GET_ORG_COLLABORATORS_LIST_SUCCESS,
-    failure: GET_ORG_COLLABORATORS_LIST_FAILURE,
-  },
-  {
-    request: getOrganizationCollaboratorsList,
-    success: getOrganizationCollaboratorsListSuccess,
-    failure: getOrganizationCollaboratorsListFailure,
-  },
-] = createGetCollaboratorsListRequestActions(SHARED_NAME)
 
 export const START_ORG_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_ORG_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)

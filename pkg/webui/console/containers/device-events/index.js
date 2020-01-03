@@ -20,13 +20,13 @@ import PropTypes from '../../../lib/prop-types'
 import { getApplicationId, getDeviceId } from '../../../lib/selectors/id'
 import EventsSubscription from '../../containers/events-subscription'
 
-import { clearDeviceEventsStream, startDeviceEventsStream } from '../../store/actions/device'
+import { clearDeviceEventsStream, startDeviceEventsStream } from '../../store/actions/devices'
 
 import {
   selectDeviceEvents,
   selectDeviceEventsStatus,
   selectDeviceEventsError,
-} from '../../store/selectors/device'
+} from '../../store/selectors/devices'
 
 @connect(
   null,

@@ -18,15 +18,15 @@ import bind from 'autobind-decorator'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import ApiKeysTable from '../../containers/api-keys-table'
-import { getApplicationApiKeysList } from '../../store/actions/applications'
+import { getApiKeysList } from '../../store/actions/api-keys'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 
 import {
-  selectApplicationApiKeys,
-  selectApplicationApiKeysTotalCount,
-  selectApplicationApiKeysFetching,
-} from '../../store/selectors/applications'
+  selectApiKeys,
+  selectApiKeysTotalCount,
+  selectApiKeysFetching,
+} from '../../store/selectors/api-keys'
 
 import PAGE_SIZES from '../../constants/page-sizes'
 
@@ -39,7 +39,7 @@ export default class ApplicationApiKeys extends React.Component {
     super(props)
 
     const { appId } = props.match.params
-    this.getApplicationsApiKeysList = filters => getApplicationApiKeysList(appId, filters)
+    this.getApiKeysList = filters => getApiKeysList('application', appId, filters)
   }
 
   @bind
@@ -48,9 +48,9 @@ export default class ApplicationApiKeys extends React.Component {
 
     const id = { id: appId }
     return {
-      keys: selectApplicationApiKeys(state, id),
-      totalCount: selectApplicationApiKeysTotalCount(state, id),
-      fetching: selectApplicationApiKeysFetching(state),
+      keys: selectApiKeys(state, id),
+      totalCount: selectApiKeysTotalCount(state, id),
+      fetching: selectApiKeysFetching(state),
     }
   }
 
@@ -63,7 +63,7 @@ export default class ApplicationApiKeys extends React.Component {
             <ApiKeysTable
               pageSize={PAGE_SIZES.REGULAR}
               baseDataSelector={this.baseDataSelector}
-              getItemsAction={this.getApplicationsApiKeysList}
+              getItemsAction={this.getApiKeysList}
             />
           </Col>
         </Row>

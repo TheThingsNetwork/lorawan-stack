@@ -12,31 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const selectApiKeysStore = (state, props) => state[props.id] || {}
+import { GET_API_KEY_BASE, GET_API_KEYS_LIST_BASE } from '../actions/api-keys'
+import { createFetchingSelector } from './fetching'
+import { createErrorSelector } from './error'
+import {
+  createPaginationIdsSelectorByEntity,
+  createPaginationTotalCountSelectorByEntity,
+} from './pagination'
 
-export const createApiKeysStoreSelector = entity => (state, props) =>
-  selectApiKeysStore(state.apiKeys[entity], props) || {}
+const ENTITY = 'apiKeys'
 
-export const createApiKeysSelector = entity =>
-  function(state, props) {
-    const store = selectApiKeysStore(state.apiKeys[entity], props)
+// Api Key
+export const selectApiKeysStore = state => state.apiKeys || {}
+export const selectApiKeysEntitiesStore = state => selectApiKeysStore(state).entities
+export const selectApiKeyById = (state, id) => selectApiKeysEntitiesStore(state)[id]
+export const selectSelectedApiKeyId = state => selectApiKeysStore(state).selectedApiKey
+export const selectSelectedApiKey = state => selectApiKeyById(state, selectSelectedApiKeyId(state))
+export const selectApiKeyFetching = createFetchingSelector(GET_API_KEY_BASE)
+export const selectApiKeyError = createErrorSelector(GET_API_KEY_BASE)
 
-    return store.keys ? store.keys : []
-  }
+// Api Keys
+const createSelectApiKeysIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
+const createSelectApiKeysTotalCountSelector = createPaginationTotalCountSelectorByEntity(ENTITY)
+const createSelectApiKeysFetchingSelector = createFetchingSelector(GET_API_KEYS_LIST_BASE)
+const createSelectApiKeysErrorSelector = createErrorSelector(GET_API_KEYS_LIST_BASE)
 
-export const createApiKeySelector = function(entity) {
-  const keysSelector = createApiKeysSelector(entity)
-
-  return function(state, props) {
-    const keys = keysSelector(state, props)
-
-    return keys.find(key => key.id === props.keyId)
-  }
-}
-
-export const createTotalCountSelector = entity =>
-  function(state, props) {
-    const store = selectApiKeysStore(state.apiKeys[entity], props)
-
-    return store.totalCount
-  }
+export const selectApiKeys = state =>
+  createSelectApiKeysIdsSelector(state).map(id => selectApiKeyById(state, id))
+export const selectApiKeysTotalCount = state => createSelectApiKeysTotalCountSelector(state)
+export const selectApiKeysFetching = state => createSelectApiKeysFetchingSelector(state)
+export const selectApiKeysError = state => createSelectApiKeysErrorSelector(state)

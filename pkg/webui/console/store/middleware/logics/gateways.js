@@ -114,45 +114,6 @@ const getGatewaysRightsLogic = createRequestLogic({
   },
 })
 
-const getGatewayCollaboratorLogic = createRequestLogic({
-  type: gateways.GET_GTW_COLLABORATOR,
-  async process({ action }) {
-    const { id: gtwId, collaboratorId, isUser } = action.payload
-
-    const collaborator = isUser
-      ? await api.gateway.collaborators.getUser(gtwId, collaboratorId)
-      : await api.gateway.collaborators.getOrganization(gtwId, collaboratorId)
-
-    const { ids, ...rest } = collaborator
-
-    return {
-      id: collaboratorId,
-      isUser,
-      ...rest,
-    }
-  },
-})
-
-const getGatewayCollaboratorsLogic = createRequestLogic({
-  type: gateways.GET_GTW_COLLABORATORS_LIST,
-  async process({ action }) {
-    const { id, params } = action.payload
-    const res = await api.gateway.collaborators.list(id, params)
-    const collaborators = res.collaborators.map(function(collaborator) {
-      const { ids, ...rest } = collaborator
-      const isUser = !!ids.user_ids
-      const collaboratorId = isUser ? ids.user_ids.user_id : ids.organization_ids.organization_id
-
-      return {
-        id: collaboratorId,
-        isUser,
-        ...rest,
-      }
-    })
-    return { id, collaborators, totalCount: res.totalCount }
-  },
-})
-
 const startGatewayStatisticsLogic = createLogic({
   type: gateways.START_GTW_STATS,
   cancelType: [gateways.STOP_GTW_STATS, gateways.UPDATE_GTW_STATS_FAILURE],
@@ -230,34 +191,13 @@ const updateGatewayStatisticsLogic = createRequestLogic({
   },
 })
 
-const getGatewayApiKeysLogic = createRequestLogic({
-  type: gateways.GET_GTW_API_KEYS_LIST,
-  async process({ action }) {
-    const { id: gtwId, params } = action.payload
-    const res = await api.gateway.apiKeys.list(gtwId, params)
-    return { ...res, id: gtwId }
-  },
-})
-
-const getGatewayApiKeyLogic = createRequestLogic({
-  type: gateways.GET_GTW_API_KEY,
-  async process({ action }) {
-    const { id: gtwId, keyId } = action.payload
-    return api.gateway.apiKeys.get(gtwId, keyId)
-  },
-})
-
 export default [
   getGatewayLogic,
   updateGatewayLogic,
   deleteGatewayLogic,
   getGatewaysLogic,
   getGatewaysRightsLogic,
-  getGatewayCollaboratorLogic,
-  getGatewayCollaboratorsLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
   ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', api.gateway.eventsSubscribe),
-  getGatewayApiKeysLogic,
-  getGatewayApiKeyLogic,
 ]

@@ -14,13 +14,13 @@
 
 import { connect } from 'react-redux'
 
-import { getOrganizationCollaboratorsList } from '../../store/actions/organizations'
+import { getCollaboratorsList } from '../../store/actions/collaborators'
+import { selectSelectedOrganizationId } from '../../store/selectors/organizations'
 import {
-  selectSelectedOrganizationId,
-  selectOrganizationCollaborators,
-  selectOrganizationCollaboratorsTotalCount,
-  selectOrganizationCollaboratorsFetching,
-} from '../../store/selectors/organizations'
+  selectCollaborators,
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+} from '../../store/selectors/collaborators'
 
 export default OrganizationCollaboratorsList =>
   connect(
@@ -28,22 +28,22 @@ export default OrganizationCollaboratorsList =>
       orgId: selectSelectedOrganizationId(state),
     }),
     dispatch => ({
-      getOrganizationCollaboratorsList: (id, filters) =>
-        dispatch(getOrganizationCollaboratorsList(id, filters)),
+      getCollaboratorsList: (id, filters) =>
+        dispatch(getCollaboratorsList('organization', id, filters)),
     }),
     (stateProps, dispatchProps, ownProps) => ({
       ...stateProps,
       ...dispatchProps,
       ...ownProps,
-      getOrganizationCollaboratorsList: filters =>
-        dispatchProps.getOrganizationCollaboratorsList(stateProps.orgId, filters),
+      getCollaboratorsList: filters =>
+        dispatchProps.getCollaboratorsList(stateProps.orgId, filters),
       selectTableData: state => {
         const id = { id: stateProps.orgId }
 
         return {
-          collaborators: selectOrganizationCollaborators(state, id),
-          totalCount: selectOrganizationCollaboratorsTotalCount(state, id),
-          fetching: selectOrganizationCollaboratorsFetching(state),
+          collaborators: selectCollaborators(state, id),
+          totalCount: selectCollaboratorsTotalCount(state, id),
+          fetching: selectCollaboratorsFetching(state),
         }
       },
     }),

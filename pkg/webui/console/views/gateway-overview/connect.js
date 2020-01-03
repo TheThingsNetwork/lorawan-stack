@@ -14,15 +14,14 @@
 
 import { connect } from 'react-redux'
 
-import { getGatewayCollaboratorsList, getGatewayApiKeysList } from '../../store/actions/gateways'
+import { getCollaboratorsList } from '../../store/actions/collaborators'
+import { getApiKeysList } from '../../store/actions/api-keys'
+import { selectSelectedGateway, selectSelectedGatewayId } from '../../store/selectors/gateways'
+import { selectApiKeysTotalCount, selectApiKeysFetching } from '../../store/selectors/api-keys'
 import {
-  selectSelectedGateway,
-  selectSelectedGatewayId,
-  selectGatewayCollaboratorsTotalCount,
-  selectGatewayCollaboratorsFetching,
-  selectGatewayApiKeysTotalCount,
-  selectGatewayApiKeysFetching,
-} from '../../store/selectors/gateways'
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+} from '../../store/selectors/collaborators'
 
 import {
   checkFromState,
@@ -32,16 +31,15 @@ import {
 
 const mapStateToProps = state => {
   const gtwId = selectSelectedGatewayId(state)
-  const collaboratorsTotalCount = selectGatewayCollaboratorsTotalCount(state, { id: gtwId })
-  const apiKeysTotalCount = selectGatewayApiKeysTotalCount(state, { id: gtwId })
+  const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: gtwId })
+  const apiKeysTotalCount = selectApiKeysTotalCount(state)
   const mayViewGatewayApiKeys = checkFromState(mayViewOrEditGatewayApiKeys, state)
   const mayViewGatewayCollaborators = checkFromState(mayViewOrEditGatewayCollaborators, state)
   const collaboratorsFetching =
     (mayViewGatewayCollaborators && collaboratorsTotalCount === undefined) ||
-    selectGatewayCollaboratorsFetching(state)
+    selectCollaboratorsFetching(state)
   const apiKeysFetching =
-    (mayViewGatewayApiKeys && apiKeysTotalCount === undefined) ||
-    selectGatewayApiKeysFetching(state)
+    (mayViewGatewayApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
 
   return {
     gtwId,
@@ -55,8 +53,8 @@ const mapStateToProps = state => {
 }
 const mapDispatchToProps = dispatch => ({
   loadData(mayViewGatewayCollaborators, mayViewGatewayApiKeys, gtwId) {
-    if (mayViewGatewayCollaborators) dispatch(getGatewayCollaboratorsList(gtwId))
-    if (mayViewGatewayApiKeys) dispatch(getGatewayApiKeysList(gtwId))
+    if (mayViewGatewayCollaborators) dispatch(getCollaboratorsList('gateway', gtwId))
+    if (mayViewGatewayApiKeys) dispatch(getApiKeysList('gateway', gtwId))
   },
 })
 

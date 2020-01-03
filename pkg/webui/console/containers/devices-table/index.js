@@ -30,6 +30,12 @@ import { getDeviceTemplateFormats } from '../../store/actions/device-template-fo
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectDeviceTemplateFormats } from '../../store/selectors/device-template-formats'
 import {
+  selectDevices,
+  selectDevicesTotalCount,
+  selectDevicesFetching,
+  selectDevicesError,
+} from '../../store/selectors/devices'
+import {
   checkFromState,
   mayCreateOrEditApplicationDevices,
   mayViewApplicationDevices,
@@ -91,7 +97,10 @@ class DevicesTable extends React.Component {
   baseDataSelector(state) {
     const { mayCreateDevices } = this.props
     return {
-      ...state.devices,
+      devices: selectDevices(state),
+      totalCount: selectDevicesTotalCount(state),
+      fetching: selectDevicesFetching(state),
+      error: selectDevicesError(state),
       mayAdd: mayCreateDevices,
     }
   }

@@ -30,6 +30,13 @@ export const getDeviceId = function(device = {}) {
   )
 }
 
+export const combineDeviceIds = (appId, devId) => `${appId}/${devId}`
+export const getCombinedDeviceId = function(device = {}) {
+  const appId = getByPath(device, 'ids.application_ids.application_id')
+  const devId = getByPath(device, 'ids.device_id')
+  return combineDeviceIds(appId, devId)
+}
+
 export const getCollaboratorId = function(collaborator = {}) {
   return (
     getByPath(collaborator, 'ids.organization_ids.organization_id') ||
@@ -78,6 +85,10 @@ export const getEntityId = function(entity) {
 
 export const getWebhookId = function(webhook = {}) {
   return getByPath(webhook, 'ids.webhook_id')
+}
+
+export const getPubsubId = function(pubsub = {}) {
+  return getByPath(pubsub, 'ids.pub_sub_id')
 }
 
 export const getUserId = function(user = {}) {

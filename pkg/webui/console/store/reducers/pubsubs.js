@@ -12,20 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_PUBSUBS_LIST_SUCCESS } from '../actions/pubsubs'
+import { GET_PUBSUB, GET_PUBSUB_SUCCESS, GET_PUBSUBS_LIST_SUCCESS } from '../actions/pubsubs'
+import { getPubsubId } from '../../../lib/selectors/id'
 
 const defaultState = {
-  fetching: false,
-  error: undefined,
-  pubsubs: undefined,
+  selectedPubsub: null,
+  totalCount: undefined,
+  entities: {},
 }
 
 const pubsubs = function(state = defaultState, { type, payload }) {
   switch (type) {
+    case GET_PUBSUB:
+      return {
+        ...state,
+        selectedPubsub: payload.pubsubId,
+      }
+    case GET_PUBSUB_SUCCESS:
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [getPubsubId(payload)]: payload,
+        },
+      }
     case GET_PUBSUBS_LIST_SUCCESS:
       return {
         ...state,
-        pubsubs: payload.pubsubs,
+        entities: {
+          ...payload.entities.reduce((acc, pubsub) => {
+            acc[getPubsubId(pubsub)] = pubsub
+            return acc
+          }, {}),
+        },
         totalCount: payload.totalCount,
       }
     default:

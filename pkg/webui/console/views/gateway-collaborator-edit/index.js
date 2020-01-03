@@ -26,18 +26,20 @@ import toast from '../../../components/toast'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import withRequest from '../../../lib/components/with-request'
 
-import { getGatewayCollaborator } from '../../store/actions/gateways'
+import { getCollaborator } from '../../store/actions/collaborators'
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
   selectGatewayPseudoRights,
   selectGatewayRightsFetching,
   selectGatewayRightsError,
-  selectGatewayUserCollaborator,
-  selectGatewayOrganizationCollaborator,
-  selectGatewayCollaboratorFetching,
-  selectGatewayCollaboratorError,
 } from '../../store/selectors/gateways'
+import {
+  selectUserCollaborator,
+  selectOrganizationCollaborator,
+  selectCollaboratorFetching,
+  selectCollaboratorError,
+} from '../../store/selectors/collaborators'
 
 import api from '../../api'
 import PropTypes from '../../../lib/prop-types'
@@ -50,11 +52,11 @@ import PropTypes from '../../../lib/prop-types'
 
     const collaborator =
       collaboratorType === 'user'
-        ? selectGatewayUserCollaborator(state)
-        : selectGatewayOrganizationCollaborator(state)
+        ? selectUserCollaborator(state)
+        : selectOrganizationCollaborator(state)
 
-    const fetching = selectGatewayRightsFetching(state) || selectGatewayCollaboratorFetching(state)
-    const error = selectGatewayRightsError(state) || selectGatewayCollaboratorError(state)
+    const fetching = selectGatewayRightsFetching(state) || selectCollaboratorFetching(state)
+    const error = selectGatewayRightsError(state) || selectCollaboratorError(state)
 
     return {
       collaboratorId,
@@ -68,8 +70,8 @@ import PropTypes from '../../../lib/prop-types'
     }
   },
   (dispatch, ownProps) => ({
-    getGatewayCollaborator(gtwId, collaboratorId, isUser) {
-      dispatch(getGatewayCollaborator(gtwId, collaboratorId, isUser))
+    getCollaborator(gtwId, collaboratorId, isUser) {
+      dispatch(getCollaborator('gateway', gtwId, collaboratorId, isUser))
     },
     redirectToList(gtwId) {
       dispatch(replace(`/gateways/${gtwId}/collaborators`))
@@ -80,7 +82,7 @@ import PropTypes from '../../../lib/prop-types'
     ...dispatchProps,
     ...ownProps,
     getGatewayCollaborator: () =>
-      dispatchProps.getGatewayCollaborator(
+      dispatchProps.getCollaborator(
         stateProps.gtwId,
         stateProps.collaboratorId,
         stateProps.collaboratorType === 'user',
@@ -137,14 +139,11 @@ export default class GatewayCollaboratorEdit extends React.Component {
   }
 
   render() {
-    const { collaborator, rights, redirectToList, pseudoRights } = this.props
+    const { collaborator, collaboratorId, rights, redirectToList, pseudoRights } = this.props
 
     return (
       <Container>
-        <PageTitle
-          title={sharedMessages.collaboratorEdit}
-          values={{ collaboratorId: collaborator.id }}
-        />
+        <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
         <Row>
           <Col lg={8} md={12}>
             <CollaboratorForm

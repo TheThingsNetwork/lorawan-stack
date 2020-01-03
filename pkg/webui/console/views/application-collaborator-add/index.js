@@ -31,21 +31,20 @@ import {
   selectApplicationRightsFetching,
   selectApplicationRightsError,
 } from '../../store/selectors/applications'
+import { selectCollaborators } from '../../store/selectors/collaborators'
 
 import api from '../../api'
 import PropTypes from '../../../lib/prop-types'
 
 @connect(
-  function(state) {
-    return {
-      appId: selectSelectedApplicationId(state),
-      collaborators: state.collaborators.applications.collaborators,
-      rights: selectApplicationRights(state),
-      pseudoRights: selectApplicationPseudoRights(state),
-      fetching: selectApplicationRightsFetching(state),
-      error: selectApplicationRightsError(state),
-    }
-  },
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    collaborators: selectCollaborators(state),
+    rights: selectApplicationRights(state),
+    pseudoRights: selectApplicationPseudoRights(state),
+    fetching: selectApplicationRightsFetching(state),
+    error: selectApplicationRightsError(state),
+  }),
   (dispatch, ownProps) => ({
     redirectToList: appId => dispatch(push(`/applications/${appId}/collaborators`)),
   }),

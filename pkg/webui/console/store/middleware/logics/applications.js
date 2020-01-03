@@ -14,11 +14,7 @@
 
 import * as applications from '../../actions/applications'
 import * as link from '../../actions/link'
-import * as webhooks from '../../actions/webhooks'
-import * as webhook from '../../actions/webhook'
 import * as webhookFormats from '../../actions/webhook-formats'
-import * as pubsubs from '../../actions/pubsubs'
-import * as pubsub from '../../actions/pubsub'
 import * as pubsubFormats from '../../actions/pubsub-formats'
 
 import api from '../../../api'
@@ -95,65 +91,6 @@ const getApplicationsRightsLogic = createRequestLogic({
   },
 })
 
-const getApplicationApiKeysLogic = createRequestLogic({
-  type: applications.GET_APP_API_KEYS_LIST,
-  async process({ getState, action }) {
-    const {
-      id: appId,
-      params: { page, limit },
-    } = action.payload
-    const res = await api.application.apiKeys.list(appId, { limit, page })
-    return { ...res, id: appId }
-  },
-})
-
-const getApplicationApiKeyLogic = createRequestLogic({
-  type: applications.GET_APP_API_KEY,
-  async process({ action }) {
-    const { id: appId, keyId } = action.payload
-    return api.application.apiKeys.get(appId, keyId)
-  },
-})
-
-const getApplicationCollaboratorLogic = createRequestLogic({
-  type: applications.GET_APP_COLLABORATOR,
-  async process({ action }) {
-    const { id: appId, collaboratorId, isUser } = action.payload
-
-    const collaborator = isUser
-      ? await api.application.collaborators.getUser(appId, collaboratorId)
-      : await api.application.collaborators.getOrganization(appId, collaboratorId)
-
-    const { ids, ...rest } = collaborator
-
-    return {
-      id: collaboratorId,
-      isUser,
-      ...rest,
-    }
-  },
-})
-
-const getApplicationCollaboratorsLogic = createRequestLogic({
-  type: applications.GET_APP_COLLABORATORS_LIST,
-  async process({ action }) {
-    const { id: appId, params } = action.payload
-    const res = await api.application.collaborators.list(appId, params)
-    const collaborators = res.collaborators.map(function(collaborator) {
-      const { ids, ...rest } = collaborator
-      const isUser = !!ids.user_ids
-      const collaboratorId = isUser ? ids.user_ids.user_id : ids.organization_ids.organization_id
-
-      return {
-        id: collaboratorId,
-        isUser,
-        ...rest,
-      }
-    })
-    return { id: appId, collaborators, totalCount: res.totalCount }
-  },
-})
-
 const getApplicationLinkLogic = createRequestLogic({
   type: link.GET_APP_LINK,
   async process({ action }, dispatch, done) {
@@ -181,51 +118,11 @@ const getApplicationLinkLogic = createRequestLogic({
   },
 })
 
-const getWebhookLogic = createRequestLogic({
-  type: webhook.GET_WEBHOOK,
-  async process({ action }) {
-    const {
-      payload: { appId, webhookId },
-      meta: { selector },
-    } = action
-    return api.application.webhooks.get(appId, webhookId, selector)
-  },
-})
-
-const getWebhooksLogic = createRequestLogic({
-  type: webhooks.GET_WEBHOOKS_LIST,
-  async process({ action }) {
-    const { appId } = action.payload
-    const res = await api.application.webhooks.list(appId)
-    return { webhooks: res.webhooks, totalCount: res.totalCount }
-  },
-})
-
 const getWebhookFormatsLogic = createRequestLogic({
   type: webhookFormats.GET_WEBHOOK_FORMATS,
   async process() {
     const { formats } = await api.application.webhooks.getFormats()
     return formats
-  },
-})
-
-const getPubsubLogic = createRequestLogic({
-  type: pubsub.GET_PUBSUB,
-  async process({ action }) {
-    const {
-      payload: { appId, pubsubId },
-      meta: { selector },
-    } = action
-    return api.application.pubsubs.get(appId, pubsubId, selector)
-  },
-})
-
-const getPubsubsLogic = createRequestLogic({
-  type: pubsubs.GET_PUBSUBS_LIST,
-  async process({ action }) {
-    const { appId } = action.payload
-    const res = await api.application.pubsubs.list(appId)
-    return { pubsubs: res.pubsubs, totalCount: res.totalCount }
   },
 })
 
@@ -243,19 +140,11 @@ export default [
   deleteApplicationLogic,
   getApplicationsLogic,
   getApplicationsRightsLogic,
-  getApplicationApiKeysLogic,
-  getApplicationApiKeyLogic,
-  getApplicationCollaboratorLogic,
-  getApplicationCollaboratorsLogic,
-  getWebhooksLogic,
-  getWebhookLogic,
   getWebhookFormatsLogic,
-  getPubsubLogic,
-  getPubsubsLogic,
   getPubsubFormatsLogic,
   getApplicationLinkLogic,
   ...createEventsConnectLogics(
-    applications.SHARED_NAME_SINGLE,
+    applications.SHARED_NAME,
     'applications',
     api.application.eventsSubscribe,
   ),

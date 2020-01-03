@@ -18,6 +18,17 @@ export const createPaginationBaseActionType = name => `GET_${name}_LIST`
 
 export const createPaginationDeleteBaseActionType = name => `DELETE_${name}`
 
+export const createPaginationByParentRequestActions = name =>
+  createRequestActions(
+    createPaginationBaseActionType(name),
+    (parentType, parentId, { page, limit, query } = {}) => ({
+      parentType,
+      parentId,
+      params: { page, limit, query },
+    }),
+    (parentType, parentId, params, selectors = []) => ({ selectors }),
+  )
+
 export const createPaginationByIdRequestActions = name =>
   createRequestActions(
     createPaginationBaseActionType(name),

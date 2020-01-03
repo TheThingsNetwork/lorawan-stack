@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 
 import FetchTable from '../fetch-table'
 import Message from '../../../lib/components/message'
+import { getCollaboratorId } from '../../../lib/selectors/id'
 import sharedMessages from '../../../lib/shared-messages'
 import Icon from '../../../components/icon'
 
@@ -28,13 +29,15 @@ const m = defineMessages({
 
 const headers = [
   {
-    name: 'id',
+    name: 'ids',
     displayName: m.id,
+    render: ids => getCollaboratorId({ ids }),
   },
   {
-    name: 'isUser',
+    name: 'ids',
     displayName: sharedMessages.type,
-    render(isUser) {
+    render(ids) {
+      const isUser = 'user_ids' in ids
       const icon = isUser ? 'user' : 'organization'
 
       return (
@@ -62,7 +65,9 @@ const headers = [
 
 export default class CollaboratorsTable extends Component {
   getCollaboratorPathPrefix(collaborator) {
-    return `/${collaborator.isUser ? 'user' : 'organization'}/${collaborator.id}`
+    return `/${'user_ids' in collaborator.ids ? 'user' : 'organization'}/${getCollaboratorId(
+      collaborator,
+    )}`
   }
 
   render() {

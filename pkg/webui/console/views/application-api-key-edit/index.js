@@ -25,17 +25,19 @@ import sharedMessages from '../../../lib/shared-messages'
 import { ApiKeyEditForm } from '../../components/api-key-form'
 import withRequest from '../../../lib/components/with-request'
 
-import { getApplicationApiKey } from '../../store/actions/applications'
+import { getApiKey } from '../../store/actions/api-keys'
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationPseudoRights,
   selectApplicationRightsError,
   selectApplicationRightsFetching,
-  selectApplicationApiKey,
-  selectApplicationApiKeyError,
-  selectApplicationApiKeyFetching,
 } from '../../store/selectors/applications'
+import {
+  selectSelectedApiKey,
+  selectApiKeyError,
+  selectApiKeyFetching,
+} from '../../store/selectors/api-keys'
 
 import api from '../../api'
 import PropTypes from '../../../lib/prop-types'
@@ -44,15 +46,15 @@ import PropTypes from '../../../lib/prop-types'
   function(state, props) {
     const { apiKeyId } = props.match.params
 
-    const keyFetching = selectApplicationApiKeyFetching(state)
+    const keyFetching = selectApiKeyFetching(state)
     const rightsFetching = selectApplicationRightsFetching(state)
-    const keyError = selectApplicationApiKeyError(state)
+    const keyError = selectApiKeyError(state)
     const rightsError = selectApplicationRightsError(state)
 
     return {
       keyId: apiKeyId,
       appId: selectSelectedApplicationId(state),
-      apiKey: selectApplicationApiKey(state),
+      apiKey: selectSelectedApiKey(state),
       rights: selectApplicationRights(state),
       pseudoRights: selectApplicationPseudoRights(state),
       fetching: keyFetching || rightsFetching,
@@ -60,14 +62,14 @@ import PropTypes from '../../../lib/prop-types'
     }
   },
   dispatch => ({
-    getApplicationApiKey(appId, apiKeyId) {
-      dispatch(getApplicationApiKey(appId, apiKeyId))
+    getApiKey(appId, keyId) {
+      dispatch(getApiKey('application', appId, keyId))
     },
     deleteSuccess: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
   }),
 )
 @withRequest(
-  ({ getApplicationApiKey, appId, keyId }) => getApplicationApiKey(appId, keyId),
+  ({ getApiKey, appId, keyId }) => getApiKey(appId, keyId),
   ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
 )
 @withBreadcrumb('apps.single.api-keys.edit', function(props) {

@@ -23,14 +23,16 @@ import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import DeviceEvents from '../../containers/device-events'
 
-import { getDeviceId } from '../../../lib/selectors/id'
+import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
+
 import PropTypes from '../../../lib/prop-types'
 
-@connect(function({ device, application }, props) {
+@connect(function(state, props) {
+  const device = selectSelectedDevice(state)
   return {
-    device: device.device,
-    devId: getDeviceId(device.device),
-    devIds: device.device && device.device.ids,
+    device,
+    devId: selectSelectedDeviceId(state),
+    devIds: device && device.ids,
   }
 })
 @withBreadcrumb('device.single.data', function(props) {

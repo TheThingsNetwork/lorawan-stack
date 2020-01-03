@@ -17,18 +17,19 @@ import { replace } from 'connected-react-router'
 
 import withRequest from '../../../lib/components/with-request'
 
-import { getOrganizationApiKey } from '../../store/actions/organizations'
+import { getApiKey } from '../../store/actions/api-keys'
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
   selectOrganizationPseudoRights,
   selectOrganizationRightsError,
   selectOrganizationRightsFetching,
-  selectOrganizationApiKey,
-  selectOrganizationApiKeyError,
-  selectOrganizationApiKeyFetching,
 } from '../../store/selectors/organizations'
-
+import {
+  selectSelectedApiKey,
+  selectApiKeyError,
+  selectApiKeyFetching,
+} from '../../store/selectors/api-keys'
 import api from '../../api'
 
 export default OrganizationApiKeyEdit =>
@@ -36,15 +37,15 @@ export default OrganizationApiKeyEdit =>
     function(state, props) {
       const { apiKeyId } = props.match.params
 
-      const keyFetching = selectOrganizationApiKeyFetching(state)
+      const keyFetching = selectApiKeyFetching(state)
       const rightsFetching = selectOrganizationRightsFetching(state)
-      const keyError = selectOrganizationApiKeyError(state)
+      const keyError = selectApiKeyError(state)
       const rightsError = selectOrganizationRightsError(state)
 
       return {
         keyId: apiKeyId,
         orgId: selectSelectedOrganizationId(state),
-        apiKey: selectOrganizationApiKey(state),
+        apiKey: selectSelectedApiKey(state),
         rights: selectOrganizationRights(state),
         pseudoRights: selectOrganizationPseudoRights(state),
         fetching: keyFetching || rightsFetching,
@@ -52,8 +53,8 @@ export default OrganizationApiKeyEdit =>
       }
     },
     dispatch => ({
-      getOrganizationApiKey(orgId, apiKeyId) {
-        dispatch(getOrganizationApiKey(orgId, apiKeyId))
+      getApiKey(orgId, keyId) {
+        dispatch(getApiKey('organization', orgId, keyId))
       },
       deleteOrganizationApiKeySuccess: orgId =>
         dispatch(replace(`/organizations/${orgId}/api-keys`)),
@@ -73,7 +74,7 @@ export default OrganizationApiKeyEdit =>
     }),
   )(
     withRequest(
-      ({ getOrganizationApiKey, orgId, keyId }) => getOrganizationApiKey(orgId, keyId),
+      ({ getApiKey, orgId, keyId }) => getApiKey(orgId, keyId),
       ({ fetching, apiKey }) => fetching || !Boolean(apiKey),
     )(OrganizationApiKeyEdit),
   )

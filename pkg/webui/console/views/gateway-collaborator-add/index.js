@@ -31,24 +31,21 @@ import {
   selectGatewayRightsFetching,
   selectGatewayRightsError,
 } from '../../store/selectors/gateways'
+import { selectSelectedCollaborator } from '../../store/selectors/collaborators'
 
 import { getGatewaysRightsList } from '../../store/actions/gateways'
 import api from '../../api'
 import PropTypes from '../../../lib/prop-types'
 
 @connect(
-  function(state, props) {
-    const { collaborators } = state
-
-    return {
-      gtwId: selectSelectedGatewayId(state),
-      collaborators: collaborators.gateways.collaborators,
-      fetching: selectGatewayRightsFetching(state),
-      error: selectGatewayRightsError(state),
-      rights: selectGatewayRights(state),
-      pseudoRights: selectGatewayPseudoRights(state),
-    }
-  },
+  state => ({
+    gtwId: selectSelectedGatewayId(state),
+    collaborators: selectSelectedCollaborator(state),
+    fetching: selectGatewayRightsFetching(state),
+    error: selectGatewayRightsError(state),
+    rights: selectGatewayRights(state),
+    pseudoRights: selectGatewayPseudoRights(state),
+  }),
   (dispatch, ownProps) => ({
     getGatewaysRightsList: gtwId => dispatch(getGatewaysRightsList(gtwId)),
     redirectToList: gtwId => dispatch(push(`/gateways/${gtwId}/collaborators`)),

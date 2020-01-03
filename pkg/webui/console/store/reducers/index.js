@@ -15,41 +15,38 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 
-import {
-  SHARED_NAME_SINGLE as APPLICATION_SHARED_NAME,
-  SHARED_NAME as APPLICATIONS_SHARED_NAME,
-} from '../actions/applications'
+import { SHARED_NAME as APPLICATION_SHARED_NAME } from '../actions/applications'
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateways'
 import { SHARED_NAME as ORGANIZATION_SHARED_NAME } from '../actions/organizations'
-import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/device'
+import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/devices'
 import { SHARED_NAME as USER_SHARED_NAME } from '../actions/users'
+import { SHARED_NAME as API_KEYS_SHARED_NAME } from '../actions/api-keys'
+import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '../actions/collaborators'
 import {
   getUserId,
   getApplicationId,
   getGatewayId,
   getOrganizationId,
+  getCombinedDeviceId,
+  getApiKeyId,
+  getCollaboratorId,
 } from '../../../lib/selectors/id'
 import user from './user'
 import users from './users'
 import init from './init'
 import applications from './applications'
 import devices from './devices'
-import device from './device'
 import gateways from './gateways'
 import configuration from './configuration'
-import createNamedApiKeysReducer from './api-keys'
+import apiKeys from './api-keys'
 import createNamedRightsReducer from './rights'
-import createNamedCollaboratorsReducer from './collaborators'
-import createNamedCollaboratorReducer from './collaborator'
+import collaborators from './collaborators'
 import createNamedEventsReducer from './events'
-import createNamedApiKeyReducer from './api-key'
 import link from './link'
 import fetching from './ui/fetching'
 import error from './ui/error'
-import webhook from './webhook'
 import webhooks from './webhooks'
 import webhookFormats from './webhook-formats'
-import pubsub from './pubsub'
 import pubsubs from './pubsubs'
 import pubsubFormats from './pubsub-formats'
 import deviceTemplateFormats from './device-template-formats'
@@ -66,37 +63,20 @@ export default history =>
     applications,
     link,
     devices,
-    device,
     gateways,
-    webhook,
     webhooks,
     webhookFormats,
     deviceTemplateFormats,
-    pubsub,
     pubsubs,
     pubsubFormats,
     configuration,
     organizations,
-    apiKeys: combineReducers({
-      application: createNamedApiKeyReducer(APPLICATION_SHARED_NAME),
-      applications: createNamedApiKeysReducer(APPLICATION_SHARED_NAME),
-      gateway: createNamedApiKeyReducer(GATEWAY_SHARED_NAME),
-      gateways: createNamedApiKeysReducer(GATEWAY_SHARED_NAME),
-      organization: createNamedApiKeyReducer(ORGANIZATION_SHARED_NAME),
-      organizations: createNamedApiKeysReducer(ORGANIZATION_SHARED_NAME),
-    }),
+    apiKeys,
+    collaborators,
     rights: combineReducers({
-      applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
+      applications: createNamedRightsReducer(APPLICATION_SHARED_NAME),
       gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
       organizations: createNamedRightsReducer(ORGANIZATION_SHARED_NAME),
-    }),
-    collaborators: combineReducers({
-      application: createNamedCollaboratorReducer(APPLICATION_SHARED_NAME),
-      applications: createNamedCollaboratorsReducer(APPLICATION_SHARED_NAME),
-      gateway: createNamedCollaboratorReducer(GATEWAY_SHARED_NAME),
-      gateways: createNamedCollaboratorsReducer(GATEWAY_SHARED_NAME),
-      organization: createNamedCollaboratorReducer(ORGANIZATION_SHARED_NAME),
-      organizations: createNamedCollaboratorsReducer(ORGANIZATION_SHARED_NAME),
     }),
     events: combineReducers({
       applications: createNamedEventsReducer(APPLICATION_SHARED_NAME),
@@ -110,6 +90,9 @@ export default history =>
     }),
     pagination: combineReducers({
       applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
+      apiKeys: createNamedPaginationReducer(API_KEYS_SHARED_NAME, getApiKeyId),
+      collaborators: createNamedPaginationReducer(COLLABORATORS_SHARED_NAME, getCollaboratorId),
+      devices: createNamedPaginationReducer(DEVICE_SHARED_NAME, getCombinedDeviceId),
       gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
       organizations: createNamedPaginationReducer(ORGANIZATION_SHARED_NAME, getOrganizationId),
       users: createNamedPaginationReducer(USER_SHARED_NAME, getUserId),

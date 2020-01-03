@@ -80,26 +80,6 @@ const deleteOrganizationLogic = createRequestLogic({
   },
 })
 
-const getOrganizationApiKeysLogic = createRequestLogic({
-  type: organizations.GET_ORG_API_KEYS_LIST,
-  async process({ getState, action }) {
-    const {
-      id: orgId,
-      params: { page, limit },
-    } = action.payload
-    const res = await api.organization.apiKeys.list(orgId, { limit, page })
-    return { ...res, id: orgId }
-  },
-})
-
-const getOrganizationApiKeyLogic = createRequestLogic({
-  type: organizations.GET_ORG_API_KEY,
-  async process({ action }) {
-    const { id: orgId, keyId } = action.payload
-    return api.organization.apiKeys.get(orgId, keyId)
-  },
-})
-
 const getOrganizationsRightsLogic = createRequestLogic({
   type: organizations.GET_ORGS_RIGHTS_LIST,
   async process({ action }) {
@@ -109,56 +89,13 @@ const getOrganizationsRightsLogic = createRequestLogic({
   },
 })
 
-const getOrganizationCollaboratorLogic = createRequestLogic({
-  type: organizations.GET_ORG_COLLABORATOR,
-  async process({ action }) {
-    const { id: orgId, collaboratorId, isUser } = action.payload
-
-    const collaborator = isUser
-      ? await api.organization.collaborators.getUser(orgId, collaboratorId)
-      : await api.organization.collaborators.getOrganization(orgId, collaboratorId)
-
-    const { ids, ...rest } = collaborator
-
-    return {
-      id: collaboratorId,
-      isUser,
-      ...rest,
-    }
-  },
-})
-
-const getOrganizationCollaboratorsLogic = createRequestLogic({
-  type: organizations.GET_ORG_COLLABORATORS_LIST,
-  async process({ action }) {
-    const { id, params } = action.payload
-    const res = await api.organization.collaborators.list(id, params)
-    const collaborators = res.collaborators.map(function(collaborator) {
-      const { ids, ...rest } = collaborator
-      const isUser = !!ids.user_ids
-      const collaboratorId = isUser ? ids.user_ids.user_id : ids.organization_ids.organization_id
-
-      return {
-        id: collaboratorId,
-        isUser,
-        ...rest,
-      }
-    })
-    return { id, collaborators, totalCount: res.totalCount }
-  },
-})
-
 export default [
   getOrganizationLogic,
   getOrganizationsLogic,
   createOrganizationLogic,
   updateOrganizationLogic,
   deleteOrganizationLogic,
-  getOrganizationApiKeysLogic,
-  getOrganizationApiKeyLogic,
   getOrganizationsRightsLogic,
-  getOrganizationCollaboratorLogic,
-  getOrganizationCollaboratorsLogic,
   ...createEventsConnectLogics(
     organizations.SHARED_NAME,
     'organizations',

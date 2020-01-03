@@ -25,13 +25,13 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
 import toast from '../../../components/toast'
 
-import { updateDevice } from '../../store/actions/device'
+import { updateDevice } from '../../store/actions/devices'
 import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
   selectSelectedDeviceId,
   selectSelectedDeviceFormatters,
-} from '../../store/selectors/device'
+} from '../../store/selectors/devices'
 
 @connect(
   function(state) {

@@ -25,14 +25,13 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
 import toast from '../../../components/toast'
 
-import { updateDevice } from '../../store/actions/device'
+import { updateDevice } from '../../store/actions/devices'
 import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import {
   selectSelectedDeviceId,
   selectSelectedDeviceFormatters,
-  selectUpdateDeviceError,
-} from '../../store/selectors/device'
+} from '../../store/selectors/devices'
 
 @connect(
   function(state) {
@@ -41,7 +40,6 @@ import {
     return {
       appId: selectSelectedApplicationId(state),
       devId: selectSelectedDeviceId(state),
-      error: selectUpdateDeviceError(state),
       formatters,
     }
   },
@@ -89,7 +87,7 @@ class DevicePayloadFormatters extends React.PureComponent {
   }
 
   render() {
-    const { formatters, error } = this.props
+    const { formatters } = this.props
 
     return (
       <React.Fragment>
@@ -97,7 +95,6 @@ class DevicePayloadFormatters extends React.PureComponent {
         <PayloadFormattersForm
           uplink
           linked
-          error={error}
           onSubmit={this.onSubmit}
           onSubmitSuccess={this.onSubmitSuccess}
           title={sharedMessages.payloadFormattersUplink}

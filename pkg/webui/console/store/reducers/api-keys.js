@@ -12,53 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createGetApiKeysListActionType } from '../actions/api-keys'
-import { createRequestActions } from '../actions/lib'
+import { GET_API_KEYS_LIST_SUCCESS, GET_API_KEY_SUCCESS, GET_API_KEY } from '../actions/api-keys'
+import { getApiKeyId } from '../../../lib/selectors/id'
 
 const defaultState = {
-  keys: [],
-  totalCount: 0,
+  entities: {},
+  selectedApiKey: null,
 }
 
-const createNamedApiKeyReducer = function(reducerName = '') {
-  const GET_LIST_BASE = createGetApiKeysListActionType(reducerName)
-  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
+const apiKey = (state = {}, apiKey) => ({
+  ...state,
+  ...apiKey,
+})
 
-  return function(state = defaultState, { type, payload }) {
-    switch (type) {
-      case GET_LIST_SUCCESS:
-        return {
-          ...state,
-          keys: payload.api_keys,
-          totalCount: payload.totalCount,
-        }
-      default:
-        return state
-    }
-  }
-}
-
-const createNamedApiKeysReducer = function(reducerName = '') {
-  const GET_LIST_BASE = createGetApiKeysListActionType(reducerName)
-  const [{ success: GET_LIST_SUCCESS }] = createRequestActions(GET_LIST_BASE)
-  const apiKey = createNamedApiKeyReducer(reducerName)
-
-  return function(state = {}, action) {
-    const { payload } = action
-    if (!payload || !payload.id) {
+const apiKeys = function(state = defaultState, { type, payload }) {
+  switch (type) {
+    case GET_API_KEY:
+      return {
+        ...state,
+        selectedApiKey: payload.keyId,
+      }
+    case GET_API_KEY_SUCCESS:
+      const id = getApiKeyId(payload)
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [id]: apiKey(state.entities[id], payload),
+        },
+      }
+    case GET_API_KEYS_LIST_SUCCESS:
+      return {
+        ...state,
+        entities: {
+          ...payload.entities.reduce(
+            (acc, ak) => {
+              const id = getApiKeyId(ak)
+              acc[id] = apiKey(state.entities[id], ak)
+              return acc
+            },
+            { ...state.entities },
+          ),
+        },
+      }
+    default:
       return state
-    }
-
-    switch (action.type) {
-      case GET_LIST_SUCCESS:
-        return {
-          ...state,
-          [payload.id]: apiKey(state[payload.id], action),
-        }
-      default:
-        return state
-    }
   }
 }
 
-export default createNamedApiKeysReducer
+export default apiKeys
