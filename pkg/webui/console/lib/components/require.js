@@ -21,7 +21,7 @@ import PropTypes from '../../../lib/prop-types'
   const { featureCheck, condition } = props
   const rights = featureCheck && featureCheck.rightsSelector(state)
   return {
-    condition: condition || featureCheck.check(rights),
+    condition: condition || (Boolean(featureCheck) && featureCheck.check(rights)),
   }
 })
 export default class Require extends Component {

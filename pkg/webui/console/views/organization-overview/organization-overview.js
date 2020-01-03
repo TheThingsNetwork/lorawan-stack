@@ -38,6 +38,8 @@ class Overview extends React.Component {
   static propTypes = {
     apiKeysTotalCount: PropTypes.number,
     collaboratorsTotalCount: PropTypes.number,
+    mayViewOrganizationApiKeys: PropTypes.bool.isRequired,
+    mayViewOrganizationCollaborators: PropTypes.bool.isRequired,
     orgId: PropTypes.string.isRequired,
     organization: PropTypes.organization.isRequired,
     statusBarFetching: PropTypes.bool.isRequired,
@@ -55,6 +57,8 @@ class Overview extends React.Component {
       collaboratorsTotalCount,
       apiKeysTotalCount,
       statusBarFetching,
+      mayViewOrganizationApiKeys,
+      mayViewOrganizationCollaborators,
     } = this.props
 
     const sheetData = [
@@ -87,16 +91,20 @@ class Overview extends React.Component {
             </Spinner>
           ) : (
             <React.Fragment>
-              <KeyValueTag
-                icon="collaborators"
-                value={collaboratorsTotalCount}
-                keyMessage={sharedMessages.collaboratorCounted}
-              />
-              <KeyValueTag
-                icon="api_keys"
-                value={apiKeysTotalCount}
-                keyMessage={sharedMessages.apiKeyCounted}
-              />
+              {mayViewOrganizationCollaborators && (
+                <KeyValueTag
+                  icon="collaborators"
+                  value={collaboratorsTotalCount}
+                  keyMessage={sharedMessages.collaboratorCounted}
+                />
+              )}
+              {mayViewOrganizationApiKeys && (
+                <KeyValueTag
+                  icon="api_keys"
+                  value={apiKeysTotalCount}
+                  keyMessage={sharedMessages.apiKeyCounted}
+                />
+              )}
             </React.Fragment>
           )}
         </EntityTitleSection>

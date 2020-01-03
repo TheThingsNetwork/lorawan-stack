@@ -48,6 +48,10 @@ class ApplicationOverview extends React.Component {
     collaboratorsTotalCount: PropTypes.number,
     devicesTotalCount: PropTypes.number,
     link: PropTypes.bool,
+    mayViewApplicationApiKeys: PropTypes.bool.isRequired,
+    mayViewApplicationCollaborators: PropTypes.bool.isRequired,
+    mayViewApplicationLink: PropTypes.bool.isRequired,
+    mayViewDevices: PropTypes.bool.isRequired,
     statusBarFetching: PropTypes.bool.isRequired,
   }
 
@@ -65,6 +69,10 @@ class ApplicationOverview extends React.Component {
       apiKeysTotalCount,
       devicesTotalCount,
       statusBarFetching,
+      mayViewApplicationApiKeys,
+      mayViewApplicationCollaborators,
+      mayViewDevices,
+      mayViewApplicationLink,
       link,
       application: { name, description, created_at, updated_at },
     } = this.props
@@ -102,22 +110,30 @@ class ApplicationOverview extends React.Component {
             </Spinner>
           ) : (
             <React.Fragment>
-              <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
-              <KeyValueTag
-                icon="devices"
-                value={devicesTotalCount}
-                keyMessage={sharedMessages.deviceCounted}
-              />
-              <KeyValueTag
-                icon="collaborators"
-                value={collaboratorsTotalCount}
-                keyMessage={sharedMessages.collaboratorCounted}
-              />
-              <KeyValueTag
-                icon="api_keys"
-                value={apiKeysTotalCount}
-                keyMessage={sharedMessages.apiKeyCounted}
-              />
+              {mayViewApplicationLink && (
+                <Status className={style.status} label={linkLabel} status={linkStatus} flipped />
+              )}
+              {mayViewDevices && (
+                <KeyValueTag
+                  icon="devices"
+                  value={devicesTotalCount}
+                  keyMessage={sharedMessages.deviceCounted}
+                />
+              )}
+              {mayViewApplicationCollaborators && (
+                <KeyValueTag
+                  icon="collaborators"
+                  value={collaboratorsTotalCount}
+                  keyMessage={sharedMessages.collaboratorCounted}
+                />
+              )}
+              {mayViewApplicationApiKeys && (
+                <KeyValueTag
+                  icon="api_keys"
+                  value={apiKeysTotalCount}
+                  keyMessage={sharedMessages.apiKeyCounted}
+                />
+              )}
             </React.Fragment>
           )}
         </EntityTitleSection>

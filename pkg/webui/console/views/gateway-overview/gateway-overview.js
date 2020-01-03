@@ -46,6 +46,8 @@ export default class GatewayOverview extends React.Component {
     collaboratorsTotalCount: PropTypes.number,
     gateway: PropTypes.gateway.isRequired,
     gtwId: PropTypes.string.isRequired,
+    mayViewGatewayApiKeys: PropTypes.bool.isRequired,
+    mayViewGatewayCollaborators: PropTypes.bool.isRequired,
     statusBarFetching: PropTypes.bool.isRequired,
   }
 
@@ -60,6 +62,8 @@ export default class GatewayOverview extends React.Component {
       collaboratorsTotalCount,
       apiKeysTotalCount,
       statusBarFetching,
+      mayViewGatewayApiKeys,
+      mayViewGatewayCollaborators,
       gateway: {
         ids,
         name,
@@ -133,16 +137,20 @@ export default class GatewayOverview extends React.Component {
             </Spinner>
           ) : (
             <React.Fragment>
-              <KeyValueTag
-                icon="collaborators"
-                value={collaboratorsTotalCount}
-                keyMessage={sharedMessages.collaboratorCounted}
-              />
-              <KeyValueTag
-                icon="api_keys"
-                value={apiKeysTotalCount}
-                keyMessage={sharedMessages.apiKeyCounted}
-              />
+              {mayViewGatewayCollaborators && (
+                <KeyValueTag
+                  icon="collaborators"
+                  value={collaboratorsTotalCount}
+                  keyMessage={sharedMessages.collaboratorCounted}
+                />
+              )}
+              {mayViewGatewayApiKeys && (
+                <KeyValueTag
+                  icon="api_keys"
+                  value={apiKeysTotalCount}
+                  keyMessage={sharedMessages.apiKeyCounted}
+                />
+              )}
             </React.Fragment>
           )}
         </EntityTitleSection>
