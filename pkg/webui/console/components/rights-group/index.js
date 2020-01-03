@@ -48,7 +48,6 @@ const computeProps = function(props) {
   } else if (Boolean(grantablePseudoRight) && Array.isArray(grantablePseudoRight)) {
     derivedPseudoRight = value.filter(right => right !== RIGHT_ALL && right.endsWith('_ALL'))
   }
-
   // Filter out rights that the entity has but may not be granted by the user
   const outOfOwnScopeRights = !Boolean(grantablePseudoRight)
     ? value.filter(right => !grantableRights.includes(right))
@@ -250,7 +249,7 @@ class RightsGroup extends React.Component {
           name="grant_type"
           value={grantType}
           onChange={this.handleGrantTypeChange}
-          disabled={!Boolean(derivedPseudoRight)}
+          disabled={derivedPseudoRight.length === 0}
         >
           <Radio label={m.allCurrentAndFutureRights} value="pseudo" />
           <Radio label={m.selectIndividualRights} value="individual" />
