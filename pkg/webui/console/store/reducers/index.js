@@ -30,7 +30,7 @@ import {
   getApplicationId,
   getGatewayId,
   getOrganizationId,
-  getDeviceId,
+  getCombinedDeviceId,
   getApiKeyId,
   getCollaboratorId,
 } from '../../../lib/selectors/id'
@@ -95,7 +95,7 @@ export default history =>
       applications: createNamedPaginationReducer(APPLICATION_SHARED_NAME, getApplicationId),
       apiKeys: createNamedPaginationReducer(API_KEYS_SHARED_NAME, getApiKeyId),
       collaborators: createNamedPaginationReducer(COLLABORATORS_SHARED_NAME, getCollaboratorId),
-      devices: createNamedPaginationReducer(DEVICE_SHARED_NAME, getDeviceId),
+      devices: createNamedPaginationReducer(DEVICE_SHARED_NAME, getCombinedDeviceId),
       gateways: createNamedPaginationReducer(GATEWAY_SHARED_NAME, getGatewayId),
       organizations: createNamedPaginationReducer(ORGANIZATION_SHARED_NAME, getOrganizationId),
       users: createNamedPaginationReducer(USER_SHARED_NAME, getUserId),

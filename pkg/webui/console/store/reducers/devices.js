@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import { merge } from 'lodash'
-import { getDeviceId } from '../../../lib/selectors/id'
+
+import { getCombinedDeviceId, combineDeviceIds } from '../../../lib/selectors/id'
 import {
   GET_DEV,
   GET_DEVICES_LIST_SUCCESS,
@@ -31,11 +32,11 @@ const devices = function(state = defaultState, { type, payload }) {
     case GET_DEV:
       return {
         ...state,
-        selectedDevice: payload.deviceId,
+        selectedDevice: combineDeviceIds(payload.appId, payload.deviceId),
       }
     case UPDATE_DEV_SUCCESS:
     case GET_DEV_SUCCESS:
-      const id = getDeviceId(payload)
+      const id = getCombinedDeviceId(payload)
       const mergedDevice = merge({}, state.entities[id], payload)
 
       return {
@@ -46,12 +47,15 @@ const devices = function(state = defaultState, { type, payload }) {
         },
       }
     case GET_DEVICES_LIST_SUCCESS:
-      const entities = payload.entities.reduce(function(acc, dev) {
-        const id = getDeviceId(dev)
+      const entities = payload.entities.reduce(
+        function(acc, dev) {
+          const id = getCombinedDeviceId(dev)
 
-        acc[id] = dev
-        return acc
-      }, {})
+          acc[id] = dev
+          return acc
+        },
+        { ...state.entities },
+      )
 
       return {
         ...state,
