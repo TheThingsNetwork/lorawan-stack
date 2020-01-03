@@ -15,6 +15,7 @@
 import axios from 'axios'
 
 import { URI_PREFIX_STACK_COMPONENT_MAP } from '../util/constants'
+import EventHandler from '../util/events'
 import stream from './stream/stream-node'
 
 /**
@@ -97,7 +98,17 @@ class Http {
         config.data = payload
       }
 
-      return await this[parsedComponent](config)
+      const response = await this[parsedComponent](config)
+
+      if ('X-Warning' in response.headers || 'x-warning' in response.headers) {
+        // Dispatch a warning event when the server has set a warning header
+        EventHandler.dispatchEvent(
+          EventHandler.EVENTS.WARNING,
+          response.headers['X-Warning'] || response.headers['x-warning'],
+        )
+      }
+
+      return response
     } catch (err) {
       if ('response' in err && err.response && 'data' in err.response) {
         throw err.response.data

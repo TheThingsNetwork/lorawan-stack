@@ -21,7 +21,6 @@ import Applications from '../applications'
 import Gateways from '../gateways'
 import Organizations from '../organizations'
 import Admin from '../admin'
-import { ToastContainer } from '../../../components/toast'
 import { FullViewErrorInner } from '../error'
 
 import style from './landing.styl'
@@ -32,7 +31,6 @@ export default class Landing extends React.PureComponent {
   render() {
     return (
       <div className={style.container}>
-        <ToastContainer />
         <WithAuth>
           <Switch>
             <Route exact path="/" component={Overview} />

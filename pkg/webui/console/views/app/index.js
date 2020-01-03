@@ -15,7 +15,6 @@
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { ConnectedRouter } from 'connected-react-router'
-
 import { Route, Switch } from 'react-router-dom'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
@@ -23,6 +22,7 @@ import { withEnv } from '../../../lib/components/env'
 import ErrorView from '../../../lib/components/error-view'
 import dev from '../../../lib/dev'
 import PropTypes from '../../../lib/prop-types'
+import { ToastContainer } from '../../../components/toast'
 
 import SideNavigation from '../../../components/navigation/side'
 import Header from '../../containers/header'
@@ -64,31 +64,34 @@ class ConsoleApp extends React.Component {
     }
 
     return (
-      <ConnectedRouter history={history}>
-        <ErrorView ErrorComponent={FullViewError}>
-          <div className={style.app}>
-            <IntlHelmet
-              titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
-              defaultTitle={siteName}
-            />
-            <div id="modal-container" />
-            <Header className={style.header} />
-            <main className={style.main}>
-              <div>
-                <SideNavigation />
-              </div>
-              <div className={style.content}>
-                <Switch>
-                  {/* routes for registration, privacy policy, other public pages */}
-                  <Route path="/login" component={Login} />
-                  <Route path="/" component={Landing} />
-                </Switch>
-              </div>
-            </main>
-            <Footer className={style.footer} supportLink={supportLink} />
-          </div>
-        </ErrorView>
-      </ConnectedRouter>
+      <React.Fragment>
+        <ToastContainer />
+        <ConnectedRouter history={history}>
+          <ErrorView ErrorComponent={FullViewError}>
+            <div className={style.app}>
+              <IntlHelmet
+                titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
+                defaultTitle={siteName}
+              />
+              <div id="modal-container" />
+              <Header className={style.header} />
+              <main className={style.main}>
+                <div>
+                  <SideNavigation />
+                </div>
+                <div className={style.content}>
+                  <Switch>
+                    {/* routes for registration, privacy policy, other public pages */}
+                    <Route path="/login" component={Login} />
+                    <Route path="/" component={Landing} />
+                  </Switch>
+                </div>
+              </main>
+              <Footer className={style.footer} supportLink={supportLink} />
+            </div>
+          </ErrorView>
+        </ConnectedRouter>
+      </React.Fragment>
     )
   }
 }

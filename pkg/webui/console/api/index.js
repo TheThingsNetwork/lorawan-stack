@@ -18,6 +18,7 @@ import TTN from 'ttn-lw'
 import token from '../lib/access-token'
 import getCookieValue from '../../lib/cookie'
 import { selectStackConfig, selectApplicationRootPath } from '../../lib/selectors/env'
+import toast from '../../components/toast'
 
 const stackConfig = selectStackConfig()
 const appRoot = selectApplicationRootPath()
@@ -43,6 +44,16 @@ const ttnClient = new TTN(token, {
 const csrf = getCookieValue('_csrf')
 const instance = axios.create({
   headers: { 'X-CSRF-Token': csrf },
+})
+
+// Forward header warnings to the toast message queue
+ttnClient.subscribe('warning', payload => {
+  toast({
+    title: 'Warning',
+    type: toast.types.WARNING,
+    message: payload,
+    preventConsecutive: true,
+  })
 })
 
 instance.interceptors.response.use(
@@ -77,13 +88,7 @@ export default {
     update: ttnClient.Users.updateById.bind(ttnClient.Users),
     delete: ttnClient.Users.deleteById.bind(ttnClient.Users),
     search: ttnClient.Users.search.bind(ttnClient.Users),
-    async authInfo() {
-      return instance.get(`${isBaseUrl}/auth_info`, {
-        headers: {
-          Authorization: `Bearer ${(await token()).access_token}`,
-        },
-      })
-    },
+    authInfo: ttnClient.Auth.getAuthInfo.bind(ttnClient.Auth),
   },
   applications: {
     list: ttnClient.Applications.getAll.bind(ttnClient.Applications),

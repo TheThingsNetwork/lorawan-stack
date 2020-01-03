@@ -19,22 +19,40 @@ class Users {
     this._api = registry
   }
 
+  _addState(fieldMask, user) {
+    // Ensure to set STATE_REQUESTED if needed, which gets stripped as null
+    // value from the backend response
+    if (fieldMask && fieldMask.field_mask.paths.includes('state') && !('state' in user)) {
+      user.state = 'STATE_REQUESTED'
+    }
+
+    return user
+  }
+
   async getAll(params, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
     const response = await this._api.UserRegistry.List(undefined, {
       ...params,
-      ...Marshaler.selectorToFieldMask(selector),
+      ...fieldMask,
     })
 
-    return Marshaler.payloadListResponse('users', response)
+    const users = Marshaler.payloadListResponse('users', response)
+    users.users.map(user => this._addState(fieldMask, user))
+
+    return users
   }
 
   async search(params, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
     const response = await this._api.EntityRegistrySearch.SearchUsers(undefined, {
       ...params,
-      ...Marshaler.selectorToFieldMask(selector),
+      ...fieldMask,
     })
 
-    return Marshaler.payloadListResponse('users', response)
+    const users = Marshaler.payloadListResponse('users', response)
+    users.users.map(user => this._addState(fieldMask, user))
+
+    return users
   }
 
   async getById(id, selector) {
@@ -46,7 +64,9 @@ class Users {
       fieldMask,
     )
 
-    return Marshaler.payloadSingleResponse(response)
+    const user = this._addState(fieldMask, Marshaler.payloadSingleResponse(response))
+
+    return user
   }
 
   async deleteById(id) {

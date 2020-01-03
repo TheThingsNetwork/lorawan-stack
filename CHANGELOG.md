@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Forwarding of backend warnings to the Console.
+- Auth Info service to the JavaScript SDK.
+- Subscribable events to the JavaScript SDK.
+
 ### Changed
 
 ### Deprecated
