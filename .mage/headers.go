@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/magefile/mage/mg"
@@ -35,12 +36,16 @@ type HeaderRule struct {
 	Include     []string `yaml:"include"`
 	Exclude     []string `yaml:"exclude"`
 	Header      string   `yaml:"header"`
-	headerLines [][]byte
+	headerLines []*regexp.Regexp
 	Prefix      string `yaml:"prefix"`
 }
 
 func (r *HeaderRule) split() {
-	r.headerLines = bytes.Split([]byte(strings.TrimSpace(r.Header)), []byte("\n"))
+	lines := bytes.Split([]byte(strings.TrimSpace(r.Header)), []byte("\n"))
+	r.headerLines = make([]*regexp.Regexp, len(lines))
+	for i, line := range lines {
+		r.headerLines[i] = regexp.MustCompile(fmt.Sprintf("^%s$", string(line)))
+	}
 }
 
 func (r *HeaderRule) match(path string) (match bool) {
@@ -142,8 +147,8 @@ func (h Headers) check(path string) error {
 		if i == 0 && bytes.Contains(line, []byte("generated")) {
 			return nil // Skip generated files.
 		}
-		if !bytes.Equal(bytes.TrimPrefix(line, []byte(rule.Prefix)), expected) && !bytes.Equal(line, bytes.TrimSpace([]byte(rule.Prefix))) {
-			return &checkErr{Path: path, Reason: fmt.Sprintf("did not contain expected header line: %s", string(expected))}
+		if !bytes.Equal(line, bytes.TrimSpace([]byte(rule.Prefix))) && !expected.Match(bytes.TrimPrefix(line, []byte(rule.Prefix))) {
+			return &checkErr{Path: path, Reason: fmt.Sprintf("did not match expected header line: %v", expected)}
 		}
 	}
 	if s.Scan() && len(s.Bytes()) != 0 {
