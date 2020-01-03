@@ -34,8 +34,7 @@ import {
   createClearEventsActionType,
 } from './events'
 
-export const SHARED_NAME = 'APPLICATIONS'
-export const SHARED_NAME_SINGLE = 'APPLICATION'
+export const SHARED_NAME = 'APPLICATION'
 
 export const GET_APP_BASE = 'GET_APPLICATION'
 export const [
@@ -53,7 +52,7 @@ export const [
   },
 ] = createRequestActions(UPDATE_APP_BASE, (id, patch) => ({ id, patch }))
 
-export const DELETE_APP_BASE = createPaginationDeleteBaseActionType(SHARED_NAME_SINGLE)
+export const DELETE_APP_BASE = createPaginationDeleteBaseActionType(SHARED_NAME)
 export const [
   { request: DELETE_APP, success: DELETE_APP_SUCCESS, failure: DELETE_APP_FAILURE },
   {
@@ -61,9 +60,9 @@ export const [
     success: deleteApplicationSuccess,
     failure: deleteApplicationFailure,
   },
-] = createPaginationDeleteActions(SHARED_NAME_SINGLE, id => ({ id }))
+] = createPaginationDeleteActions(SHARED_NAME, id => ({ id }))
 
-export const GET_APPS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME_SINGLE)
+export const GET_APPS_LIST_BASE = createPaginationBaseActionType(SHARED_NAME)
 export const [
   { request: GET_APPS_LIST, success: GET_APPS_LIST_SUCCESS, failure: GET_APPS_LIST_FAILURE },
   {
@@ -71,7 +70,7 @@ export const [
     success: getApplicationsSuccess,
     failure: getApplicationsFailure,
   },
-] = createPaginationRequestActions(SHARED_NAME_SINGLE)
+] = createPaginationRequestActions(SHARED_NAME)
 
 export const GET_APPS_RIGHTS_LIST_BASE = createGetRightsListActionType(SHARED_NAME)
 export const [
@@ -87,18 +86,14 @@ export const [
   },
 ] = createGetRightsListRequestActions(SHARED_NAME)
 
-export const START_APP_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME_SINGLE)
-export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(
-  SHARED_NAME_SINGLE,
-)
-export const START_APP_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(
-  SHARED_NAME_SINGLE,
-)
-export const STOP_APP_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME_SINGLE)
-export const CLEAR_APP_EVENTS = createClearEventsActionType(SHARED_NAME_SINGLE)
+export const START_APP_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
+export const START_APP_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(SHARED_NAME)
+export const START_APP_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(SHARED_NAME)
+export const STOP_APP_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
+export const CLEAR_APP_EVENTS = createClearEventsActionType(SHARED_NAME)
 
-export const startApplicationEventsStream = startEventsStream(SHARED_NAME_SINGLE)
-export const startApplicationEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME_SINGLE)
-export const startApplicationEventsStreamFailure = startEventsStreamFailure(SHARED_NAME_SINGLE)
-export const stopApplicationEventsStream = stopEventsStream(SHARED_NAME_SINGLE)
-export const clearApplicationEventsStream = clearEvents(SHARED_NAME_SINGLE)
+export const startApplicationEventsStream = startEventsStream(SHARED_NAME)
+export const startApplicationEventsStreamSuccess = startEventsStreamSuccess(SHARED_NAME)
+export const startApplicationEventsStreamFailure = startEventsStreamFailure(SHARED_NAME)
+export const stopApplicationEventsStream = stopEventsStream(SHARED_NAME)
+export const clearApplicationEventsStream = clearEvents(SHARED_NAME)

@@ -144,7 +144,7 @@ export default [
   getPubsubFormatsLogic,
   getApplicationLinkLogic,
   ...createEventsConnectLogics(
-    applications.SHARED_NAME_SINGLE,
+    applications.SHARED_NAME,
     'applications',
     api.application.eventsSubscribe,
   ),

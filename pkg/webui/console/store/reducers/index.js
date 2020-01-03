@@ -15,10 +15,7 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 
-import {
-  SHARED_NAME_SINGLE as APPLICATION_SHARED_NAME,
-  SHARED_NAME as APPLICATIONS_SHARED_NAME,
-} from '../actions/applications'
+import { SHARED_NAME as APPLICATION_SHARED_NAME } from '../actions/applications'
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '../actions/gateways'
 import { SHARED_NAME as ORGANIZATION_SHARED_NAME } from '../actions/organizations'
 import { SHARED_NAME as DEVICE_SHARED_NAME } from '../actions/devices'
@@ -77,7 +74,7 @@ export default history =>
     apiKeys,
     collaborators,
     rights: combineReducers({
-      applications: createNamedRightsReducer(APPLICATIONS_SHARED_NAME),
+      applications: createNamedRightsReducer(APPLICATION_SHARED_NAME),
       gateways: createNamedRightsReducer(GATEWAY_SHARED_NAME),
       organizations: createNamedRightsReducer(ORGANIZATION_SHARED_NAME),
     }),
