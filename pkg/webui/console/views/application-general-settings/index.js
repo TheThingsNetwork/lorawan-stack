@@ -154,12 +154,24 @@ export default class ApplicationGeneralSettings extends React.Component {
               error={error}
               horizontal
               onSubmit={this.handleSubmit}
-              initialValues={{ name: application.name, description: application.description }}
+              initialValues={application}
               validationSchema={validationSchema}
             >
               <Message component="h4" content={m.basics} />
+              <Form.Field
+                title={sharedMessages.appId}
+                name="ids.application_id"
+                required
+                component={Input}
+                disabled
+              />
               <Form.Field title={sharedMessages.name} name="name" component={Input} />
-              <Form.Field title={sharedMessages.description} name="description" component={Input} />
+              <Form.Field
+                title={sharedMessages.description}
+                type="textarea"
+                name="description"
+                component={Input}
+              />
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
                 <Require featureCheck={mayDeleteApplication}>
