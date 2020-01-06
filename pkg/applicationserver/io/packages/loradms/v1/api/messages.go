@@ -17,6 +17,7 @@ package api
 import (
 	"encoding/json"
 	"io"
+	"io/ioutil"
 
 	"github.com/golang/protobuf/proto"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1/api/objects"
@@ -44,6 +45,7 @@ type baseResponse struct {
 var errAPICallFailed = errors.Define("api_call_failed", "", "")
 
 func parse(result interface{}, body io.Reader) error {
+	defer io.Copy(ioutil.Discard, body)
 	r := &baseResponse{
 		Result: result,
 	}

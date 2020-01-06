@@ -95,7 +95,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.App
 		logger.WithError(err).Debug("Failed to send uplink upstream")
 		return err
 	}
-	logger.WithFields(uplink).Debug("Uplink sent to the Device Management Service")
+	logger.Debug("Uplink sent to the Device Management Service")
 
 	response, ok := resp[eui]
 	if !ok {
@@ -119,7 +119,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.App
 		logger.WithError(err).Debug("Failed to push downlink to device")
 		return err
 	}
-	logger.WithFields(downlink).Debug("Device Management Service downlink scheduled")
+	logger.Debug("Device Management Service downlink scheduled")
 
 	return nil
 }
