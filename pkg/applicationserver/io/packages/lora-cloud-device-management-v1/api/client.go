@@ -49,7 +49,8 @@ const (
 )
 
 var (
-	userAgent = "ttn-lw-application-server/" + version.TTN
+	userAgent     = "ttn-lw-application-server/" + version.TTN
+	parsedBaseURL *url.URL
 )
 
 type queryParam struct {
@@ -57,10 +58,7 @@ type queryParam struct {
 }
 
 func (c *Client) newRequest(method, category, entity, operation string, body io.Reader, queryParams ...queryParam) (*http.Request, error) {
-	u, err := url.Parse(baseURL)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to parse base URL : %v", err))
-	}
+	u := cloneURL(parsedBaseURL)
 	u.Path = path.Join(u.Path, category, entity, operation)
 	q := u.Query()
 	for _, p := range queryParams {
@@ -106,4 +104,27 @@ func New(cl *http.Client, opts ...Option) (*Client, error) {
 		opt.apply(client)
 	}
 	return client, nil
+}
+
+// cloneURL deep-clones a url.URL.
+// Based on $GOROOT/src/net/http/clone.go.
+func cloneURL(u *url.URL) *url.URL {
+	if u == nil {
+		return nil
+	}
+	u2 := new(url.URL)
+	*u2 = *u
+	if u.User != nil {
+		u2.User = new(url.Userinfo)
+		*u2.User = *u.User
+	}
+	return u2
+}
+
+func init() {
+	var err error
+	parsedBaseURL, err = url.Parse(baseURL)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to parse base URL : %v", err))
+	}
 }
