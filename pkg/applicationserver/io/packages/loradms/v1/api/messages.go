@@ -19,7 +19,7 @@ import (
 	"io"
 
 	"github.com/golang/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/lora-cloud-device-management-v1/api/objects"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1/api/objects"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 

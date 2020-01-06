@@ -30,7 +30,7 @@ import (
 	iogrpc "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mqtt"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages"
-	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/lora-cloud-device-management-v1" // The LoRa Cloud Device Management v1 package implementation
+	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1" // The LoRa Cloud Device Management v1 package implementation
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub"
 	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider

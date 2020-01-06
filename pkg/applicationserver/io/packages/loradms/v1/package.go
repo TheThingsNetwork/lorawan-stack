@@ -21,8 +21,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/lora-cloud-device-management-v1/api"
-	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/lora-cloud-device-management-v1/api/objects"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1/api"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/loradms/v1/api/objects"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -48,7 +48,7 @@ var (
 
 // HandleUp implements packages.ApplicationPackageHandler.
 func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
-	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loraclouddevicemanagementv1")
+	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loradms/v1")
 	logger := log.FromContext(ctx)
 
 	eui := objects.EUI(*up.DevEUI)
@@ -75,20 +75,24 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.App
 			},
 		)
 		if err != nil {
+			logger.WithError(err).Debug("Failed to update package data")
 			return err
 		}
 	} else if err != nil {
+		logger.WithError(err).Debug("Failed to parse package data")
 		return err
 	}
 
 	client, err := api.New(http.DefaultClient, api.WithToken(data.token))
 	if err != nil {
+		logger.WithError(err).Debug("Failed to create API client")
 		return err
 	}
 	resp, err := client.Uplinks.Send(objects.DeviceUplinks{
 		eui: uplink,
 	})
 	if err != nil {
+		logger.WithError(err).Debug("Failed to send uplink upstream")
 		return err
 	}
 	logger.WithFields(uplink).Debug("Uplink sent to the Device Management Service")
@@ -112,6 +116,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.App
 	}
 	err = p.server.DownlinkQueuePush(ctx, assoc.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink{down})
 	if err != nil {
+		logger.WithError(err).Debug("Failed to push downlink to device")
 		return err
 	}
 	logger.WithFields(downlink).Debug("Device Management Service downlink scheduled")

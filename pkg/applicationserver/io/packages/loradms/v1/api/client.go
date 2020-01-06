@@ -125,6 +125,6 @@ func init() {
 	var err error
 	parsedBaseURL, err = url.Parse(baseURL)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to parse base URL : %v", err))
+		panic(fmt.Sprintf("loradms: failed to parse base URL: %v", err))
 	}
 }

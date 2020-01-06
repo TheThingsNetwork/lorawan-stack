@@ -1,11 +1,10 @@
 ---
-title: "LoRa Cloud Device Management v1"
+title: "LoRa Cloud Device Management"
 description: ""
 weight: 2
 ---
 
-
-The LoRa Cloud Device Management v1 application package communicates the uplinks received from a DM-compatible device to the LoRa Cloud Device Management Service, and schedules the downlinks received from the service back to the device.
+The LoRa Cloud Device Management v1 application package communicates the uplinks received from a compatible device to the LoRa Cloud Device Management Service, and schedules the downlinks received from the service back to the device.
 
 More information on the LoRa Cloud Device Management can be found in the [official documentation](https://www.loracloud.com/documentation/device_management?url=overview.html).
 
