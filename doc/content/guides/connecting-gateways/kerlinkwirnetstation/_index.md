@@ -27,10 +27,10 @@ All further steps will assume the gateway is available at `192.168.4.155`, the s
 
 1. Execute: 
 ```bash
-$ curl -sL https://raw.githubusercontent.com/TheThingsNetwork/kerlink-station-firmware/master/provision.sh | bash -s -- '192.168.4.155' 'thethings.example.com' 'example-gtw' 'NNSXS.GTSZYGHE4NBR4XJZHJWEEMLXWYIFHEYZ4WR7UAI.YAT3OFLWLUVGQ45YYXSNS7HTVTFALWYSXK6YLJ6BDUNBPJMRH3UQ'
+$ curl -sL https://raw.githubusercontent.com/TheThingsNetwork/kerlink-wirnet-firmware/v0.0.1/provision.sh | bash -s -- 'wirnet-station' '192.168.4.155' 'thethings.example.com' 'example-gtw' 'NNSXS.GTSZYGHE4NBR4XJZHJWEEMLXWYIFHEYZ4WR7UAI.YAT3OFLWLUVGQ45YYXSNS7HTVTFALWYSXK6YLJ6BDUNBPJMRH3UQ'
 ```
 
-Please refer to [Kerlink Wirnet Station provisioning documentation](https://github.com/TheThingsNetwork/kerlink-station-firmware#provisioning) if more detailed up-to-date documentation is necessary.
+Please refer to [Kerlink Wirnet provisioning documentation](https://github.com/TheThingsNetwork/kerlink-wirnet-firmware/tree/v0.0.1#provisioning) if more detailed up-to-date documentation is necessary.
 
 > NOTE: To avoid being prompted for `root` user password several times, you may add your SSH public key as authorized for `root` user on the gateway, for example, by `ssh-copy-id root@192.168.4.155`.
 
