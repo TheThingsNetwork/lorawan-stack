@@ -49,7 +49,8 @@ const m = defineMessages({
   appDescDescription:
     'Optional application description; can also be used to save notes about the application',
   createApplication: 'Create Application',
-  linkAutomatically: 'Link automatically',
+  linking: 'Linking',
+  linkAutomatically: 'Link new application to Network Server automatically',
   linkFailure: 'There was a problem while linking the application',
   linkFailureTitle: 'Application link failed',
 })
@@ -160,8 +161,9 @@ export default class Add extends React.Component {
       <React.Fragment>
         <Form.Field
           onChange={this.handleLinkChange}
-          title={m.linkAutomatically}
+          title={m.linking}
           name="link"
+          label={m.linkAutomatically}
           component={Checkbox}
         />
         <Form.Field
