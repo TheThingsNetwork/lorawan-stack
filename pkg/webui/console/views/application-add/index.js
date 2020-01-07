@@ -99,7 +99,7 @@ export default class Add extends React.Component {
   }
 
   @bind
-  async handleSubmit(values, { resetForm }) {
+  async handleSubmit(values, { setSubmitting }) {
     const { userId, navigateToApplication } = this.props
     const { owner_id, application_id, name, description } = values
 
@@ -140,8 +140,7 @@ export default class Add extends React.Component {
 
       navigateToApplication(appId)
     } catch (error) {
-      const { application_id, name, description } = values
-      resetForm({ application_id, name, description })
+      setSubmitting(false)
 
       await this.setState({ error })
     }
