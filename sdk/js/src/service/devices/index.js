@@ -16,6 +16,8 @@
 
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
+import { getComponentsWithDistinctBaseUrls } from '../../util/stack-components'
+import combineStreams from '../../util/combine-streams'
 import Device from '../../entity/device'
 import { notify, EVENTS } from '../../api/stream/shared'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
@@ -428,7 +430,23 @@ class Devices {
       after,
     }
 
-    return this._api.Events.Stream(undefined, payload)
+    // Event streams can come from multiple stack components. It is necessary to
+    // check for stack components on different hosts and open distinct stream
+    // connections for any distinct host if need be.
+    const distinctComponents = getComponentsWithDistinctBaseUrls(this._stackConfig, [
+      'is',
+      'js',
+      'ns',
+      'as',
+      'dtc',
+    ])
+
+    const streams = distinctComponents.map(component =>
+      this._api.Events.Stream({ component }, payload),
+    )
+
+    // Combine all stream sources to one subscription generator.
+    return combineStreams(streams)
   }
 }
 
