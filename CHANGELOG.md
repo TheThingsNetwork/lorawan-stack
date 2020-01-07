@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Increase time that class C messages are scheduled in advance from 300 to 500 ms to support higher latency gateway backhauls.
+
 ### Deprecated
 
 ### Removed

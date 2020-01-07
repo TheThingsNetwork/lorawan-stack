@@ -42,7 +42,7 @@ var (
 	// ScheduleTimeLong is a long time to send a downlink message to the gateway before it has to be transmitted.
 	// This time is comprised of a higher network latency and QueueDelay. This delay is used for pseudo-immediate
 	// scheduling, see ScheduleAnytime.
-	ScheduleTimeLong = 300*time.Millisecond + QueueDelay
+	ScheduleTimeLong = 500*time.Millisecond + QueueDelay
 )
 
 // TimeSource is a source for getting a current time.
@@ -139,9 +139,7 @@ func (s *Scheduler) findSubBand(frequency uint64) (*SubBand, error) {
 	return nil, errSubBandNotFound.WithAttributes("frequency", frequency)
 }
 
-var (
-	errDwellTime = errors.DefineFailedPrecondition("dwell_time", "packet exceeds dwell time restriction")
-)
+var errDwellTime = errors.DefineFailedPrecondition("dwell_time", "packet exceeds dwell time restriction")
 
 func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings, starts ConcentratorTime) (Emission, error) {
 	d, err := toa.Compute(payloadSize, settings)
@@ -172,7 +170,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync
 	}
-	var minScheduleTime = ScheduleTimeShort
+	minScheduleTime := ScheduleTimeShort
 	var medianRTT *time.Duration
 	if rtts != nil {
 		if _, max, median, n := rtts.Stats(); n > 0 {
@@ -246,7 +244,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	if !s.clock.IsSynced() {
 		return Emission{}, errNoClockSync
 	}
-	var minScheduleTime = ScheduleTimeShort
+	minScheduleTime := ScheduleTimeShort
 	if rtts != nil {
 		if _, max, _, n := rtts.Stats(); n > 0 {
 			minScheduleTime = max + QueueDelay
