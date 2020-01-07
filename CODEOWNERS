@@ -29,12 +29,14 @@
 
 # Shared components
 /pkg/component @johanstokking @htdvisser
+/pkg/pfconfig @rvolosatovs @KrishnaIyer
 /pkg/types @johanstokking @htdvisser @rvolosatovs
 /pkg/webui @bafonins @kschiffer @pgalic96
 
 # Subsystems
 /pkg/applicationserver @johanstokking @adriansmares
 /pkg/console @bafonins @kschiffer
+/pkg/gatewayconfigurationserver @rvolosatovs @KrishnaIyer
 /pkg/gatewayserver @johanstokking @KrishnaIyer
 /pkg/identityserver @htdvisser @bafonins
 /pkg/interop @johanstokking @rvolosatovs
