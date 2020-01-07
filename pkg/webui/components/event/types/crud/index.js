@@ -34,9 +34,9 @@ class CRUDEvent extends React.PureComponent {
   }
 
   static defaultProps = {
-    className: PropTypes.string,
-    expandedClassName: PropTypes.string,
-    overviewClassName: PropTypes.string,
+    className: undefined,
+    expandedClassName: undefined,
+    overviewClassName: undefined,
     widget: false,
   }
 
