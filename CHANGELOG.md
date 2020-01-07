@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix selection of pseudo wildcard rights being possible (leading to crash) in the Console even when such right cannot be granted.
 - Fix loading spinner being stuck infinitely in gateway / application / organization overview when some rights aren't granted to the collaborator.
+- Fix deadlock of application add form in the Console when the submit results in an error.
 
 ### Security
 
