@@ -53,8 +53,8 @@ type Server interface {
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
 	Connect(ctx context.Context, frontend Frontend, ids ttnpb.GatewayIdentifiers) (*Connection, error)
-	// GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
-	GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error)
+	// GetFrequencyPlans gets the frequency plans by the gateway identifiers.
+	GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) ([]*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
 	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
@@ -77,7 +77,7 @@ type Connection struct {
 
 	frontend  Frontend
 	gateway   *ttnpb.Gateway
-	fp        *frequencyplans.FrequencyPlan
+	fps       []*frequencyplans.FrequencyPlan
 	scheduler *scheduling.Scheduler
 	rtts      *rtts
 
@@ -100,7 +100,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 
 		frontend:    frontend,
 		gateway:     gateway,
-		fp:          fp,
+		fps:         fps,
 		scheduler:   scheduler,
 		rtts:        newRTTs(maxRTTs),
 		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
@@ -245,6 +245,8 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 	return nil
 }
 
+var errUnconfiguredFrequencyPlan = errors.DefineInvalidArgument("unconfigured_frequency_plan", "frequency plan `{name}` is not configured for this gateway")
+
 // ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
 func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
@@ -263,7 +265,19 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	if err != nil {
 		return 0, err
 	}
-	phy, err := band.GetByID(c.fp.BandID)
+	var fpIndex int
+	var gtwFP *frequencyplans.FrequencyPlan
+	for fpIndex, gtwFP = range c.fps {
+		if gtwFP.BandID == request.FrequencyPlanID {
+			break
+		}
+	}
+	if fpIndex == len(c.fps) {
+		return 0, errUnconfiguredFrequencyPlan
+	}
+	fp := c.fps[fpIndex]
+
+	phy, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return 0, err
 	}
@@ -304,7 +318,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
 		}
 		// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
-		maxPHYLength := phy.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
+		maxPHYLength := phy.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()) + 5
 		if len(msg.RawPayload) > int(maxPHYLength) {
 			return 0, errTooLong.WithAttributes(
 				"payload_length", len(msg.RawPayload),
@@ -316,10 +330,10 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if sb, ok := phy.FindSubBand(rx.frequency); ok {
 			eirp = sb.MaxEIRP
 		}
-		if c.fp.MaxEIRP != nil {
-			eirp = *c.fp.MaxEIRP
+		if fp.MaxEIRP != nil {
+			eirp = *fp.MaxEIRP
 		}
-		if sb, ok := c.fp.FindSubBand(rx.frequency); ok && sb.MaxEIRP != nil {
+		if sb, ok := fp.FindSubBand(rx.frequency); ok && sb.MaxEIRP != nil {
 			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
@@ -448,8 +462,8 @@ func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 	return c.rtts.Stats()
 }
 
-// FrequencyPlan returns the frequency plan for the gateway.
-func (c *Connection) FrequencyPlan() *frequencyplans.FrequencyPlan { return c.fp }
+// FrequencyPlans returns the frequency plans for the gateway.
+func (c *Connection) FrequencyPlans() []*frequencyplans.FrequencyPlan { return c.fps }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
