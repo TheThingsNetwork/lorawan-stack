@@ -274,6 +274,10 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
 			antennaPaths := util.UpdateFieldMask(cmd.Flags(), setGatewayAntennaFlags)
+
+			if gtwID.EUI != nil {
+				paths = append(paths, "ids.eui")
+			}
 			if len(paths)+len(antennaPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
