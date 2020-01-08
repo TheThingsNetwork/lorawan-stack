@@ -27,7 +27,7 @@ pygmentsUseClasses = true
   keywords = []
   github_repository = "https://github.com/TheThingsNetwork/lorawan-stack"
   github_repository_edit = "https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content"
-  version = "v3.4.1"
+  version = "v3.4.2"
 
 [menu]
   [[menu.right]]
