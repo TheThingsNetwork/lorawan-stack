@@ -244,7 +244,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	}
 	defer ws.Close()
 
-	fp := conn.FrequencyPlan()
+	fps := conn.FrequencyPlans()
 
 	go func() {
 		for {
@@ -330,7 +330,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					"firmware", version.Firmware,
 					"model", version.Model,
 				))
-				cfg, err := pfconfig.GetRouterConfig(*fp, version.IsProduction(), time.Now())
+				cfg, err := pfconfig.GetRouterConfig(fps, version.IsProduction(), time.Now())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to generate router configuration")
 					return err
@@ -376,7 +376,8 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.WithError(err).Debug("Failed to unmarshal join-request message")
 					return nil
 				}
-				up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
+				// According to spec, all frequency plans must be from the same band, so choosing the first one.
+				up, err := jreq.ToUplinkMessage(ids, fps[0].BandID, receivedAt)
 				if err != nil {
 					logger.WithError(err).Debug("Failed to parse join-request message")
 					return nil
@@ -393,7 +394,8 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.WithError(err).Debug("Failed to unmarshal uplink data frame")
 					return nil
 				}
-				up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
+				// According to spec, all frequency plans must be from the same band, so choosing the first one.
+				up, err := updf.ToUplinkMessage(ids, fps[0].BandID, receivedAt)
 				if err != nil {
 					logger.WithError(err).Debug("Failed to parse uplink data frame")
 					return nil
