@@ -1592,6 +1592,60 @@
       "file": "mqtt.go"
     }
   },
+  "error:pkg/applicationserver/io/packages/loradms/v1/api/objects:invalid_request_type": {
+    "translations": {
+      "en": "request type `{type}` is invalid"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1/api/objects",
+      "file": "objects.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1/api:api_call_failed": {
+    "translations": {
+      "en": ""
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1/api",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1:device_eui_missing": {
+    "translations": {
+      "en": "device EUI `{dev_eui}` not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "package.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1:field_not_found": {
+    "translations": {
+      "en": "field `{field}` not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "data.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1:invalid_field_type": {
+    "translations": {
+      "en": "field `{field}` has the wrong type `{type}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "data.go"
+    }
+  },
+  "error:pkg/applicationserver/io/packages/loradms/v1:uplink_request_failed": {
+    "translations": {
+      "en": "uplink request failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/packages/loradms/v1",
+      "file": "package.go"
+    }
+  },
   "error:pkg/applicationserver/io/packages/redis:invalid_fieldmask": {
     "translations": {
       "en": "invalid fieldmask"

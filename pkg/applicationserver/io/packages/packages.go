@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 	"google.golang.org/grpc"
 )
 
@@ -57,6 +58,7 @@ func New(ctx context.Context, io io.Server, registry Registry) (Server, error) {
 }
 
 func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
+	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, msg.EndDeviceIdentifiers))
 	switch up := msg.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
 		association, err := s.registry.Get(ctx, ttnpb.ApplicationPackageAssociationIdentifiers{
@@ -74,6 +76,7 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 			return err
 		}
 		if handler, ok := s.handlers[association.PackageName]; ok {
+			ctx := log.NewContextWithField(ctx, "package", association.PackageName)
 			return handler.HandleUp(ctx, association, msg)
 		}
 		return errNotImplemented.WithAttributes("name", association.PackageName)

@@ -397,10 +397,10 @@ func (m *ApplicationPackageAssociation) ValidateFields(paths ...string) error {
 
 		case "package_name":
 
-			if utf8.RuneCountInString(m.GetPackageName()) > 20 {
+			if utf8.RuneCountInString(m.GetPackageName()) > 36 {
 				return ApplicationPackageAssociationValidationError{
 					field:  "package_name",
-					reason: "value length must be at most 20 runes",
+					reason: "value length must be at most 36 runes",
 				}
 			}
 
