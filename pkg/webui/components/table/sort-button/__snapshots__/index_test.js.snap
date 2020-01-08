@@ -11,10 +11,10 @@ exports[`SortButton is active is in ascending direction should match snapshot 1`
   />
   <Icon
     className="icon"
-    icon="sort"
+    icon="sort_order_asc"
     large={false}
     nudgeDown={false}
-    nudgeUp={false}
+    nudgeUp={true}
     small={false}
   />
 </button>
@@ -31,10 +31,10 @@ exports[`SortButton is active is in descending direction should match snapshot 1
   />
   <Icon
     className="icon"
-    icon="sort"
+    icon="sort_order_desc"
     large={false}
     nudgeDown={false}
-    nudgeUp={false}
+    nudgeUp={true}
     small={false}
   />
 </button>
@@ -51,10 +51,10 @@ exports[`SortButton is not active should match snapshot 1`] = `
   />
   <Icon
     className="icon"
-    icon="sort"
+    icon="sort_order"
     large={false}
     nudgeDown={false}
-    nudgeUp={false}
+    nudgeUp={true}
     small={false}
   />
 </button>
