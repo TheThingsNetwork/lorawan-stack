@@ -29,6 +29,7 @@ type Config struct {
 
 // GatewayConf contains the configuration for the gateway's server connection.
 type GatewayConf struct {
+	GatewayID      string        `json:"gateway_ID,omitempty"`
 	ServerAddress  string        `json:"server_address"`
 	ServerPortUp   uint32        `json:"serv_port_up"`
 	ServerPortDown uint32        `json:"serv_port_down"`
@@ -43,6 +44,10 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 	host, port, err := shared.ParseGatewayServerAddress(gateway.GatewayServerAddress)
 	if err != nil {
 		return nil, err
+	}
+
+	if gateway.EUI != nil {
+		c.GatewayConf.GatewayID = gateway.EUI.String()
 	}
 	c.GatewayConf.ServerAddress, c.GatewayConf.ServerPortUp, c.GatewayConf.ServerPortDown = host, uint32(port), uint32(port)
 	server := c.GatewayConf
