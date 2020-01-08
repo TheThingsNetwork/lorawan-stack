@@ -34,16 +34,21 @@ const headers = [
     name: 'ids.gateway_id',
     displayName: sharedMessages.id,
     width: 24,
+    sortable: true,
+    sortKey: 'gateway_id',
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
     width: 24,
+    sortable: true,
   },
   {
     name: 'ids.eui',
     displayName: sharedMessages.gatewayEUI,
     width: 24,
+    sortable: true,
+    sortKey: 'gateway_eui',
   },
   {
     name: 'frequency_plan_id',

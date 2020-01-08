@@ -34,11 +34,14 @@ const headers = [
     name: 'ids.organization_id',
     displayName: sharedMessages.id,
     width: 25,
+    sortable: true,
+    sortKey: 'organization_id',
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
     width: 25,
+    sortable: true,
   },
   {
     name: 'description',
