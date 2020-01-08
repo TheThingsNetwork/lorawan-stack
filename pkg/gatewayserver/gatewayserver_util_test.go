@@ -71,6 +71,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 	is.gateways[uid] = &ttnpb.Gateway{
 		GatewayIdentifiers: ids,
 		FrequencyPlanID:    test.EUFrequencyPlanID,
+		FrequencyPlanIDs:   []string{test.EUFrequencyPlanID},
 		Antennas: []ttnpb.GatewayAntenna{
 			{
 				Location: ttnpb.Location{
