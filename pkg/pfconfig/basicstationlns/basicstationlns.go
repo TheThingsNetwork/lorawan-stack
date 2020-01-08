@@ -18,6 +18,7 @@ package basicstationlns
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -28,11 +29,10 @@ import (
 )
 
 const (
-	configHardwareSpecPrefix            = "sx1301"
-	configHardwareSpecNoOfConcentrators = "1"
+	configHardwareSpecPrefix = "sx1301"
 )
 
-var errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan")
+var errFrequencyPlan = errors.DefineInvalidArgument("frequency_plan", "invalid frequency plan `{name}`")
 
 // DataRates encodes the available datarates of the channel plan for the Station in the format below:
 // [0] -> SF (Spreading Factor; Range: 7...12 for LoRa, 0 for FSK)
@@ -72,38 +72,38 @@ func (cfg RouterConfig) MarshalJSON() ([]byte, error) {
 }
 
 // GetRouterConfig returns the routerconfig message to be sent to the gateway.
-func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time) (RouterConfig, error) {
-	if err := fp.Validate(); err != nil {
-		return RouterConfig{}, errFrequencyPlan
+// Currently as per the basic station docs, all frequency plans have to be from the same region (band) https://doc.sm.tc/station/tcproto.html#router-config-message.
+func GetRouterConfig(fps []*frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time) (RouterConfig, error) {
+	for _, fp := range fps {
+		if err := fp.Validate(); err != nil {
+			return RouterConfig{}, errFrequencyPlan
+		}
 	}
-
 	cfg := RouterConfig{}
 	cfg.JoinEUI = nil
 	cfg.NetID = nil
 
-	band, err := band.GetByID(fp.BandID)
+	// All frequency plans are from the same band, so choosing the first one.
+	band, err := band.GetByID(fps[0].BandID)
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan
 	}
-
 	s := strings.Split(band.ID, "_")
 	if len(s) < 2 {
 		return RouterConfig{}, errFrequencyPlan
 	}
 	cfg.Region = fmt.Sprintf("%s%s", s[0], s[1])
-	if len(fp.Radios) == 0 {
-		return RouterConfig{}, errFrequencyPlan
-	}
-	// TODO: Handle FP with multiple radios if necessary (https://github.com/TheThingsNetwork/lorawan-stack/issues/761).
+
+	min, max, err := getMinMaxFrequencies(fps)
 	cfg.FrequencyRange = []int{
-		int(fp.Radios[0].TxConfiguration.MinFrequency),
-		int(fp.Radios[0].TxConfiguration.MaxFrequency),
+		int(min),
+		int(max),
 	}
 
-	// TODO: Dynamically fill this field based on no of SX1301_conf objects (https://github.com/TheThingsNetwork/lorawan-stack/issues/761).
-	cfg.HardwareSpec = fmt.Sprintf("%s/%s", configHardwareSpecPrefix, configHardwareSpecNoOfConcentrators)
+	cfg.HardwareSpec = fmt.Sprintf("%s/%d", configHardwareSpecPrefix, len(fps))
 
-	drs, err := getDataRatesFromBandID(fp.BandID)
+	// All frequency plans are from the same band, so choosing the first one.
+	drs, err := getDataRatesFromBandID(fps[0].BandID)
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan
 	}
@@ -113,23 +113,21 @@ func GetRouterConfig(fp frequencyplans.FrequencyPlan, isProd bool, dlTime time.T
 	cfg.NoDutyCycle = !isProd
 	cfg.NoDwellTime = !isProd
 
-	sx1301Conf, err := shared.BuildSX1301Config(&fp)
-	if err != nil {
-		return RouterConfig{}, err
+	for _, fp := range fps {
+		sx1301Conf, err := shared.BuildSX1301Config(fp)
+		// These fields are not defined in the v1.5 ref design https://doc.sm.tc/station/gw_v1.5.html#rfconf-object and would cause a parsing error.
+		sx1301Conf.Radios[0].TxFreqMin = 0
+		sx1301Conf.Radios[0].TxFreqMax = 0
+		// Remove hardware specific values that are not necessary.
+		sx1301Conf.TxLUTConfigs = nil
+		for i := range sx1301Conf.Radios {
+			sx1301Conf.Radios[i].Type = ""
+		}
+		if err != nil {
+			return RouterConfig{}, err
+		}
+		cfg.SX1301Config = append(cfg.SX1301Config, *sx1301Conf)
 	}
-
-	// Remove hardware specific values that are not necessary.
-	sx1301Conf.TxLUTConfigs = nil
-	for i := range sx1301Conf.Radios {
-		sx1301Conf.Radios[i].Type = ""
-	}
-
-	// These fields are not defined in the v1.5 ref design https://doc.sm.tc/station/gw_v1.5.html#rfconf-object and would cause a parsing error.
-	sx1301Conf.Radios[0].TxFreqMin = 0
-	sx1301Conf.Radios[0].TxFreqMax = 0
-
-	// TODO: Extend this for > 8ch gateways (https://github.com/TheThingsNetwork/lorawan-stack/issues/761).
-	cfg.SX1301Config = append(cfg.SX1301Config, *sx1301Conf)
 
 	// Add the MuxTime for RTT measurement.
 	cfg.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
@@ -162,4 +160,22 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 		}
 	}
 	return drs, nil
+}
+
+// getMinMaxFrequencies extract the minimum and maximum frequencies between all the bands.
+func getMinMaxFrequencies(fps []*frequencyplans.FrequencyPlan) (uint64, uint64, error) {
+	var min, max uint64
+	min = math.MaxUint64
+	for _, fp := range fps {
+		if len(fp.Radios) == 0 {
+			return 0, 0, errFrequencyPlan
+		}
+		if fp.Radios[0].TxConfiguration.MinFrequency < min {
+			min = fp.Radios[0].TxConfiguration.MinFrequency
+		}
+		if fp.Radios[0].TxConfiguration.MaxFrequency > max {
+			max = fp.Radios[0].TxConfiguration.MaxFrequency
+		}
+	}
+	return min, max, nil
 }
