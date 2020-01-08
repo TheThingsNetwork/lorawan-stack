@@ -51,11 +51,11 @@ const getDevicesListLogic = createRequestLogic({
   async process({ action }) {
     const {
       id: appId,
-      params: { page, limit },
+      params: { page, limit, order },
     } = action.payload
     const { selectors } = action.meta
 
-    const data = await api.devices.list(appId, { page, limit }, selectors)
+    const data = await api.devices.list(appId, { page, limit, order }, selectors)
     return { entities: data.end_devices, totalCount: data.totalCount }
   },
 })
