@@ -38,10 +38,15 @@ class SortButton extends React.PureComponent {
       [style.buttonDesc]: active && direction === 'desc',
     })
 
+    let icon = 'sort_order'
+    if (active && direction) {
+      icon += `_${direction}`
+    }
+
     return (
       <button className={buttonClassNames} type="button" onClick={this.onSort}>
         <Message content={title} />
-        <Icon className={style.icon} icon="sort" />
+        <Icon className={style.icon} icon={icon} nudgeUp />
       </button>
     )
   }
