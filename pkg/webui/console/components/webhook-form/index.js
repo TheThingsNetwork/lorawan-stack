@@ -27,7 +27,7 @@ import KeyValueMap from '../../../components/key-value-map'
 import ModalButton from '../../../components/button/modal-button'
 import WebhookFormatSelector from '../../containers/webhook-formats-select'
 import sharedMessages from '../../../lib/shared-messages'
-import { id as webhookIdRegexp } from '../../lib/regexp'
+import { id as webhookIdRegexp, apiKey as webhookAPIKeyRegexp } from '../../lib/regexp'
 import PropTypes from '../../../lib/prop-types'
 
 import { mapWebhookToFormValues, mapFormValuesToWebhook, blankValues } from './mapping'
@@ -46,6 +46,7 @@ const m = defineMessages({
   headersValuePlaceholder: 'Bearer my-auth-token',
   headersAdd: 'Add header entry',
   headersValidateRequired: 'All header entry values are required. Please remove empty entries.',
+  downlinkAPIKey: 'Downlink API Key',
 })
 
 const headerCheck = headers =>
@@ -64,6 +65,7 @@ const validationSchema = Yup.object().shape({
   base_url: Yup.string()
     .url(sharedMessages.validateUrl)
     .required(sharedMessages.validateRequired),
+  downlink_api_key: Yup.string().matches(webhookAPIKeyRegexp, sharedMessages.validateFormat),
 })
 
 @bind
@@ -151,6 +153,7 @@ export default class WebhookForm extends Component {
           component={Input}
           required
         />
+        <Form.Field name="downlink_api_key" title={m.downlinkAPIKey} component={Input} code />
         <Message component="h4" content={sharedMessages.messageTypes} />
         <Notification info content={m.messageInfo} small />
         <Form.Field
