@@ -42,7 +42,7 @@ func (p *DeviceManagementPackage) RegisterServices(s *grpc.Server) {}
 func (p *DeviceManagementPackage) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
 
 var (
-	errDeviceEUIMissing    = errors.DefineNotFound("device_eui_missing", "device EUI `{devEUI}` not found")
+	errDeviceEUIMissing    = errors.DefineNotFound("device_eui_missing", "device EUI `{dev_eui}` not found")
 	errUplinkRequestFailed = errors.DefineInternal("uplink_request_failed", "uplink request failed")
 )
 
@@ -50,6 +50,11 @@ var (
 func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/packages/loradms/v1")
 	logger := log.FromContext(ctx)
+
+	if up.DevEUI == nil || up.DevEUI.IsZero() {
+		logger.Debug("Package configured for end device with no device EUI")
+		return nil
+	}
 
 	eui := objects.EUI(*up.DevEUI)
 	message := up.GetUplinkMessage()
@@ -99,7 +104,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.App
 
 	response, ok := resp[eui]
 	if !ok {
-		return errDeviceEUIMissing.WithAttributes("devEUI", up.DevEUI)
+		return errDeviceEUIMissing.WithAttributes("dev_eui", up.DevEUI)
 	}
 	if response.Error != "" {
 		return errUplinkRequestFailed.WithCause(errors.New(response.Error))

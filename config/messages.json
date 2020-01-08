@@ -1612,7 +1612,7 @@
   },
   "error:pkg/applicationserver/io/packages/loradms/v1:device_eui_missing": {
     "translations": {
-      "en": "device EUI `{devEUI}` not found"
+      "en": "device EUI `{dev_eui}` not found"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1",
