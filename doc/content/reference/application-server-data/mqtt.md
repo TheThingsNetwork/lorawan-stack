@@ -12,11 +12,11 @@ The Application Server exposes a MQTT server to work with streaming events. In o
 
 The Console provides the required connection information and can be used to create an API key for authentication. In your application select the **MQTT** submenu from the **Integrations** side menu.
 
-{{< figure src="mqtt-integration.png" alt="MQTT connection information" >}}
+{{< figure src="../mqtt-integration.png" alt="MQTT connection information" >}}
 
 You can now click on the **Generate new API key** button in order to generate an API key which can be used to send and receive traffic from MQTT.
 
-{{< figure src="mqtt-key-created.png" alt="MQTT API key created" >}}
+{{< figure src="../mqtt-key-created.png" alt="MQTT API key created" >}}
 
 Make sure to copy your API key now, since it will no longer be visible after leaving the page for security reasons. You can now login using an MQTT client with the application ID `app1` as user name and the newly generated API key as password.
 

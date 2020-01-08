@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for releasing gateway EUI after deletion.
+Added support in the Application Server for the `X-Downlink-APIKey`, `X-Downlink-Push` and `X-Downlink-Replace` headers. The headers provide the webhook endpoints with information regarding the configured API key and the URLs to be used for downlink queue operations. 
 
 ### Changed
 
