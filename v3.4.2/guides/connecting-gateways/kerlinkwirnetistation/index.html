@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Kerlink Wirnet iStation | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/kerlinkwirnetistation/" />
+  <link rel="icon" type="image/png" href="/v3.4.2/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.2/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Kerlink Wirnet iStation">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Kerlink Wirnet iStation">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/kerlinkwirnetistation/">
+  <meta name="twitter:title" content="Kerlink Wirnet iStation" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.2/">
+        <img src="/v3.4.2/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.2/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.2/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.2/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.2/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.2/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Connecting Gateways</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/kerlinkwirnetistation/" class="is-active">Kerlink Wirnet iStation</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/kerlinkwirnetstation/" class="">Kerlink Wirnet Station</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/nasysoutdoorgateway/" class="">NASys LoRaWAN Outdoor Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/tektelickonamicro/" class="">Tektelic Kona Micro IoT LoRaWAN Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/thethingskickstartergateway/" class="">The Things Kickstarter Gateway</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Kerlink Wirnet iStation</h1>
+
+<div class="content">
+
+<p>Kerlink Wirnet iStation is a LoRaWAN gateway, whose technical specifications can be found in <a href="https://www.kerlink.com/product/wirnet-istation/">the official documentation</a>. This page guides you to connect it to The Things Stack.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ol>
+<li>User account on The Things Stack with rights to create Gateways.</li>
+</ol>
+
+<h2 id="registration">Registration</h2>
+
+<p>Create a gateway by following the instructions for the <a href="https://thethingsstack.io/v3.4.2/guides/getting-started/console/#create-gateway">Console</a> or the <a href="https://thethingsstack.io/v3.4.2/guides/getting-started/cli/#create-gateway">CLI</a>. Choose a <strong>Gateway ID</strong> and set <strong>EUI</strong> equal to the one on the gateway.</p>
+
+<p>Create an API Key with Gateway Info rights for this gateway using the same instructions. Copy the key and save it for later use.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>All further steps will assume the gateway is available at <code>192.168.4.155</code>, the stack address is <code>thethings.example.com</code>, gateway ID is <code>example-gtw</code> and gateway API key is <code>NNSXS.GTSZYGHE4NBR4XJZHJWEEMLXWYIFHEYZ4WR7UAI.YAT3OFLWLUVGQ45YYXSNS7HTVTFALWYSXK6YLJ6BDUNBPJMRH3UQ</code>, please replace these by the values appropriate for your setup.</p>
+
+<h3 id="provisioning">Provisioning</h3>
+
+<ol>
+<li><p>Execute:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ curl -sL https://raw.githubusercontent.com/TheThingsNetwork/kerlink-wirnet-firmware/v0.0.1/provision.sh <span class="p">|</span> bash -s -- <span class="s1">&#39;wirnet-istation&#39;</span> <span class="s1">&#39;192.168.4.155&#39;</span> <span class="s1">&#39;thethings.example.com&#39;</span> <span class="s1">&#39;example-gtw&#39;</span> <span class="s1">&#39;NNSXS.GTSZYGHE4NBR4XJZHJWEEMLXWYIFHEYZ4WR7UAI.YAT3OFLWLUVGQ45YYXSNS7HTVTFALWYSXK6YLJ6BDUNBPJMRH3UQ&#39;</span></code></pre></div></li>
+</ol>
+
+<p>Please refer to <a href="https://github.com/TheThingsNetwork/kerlink-wirnet-firmware/tree/v0.0.1#provisioning">Kerlink Wirnet provisioning documentation</a> if more detailed up-to-date documentation is necessary.</p>
+
+<blockquote>
+<p>NOTE: To avoid being prompted for <code>root</code> user password several times, you may add your SSH public key as authorized for <code>root</code> user on the gateway, for example, by <code>ssh-copy-id root@192.168.4.155</code>.</p>
+</blockquote>
+</div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.2/guides/connecting-gateways/">← Connecting Gateways</a>
+<a class="button is-pulled-right" href="/v3.4.2/guides/connecting-gateways/kerlinkwirnetstation/">Kerlink Wirnet Station →</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.2/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.2/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.2/components/">Components</a></p>
+        <p><a class="" href="/v3.4.2/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Roman Volosatovs on 07 Jan 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/027e234cb88daa9daeaf8008ef5891b18e0f7fc7">
+      doc: Add Kerlink Wirnet iStation provisioning guide
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/connecting-gateways/kerlinkwirnetistation/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.2/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

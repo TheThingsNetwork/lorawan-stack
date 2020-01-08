@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>NASys LoRaWAN Outdoor Gateway | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/nasysoutdoorgateway/" />
+  <link rel="icon" type="image/png" href="/v3.4.2/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.2/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="NASys LoRaWAN Outdoor Gateway">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="NASys LoRaWAN Outdoor Gateway">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/nasysoutdoorgateway/">
+  <meta name="twitter:title" content="NASys LoRaWAN Outdoor Gateway" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.2/">
+        <img src="/v3.4.2/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.2/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.2/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.2/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.2/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.2/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Connecting Gateways</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/kerlinkwirnetistation/" class="">Kerlink Wirnet iStation</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/kerlinkwirnetstation/" class="">Kerlink Wirnet Station</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/nasysoutdoorgateway/" class="is-active">NASys LoRaWAN Outdoor Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/tektelickonamicro/" class="">Tektelic Kona Micro IoT LoRaWAN Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/guides/connecting-gateways/thethingskickstartergateway/" class="">The Things Kickstarter Gateway</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">NASys LoRaWAN Outdoor Gateway</h1>
+
+<div class="content">
+
+<p>NASys LoRaWAN Outdoor Gateway is an 8 Channel LoRaWAN gateway, whose technical specifications can be found in <a href="https://www.nasys.no/product/lorawan-gateway/">the official product page</a>. This page guides you to connect it to The Things Stack.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ol>
+<li>User account on The Things Stack with rights to create Gateways.</li>
+<li>NASys LoRaWAN Outdoor Gateway connected to the internet (or your local network) via ethernet.</li>
+</ol>
+
+<h2 id="registration">Registration</h2>
+
+<p>Create a gateway by following the instructions for the <a href="https://thethingsstack.io/v3.4.2/guides/getting-started/console/#create-gateway">Console</a> or the <a href="https://thethingsstack.io/v3.4.2/guides/getting-started/cli/#create-gateway">CLI</a>. Typically, the <strong>EUI</strong> field for your gateway should exist on the sticker at the bottom. Make note of the Gateway ID you choose, because it will be needed later.</p>
+
+<h2 id="configuration-using-a-terminal">Configuration using a Terminal</h2>
+
+<p>Find the IP address the gateway. This can be done in various ways. You can connect your machine to the same local network as that of the gateway Ethernet connection and scan for open SSH ports or assign a static IP to the gateway and use that. Once the gateway IP address is found, ssh into it.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ssh root@&lt;GatewayIP&gt;</code></pre></div>
+<p>The default username is <strong>root</strong>, and the default password can be also found in the sticker.</p>
+
+<p>Your gateway should come with a slightly modified version of the <a href="https://github.com/Lora-net/packet_forwarder">Lora-net UDP packet forwarder</a> pre-installed at <code>/opt/nas-lgw</code>. There are two configuration files <code>global_conf.json</code> and <code>local_conf.json</code>, both located in <code>/opt/nas_lgw</code>.</p>
+
+<p>The Gateway Configuration Server can be used to retrieve a proper <code>global_conf.json</code> configuration file for your gateway.</p>
+
+<p>You will need a Gateway API key with the <code>View gateway information</code> right enabled. Instructions can be found in the relevant sections of the <a href="https://thethingsstack.io/v3.4.2/guides/getting-started/console/#create-gateway">Console</a> or the <a href="https://thethingsstack.io/v3.4.2/guides/getting-started/cli/#create-gateway">CLI</a> getting started guides.</p>
+
+<p>Make sure to replace <code>thethings.example.com</code> with your server:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ <span class="nb">export</span> <span class="nv">GATEWAY_ID</span><span class="o">=</span><span class="s2">&#34;&lt;ID_OF_YOUR_GATEWAY_ON_TTS&gt;&#34;</span>
+$ <span class="nb">export</span> <span class="nv">GTW_API_KEY</span><span class="o">=</span><span class="s2">&#34;NNSXS.AAAAAAAAAAAAA.BBBBBBBBBBBBBBBBB&#34;</span>
+$ curl -XGET <span class="se">\
+</span><span class="se"></span>    <span class="s2">&#34;https://thethings.example.com/api/v3/gcs/gateways/</span><span class="si">${</span><span class="nv">GATEWAY_ID</span><span class="si">}</span><span class="s2">/semtechudp/global_conf.json&#34;</span> <span class="se">\
+</span><span class="se"></span>    -H <span class="s2">&#34;Authorization: Bearer </span><span class="si">${</span><span class="nv">GTW_API_KEY</span><span class="si">}</span><span class="s2">&#34;</span> &gt; ~/global_conf.json</code></pre></div>
+<p>Then, update the configuration files and restart the packet forwarder:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ mv /opt/nas-lgw/local_conf.json /opt/nas-lgw/local_conf.json.old
+$ cp ~/global_conf.json /opt/nas-lgw/global_conf.json
+
+$ systemctl restart nas_lgw</code></pre></div>
+<p>If your configuration was successful, your gateway will connect to The Things Stack after a couple of seconds.</p>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<p>If the gateway does not connect to The Things Stack after a few minutes, issue a <code>reboot</code> command, or disconnect and reconnect the power supply to power-cycle the gateway.</p>
+
+<p>If you still have trouble connecting to The Things Stack, then try editing the <code>gateway_conf</code> section:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ vi /opt/nas-lgw/global_conf.json</code></pre></div>
+<p>Edit the server parameters:</p>
+
+<ol>
+<li><strong>gateway_ID</strong>: Make sure this is the same as the GatewayEUI (in lowercase).</li>
+<li><strong>server_address</strong>: Address of the Gateway Server. If you followed the <a href="https://thethingsstack.io/v3.4.2/guides/getting-started/">Getting Started guide</a> this is the same as what you use instead of <code>thethings.example.com</code>.</li>
+<li><strong>serv_port_up</strong>: UDP upstream port of the Gateway Server, typically 1700.</li>
+<li><strong>serv_port_down</strong>: UDP downstream port of the Gateway Server, typically 1700.</li>
+</ol>
+
+<p>You can access the gateway system logs using journalctl. See <code>journalctl --help</code> for details</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ journalctl -f -u nas_lgw -n <span class="m">1000</span></code></pre></div>
+<blockquote>
+<p><strong>IMPORTANT NOTE</strong>: The gateway logs will rotate when they reach about 15M in size, which means that you will generally not be able to access very old logs. At times of dense traffic (e.g. ~1000s of devices) this typically means that you will only have logs for 2-3 hours. If you want to keep historical data (for whatever reason), then you will have to forward the logs to an external server. If you decide to do so, then <code>netcat</code> may be useful:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ journalctl -f <span class="p">|</span> nc server-hostname server-port</code></pre></div></blockquote>
+</div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.2/guides/connecting-gateways/kerlinkwirnetstation/">← Kerlink Wirnet Station</a>
+<a class="button is-pulled-right" href="/v3.4.2/guides/connecting-gateways/tektelickonamicro/">Tektelic Kona Micro IoT LoRaWAN Gateway →</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.2/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.2/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.2/components/">Components</a></p>
+        <p><a class="" href="/v3.4.2/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Aggelos Kolaitis on 20 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/e45856e77378109d3f1caff6bd0c1522306d0126">
+      doc: Add NASYS LoRaWAN Outdoor Gateway connection guide
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/connecting-gateways/nasysoutdoorgateway/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.2/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

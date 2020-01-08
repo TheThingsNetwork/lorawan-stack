@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Command-line Interface | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.2/components/cli/" />
+  <link rel="icon" type="image/png" href="/v3.4.2/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.2/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Command-line Interface">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Command-line Interface">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.2/components/cli/">
+  <meta name="twitter:title" content="Command-line Interface" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.2/">
+        <img src="/v3.4.2/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.2/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.2/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.2/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.2/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.2/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">Command-line Interface</h1>
+
+<div class="content"><p>The Command-line Interface (CLI) provides a cross-platform interface for managing components through the command-line.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>See the <a href="https://thethingsstack.io/v3.4.2/reference/configuration/">Configuration Reference</a> for details on how the CLI can be configured. The different options are detailed in the <a href="https://thethingsstack.io/v3.4.2/reference/configuration/cli/">CLI Configuration Reference</a>.</p>
+
+<h2 id="help-for-commands">Help for Commands</h2>
+
+<p>The CLI comes with builtin documentation. This documentation can be printed by adding the <code>-h</code> or <code>--help</code> flag to any command.</p>
+
+<h2 id="command-aliases">Command Aliases</h2>
+
+<p>Many CLI commands names have aliases, which are different spellings or shorter versions of the same command. For instance, <code>applications</code> commands can also be written as <code>application</code>, <code>apps</code>, <code>app</code> or even <code>a</code>. This could save you some typing if you frequently use the CLI.</p>
+
+<blockquote>
+<p>Tip: For even less typing you could also register an alias for <code>ttn-lw-cli</code> itself (<code>alias tt=ttn-lw-cli</code>).</p>
+</blockquote>
+
+<h2 id="input-and-output-formats">Input and Output Formats</h2>
+
+<p>By default the CLI outputs results as one or more JSON objects. These JSON objects are equivalent to the JSON objects that would be returned when using the HTTP API of The Things Stack. Some commands accept one or more JSON objects as input. These JSON objects are equivalent to the JSON objects that can be sent to the HTTP API. This way of handling input and output is used by the <a href="https://thethingsstack.io/v3.4.2/reference/end-device-templates/">End Device Templates feature</a>.</p>
+
+<p>The <code>--output-format</code> flag allows you to specify a <a href="https://golang.org/pkg/text/template/">Go template</a> that is executed for the result(s) of a command. The example below executes lists applications and outputs their IDs and names:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli applications list --name --output-format <span class="s2">&#34;{{ .ApplicationID }}: {{ .Name }}&#34;</span></code></pre></div>
+<h2 id="login-and-logout">Login and Logout</h2>
+
+<p>The <code>login</code> command starts the OAuth authorization flow with the configured OAuth server. By default this makes use of an endpoint on <code>localhost</code> for the OAuth callback. If you are not running the CLI on the machine that is <code>localhost</code>, you can add the flag <code>--callback=false</code> to the <code>login</code> command. This will disable the callback endpoint, and instead ask you to copy/paste the authorization code that you will receive from the OAuth server.</p>
+
+<p>It is also possible to use an API key instead of OAuth. To do this, add the flag <code>--api-key=NNSXS.AAAA.BBBB</code> to the <code>login</code> command (replacing <code>NNSXS.AAAA.BBBB</code> with your API key).</p>
+
+<p>Logging out of the CLI is done with the <code>logout</code> command, which will automatically invalidate the OAuth access token that was in use.</p>
+
+<h2 id="entity-management">Entity Management</h2>
+
+<p>In most cases the CLI be used to manage entities, such as applications, end devices or gateways. For each of these entities, the cli has <code>create</code>, <code>get</code>, <code>list</code>, <code>update</code> and <code>delete</code> commands.</p>
+
+<h3 id="creating-entities">Creating Entities</h3>
+
+<p>When creating an application or gateway, you need to specify a user or organization with the <code>--user-id</code> or <code>--organization-id</code> flag. This user or organization will be granted all rights on the new application or gateway.</p>
+
+<p>When creating an end device, you need to specify an application in which the end device should be created.</p>
+
+<p>All other flags correspond to the fields of the entity, as can be seen with the <code>--help</code> flag and in the <a href="https://thethingsstack.io/v3.4.2/reference/api/">API Reference</a>.</p>
+
+<h3 id="getting-or-listing-entities">Getting or Listing Entities</h3>
+
+<p>When getting a single entity or listing entities, you need to provide flags for selecting the fields to fetch from the server. For performance reasons, list commands only allow a subset of fields (the fields stored in the <a href="/v3.4.2/components/identity-server/">Identity Server</a>).</p>
+
+<h3 id="updating-entities">Updating Entities</h3>
+
+<p>When updating an entity, you provide flags for the fields that need to be updated. All other fields of the entitiy are left unchanged.</p>
+
+<h3 id="deleting-entities">Deleting Entities</h3>
+
+<p>Be careful when using the <code>delete</code> command, as it won&rsquo;t ask for confirmation.</p>
+
+<h2 id="access-control">Access Control</h2>
+
+<p>The CLI can be used to manage access control of entities. Managing collaborators is done with the <code>collaborators</code> commands (i.e. <code>ttn-lw-cli applications collaborators</code>) and managing API keys with the <code>api-keys</code> commands (i.e. <code>ttn-lw-cli applications api-keys</code>).</p>
+
+<h3 id="collaborator-rights">Collaborator Rights</h3>
+
+<p>Collaborator rights can be <code>set</code>, <code>list</code>ed or <code>delete</code>d. When setting collaborator rights, specify a user or organization with the <code>--user-id</code> or <code>--organization-id</code> flag and the flags for the rights that you want to assign. Use the <code>--help</code> or <code>-h</code> for more information on the available rights.</p>
+
+<h3 id="api-keys">API Keys</h3>
+
+<p>API keys can be <code>create</code>d, <code>list</code>ed, <code>update</code>d and <code>delete</code>d. Creating an API key is very similar to setting collaborator rights. Be aware that API keys are only shown once when they are created, and will never be shown again, so make sure to copy them to a safe place.</p>
+
+<h2 id="uplink-traffic">Uplink Traffic</h2>
+
+<p>The CLI can be used to subscribe to uplink traffic. See the <a href="https://thethingsstack.io/v3.4.2/guides/getting-started/cli/">Getting Started guide</a> for more details.</p>
+
+<h2 id="downlink-queue">Downlink Queue</h2>
+
+<p>The CLI can manage the downlink queue of end devices. See the <a href="https://thethingsstack.io/v3.4.2/guides/downlink-queue-ops/">Downlink Queue Operations guide</a> for more details.</p>
+
+<h2 id="events">Events</h2>
+
+<p>The CLI can be used to subscribe to events. See the <a href="https://thethingsstack.io/v3.4.2/guides/events/">Events guide</a> for more details.</p></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.2/components/qr-code-generator/">← QR Code Generator</a>
+<a class="button is-pulled-right" href="/v3.4.2/components/device-template-converter/">Device Template Converter →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.2/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.2/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.2/components/">Components</a></p>
+        <p><a class="" href="/v3.4.2/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Johan Stokking on 06 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/c3e9c7c8d65848e955bc8fbc31e0ac5e26027fcf">
+      doc: Add QR code generator component and guide
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/components/cli.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.2/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

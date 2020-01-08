@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.59.1" />
+  <title>Mapping Templates | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.4.2/reference/end-device-templates/mapping/" />
+  <link rel="icon" type="image/png" href="/v3.4.2/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.4.2/css/theme.min.090173fef411fe1179cbb40989d85adbfb5ea13a21f59ef6af19496b7de096af.css" integrity="sha256-CQFz/vQR/hF5y7QJidha2/teoToh9Z72rxlJa33glq8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Mapping Templates">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Mapping Templates">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.4.2/reference/end-device-templates/mapping/">
+  <meta name="twitter:title" content="Mapping Templates" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.4.2/">
+        <img src="/v3.4.2/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.4.2/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.4.2/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.4.2/components/">Components</a>
+        <a class="navbar-item" href="/v3.4.2/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.4.2/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">End Device Templates</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.4.2/reference/end-device-templates/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/reference/end-device-templates/creating/" class="">Creating Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/reference/end-device-templates/converting/" class="">Converting Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/reference/end-device-templates/executing/" class="">Executing Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/reference/end-device-templates/mapping/" class="is-active">Mapping Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.4.2/reference/end-device-templates/assigning-euis/" class="">Assigning EUIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Mapping Templates</h1>
+
+<div class="content">
+
+<div class="notification is-primary">
+  <h3 class="has-text-light">Command-line interface only</h3>
+  <p>The instructions below use the command-line interface (CLI).</p>
+  <div class="buttons">
+    <a class="button is-primary is-inverted is-outlined" href="https://thethingsstack.io/v3.4.2/guides/getting-started/cli/#installation">Learn how to install the CLI</a>
+  </div>
+</div>
+
+
+<p>You can use the <code>end-device templates map</code> command to map input templates with a mapping file to create new device templates. This allows for combining fields from different device template files.</p>
+
+<p>The matching from input to a mapping template is, in order, by mapping key (<code>mapping_key</code>), end device identifiers (<code>ids.application_id</code> and <code>ids.device_id</code>) and <code>DevEUI</code> (<code>ids.dev_eui</code>). If you don&rsquo;t specify a mapping key, end device identifiers nor <code>DevEUI</code>, the mapping entry always matches. This is useful for mapping many end device templates with a generic template.</p>
+
+<p>Typical use cases are:</p>
+
+<ol>
+<li>Assigning identifiers from a mapping file to device templates matching on mapping key.</li>
+<li>Mapping a device profile (i.e. MAC and PHY versions, frequency plan and class B/C support) from a mapping file to many end device templates.</li>
+</ol>
+
+<h2 id="example">Example</h2>
+
+<p>This example shows creating a generic device profile that is mapped with provisioning data for secure elements to create device templates.</p>
+
+<p>First, create a mapping file with a device profile:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-device template extend <span class="se">\
+</span><span class="se"></span>  --frequency-plan-id EU_863_870 <span class="se">\
+</span><span class="se"></span>  --lorawan-version <span class="m">1</span>.0.3 <span class="se">\
+</span><span class="se"></span>  --lorawan-phy-version <span class="m">1</span>.0.3-a <span class="se">\
+</span><span class="se"></span>  --supports-join <span class="se">\
+</span><span class="se"></span>  --supports-class-c <span class="se">\
+</span><span class="se"></span>  --version-ids.brand-id <span class="s2">&#34;thethingsproducts&#34;</span> <span class="se">\
+</span><span class="se"></span>  --version-ids.model-id <span class="s2">&#34;genericnode&#34;</span> <span class="se">\
+</span><span class="se"></span>  --version-ids.hardware-version <span class="s2">&#34;1.0&#34;</span> <span class="se">\
+</span><span class="se"></span>  --version-ids.firmware-version <span class="s2">&#34;1.0&#34;</span> &gt; profile.json</code></pre></div>
+<p>The mapping file <code>profile.json</code> contains the following entries (omitting empty fields).</p>
+
+<p><details><summary>Show <code>profile.json</code></summary></p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;version_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;brand_id&#34;</span><span class="p">:</span> <span class="s2">&#34;thethingsproducts&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;model_id&#34;</span><span class="p">:</span> <span class="s2">&#34;genericnode&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;hardware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;firmware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;supports_class_c&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_class_c&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.hardware_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.model_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.brand_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.firmware_version&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p></details></p>
+
+<p>Second, convert the provisioning data to a device templates file to <code>provisioningdata.json</code>.</p>
+
+<blockquote>
+<p>This example uses a <strong>Microchip ATECC608A-MAHTN-T Manifest File</strong>. This file contains provisioning data for The Things Industries Join Server. You can <a href="microchip-atecc608a-mahtn-t-example.json">download the example file</a>.</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-file example.json &gt; provisioningdata.json</code></pre></div>
+<p>Third, map the two files to <code>templates.json</code>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ cat provisioningdata.json <span class="se">\
+</span><span class="se"></span>  <span class="p">|</span> ttn-lw-cli end-device template map --mapping-local-file profile.json &gt; templates.json</code></pre></div>
+<p>This returns the device templates with provisioning data and device profile combined.</p>
+
+<p><details><summary>Show output</summary></p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;version_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;brand_id&#34;</span><span class="p">:</span> <span class="s2">&#34;thethingsproducts&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;model_id&#34;</span><span class="p">:</span> <span class="s2">&#34;genericnode&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;hardware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;firmware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;supports_class_c&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;provisioner_id&#34;</span><span class="p">:</span> <span class="s2">&#34;microchip&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;provisioning_data&#34;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&#34;distributor&#34;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&#34;organizationName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Technology Inc&#34;</span><span class="p">,</span>
+              <span class="nt">&#34;organizationalUnitName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Direct&#34;</span>
+            <span class="p">},</span>
+        <span class="nt">&#34;groupId&#34;</span><span class="p">:</span> <span class="s2">&#34;J2D3YNT8Y8WJDC27&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;manufacturer&#34;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&#34;organizationName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Technology Inc&#34;</span><span class="p">,</span>
+              <span class="nt">&#34;organizationalUnitName&#34;</span><span class="p">:</span> <span class="s2">&#34;Secure Products Group&#34;</span>
+            <span class="p">},</span>
+        <span class="nt">&#34;model&#34;</span><span class="p">:</span> <span class="s2">&#34;ATECC608A&#34;</span><span class="p">,</span>
+        <span class="err">...</span>
+        <span class="nt">&#34;uniqueId&#34;</span><span class="p">:</span> <span class="s2">&#34;0123d34fb176c66f27&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.hardware_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.firmware_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.model_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;provisioner_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;provisioning_data&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.brand_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_class_c&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;version_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;brand_id&#34;</span><span class="p">:</span> <span class="s2">&#34;thethingsproducts&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;model_id&#34;</span><span class="p">:</span> <span class="s2">&#34;genericnode&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;hardware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;firmware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;supports_class_c&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;provisioner_id&#34;</span><span class="p">:</span> <span class="s2">&#34;microchip&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;provisioning_data&#34;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&#34;distributor&#34;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&#34;organizationName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Technology Inc&#34;</span><span class="p">,</span>
+              <span class="nt">&#34;organizationalUnitName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Direct&#34;</span>
+            <span class="p">},</span>
+        <span class="nt">&#34;groupId&#34;</span><span class="p">:</span> <span class="s2">&#34;J2D3YNT8Y8WJDC27&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;manufacturer&#34;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&#34;organizationName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Technology Inc&#34;</span><span class="p">,</span>
+              <span class="nt">&#34;organizationalUnitName&#34;</span><span class="p">:</span> <span class="s2">&#34;Secure Products Group&#34;</span>
+            <span class="p">},</span>
+        <span class="nt">&#34;model&#34;</span><span class="p">:</span> <span class="s2">&#34;ATECC608A&#34;</span><span class="p">,</span>
+        <span class="err">...</span>
+        <span class="nt">&#34;uniqueId&#34;</span><span class="p">:</span> <span class="s2">&#34;012350172871677127&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;version_ids.firmware_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;provisioner_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;provisioning_data&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_class_c&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.model_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.brand_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.hardware_version&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p></details></p>
+
+<p>Fourth, you can personalize these devices by assigning the <code>JoinEUI</code> and <code>DevEUI</code> to <code>devices.json</code>, see <a href="/v3.4.2/reference/end-device-templates/assigning-euis/">Assigning EUIs</a>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ cat templates.json <span class="se">\
+</span><span class="se"></span>  <span class="p">|</span> ttn-lw-cli end-device template assign-euis 70b3d57ed0000000 70b3d57ed0000001 &gt; devices.json</code></pre></div>
+<p><details><summary>Show output</summary></p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;device_id&#34;</span><span class="p">:</span> <span class="s2">&#34;eui-70b3d57ed0000001&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">},</span>
+      <span class="nt">&#34;dev_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000001&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;join_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000000&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;version_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;brand_id&#34;</span><span class="p">:</span> <span class="s2">&#34;thethingsproducts&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;model_id&#34;</span><span class="p">:</span> <span class="s2">&#34;genericnode&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;hardware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;firmware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;supports_class_c&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;provisioner_id&#34;</span><span class="p">:</span> <span class="s2">&#34;microchip&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;provisioning_data&#34;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&#34;distributor&#34;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&#34;organizationName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Technology Inc&#34;</span><span class="p">,</span>
+              <span class="nt">&#34;organizationalUnitName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Direct&#34;</span>
+            <span class="p">},</span>
+        <span class="nt">&#34;groupId&#34;</span><span class="p">:</span> <span class="s2">&#34;J2D3YNT8Y8WJDC27&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;manufacturer&#34;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&#34;organizationName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Technology Inc&#34;</span><span class="p">,</span>
+              <span class="nt">&#34;organizationalUnitName&#34;</span><span class="p">:</span> <span class="s2">&#34;Secure Products Group&#34;</span>
+            <span class="p">},</span>
+        <span class="nt">&#34;model&#34;</span><span class="p">:</span> <span class="s2">&#34;ATECC608A&#34;</span><span class="p">,</span>
+        <span class="err">...</span>
+        <span class="nt">&#34;uniqueId&#34;</span><span class="p">:</span> <span class="s2">&#34;0123d34fb176c66f27&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;provisioner_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.device_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;provisioning_data&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.dev_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_join&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.firmware_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.hardware_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.brand_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.join_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.model_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_class_c&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="nt">&#34;end_device&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;device_id&#34;</span><span class="p">:</span> <span class="s2">&#34;eui-70b3d57ed0000002&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;application_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+
+      <span class="p">},</span>
+      <span class="nt">&#34;dev_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000002&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;join_eui&#34;</span><span class="p">:</span> <span class="s2">&#34;70B3D57ED0000000&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;created_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;updated_at&#34;</span><span class="p">:</span> <span class="s2">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;version_ids&#34;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;brand_id&#34;</span><span class="p">:</span> <span class="s2">&#34;thethingsproducts&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;model_id&#34;</span><span class="p">:</span> <span class="s2">&#34;genericnode&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;hardware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;firmware_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0&#34;</span>
+    <span class="p">},</span>
+    <span class="nt">&#34;supports_class_c&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;lorawan_phy_version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.3-a&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;frequency_plan_id&#34;</span><span class="p">:</span> <span class="s2">&#34;EU_863_870&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;supports_join&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;provisioner_id&#34;</span><span class="p">:</span> <span class="s2">&#34;microchip&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;provisioning_data&#34;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&#34;distributor&#34;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&#34;organizationName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Technology Inc&#34;</span><span class="p">,</span>
+              <span class="nt">&#34;organizationalUnitName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Direct&#34;</span>
+            <span class="p">},</span>
+        <span class="nt">&#34;groupId&#34;</span><span class="p">:</span> <span class="s2">&#34;J2D3YNT8Y8WJDC27&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;manufacturer&#34;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&#34;organizationName&#34;</span><span class="p">:</span> <span class="s2">&#34;Microchip Technology Inc&#34;</span><span class="p">,</span>
+              <span class="nt">&#34;organizationalUnitName&#34;</span><span class="p">:</span> <span class="s2">&#34;Secure Products Group&#34;</span>
+            <span class="p">},</span>
+        <span class="nt">&#34;model&#34;</span><span class="p">:</span> <span class="s2">&#34;ATECC608A&#34;</span><span class="p">,</span>
+        <span class="err">...</span>
+        <span class="nt">&#34;uniqueId&#34;</span><span class="p">:</span> <span class="s2">&#34;012350172871677127&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;field_mask&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;paths&#34;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&#34;ids.join_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.dev_eui&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.firmware_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;provisioning_data&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;frequency_plan_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;provisioner_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.model_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;ids.device_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.brand_id&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_class_c&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;version_ids.hardware_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;lorawan_phy_version&#34;</span><span class="p">,</span>
+      <span class="s2">&#34;supports_join&#34;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p></details></p>
+
+<p>Finally, you can create these devices in your The Things Stack application <code>test-app</code>, see <a href="/v3.4.2/reference/end-device-templates/executing/">Executing Templates</a>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ cat devices.json <span class="se">\
+</span><span class="se"></span>  <span class="p">|</span> ttn-lw-cli end-device template execute <span class="se">\
+</span><span class="se"></span>  <span class="p">|</span> ttn-lw-cli device create --application-id test-app</code></pre></div></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.4.2/reference/end-device-templates/executing/">← Executing Templates</a>
+<a class="button is-pulled-right" href="/v3.4.2/reference/end-device-templates/assigning-euis/">Assigning EUIs →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.4.2/guides/">Guides</a></p>
+        <p><a class="" href="/v3.4.2/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.4.2/components/">Components</a></p>
+        <p><a class="" href="/v3.4.2/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by MathieuMonneret on 04 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/d357ac372b5b801262eb38e7a0dbddb393db11d4">
+      doc: Add tts shortcode
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/end-device-templates/mapping.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.4.2/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
