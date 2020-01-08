@@ -285,6 +285,7 @@ func (c *Component) Start() (err error) {
 	c.logger.Debug("Starting interop server")
 	if err = c.listenInterop(); err != nil {
 		c.logger.WithError(err).Error("Could not start interop server")
+		return err
 	}
 	c.logger.Debug("Started interop server")
 
