@@ -63,7 +63,7 @@ const getGatewaysLogic = createRequestLogic({
   latest: true,
   async process({ action }) {
     const {
-      params: { page, limit, query },
+      params: { page, limit, query, order },
     } = action.payload
     const { selectors, options } = action.meta
 
@@ -74,10 +74,11 @@ const getGatewaysLogic = createRequestLogic({
             limit,
             id_contains: query,
             name_contains: query,
+            order,
           },
           selectors,
         )
-      : await api.gateways.list({ page, limit }, selectors)
+      : await api.gateways.list({ page, limit, order }, selectors)
 
     let entities = data.gateways
     if (options.withStatus) {

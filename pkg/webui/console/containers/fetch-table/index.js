@@ -31,24 +31,14 @@ import style from './fetch-table.styl'
 const DEFAULT_PAGE = 1
 const DEFAULT_TAB = 'all'
 const ALLOWED_TABS = ['all']
-const ALLOWED_ORDERS = ['asc', 'desc', undefined]
 
 const filterValidator = function(filters) {
   if (!ALLOWED_TABS.includes(filters.tab)) {
     filters.tab = DEFAULT_TAB
   }
 
-  if (!ALLOWED_ORDERS.includes(filters.order)) {
+  if (typeof filters.order === 'string' && filters.order.match(/-?[a-z0-9]/) === null) {
     filters.order = undefined
-    filters.orderBy = undefined
-  }
-
-  if (
-    (Boolean(filters.order) && !Boolean(filters.orderBy)) ||
-    (!Boolean(filters.order) && Boolean(filters.orderBy))
-  ) {
-    filters.order = undefined
-    filters.orderBy = undefined
   }
 
   if (!Boolean(filters.page) || filters.page < 0) {
@@ -80,7 +70,6 @@ class FetchTable extends Component {
       page: 1,
       tab: 'all',
       order: undefined,
-      orderBy: undefined,
     }
 
     const { debouncedFunction, cancel } = debounce(this.requestSearch, 350)
@@ -147,11 +136,12 @@ class FetchTable extends Component {
   }
 
   async onOrderChange(order, orderBy) {
+    const filterOrder = `${order === 'desc' ? '-' : ''}${orderBy}`
+
     await this.setState(
       this.props.filterValidator({
         ...this.state,
-        order,
-        orderBy,
+        order: filterOrder,
       }),
     )
 
@@ -217,7 +207,14 @@ class FetchTable extends Component {
       pathname,
       actionItems,
     } = this.props
-    const { page, query, tab } = this.state
+    const { page, query, tab, order } = this.state
+    let orderDirection, orderBy
+
+    // Parse order string
+    if (typeof order === 'string') {
+      orderDirection = typeof order === 'string' && order[0] === '-' ? 'desc' : 'asc'
+      orderBy = typeof order === 'string' && order[0] === '-' ? order.substr(1) : order
+    }
 
     const buttonClassNames = classnames(style.filters, {
       [style.topRule]: Boolean(tabs || tableTitle),
@@ -274,6 +271,9 @@ class FetchTable extends Component {
           data={items}
           emptyMessage={sharedMessages.noMatch}
           handlesPagination={handlesPagination}
+          onSortRequest={this.onOrderChange}
+          order={orderDirection}
+          orderBy={orderBy}
         />
       </div>
     )

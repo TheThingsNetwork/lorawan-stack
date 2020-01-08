@@ -37,21 +37,26 @@ const headers = [
     name: 'ids.user_id',
     displayName: sharedMessages.id,
     width: 28,
+    sortable: true,
+    sortKey: 'user_id',
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
     width: 22,
+    sortable: true,
   },
   {
     name: 'primary_email_address',
     displayName: sharedMessages.email,
     width: 28,
+    sortable: true,
   },
   {
     name: 'state',
     displayName: sharedMessages.state,
     width: 15,
+    sortable: true,
     render(state) {
       let indicator = 'unknown'
       let label = sharedMessages.notSet

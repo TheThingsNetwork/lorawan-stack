@@ -36,11 +36,11 @@ const getOrganizationsLogic = createRequestLogic({
   latest: true,
   async process({ action }) {
     const {
-      params: { page, limit },
+      params: { page, limit, order },
     } = action.payload
     const { selectors } = action.meta
 
-    const data = await api.organizations.list({ page, limit }, selectors)
+    const data = await api.organizations.list({ page, limit, order }, selectors)
 
     return {
       entities: data.organizations,

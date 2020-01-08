@@ -33,11 +33,14 @@ const headers = [
     name: 'ids.application_id',
     displayName: sharedMessages.id,
     width: 25,
+    sortable: true,
+    sortKey: 'application_id',
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
     width: 25,
+    sortable: true,
   },
   {
     name: 'description',

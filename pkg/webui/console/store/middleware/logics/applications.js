@@ -62,7 +62,7 @@ const getApplicationsLogic = createRequestLogic({
   latest: true,
   async process({ action }) {
     const {
-      params: { page, limit, query },
+      params: { page, limit, query, order },
     } = action.payload
     const { selectors } = action.meta
 
@@ -73,10 +73,11 @@ const getApplicationsLogic = createRequestLogic({
             limit,
             id_contains: query,
             name_contains: query,
+            order,
           },
           selectors,
         )
-      : await api.applications.list({ page, limit }, selectors)
+      : await api.applications.list({ page, limit, order }, selectors)
 
     return { entities: data.applications, totalCount: data.totalCount }
   },

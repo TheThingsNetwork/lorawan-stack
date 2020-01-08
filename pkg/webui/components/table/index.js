@@ -37,10 +37,6 @@ class Tabular extends React.Component {
       this.props.onSortRequest('desc', orderBy)
 
       return
-    } else if (sameColumn && order === 'desc') {
-      this.props.onSortRequest()
-
-      return
     }
 
     this.props.onSortRequest('asc', newOrderBy)
@@ -91,8 +87,8 @@ class Tabular extends React.Component {
               <Table.SortButton
                 title={header.displayName}
                 direction={order}
-                name={header.name}
-                active={orderBy === header.name}
+                name={header.sortKey || header.name}
+                active={header.sortKey ? orderBy === header.sortKey : orderBy === header.name}
                 onSort={this.onSortRequest}
               />
             ) : null}

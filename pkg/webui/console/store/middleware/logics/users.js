@@ -57,7 +57,7 @@ const getUsersLogic = createRequestLogic({
   type: users.GET_USERS_LIST,
   async process({ action }) {
     const {
-      params: { page, limit, query },
+      params: { page, limit, query, order },
     } = action.payload
     const { selectors } = action.meta
 
@@ -67,10 +67,11 @@ const getUsersLogic = createRequestLogic({
             page,
             limit,
             id_contains: query,
+            order,
           },
           selectors,
         )
-      : await api.users.list({ page, limit }, selectors)
+      : await api.users.list({ page, limit, order }, selectors)
 
     return { entities: data.users, totalCount: data.totalCount }
   },

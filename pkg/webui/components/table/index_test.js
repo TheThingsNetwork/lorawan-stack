@@ -236,10 +236,11 @@ describe('Table', function() {
           })
 
           it('the `onSortRequest` function should be called with correct arguments', function() {
-            const columnName = undefined
-            const order = undefined
+            const columnName = 'test-column-name'
 
-            expect(onSortRequest.mock.calls[2][0]).toBe(order)
+            expect(onSortRequest.mock.calls[0][0]).toBe('asc')
+            expect(onSortRequest.mock.calls[1][0]).toBe('desc')
+            expect(onSortRequest.mock.calls[2][0]).toBe('asc')
             expect(onSortRequest.mock.calls[2][1]).toBe(columnName)
           })
         })

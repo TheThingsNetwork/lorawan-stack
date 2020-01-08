@@ -47,14 +47,18 @@ const headers = [
   {
     name: 'ids.device_id',
     displayName: sharedMessages.id,
+    sortable: true,
+    sortKey: 'device_id',
   },
   {
     name: 'name',
     displayName: sharedMessages.name,
+    sortable: true,
   },
   {
     name: 'created_at',
     displayName: sharedMessages.created,
+    sortable: true,
     render(datetime) {
       return <DateTime.Relative value={datetime} />
     },
