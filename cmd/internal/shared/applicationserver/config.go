@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	"go.thethings.network/lorawan-stack/pkg/config"
+	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
 // DefaultApplicationServerConfig is the default configuration for the Application Server.
@@ -37,5 +38,6 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Timeout:   5 * time.Second,
 		QueueSize: 16,
 		Workers:   16,
+		Downlinks: webui.APIConfig{Enabled: true, BaseURL: shared.DefaultPublicURL + "/api/v3"},
 	},
 }

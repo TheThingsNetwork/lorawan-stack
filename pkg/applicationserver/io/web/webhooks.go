@@ -17,6 +17,7 @@ package web
 import (
 	"bytes"
 	"context"
+	"fmt"
 	stdio "io"
 	"io/ioutil"
 	"net/http"
@@ -34,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/version"
 	ttnweb "go.thethings.network/lorawan-stack/pkg/web"
+	"go.thethings.network/lorawan-stack/pkg/webui"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/grpc/metadata"
 )
@@ -142,20 +144,22 @@ type Webhooks interface {
 }
 
 type webhooks struct {
-	ctx      context.Context
-	server   io.Server
-	registry WebhookRegistry
-	target   Sink
+	ctx       context.Context
+	server    io.Server
+	registry  WebhookRegistry
+	target    Sink
+	downlinks webui.APIConfig
 }
 
 // NewWebhooks returns a new Webhooks.
-func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink) Webhooks {
+func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink, downlinks webui.APIConfig) Webhooks {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/web")
 	return &webhooks{
-		ctx:      ctx,
-		server:   server,
-		registry: registry,
-		target:   target,
+		ctx:       ctx,
+		server:    server,
+		registry:  registry,
+		target:    target,
+		downlinks: downlinks,
 	}
 }
 
@@ -200,7 +204,24 @@ const (
 	applicationIDKey = "application_id"
 	deviceIDKey      = "device_id"
 	webhookIDKey     = "webhook_id"
+
+	downlinkKeyHeader     = "X-Downlink-APIKey"
+	downlinkPushHeader    = "X-Downlink-Push"
+	downlinkReplaceHeader = "X-Downlink-Replace"
+
+	downlinkOperationURLFormat = "%s/as/applications/%s/webhooks/%s/devices/%s/down/%s"
 )
+
+func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
+	baseURL := w.downlinks.BaseURL
+	return fmt.Sprintf(downlinkOperationURLFormat,
+		baseURL,
+		webhookID.ApplicationID,
+		webhookID.WebhookID,
+		devID.DeviceID,
+		op,
+	)
+}
 
 func (w *webhooks) validateAndFillIDs() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -282,6 +303,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	hooks, err := w.registry.List(ctx, msg.ApplicationIdentifiers,
 		[]string{
 			"base_url",
+			"downlink_api_key",
 			"downlink_ack",
 			"downlink_failed",
 			"downlink_nack",
@@ -368,6 +390,12 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	}
 	for key, value := range hook.Headers {
 		req.Header.Set(key, value)
+	}
+	config := w.downlinks
+	if config.Enabled && hook.DownlinkAPIKey != "" {
+		req.Header.Set(downlinkKeyHeader, hook.DownlinkAPIKey)
+		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "replace"))
 	}
 	req.Header.Set("Content-Type", format.ContentType)
 	req.Header.Set("User-Agent", userAgent)
