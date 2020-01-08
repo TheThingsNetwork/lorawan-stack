@@ -169,11 +169,12 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
-	fp, err := s.server.GetFrequencyPlan(ctx, ids)
+	fps, err := s.server.GetFrequencyPlans(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
-	return fp.ToConcentratorConfig()
+	// TODO: Support mulitple frequency plans (https://github.com/TheThingsNetwork/lorawan-stack/issues/1820)
+	return fps[0].ToConcentratorConfig()
 }
 
 var errNoMQTTConfigProvider = errors.DefineUnimplemented("no_configuration_provider", "no MQTT configuration provider available")
