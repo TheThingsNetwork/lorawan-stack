@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.4.2] (2020-01-08)
+
+### Added
+
 - Forwarding of backend warnings to the Console.
 - Auth Info service to the JavaScript SDK.
 - Subscribable events to the JavaScript SDK.
@@ -18,18 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Increase time that class C messages are scheduled in advance from 300 to 500 ms to support higher latency gateway backhauls.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Fix selection of pseudo wildcard rights being possible (leading to crash) in the Console even when such right cannot be granted.
 - Fix loading spinner being stuck infinitely in gateway / application / organization overview when some rights aren't granted to the collaborator.
 - Fix deadlock of application add form in the Console when the submit results in an error.
 - Fix ttn-lw-cli sometimes refusing to update Gateway EUI.
-
-### Security
 
 ## [3.4.1] (2019-12-30)
 
@@ -520,7 +528,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.1...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.2...HEAD
+[3.4.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.1...v3.4.2
 [3.4.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.2...v3.4.0
 [3.3.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.3.1...v3.3.2
