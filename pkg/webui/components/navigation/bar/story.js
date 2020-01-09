@@ -17,7 +17,7 @@ import { storiesOf } from '@storybook/react'
 import 'focus-visible/dist/focus-visible'
 import { withInfo } from '@storybook/addon-info'
 
-import NavigationBar from '../bar'
+import NavigationBar, { NavigationBarItem } from '../bar'
 
 storiesOf('Navigation', module)
   .addDecorator((story, context) =>
@@ -28,29 +28,11 @@ storiesOf('Navigation', module)
       propTables: [NavigationBar],
     })(story)(context),
   )
-  .add('NavigationBar', function() {
-    const entries = [
-      {
-        title: 'Overview',
-        icon: 'overview',
-        path: '/overview',
-      },
-      {
-        title: 'Applications',
-        icon: 'application',
-        path: '/applications',
-      },
-      {
-        title: 'Gateways',
-        icon: 'gateway',
-        path: '/gateways',
-      },
-      {
-        title: 'Organizations',
-        icon: 'organization',
-        path: '/organizations',
-      },
-    ]
-
-    return <NavigationBar entries={entries} />
-  })
+  .add('NavigationBar', () => (
+    <NavigationBar>
+      <NavigationBarItem title="Overview" icon="overview" path="/overview" />
+      <NavigationBarItem title="Applications" icon="Application" path="/application" />
+      <NavigationBarItem title="Gateways" icon="gateway" path="/gateways" />
+      <NavigationBarItem title="Organizations" icon="organization" path="/organization" />
+    </NavigationBar>
+  ))
