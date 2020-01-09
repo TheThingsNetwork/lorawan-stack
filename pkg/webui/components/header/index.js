@@ -43,13 +43,7 @@ const Header = function({
         <LinkComponent {...(anchored ? { href: '/' } : { to: '/' })} className={styles.logo}>
           <Logo />
         </LinkComponent>
-        {!isGuest && (
-          <NavigationBar
-            className={styles.navList}
-            entries={navigationEntries}
-            anchored={anchored}
-          />
-        )}
+        {!isGuest && <NavigationBar className={styles.navList}>{navigationEntries}</NavigationBar>}
       </div>
       {!isGuest && (
         <div className={styles.right}>
@@ -77,12 +71,8 @@ Header.propTypes = {
   dropdownItems: ProfileDropdown.propTypes.dropdownItems,
   /** A handler for when the user used the search input */
   handleSearchRequest: PropTypes.func,
-  /** A flag identifying whether the header should display the search input */
-  /**
-   * A list of navigation bar entries
-   * See `<NavigationBar/>`'s `entries` proptypes for details
-   */
-  navigationEntries: NavigationBar.propTypes.entries,
+  /** Child node of the navigation bar */
+  navigationEntries: NavigationBar.propTypes.children,
   searchable: PropTypes.bool,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
