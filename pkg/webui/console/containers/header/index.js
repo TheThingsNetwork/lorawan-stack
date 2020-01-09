@@ -20,6 +20,7 @@ import bind from 'autobind-decorator'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import HeaderComponent from '../../../components/header'
+import { NavigationBarItem } from '../../../components/navigation/bar'
 
 import { logout } from '../../store/actions/user'
 import { selectUser } from '../../store/selectors/user'
@@ -94,32 +95,28 @@ class Header extends Component {
       mayManageUsers,
     } = this.props
 
-    const navigationEntries = [
-      {
-        title: sharedMessages.overview,
-        icon: 'overview',
-        path: '/',
-        exact: true,
-      },
-      {
-        title: sharedMessages.applications,
-        icon: 'application',
-        path: '/applications',
-        hidden: !mayViewApplications,
-      },
-      {
-        title: sharedMessages.gateways,
-        icon: 'gateway',
-        path: '/gateways',
-        hidden: !mayViewGateways,
-      },
-      {
-        title: sharedMessages.organizations,
-        icon: 'organization',
-        path: '/organizations',
-        hidden: !mayViewOrganizations,
-      },
-    ]
+    const navigationEntries = (
+      <React.Fragment>
+        <NavigationBarItem title={sharedMessages.overview} icon="overview" path="/" exact />
+        {mayViewApplications && (
+          <NavigationBarItem
+            title={sharedMessages.applications}
+            icon="application"
+            path="/applications"
+          />
+        )}
+        {mayViewGateways && (
+          <NavigationBarItem title={sharedMessages.gateways} icon="gateway" path="/gateways" />
+        )}
+        {mayViewOrganizations && (
+          <NavigationBarItem
+            title={sharedMessages.organizations}
+            icon="organization"
+            path="/organizations"
+          />
+        )}
+      </React.Fragment>
+    )
 
     const dropdownItems = [
       {
