@@ -22,7 +22,7 @@ import ProfileDropdown from '../profile-dropdown'
 import Input from '../input'
 import PropTypes from '../../lib/prop-types'
 
-import styles from './header.styl'
+import style from './header.styl'
 
 const Header = function({
   className,
@@ -38,21 +38,19 @@ const Header = function({
   const LinkComponent = anchored ? Link.BaseAnchor : Link
 
   return (
-    <header {...rest} className={classnames(className, styles.bar)}>
-      <div className={styles.left}>
-        <LinkComponent {...(anchored ? { href: '/' } : { to: '/' })} className={styles.logo}>
+    <header {...rest} className={classnames(className, style.bar)}>
+      <div className={style.left}>
+        <LinkComponent {...(anchored ? { href: '/' } : { to: '/' })} className={style.logo}>
           <Logo />
         </LinkComponent>
-        {!isGuest && <NavigationBar className={styles.navList}>{navigationEntries}</NavigationBar>}
+        {!isGuest && <NavigationBar className={style.navList}>{navigationEntries}</NavigationBar>}
       </div>
       {!isGuest && (
-        <div className={styles.right}>
+        <div className={style.right}>
           {searchable && <Input icon="search" onEnter={handleSearchRequest} />}
-          <ProfileDropdown
-            dropdownItems={dropdownItems}
-            userId={user.ids.user_id}
-            anchored={anchored}
-          />
+          <ProfileDropdown userId={user.ids.user_id} anchored={anchored}>
+            {dropdownItems}
+          </ProfileDropdown>
         </div>
       )}
     </header>
@@ -68,7 +66,7 @@ Header.propTypes = {
    * A list of items for the dropdown
    * See `<ProfileDropdown/>`'s `items` proptypes for details
    */
-  dropdownItems: ProfileDropdown.propTypes.dropdownItems,
+  dropdownItems: ProfileDropdown.propTypes.children,
   /** A handler for when the user used the search input */
   handleSearchRequest: PropTypes.func,
   /** Child node of the navigation bar */
