@@ -21,6 +21,7 @@ import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import HeaderComponent from '../../../components/header'
 import { NavigationBarItem } from '../../../components/navigation/bar'
+import { DropdownItem } from '../../../components/profile-dropdown'
 
 import { logout } from '../../store/actions/user'
 import { selectUser } from '../../store/selectors/user'
@@ -118,19 +119,22 @@ class Header extends Component {
       </React.Fragment>
     )
 
-    const dropdownItems = [
-      {
-        title: sharedMessages.userManagement,
-        icon: 'user_management',
-        path: '/admin/user-management',
-        hidden: !mayManageUsers,
-      },
-      {
-        title: sharedMessages.logout,
-        icon: 'power_settings_new',
-        action: handleLogout,
-      },
-    ]
+    const dropdownItems = (
+      <React.Fragment>
+        {mayManageUsers && (
+          <DropdownItem
+            title={sharedMessages.userManagement}
+            icon="user_management"
+            path="/admin/user-management"
+          />
+        )}
+        <DropdownItem
+          title={sharedMessages.logout}
+          icon="power_settings_new"
+          action={handleLogout}
+        />
+      </React.Fragment>
+    )
 
     return (
       <HeaderComponent
