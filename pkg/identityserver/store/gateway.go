@@ -16,6 +16,7 @@ package store
 
 import (
 	"sort"
+	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -52,8 +53,9 @@ type Gateway struct {
 	StatusPublic   bool `gorm:"not null"`
 	LocationPublic bool `gorm:"not null"`
 
-	ScheduleDownlinkLate   bool `gorm:"not null"`
-	EnforceDutyCycle       bool `gorm:"not null"`
+	ScheduleDownlinkLate   bool  `gorm:"not null"`
+	EnforceDutyCycle       bool  `gorm:"not null"`
+	ScheduleAnytimeDelay   int64 `gorm:"default:0 not null"`
 	DownlinkPathConstraint int
 
 	Antennas []GatewayAntenna
@@ -88,7 +90,11 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	statusPublicField:         func(pb *ttnpb.Gateway, gtw *Gateway) { pb.StatusPublic = gtw.StatusPublic },
 	locationPublicField:       func(pb *ttnpb.Gateway, gtw *Gateway) { pb.LocationPublic = gtw.LocationPublic },
 	scheduleDownlinkLateField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ScheduleDownlinkLate = gtw.ScheduleDownlinkLate },
-	enforceDutyCycleField:     func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EnforceDutyCycle = gtw.EnforceDutyCycle },
+	scheduleAnytimeDelayField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		d := time.Duration(gtw.ScheduleAnytimeDelay)
+		pb.ScheduleAnytimeDelay = &d
+	},
+	enforceDutyCycleField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EnforceDutyCycle = gtw.EnforceDutyCycle },
 	downlinkPathConstraintField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint(gtw.DownlinkPathConstraint)
 	},
@@ -115,17 +121,24 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 		gtw.HardwareVersion = pb.HardwareVersion
 		gtw.FirmwareVersion = pb.FirmwareVersion
 	},
-	brandIDField:                func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.BrandID = pb.BrandID },
-	modelIDField:                func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelID },
-	hardwareVersionField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.HardwareVersion = pb.HardwareVersion },
-	firmwareVersionField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FirmwareVersion = pb.FirmwareVersion },
-	gatewayServerAddressField:   func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
-	autoUpdateField:             func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
-	updateChannelField:          func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateChannel = pb.UpdateChannel },
-	frequencyPlanIDField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FrequencyPlanID = pb.FrequencyPlanID },
-	statusPublicField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.StatusPublic = pb.StatusPublic },
-	locationPublicField:         func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.LocationPublic = pb.LocationPublic },
-	scheduleDownlinkLateField:   func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate },
+	brandIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.BrandID = pb.BrandID },
+	modelIDField:              func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ModelID = pb.ModelID },
+	hardwareVersionField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.HardwareVersion = pb.HardwareVersion },
+	firmwareVersionField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FirmwareVersion = pb.FirmwareVersion },
+	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
+	autoUpdateField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
+	updateChannelField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateChannel = pb.UpdateChannel },
+	frequencyPlanIDField:      func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FrequencyPlanID = pb.FrequencyPlanID },
+	statusPublicField:         func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.StatusPublic = pb.StatusPublic },
+	locationPublicField:       func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.LocationPublic = pb.LocationPublic },
+	scheduleDownlinkLateField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate },
+	scheduleAnytimeDelayField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.ScheduleAnytimeDelay == nil {
+			gtw.ScheduleAnytimeDelay = 0
+		} else {
+			gtw.ScheduleAnytimeDelay = int64(*pb.ScheduleAnytimeDelay)
+		}
+	},
 	enforceDutyCycleField:       func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.EnforceDutyCycle = pb.EnforceDutyCycle },
 	downlinkPathConstraintField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.DownlinkPathConstraint = int(pb.DownlinkPathConstraint) },
 	antennasField: func(gtw *Gateway, pb *ttnpb.Gateway) {
@@ -174,6 +187,7 @@ var gatewayColumnNames = map[string][]string{
 	statusPublicField:           {statusPublicField},
 	locationPublicField:         {locationPublicField},
 	scheduleDownlinkLateField:   {scheduleDownlinkLateField},
+	scheduleAnytimeDelayField:   {scheduleAnytimeDelayField},
 	enforceDutyCycleField:       {enforceDutyCycleField},
 	downlinkPathConstraintField: {downlinkPathConstraintField},
 	antennasField:               {},

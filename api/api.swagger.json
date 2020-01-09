@@ -9352,6 +9352,10 @@
         },
         "downlink_path_constraint": {
           "$ref": "#/definitions/v3DownlinkPathConstraint"
+        },
+        "schedule_anytime_delay": {
+          "type": "string",
+          "description": "Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite."
         }
       },
       "description": "Gateway is the message that defines a gateway on the network."

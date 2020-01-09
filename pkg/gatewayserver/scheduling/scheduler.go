@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/toa"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -66,19 +67,32 @@ type RTTs interface {
 
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
 // If no time source is specified, the system time is used.
-func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool, timeSource TimeSource) (*Scheduler, error) {
+func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, timeSource TimeSource) (*Scheduler, error) {
+	logger := log.FromContext(ctx)
 	if timeSource == nil {
 		timeSource = SystemTimeSource
 	}
+
+	if scheduleAnytimeDelay == nil || *scheduleAnytimeDelay == 0 {
+		scheduleAnytimeDelay = &ScheduleTimeLong
+	} else if *scheduleAnytimeDelay < ScheduleTimeShort {
+		logger.WithFields(log.Fields(
+			"minimum", ScheduleTimeShort,
+			"requested", *scheduleAnytimeDelay,
+		)).Info("Requested scheduling delay is too small")
+		scheduleAnytimeDelay = &ScheduleTimeShort
+	}
+
 	toa := fp.TimeOffAir
 	if toa.Duration < QueueDelay {
 		toa.Duration = QueueDelay
 	}
 	s := &Scheduler{
-		clock:             &RolloverClock{},
-		respectsDwellTime: fp.RespectsDwellTime,
-		timeOffAir:        toa,
-		timeSource:        timeSource,
+		clock:                &RolloverClock{},
+		respectsDwellTime:    fp.RespectsDwellTime,
+		timeOffAir:           toa,
+		timeSource:           timeSource,
+		scheduleAnytimeDelay: *scheduleAnytimeDelay,
 	}
 	if enforceDutyCycle {
 		if subBands := fp.SubBands; len(subBands) > 0 {
@@ -119,13 +133,14 @@ func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforce
 
 // Scheduler is a packet scheduler that takes time conflicts and sub-band restrictions into account.
 type Scheduler struct {
-	clock             *RolloverClock
-	respectsDwellTime func(isDownlink bool, frequency uint64, duration time.Duration) bool
-	timeOffAir        frequencyplans.TimeOffAir
-	timeSource        TimeSource
-	subBands          []*SubBand
-	mu                sync.RWMutex
-	emissions         Emissions
+	clock                *RolloverClock
+	respectsDwellTime    func(isDownlink bool, frequency uint64, duration time.Duration) bool
+	timeOffAir           frequencyplans.TimeOffAir
+	timeSource           TimeSource
+	subBands             []*SubBand
+	mu                   sync.RWMutex
+	emissions            Emissions
+	scheduleAnytimeDelay time.Duration
 }
 
 var errSubBandNotFound = errors.DefineFailedPrecondition("sub_band_not_found", "sub-band not found for frequency `{frequency}` Hz")
@@ -256,7 +271,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 		return Emission{}, errNoServerTime
 	}
 	if settings.Timestamp == 0 {
-		starts = now + ConcentratorTime(ScheduleTimeLong)
+		starts = now + ConcentratorTime(s.scheduleAnytimeDelay)
 		settings.Timestamp = uint32(time.Duration(starts) / time.Microsecond)
 	} else {
 		starts = s.clock.FromTimestampTime(settings.Timestamp)

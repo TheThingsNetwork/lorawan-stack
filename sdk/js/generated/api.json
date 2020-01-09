@@ -9854,6 +9854,16 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "schedule_anytime_delay",
+              "description": "Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

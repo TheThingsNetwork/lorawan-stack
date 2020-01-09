@@ -748,6 +748,18 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "schedule_anytime_delay":
+
+			if v, ok := interface{}(m.GetScheduleAnytimeDelay()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayValidationError{
+						field:  "schedule_anytime_delay",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return GatewayValidationError{
 				field:  name,

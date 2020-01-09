@@ -362,10 +362,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		GatewayIdentifiers: ids,
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{
-				"frequency_plan_id",
-				"schedule_downlink_late",
-				"enforce_duty_cycle",
 				"downlink_path_constraint",
+				"enforce_duty_cycle",
+				"frequency_plan_id",
+				"schedule_anytime_delay",
+				"schedule_downlink_late",
 			},
 		},
 	}, callOpt)
@@ -392,7 +393,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, fp, gtw.EnforceDutyCycle)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fp, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
 	if err != nil {
 		return nil, err
 	}
