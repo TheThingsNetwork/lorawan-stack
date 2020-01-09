@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import React from 'react'
+
+import { DropdownItem } from '../dropdown'
+
 import getProfileDropdownDriver from './index_driver'
 
 const userId = 'kschiffer'
-const dropdownItems = [
-  {
-    title: 'Profile Settings',
-    icon: 'settings',
-    path: '/profile-settings',
-  },
-  {
-    title: 'Logout',
-    icon: 'power_settings_new',
-    action: () => null,
-  },
-]
+const nullAction = function() {
+  return null
+}
+const children = (
+  <React.Fragment>
+    <DropdownItem title="Profile Settings" icon="settings" link="/profile-settings" />
+    <DropdownItem title="Logout" icon="power_settings_new" action={nullAction} />
+  </React.Fragment>
+)
 
 describe('Profile Dropdown', function() {
   let driver = null
@@ -37,7 +38,7 @@ describe('Profile Dropdown', function() {
 
   describe('is in initial state', function() {
     beforeEach(function() {
-      driver.when.created({ userId, dropdownItems })
+      driver.when.created({ userId, children })
     })
     it('should match snapshot', function() {
       expect(driver.component).toMatchSnapshot()

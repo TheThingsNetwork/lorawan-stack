@@ -16,11 +16,8 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
-import ProfileDropdown, { DropdownItem } from '.'
-
-const user = {
-  name: 'kschiffer',
-}
+import { DropdownItem } from '../dropdown'
+import ProfileDropdown from '.'
 
 const handleLogout = function() {
   // eslint-disable-next-line no-console
@@ -38,9 +35,11 @@ storiesOf('Profile Dropdown', module)
   )
   .add('Default', function() {
     return (
-      <ProfileDropdown style={{ marginLeft: '60px' }} user={user}>
-        <DropdownItem title="Profile Settings" icon="settings" link="/profile-settings" />
-        <DropdownItem title="Logout" icon="power_settings_new" action={handleLogout} />
-      </ProfileDropdown>
+      <div style={{ height: '6rem' }}>
+        <ProfileDropdown style={{ marginLeft: '120px' }} userId="johndoe">
+          <DropdownItem title="Profile Settings" icon="settings" path="/profile-settings" />
+          <DropdownItem title="Logout" icon="power_settings_new" action={handleLogout} />
+        </ProfileDropdown>
+      </div>
     )
   })

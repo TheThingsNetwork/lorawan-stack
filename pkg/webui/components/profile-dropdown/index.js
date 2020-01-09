@@ -14,14 +14,12 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import classnames from 'classnames'
 
 import Icon from '../icon'
-import Message from '../../lib/components/message'
-import Link from '../link'
+import Dropdown from '../dropdown'
 import PropTypes from '../../lib/prop-types'
 
-import styles from './profile-dropdown.styl'
+import style from './profile-dropdown.styl'
 
 export default class ProfileDropdown extends React.PureComponent {
   state = {
@@ -68,7 +66,7 @@ export default class ProfileDropdown extends React.PureComponent {
 
     return (
       <div
-        className={styles.container}
+        className={style.container}
         onClick={this.toggleDropdown}
         onKeyPress={this.toggleDropdown}
         ref={this.ref}
@@ -76,9 +74,13 @@ export default class ProfileDropdown extends React.PureComponent {
         role="button"
         {...rest}
       >
-        <span className={styles.id}>{userId}</span>
+        <span className={style.id}>{userId}</span>
         <Icon icon="arrow_drop_down" />
-        {this.state.expanded && <Dropdown anchored={anchored}>{children}</Dropdown>}
+        {this.state.expanded && (
+          <Dropdown className={style.dropdown} anchored={anchored}>
+            {children}
+          </Dropdown>
+        )}
       </div>
     )
   }
@@ -98,58 +100,3 @@ ProfileDropdown.propTypes = {
 ProfileDropdown.defaultProps = {
   anchored: undefined,
 }
-
-const Dropdown = ({ children, anchored }) => <ul className={styles.dropdown}>{children}</ul>
-
-Dropdown.propTypes = {
-  /** Flag identifying whether link should be rendered as plain anchor link */
-  anchored: PropTypes.bool,
-  children: PropTypes.node.isRequired,
-}
-
-Dropdown.defaultProps = {
-  anchored: undefined,
-}
-
-const DropdownItem = function({ className, icon, title, path, action, anchored }) {
-  const iconElement = icon && <Icon className={styles.icon} icon={icon} />
-  const ItemElement = action ? (
-    <button onClick={action} onKeyPress={action} role="tab" tabIndex="0">
-      {iconElement}
-      <Message content={title} />
-    </button>
-  ) : anchored ? (
-    <Link.BaseAnchor href={path}>
-      {iconElement}
-      <Message content={title} />
-    </Link.BaseAnchor>
-  ) : (
-    <Link to={path}>
-      {iconElement}
-      <Message content={title} />
-    </Link>
-  )
-  return (
-    <li className={classnames(styles.dropdownItem, className)} key={title.id || title}>
-      {ItemElement}
-    </li>
-  )
-}
-
-DropdownItem.propTypes = {
-  action: PropTypes.func,
-  anchored: PropTypes.bool,
-  className: PropTypes.string,
-  icon: PropTypes.string.isRequired,
-  path: PropTypes.string,
-  title: PropTypes.message.isRequired,
-}
-
-DropdownItem.defaultProps = {
-  action: undefined,
-  anchored: false,
-  path: undefined,
-  className: undefined,
-}
-
-export { Dropdown, DropdownItem }

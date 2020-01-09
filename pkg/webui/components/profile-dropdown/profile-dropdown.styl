@@ -34,44 +34,5 @@
   one-liner()
   margin-right: $cs.s
 
-ul.dropdown
-  border-normal()
-  z-index: $zi.nav
+.dropdown
   top: 6rem
-  right: 0
-  position: absolute
-  background: white
-  padding: 0
-  min-width: 14rem
-
-  li.dropdown-item
-    display: block
-    margin-bottom: 0
-
-    button
-      reset-button()
-
-    & > a, & > button
-      one-liner()
-      color: $tc-deep-gray
-      text-decoration: none
-      padding: $cs.m 0
-      width: 100%
-
-      span:last-child
-        nudge('down')
-
-    .icon
-      margin-left: $cs.m
-
-    &:not(:last-child)
-      border-normal('bottom')
-
-    &:hover
-      background-color: $c-active-blue
-
-      a, button
-        color: white
-
-      .icon
-        color: white

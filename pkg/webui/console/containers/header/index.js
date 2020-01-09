@@ -21,7 +21,7 @@ import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import HeaderComponent from '../../../components/header'
 import { NavigationBarItem } from '../../../components/navigation/bar'
-import { DropdownItem } from '../../../components/profile-dropdown'
+import { DropdownItem } from '../../../components/dropdown'
 
 import { logout } from '../../store/actions/user'
 import { selectUser } from '../../store/selectors/user'

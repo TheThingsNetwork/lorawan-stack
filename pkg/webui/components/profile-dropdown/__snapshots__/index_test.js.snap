@@ -3,20 +3,6 @@
 exports[`Profile Dropdown is in initial state has dropdown open should match snapshot 1`] = `
 <div
   className="container"
-  dropdownItems={
-    Array [
-      Object {
-        "icon": "settings",
-        "path": "/profile-settings",
-        "title": "Profile Settings",
-      },
-      Object {
-        "action": [Function],
-        "icon": "power_settings_new",
-        "title": "Logout",
-      },
-    ]
-  }
   onClick={[Function]}
   onKeyPress={[Function]}
   role="button"
@@ -34,8 +20,44 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
     nudgeUp={false}
     small={false}
   />
-  <Dropdown />
+  <Dropdown
+    className="dropdown"
+  >
+    <DropdownItem
+      anchored={false}
+      icon="settings"
+      link="/profile-settings"
+      title="Profile Settings"
+    />
+    <DropdownItem
+      action={[Function]}
+      anchored={false}
+      icon="power_settings_new"
+      title="Logout"
+    />
+  </Dropdown>
 </div>
 `;
 
-exports[`Profile Dropdown is in initial state should match snapshot 1`] = `undefined`;
+exports[`Profile Dropdown is in initial state should match snapshot 1`] = `
+<div
+  className="container"
+  onClick={[Function]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex="0"
+>
+  <span
+    className="id"
+  >
+    kschiffer
+  </span>
+  <Icon
+    icon="arrow_drop_down"
+    large={false}
+    nudgeDown={false}
+    nudgeUp={false}
+    small={false}
+  />
+</div>
+`;
