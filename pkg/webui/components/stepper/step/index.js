@@ -81,7 +81,7 @@ Step.defaultProps = {
   className: undefined,
   description: undefined,
   transitionFailed: false,
-  vertical: PropTypes.bool,
+  vertical: false,
 }
 
 Step.propTypes = {
@@ -92,7 +92,7 @@ Step.propTypes = {
   stepNumber: PropTypes.number.isRequired,
   title: PropTypes.message.isRequired,
   transitionFailed: PropTypes.bool,
-  vertical: false,
+  vertical: PropTypes.bool,
 }
 
 export default Step
