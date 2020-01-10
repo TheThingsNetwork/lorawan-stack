@@ -173,7 +173,7 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Support mulitple frequency plans (https://github.com/TheThingsNetwork/lorawan-stack/issues/1820)
+	// TODO: Support multiple frequency plans (https://github.com/TheThingsNetwork/lorawan-stack/issues/1820)
 	return fps[0].ToConcentratorConfig()
 }
 
