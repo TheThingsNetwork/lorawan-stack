@@ -3401,6 +3401,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/io:frequency_plan_not_configured": {
+    "translations": {
+      "en": "frequency plan `{name}` is not configured for this gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/gatewayserver/io:no_uplink_token": {
     "translations": {
       "en": "no uplink token provided for class A downlink"
@@ -3966,6 +3975,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "identityserver.go"
+    }
+  },
+  "error:pkg/identityserver:frequency_plans": {
+    "translations": {
+      "en": "frequency plans must be from the same band"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "gateway_registry.go"
     }
   },
   "error:pkg/identityserver:invalid_authorization": {
@@ -5624,6 +5642,15 @@
       "file": "server.go"
     }
   },
+  "error:pkg/pfconfig/basicstationlns:frequency_plan": {
+    "translations": {
+      "en": "invalid frequency plan `{name}`"
+    },
+    "description": {
+      "package": "pkg/pfconfig/basicstationlns",
+      "file": "basicstationlns.go"
+    }
+  },
   "error:pkg/pfconfig/shared:empty_gateway_server_address": {
     "translations": {
       "en": "gateway server address is empty"
@@ -5640,15 +5667,6 @@
     "description": {
       "package": "pkg/pfconfig/shared",
       "file": "shared.go"
-    }
-  },
-  "error:pkg/pfconfig/basicstationlns:frequency_plan": {
-    "translations": {
-      "en": "invalid frequency plan"
-    },
-    "description": {
-      "package": "pkg/pfconfig/basicstationlns",
-      "file": "basicstationlns.go"
     }
   },
   "error:pkg/pfconfig/shared:invalid_key": {
