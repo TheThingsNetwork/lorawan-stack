@@ -60,14 +60,14 @@ type RouterConfig struct {
 }
 
 // MarshalJSON implements json.Marshaler.
-func (cfg RouterConfig) MarshalJSON() ([]byte, error) {
+func (conf RouterConfig) MarshalJSON() ([]byte, error) {
 	type Alias RouterConfig
 	return json.Marshal(struct {
 		Type string `json:"msgtype"`
 		Alias
 	}{
 		Type:  "router_config",
-		Alias: Alias(cfg),
+		Alias: Alias(conf),
 	})
 }
 
@@ -79,9 +79,9 @@ func GetRouterConfig(fps []*frequencyplans.FrequencyPlan, isProd bool, dlTime ti
 			return RouterConfig{}, errFrequencyPlan
 		}
 	}
-	cfg := RouterConfig{}
-	cfg.JoinEUI = nil
-	cfg.NetID = nil
+	conf := RouterConfig{}
+	conf.JoinEUI = nil
+	conf.NetID = nil
 
 	// All frequency plans are from the same band, so choosing the first one.
 	band, err := band.GetByID(fps[0].BandID)
@@ -92,26 +92,26 @@ func GetRouterConfig(fps []*frequencyplans.FrequencyPlan, isProd bool, dlTime ti
 	if len(s) < 2 {
 		return RouterConfig{}, errFrequencyPlan
 	}
-	cfg.Region = fmt.Sprintf("%s%s", s[0], s[1])
+	conf.Region = fmt.Sprintf("%s%s", s[0], s[1])
 
 	min, max, err := getMinMaxFrequencies(fps)
-	cfg.FrequencyRange = []int{
+	conf.FrequencyRange = []int{
 		int(min),
 		int(max),
 	}
 
-	cfg.HardwareSpec = fmt.Sprintf("%s/%d", configHardwareSpecPrefix, len(fps))
+	conf.HardwareSpec = fmt.Sprintf("%s/%d", configHardwareSpecPrefix, len(fps))
 
 	// All frequency plans are from the same band, so choosing the first one.
 	drs, err := getDataRatesFromBandID(fps[0].BandID)
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan
 	}
-	cfg.DataRates = drs
+	conf.DataRates = drs
 
-	cfg.NoCCA = !isProd
-	cfg.NoDutyCycle = !isProd
-	cfg.NoDwellTime = !isProd
+	conf.NoCCA = !isProd
+	conf.NoDutyCycle = !isProd
+	conf.NoDwellTime = !isProd
 
 	for _, fp := range fps {
 		sx1301Conf, err := shared.BuildSX1301Config(fp)
@@ -126,13 +126,13 @@ func GetRouterConfig(fps []*frequencyplans.FrequencyPlan, isProd bool, dlTime ti
 		if err != nil {
 			return RouterConfig{}, err
 		}
-		cfg.SX1301Config = append(cfg.SX1301Config, *sx1301Conf)
+		conf.SX1301Config = append(conf.SX1301Config, *sx1301Conf)
 	}
 
 	// Add the MuxTime for RTT measurement.
-	cfg.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
+	conf.MuxTime = float64(dlTime.Unix()) + float64(dlTime.Nanosecond())/(1e9)
 
-	return cfg, nil
+	return conf, nil
 }
 
 // getDataRatesFromBandID parses the available data rates from the band into DataRates.
