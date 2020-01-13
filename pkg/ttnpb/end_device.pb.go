@@ -691,7 +691,7 @@ type EndDeviceVersion struct {
 	MaxFrequency uint64 `protobuf:"varint,10,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
 	// The device supports join (it's OTAA).
 	SupportsJoin bool `protobuf:"varint,11,opt,name=supports_join,json=supportsJoin,proto3" json:"supports_join,omitempty"`
-	// Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
+	// Whether the device resets the join and dev nonces (not LoRaWAN compliant).
 	ResetsJoinNonces bool `protobuf:"varint,12,opt,name=resets_join_nonces,json=resetsJoinNonces,proto3" json:"resets_join_nonces,omitempty"`
 	// Default formatters defining the payload formats for this end device.
 	DefaultFormatters    MessagePayloadFormatters `protobuf:"bytes,13,opt,name=default_formatters,json=defaultFormatters,proto3" json:"default_formatters"`
@@ -1479,7 +1479,7 @@ type EndDevice struct {
 	// The device supports join (it's OTAA).
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
 	SupportsJoin bool `protobuf:"varint,20,opt,name=supports_join,json=supportsJoin,proto3" json:"supports_join,omitempty"`
-	// Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server.
+	// Whether the device resets the join and dev nonces (not LoRaWAN compliant). Stored in Join Server.
 	// Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
 	ResetsJoinNonces bool `protobuf:"varint,21,opt,name=resets_join_nonces,json=resetsJoinNonces,proto3" json:"resets_join_nonces,omitempty"`
 	// Device root keys. Stored in Join Server.

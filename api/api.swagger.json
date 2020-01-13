@@ -8840,7 +8840,7 @@
         "resets_join_nonces": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
+          "description": "Whether the device resets the join and dev nonces (not LoRaWAN compliant). Stored in Join Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any."
         },
         "root_keys": {
           "$ref": "#/definitions/v3RootKeys",
