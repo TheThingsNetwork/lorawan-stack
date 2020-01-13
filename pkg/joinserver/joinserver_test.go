@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver/redis"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -1705,6 +1706,7 @@ func TestHandleJoin(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			ctx := tc.ContextFunc(ctx)
+			ctx = log.NewContext(ctx, test.GetLogger(t))
 
 			redisClient, flush := test.NewRedis(t, "joinserver_test")
 			defer flush()
