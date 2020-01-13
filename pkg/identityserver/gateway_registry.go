@@ -20,7 +20,6 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
@@ -42,8 +41,6 @@ var (
 	)
 )
 
-var errFrequencyPlans = errors.DefineInvalidArgument("frequency_plans", "frequency plans must be from the same band")
-
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
 	if err = blacklist.Check(ctx, req.GatewayID); err != nil {
 		return nil, err
@@ -62,24 +59,6 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	}
 	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
 		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
-	}
-
-	// Ensure that all Frequency Plan IDs are from the same band.
-	lenFPIDs := len(req.FrequencyPlanIDs)
-	if lenFPIDs > 1 {
-		for i := 0; i < (lenFPIDs - 1); i++ {
-			fp1, err := is.FrequencyPlans.GetByID(req.FrequencyPlanIDs[i])
-			if err != nil {
-				return nil, err
-			}
-			fp2, err := is.FrequencyPlans.GetByID(req.FrequencyPlanIDs[i+1])
-			if err != nil {
-				return nil, err
-			}
-			if fp1.BandID != fp2.BandID {
-				return nil, errFrequencyPlans
-			}
-		}
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -267,24 +246,6 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	}
 	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
 		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
-	}
-
-	// Ensure that all Frequency Plan IDs are from the same band.
-	lenFPIDs := len(req.FrequencyPlanIDs)
-	if lenFPIDs > 1 {
-		for i := 0; i < (lenFPIDs - 1); i++ {
-			fp1, err := is.FrequencyPlans.GetByID(req.FrequencyPlanIDs[i])
-			if err != nil {
-				return nil, err
-			}
-			fp2, err := is.FrequencyPlans.GetByID(req.FrequencyPlanIDs[i+1])
-			if err != nil {
-				return nil, err
-			}
-			if fp1.BandID != fp2.BandID {
-				return nil, errFrequencyPlans
-			}
-		}
 	}
 
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, nil, append(getPaths, "frequency_plan_id"))
