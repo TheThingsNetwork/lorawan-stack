@@ -159,6 +159,11 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		}
 		md.UplinkToken = buf
 		md.DownlinkPathConstraint = c.gateway.DownlinkPathConstraint
+
+		if len(c.gateway.Antennas) > int(md.AntennaIndex) {
+			location := c.gateway.Antennas[md.AntennaIndex].Location
+			md.Location = &location
+		}
 	}
 
 	select {

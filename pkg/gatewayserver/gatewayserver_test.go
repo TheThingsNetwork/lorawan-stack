@@ -665,6 +665,9 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
+											Location: &ttnpb.Location{
+												Source: ttnpb.SOURCE_REGISTRY,
+											},
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -696,6 +699,9 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
+											Location: &ttnpb.Location{
+												Source: ttnpb.SOURCE_REGISTRY,
+											},
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -729,6 +735,9 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -112,
 											ChannelRSSI:        -112,
 											SNR:                2,
+											Location: &ttnpb.Location{
+												Source: ttnpb.SOURCE_REGISTRY,
+											},
 										},
 									},
 									RawPayload: []byte{0xff, 0x02, 0x03}, // Garbage; doesn't get forwarded.
@@ -754,6 +763,9 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -69,
 											ChannelRSSI:        -69,
 											SNR:                11,
+											Location: &ttnpb.Location{
+												Source: ttnpb.SOURCE_REGISTRY,
+											},
 										},
 									},
 									RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -779,6 +791,9 @@ func TestGatewayServer(t *testing.T) {
 											RSSI:               -36,
 											ChannelRSSI:        -36,
 											SNR:                5,
+											Location: &ttnpb.Location{
+												Source: ttnpb.SOURCE_REGISTRY,
+											},
 										},
 									},
 									RawPayload: randomJoinRequestPayload(
