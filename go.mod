@@ -123,7 +123,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.6.1
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	github.com/tdewolff/minify/v2 v2.7.0 // indirect
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/yuin/goldmark v1.1.20 // indirect
 	go.opencensus.io v0.22.2
