@@ -1664,6 +1664,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:     431000000,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -1918,6 +1919,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:     431000000,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -2224,6 +2226,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:     431000000,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -2537,6 +2540,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Delay:         ttnpb.RX_DELAY_3,
 							Rx1DataRateIndex: ttnpb.DATA_RATE_4,
 							Rx1Frequency:     431000000,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -2982,6 +2986,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:     431000000,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -3311,6 +3316,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:     431000000,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -3385,6 +3391,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:         ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -3696,6 +3703,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
 							AbsoluteTime:     &absTime,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -4013,6 +4021,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
 							AbsoluteTime:     &absTime,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -4318,6 +4327,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
 							AbsoluteTime:     &absTime,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -4918,6 +4928,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:     431000000,
 							Rx2DataRateIndex: ttnpb.DATA_RATE_1,
 							Rx2Frequency:     420000000,
+							FrequencyPlanID:  test.EUFrequencyPlanID,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
