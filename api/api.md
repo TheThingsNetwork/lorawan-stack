@@ -4793,7 +4793,6 @@ Uplink message from the end device to the network
 | Field | Validations |
 | ----- | ----------- |
 | `settings` | <p>`message.required`: `true`</p> |
-| `rx_metadata` | <p>`repeated.min_items`: `1`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
 | `device_channel_index` | <p>`uint32.lte`: `255`</p> |
 
