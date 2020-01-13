@@ -288,7 +288,7 @@
   "console.views.gateway-data.index.gtwData": "Xxxxxxx Xxxx",
   "console.views.gateway-general-settings.index.updateSuccess": "Xxxxxxxxxxxx xxxxxxx xxxxxxx",
   "console.views.gateway-general-settings.index.deleteGateway": "Xxxxxx Xxxxxxx",
-  "console.views.gateway-general-settings.index.modalWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx \"{gtwName}\"? Xxxx xxxxxx xxxxxx xx xxxxxx xxx xx xxxx xxx xx xxxxxxxx xx xxxxx xxx xxxxxxx XX xxx XXX!",
+  "console.views.gateway-general-settings.index.modalWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx \"{gtwName}\"? Xxxx xxxxxx xxxxxx xx xxxxxx xxx xx xxxx xxx xx xxxxxxxx xx xxxxx xxx xxxxxxx XX!",
   "console.views.gateway-location.index.setGatewayLocation": "Xxx xxxxxxx xxxxxxx xxxxxxxx",
   "console.views.login.index.welcome": "Xxxxxxx xx {siteName}",
   "console.views.login.index.loginSub": "Xxx xxxx xx xx xxxxxx xx xx xxx xxxx xxxx.",
