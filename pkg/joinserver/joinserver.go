@@ -323,13 +323,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				paths = append(paths, "last_dev_nonce")
 			} else {
 				i := sort.Search(len(dev.UsedDevNonces), func(i int) bool { return dev.UsedDevNonces[i] >= dn })
-				if i < len(dev.UsedDevNonces) && dev.UsedDevNonces[i] == dn {
+				if i >= len(dev.UsedDevNonces) || dev.UsedDevNonces[i] != dn {
+					dev.UsedDevNonces = append(dev.UsedDevNonces, 0)
+					copy(dev.UsedDevNonces[i+1:], dev.UsedDevNonces[i:])
+					dev.UsedDevNonces[i] = dn
+					paths = append(paths, "used_dev_nonces")
+				} else if !dev.ResetsJoinNonces {
 					return nil, nil, errReuseDevNonce
 				}
-				dev.UsedDevNonces = append(dev.UsedDevNonces, 0)
-				copy(dev.UsedDevNonces[i+1:], dev.UsedDevNonces[i:])
-				dev.UsedDevNonces[i] = dn
-				paths = append(paths, "used_dev_nonces")
 			}
 
 			var b []byte
