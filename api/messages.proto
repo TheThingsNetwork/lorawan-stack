@@ -74,7 +74,7 @@ message UplinkMessage {
   bytes raw_payload = 1;
   Message payload = 2;
   TxSettings settings = 4 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  repeated RxMetadata rx_metadata = 5 [(validate.rules).repeated.min_items = 1];
+  repeated RxMetadata rx_metadata = 5;
   // Server time when a component received the message.
   // The Gateway Server and Network Server set this value to their local server time of reception.
   google.protobuf.Timestamp received_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
