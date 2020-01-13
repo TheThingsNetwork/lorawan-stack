@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `resets_join_nonces` now applies to pre-1.1 devices as well as 1.1+ devices.
+
 ### Deprecated
 
 ### Removed
