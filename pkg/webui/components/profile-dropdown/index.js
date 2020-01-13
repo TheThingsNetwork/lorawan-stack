@@ -62,7 +62,7 @@ export default class ProfileDropdown extends React.PureComponent {
   }
 
   render() {
-    const { userId, children, anchored, ...rest } = this.props
+    const { userId, children, ...rest } = this.props
 
     return (
       <div
@@ -76,18 +76,13 @@ export default class ProfileDropdown extends React.PureComponent {
       >
         <span className={style.id}>{userId}</span>
         <Icon icon="arrow_drop_down" />
-        {this.state.expanded && (
-          <Dropdown className={style.dropdown} anchored={anchored}>
-            {children}
-          </Dropdown>
-        )}
+        {this.state.expanded && <Dropdown className={style.dropdown}>{children}</Dropdown>}
       </div>
     )
   }
 }
 
 ProfileDropdown.propTypes = {
-  anchored: PropTypes.bool,
   /**
    * A list of items for the dropdown component
    * See `<Dropdown />`'s `items` proptypes for details
@@ -95,8 +90,4 @@ ProfileDropdown.propTypes = {
   children: PropTypes.node.isRequired,
   /** The id of the current user */
   userId: PropTypes.string.isRequired,
-}
-
-ProfileDropdown.defaultProps = {
-  anchored: undefined,
 }

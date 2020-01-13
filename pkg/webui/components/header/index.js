@@ -31,26 +31,22 @@ const Header = function({
   user,
   searchable,
   handleSearchRequest = () => null,
-  anchored = false,
   ...rest
 }) {
   const isGuest = !Boolean(user)
-  const LinkComponent = anchored ? Link.BaseAnchor : Link
 
   return (
     <header {...rest} className={classnames(className, style.bar)}>
       <div className={style.left}>
-        <LinkComponent {...(anchored ? { href: '/' } : { to: '/' })} className={style.logo}>
+        <Link to="/" className={style.logo}>
           <Logo />
-        </LinkComponent>
+        </Link>
         {!isGuest && <NavigationBar className={style.navList}>{navigationEntries}</NavigationBar>}
       </div>
       {!isGuest && (
         <div className={style.right}>
           {searchable && <Input icon="search" onEnter={handleSearchRequest} />}
-          <ProfileDropdown userId={user.ids.user_id} anchored={anchored}>
-            {dropdownItems}
-          </ProfileDropdown>
+          <ProfileDropdown userId={user.ids.user_id}>{dropdownItems}</ProfileDropdown>
         </div>
       )}
     </header>
@@ -58,8 +54,6 @@ const Header = function({
 }
 
 Header.propTypes = {
-  /** Flag identifying whether links should be rendered as plain anchor link */
-  anchored: PropTypes.bool,
   /** The classname applied to the component */
   className: PropTypes.string,
   /**
@@ -80,7 +74,6 @@ Header.propTypes = {
 }
 
 Header.defaultProps = {
-  anchored: false,
   className: undefined,
   dropdownItems: undefined,
   navigationEntries: undefined,

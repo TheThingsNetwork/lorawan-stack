@@ -53,8 +53,6 @@ import {
 @bind
 class Header extends Component {
   static propTypes = {
-    /** Flag identifying whether links should be rendered as plain anchor link */
-    anchored: PropTypes.bool,
     /** A handler for when the user clicks the logout button */
     handleLogout: PropTypes.func.isRequired,
     /** A handler for when the user used the search input */
@@ -73,7 +71,6 @@ class Header extends Component {
   }
 
   static defaultProps = {
-    anchored: false,
     handleSearchRequest: () => null,
     searchable: false,
     user: undefined,
@@ -86,7 +83,6 @@ class Header extends Component {
   render() {
     const {
       user,
-      anchored,
       handleSearchRequest,
       handleLogout,
       searchable,
@@ -141,7 +137,6 @@ class Header extends Component {
         user={user}
         dropdownItems={dropdownItems}
         navigationEntries={navigationEntries}
-        anchored={anchored}
         searchable={searchable}
         handleSearchRequest={handleSearchRequest}
       />
