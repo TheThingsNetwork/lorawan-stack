@@ -167,6 +167,7 @@
   "console.components.webhook-form.index.headersAdd": "Add header entry",
   "console.components.webhook-form.index.headersValidateRequired": "All header entry values are required. Please remove empty entries.",
   "console.components.webhook-form.index.downlinkAPIKey": "Downlink API Key",
+  "console.components.webhook-form.index.downlinkAPIKeyDesc": "The API Key will be provided to the endpoint using the X-Downlink-Apikey header",
   "console.containers.api-keys-table.index.keyId": "Key ID",
   "console.containers.api-keys-table.index.grantedRights": "Granted Rights",
   "console.containers.application-payload-formatters.downlink.infoText": "These payload formatters are executed on downlink messages to all devices in this application. If payload formatters are also set for a specific device, only those will be executed for downlinks to that device.",

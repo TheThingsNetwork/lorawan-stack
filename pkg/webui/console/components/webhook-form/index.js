@@ -47,6 +47,8 @@ const m = defineMessages({
   headersAdd: 'Add header entry',
   headersValidateRequired: 'All header entry values are required. Please remove empty entries.',
   downlinkAPIKey: 'Downlink API Key',
+  downlinkAPIKeyDesc:
+    'The API Key will be provided to the endpoint using the X-Downlink-Apikey header',
 })
 
 const headerCheck = headers =>
@@ -153,7 +155,13 @@ export default class WebhookForm extends Component {
           component={Input}
           required
         />
-        <Form.Field name="downlink_api_key" title={m.downlinkAPIKey} component={Input} code />
+        <Form.Field
+          name="downlink_api_key"
+          title={m.downlinkAPIKey}
+          component={Input}
+          description={m.downlinkAPIKeyDesc}
+          code
+        />
         <Message component="h4" content={sharedMessages.messageTypes} />
         <Notification info content={m.messageInfo} small />
         <Form.Field
