@@ -236,7 +236,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 		{
 			Name: "ValidFrequencyPlan",
 			FrequencyPlans: []*frequencyplans.FrequencyPlan{
-				&frequencyplans.FrequencyPlan{
+				{
 					BandID: "US_902_928",
 					Radios: []frequencyplans.Radio{
 						{
@@ -255,7 +255,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 						},
 					},
 				},
-				&frequencyplans.FrequencyPlan{
+				{
 					BandID: "US_902_928",
 					Radios: []frequencyplans.Radio{
 						{
