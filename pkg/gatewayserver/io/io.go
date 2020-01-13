@@ -162,7 +162,9 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 
 		if len(c.gateway.Antennas) > int(md.AntennaIndex) {
 			location := c.gateway.Antennas[md.AntennaIndex].Location
-			md.Location = &location
+			if location.Source != ttnpb.SOURCE_UNKNOWN {
+				md.Location = &location
+			}
 		}
 	}
 
