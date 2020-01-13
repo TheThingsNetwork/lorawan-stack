@@ -43,7 +43,7 @@ const m = defineMessages({
   updateSuccess: 'Successfully updated gateway',
   deleteGateway: 'Delete Gateway',
   modalWarning:
-    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID and EUI!',
+    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID!',
 })
 
 @connect(
