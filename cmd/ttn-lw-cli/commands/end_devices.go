@@ -160,7 +160,7 @@ func generateDevAddr(netID types.NetID) (types.DevAddr, error) {
 	return devAddr, nil
 }
 
-var errGatewayServerDisabled = errors.DefineFailedPrecondition("gateway_server_disabled", "Gateway Server is disabled")
+var errNetworkServerDisabled = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
 
 var (
 	endDevicesCommand = &cobra.Command{
@@ -173,8 +173,8 @@ var (
 		Short:             "List available frequency plans for end devices",
 		PersistentPreRunE: preRun(),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !config.GatewayServerEnabled {
-				return errGatewayServerDisabled
+			if !config.NetworkServerEnabled {
+				return errNetworkServerDisabled
 			}
 
 			baseFrequency, _ := cmd.Flags().GetUint32("base-frequency")
