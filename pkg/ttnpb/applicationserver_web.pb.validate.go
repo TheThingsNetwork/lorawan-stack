@@ -516,6 +516,8 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 
 			}
 
+		case "create_downlink_api_key":
+			// no validation rules for CreateDownlinkAPIKey
 		case "uplink_message":
 
 			if v, ok := interface{}(m.GetUplinkMessage()).(interface{ ValidateFields(...string) error }); ok {
@@ -878,6 +880,8 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 
 		case "template_fields":
 			// no validation rules for TemplateFields
+		case "downlink_api_key":
+			// no validation rules for DownlinkAPIKey
 		case "uplink_message":
 
 			if v, ok := interface{}(m.GetUplinkMessage()).(interface{ ValidateFields(...string) error }); ok {

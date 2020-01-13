@@ -166,6 +166,8 @@
   "console.components.webhook-form.index.headersValuePlaceholder": "Xxxxxx xx-xxxx-xxxxx",
   "console.components.webhook-form.index.headersAdd": "Xxx xxxxxx xxxxx",
   "console.components.webhook-form.index.headersValidateRequired": "Xxx xxxxxx xxxxx xxxxxx xxx xxxxxxxx. Xxxxxx xxxxxx xxxxx xxxxxxx.",
+  "console.components.webhook-form.index.downlinkAPIKey": "Xxxxxxxx XXX Xxx",
+  "console.components.webhook-form.index.downlinkAPIKeyDesc": "Xxx XXX Xxx xxxx xx xxxxxxxx xx xxx xxxxxxxx xxxxx xxx X-Xxxxxxxx-Xxxxxx xxxxxx",
   "console.containers.api-keys-table.index.keyId": "Xxx XX",
   "console.containers.api-keys-table.index.grantedRights": "Xxxxxxx Xxxxxx",
   "console.containers.application-payload-formatters.downlink.infoText": "Xxxxx xxxxxxx xxxxxxxxxx xxx xxxxxxxx xx xxxxxxxx xxxxxxxx xx xxx xxxxxxx xx xxxx xxxxxxxxxxx. Xx xxxxxxx xxxxxxxxxx xxx xxxx xxx xxx x xxxxxxxx xxxxxx, xxxx xxxxx xxxx xx xxxxxxxx xxx xxxxxxxxx xx xxxx xxxxxx.",

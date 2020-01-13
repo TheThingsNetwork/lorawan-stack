@@ -239,6 +239,16 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 			} else {
 				dst.Fields = nil
 			}
+		case "create_downlink_api_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'create_downlink_api_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CreateDownlinkAPIKey = src.CreateDownlinkAPIKey
+			} else {
+				var zero bool
+				dst.CreateDownlinkAPIKey = zero
+			}
 		case "uplink_message":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookTemplate_Message
@@ -570,6 +580,16 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 				dst.TemplateFields = src.TemplateFields
 			} else {
 				dst.TemplateFields = nil
+			}
+		case "downlink_api_key":
+			if len(subs) > 0 {
+				return fmt.Errorf("'downlink_api_key' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DownlinkAPIKey = src.DownlinkAPIKey
+			} else {
+				var zero string
+				dst.DownlinkAPIKey = zero
 			}
 		case "uplink_message":
 			if len(subs) > 0 {

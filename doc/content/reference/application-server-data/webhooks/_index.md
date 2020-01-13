@@ -1,7 +1,7 @@
 ---
 title: "HTTP Webhooks"
 description: ""
-weight: 20
+weight: 3
 ---
 
 The webhooks feature allows the Application Server to send application related messages to specific HTTP(S) endpoints.
@@ -47,3 +47,5 @@ $ curl https://thethings.example.com/api/v3/as/applications/app1/webhooks/wh1/de
 ```
 
 Will push a downlink to the end device `dev1` of the application `app1` using the webhook `wh1`.
+
+You can also save the API key in the webhook configuration page using the the **Downlink API Key** field. The Application Server will provide it to your endpoint using the `X-Downlink-Apikey` header and the push and replace operations paths using the `X-Downlink-Push` and `X-Downlink-Replace` headers.

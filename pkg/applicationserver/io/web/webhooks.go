@@ -17,6 +17,7 @@ package web
 import (
 	"bytes"
 	"context"
+	"fmt"
 	stdio "io"
 	"io/ioutil"
 	"net/http"
@@ -141,21 +142,30 @@ type Webhooks interface {
 	NewSubscription() *io.Subscription
 }
 
+// DownlinksConfig defines the configuration for the webhook downlink queue operations.
+// For public addresses, the TLS version is preferred when present.
+type DownlinksConfig struct {
+	PublicAddress    string `name:"public-address" description:"Public address of the HTTP webhooks frontend"`
+	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the HTTPS webhooks frontend"`
+}
+
 type webhooks struct {
-	ctx      context.Context
-	server   io.Server
-	registry WebhookRegistry
-	target   Sink
+	ctx       context.Context
+	server    io.Server
+	registry  WebhookRegistry
+	target    Sink
+	downlinks DownlinksConfig
 }
 
 // NewWebhooks returns a new Webhooks.
-func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink) Webhooks {
+func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink, downlinks DownlinksConfig) Webhooks {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/web")
 	return &webhooks{
-		ctx:      ctx,
-		server:   server,
-		registry: registry,
-		target:   target,
+		ctx:       ctx,
+		server:    server,
+		registry:  registry,
+		target:    target,
+		downlinks: downlinks,
 	}
 }
 
@@ -200,7 +210,28 @@ const (
 	applicationIDKey = "application_id"
 	deviceIDKey      = "device_id"
 	webhookIDKey     = "webhook_id"
+
+	downlinkKeyHeader     = "X-Downlink-Apikey"
+	downlinkPushHeader    = "X-Downlink-Push"
+	downlinkReplaceHeader = "X-Downlink-Replace"
+
+	downlinkOperationURLFormat = "%s/as/applications/%s/webhooks/%s/devices/%s/down/%s"
 )
+
+func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
+	downlinks := w.downlinks
+	baseURL := downlinks.PublicTLSAddress
+	if baseURL == "" {
+		baseURL = downlinks.PublicAddress
+	}
+	return fmt.Sprintf(downlinkOperationURLFormat,
+		baseURL,
+		webhookID.ApplicationID,
+		webhookID.WebhookID,
+		devID.DeviceID,
+		op,
+	)
+}
 
 func (w *webhooks) validateAndFillIDs() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -282,6 +313,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	hooks, err := w.registry.List(ctx, msg.ApplicationIdentifiers,
 		[]string{
 			"base_url",
+			"downlink_api_key",
 			"downlink_ack",
 			"downlink_failed",
 			"downlink_nack",
@@ -368,6 +400,11 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	}
 	for key, value := range hook.Headers {
 		req.Header.Set(key, value)
+	}
+	if hook.DownlinkAPIKey != "" {
+		req.Header.Set(downlinkKeyHeader, hook.DownlinkAPIKey)
+		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "replace"))
 	}
 	req.Header.Set("Content-Type", format.ContentType)
 	req.Header.Set("User-Agent", userAgent)

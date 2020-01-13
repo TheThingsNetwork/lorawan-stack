@@ -91,6 +91,7 @@ type WebhooksConfig struct {
 	QueueSize int                 `name:"queue-size" description:"Number of requests to queue"`
 	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
 	Templates web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
+	Downlinks web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
 }
 
 // PubSubConfig contains go-cloud PubSub configuration of the Application Server.
@@ -136,7 +137,7 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 			}
 		}()
 	}
-	return web.NewWebhooks(ctx, server, c.Registry, target), nil
+	return web.NewWebhooks(ctx, server, c.Registry, target, c.Downlinks), nil
 }
 
 // NewPubSub returns a new pubsub.PubSub based on the configuration.

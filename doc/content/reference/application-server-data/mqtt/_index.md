@@ -1,7 +1,7 @@
 ---
 title: "MQTT Server"
 description: ""
-weight: 10
+weight: 3
 ---
 
 The Application Server exposes a MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API key to authenticate.

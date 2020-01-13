@@ -43,6 +43,9 @@ func TestWebhooks(t *testing.T) {
 	redisClient, flush := test.NewRedis(t, "web_test")
 	defer flush()
 	defer redisClient.Close()
+	downlinks := web.DownlinksConfig{
+		PublicAddress: "https://example.com/api/v3",
+	}
 	registry := &redis.WebhookRegistry{
 		Redis: redisClient,
 	}
@@ -57,7 +60,8 @@ func TestWebhooks(t *testing.T) {
 				Headers: map[string]string{
 					"Authorization": "key secret",
 				},
-				Format: "json",
+				DownlinkAPIKey: "foo.secret",
+				Format:         "json",
 				UplinkMessage: &ttnpb.ApplicationWebhook_Message{
 					Path: "up",
 				},
@@ -85,6 +89,7 @@ func TestWebhooks(t *testing.T) {
 			},
 			[]string{
 				"base_url",
+				"downlink_api_key",
 				"downlink_ack",
 				"downlink_failed",
 				"downlink_nack",
@@ -130,7 +135,7 @@ func TestWebhooks(t *testing.T) {
 				if controllable, ok := sink.(web.ControllableSink); ok {
 					go controllable.Run(ctx)
 				}
-				w := web.NewWebhooks(ctx, nil, registry, sink)
+				w := web.NewWebhooks(ctx, nil, registry, sink, downlinks)
 				sub := w.NewSubscription()
 				for _, tc := range []struct {
 					Name    string
@@ -308,6 +313,11 @@ func TestWebhooks(t *testing.T) {
 						a.So(req.URL.String(), should.Equal, tc.URL)
 						a.So(req.Header.Get("Authorization"), should.Equal, "key secret")
 						a.So(req.Header.Get("Content-Type"), should.Equal, "application/json")
+						a.So(req.Header.Get("X-Downlink-Apikey"), should.Equal, "foo.secret")
+						a.So(req.Header.Get("X-Downlink-Push"), should.Equal,
+							"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/push")
+						a.So(req.Header.Get("X-Downlink-Replace"), should.Equal,
+							"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/replace")
 						actualBody, err := ioutil.ReadAll(req.Body)
 						if !a.So(err, should.BeNil) {
 							t.FailNow()
@@ -347,7 +357,7 @@ func TestWebhooks(t *testing.T) {
 			Component: c,
 			Server:    io,
 		}
-		w := web.NewWebhooks(ctx, testSink.Server, registry, testSink)
+		w := web.NewWebhooks(ctx, testSink.Server, registry, testSink, downlinks)
 		c.RegisterWeb(w)
 		componenttest.StartComponent(t, c)
 		defer c.Close()

@@ -20,6 +20,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/config"
 )
 
@@ -37,5 +38,6 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Timeout:   5 * time.Second,
 		QueueSize: 16,
 		Workers:   16,
+		Downlinks: web.DownlinksConfig{PublicAddress: shared.DefaultPublicURL + "/api/v3"},
 	},
 }
