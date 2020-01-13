@@ -653,12 +653,12 @@ func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.Gatewa
 	}
 
 	fps := make([]*frequencyplans.FrequencyPlan, len(fpIDs))
-	for _, fpID := range fpIDs {
+	for i, fpID := range fpIDs {
 		fp, err := gs.FrequencyPlans.GetByID(fpID)
 		if err != nil {
 			return nil, err
 		}
-		fps = append(fps, fp)
+		fps[i] = fp
 	}
 	return fps, nil
 }
