@@ -1055,7 +1055,7 @@ func init() {
 
 	endDevicePictureFlags.String("picture", "", "upload the end device picture from this file")
 
-	endDevicesListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
+	endDevicesListFrequencyPlans.Flags().Uint32("base-frequency", 0, "base frequency in MHz for hardware support (433, 470, 868 or 915)")
 	endDevicesCommand.AddCommand(endDevicesListFrequencyPlans)
 	endDevicesListCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesListCommand.Flags().AddFlagSet(selectEndDeviceListFlags)
