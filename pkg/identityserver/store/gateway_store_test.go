@@ -36,10 +36,11 @@ func TestGatewayStore(t *testing.T) {
 		prepareTest(db, &Gateway{}, &GatewayAntenna{}, &Attribute{})
 		store := GetGatewayStore(db)
 
+		eui := &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{
 			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
 				GatewayID: "foo",
-				EUI:       &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+				EUI:       eui,
 			},
 			Name:        "Foo Gateway",
 			Description: "The Amazing Foo Gateway",
@@ -166,5 +167,18 @@ func TestGatewayStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
+
+		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
+			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayID: "reuse-foo-eui",
+				EUI:       eui,
+			},
+		})
+
+		a.So(err, should.BeNil)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.GatewayID, should.Equal, "reuse-foo-eui")
+			a.So(got.EUI, should.Resemble, eui)
+		}
 	})
 }
