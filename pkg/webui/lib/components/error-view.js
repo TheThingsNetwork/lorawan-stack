@@ -13,19 +13,42 @@
 // limitations under the License.
 
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 
 import PropTypes from '../../lib/prop-types'
 
+@withRouter
 class ErrorView extends React.Component {
+  static propTypes = {
+    ErrorComponent: PropTypes.func.isRequired,
+    children: PropTypes.node.isRequired,
+    history: PropTypes.history.isRequired,
+  }
+
   state = {
     error: undefined,
     hasCaught: false,
+  }
+
+  unlisten = () => null
+
+  componentWillUnmount() {
+    this.unlisten()
   }
 
   componentDidCatch(error) {
     this.setState({
       hasCaught: true,
       error,
+    })
+
+    // Clear the error when the route changes (e.g. user clicking a link)
+    const { history } = this.props
+    this.unlisten = history.listen((location, action) => {
+      if (this.state.hasCaught) {
+        this.setState({ hasCaught: false, error: undefined })
+        this.unlisten()
+      }
     })
   }
 
@@ -39,10 +62,6 @@ class ErrorView extends React.Component {
 
     return React.Children.only(children)
   }
-}
-
-ErrorView.propTypes = {
-  ErrorComponent: PropTypes.func.isRequired,
 }
 
 export default ErrorView
