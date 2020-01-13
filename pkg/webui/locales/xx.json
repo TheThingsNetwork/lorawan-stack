@@ -24,7 +24,7 @@
   "components.location-form.index.updateSuccess": "Xxx xxxxxxxx xxx xxxx xxxxxxx xxxxxxxxxxxx",
   "components.location-form.index.deleteFailure": "Xxxxx xxx x xxxxxxx xxxxxxxx xxx xxxxxxxx",
   "components.location-form.index.deleteSuccess": "Xxx xxxxxxxx xxx xxxx xxxxxxx xxxxxxxxxxxx",
-  "components.navigation.side.side.hideSidebar": "Xxxx Xxxxxxx",
+  "components.navigation.side.index.hideSidebar": "Xxxx Xxxxxxx",
   "components.notification.details.index.showDetails": "Xxxx Xxxxxxx",
   "components.notification.details.index.hideDetails": "Xxxx Xxxxxxx",
   "components.safe-inspector.index.copied": "Xxxxxx xx xxxxxxxxx!",
