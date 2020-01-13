@@ -364,6 +364,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			Paths: []string{
 				"downlink_path_constraint",
 				"enforce_duty_cycle",
+				"antennas",
 				"frequency_plan_id",
 				"schedule_anytime_delay",
 				"schedule_downlink_late",
@@ -384,6 +385,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			FrequencyPlanID:        fpID,
 			EnforceDutyCycle:       true,
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			Antennas:               []ttnpb.GatewayAntenna{},
 		}
 	} else if err != nil {
 		return nil, err
