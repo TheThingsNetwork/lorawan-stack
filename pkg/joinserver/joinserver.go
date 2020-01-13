@@ -465,7 +465,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			if err != nil {
 				return nil, nil, errWrapKey.WithCause(err)
 			}
-			if req.SelectedMACVersion >= ttnpb.MAC_V1_1 {
+			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 				sessionKeys.SNwkSIntKey, err = js.wrapKeyIfKEKExists(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel)
 				if err != nil {
 					return nil, nil, errWrapKey.WithCause(err)
