@@ -36,7 +36,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
 func TestWebhooks(t *testing.T) {
@@ -44,9 +43,8 @@ func TestWebhooks(t *testing.T) {
 	redisClient, flush := test.NewRedis(t, "web_test")
 	defer flush()
 	defer redisClient.Close()
-	downlinks := webui.APIConfig{
-		Enabled: true,
-		BaseURL: "https://example.com/api/v3",
+	downlinks := web.DownlinksConfig{
+		PublicAddress: "https://example.com/api/v3",
 	}
 	registry := &redis.WebhookRegistry{
 		Redis: redisClient,

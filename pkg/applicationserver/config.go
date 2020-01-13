@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
 // LinkMode defines how applications are linked to their Network Server.
@@ -92,7 +91,7 @@ type WebhooksConfig struct {
 	QueueSize int                 `name:"queue-size" description:"Number of requests to queue"`
 	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
 	Templates web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
-	Downlinks webui.APIConfig     `name:"downlink" description:"The downlink operations API configuration"`
+	Downlinks web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
 }
 
 // PubSubConfig contains go-cloud PubSub configuration of the Application Server.

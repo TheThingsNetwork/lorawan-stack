@@ -35,7 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/version"
 	ttnweb "go.thethings.network/lorawan-stack/pkg/web"
-	"go.thethings.network/lorawan-stack/pkg/webui"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/grpc/metadata"
 )
@@ -143,16 +142,23 @@ type Webhooks interface {
 	NewSubscription() *io.Subscription
 }
 
+// DownlinksConfig defines the configuration for the webhook downlink queue operations.
+// For public addresses, the TLS version is preferred when present.
+type DownlinksConfig struct {
+	PublicAddress    string `name:"public-address" description:"Public address of the HTTP webhooks frontend"`
+	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the HTTPS webhooks frontend"`
+}
+
 type webhooks struct {
 	ctx       context.Context
 	server    io.Server
 	registry  WebhookRegistry
 	target    Sink
-	downlinks webui.APIConfig
+	downlinks DownlinksConfig
 }
 
 // NewWebhooks returns a new Webhooks.
-func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink, downlinks webui.APIConfig) Webhooks {
+func NewWebhooks(ctx context.Context, server io.Server, registry WebhookRegistry, target Sink, downlinks DownlinksConfig) Webhooks {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/web")
 	return &webhooks{
 		ctx:       ctx,
@@ -205,7 +211,7 @@ const (
 	deviceIDKey      = "device_id"
 	webhookIDKey     = "webhook_id"
 
-	downlinkKeyHeader     = "X-Downlink-APIKey"
+	downlinkKeyHeader     = "X-Downlink-Apikey"
 	downlinkPushHeader    = "X-Downlink-Push"
 	downlinkReplaceHeader = "X-Downlink-Replace"
 
@@ -213,7 +219,10 @@ const (
 )
 
 func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
-	baseURL := w.downlinks.BaseURL
+	baseURL := w.downlinks.PublicTLSAddress
+	if baseURL == "" {
+		baseURL = w.downlinks.PublicAddress
+	}
 	return fmt.Sprintf(downlinkOperationURLFormat,
 		baseURL,
 		webhookID.ApplicationID,
@@ -391,8 +400,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	for key, value := range hook.Headers {
 		req.Header.Set(key, value)
 	}
-	config := w.downlinks
-	if config.Enabled && hook.DownlinkAPIKey != "" {
+	if hook.DownlinkAPIKey != "" {
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkAPIKey)
 		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "push"))
 		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "replace"))
