@@ -3590,6 +3590,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:frequency_plans": {
+    "translations": {
+      "en": "frequency plans must be from the same band"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:gateway_eui_not_registered": {
     "translations": {
       "en": "gateway EUI `{eui}` is not registered"
@@ -4002,15 +4011,6 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "identityserver.go"
-    }
-  },
-  "error:pkg/identityserver:frequency_plans": {
-    "translations": {
-      "en": "frequency plans must be from the same band"
-    },
-    "description": {
-      "package": "pkg/identityserver",
-      "file": "gateway_registry.go"
     }
   },
   "error:pkg/identityserver:invalid_authorization": {
