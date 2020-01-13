@@ -48,3 +48,8 @@ Application Server supports templates for webhooks that can be loaded from a `di
 - `as.webhooks.templates.directory`: Retrieve the webhook templates from the filesystem
 - `as.webhooks.templates.url`: Retrieve the webhook templates from a web server
 - `as.webhooks.templates.logo-base-url`: The base URL for the logo storage
+
+Application Server supports communicating the paths of the downlink queue operations to the webhook endpoints via headers. The paths are computed from the public address, and the HTTPS endpoint is preferred over the HTTP one.
+
+- `as.webhooks.downlinks.public-address`: Public address of the HTTP webhooks frontend (default "http://localhost:1885/api/v3")
+- `as.webhooks.downlinks.public-tls-address`: Public address of the HTTPS webhooks frontend
