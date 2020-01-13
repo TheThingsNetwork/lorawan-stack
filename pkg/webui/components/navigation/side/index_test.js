@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import React from 'react'
+
 import getSideNavigationDriver from './index_driver'
+import SideNavigation from '.'
 
 describe('SideNavigation', function() {
   let driver = null
@@ -27,16 +30,12 @@ describe('SideNavigation', function() {
         title: 'test-header-title',
         icon: 'application',
       },
-      entries: [
-        {
-          title: 'test-title',
-          path: '/test-path',
-        },
-        {
-          title: 'test-title2',
-          path: '/test-title2',
-        },
-      ],
+      children: (
+        <React.Fragment>
+          <SideNavigation.Item title="test-tile" path="/test-path" />
+          <SideNavigation.Item title="test-tile2" path="/test-path2" />
+        </React.Fragment>
+      ),
     }
 
     beforeEach(function() {
@@ -48,7 +47,7 @@ describe('SideNavigation', function() {
     })
 
     it('should render correct number of items', function() {
-      expect(driver.get.itemsCount()).toBe(props.entries.length)
+      expect(driver.get.itemsCount()).toBe(2)
     })
     it('should have no collapsable items', function() {
       expect(driver.get.collapsableItemsCount()).toBe(0)
@@ -81,36 +80,18 @@ describe('SideNavigation', function() {
         title: 'test-header-title',
         icon: 'application',
       },
-      entries: [
-        {
-          title: 'test-title',
-          nested: true,
-          items: [
-            {
-              title: 'nested-test-title',
-              path: '/nested-test-title',
-            },
-          ],
-        },
-        {
-          title: 'test-title2',
-          nested: true,
-          items: [
-            {
-              title: 'nested-test-title2',
-              path: '/nested-test-title2',
-            },
-            {
-              title: 'nested-test-title3',
-              path: '/nested-test-title3',
-            },
-          ],
-        },
-        {
-          title: 'test-title3',
-          path: '/test-title3',
-        },
-      ],
+      children: (
+        <React.Fragment>
+          <SideNavigation.Item title="test-title" path="/test-path">
+            <SideNavigation.Item title="nested-test-tile" path="/nested-test-title" />
+          </SideNavigation.Item>
+          <SideNavigation.Item title="test-title2">
+            <SideNavigation.Item title="nested-test-tile2" path="/nested-test-title2" />
+            <SideNavigation.Item title="nested-test-tile3" path="/nested-test-title3" />
+          </SideNavigation.Item>
+          <SideNavigation.Item title="test-title3" path="/test-title3" />
+        </React.Fragment>
+      ),
     }
 
     beforeEach(function() {
@@ -122,12 +103,11 @@ describe('SideNavigation', function() {
     })
 
     it('should render correct number of top-level items', function() {
-      expect(driver.get.itemsCount()).toBe(props.entries.length)
+      expect(driver.get.itemsCount()).toBe(3)
     })
 
     it('should have correct number of collapsable items', function() {
-      const count = props.entries.filter(i => i.nested).length
-      expect(driver.get.collapsableItemsCount()).toBe(count)
+      expect(driver.get.collapsableItemsCount()).toBe(2)
     })
 
     describe('the user minimizes the side navigation', function() {
@@ -139,54 +119,6 @@ describe('SideNavigation', function() {
         expect(driver.is.minimized()).toBeTruthy()
       })
 
-      describe('the user selects a top-level item', function() {
-        const SELECTED_INDEX = 2
-
-        beforeEach(function() {
-          driver.when.linkSelected(SELECTED_INDEX)
-        })
-
-        it('should stay minimized', function() {
-          expect(driver.is.minimized()).toBeTruthy()
-        })
-      })
-
-      describe('the user selects the first closed and collapsable item', function() {
-        const SELECTED_INDEX = 0
-
-        beforeEach(function() {
-          driver.when.itemSelected(SELECTED_INDEX)
-        })
-
-        it('should not be minimized', function() {
-          expect(driver.is.minimized()).toBeFalsy()
-        })
-
-        it('should update the state', function() {
-          expect(driver.is.expanded(SELECTED_INDEX)).toBeTruthy()
-        })
-
-        it('should expand the item', function() {
-          expect(driver.is.itemExpanded(SELECTED_INDEX)).toBeTruthy()
-        })
-
-        it('should not be active', function() {
-          expect(driver.is.itemActive(SELECTED_INDEX)).toBeFalsy()
-        })
-
-        describe('the user selects a link in the opened item', function() {
-          const SELECTED_LINK_INDEX = 0
-
-          beforeEach(function() {
-            driver.when.nestedLinkSelected(SELECTED_INDEX, SELECTED_LINK_INDEX)
-          })
-
-          it('the item should become active', function() {
-            expect(driver.is.itemActive(SELECTED_INDEX)).toBeTruthy()
-          })
-        })
-      })
-
       describe('the user expands the side navigation back to normal state', function() {
         beforeEach(function() {
           driver.when.minimized()
@@ -194,67 +126,6 @@ describe('SideNavigation', function() {
 
         it('should not be minimized', function() {
           expect(driver.is.minimized()).toBeFalsy()
-        })
-      })
-    })
-
-    describe('the user selects a collapsable item', function() {
-      const FST_SELECTED_INDEX = 0
-      const SND_SELECTED_INDEX = 1
-
-      beforeEach(function() {
-        driver.when.itemSelected(FST_SELECTED_INDEX)
-      })
-
-      it('should update the state', function() {
-        expect(driver.is.expanded(FST_SELECTED_INDEX)).toBeTruthy()
-      })
-
-      it('should expand the item', function() {
-        expect(driver.is.itemExpanded(FST_SELECTED_INDEX)).toBeTruthy()
-      })
-
-      describe('the user selects the item again', function() {
-        beforeEach(function() {
-          driver.when.itemSelected(FST_SELECTED_INDEX)
-        })
-
-        it('should update the state', function() {
-          expect(driver.is.expanded(FST_SELECTED_INDEX)).toBeFalsy()
-        })
-
-        it('should collapse the item', function() {
-          expect(driver.is.itemExpanded(FST_SELECTED_INDEX)).toBeFalsy()
-        })
-
-        it('should have no expanded items', function() {
-          expect(driver.get.expandedItemsCount()).toBe(0)
-        })
-      })
-
-      describe('the user selects another collapsable item', function() {
-        beforeEach(function() {
-          driver.when.itemSelected(SND_SELECTED_INDEX)
-        })
-
-        it('should keep the first collapsable item in the state', function() {
-          expect(driver.is.expanded(FST_SELECTED_INDEX)).toBeTruthy()
-        })
-
-        it('should keep the first collapsable item expanded', function() {
-          expect(driver.is.itemExpanded(FST_SELECTED_INDEX)).toBeTruthy()
-        })
-
-        it('should update the state', function() {
-          expect(driver.is.expanded(SND_SELECTED_INDEX)).toBeTruthy()
-        })
-
-        it('should expand the second item', function() {
-          expect(driver.is.itemExpanded(SND_SELECTED_INDEX)).toBeTruthy()
-        })
-
-        it('should have `2` items expanded', function() {
-          expect(driver.get.expandedItemsCount()).toBe(2)
         })
       })
     })
