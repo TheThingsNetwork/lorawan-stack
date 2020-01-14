@@ -177,7 +177,7 @@ message EndDeviceVersion {
   uint64 max_frequency = 10;
   // The device supports join (it's OTAA).
   bool supports_join = 11;
-  // Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
+  // Whether the device resets the join and dev nonces (not LoRaWAN compliant).
   bool resets_join_nonces = 12;
 
   // Default formatters defining the payload formats for this end device.
@@ -427,7 +427,7 @@ message EndDevice {
   // The device supports join (it's OTAA).
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
   bool supports_join = 20;
-  // Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server.
+  // Whether the device resets the join and dev nonces (not LoRaWAN compliant). Stored in Join Server.
   // Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
   bool resets_join_nonces = 21;
 

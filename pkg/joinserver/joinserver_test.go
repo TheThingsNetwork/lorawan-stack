@@ -1166,6 +1166,92 @@ func TestHandleJoin(t *testing.T) {
 			},
 		},
 		{
+			Name:        "1.0.0/cluster auth/existing device/nonce reuse",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			Device: &ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442, 0x2444},
+				LastJoinNonce: 0x42fffd,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					DeviceID:               "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &appKey,
+					},
+				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0,
+				NetworkServerAddress: nsAddr,
+				ResetsJoinNonces:     true,
+			},
+			NextLastJoinNonce: 0x42fffe,
+			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442, 0x2444},
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMACVersion: ttnpb.MAC_V1_0,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x42, 0x24,
+
+					/* MIC */
+					0xed, 0x8b, 0xd2, 0x24,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			JoinResponse: &ttnpb.JoinResponse{
+				RawPayload: append([]byte{
+					/* MHDR */
+					0x20},
+					mustEncryptJoinAccept(appKey, []byte{
+						/* JoinNonce */
+						0xfe, 0xff, 0x42,
+						/* NetID */
+						0xff, 0xff, 0x42,
+						/* DevAddr */
+						0xff, 0xff, 0xff, 0x42,
+						/* DLSettings */
+						0xff,
+						/* RxDelay */
+						0x42,
+
+						/* MIC */
+						0xf8, 0x4a, 0x11, 0x8e,
+					})...),
+				SessionKeys: ttnpb.SessionKeys{
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+							appKey,
+							types.JoinNonce{0x42, 0xff, 0xfe},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x24, 0x42})),
+					},
+					AppSKey: &ttnpb.KeyEnvelope{
+						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+							appKey,
+							types.JoinNonce{0x42, 0xff, 0xfe},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x24, 0x42})),
+					},
+				},
+			},
+		},
+		{
 			Name: "1.0.0/TLS client auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return auth.NewContextWithX509DN(ctx, pkix.Name{

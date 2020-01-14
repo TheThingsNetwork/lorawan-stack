@@ -6486,7 +6486,7 @@
             },
             {
               "name": "resets_join_nonces",
-              "description": "Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.",
+              "description": "Whether the device resets the join and dev nonces (not LoRaWAN compliant). Stored in Join Server.\nCopied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -7352,7 +7352,7 @@
             },
             {
               "name": "resets_join_nonces",
-              "description": "Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).",
+              "description": "Whether the device resets the join and dev nonces (not LoRaWAN compliant).",
               "label": "",
               "type": "bool",
               "longType": "bool",

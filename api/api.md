@@ -1837,7 +1837,7 @@ SDKs are responsible for combining (if desired) the three.
 | `min_frequency` | [`uint64`](#uint64) |  | Minimum frequency the device is capable of using (Hz). Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | `max_frequency` | [`uint64`](#uint64) |  | Maximum frequency the device is capable of using (Hz). Stored in Network Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | `supports_join` | [`bool`](#bool) |  | The device supports join (it's OTAA). Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
-| `resets_join_nonces` | [`bool`](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
+| `resets_join_nonces` | [`bool`](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN compliant). Stored in Join Server. Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any. |
 | `root_keys` | [`RootKeys`](#ttn.lorawan.v3.RootKeys) |  | Device root keys. Stored in Join Server. |
 | `net_id` | [`bytes`](#bytes) |  | Home NetID. Stored in Join Server. |
 | `mac_settings` | [`MACSettings`](#ttn.lorawan.v3.MACSettings) |  | Settings for how the Network Server handles MAC layer for this device. Stored in Network Server. |
@@ -2008,7 +2008,7 @@ Template for creating end devices.
 | `min_frequency` | [`uint64`](#uint64) |  | Minimum frequency the device is capable of using (Hz). |
 | `max_frequency` | [`uint64`](#uint64) |  | Maximum frequency the device is capable of using (Hz). |
 | `supports_join` | [`bool`](#bool) |  | The device supports join (it's OTAA). |
-| `resets_join_nonces` | [`bool`](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). |
+| `resets_join_nonces` | [`bool`](#bool) |  | Whether the device resets the join and dev nonces (not LoRaWAN compliant). |
 | `default_formatters` | [`MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters) |  | Default formatters defining the payload formats for this end device. |
 
 #### Field Rules
