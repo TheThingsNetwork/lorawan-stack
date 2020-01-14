@@ -30,6 +30,7 @@ const Header = function({
   navigationEntries,
   user,
   searchable,
+  logo,
   handleSearchRequest = () => null,
   ...rest
 }) {
@@ -39,7 +40,7 @@ const Header = function({
     <header {...rest} className={classnames(className, style.bar)}>
       <div className={style.left}>
         <Link to="/" className={style.logo}>
-          <Logo />
+          {logo}
         </Link>
         {!isGuest && <NavigationBar className={style.navList}>{navigationEntries}</NavigationBar>}
       </div>
@@ -64,6 +65,7 @@ Header.propTypes = {
   /** A handler for when the user used the search input */
   handleSearchRequest: PropTypes.func,
   /** Child node of the navigation bar */
+  logo: PropTypes.node,
   navigationEntries: NavigationBar.propTypes.children,
   searchable: PropTypes.bool,
   /**
@@ -78,6 +80,7 @@ Header.defaultProps = {
   dropdownItems: undefined,
   navigationEntries: undefined,
   handleSearchRequest: () => null,
+  logo: <Logo />,
   searchable: false,
   user: undefined,
 }

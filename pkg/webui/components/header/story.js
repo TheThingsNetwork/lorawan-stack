@@ -18,6 +18,9 @@ import { action } from '@storybook/addon-actions'
 
 import Dropdown from '../dropdown'
 import NavigationBar from '../navigation/bar'
+import Logo from '../logo'
+import TtsLogo from '../../assets/static/logo.svg'
+import ExampleLogo from '../logo/story-logo.svg'
 import Header from '.'
 
 const user = {
@@ -26,6 +29,14 @@ const user = {
     user_id: 'ksc300',
   },
 }
+
+const singleLogo = <Logo logo={{ src: TtsLogo, alt: 'Logo' }} />
+const doubleLogo = (
+  <Logo
+    logo={{ src: TtsLogo, alt: 'Logo' }}
+    secondaryLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+  />
+)
 
 const navigationEntries = (
   <React.Fragment>
@@ -43,12 +54,24 @@ const items = (
   </React.Fragment>
 )
 
-storiesOf('Header', module).add('Default', () => (
-  <Header
-    dropdownItems={items}
-    handleSearchRequest={action('Search')}
-    navigationEntries={navigationEntries}
-    style={{ margin: '-1rem' }}
-    user={user}
-  />
-))
+storiesOf('Header', module)
+  .add('Single Logo', () => (
+    <Header
+      dropdownItems={items}
+      handleSearchRequest={action('Search')}
+      navigationEntries={navigationEntries}
+      style={{ margin: '-1rem' }}
+      user={user}
+      logo={singleLogo}
+    />
+  ))
+  .add('Double Logo', () => (
+    <Header
+      dropdownItems={items}
+      handleSearchRequest={action('Search')}
+      navigationEntries={navigationEntries}
+      style={{ margin: '-1rem' }}
+      user={user}
+      logo={doubleLogo}
+    />
+  ))
