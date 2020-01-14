@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	. "go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver/redis"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -746,6 +747,89 @@ func TestHandleJoin(t *testing.T) {
 				RxDelay: 0x42,
 			},
 			ErrorAssertion: errors.IsInvalidArgument,
+		},
+		{
+			Name:        "1.0.3/cluster auth/new device",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			Device: &ttnpb.EndDevice{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEUI:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app"},
+					DeviceID:               "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &appKey,
+					},
+				},
+				LoRaWANVersion:       ttnpb.MAC_V1_0_3,
+				NetworkServerAddress: nsAddr,
+			},
+			NextLastJoinNonce: 1,
+			NextUsedDevNonces: []uint32{1},
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMACVersion: ttnpb.MAC_V1_0_3,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x01, 0x00,
+
+					/* MIC */
+					0xc4, 0x8, 0x50, 0xcf,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetID:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DROffset: 0x7,
+					Rx2DR:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			JoinResponse: &ttnpb.JoinResponse{
+				RawPayload: append([]byte{
+					/* MHDR */
+					0x20},
+					mustEncryptJoinAccept(appKey, []byte{
+						/* JoinNonce */
+						0x01, 0x00, 0x00,
+						/* NetID */
+						0xff, 0xff, 0x42,
+						/* DevAddr */
+						0xff, 0xff, 0xff, 0x42,
+						/* DLSettings */
+						0xff,
+						/* RxDelay */
+						0x42,
+
+						/* MIC */
+						0xc9, 0x7a, 0x61, 0x04,
+					})...),
+				SessionKeys: ttnpb.SessionKeys{
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: KeyPtr(crypto.DeriveLegacyNwkSKey(
+							appKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x00, 0x01})),
+					},
+					AppSKey: &ttnpb.KeyEnvelope{
+						Key: KeyPtr(crypto.DeriveLegacyAppSKey(
+							appKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x00, 0x01})),
+					},
+				},
+			},
 		},
 		{
 			Name:        "1.0.2/cluster auth/new device",
@@ -1622,6 +1706,7 @@ func TestHandleJoin(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			ctx := tc.ContextFunc(ctx)
+			ctx = log.NewContext(ctx, test.GetLogger(t))
 
 			redisClient, flush := test.NewRedis(t, "joinserver_test")
 			defer flush()
