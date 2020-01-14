@@ -80,6 +80,7 @@ type Connection struct {
 	fps       []*frequencyplans.FrequencyPlan
 	scheduler *scheduling.Scheduler
 	rtts      *rtts
+	fpStore   *frequencyplans.Store
 
 	upCh     chan *ttnpb.UplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -88,7 +89,7 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps []*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
+func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps []*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, fpStore *frequencyplans.Store) (*Connection, error) {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	scheduler, err := scheduling.NewScheduler(ctx, fps[0], enforceDutyCycle, scheduleAnytimeDelay, nil)
 	if err != nil {
@@ -101,6 +102,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		frontend:    frontend,
 		gateway:     gateway,
 		fps:         fps,
+		fpStore:     fpStore,
 		scheduler:   scheduler,
 		rtts:        newRTTs(maxRTTs),
 		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
@@ -269,7 +271,11 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	}
 	var fp *frequencyplans.FrequencyPlan
 	for _, gtwFP := range c.fps {
-		if gtwFP.BandID == request.FrequencyPlanID {
+		reqFP, err := c.fpStore.GetByID(request.FrequencyPlanID)
+		if err != nil {
+			return 0, err
+		}
+		if gtwFP.BandID == reqFP.BandID {
 			fp = gtwFP
 			break
 		}

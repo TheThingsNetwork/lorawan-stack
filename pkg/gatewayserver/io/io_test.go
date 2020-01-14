@@ -162,6 +162,7 @@ func TestFlow(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -183,6 +184,7 @@ func TestFlow(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,         // Same as previous.
 						Rx1Frequency:     868100000, // Same as previous.
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -212,6 +214,7 @@ func TestFlow(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,         // Same as previous.
 						Rx1Frequency:     868100000, // Same as previous.
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -252,6 +255,7 @@ func TestFlow(t *testing.T) {
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRateIndex: 5,
 						Rx2Frequency:     869525000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -276,6 +280,7 @@ func TestFlow(t *testing.T) {
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRateIndex: 5,
 						Rx2Frequency:     869525000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -301,6 +306,7 @@ func TestFlow(t *testing.T) {
 						Rx2DataRateIndex: 5,
 						Rx2Frequency:     869525000,
 						AbsoluteTime:     timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -318,6 +324,7 @@ func TestFlow(t *testing.T) {
 						Rx2DataRateIndex: 5,
 						Rx2Frequency:     869525000,
 						AbsoluteTime:     timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -338,6 +345,7 @@ func TestFlow(t *testing.T) {
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRateIndex: 10, // This one doesn't exist in the band.
 						Rx2Frequency:     869525000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -358,6 +366,7 @@ func TestFlow(t *testing.T) {
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRateIndex: 0,
 						Rx2Frequency:     869525000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -488,6 +497,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     923200000,
+						FrequencyPlanID:  "AS_923_925_AU",
 					},
 				},
 			},
