@@ -91,7 +91,7 @@ type Connection struct {
 // NewConnection instantiates a new gateway connection.
 func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps []*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, fpStore *frequencyplans.Store) (*Connection, error) {
 	ctx, cancelCtx := errorcontext.New(ctx)
-	scheduler, err := scheduling.NewScheduler(ctx, fps[0], enforceDutyCycle, scheduleAnytimeDelay, nil)
+	scheduler, err := scheduling.NewScheduler(ctx, fps, enforceDutyCycle, scheduleAnytimeDelay, nil)
 	if err != nil {
 		return nil, err
 	}
