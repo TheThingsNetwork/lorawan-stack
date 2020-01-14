@@ -88,9 +88,9 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
+func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps []*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
 	ctx, cancelCtx := errorcontext.New(ctx)
-	scheduler, err := scheduling.NewScheduler(ctx, fp, enforceDutyCycle, scheduleAnytimeDelay, nil)
+	scheduler, err := scheduling.NewScheduler(ctx, fps[0], enforceDutyCycle, scheduleAnytimeDelay, nil)
 	if err != nil {
 		return nil, err
 	}
