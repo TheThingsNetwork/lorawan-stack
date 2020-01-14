@@ -14,9 +14,10 @@
 
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import { withInfo } from '@storybook/addon-info'
 import { action } from '@storybook/addon-actions'
 
+import Dropdown from '../dropdown'
+import NavigationBar from '../navigation/bar'
 import Header from '.'
 
 const user = {
@@ -26,32 +27,28 @@ const user = {
   },
 }
 
-const items = [
-  {
-    title: 'Profile Settings',
-    icon: 'settings',
-    path: '/profile-settings',
-  },
-  {
-    title: 'Logout',
-    icon: 'power_settings_new',
-    path: '/logout',
-  },
-]
+const navigationEntries = (
+  <React.Fragment>
+    <NavigationBar.Item title="Overview" icon="overview" path="/overview" />
+    <NavigationBar.Item title="Applications" icon="application" path="/application" />
+    <NavigationBar.Item title="Gateways" icon="gateway" path="/gateways" />
+    <NavigationBar.Item title="Organizations" icon="organization" path="/organization" />
+  </React.Fragment>
+)
 
-storiesOf('Header', module)
-  .addDecorator((story, context) =>
-    withInfo({
-      inline: true,
-      header: false,
-      propTables: [Header],
-    })(story)(context),
-  )
-  .add('Default', () => (
-    <Header
-      dropdownItems={items}
-      user={user}
-      style={{ margin: '-1rem' }}
-      handleSearchRequest={action('Search')}
-    />
-  ))
+const items = (
+  <React.Fragment>
+    <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
+    <Dropdown.Item title="Logout" icon="power_settings_new" path="/logout" />
+  </React.Fragment>
+)
+
+storiesOf('Header', module).add('Default', () => (
+  <Header
+    dropdownItems={items}
+    handleSearchRequest={action('Search')}
+    navigationEntries={navigationEntries}
+    style={{ margin: '-1rem' }}
+    user={user}
+  />
+))
