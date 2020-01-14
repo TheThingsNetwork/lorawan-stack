@@ -421,7 +421,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, errFrequencyPlans
 	}
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay, gs.FrequencyPlans)
 	if err != nil {
 		return nil, err
 	}
