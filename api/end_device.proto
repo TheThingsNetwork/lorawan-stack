@@ -200,6 +200,9 @@ message MACSettings {
   // Frequency of the class B ping slot (Hz).
   // If unset, the default value from Network Server configuration will be used.
   google.protobuf.UInt64Value ping_slot_frequency = 4 [(validate.rules).uint64.gte = 100000];
+  // Frequency of the class B beacon (Hz).
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt64Value beacon_frequency = 25 [(validate.rules).uint64.gte = 100000];
 
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
   // If unset, the default value from Network Server configuration will be used.
@@ -268,6 +271,16 @@ message MACSettings {
   // The ADR ACK delay Network Server should configure device to use via MAC commands.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   ADRAckDelayExponentValue desired_adr_ack_delay_exponent = 24 [(gogoproto.customname) = "DesiredADRAckDelayExponent"];
+
+  // The data rate index of the class B ping slot Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration will be used.
+  DataRateIndexValue desired_ping_slot_data_rate_index = 27;
+  // The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  google.protobuf.UInt64Value desired_ping_slot_frequency = 28 [(validate.rules).uint64.gte = 100000];
+  // The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.
+  // If unset, the default value from Network Server configuration will be used.
+  google.protobuf.UInt64Value desired_beacon_frequency = 29 [(validate.rules).uint64.gte = 100000];
 }
 
 // MACState represents the state of MAC layer of the device.
