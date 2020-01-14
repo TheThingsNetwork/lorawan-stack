@@ -48,6 +48,7 @@ const (
 	requirePasswordUpdateField          = "require_password_update"
 	rightsField                         = "rights"
 	scheduleDownlinkLateField           = "schedule_downlink_late"
+	scheduleAnytimeDelayField           = "schedule_anytime_delay"
 	secretField                         = "secret"
 	serviceProfileIDField               = "service_profile_id"
 	skipAuthorizationField              = "skip_authorization"

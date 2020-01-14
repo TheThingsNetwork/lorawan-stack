@@ -47,7 +47,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	timeSource := &mockTimeSource{
 		Time: time.Unix(0, 0),
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -360,7 +360,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 	timeSource := &mockTimeSource{
 		Time: time.Unix(0, 0),
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -437,7 +437,7 @@ func TestScheduleAnytime(t *testing.T) {
 			Duration:  durationPtr(2 * time.Second),
 		},
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, nil)
 	a.So(err, should.BeNil)
 	scheduler.SyncWithGatewayAbsolute(0, time.Now(), time.Unix(0, 0))
 
@@ -550,7 +550,49 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
 		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
+		a.So(err, should.BeNil)
+		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
+		a.So(err, should.BeNil)
+		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeLong)
+	}
+
+	// Gateway time; too late (100 ms) without RTT, with high schedule_anytime_delay
+	{
+		timeSource := &mockTimeSource{
+			Time: time.Now(),
+		}
+		scheduleAnytimeDelay := time.Second
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, &scheduleAnytimeDelay, timeSource)
+		a.So(err, should.BeNil)
+		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
+		a.So(err, should.BeNil)
+		a.So(time.Duration(em.Starts()), should.Equal, time.Second)
+	}
+
+	// Gateway time; too late (100 ms) without RTT, with low schedule_anytime_delay
+	{
+		timeSource := &mockTimeSource{
+			Time: time.Now(),
+		}
+		scheduleAnytimeDelay := time.Millisecond
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, &scheduleAnytimeDelay, timeSource)
+		a.So(err, should.BeNil)
+		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
+		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
+		a.So(err, should.BeNil)
+		a.So(time.Duration(em.Starts()), should.Equal, scheduling.ScheduleTimeShort)
+	}
+
+	// Gateway time; too late (100 ms) without RTT, with zero schedule_anytime_delay
+	{
+		timeSource := &mockTimeSource{
+			Time: time.Now(),
+		}
+		scheduleAnytimeDelay := time.Duration(0)
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, &scheduleAnytimeDelay, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
@@ -563,7 +605,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
 		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		rtts := &mockRTTs{
@@ -580,7 +622,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
 		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 100*1000), nil, ttnpb.TxSchedulePriority_NORMAL)
@@ -593,7 +635,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
 		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		rtts := &mockRTTs{
@@ -623,7 +665,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	timeSource := &mockTimeSource{
 		Time: time.Unix(0, 0),
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, timeSource)
+	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
 	a.So(err, should.BeNil)
 	scheduler.Sync(0, timeSource.Time)
 

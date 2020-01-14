@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for releasing gateway EUI after deletion.
 - Added support in the Application Server for the `X-Downlink-Apikey`, `X-Downlink-Push` and `X-Downlink-Replace` webhook headers. They allow webhook integrations to determine which endpoints to use for downlink queue operations.
-- Added the `as.webhooks.downlinks.public-address` and `as.webhooks.downlinks.public-tls-address` configuration options to the Application Server. 
+- Added the `as.webhooks.downlinks.public-address` and `as.webhooks.downlinks.public-tls-address` configuration options to the Application Server.
+- Support for adjusting the time that the Gateway Server schedules class C messages in advance per gateway.
+  - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 
 ### Changed
 

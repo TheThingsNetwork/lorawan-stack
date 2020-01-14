@@ -481,6 +481,15 @@ func (dst *Gateway) SetFields(src *Gateway, paths ...string) error {
 				var zero DownlinkPathConstraint
 				dst.DownlinkPathConstraint = zero
 			}
+		case "schedule_anytime_delay":
+			if len(subs) > 0 {
+				return fmt.Errorf("'schedule_anytime_delay' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ScheduleAnytimeDelay = src.ScheduleAnytimeDelay
+			} else {
+				dst.ScheduleAnytimeDelay = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
