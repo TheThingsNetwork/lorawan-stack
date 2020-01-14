@@ -92,7 +92,8 @@ message MACParameters {
   // Frequency of the class B ping slot (Hz).
   uint64 ping_slot_frequency = 16 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
   // Data rate index of the class B ping slot.
-  DataRateIndex ping_slot_data_rate_index = 17 [(validate.rules).enum.defined_only = true];
+  // This field is deprecated, use ping_slot_data_rate_index_value instead.
+  DataRateIndex ping_slot_data_rate_index = 17 [deprecated = true];
   // Frequency of the class B beacon (Hz).
   uint64 beacon_frequency = 18 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
 
@@ -124,6 +125,8 @@ message MACParameters {
   ADRAckLimitExponentValue adr_ack_limit_exponent = 22 [(gogoproto.customname) = "ADRAckLimitExponent"];
   // ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
   ADRAckDelayExponentValue adr_ack_delay_exponent = 23 [(gogoproto.customname) = "ADRAckDelayExponent"];
+  // Data rate index of the class B ping slot.
+  DataRateIndexValue ping_slot_data_rate_index_value = 24;
 }
 
 message EndDeviceBrand {

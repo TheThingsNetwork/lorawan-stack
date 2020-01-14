@@ -194,7 +194,12 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out.Rx2Frequency = NewPopulatedFrequency(r, easy)
 	out.RejoinTimePeriodicity = RejoinTimeExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
 	out.PingSlotFrequency = NewPopulatedFrequency(r, easy)
-	out.PingSlotDataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	if r.Intn(2) == 0 {
+		out.PingSlotDataRateIndexValue = &DataRateIndexValue{
+			Value: NewPopulatedDataRateIndex(r, easy),
+		}
+		out.PingSlotDataRateIndex = out.PingSlotDataRateIndexValue.Value
+	}
 	out.BeaconFrequency = NewPopulatedFrequency(r, easy)
 	return out
 }
