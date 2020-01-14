@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import { DropdownItem } from '../dropdown'
+import Dropdown from '../dropdown'
 
 import getProfileDropdownDriver from './index_driver'
 
@@ -24,8 +24,8 @@ const nullAction = function() {
 }
 const children = (
   <React.Fragment>
-    <DropdownItem title="Profile Settings" icon="settings" link="/profile-settings" />
-    <DropdownItem title="Logout" icon="power_settings_new" action={nullAction} />
+    <Dropdown.Item title="Profile Settings" icon="settings" link="/profile-settings" />
+    <Dropdown.Item title="Logout" icon="power_settings_new" action={nullAction} />
   </React.Fragment>
 )
 

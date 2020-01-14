@@ -24,14 +24,12 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
     className="dropdown"
   >
     <DropdownItem
-      anchored={false}
       icon="settings"
       link="/profile-settings"
       title="Profile Settings"
     />
     <DropdownItem
       action={[Function]}
-      anchored={false}
       icon="power_settings_new"
       title="Logout"
     />

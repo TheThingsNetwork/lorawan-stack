@@ -64,8 +64,9 @@ DropdownItem.propTypes = {
 
 DropdownItem.defaultProps = {
   action: undefined,
-  anchored: false,
   path: undefined,
 }
 
-export { Dropdown as default, DropdownItem }
+Dropdown.Item = DropdownItem
+
+export default Dropdown

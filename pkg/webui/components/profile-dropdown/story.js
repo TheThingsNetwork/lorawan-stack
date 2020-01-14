@@ -16,7 +16,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
-import { DropdownItem } from '../dropdown'
+import Dropdown from '../dropdown'
 import ProfileDropdown from '.'
 
 const handleLogout = function() {
@@ -37,8 +37,8 @@ storiesOf('Profile Dropdown', module)
     return (
       <div style={{ height: '6rem' }}>
         <ProfileDropdown style={{ marginLeft: '120px' }} userId="johndoe">
-          <DropdownItem title="Profile Settings" icon="settings" path="/profile-settings" />
-          <DropdownItem title="Logout" icon="power_settings_new" action={handleLogout} />
+          <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
+          <Dropdown.Item title="Logout" icon="power_settings_new" action={handleLogout} />
         </ProfileDropdown>
       </div>
     )
