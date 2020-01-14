@@ -56,4 +56,6 @@ NavigationBarItem.defaultProps = {
   className: undefined,
 }
 
-export { NavigationBar as default, NavigationBarItem }
+NavigationBar.Item = NavigationBarItem
+
+export default NavigationBar

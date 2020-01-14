@@ -20,8 +20,8 @@ import bind from 'autobind-decorator'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import HeaderComponent from '../../../components/header'
-import { NavigationBarItem } from '../../../components/navigation/bar'
-import { DropdownItem } from '../../../components/dropdown'
+import NavigationBar from '../../../components/navigation/bar'
+import Dropdown from '../../../components/dropdown'
 
 import { logout } from '../../store/actions/user'
 import { selectUser } from '../../store/selectors/user'
@@ -94,19 +94,19 @@ class Header extends Component {
 
     const navigationEntries = (
       <React.Fragment>
-        <NavigationBarItem title={sharedMessages.overview} icon="overview" path="/" exact />
+        <NavigationBar.Item title={sharedMessages.overview} icon="overview" path="/" exact />
         {mayViewApplications && (
-          <NavigationBarItem
+          <NavigationBar.Item
             title={sharedMessages.applications}
             icon="application"
             path="/applications"
           />
         )}
         {mayViewGateways && (
-          <NavigationBarItem title={sharedMessages.gateways} icon="gateway" path="/gateways" />
+          <NavigationBar.Item title={sharedMessages.gateways} icon="gateway" path="/gateways" />
         )}
         {mayViewOrganizations && (
-          <NavigationBarItem
+          <NavigationBar.Item
             title={sharedMessages.organizations}
             icon="organization"
             path="/organizations"
@@ -118,13 +118,13 @@ class Header extends Component {
     const dropdownItems = (
       <React.Fragment>
         {mayManageUsers && (
-          <DropdownItem
+          <Dropdown.Item
             title={sharedMessages.userManagement}
             icon="user_management"
             path="/admin/user-management"
           />
         )}
-        <DropdownItem
+        <Dropdown.Item
           title={sharedMessages.logout}
           icon="power_settings_new"
           action={handleLogout}

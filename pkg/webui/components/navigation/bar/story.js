@@ -17,7 +17,7 @@ import { storiesOf } from '@storybook/react'
 import 'focus-visible/dist/focus-visible'
 import { withInfo } from '@storybook/addon-info'
 
-import NavigationBar, { NavigationBarItem } from '../bar'
+import NavigationBar from '../bar'
 
 storiesOf('Navigation', module)
   .addDecorator((story, context) =>
@@ -30,9 +30,9 @@ storiesOf('Navigation', module)
   )
   .add('NavigationBar', () => (
     <NavigationBar>
-      <NavigationBarItem title="Overview" icon="overview" path="/overview" />
-      <NavigationBarItem title="Applications" icon="Application" path="/application" />
-      <NavigationBarItem title="Gateways" icon="gateway" path="/gateways" />
-      <NavigationBarItem title="Organizations" icon="organization" path="/organization" />
+      <NavigationBar.Item title="Overview" icon="overview" path="/overview" />
+      <NavigationBar.Item title="Applications" icon="application" path="/application" />
+      <NavigationBar.Item title="Gateways" icon="gateway" path="/gateways" />
+      <NavigationBar.Item title="Organizations" icon="organization" path="/organization" />
     </NavigationBar>
   ))
