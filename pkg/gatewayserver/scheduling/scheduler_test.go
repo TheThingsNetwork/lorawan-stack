@@ -34,7 +34,7 @@ import (
 func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fp := &frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -43,11 +43,11 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			Downlinks: boolPtr(true),
 			Duration:  durationPtr(2 * time.Second),
 		},
-	}
+	}}
 	timeSource := &mockTimeSource{
 		Time: time.Unix(0, 0),
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
+	scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -344,7 +344,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fp := &frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
 		BandID: band.EU_863_870,
 		SubBands: []frequencyplans.SubBandParameters{
 			{
@@ -356,11 +356,11 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
 		},
-	}
+	}}
 	timeSource := &mockTimeSource{
 		Time: time.Unix(0, 0),
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
+	scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 	a.So(err, should.BeNil)
 
 	for i, tc := range []struct {
@@ -427,7 +427,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 func TestScheduleAnytime(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fp := &frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -436,8 +436,8 @@ func TestScheduleAnytime(t *testing.T) {
 			Downlinks: boolPtr(true),
 			Duration:  durationPtr(2 * time.Second),
 		},
-	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, nil)
+	}}
+	scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, nil)
 	a.So(err, should.BeNil)
 	scheduler.SyncWithGatewayAbsolute(0, time.Now(), time.Unix(0, 0))
 
@@ -517,7 +517,7 @@ func TestScheduleAnytime(t *testing.T) {
 func TestScheduleAnytimeShort(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fp := &frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -526,7 +526,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			Downlinks: boolPtr(true),
 			Duration:  durationPtr(2 * time.Second),
 		},
-	}
+	}}
 
 	settingsAt := func(frequency uint64, sf uint32, time *time.Time, timestamp uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
@@ -550,7 +550,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
 		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
@@ -564,7 +564,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			Time: time.Now(),
 		}
 		scheduleAnytimeDelay := time.Second
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, &scheduleAnytimeDelay, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fps, true, &scheduleAnytimeDelay, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
@@ -578,7 +578,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			Time: time.Now(),
 		}
 		scheduleAnytimeDelay := time.Millisecond
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, &scheduleAnytimeDelay, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fps, true, &scheduleAnytimeDelay, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
@@ -592,7 +592,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			Time: time.Now(),
 		}
 		scheduleAnytimeDelay := time.Duration(0)
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, &scheduleAnytimeDelay, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fps, true, &scheduleAnytimeDelay, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 0), nil, ttnpb.TxSchedulePriority_NORMAL)
@@ -605,7 +605,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
 		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		rtts := &mockRTTs{
@@ -622,7 +622,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
 		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		em, err := scheduler.ScheduleAnytime(ctx, 10, settingsAt(869525000, 7, nil, 100*1000), nil, ttnpb.TxSchedulePriority_NORMAL)
@@ -635,7 +635,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		timeSource := &mockTimeSource{
 			Time: time.Now(),
 		}
-		scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
+		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
 		rtts := &mockRTTs{
@@ -651,7 +651,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 func TestScheduleAnytimeClassC(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fp := &frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -660,12 +660,12 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 			Downlinks: boolPtr(true),
 			Duration:  durationPtr(2 * time.Second),
 		},
-	}
+	}}
 
 	timeSource := &mockTimeSource{
 		Time: time.Unix(0, 0),
 	}
-	scheduler, err := scheduling.NewScheduler(ctx, fp, true, nil, timeSource)
+	scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 	a.So(err, should.BeNil)
 	scheduler.Sync(0, timeSource.Time)
 
