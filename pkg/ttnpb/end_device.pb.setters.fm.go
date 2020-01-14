@@ -339,6 +339,31 @@ func (dst *MACParameters) SetFields(src *MACParameters, paths ...string) error {
 					dst.ADRAckDelayExponent = nil
 				}
 			}
+		case "ping_slot_data_rate_index_value":
+			if len(subs) > 0 {
+				var newDst, newSrc *DataRateIndexValue
+				if (src == nil || src.PingSlotDataRateIndexValue == nil) && dst.PingSlotDataRateIndexValue == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.PingSlotDataRateIndexValue
+				}
+				if dst.PingSlotDataRateIndexValue != nil {
+					newDst = dst.PingSlotDataRateIndexValue
+				} else {
+					newDst = &DataRateIndexValue{}
+					dst.PingSlotDataRateIndexValue = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.PingSlotDataRateIndexValue = src.PingSlotDataRateIndexValue
+				} else {
+					dst.PingSlotDataRateIndexValue = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -731,6 +756,15 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			} else {
 				dst.PingSlotFrequency = nil
 			}
+		case "beacon_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'beacon_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BeaconFrequency = src.BeaconFrequency
+			} else {
+				dst.BeaconFrequency = nil
+			}
 		case "class_c_timeout":
 			if len(subs) > 0 {
 				return fmt.Errorf("'class_c_timeout' has no subfields, but %s were specified", subs)
@@ -1039,6 +1073,49 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 					dst.DesiredADRAckDelayExponent = nil
 				}
 			}
+		case "desired_ping_slot_data_rate_index":
+			if len(subs) > 0 {
+				var newDst, newSrc *DataRateIndexValue
+				if (src == nil || src.DesiredPingSlotDataRateIndex == nil) && dst.DesiredPingSlotDataRateIndex == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DesiredPingSlotDataRateIndex
+				}
+				if dst.DesiredPingSlotDataRateIndex != nil {
+					newDst = dst.DesiredPingSlotDataRateIndex
+				} else {
+					newDst = &DataRateIndexValue{}
+					dst.DesiredPingSlotDataRateIndex = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DesiredPingSlotDataRateIndex = src.DesiredPingSlotDataRateIndex
+				} else {
+					dst.DesiredPingSlotDataRateIndex = nil
+				}
+			}
+		case "desired_ping_slot_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'desired_ping_slot_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DesiredPingSlotFrequency = src.DesiredPingSlotFrequency
+			} else {
+				dst.DesiredPingSlotFrequency = nil
+			}
+		case "desired_beacon_frequency":
+			if len(subs) > 0 {
+				return fmt.Errorf("'desired_beacon_frequency' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DesiredBeaconFrequency = src.DesiredBeaconFrequency
+			} else {
+				dst.DesiredBeaconFrequency = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1127,13 +1204,28 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			}
 		case "ping_slot_periodicity":
 			if len(subs) > 0 {
-				return fmt.Errorf("'ping_slot_periodicity' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.PingSlotPeriodicity = src.PingSlotPeriodicity
+				var newDst, newSrc *PingSlotPeriodValue
+				if (src == nil || src.PingSlotPeriodicity == nil) && dst.PingSlotPeriodicity == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.PingSlotPeriodicity
+				}
+				if dst.PingSlotPeriodicity != nil {
+					newDst = dst.PingSlotPeriodicity
+				} else {
+					newDst = &PingSlotPeriodValue{}
+					dst.PingSlotPeriodicity = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
 			} else {
-				var zero PingSlotPeriod
-				dst.PingSlotPeriodicity = zero
+				if src != nil {
+					dst.PingSlotPeriodicity = src.PingSlotPeriodicity
+				} else {
+					dst.PingSlotPeriodicity = nil
+				}
 			}
 		case "pending_application_downlink":
 			if len(subs) > 0 {

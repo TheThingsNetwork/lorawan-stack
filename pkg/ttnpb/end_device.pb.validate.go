@@ -269,14 +269,7 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 			}
 
 		case "ping_slot_data_rate_index":
-
-			if _, ok := DataRateIndex_name[int32(m.GetPingSlotDataRateIndex())]; !ok {
-				return MACParametersValidationError{
-					field:  "ping_slot_data_rate_index",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
+			// no validation rules for PingSlotDataRateIndex
 		case "beacon_frequency":
 
 			if val := m.GetBeaconFrequency(); val > 0 && val < 100000 {
@@ -352,6 +345,18 @@ func (m *MACParameters) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACParametersValidationError{
 						field:  "adr_ack_delay_exponent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "ping_slot_data_rate_index_value":
+
+			if v, ok := interface{}(m.GetPingSlotDataRateIndexValue()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACParametersValidationError{
+						field:  "ping_slot_data_rate_index_value",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -968,6 +973,19 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 
 			}
 
+		case "beacon_frequency":
+
+			if wrapper := m.GetBeaconFrequency(); wrapper != nil {
+
+				if wrapper.GetValue() < 100000 {
+					return MACSettingsValidationError{
+						field:  "beacon_frequency",
+						reason: "value must be greater than or equal to 100000",
+					}
+				}
+
+			}
+
 		case "class_c_timeout":
 
 			if v, ok := interface{}(m.GetClassCTimeout()).(interface{ ValidateFields(...string) error }); ok {
@@ -1201,6 +1219,44 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "desired_ping_slot_data_rate_index":
+
+			if v, ok := interface{}(m.GetDesiredPingSlotDataRateIndex()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "desired_ping_slot_data_rate_index",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "desired_ping_slot_frequency":
+
+			if wrapper := m.GetDesiredPingSlotFrequency(); wrapper != nil {
+
+				if wrapper.GetValue() < 100000 {
+					return MACSettingsValidationError{
+						field:  "desired_ping_slot_frequency",
+						reason: "value must be greater than or equal to 100000",
+					}
+				}
+
+			}
+
+		case "desired_beacon_frequency":
+
+			if wrapper := m.GetDesiredBeaconFrequency(); wrapper != nil {
+
+				if wrapper.GetValue() < 100000 {
+					return MACSettingsValidationError{
+						field:  "desired_beacon_frequency",
+						reason: "value must be greater than or equal to 100000",
+					}
+				}
+
+			}
+
 		default:
 			return MACSettingsValidationError{
 				field:  name,
@@ -1338,10 +1394,13 @@ func (m *MACState) ValidateFields(paths ...string) error {
 			// no validation rules for LastDevStatusFCntUp
 		case "ping_slot_periodicity":
 
-			if _, ok := PingSlotPeriod_name[int32(m.GetPingSlotPeriodicity())]; !ok {
-				return MACStateValidationError{
-					field:  "ping_slot_periodicity",
-					reason: "value must be one of the defined enum values",
+			if v, ok := interface{}(m.GetPingSlotPeriodicity()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACStateValidationError{
+						field:  "ping_slot_periodicity",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 
