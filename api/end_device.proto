@@ -290,7 +290,7 @@ message MACState {
   // Frame counter value of last uplink containing DevStatusAns.
   uint32 last_dev_status_f_cnt_up = 6;
   // Periodicity of the class B ping slot.
-  PingSlotPeriod ping_slot_periodicity = 7 [(validate.rules).enum.defined_only = true];
+  PingSlotPeriodValue ping_slot_periodicity = 7;
   // A confirmed application downlink, for which an acknowledgment is expected to arrive.
   ApplicationDownlink pending_application_downlink = 8;
   // Queued MAC responses.
