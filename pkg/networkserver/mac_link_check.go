@@ -39,16 +39,17 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 			return evs, errInvalidDataRate
 		}
 	}
-	gtws := make(map[string]struct{}, len(msg.RxMetadata))
+	if len(msg.RxMetadata) == 0 {
+		return evs, nil
+	}
 
+	gtws := make(map[string]struct{}, len(msg.RxMetadata))
 	maxSNR := msg.RxMetadata[0].SNR
 	for _, md := range msg.RxMetadata {
 		gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
-
-		if md.SNR <= maxSNR {
-			continue
+		if md.SNR > maxSNR {
+			maxSNR = md.SNR
 		}
-		maxSNR = md.SNR
 	}
 
 	ans := &ttnpb.MACCommand_LinkCheckAns{

@@ -78,7 +78,7 @@ func sendUplinkDuplicates(ctx context.Context, handle func(ctx context.Context, 
 				msg := makeMessage(false)
 
 				msg.RxMetadata = nil
-				n := 1 + rand.Intn(10)
+				n := rand.Intn(10)
 				for i := 0; i < n; i++ {
 					md := ttnpb.NewPopulatedRxMetadata(test.Randy, false)
 					msg.RxMetadata = append(msg.RxMetadata, md)

@@ -224,6 +224,10 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 		}
 
 		makeUplink := func(rxMetadata *ttnpb.RxMetadata, correlationIDs ...string) *ttnpb.UplinkMessage {
+			var mds []*ttnpb.RxMetadata
+			if rxMetadata != nil {
+				mds = []*ttnpb.RxMetadata{rxMetadata}
+			}
 			return &ttnpb.UplinkMessage{
 				RawPayload: payload,
 				Settings: ttnpb.TxSettings{
@@ -237,9 +241,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 					EnableCRC: true,
 					Timestamp: 42,
 				},
-				RxMetadata: []*ttnpb.RxMetadata{
-					rxMetadata,
-				},
+				RxMetadata:     mds,
 				ReceivedAt:     time.Now(),
 				CorrelationIDs: correlationIDs,
 			}
@@ -271,6 +273,15 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 					UplinkToken: []byte("join-request-token-2"),
 				},
 				"GsNs-1", "GsNs-3",
+			))
+			t.Logf("Duplicate HandleUplink returned %v", err)
+			handleUplinkErrCh <- err
+		}).Stop()
+
+		defer time.AfterFunc((1<<3)*test.Delay, func() {
+			_, err := gsns.HandleUplink(ctx, makeUplink(
+				nil,
+				"GsNs-4",
 			))
 			t.Logf("Duplicate HandleUplink returned %v", err)
 			handleUplinkErrCh <- err
@@ -362,6 +373,17 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 			t.Error("Join-request forward event assertion failed")
 		}
 
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for duplicate HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle duplicate uplink: %s", err)
+				return
+			}
+		}
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for duplicate HandleUplink to return")
@@ -521,6 +543,10 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 		uplinkFRMPayload := test.Must(crypto.EncryptUplink(appSKey, devAddr, 0, []byte("test"))).([]byte)
 
 		makeUplink := func(rxMetadata *ttnpb.RxMetadata, correlationIDs ...string) *ttnpb.UplinkMessage {
+			var mds []*ttnpb.RxMetadata
+			if rxMetadata != nil {
+				mds = []*ttnpb.RxMetadata{rxMetadata}
+			}
 			return &ttnpb.UplinkMessage{
 				RawPayload: MustAppendLegacyUplinkMIC(
 					fNwkSIntKey,
@@ -554,9 +580,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 					Frequency: 867100000,
 					Timestamp: 42,
 				},
-				RxMetadata: []*ttnpb.RxMetadata{
-					rxMetadata,
-				},
+				RxMetadata:     mds,
 				ReceivedAt:     time.Now(),
 				CorrelationIDs: correlationIDs,
 			}
@@ -602,6 +626,26 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 				handleUplinkErrCh <- err
 			}).Stop()
 
+			defer time.AfterFunc((1<<3)*test.Delay, func() {
+				_, err := gsns.HandleUplink(ctx, makeUplink(
+					nil,
+					"GsNs-1", "GsNs-4",
+				))
+				t.Logf("Duplicate HandleUplink returned %v", err)
+				handleUplinkErrCh <- err
+			}).Stop()
+
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for duplicate HandleUplink to return")
+				return false
+
+			case err := <-handleUplinkErrCh:
+				if !a.So(err, should.BeNil) {
+					t.Errorf("Failed to handle duplicate uplink: %s", err)
+					return false
+				}
+			}
 			select {
 			case <-ctx.Done():
 				t.Error("Timed out while waiting for duplicate HandleUplink to return")

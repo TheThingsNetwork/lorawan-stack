@@ -132,19 +132,38 @@ loop:
 	return float32(lost) / float32(n)
 }
 
+func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
+	if len(mds) == 0 {
+		return 0, false
+	}
+	maxSNR := mds[0].SNR
+	for _, md := range mds[1:] {
+		if md.SNR > maxSNR {
+			maxSNR = md.SNR
+		}
+	}
+	return maxSNR, true
+}
+
+func uplinkMetadata(ups ...*ttnpb.UplinkMessage) []*ttnpb.RxMetadata {
+	mds := make([]*ttnpb.RxMetadata, 0, len(ups))
+	for _, up := range ups {
+		for _, md := range up.RxMetadata {
+			mds = append(mds, md)
+		}
+	}
+	return mds
+}
+
 func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) error {
 	ups := dev.RecentADRUplinks
 	if len(ups) == 0 {
 		return nil
 	}
 
-	maxSNR := ups[0].RxMetadata[0].SNR
-	for _, up := range ups {
-		for _, md := range up.RxMetadata {
-			if md.SNR > maxSNR {
-				maxSNR = md.SNR
-			}
-		}
+	maxSNR, ok := maxSNRFromMetadata(uplinkMetadata(ups...)...)
+	if !ok {
+		return nil
 	}
 
 	_, phy, err := getDeviceBandVersion(dev, fps)
@@ -152,10 +171,10 @@ func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 		return err
 	}
 
-	up := lastUplink(ups...)
-
 	dev.MACState.DesiredParameters.ADRDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex
 	dev.MACState.DesiredParameters.ADRTxPowerIndex = dev.MACState.CurrentParameters.ADRTxPowerIndex
+
+	up := lastUplink(ups...)
 
 	// NOTE: We currently assume that the uplink's SF and BW correspond to CurrentParameters.ADRDataRateIndex.
 	var df float32

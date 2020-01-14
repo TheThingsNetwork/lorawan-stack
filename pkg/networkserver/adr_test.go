@@ -269,7 +269,7 @@ func TestAdaptDataRate(t *testing.T) {
 					{FCnt: 19, MaxSNR: -10, GtwDiversity: 3},
 					{FCnt: 20, MaxSNR: -6, GtwDiversity: 2},
 					{FCnt: 21, MaxSNR: -7, GtwDiversity: 2},
-					{FCnt: 22, MaxSNR: -25, GtwDiversity: 1},
+					{FCnt: 22, MaxSNR: -25, GtwDiversity: 0},
 					{FCnt: 23, MaxSNR: -25, GtwDiversity: 1},
 					{FCnt: 24, MaxSNR: -10, GtwDiversity: 2},
 					{FCnt: 25, MaxSNR: -10, GtwDiversity: 2},

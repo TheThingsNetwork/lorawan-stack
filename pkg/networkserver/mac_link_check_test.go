@@ -59,6 +59,30 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			Error: errInvalidDataRate,
 		},
 		{
+			Name: "SF12BW250/no gateways",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+			Message: &ttnpb.UplinkMessage{
+				Settings: ttnpb.TxSettings{
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{
+							LoRa: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 12,
+								Bandwidth:       250000,
+							},
+						},
+					},
+				},
+			},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveLinkCheckRequest.BindData(nil),
+			},
+		},
+		{
 			Name: "SF12BW250/1 gateway/empty queue",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{},

@@ -19311,15 +19311,7 @@
               "longType": "RxMetadata",
               "fullType": "ttn.lorawan.v3.RxMetadata",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "repeated.min_items",
-                    "value": 1
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "received_at",
