@@ -205,6 +205,11 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings, star
 	return Emission{}, errDwellTime
 }
 
+// NoOfSubBands returns the number of sub bands in the scheduler
+func (s *Scheduler) NoOfSubBands() int {
+	return len(s.subBands)
+}
+
 var (
 	errConflict              = errors.DefineResourceExhausted("conflict", "scheduling conflict")
 	errTooLate               = errors.DefineFailedPrecondition("too_late", "too late to transmission scheduled time (delta is `{delta}`)")
