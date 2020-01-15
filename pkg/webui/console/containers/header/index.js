@@ -92,25 +92,38 @@ class Header extends Component {
       mayManageUsers,
     } = this.props
 
+    const navigation = [
+      {
+        title: sharedMessages.overview,
+        icon: 'overview',
+        path: '/',
+        exact: true,
+        hidden: false,
+      },
+      {
+        title: sharedMessages.applications,
+        icon: 'application',
+        path: '/applications',
+        hidden: !mayViewApplications,
+      },
+      {
+        title: sharedMessages.gateways,
+        icon: 'gateway',
+        path: '/gateways',
+        hidden: !mayViewGateways,
+      },
+      {
+        title: sharedMessages.organizations,
+        icon: 'organization',
+        path: '/organizations',
+        hidden: !mayViewOrganizations,
+      },
+    ]
+
     const navigationEntries = (
       <React.Fragment>
-        <NavigationBar.Item title={sharedMessages.overview} icon="overview" path="/" exact />
-        {mayViewApplications && (
-          <NavigationBar.Item
-            title={sharedMessages.applications}
-            icon="application"
-            path="/applications"
-          />
-        )}
-        {mayViewGateways && (
-          <NavigationBar.Item title={sharedMessages.gateways} icon="gateway" path="/gateways" />
-        )}
-        {mayViewOrganizations && (
-          <NavigationBar.Item
-            title={sharedMessages.organizations}
-            icon="organization"
-            path="/organizations"
-          />
+        {navigation.map(
+          ({ hidden, ...rest }) => !hidden && <NavigationBar.Item {...rest} key={rest.title.id} />,
         )}
       </React.Fragment>
     )
@@ -124,11 +137,25 @@ class Header extends Component {
             path="/admin/user-management"
           />
         )}
-        <Dropdown.Item
-          title={sharedMessages.logout}
-          icon="power_settings_new"
-          action={handleLogout}
-        />
+        <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
+      </React.Fragment>
+    )
+
+    const mobileDropdownItems = (
+      <React.Fragment>
+        {navigation.map(
+          ({ hidden, ...rest }) => !hidden && <Dropdown.Item {...rest} key={rest.title.id} />,
+        )}
+        {mayManageUsers && (
+          <React.Fragment>
+            <hr />
+            <Dropdown.Item
+              title={sharedMessages.userManagement}
+              icon="user_management"
+              path="/admin/user-management"
+            />
+          </React.Fragment>
+        )}
       </React.Fragment>
     )
 
@@ -136,9 +163,11 @@ class Header extends Component {
       <HeaderComponent
         user={user}
         dropdownItems={dropdownItems}
+        mobileDropdownItems={mobileDropdownItems}
         navigationEntries={navigationEntries}
         searchable={searchable}
-        handleSearchRequest={handleSearchRequest}
+        onSearchRequest={handleSearchRequest}
+        onLogout={handleLogout}
       />
     )
   }
