@@ -29,11 +29,11 @@ ul.dropdown
       reset-button()
 
     & > a, & > button
-      one-liner()
+      line-height: 1
+      display: block
       color: $tc-deep-gray
       text-decoration: none
       padding: $cs.m 0
-      width: 100%
 
       span:last-child
         nudge('down')
@@ -48,7 +48,8 @@ ul.dropdown
       background-color: $c-active-blue
 
       a, button
-        color: white
+        span
+          color: white
 
       .icon
         color: white
