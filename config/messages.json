@@ -3419,6 +3419,24 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/io:no_absolute_time": {
+    "translations": {
+      "en": "no absolute time provided for class B downlink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:no_rx_delay": {
+    "translations": {
+      "en": "no Rx delay provided for class A downlink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/gatewayserver/io:no_uplink_token": {
     "translations": {
       "en": "no uplink token provided for class A downlink"
