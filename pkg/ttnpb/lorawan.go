@@ -674,6 +674,8 @@ func (v MACVersion) String() string {
 		return "1.0.2"
 	case MAC_V1_0_3:
 		return "1.0.3"
+	case MAC_V1_0_4:
+		return "1.0.4"
 	case MAC_V1_1:
 		return "1.1.0"
 	}
