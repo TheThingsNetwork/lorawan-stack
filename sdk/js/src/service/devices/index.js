@@ -120,13 +120,28 @@ class Devices {
       ? requestTreeOverwrite
       : splitSetPaths(paths, mergeBase)
 
-    // Retrieve join information if not present
-    if (!create) {
-      const paths = [['application_server_address'], ['network_server_address']]
+    let jsHost
+    try {
+      jsHost = new URL(this._stackConfig.js).hostname
+    } catch (e) {
+      delete requestTree.js
+    }
+
+    if (create) {
+      // Skip request to JS if an external js is used
+      if (device.join_server_address !== jsHost) {
+        delete requestTree.js
+      }
+    } else {
+      // Retrieve join information if not present for update
+      const paths = [
+        ['application_server_address'],
+        ['network_server_address'],
+        ['join_server_address'],
+      ]
 
       if (!('supports_join' in device)) {
         paths.push(['supports_join'])
-        paths.push(['join_server_address'])
       }
 
       const res = await this._getDevice(appId, devId, paths, true)
@@ -159,6 +174,11 @@ class Devices {
         }
       } catch (e) {
         delete requestTree.as
+      }
+
+      // Skip request to JS if an external js is used
+      if (res.join_server_address !== jsHost) {
+        delete requestTree.js
       }
     }
 
