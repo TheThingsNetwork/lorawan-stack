@@ -22,7 +22,7 @@ import ProfileDropdown from '../profile-dropdown'
 import Input from '../input'
 import PropTypes from '../../lib/prop-types'
 
-import styles from './header.styl'
+import style from './header.styl'
 
 const Header = function({
   className,
@@ -30,35 +30,24 @@ const Header = function({
   navigationEntries,
   user,
   searchable,
+  logo,
   handleSearchRequest = () => null,
-  anchored = false,
   ...rest
 }) {
   const isGuest = !Boolean(user)
-  const LinkComponent = anchored ? Link.BaseAnchor : Link
 
   return (
-    <header {...rest} className={classnames(className, styles.bar)}>
-      <div className={styles.left}>
-        <LinkComponent {...(anchored ? { href: '/' } : { to: '/' })} className={styles.logo}>
-          <Logo />
-        </LinkComponent>
-        {!isGuest && (
-          <NavigationBar
-            className={styles.navList}
-            entries={navigationEntries}
-            anchored={anchored}
-          />
-        )}
+    <header {...rest} className={classnames(className, style.bar)}>
+      <div className={style.left}>
+        <Link to="/" className={style.logo}>
+          {logo}
+        </Link>
+        {!isGuest && <NavigationBar className={style.navList}>{navigationEntries}</NavigationBar>}
       </div>
       {!isGuest && (
-        <div className={styles.right}>
+        <div className={style.right}>
           {searchable && <Input icon="search" onEnter={handleSearchRequest} />}
-          <ProfileDropdown
-            dropdownItems={dropdownItems}
-            userId={user.ids.user_id}
-            anchored={anchored}
-          />
+          <ProfileDropdown userId={user.ids.user_id}>{dropdownItems}</ProfileDropdown>
         </div>
       )}
     </header>
@@ -66,23 +55,18 @@ const Header = function({
 }
 
 Header.propTypes = {
-  /** Flag identifying whether links should be rendered as plain anchor link */
-  anchored: PropTypes.bool,
   /** The classname applied to the component */
   className: PropTypes.string,
   /**
    * A list of items for the dropdown
    * See `<ProfileDropdown/>`'s `items` proptypes for details
    */
-  dropdownItems: ProfileDropdown.propTypes.dropdownItems,
+  dropdownItems: ProfileDropdown.propTypes.children,
   /** A handler for when the user used the search input */
   handleSearchRequest: PropTypes.func,
-  /** A flag identifying whether the header should display the search input */
-  /**
-   * A list of navigation bar entries
-   * See `<NavigationBar/>`'s `entries` proptypes for details
-   */
-  navigationEntries: NavigationBar.propTypes.entries,
+  /** Child node of the navigation bar */
+  logo: PropTypes.node,
+  navigationEntries: NavigationBar.propTypes.children,
   searchable: PropTypes.bool,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
@@ -92,11 +76,11 @@ Header.propTypes = {
 }
 
 Header.defaultProps = {
-  anchored: false,
   className: undefined,
   dropdownItems: undefined,
   navigationEntries: undefined,
   handleSearchRequest: () => null,
+  logo: <Logo />,
   searchable: false,
   user: undefined,
 }

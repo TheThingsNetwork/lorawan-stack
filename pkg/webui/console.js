@@ -19,7 +19,6 @@ import { Provider } from 'react-redux'
 
 import { EnvProvider } from './lib/components/env'
 import { BreadcrumbsProvider } from './components/breadcrumbs/context'
-import { SideNavigationProvider } from './components/navigation/side/context'
 import Init from './lib/components/init'
 import WithLocale from './lib/components/with-locale'
 import env from './lib/env'
@@ -43,9 +42,7 @@ const render = () => {
         <WithLocale>
           <Init>
             <BreadcrumbsProvider>
-              <SideNavigationProvider>
-                <App history={history} />
-              </SideNavigationProvider>
+              <App history={history} />
             </BreadcrumbsProvider>
           </Init>
         </WithLocale>

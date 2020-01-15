@@ -16,24 +16,13 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
+import Dropdown from '../dropdown'
 import ProfileDropdown from '.'
 
-const user = {
-  name: 'kschiffer',
+const handleLogout = function() {
+  // eslint-disable-next-line no-console
+  console.log('Click')
 }
-
-const items = [
-  {
-    title: 'Profile Settings',
-    icon: 'settings',
-    link: '/profile-settings',
-  },
-  {
-    title: 'Logout',
-    icon: 'power_settings_new',
-    action: () => null,
-  },
-]
 
 storiesOf('Profile Dropdown', module)
   .addDecorator((story, context) =>
@@ -45,5 +34,12 @@ storiesOf('Profile Dropdown', module)
     })(story)(context),
   )
   .add('Default', function() {
-    return <ProfileDropdown style={{ marginLeft: '60px' }} user={user} dropdownItems={items} />
+    return (
+      <div style={{ height: '6rem' }}>
+        <ProfileDropdown style={{ marginLeft: '120px' }} userId="johndoe">
+          <Dropdown.Item title="Profile Settings" icon="settings" path="/profile-settings" />
+          <Dropdown.Item title="Logout" icon="power_settings_new" action={handleLogout} />
+        </ProfileDropdown>
+      </div>
+    )
   })

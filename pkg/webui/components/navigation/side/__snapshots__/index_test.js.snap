@@ -25,21 +25,17 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
       depth={0}
       isExpanded={false}
       isMinimized={false}
-      items={
-        Array [
-          Object {
-            "path": "/test-path",
-            "title": "test-title",
-          },
-          Object {
-            "path": "/test-title2",
-            "title": "test-title2",
-          },
-        ]
-      }
-      itemsExpanded={Object {}}
       onItemExpand={[Function]}
-    />
+    >
+      <withRouter(SideNavigationItem)
+        path="/test-path"
+        title="test-tile"
+      />
+      <withRouter(SideNavigationItem)
+        path="/test-path2"
+        title="test-tile2"
+      />
+    </SideNavigationList>
   </div>
   <injectIntl(Button)
     className="navigationButton"
@@ -48,7 +44,7 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
     message={
       Object {
         "defaultMessage": "Hide Sidebar",
-        "id": "components.navigation.side.side.hideSidebar",
+        "id": "components.navigation.side.index.hideSidebar",
       }
     }
     naked={true}
@@ -83,41 +79,34 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
       depth={0}
       isExpanded={false}
       isMinimized={false}
-      items={
-        Array [
-          Object {
-            "items": Array [
-              Object {
-                "path": "/nested-test-title",
-                "title": "nested-test-title",
-              },
-            ],
-            "nested": true,
-            "title": "test-title",
-          },
-          Object {
-            "items": Array [
-              Object {
-                "path": "/nested-test-title2",
-                "title": "nested-test-title2",
-              },
-              Object {
-                "path": "/nested-test-title3",
-                "title": "nested-test-title3",
-              },
-            ],
-            "nested": true,
-            "title": "test-title2",
-          },
-          Object {
-            "path": "/test-title3",
-            "title": "test-title3",
-          },
-        ]
-      }
-      itemsExpanded={Object {}}
       onItemExpand={[Function]}
-    />
+    >
+      <withRouter(SideNavigationItem)
+        path="/test-path"
+        title="test-title"
+      >
+        <withRouter(SideNavigationItem)
+          path="/nested-test-title"
+          title="nested-test-tile"
+        />
+      </withRouter(SideNavigationItem)>
+      <withRouter(SideNavigationItem)
+        title="test-title2"
+      >
+        <withRouter(SideNavigationItem)
+          path="/nested-test-title2"
+          title="nested-test-tile2"
+        />
+        <withRouter(SideNavigationItem)
+          path="/nested-test-title3"
+          title="nested-test-tile3"
+        />
+      </withRouter(SideNavigationItem)>
+      <withRouter(SideNavigationItem)
+        path="/test-title3"
+        title="test-title3"
+      />
+    </SideNavigationList>
   </div>
   <injectIntl(Button)
     className="navigationButton"
@@ -126,7 +115,7 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
     message={
       Object {
         "defaultMessage": "Hide Sidebar",
-        "id": "components.navigation.side.side.hideSidebar",
+        "id": "components.navigation.side.index.hideSidebar",
       }
     }
     naked={true}

@@ -18,9 +18,9 @@ import { connect } from 'react-redux'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import sharedMessages from '../../../lib/shared-messages'
-import { withSideNavigation } from '../../../components/navigation/side/context'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import SideNavigation from '../../../components/navigation/side'
 import withRequest from '../../../lib/components/with-request'
 import withEnv from '../../../lib/components/env'
 import BreadcrumbView from '../../../lib/components/breadcrumb-view'
@@ -90,57 +90,6 @@ import PropTypes from '../../../lib/prop-types'
     ]),
   ({ fetching, gateway }) => fetching || !Boolean(gateway),
 )
-@withSideNavigation(function(props) {
-  const {
-    match: { url: matchedUrl },
-    gtwId,
-    rights,
-  } = props
-
-  return {
-    header: { title: gtwId, icon: 'gateway' },
-    entries: [
-      {
-        title: sharedMessages.overview,
-        path: matchedUrl,
-        icon: 'overview',
-        hidden: !mayViewGatewayInfo.check(rights),
-      },
-      {
-        title: sharedMessages.data,
-        path: `${matchedUrl}/data`,
-        icon: 'data',
-        hidden: !mayViewGatewayEvents.check(rights),
-      },
-      {
-        title: sharedMessages.location,
-        path: `${matchedUrl}/location`,
-        icon: 'location',
-        hidden: !mayViewOrEditGatewayLocation.check(rights),
-      },
-      {
-        title: sharedMessages.collaborators,
-        path: `${matchedUrl}/collaborators`,
-        icon: 'organization',
-        exact: false,
-        hidden: !mayViewOrEditGatewayCollaborators.check(rights),
-      },
-      {
-        title: sharedMessages.apiKeys,
-        path: `${matchedUrl}/api-keys`,
-        icon: 'api_keys',
-        exact: false,
-        hidden: !mayViewOrEditGatewayApiKeys.check(rights),
-      },
-      {
-        title: sharedMessages.generalSettings,
-        path: `${matchedUrl}/general-settings`,
-        icon: 'general_settings',
-        hidden: !mayEditBasicGatewayInformation.check(rights),
-      },
-    ],
-  }
-})
 @withBreadcrumb('gateways.single', function(props) {
   const {
     gtwId,
@@ -156,6 +105,7 @@ export default class Gateway extends React.Component {
     gateway: PropTypes.gateway.isRequired,
     gtwId: PropTypes.string.isRequired,
     match: PropTypes.match.isRequired,
+    rights: PropTypes.rights.isRequired,
   }
 
   static defaultProps = {
@@ -163,11 +113,62 @@ export default class Gateway extends React.Component {
   }
 
   render() {
-    const { match, gateway, gtwId, env } = this.props
+    const {
+      match: { url: matchedUrl },
+      gateway,
+      gtwId,
+      env,
+      rights,
+      match,
+    } = this.props
 
     return (
       <BreadcrumbView>
         <IntlHelmet titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`} />
+        <SideNavigation header={{ icon: 'gateway', title: gateway.name || gtwId }}>
+          {mayViewGatewayInfo.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.overview}
+              path={matchedUrl}
+              icon="overview"
+            />
+          )}
+          {mayViewGatewayEvents.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.data}
+              path={`${matchedUrl}/data`}
+              icon="data"
+            />
+          )}
+          {mayViewOrEditGatewayLocation.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.location}
+              path={`${matchedUrl}/location`}
+              icon="location"
+            />
+          )}
+          {mayViewOrEditGatewayCollaborators.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.collaborators}
+              path={`${matchedUrl}/collaborators`}
+              icon="organization"
+            />
+          )}
+          {mayViewOrEditGatewayApiKeys.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.apiKeys}
+              path={`${matchedUrl}/api-keys`}
+              icon="api_keys"
+            />
+          )}
+          {mayEditBasicGatewayInformation.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.generalSettings}
+              path={`${matchedUrl}/general-settings`}
+              icon="general_settings"
+            />
+          )}
+        </SideNavigation>
         <Switch>
           <Route exact path={`${match.path}`} component={GatewayOverview} />
           <Route path={`${match.path}/api-keys`} component={GatewayApiKeys} />

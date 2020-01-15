@@ -18,7 +18,7 @@ import { Switch, Route } from 'react-router'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import { withSideNavigation } from '../../../components/navigation/side/context'
+import SideNavigation from '../../../components/navigation/side'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
@@ -86,108 +86,6 @@ import PropTypes from '../../../lib/prop-types'
   ({ appId, loadData }) => loadData(appId),
   ({ fetching, application }) => fetching || !Boolean(application),
 )
-@withSideNavigation(function(props) {
-  const matchedUrl = props.match.url
-  const { rights } = props
-
-  return {
-    header: { title: props.appId, icon: 'application' },
-    entries: [
-      {
-        title: sharedMessages.overview,
-        path: matchedUrl,
-        icon: 'overview',
-        hidden: !mayViewApplicationInfo.check(rights),
-      },
-      {
-        title: sharedMessages.devices,
-        path: `${matchedUrl}/devices`,
-        icon: 'devices',
-        exact: false,
-        hidden: !mayViewApplicationDevices.check(rights),
-      },
-      {
-        title: sharedMessages.data,
-        path: `${matchedUrl}/data`,
-        icon: 'data',
-        exact: false,
-        hidden: !mayViewApplicationEvents.check(rights),
-      },
-      {
-        title: sharedMessages.link,
-        path: `${matchedUrl}/link`,
-        icon: 'link',
-        hidden: !mayLinkApplication.check(rights),
-      },
-      {
-        title: sharedMessages.payloadFormatters,
-        icon: 'code',
-        nested: true,
-        exact: false,
-        hidden: !mayLinkApplication.check(rights),
-        items: [
-          {
-            title: sharedMessages.uplink,
-            path: `${matchedUrl}/payload-formatters/uplink`,
-            icon: 'uplink',
-          },
-          {
-            title: sharedMessages.downlink,
-            path: `${matchedUrl}/payload-formatters/downlink`,
-            icon: 'downlink',
-          },
-        ],
-      },
-      {
-        title: sharedMessages.integrations,
-        icon: 'integration',
-        nested: true,
-        exact: false,
-        hidden: !mayCreateOrEditApplicationIntegrations.check(rights),
-        items: [
-          {
-            title: sharedMessages.mqtt,
-            path: `${matchedUrl}/integrations/mqtt`,
-            icon: 'extension',
-            exact: false,
-          },
-          {
-            title: sharedMessages.webhooks,
-            path: `${matchedUrl}/integrations/webhooks`,
-            icon: 'extension',
-            exact: false,
-          },
-          {
-            title: sharedMessages.pubsubs,
-            path: `${matchedUrl}/integrations/pubsubs`,
-            icon: 'extension',
-            exact: false,
-          },
-        ],
-      },
-      {
-        title: sharedMessages.collaborators,
-        path: `${matchedUrl}/collaborators`,
-        icon: 'organization',
-        exact: false,
-        hidden: !mayViewOrEditApplicationCollaborators.check(rights),
-      },
-      {
-        title: sharedMessages.apiKeys,
-        path: `${matchedUrl}/api-keys`,
-        icon: 'api_keys',
-        exact: false,
-        hidden: !mayViewOrEditApplicationApiKeys.check(rights),
-      },
-      {
-        title: sharedMessages.generalSettings,
-        path: `${matchedUrl}/general-settings`,
-        icon: 'general_settings',
-        hidden: !mayEditBasicApplicationInfo.check(rights),
-      },
-    ],
-  }
-})
 @withBreadcrumb('apps.single', function(props) {
   const {
     appId,
@@ -203,6 +101,7 @@ export default class Application extends React.Component {
     env: PropTypes.env,
     match: PropTypes.match.isRequired,
     stopStream: PropTypes.func.isRequired,
+    rights: PropTypes.rights.isRequired,
   }
 
   static defaultProps = {
@@ -216,32 +115,117 @@ export default class Application extends React.Component {
   }
 
   render() {
-    const { match, application, appId, env } = this.props
+    const {
+      match: { url: matchedUrl, path },
+      application,
+      appId,
+      env,
+      rights,
+    } = this.props
 
     return (
       <BreadcrumbView>
         <IntlHelmet titleTemplate={`%s - ${application.name || appId} - ${env.siteName}`} />
+        <SideNavigation header={{ icon: 'application', title: application.name || appId }}>
+          {mayViewApplicationInfo.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.overview}
+              path={matchedUrl}
+              icon="overview"
+              exact
+            />
+          )}
+          {mayViewApplicationDevices.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.devices}
+              path={`${matchedUrl}/devices`}
+              icon="devices"
+            />
+          )}
+          {mayViewApplicationEvents.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.data}
+              path={`${matchedUrl}/data`}
+              icon="data"
+            />
+          )}
+          {mayLinkApplication.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.link}
+              path={`${matchedUrl}/link`}
+              icon="link"
+            />
+          )}
+          {mayLinkApplication.check(rights) && (
+            <SideNavigation.Item title={sharedMessages.payloadFormatters} icon="code">
+              <SideNavigation.Item
+                title={sharedMessages.uplink}
+                path={`${matchedUrl}/payload-formatters/uplink`}
+                icon="uplink"
+              />
+              <SideNavigation.Item
+                title={sharedMessages.downlink}
+                path={`${matchedUrl}/payload-formatters/downlink`}
+                icon="downlink"
+              />
+            </SideNavigation.Item>
+          )}
+          {mayCreateOrEditApplicationIntegrations.check(rights) && (
+            <SideNavigation.Item title={sharedMessages.integrations} icon="integration">
+              <SideNavigation.Item
+                title={sharedMessages.mqtt}
+                path={`${matchedUrl}/integrations/mqtt`}
+                icon="extension"
+              />
+              <SideNavigation.Item
+                title={sharedMessages.webhooks}
+                path={`${matchedUrl}/integrations/webhooks`}
+                icon="extension"
+              />
+              <SideNavigation.Item
+                title={sharedMessages.pubsubs}
+                path={`${matchedUrl}/integrations/pubsubs`}
+                icon="extension"
+              />
+            </SideNavigation.Item>
+          )}
+          {mayViewOrEditApplicationCollaborators.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.collaborators}
+              path={`${matchedUrl}/collaborators`}
+              icon="organization"
+            />
+          )}
+          {mayViewOrEditApplicationApiKeys.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.apiKeys}
+              path={`${matchedUrl}/api-keys`}
+              icon="api_keys"
+            />
+          )}
+          {mayEditBasicApplicationInfo.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.generalSettings}
+              path={`${matchedUrl}/general-settings`}
+              icon="general_settings"
+            />
+          )}
+        </SideNavigation>
         <Switch>
-          <Route exact path={`${match.path}`} component={ApplicationOverview} />
-          <Route path={`${match.path}/general-settings`} component={ApplicationGeneralSettings} />
-          <Route path={`${match.path}/api-keys`} component={ApplicationApiKeys} />
-          <Route path={`${match.path}/link`} component={ApplicationLink} />
-          <Route path={`${match.path}/devices`} component={Devices} />
-          <Route path={`${match.path}/collaborators`} component={ApplicationCollaborators} />
-          <Route path={`${match.path}/data`} component={ApplicationData} />
+          <Route exact path={`${path}`} component={ApplicationOverview} />
+          <Route path={`${path}/general-settings`} component={ApplicationGeneralSettings} />
+          <Route path={`${path}/api-keys`} component={ApplicationApiKeys} />
+          <Route path={`${path}/link`} component={ApplicationLink} />
+          <Route path={`${path}/devices`} component={Devices} />
+          <Route path={`${path}/collaborators`} component={ApplicationCollaborators} />
+          <Route path={`${path}/data`} component={ApplicationData} />
+          <Route path={`${path}/payload-formatters`} component={ApplicationPayloadFormatters} />
+          <Route path={`${path}/integrations/mqtt`} component={ApplicationIntegrationsMqtt} />
           <Route
-            path={`${match.path}/payload-formatters`}
-            component={ApplicationPayloadFormatters}
-          />
-          <Route path={`${match.path}/integrations/mqtt`} component={ApplicationIntegrationsMqtt} />
-          <Route
-            path={`${match.path}/integrations/webhooks`}
+            path={`${path}/integrations/webhooks`}
             component={ApplicationIntegrationsWebhooks}
           />
-          <Route
-            path={`${match.path}/integrations/pubsubs`}
-            component={ApplicationIntegrationsPubsubs}
-          />
+          <Route path={`${path}/integrations/pubsubs`} component={ApplicationIntegrationsPubsubs} />
           <NotFoundRoute />
         </Switch>
       </BreadcrumbView>

@@ -15,58 +15,47 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import NavigationLink, { NavigationAnchorLink } from '../link'
+import NavigationLink from '../link'
 import Message from '../../../lib/components/message'
 import Icon from '../../icon'
 import PropTypes from '../../../lib/prop-types'
 
 import style from './bar.styl'
 
-const NavigationBar = function({ className, entries, anchored }) {
-  return (
-    <nav className={classnames(className, style.bar)}>
-      {entries.map(function(entry, index) {
-        const { path, title, icon = null, exact = false, hidden } = entry
-
-        if (hidden) return null
-
-        const Component = anchored ? NavigationAnchorLink : NavigationLink
-
-        return (
-          <Component
-            key={index}
-            path={path}
-            exact={exact}
-            className={style.link}
-            activeClassName={style.linkActive}
-          >
-            {icon && <Icon icon={icon} className={style.icon} />}
-            <Message content={title} />
-          </Component>
-        )
-      })}
-    </nav>
-  )
+const NavigationBar = function({ className, children }) {
+  return <nav className={className}>{children}</nav>
 }
 
 NavigationBar.propTypes = {
-  /** Flag identifying whether links should be rendered as plain anchor link */
-  anchored: PropTypes.bool,
+  children: PropTypes.node.isRequired,
   className: PropTypes.string,
-  /**
-   * A list of navigation bar entries.
-   * @param {(string|Object)} title - The title to be displayed
-   * @param {string} icon - The icon name to be displayed next to the title
-   * @param {string} path -  The path for a navigation tab
-   * @param {boolean} exact - Flag identifying whether the path should be matched exactly
-   */
-  entries: PropTypes.arrayOf(PropTypes.link),
 }
 
 NavigationBar.defaultProps = {
   className: undefined,
-  entries: [],
-  anchored: false,
 }
+
+const NavigationBarItem = ({ icon, title, className, ...rest }) => (
+  <NavigationLink
+    {...rest}
+    className={classnames(style.link, className)}
+    activeClassName={style.linkActive}
+  >
+    {icon && <Icon icon={icon} className={style.icon} />}
+    <Message content={title} />
+  </NavigationLink>
+)
+
+NavigationBarItem.propTypes = {
+  className: PropTypes.string,
+  icon: PropTypes.string.isRequired,
+  title: PropTypes.message.isRequired,
+}
+
+NavigationBarItem.defaultProps = {
+  className: undefined,
+}
+
+NavigationBar.Item = NavigationBarItem
 
 export default NavigationBar
