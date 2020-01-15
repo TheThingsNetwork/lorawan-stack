@@ -197,6 +197,10 @@ PropTypes.location = PropTypes.shape({
   }),
 })
 
+PropTypes.history = PropTypes.shape({
+  listen: PropTypes.func,
+})
+
 PropTypes.collaborator = PropTypes.shape({
   rights: PropTypes.rights,
 })

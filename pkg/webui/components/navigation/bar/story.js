@@ -28,29 +28,11 @@ storiesOf('Navigation', module)
       propTables: [NavigationBar],
     })(story)(context),
   )
-  .add('NavigationBar', function() {
-    const entries = [
-      {
-        title: 'Overview',
-        icon: 'overview',
-        path: '/overview',
-      },
-      {
-        title: 'Applications',
-        icon: 'application',
-        path: '/applications',
-      },
-      {
-        title: 'Gateways',
-        icon: 'gateway',
-        path: '/gateways',
-      },
-      {
-        title: 'Organizations',
-        icon: 'organization',
-        path: '/organizations',
-      },
-    ]
-
-    return <NavigationBar entries={entries} />
-  })
+  .add('NavigationBar', () => (
+    <NavigationBar>
+      <NavigationBar.Item title="Overview" icon="overview" path="/overview" />
+      <NavigationBar.Item title="Applications" icon="application" path="/application" />
+      <NavigationBar.Item title="Gateways" icon="gateway" path="/gateways" />
+      <NavigationBar.Item title="Organizations" icon="organization" path="/organization" />
+    </NavigationBar>
+  ))

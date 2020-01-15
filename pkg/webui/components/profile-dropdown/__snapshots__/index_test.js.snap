@@ -21,21 +21,19 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
     small={false}
   />
   <Dropdown
-    items={
-      Array [
-        Object {
-          "icon": "settings",
-          "path": "/profile-settings",
-          "title": "Profile Settings",
-        },
-        Object {
-          "action": [Function],
-          "icon": "power_settings_new",
-          "title": "Logout",
-        },
-      ]
-    }
-  />
+    className="dropdown"
+  >
+    <DropdownItem
+      icon="settings"
+      link="/profile-settings"
+      title="Profile Settings"
+    />
+    <DropdownItem
+      action={[Function]}
+      icon="power_settings_new"
+      title="Logout"
+    />
+  </Dropdown>
 </div>
 `;
 

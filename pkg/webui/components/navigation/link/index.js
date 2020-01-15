@@ -63,7 +63,7 @@ NavigationLink.propTypes = {
    * Boolean flag identifying whether the path should
    * be matched exactly
    */
-  exact: PropTypes.bool.isRequired,
+  exact: PropTypes.bool,
   onClick: PropTypes.func,
   /** The path for a link */
   path: PropTypes.string.isRequired,
@@ -74,6 +74,7 @@ NavigationLink.defaultProps = {
   activeClassName: undefined,
   children: undefined,
   className: undefined,
+  exact: false,
   onClick: () => null,
 }
 

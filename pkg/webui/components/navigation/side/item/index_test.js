@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import React from 'react'
+
 import getSideNavigationItemDriver from './index_driver'
+import { SideNavigationItem } from '.'
 
 describe('SideNavigationItem', function() {
   let driver = null
-  let onExpandSpy = null
+  const location = {
+    pathname: '/',
+  }
 
   beforeEach(function() {
     driver = getSideNavigationItemDriver()
-    onExpandSpy = jest.fn()
   })
 
   describe('is flat', function() {
@@ -29,12 +33,9 @@ describe('SideNavigationItem', function() {
         title: 'test-title',
         path: '/test-title',
         depth: 0,
-        isCollapsable: false,
         isMinimized: false,
-        isExpanded: false,
         isActive: false,
         items: [],
-        onExpand: onExpandSpy,
       })
     })
 
@@ -48,21 +49,14 @@ describe('SideNavigationItem', function() {
       driver.when.created({
         title: 'test-title',
         depth: 0,
-        isCollapsable: true,
         isMinimized: false,
-        isExpanded: true,
         isActive: false,
-        onExpand: onExpandSpy,
-        items: [
-          {
-            title: 'nested-title',
-            path: '/nested-title',
-          },
-          {
-            title: 'nested-title2',
-            path: '/nested-title2',
-          },
-        ],
+        children: (
+          <React.Fragment>
+            <SideNavigationItem location={location} title="nested-title" path="/nested-title" />
+            <SideNavigationItem location={location} title="nested-title2" path="/nested-title2" />
+          </React.Fragment>
+        ),
       })
     })
 
@@ -75,8 +69,13 @@ describe('SideNavigationItem', function() {
         driver.when.itemSelected()
       })
 
-      it('should call `onExpand` only once', function() {
-        expect(onExpandSpy.mock.calls).toHaveLength(1)
+      it('should toggle the isExpanded state to true', function() {
+        expect(driver.component.state('isExpanded')).toBe(true)
+      })
+
+      it('should toggle the isExpanded state to false again', function() {
+        driver.when.itemSelected()
+        expect(driver.component.state('isExpanded')).toBe(false)
       })
     })
   })

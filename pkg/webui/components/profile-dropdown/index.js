@@ -16,53 +16,36 @@ import React from 'react'
 import bind from 'autobind-decorator'
 
 import Icon from '../icon'
-import Message from '../../lib/components/message'
-import Link from '../link'
+import Dropdown from '../dropdown'
 import PropTypes from '../../lib/prop-types'
 
-import styles from './profile-dropdown.styl'
+import style from './profile-dropdown.styl'
 
-const dropdownItemsPropTypes = PropTypes.arrayOf(
-  PropTypes.oneOfType([
-    PropTypes.shape({
-      title: PropTypes.message.isRequired,
-      icon: PropTypes.string,
-      path: PropTypes.string,
-      action: PropTypes.func.isRequired,
-      hidden: PropTypes.bool,
-    }),
-    PropTypes.shape({
-      title: PropTypes.message.isRequired,
-      icon: PropTypes.string,
-      path: PropTypes.string.isRequired,
-      action: PropTypes.func,
-      hidden: PropTypes.bool,
-    }),
-  ]),
-).isRequired
-
-@bind
 export default class ProfileDropdown extends React.PureComponent {
   state = {
     expanded: false,
   }
 
+  @bind
   showDropdown() {
     document.addEventListener('mousedown', this.handleClickOutside)
     this.setState({ expanded: true })
   }
 
+  @bind
   hideDropdown() {
     document.removeEventListener('mousedown', this.handleClickOutside)
     this.setState({ expanded: false })
   }
 
+  @bind
   handleClickOutside(e) {
     if (!this.node.contains(e.target)) {
       this.hideDropdown()
     }
   }
 
+  @bind
   toggleDropdown() {
     let { expanded } = this.state
     expanded = !expanded
@@ -73,16 +56,17 @@ export default class ProfileDropdown extends React.PureComponent {
     }
   }
 
+  @bind
   ref(node) {
     this.node = node
   }
 
   render() {
-    const { userId, dropdownItems, anchored, ...rest } = this.props
+    const { userId, children, ...rest } = this.props
 
     return (
       <div
-        className={styles.container}
+        className={style.container}
         onClick={this.toggleDropdown}
         onKeyPress={this.toggleDropdown}
         ref={this.ref}
@@ -90,77 +74,20 @@ export default class ProfileDropdown extends React.PureComponent {
         role="button"
         {...rest}
       >
-        <span className={styles.id}>{userId}</span>
+        <span className={style.id}>{userId}</span>
         <Icon icon="arrow_drop_down" />
-        {this.state.expanded && <Dropdown items={dropdownItems} anchored={anchored} />}
+        {this.state.expanded && <Dropdown className={style.dropdown}>{children}</Dropdown>}
       </div>
     )
   }
 }
 
 ProfileDropdown.propTypes = {
-  anchored: PropTypes.bool,
   /**
    * A list of items for the dropdown component
    * See `<Dropdown />`'s `items` proptypes for details
    */
-  // eslint-disable-next-line react/require-default-props
-  dropdownItems: dropdownItemsPropTypes,
+  children: PropTypes.node.isRequired,
   /** The id of the current user */
   userId: PropTypes.string.isRequired,
 }
-
-ProfileDropdown.defaultProps = {
-  anchored: undefined,
-}
-
-const Dropdown = ({ items, anchored }) => (
-  <ul className={styles.dropdown}>
-    {items.map(function(item) {
-      if (item.hidden) return null
-
-      const icon = item.icon && <Icon className={styles.icon} icon={item.icon} />
-      const ItemElement = item.action ? (
-        <button onClick={item.action} onKeyPress={item.action} role="tab" tabIndex="0">
-          {icon}
-          <Message content={item.title} />
-        </button>
-      ) : anchored ? (
-        <Link.BaseAnchor href={item.path}>
-          {icon}
-          <Message content={item.title} />
-        </Link.BaseAnchor>
-      ) : (
-        <Link to={item.path}>
-          {icon}
-          <Message content={item.title} />
-        </Link>
-      )
-      return (
-        <li className={styles.dropdownItem} key={item.title.id || item.title}>
-          {ItemElement}
-        </li>
-      )
-    })}
-  </ul>
-)
-
-Dropdown.propTypes = {
-  /** Flag identifying whether link should be rendered as plain anchor link */
-  anchored: PropTypes.bool,
-  /**
-   * A list of items for the dropdown
-   * @param {(string|Object)} title - The title to be displayed
-   * @param {string} icon - The icon name to be displayed next to the title
-   * @param {string} path - The path for a navigation tab
-   * @param {function} action - Alternatively, the function to be called on click
-   */
-  // eslint-disable-next-line react/require-default-props
-  items: dropdownItemsPropTypes,
-}
-
-Dropdown.defaultProps = {
-  anchored: undefined,
-}
-
-export { Dropdown }

@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import SideNavigation from './side'
+import { SideNavigation } from '.'
 
 export default function() {
   const driver = {
@@ -22,29 +22,14 @@ export default function() {
     location: {
       pathname: '/',
     },
-
     when: {
       created(props) {
-        driver.component = shallow(
-          <SideNavigation.WrappedComponent location={location} {...props} />,
-        )
+        driver.component = shallow(<SideNavigation location={location} {...props} />)
 
         return driver
       },
       minimized() {
         driver.get.hideButton().simulate('click')
-        driver.component.update()
-      },
-      itemSelected(index) {
-        driver.get.itemButton(index).simulate('click')
-        driver.component.update()
-      },
-      linkSelected(index) {
-        driver.get.itemLink(index).simulate('click')
-        driver.component.update()
-      },
-      nestedLinkSelected(itemIndex, linkIndex) {
-        driver.get.nestedItemLink(itemIndex, linkIndex).simulate('click')
         driver.component.update()
       },
     },
@@ -54,12 +39,6 @@ export default function() {
       },
       expanded(index) {
         return !!driver.component.state().itemsExpanded[index].isOpen
-      },
-      itemExpanded(index) {
-        return driver.get.item(index).props().isExpanded
-      },
-      itemActive(index) {
-        return driver.get.item(index).props().isActive
       },
     },
     get: {
@@ -83,38 +62,11 @@ export default function() {
       item(index) {
         return driver.get.items().at(index)
       },
-      itemButton(index) {
-        return driver.get
-          .item(index)
-          .dive()
-          .find('CollapsableItem')
-          .dive()
-          .find('[data-hook="side-nav-item-button"]')
-      },
-      itemLink(index) {
-        return driver.get
-          .item(index)
-          .dive()
-          .find('LinkItem')
-          .dive()
-          .find('[data-hook="side-nav-item-link"]')
-      },
-      nestedItemLink(itemIndex, linkIndex) {
-        return driver.get
-          .nestedList(itemIndex)
-          .dive()
-          .find('SideNavigationItem')
-          .dive()
-          .find('LinkItem')
-          .at(linkIndex)
-          .dive()
-          .find('[data-hook="side-nav-item-link"]')
-      },
       itemsCount() {
         return driver.get.items().length
       },
       collapsableItemsCount() {
-        return driver.get.items().findWhere(i => i.props().isCollapsable).length
+        return driver.get.items().findWhere(i => i.props().children !== undefined).length
       },
       expandedItemsCount() {
         return driver.get.items().findWhere(i => i.props().isExpanded).length

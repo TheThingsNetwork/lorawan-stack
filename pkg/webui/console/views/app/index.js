@@ -24,7 +24,6 @@ import dev from '../../../lib/dev'
 import PropTypes from '../../../lib/prop-types'
 import { ToastContainer } from '../../../components/toast'
 
-import SideNavigation from '../../../components/navigation/side'
 import Header from '../../containers/header'
 import Footer from '../../../components/footer'
 import Landing from '../landing'
@@ -76,9 +75,7 @@ class ConsoleApp extends React.Component {
               <div id="modal-container" />
               <Header className={style.header} />
               <main className={style.main}>
-                <div>
-                  <SideNavigation />
-                </div>
+                <div id="sidebar" />
                 <div className={style.content}>
                   <Switch>
                     {/* routes for registration, privacy policy, other public pages */}

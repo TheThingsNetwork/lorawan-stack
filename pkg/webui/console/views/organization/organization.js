@@ -16,10 +16,10 @@ import React from 'react'
 import { Switch, Route } from 'react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import { withSideNavigation } from '../../../components/navigation/side/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
+import SideNavigation from '../../../components/navigation/side'
 import BreadcrumbView from '../../../lib/components/breadcrumb-view'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
@@ -38,46 +38,6 @@ import {
 } from '../../lib/feature-checks'
 
 @withEnv
-@withSideNavigation(function(props) {
-  const matchedUrl = props.match.url
-  const { rights } = props
-  return {
-    header: { title: props.orgId, icon: 'organization' },
-    entries: [
-      {
-        title: sharedMessages.overview,
-        path: matchedUrl,
-        icon: 'overview',
-        hidden: !mayViewOrganizationInformation.check(rights),
-      },
-      {
-        title: sharedMessages.data,
-        path: `${matchedUrl}/data`,
-        icon: 'data',
-      },
-      {
-        title: sharedMessages.apiKeys,
-        path: `${matchedUrl}/api-keys`,
-        icon: 'api_keys',
-        exact: false,
-        hidden: !mayViewOrEditOrganizationApiKeys.check(rights),
-      },
-      {
-        title: sharedMessages.collaborators,
-        path: `${matchedUrl}/collaborators`,
-        icon: 'organization',
-        exact: false,
-        hidden: !mayViewOrEditOrganizationCollaborators.check(rights),
-      },
-      {
-        title: sharedMessages.generalSettings,
-        path: `${matchedUrl}/general-settings`,
-        icon: 'general_settings',
-        hidden: !mayEditBasicOrganizationInformation.check(rights),
-      },
-    ],
-  }
-})
 @withBreadcrumb('orgs.single', function(props) {
   const {
     orgId,
@@ -101,17 +61,58 @@ class Organization extends React.Component {
   }
 
   render() {
-    const { match, organization, orgId, env } = this.props
+    const {
+      match: { url: matchedUrl, path },
+      organization,
+      orgId,
+      env,
+      rights,
+    } = this.props
 
     return (
       <BreadcrumbView>
         <IntlHelmet titleTemplate={`%s - ${organization.name || orgId} - ${env.siteName}`} />
+        <SideNavigation header={{ title: organization.name || orgId, icon: 'organization' }}>
+          {mayViewOrganizationInformation.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.overview}
+              icon="overview"
+              path={matchedUrl}
+            />
+          )}
+          <SideNavigation.Item
+            title={sharedMessages.data}
+            icon="data"
+            path={`${matchedUrl}/data`}
+          />
+          {mayViewOrEditOrganizationApiKeys.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.apiKeys}
+              icon="api_keys"
+              path={`${matchedUrl}/api-keys`}
+            />
+          )}
+          {mayViewOrEditOrganizationCollaborators.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.collaborators}
+              icon="collaborators"
+              path={`${matchedUrl}/collaborators`}
+            />
+          )}
+          {mayEditBasicOrganizationInformation.check(rights) && (
+            <SideNavigation.Item
+              title={sharedMessages.generalSettings}
+              icon="general_settings"
+              path={`${matchedUrl}/general-settings`}
+            />
+          )}
+        </SideNavigation>
         <Switch>
-          <Route exact path={`${match.path}`} component={OrganizationOverview} />
-          <Route path={`${match.path}/data`} component={OrganizationData} />
-          <Route path={`${match.path}/general-settings`} component={OrganizationGeneralSettings} />
-          <Route path={`${match.path}/api-keys`} component={OrganizationApiKeys} />
-          <Route path={`${match.path}/collaborators`} component={OrganizationCollaborators} />
+          <Route exact path={`${path}`} component={OrganizationOverview} />
+          <Route path={`${path}/data`} component={OrganizationData} />
+          <Route path={`${path}/general-settings`} component={OrganizationGeneralSettings} />
+          <Route path={`${path}/api-keys`} component={OrganizationApiKeys} />
+          <Route path={`${path}/collaborators`} component={OrganizationCollaborators} />
           <NotFoundRoute />
         </Switch>
       </BreadcrumbView>
