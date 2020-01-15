@@ -66,6 +66,7 @@ func (r *mockRTTs) Stats() (min, max, median time.Duration, count int) {
 func boolPtr(v bool) *bool                       { return &v }
 func durationPtr(d time.Duration) *time.Duration { return &d }
 func timePtr(t time.Time) *time.Time             { return &t }
+func float32Ptr(v float32) *float32              { return &v }
 
 func init() {
 	scheduling.DutyCycleWindow = 10 * time.Second

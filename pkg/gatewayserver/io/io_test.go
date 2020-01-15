@@ -235,6 +235,7 @@ func TestFlow(t *testing.T) {
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},

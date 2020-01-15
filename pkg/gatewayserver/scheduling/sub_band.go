@@ -215,17 +215,8 @@ func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() ConcentratorTime
 
 // HasOverlap checks if the two sub bands have an overlap.
 func (sb *SubBand) HasOverlap(subBand *SubBand) bool {
-	if sb.MinFrequency < subBand.MinFrequency && subBand.MinFrequency < sb.MaxFrequency {
-		return true
-	} else if sb.MinFrequency < subBand.MaxFrequency && subBand.MaxFrequency < sb.MaxFrequency {
-		return true
-	}
-	if subBand.MinFrequency < sb.MinFrequency && sb.MinFrequency < subBand.MaxFrequency {
-		return true
-	} else if subBand.MinFrequency < sb.MaxFrequency && sb.MaxFrequency < subBand.MaxFrequency {
-		return true
-	}
-	return false
+	return subBand.MaxFrequency > sb.MinFrequency && subBand.MinFrequency < sb.MaxFrequency ||
+		subBand.MinFrequency < sb.MaxFrequency && subBand.MaxFrequency > sb.MaxFrequency
 }
 
 // IsIdentical checks if the two sub bands are identical.

@@ -65,8 +65,10 @@ type RTTs interface {
 	Stats() (min, max, median time.Duration, count int)
 }
 
-var errFrequencyPlansTimeOffAir = errors.DefineInvalidArgument("frequency_plans_timeoffair", "frequency plans must have the same TimeOffAir value")
-var errFrequencyPlansOverlapSubBand = errors.DefineInvalidArgument("frequency_plans_overlap_subband", "frequency plans must not have overlapping sub bands")
+var (
+	errFrequencyPlansTimeOffAir     = errors.DefineInvalidArgument("frequency_plans_timeoffair", "frequency plans must have the same time off air value")
+	errFrequencyPlansOverlapSubBand = errors.DefineInvalidArgument("frequency_plans_overlap_sub_band", "frequency plans must not have overlapping sub bands")
+)
 
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
 // If no time source is specified, the system time is used.
@@ -203,6 +205,11 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings, star
 		}
 	}
 	return Emission{}, errDwellTime
+}
+
+// SubBandCount returns the number of sub bands in the scheduler.
+func (s *Scheduler) SubBandCount() int {
+	return len(s.subBands)
 }
 
 var (
