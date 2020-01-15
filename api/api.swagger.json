@@ -10043,7 +10043,7 @@
         },
         "ping_slot_data_rate_index": {
           "$ref": "#/definitions/v3DataRateIndex",
-          "description": "Data rate index of the class B ping slot."
+          "description": "Data rate index of the class B ping slot.\nThis field is deprecated, use ping_slot_data_rate_index_value instead."
         },
         "beacon_frequency": {
           "type": "string",
@@ -10074,6 +10074,10 @@
         "adr_ack_delay_exponent": {
           "$ref": "#/definitions/v3ADRAckDelayExponentValue",
           "description": "ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate."
+        },
+        "ping_slot_data_rate_index_value": {
+          "$ref": "#/definitions/v3DataRateIndexValue",
+          "description": "Data rate index of the class B ping slot."
         }
       },
       "description": "MACParameters represent the parameters of the device's MAC layer (active or desired).\nThis is used internally by the Network Server."
@@ -10144,6 +10148,11 @@
           "type": "string",
           "format": "uint64",
           "description": "Frequency of the class B ping slot (Hz).\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "beacon_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Frequency of the class B beacon (Hz).\nIf unset, the default value from Network Server configuration will be used."
         },
         "class_c_timeout": {
           "type": "string",
@@ -10237,6 +10246,20 @@
         "desired_adr_ack_delay_exponent": {
           "$ref": "#/definitions/v3ADRAckDelayExponentValue",
           "description": "The ADR ACK delay Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+        },
+        "desired_ping_slot_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndexValue",
+          "description": "The data rate index of the class B ping slot Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "desired_ping_slot_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+        },
+        "desired_beacon_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
         }
       }
     },
@@ -10270,7 +10293,7 @@
           "description": "Frame counter value of last uplink containing DevStatusAns."
         },
         "ping_slot_periodicity": {
-          "$ref": "#/definitions/v3PingSlotPeriod",
+          "$ref": "#/definitions/v3PingSlotPeriodValue",
           "description": "Periodicity of the class B ping slot."
         },
         "pending_application_downlink": {

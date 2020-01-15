@@ -160,11 +160,17 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_limit") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.adr_ack_limit_exponent") {
 		gets = ttnpb.AddFields(gets, "mac_state.current_parameters.adr_ack_limit_exponent")
 	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.ping_slot_data_rate_index") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.ping_slot_data_rate_index_value") {
+		gets = ttnpb.AddFields(gets, "mac_state.current_parameters.ping_slot_data_rate_index_value")
+	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_delay") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.adr_ack_delay_exponent") {
 		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.adr_ack_delay_exponent")
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_limit") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.adr_ack_limit_exponent") {
 		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.adr_ack_limit_exponent")
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.ping_slot_data_rate_index") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.ping_slot_data_rate_index_value") {
+		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.ping_slot_data_rate_index_value")
 	}
 
 	dev, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
@@ -224,11 +230,17 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_limit") && dev.MACState.CurrentParameters.ADRAckLimitExponent != nil {
 			dev.MACState.CurrentParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(dev.MACState.CurrentParameters.ADRAckLimitExponent.Value)
 		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.ping_slot_data_rate_index") && dev.MACState.CurrentParameters.PingSlotDataRateIndexValue != nil {
+			dev.MACState.CurrentParameters.PingSlotDataRateIndex = dev.MACState.CurrentParameters.PingSlotDataRateIndexValue.Value
+		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_delay") && dev.MACState.DesiredParameters.ADRAckDelayExponent != nil {
 			dev.MACState.DesiredParameters.ADRAckDelay = lorawan.ADRAckDelayExponentToUint32(dev.MACState.DesiredParameters.ADRAckDelayExponent.Value)
 		}
 		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_limit") && dev.MACState.DesiredParameters.ADRAckLimitExponent != nil {
 			dev.MACState.DesiredParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(dev.MACState.DesiredParameters.ADRAckLimitExponent.Value)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.ping_slot_data_rate_index") && dev.MACState.DesiredParameters.PingSlotDataRateIndexValue != nil {
+			dev.MACState.DesiredParameters.PingSlotDataRateIndex = dev.MACState.DesiredParameters.PingSlotDataRateIndexValue.Value
 		}
 	}
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
@@ -408,6 +420,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
 				sets = append(sets, "ids.dev_addr")
 			}
+			_, _, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+			if err != nil {
+				return nil, nil, err
+			}
 			return &req.EndDevice, sets, nil
 		}
 
@@ -421,13 +437,25 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, nil, errInvalidFieldMask.WithCause(err)
 		}
 
+		_, phy, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		if ttnpb.HasAnyField(sets, "supports_class_b") && req.EndDevice.SupportsClassB {
-			if err := ttnpb.RequireFields(sets,
-				"mac_settings.ping_slot_date_rate_index",
-				"mac_settings.ping_slot_frequency",
-				"mac_settings.ping_slot_periodicity",
-			); err != nil {
-				return nil, nil, errInvalidFieldMask.WithCause(err)
+			if ns.defaultMACSettings.PingSlotFrequency == nil && phy.PingSlotFrequency == nil {
+				if err := ttnpb.RequireFields(sets,
+					"mac_settings.ping_slot_frequency.value",
+				); err != nil {
+					return nil, nil, errInvalidFieldMask.WithCause(err)
+				}
+			}
+			if ns.defaultMACSettings.PingSlotPeriodicity == nil && ttnpb.HasAnyField(req.FieldMask.Paths, "multicast") && req.EndDevice.Multicast {
+				if err := ttnpb.RequireFields(sets,
+					"mac_settings.ping_slot_periodicity.value",
+				); err != nil {
+					return nil, nil, errInvalidFieldMask.WithCause(err)
+				}
 			}
 		}
 

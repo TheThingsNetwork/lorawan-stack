@@ -40,12 +40,12 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
-						PingSlotFrequency:     123,
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotFrequency:          123,
 					},
 					DesiredParameters: ttnpb.MACParameters{
-						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
-						PingSlotFrequency:     123,
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotFrequency:          123,
 					},
 				},
 			},
@@ -55,12 +55,12 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
-						PingSlotFrequency:     123,
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotFrequency:          123,
 					},
 					DesiredParameters: ttnpb.MACParameters{
-						PingSlotDataRateIndex: ttnpb.DATA_RATE_2,
-						PingSlotFrequency:     123,
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_2},
+						PingSlotFrequency:          123,
 					},
 				},
 			},
@@ -71,12 +71,12 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
-						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
-						PingSlotFrequency:     123,
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotFrequency:          123,
 					},
 					DesiredParameters: ttnpb.MACParameters{
-						PingSlotDataRateIndex: ttnpb.DATA_RATE_1,
-						PingSlotFrequency:     124,
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotFrequency:          124,
 					},
 				},
 			},
@@ -152,8 +152,8 @@ func TestHandlePingSlotChannelAns(t *testing.T) {
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: ttnpb.MACParameters{
-						PingSlotDataRateIndex: 43,
-						PingSlotFrequency:     42,
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: 43},
+						PingSlotFrequency:          42,
 					},
 				},
 			},

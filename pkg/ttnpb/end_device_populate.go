@@ -40,7 +40,11 @@ func NewPopulatedMACState(r randyEndDevice, easy bool) *MACState {
 	out := &MACState{}
 	out.DeviceClass = Class([]int32{0, 1, 2}[r.Intn(3)])
 	out.LoRaWANVersion = MACVersion([]int32{1, 2, 3, 4}[r.Intn(4)])
-	out.PingSlotPeriodicity = PingSlotPeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
+	if r.Intn(2) == 0 {
+		out.PingSlotPeriodicity = &PingSlotPeriodValue{
+			Value: PingSlotPeriod([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)]),
+		}
+	}
 	out.LastConfirmedDownlinkAt = pbtypes.NewPopulatedStdTime(r, easy)
 	if r.Intn(10) != 0 {
 		out.QueuedResponses = make([]*MACCommand, r.Intn(5))
@@ -190,7 +194,12 @@ func NewPopulatedMACParameters(r randyEndDevice, easy bool) *MACParameters {
 	out.Rx2Frequency = NewPopulatedFrequency(r, easy)
 	out.RejoinTimePeriodicity = RejoinTimeExponent([]int32{0, 1, 2, 3, 4, 5, 6, 7}[r.Intn(8)])
 	out.PingSlotFrequency = NewPopulatedFrequency(r, easy)
-	out.PingSlotDataRateIndex = NewPopulatedDataRateIndex(r, easy)
+	if r.Intn(2) == 0 {
+		out.PingSlotDataRateIndexValue = &DataRateIndexValue{
+			Value: NewPopulatedDataRateIndex(r, easy),
+		}
+		out.PingSlotDataRateIndex = out.PingSlotDataRateIndexValue.Value
+	}
 	out.BeaconFrequency = NewPopulatedFrequency(r, easy)
 	return out
 }

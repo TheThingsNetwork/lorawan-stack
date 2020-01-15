@@ -7894,7 +7894,7 @@
             },
             {
               "name": "ping_slot_data_rate_index",
-              "description": "Data rate index of the class B ping slot.",
+              "description": "Data rate index of the class B ping slot.\nThis field is deprecated, use ping_slot_data_rate_index_value instead.",
               "label": "",
               "type": "DataRateIndex",
               "longType": "DataRateIndex",
@@ -7902,12 +7902,7 @@
               "ismap": false,
               "defaultValue": "",
               "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
+                "deprecated": true
               }
             },
             {
@@ -7987,6 +7982,16 @@
               "type": "ADRAckDelayExponentValue",
               "longType": "ADRAckDelayExponentValue",
               "fullType": "ttn.lorawan.v3.ADRAckDelayExponentValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "ping_slot_data_rate_index_value",
+              "description": "Data rate index of the class B ping slot.",
+              "label": "",
+              "type": "DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
               "ismap": false,
               "defaultValue": ""
             }
@@ -8127,6 +8132,24 @@
             {
               "name": "ping_slot_frequency",
               "description": "Frequency of the class B ping slot (Hz).\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt64Value",
+              "longType": "google.protobuf.UInt64Value",
+              "fullType": "google.protobuf.UInt64Value",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "beacon_frequency",
+              "description": "Frequency of the class B beacon (Hz).\nIf unset, the default value from Network Server configuration will be used.",
               "label": "",
               "type": "UInt64Value",
               "longType": "google.protobuf.UInt64Value",
@@ -8365,6 +8388,52 @@
               "fullType": "ttn.lorawan.v3.ADRAckDelayExponentValue",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "desired_ping_slot_data_rate_index",
+              "description": "The data rate index of the class B ping slot Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "desired_ping_slot_frequency",
+              "description": "The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "UInt64Value",
+              "longType": "google.protobuf.UInt64Value",
+              "fullType": "google.protobuf.UInt64Value",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "desired_beacon_frequency",
+              "description": "The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt64Value",
+              "longType": "google.protobuf.UInt64Value",
+              "fullType": "google.protobuf.UInt64Value",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             }
           ]
         },
@@ -8473,19 +8542,11 @@
               "name": "ping_slot_periodicity",
               "description": "Periodicity of the class B ping slot.",
               "label": "",
-              "type": "PingSlotPeriod",
-              "longType": "PingSlotPeriod",
-              "fullType": "ttn.lorawan.v3.PingSlotPeriod",
+              "type": "PingSlotPeriodValue",
+              "longType": "PingSlotPeriodValue",
+              "fullType": "ttn.lorawan.v3.PingSlotPeriodValue",
               "ismap": false,
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "pending_application_downlink",

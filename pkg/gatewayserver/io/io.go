@@ -205,6 +205,8 @@ func (c *Connection) RecordRTT(d time.Duration) { c.rtts.Record(d) }
 var (
 	errNotAllowed       = errors.DefineFailedPrecondition("not_allowed", "downlink not allowed")
 	errNotTxRequest     = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
+	errNoAbsoluteTime   = errors.DefineInvalidArgument("no_absolute_time", "no absolute time provided for class B downlink")
+	errNoRxDelay        = errors.DefineInvalidArgument("no_rx_delay", "no Rx delay provided for class A downlink")
 	errNoUplinkToken    = errors.DefineInvalidArgument("no_uplink_token", "no uplink token provided for class A downlink")
 	errDownlinkPath     = errors.DefineInvalidArgument("downlink_path", "invalid downlink path")
 	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
@@ -284,11 +286,6 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			delay:         time.Second,
 		},
 	} {
-		rx1Delay := time.Duration(request.Rx1Delay) * time.Second
-		if rx1Delay == 0 {
-			rx1Delay = time.Second // RX_DELAY_0 is valid, and 1 second.
-		}
-		rxDelay := rx1Delay + rx.delay
 		if rx.frequency == 0 {
 			rxErrs = append(rxErrs, errRxEmpty)
 			continue
@@ -342,14 +339,20 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		switch request.Class {
 		case ttnpb.CLASS_A:
 			f = c.scheduler.ScheduleAt
-			settings.Timestamp = uplinkTimestamp + uint32(rxDelay/time.Microsecond)
+			if request.Rx1Delay == ttnpb.RX_DELAY_0 {
+				return 0, errNoRxDelay
+			}
+			settings.Timestamp = uplinkTimestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
 		case ttnpb.CLASS_B:
-			f = c.scheduler.ScheduleAnytime
+			if request.AbsoluteTime == nil {
+				return 0, errNoAbsoluteTime
+			}
+			f = c.scheduler.ScheduleAt
+			settings.Time = request.AbsoluteTime
 		case ttnpb.CLASS_C:
 			if request.AbsoluteTime != nil {
 				f = c.scheduler.ScheduleAt
-				abs := *request.AbsoluteTime
-				settings.Time = &abs
+				settings.Time = request.AbsoluteTime
 			} else {
 				f = c.scheduler.ScheduleAnytime
 			}
