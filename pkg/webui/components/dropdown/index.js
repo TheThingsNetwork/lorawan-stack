@@ -14,39 +14,48 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { NavLink } from 'react-router-dom'
 
 import Icon from '../icon'
 import Message from '../../lib/components/message'
-import Link from '../link'
 import PropTypes from '../../lib/prop-types'
 
 import style from './dropdown.styl'
 
-const Dropdown = ({ className, children }) => (
-  <ul className={classnames(style.dropdown, className)}>{children}</ul>
+const Dropdown = ({ className, children, larger, onItemsClick }) => (
+  <ul
+    onClick={onItemsClick}
+    className={classnames(style.dropdown, className, { [style.larger]: larger })}
+  >
+    {children}
+  </ul>
 )
 
 Dropdown.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  larger: PropTypes.bool,
+  onItemsClick: PropTypes.func,
 }
 
 Dropdown.defaultProps = {
   className: undefined,
+  larger: false,
+  onItemsClick: () => null,
 }
 
-const DropdownItem = function({ icon, title, path, action }) {
-  const iconElement = icon && <Icon className={style.icon} icon={icon} />
+const DropdownItem = function({ icon, title, path, action, exact }) {
+  const iconElement = icon && <Icon className={style.icon} icon={icon} nudgeUp />
   const ItemElement = action ? (
     <button onClick={action} onKeyPress={action} role="tab" tabIndex="0">
       {iconElement}
       <Message content={title} />
     </button>
   ) : (
-    <Link to={path}>
+    <NavLink activeClassName={style.active} to={path} exact={exact}>
       {iconElement}
       <Message content={title} />
-    </Link>
+    </NavLink>
   )
   return (
     <li className={style.dropdownItem} key={title.id || title}>
@@ -57,6 +66,7 @@ const DropdownItem = function({ icon, title, path, action }) {
 
 DropdownItem.propTypes = {
   action: PropTypes.func,
+  exact: PropTypes.bool,
   icon: PropTypes.string.isRequired,
   path: PropTypes.string,
   title: PropTypes.message.isRequired,
@@ -64,6 +74,7 @@ DropdownItem.propTypes = {
 
 DropdownItem.defaultProps = {
   action: undefined,
+  exact: false,
   path: undefined,
 }
 

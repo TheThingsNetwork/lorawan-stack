@@ -20,6 +20,17 @@ ul.dropdown
   background: white
   padding: 0
   min-width: 14rem
+  z-index: $zi.dropdown
+  margin: 0
+
+  &.larger
+    li.dropdown-item
+      & > a, & > button
+        padding: $cs.l
+
+  hr
+    margin-top: 0
+    height: .4rem
 
   li.dropdown-item
     display: block
@@ -32,14 +43,14 @@ ul.dropdown
       one-liner()
       color: $tc-deep-gray
       text-decoration: none
-      padding: $cs.m 0
+      padding: $cs.m
       width: 100%
 
       span:last-child
         nudge('down')
 
     .icon
-      margin-left: $cs.m
+      margin-right: $cs.xs
 
     &:not(:last-child)
       border-normal('bottom')
@@ -52,3 +63,9 @@ ul.dropdown
 
       .icon
         color: white
+
+.active
+  border-left: $c-active-blue 5px solid
+  box-sizing: border-box
+  span
+    color: $c-active-blue

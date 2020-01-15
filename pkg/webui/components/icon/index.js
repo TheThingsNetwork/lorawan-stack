@@ -48,6 +48,8 @@ const hardcoded = {
   downlink: 'arrow_drop_down',
   import_devices: 'playlist_add',
   collaborators: 'people',
+  logout: 'power_settings_new',
+  user_management: 'how_to_reg',
 }
 
 const Icon = function({ icon, className, nudgeUp, nudgeDown, small, large, ...rest }) {
