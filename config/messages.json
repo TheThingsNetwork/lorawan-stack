@@ -3527,6 +3527,24 @@
       "file": "scheduler.go"
     }
   },
+  "error:pkg/gatewayserver/scheduling:frequency_plans_overlap_sub_band": {
+    "translations": {
+      "en": "frequency plans must not have overlapping sub bands"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduler.go"
+    }
+  },
+  "error:pkg/gatewayserver/scheduling:frequency_plans_timeoffair": {
+    "translations": {
+      "en": "frequency plans must have the same time off air value"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "scheduler.go"
+    }
+  },
   "error:pkg/gatewayserver/scheduling:no_absolute_gateway_time": {
     "translations": {
       "en": "no absolute gateway time"

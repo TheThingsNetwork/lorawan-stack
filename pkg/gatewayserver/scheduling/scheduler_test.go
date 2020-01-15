@@ -34,7 +34,7 @@ import (
 func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -344,7 +344,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		SubBands: []frequencyplans.SubBandParameters{
 			{
@@ -427,7 +427,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 func TestScheduleAnytime(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -517,7 +517,7 @@ func TestScheduleAnytime(t *testing.T) {
 func TestScheduleAnytimeShort(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -651,7 +651,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 func TestScheduleAnytimeClassC(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -699,6 +699,284 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 		},
 		CodingRate: "4/5",
 		Frequency:  868100000,
+		Timestamp:  7000000,
+	}, nil, ttnpb.TxSchedulePriority_HIGHEST)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	// Fast forward 9 seconds.
+	timeSource.Time = time.Unix(9, 0)
+	scheduler.Sync(9000000, timeSource.Time)
+
+	// Schedule any time.
+	em, err := scheduler.ScheduleAnytime(ctx, 10, ttnpb.TxSettings{
+		DataRate: ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_LoRa{
+				LoRa: &ttnpb.LoRaDataRate{
+					Bandwidth:       125000,
+					SpreadingFactor: 7,
+				},
+			},
+		},
+		CodingRate: "4/5",
+		Frequency:  869525000,
+	}, nil, ttnpb.TxSchedulePriority_HIGHEST)
+	a.So(err, should.BeNil)
+	a.So(time.Duration(em.Starts()), should.Equal, 9*time.Second+scheduling.ScheduleTimeLong)
+}
+
+func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
+	ctx := test.Context()
+	for _, tc := range []struct {
+		Name                 string
+		FrequencyPlans       []*frequencyplans.FrequencyPlan
+		ExpectedSubBandCount int
+		ErrorAssertion       func(error) bool
+	}{
+		{
+			Name: "RepeatedNoOverlap",
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
+				BandID: band.EU_863_870,
+				TimeOffAir: frequencyplans.TimeOffAir{
+					Duration: time.Second,
+				},
+				DwellTime: frequencyplans.DwellTime{
+					Downlinks: boolPtr(true),
+					Duration:  durationPtr(2 * time.Second),
+				},
+			},
+				{
+					BandID: band.EU_863_870,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
+				},
+			},
+			ExpectedSubBandCount: 6,
+		},
+		{
+			Name: "UnionOfNonOverlapping",
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
+				BandID: band.EU_863_870,
+				TimeOffAir: frequencyplans.TimeOffAir{
+					Duration: time.Second,
+				},
+				DwellTime: frequencyplans.DwellTime{
+					Downlinks: boolPtr(true),
+					Duration:  durationPtr(2 * time.Second),
+				},
+				SubBands: []frequencyplans.SubBandParameters{
+					// Fictional Band S
+					{
+						MinFrequency: 870000000,
+						MaxFrequency: 875000000,
+						DutyCycle:    0.01,
+						MaxEIRP:      float32Ptr(16.25),
+					},
+				},
+			},
+				{
+					BandID: band.EU_863_870,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
+				},
+			},
+			ExpectedSubBandCount: 7,
+		},
+		{
+			Name: "MismatchedTimeOffAir",
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
+				BandID: band.EU_863_870,
+				TimeOffAir: frequencyplans.TimeOffAir{
+					Duration: 2 * time.Second,
+				},
+				DwellTime: frequencyplans.DwellTime{
+					Downlinks: boolPtr(true),
+					Duration:  durationPtr(2 * time.Second),
+				},
+			},
+				{
+					BandID: band.EU_863_870,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
+				},
+			},
+			ErrorAssertion: func(err error) bool {
+				return errors.IsInvalidArgument(err)
+			},
+		},
+		{
+			Name: "OverlappingSubBands",
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
+				BandID: band.EU_863_870,
+				TimeOffAir: frequencyplans.TimeOffAir{
+					Duration: time.Second,
+				},
+				DwellTime: frequencyplans.DwellTime{
+					Downlinks: boolPtr(true),
+					Duration:  durationPtr(2 * time.Second),
+				},
+				SubBands: []frequencyplans.SubBandParameters{
+					// Fictional Band S
+					{
+						MinFrequency: 869000000,
+						MaxFrequency: 873000000,
+						DutyCycle:    0.01,
+						MaxEIRP:      float32Ptr(16.25),
+					},
+				},
+			},
+				{
+					BandID: band.EU_863_870,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
+				},
+			},
+			ErrorAssertion: func(err error) bool {
+				return errors.IsInvalidArgument(err)
+			},
+		},
+		{
+			Name: "OverlappingSubBandsFromBand",
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
+				// This is a fictional test case since currently we don't support mix-band frequency plans (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394).
+				BandID: band.AS_923,
+				TimeOffAir: frequencyplans.TimeOffAir{
+					Duration: time.Second,
+				},
+				DwellTime: frequencyplans.DwellTime{
+					Downlinks: boolPtr(true),
+					Duration:  durationPtr(2 * time.Second),
+				},
+			},
+				{
+					BandID: band.AU_915_928,
+					TimeOffAir: frequencyplans.TimeOffAir{
+						Duration: time.Second,
+					},
+					DwellTime: frequencyplans.DwellTime{
+						Downlinks: boolPtr(true),
+						Duration:  durationPtr(2 * time.Second),
+					},
+				},
+			},
+			ErrorAssertion: func(err error) bool {
+				return errors.IsInvalidArgument(err)
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+			timeSource := &mockTimeSource{
+				Time: time.Unix(0, 0),
+			}
+			scheduler, err := scheduling.NewScheduler(ctx, tc.FrequencyPlans, true, nil, timeSource)
+			if err != nil {
+				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+			} else if tc.ErrorAssertion != nil {
+				t.Fatalf("Expected error")
+			} else {
+				if !a.So(scheduler.SubBandCount(), should.Equal, tc.ExpectedSubBandCount) {
+					t.Fatalf("Invalid number of sub bands: %v", scheduler.SubBandCount())
+				}
+			}
+		})
+	}
+}
+
+func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
+	a := assertions.New(t)
+	ctx := test.Context()
+	fps := []*frequencyplans.FrequencyPlan{{
+		BandID: band.EU_863_870,
+		TimeOffAir: frequencyplans.TimeOffAir{
+			Duration: time.Second,
+		},
+		DwellTime: frequencyplans.DwellTime{
+			Downlinks: boolPtr(true),
+			Duration:  durationPtr(2 * time.Second),
+		},
+		SubBands: []frequencyplans.SubBandParameters{
+			// Fictional Band S
+			{
+				MinFrequency: 870000000,
+				MaxFrequency: 875000000,
+				DutyCycle:    0.01,
+				MaxEIRP:      float32Ptr(16.25),
+			},
+		},
+	},
+		{
+			BandID: band.EU_863_870,
+			TimeOffAir: frequencyplans.TimeOffAir{
+				Duration: time.Second,
+			},
+			DwellTime: frequencyplans.DwellTime{
+				Downlinks: boolPtr(true),
+				Duration:  durationPtr(2 * time.Second),
+			},
+		},
+	}
+
+	timeSource := &mockTimeSource{
+		Time: time.Unix(0, 0),
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
+	a.So(err, should.BeNil)
+	scheduler.Sync(0, timeSource.Time)
+
+	// Schedule a join-accept.
+	_, err = scheduler.ScheduleAt(ctx, 10, ttnpb.TxSettings{
+		DataRate: ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_LoRa{
+				LoRa: &ttnpb.LoRaDataRate{
+					Bandwidth:       125000,
+					SpreadingFactor: 7,
+				},
+			},
+		},
+		CodingRate: "4/5",
+		Frequency:  871100000,
+		Timestamp:  5000000,
+	}, nil, ttnpb.TxSchedulePriority_HIGHEST)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	// Schedule another class A transmission after.
+	_, err = scheduler.ScheduleAt(ctx, 10, ttnpb.TxSettings{
+		DataRate: ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_LoRa{
+				LoRa: &ttnpb.LoRaDataRate{
+					Bandwidth:       125000,
+					SpreadingFactor: 7,
+				},
+			},
+		},
+		CodingRate: "4/5",
+		Frequency:  872100000,
 		Timestamp:  7000000,
 	}, nil, ttnpb.TxSchedulePriority_HIGHEST)
 	if !a.So(err, should.BeNil) {

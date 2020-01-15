@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `mac_settings.desired_beacon_frequency` end device field, which defines the desired frequency of class B beacon in Hz that will be configured via MAC commands.
 - `mac_settings.desired_ping_slot_data_rate_index` end device field, which defines the desired data rate index of the class B ping slot that will be configured via MAC commands.
 - `mac_settings.desired_ping_slot_frequency` end device field, which defines the desired frequency of the class B ping slot that will be configured via MAC commands.
+- Support multiple frequency plans for a Gateway.
 
 ### Changed
 
