@@ -8975,6 +8975,11 @@
         "claim_authentication_code": {
           "$ref": "#/definitions/v3EndDeviceAuthenticationCode",
           "description": "Authentication code to claim ownership of the end device. Stored in Join Server."
+        },
+        "skip_payload_crypto": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Skip decryption of uplink payloads and encryption of downlink payloads."
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."

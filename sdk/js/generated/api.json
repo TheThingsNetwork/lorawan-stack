@@ -6775,6 +6775,16 @@
               "fullType": "ttn.lorawan.v3.EndDeviceAuthenticationCode",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "skip_payload_crypto",
+              "description": "Skip decryption of uplink payloads and encryption of downlink payloads.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

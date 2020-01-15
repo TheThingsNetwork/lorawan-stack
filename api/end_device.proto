@@ -525,6 +525,11 @@ message EndDevice {
 
   // Authentication code to claim ownership of the end device. Stored in Join Server.
   EndDeviceAuthenticationCode claim_authentication_code = 46;
+
+  // Skip decryption of uplink payloads and encryption of downlink payloads.
+  bool skip_payload_crypto = 51;
+
+  // next: 52;
 }
 
 message EndDevices {

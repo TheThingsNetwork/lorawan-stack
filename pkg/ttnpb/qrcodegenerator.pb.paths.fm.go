@@ -612,6 +612,7 @@ var GenerateEndDeviceQRCodeRequestFieldPathsNested = []string{
 	"end_device.session.last_f_cnt_up",
 	"end_device.session.last_n_f_cnt_down",
 	"end_device.session.started_at",
+	"end_device.skip_payload_crypto",
 	"end_device.supports_class_b",
 	"end_device.supports_class_c",
 	"end_device.supports_join",
