@@ -38,10 +38,10 @@ dev.databases.redis-cli: dev.databases.start
 	@$(DEV_DOCKER_COMPOSE) exec redis redis-cli
 
 dev.stack.init: dev.databases.start
-	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db init
-	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db create-admin-user --id admin --email admin@localhost --password admin
-	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'local-callback' --redirect-uri 'code'
-	@$(DEV_DOCKER_COMPOSE) run --rm stack is-db create-oauth-client --id console --name "Console" --owner admin --secret console --redirect-uri 'https://localhost:8885/console/oauth/callback' --redirect-uri 'http://localhost:1885/console/oauth/callback' --redirect-uri '/console/oauth/callback'
+	@go run ./cmd/ttn-lw-stack is-db init
+	@go run ./cmd/ttn-lw-stack is-db create-admin-user --id admin --email admin@localhost --password admin
+	@go run ./cmd/ttn-lw-stack is-db create-oauth-client --id cli --name "Command Line Interface" --owner admin --no-secret --redirect-uri 'local-callback' --redirect-uri 'code'
+	@go run ./cmd/ttn-lw-stack is-db create-oauth-client --id console --name "Console" --owner admin --secret console --redirect-uri 'https://localhost:8885/console/oauth/callback' --redirect-uri 'http://localhost:1885/console/oauth/callback' --redirect-uri '/console/oauth/callback'
 
 .PHONY: git.diff
 git.diff:
