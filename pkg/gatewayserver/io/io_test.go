@@ -159,6 +159,7 @@ func TestFlow(t *testing.T) {
 					Request: &ttnpb.TxRequest{
 						Class:            ttnpb.CLASS_A,
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
 					},
@@ -179,6 +180,7 @@ func TestFlow(t *testing.T) {
 					Request: &ttnpb.TxRequest{
 						Class:            ttnpb.CLASS_A,
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,         // Same as previous.
 						Rx1Frequency:     868100000, // Same as previous.
 					},
@@ -207,8 +209,29 @@ func TestFlow(t *testing.T) {
 					Request: &ttnpb.TxRequest{
 						Class:            ttnpb.CLASS_A,
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,         // Same as previous.
 						Rx1Frequency:     868100000, // Same as previous.
+					},
+				},
+			},
+			ErrorAssertion: errors.IsInvalidArgument,
+		},
+		{
+			Name: "NoRx1DelayClassA",
+			Path: &ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayID: "foo-gateway"}}, 100),
+				},
+			},
+			Message: &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:            ttnpb.CLASS_A,
+						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1DataRateIndex: 5,
+						Rx1Frequency:     868100000,
 					},
 				},
 			},
@@ -462,6 +485,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 					Request: &ttnpb.TxRequest{
 						Class:            ttnpb.CLASS_A,
 						Priority:         ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     923200000,
 					},
