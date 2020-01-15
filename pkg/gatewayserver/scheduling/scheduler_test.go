@@ -34,7 +34,7 @@ import (
 func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -344,7 +344,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		SubBands: []frequencyplans.SubBandParameters{
 			{
@@ -427,7 +427,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 func TestScheduleAnytime(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -517,7 +517,7 @@ func TestScheduleAnytime(t *testing.T) {
 func TestScheduleAnytimeShort(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -651,7 +651,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 func TestScheduleAnytimeClassC(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -727,17 +727,16 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 }
 
 func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
-	a := assertions.New(t)
 	ctx := test.Context()
 	for _, tc := range []struct {
 		Name                 string
 		FrequencyPlans       []*frequencyplans.FrequencyPlan
-		ExpectedNoOfSubBands int
+		ExpectedSubBandCount int
 		ErrorAssertion       func(error) bool
 	}{
 		{
 			Name: "RepeatedNoOverlap",
-			FrequencyPlans: []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
 				BandID: band.EU_863_870,
 				TimeOffAir: frequencyplans.TimeOffAir{
 					Duration: time.Second,
@@ -747,7 +746,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 					Duration:  durationPtr(2 * time.Second),
 				},
 			},
-				&frequencyplans.FrequencyPlan{
+				{
 					BandID: band.EU_863_870,
 					TimeOffAir: frequencyplans.TimeOffAir{
 						Duration: time.Second,
@@ -758,11 +757,11 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 					},
 				},
 			},
-			ExpectedNoOfSubBands: 6,
+			ExpectedSubBandCount: 6,
 		},
 		{
 			Name: "UnionOfNonOverlapping",
-			FrequencyPlans: []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
 				BandID: band.EU_863_870,
 				TimeOffAir: frequencyplans.TimeOffAir{
 					Duration: time.Second,
@@ -773,7 +772,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 				},
 				SubBands: []frequencyplans.SubBandParameters{
 					// Fictional Band S
-					frequencyplans.SubBandParameters{
+					{
 						MinFrequency: 870000000,
 						MaxFrequency: 875000000,
 						DutyCycle:    0.01,
@@ -781,7 +780,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 					},
 				},
 			},
-				&frequencyplans.FrequencyPlan{
+				{
 					BandID: band.EU_863_870,
 					TimeOffAir: frequencyplans.TimeOffAir{
 						Duration: time.Second,
@@ -792,11 +791,11 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 					},
 				},
 			},
-			ExpectedNoOfSubBands: 7,
+			ExpectedSubBandCount: 7,
 		},
 		{
 			Name: "MismatchedTimeOffAir",
-			FrequencyPlans: []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
 				BandID: band.EU_863_870,
 				TimeOffAir: frequencyplans.TimeOffAir{
 					Duration: 2 * time.Second,
@@ -806,7 +805,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 					Duration:  durationPtr(2 * time.Second),
 				},
 			},
-				&frequencyplans.FrequencyPlan{
+				{
 					BandID: band.EU_863_870,
 					TimeOffAir: frequencyplans.TimeOffAir{
 						Duration: time.Second,
@@ -823,7 +822,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 		},
 		{
 			Name: "OverlappingSubBands",
-			FrequencyPlans: []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
 				BandID: band.EU_863_870,
 				TimeOffAir: frequencyplans.TimeOffAir{
 					Duration: time.Second,
@@ -834,7 +833,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 				},
 				SubBands: []frequencyplans.SubBandParameters{
 					// Fictional Band S
-					frequencyplans.SubBandParameters{
+					{
 						MinFrequency: 869000000,
 						MaxFrequency: 873000000,
 						DutyCycle:    0.01,
@@ -842,7 +841,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 					},
 				},
 			},
-				&frequencyplans.FrequencyPlan{
+				{
 					BandID: band.EU_863_870,
 					TimeOffAir: frequencyplans.TimeOffAir{
 						Duration: time.Second,
@@ -859,7 +858,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 		},
 		{
 			Name: "OverlappingSubBandsFromBand",
-			FrequencyPlans: []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+			FrequencyPlans: []*frequencyplans.FrequencyPlan{{
 				// This is a fictional test case since currently we don't support mix-band frequency plans (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394).
 				BandID: band.AS_923,
 				TimeOffAir: frequencyplans.TimeOffAir{
@@ -870,7 +869,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 					Duration:  durationPtr(2 * time.Second),
 				},
 			},
-				&frequencyplans.FrequencyPlan{
+				{
 					BandID: band.AU_915_928,
 					TimeOffAir: frequencyplans.TimeOffAir{
 						Duration: time.Second,
@@ -887,6 +886,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
 			timeSource := &mockTimeSource{
 				Time: time.Unix(0, 0),
 			}
@@ -898,8 +898,8 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 			} else if tc.ErrorAssertion != nil {
 				t.Fatalf("Expected error")
 			} else {
-				if !a.So(scheduler.NoOfSubBands(), should.Equal, tc.ExpectedNoOfSubBands) {
-					t.Fatalf("Invalid no of sub bands: %v", scheduler.NoOfSubBands())
+				if !a.So(scheduler.SubBandCount(), should.Equal, tc.ExpectedSubBandCount) {
+					t.Fatalf("Invalid number of sub bands: %v", scheduler.SubBandCount())
 				}
 			}
 		})
@@ -909,7 +909,7 @@ func TestSchedulerWithMultipleFrequencyPlans(t *testing.T) {
 func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	fps := []*frequencyplans.FrequencyPlan{&frequencyplans.FrequencyPlan{
+	fps := []*frequencyplans.FrequencyPlan{{
 		BandID: band.EU_863_870,
 		TimeOffAir: frequencyplans.TimeOffAir{
 			Duration: time.Second,
@@ -920,7 +920,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 		},
 		SubBands: []frequencyplans.SubBandParameters{
 			// Fictional Band S
-			frequencyplans.SubBandParameters{
+			{
 				MinFrequency: 870000000,
 				MaxFrequency: 875000000,
 				DutyCycle:    0.01,
@@ -928,7 +928,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 			},
 		},
 	},
-		&frequencyplans.FrequencyPlan{
+		{
 			BandID: band.EU_863_870,
 			TimeOffAir: frequencyplans.TimeOffAir{
 				Duration: time.Second,
