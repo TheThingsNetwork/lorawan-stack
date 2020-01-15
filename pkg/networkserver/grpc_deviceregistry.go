@@ -443,7 +443,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		if ttnpb.HasAnyField(sets, "supports_class_b") && req.EndDevice.SupportsClassB {
-			if ns.defaultMACSettings.PingSlotFrequency == nil && phy.Beacon.PingSlotChannel == nil {
+			if ns.defaultMACSettings.PingSlotFrequency == nil && phy.PingSlotFrequency == nil {
 				if err := ttnpb.RequireFields(sets,
 					"mac_settings.ping_slot_frequency.value",
 				); err != nil {

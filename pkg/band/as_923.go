@@ -32,7 +32,7 @@ func init() {
 		{Frequency: 923200000, MinDataRate: 0, MaxDataRate: 5},
 		{Frequency: 923400000, MinDataRate: 0, MaxDataRate: 5},
 	}
-	const asBeaconChannel = 923400000
+	const asBeaconFrequency = 923400000
 
 	as_923 = Band{
 		ID: AS_923,
@@ -147,9 +147,9 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    3,
 			CodingRate:       "4/5",
-			BroadcastChannel: func(_ float64) uint64 { return asBeaconChannel },
-			PingSlotChannel:  uint64Ptr(asBeaconChannel),
+			ComputeFrequency: func(_ float64) uint64 { return asBeaconFrequency },
 		},
+		PingSlotFrequency: uint64Ptr(asBeaconFrequency),
 
 		TxParamSetupReqSupport: true,
 

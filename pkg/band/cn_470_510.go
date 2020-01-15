@@ -141,7 +141,7 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    2,
 			CodingRate:       "4/5",
-			BroadcastChannel: beaconChannelFromFrequencies(cn470BeaconFrequencies),
+			ComputeFrequency: makeBeaconFrequencyFunc(cn470BeaconFrequencies),
 		},
 
 		LoRaCodingRate: "4/5",

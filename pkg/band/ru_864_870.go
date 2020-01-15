@@ -143,9 +143,9 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    3,
 			CodingRate:       "4/5",
-			BroadcastChannel: func(_ float64) uint64 { return 869100000 },
-			PingSlotChannel:  uint64Ptr(868900000),
+			ComputeFrequency: func(_ float64) uint64 { return 869100000 },
 		},
+		PingSlotFrequency: uint64Ptr(868900000),
 
 		// No LoRaWAN Regional Parameters 1.0
 		// No LoRaWAN Regional Parameters 1.0.1

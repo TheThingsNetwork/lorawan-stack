@@ -33,7 +33,7 @@ func init() {
 		{Frequency: 865402500, MinDataRate: 0, MaxDataRate: 5},
 		{Frequency: 865985000, MinDataRate: 0, MaxDataRate: 5},
 	}
-	const inBeaconChannel = 866500000
+	const inBeaconFrequency = 866500000
 
 	in_865_867 = Band{
 		ID: IN_865_867,
@@ -142,9 +142,9 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    4,
 			CodingRate:       "4/5",
-			BroadcastChannel: func(_ float64) uint64 { return inBeaconChannel },
-			PingSlotChannel:  uint64Ptr(inBeaconChannel),
+			ComputeFrequency: func(_ float64) uint64 { return inBeaconFrequency },
 		},
+		PingSlotFrequency: uint64Ptr(inBeaconFrequency),
 
 		// No LoRaWAN 1.0
 		// No LoRaWAN 1.0.1

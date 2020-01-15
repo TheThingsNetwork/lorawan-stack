@@ -108,8 +108,7 @@ type Beacon struct {
 	// Channel returns in Hz on which beaconing is performed.
 	//
 	// beaconTime is the integer value, converted in float64, of the 4 bytes “Time” field of the beacon frame.
-	BroadcastChannel func(beaconTime float64) uint64
-	PingSlotChannel  *uint64
+	ComputeFrequency func(beaconTime float64) uint64
 }
 
 // ChMaskCntlPair pairs a ChMaskCntl with a mask.
@@ -122,7 +121,8 @@ type ChMaskCntlPair struct {
 type Band struct {
 	ID string
 
-	Beacon Beacon
+	Beacon            Beacon
+	PingSlotFrequency *uint64
 
 	// MaxUplinkChannels is the maximum amount of uplink channels that can be defined.
 	MaxUplinkChannels uint8
@@ -286,7 +286,7 @@ func (b Band) FindSubBand(frequency uint64) (SubBandParameters, bool) {
 	return SubBandParameters{}, false
 }
 
-func beaconChannelFromFrequencies(frequencies [8]uint64) func(float64) uint64 {
+func makeBeaconFrequencyFunc(frequencies [8]uint64) func(float64) uint64 {
 	return func(beaconTime float64) uint64 {
 		floor := math.Floor(beaconTime / float64(128))
 		return frequencies[int32(floor)%8]
