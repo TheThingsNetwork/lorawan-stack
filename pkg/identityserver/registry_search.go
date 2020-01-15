@@ -75,6 +75,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 		if len(ids) == 0 {
 			return nil
 		}
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
 		res.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -117,6 +118,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchEn
 		if len(ids) == 0 {
 			return nil
 		}
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
 		res.Clients, err = store.GetClientStore(db).FindClients(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -159,6 +161,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchE
 		if len(ids) == 0 {
 			return nil
 		}
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
 		res.Gateways, err = store.GetGatewayStore(db).FindGateways(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -201,6 +204,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 		if len(ids) == 0 {
 			return nil
 		}
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
 		res.Organizations, err = store.GetOrganizationStore(db).FindOrganizations(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -246,6 +250,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEnti
 		if len(ids) == 0 {
 			return nil
 		}
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEntities).
 		res.Users, err = store.GetUserStore(db).FindUsers(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err
@@ -281,6 +286,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 		if len(ids) == 0 {
 			return nil
 		}
+		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in FindEndDevices).
 		res.EndDevices, err = store.GetEndDeviceStore(db).FindEndDevices(ctx, ids, &req.FieldMask)
 		if err != nil {
 			return err

@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Respect stack components on different hosts when connected to event sources in the Console.
+- Pagination of search results.
 
 ### Security
 
