@@ -416,23 +416,23 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 	}
 
 	if dev.GetMACSettings().GetPingSlotDataRateIndex() != nil {
-		macState.CurrentParameters.PingSlotDataRateIndex = dev.MACSettings.PingSlotDataRateIndex
+		macState.CurrentParameters.PingSlotDataRateIndexValue = dev.MACSettings.PingSlotDataRateIndex
 	} else if defaults.PingSlotDataRateIndex != nil {
-		macState.CurrentParameters.PingSlotDataRateIndex = defaults.PingSlotDataRateIndex
+		macState.CurrentParameters.PingSlotDataRateIndexValue = defaults.PingSlotDataRateIndex
 	} else {
 		// Default to mbed-os and LoRaMac-node behavior.
 		// https://github.com/ARMmbed/mbed-os/blob/131ea2bb243eef898a501576e611ebbf504b079a/features/lorawan/lorastack/phy/LoRaPHY.cpp#L1625-L1630
 		// https://github.com/Lora-net/LoRaMac-node/blob/87f19e84ae2fc4af72af9567fe722386de6ce9f4/src/mac/region/RegionCN779.h#L235.
-		macState.CurrentParameters.PingSlotDataRateIndex = &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex(phy.Beacon.DataRateIndex)}
+		macState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex(phy.Beacon.DataRateIndex)}
 	}
 	if dev.GetMACSettings().GetDesiredPingSlotDataRateIndex() != nil {
-		macState.DesiredParameters.PingSlotDataRateIndex = dev.MACSettings.DesiredPingSlotDataRateIndex
+		macState.DesiredParameters.PingSlotDataRateIndexValue = dev.MACSettings.DesiredPingSlotDataRateIndex
 	} else if fp.DefaultPingSlotDataRate != nil {
-		macState.DesiredParameters.PingSlotDataRateIndex = &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)}
+		macState.DesiredParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex(*fp.DefaultPingSlotDataRate)}
 	} else if defaults.DesiredPingSlotDataRateIndex != nil {
-		macState.DesiredParameters.PingSlotDataRateIndex = defaults.DesiredPingSlotDataRateIndex
+		macState.DesiredParameters.PingSlotDataRateIndexValue = defaults.DesiredPingSlotDataRateIndex
 	} else {
-		macState.DesiredParameters.PingSlotDataRateIndex = macState.CurrentParameters.PingSlotDataRateIndex
+		macState.DesiredParameters.PingSlotDataRateIndexValue = macState.CurrentParameters.PingSlotDataRateIndexValue
 	}
 
 	if dev.GetMACSettings().GetBeaconFrequency() != nil && dev.MACSettings.BeaconFrequency.Value != 0 {
