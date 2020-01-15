@@ -1232,6 +1232,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:join_server_disabled": {
+    "translations": {
+      "en": "Join Server is disabled"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:mac_version": {
     "translations": {
       "en": "LoRaWAN MAC version is invalid"

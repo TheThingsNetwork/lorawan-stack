@@ -160,7 +160,10 @@ func generateDevAddr(netID types.NetID) (types.DevAddr, error) {
 	return devAddr, nil
 }
 
-var errNetworkServerDisabled = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
+var (
+	errJoinServerDisabled    = errors.DefineFailedPrecondition("join_server_disabled", "Join Server is disabled")
+	errNetworkServerDisabled = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
+)
 
 var (
 	endDevicesCommand = &cobra.Command{
@@ -1025,6 +1028,57 @@ To generate a QR code for multiple end devices:
 			return nil
 		}),
 	}
+	endDevicesExternalJSCommand = &cobra.Command{
+		Use:     "use-external-join-server [application-id] [device-id]",
+		Aliases: []string{"use-external-js", "use-ext-js"},
+		Short:   "Disassociate and delete the device from Join Server",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			devID, err := getEndDeviceID(cmd.Flags(), args, true)
+			if err != nil {
+				return err
+			}
+			if !config.JoinServerEnabled {
+				return errJoinServerDisabled
+			}
+
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			dev, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
+				EndDeviceIdentifiers: *devID,
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"join_server_address",
+					},
+				},
+			})
+			if _, _, nok := compareServerAddressesEndDevice(dev, config); nok {
+				return errAddressMismatchEndDevice
+			}
+
+			js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			_, err = ttnpb.NewJsEndDeviceRegistryClient(js).Delete(ctx, devID)
+			if err != nil {
+				return err
+			}
+
+			_, err = ttnpb.NewEndDeviceRegistryClient(is).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
+				EndDevice: ttnpb.EndDevice{
+					EndDeviceIdentifiers: *devID,
+				},
+				FieldMask: pbtypes.FieldMask{
+					Paths: []string{
+						"join_server_address",
+					},
+				},
+			})
+			return err
+		},
+	}
 )
 
 func init() {
@@ -1110,6 +1164,8 @@ func init() {
 	endDevicesGenerateQRCommand.Flags().Uint32("size", 300, "size of the image in pixels")
 	endDevicesGenerateQRCommand.Flags().String("folder", "", "folder to write the QR code image to")
 	endDevicesCommand.AddCommand(endDevicesGenerateQRCommand)
+	endDevicesExternalJSCommand.Flags().AddFlagSet(endDeviceIDFlags())
+	endDevicesCommand.AddCommand(endDevicesExternalJSCommand)
 
 	endDevicesCommand.AddCommand(applicationsDownlinkCommand)
 
