@@ -336,10 +336,10 @@ class Devices {
     return this._responseTransform(response)
   }
 
-  async create(applicationId, device, { abp = false } = {}) {
+  async create(applicationId, device, { otaa = false }) {
     const dev = device
 
-    if (abp) {
+    if (!otaa) {
       dev.supports_join = false
     } else {
       if ('provisioner_id' in dev && dev.provisioner_id !== '') {
