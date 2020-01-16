@@ -650,6 +650,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		if err := as.decryptAndDecode(ctx, dev, uplink, link.DefaultFormatters); err != nil {
 			return err
 		}
+	} else if dev.Session != nil && dev.Session.AppSKey != nil {
+		uplink.AppSKey = dev.Session.AppSKey
+		uplink.LastAFCntDown = dev.Session.LastAFCntDown
 	}
 	// TODO: Run uplink messages through location solvers async (https://github.com/TheThingsNetwork/lorawan-stack/issues/37)
 	return nil
