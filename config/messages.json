@@ -3410,6 +3410,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/io:frequency_plan_not_configured": {
+    "translations": {
+      "en": "frequency plan `{name}` is not configured for this gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/gatewayserver/io:no_absolute_time": {
     "translations": {
       "en": "no absolute time provided for class B downlink"
@@ -3422,15 +3431,6 @@
   "error:pkg/gatewayserver/io:no_rx_delay": {
     "translations": {
       "en": "no Rx delay provided for class A downlink"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io",
-      "file": "io.go"
-    }
-  },
-  "error:pkg/gatewayserver/io:frequency_plan_not_configured": {
-    "translations": {
-      "en": "frequency plan `{name}` is not configured for this gateway"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
