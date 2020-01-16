@@ -159,11 +159,11 @@ The folder structure of the frontend looks as follows:
 ├── template.go       go template module used to render the frontend HTML
 ```
 
-For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `mage js:build`, it can be served using:
+For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `./mage js:build`, it can be served using:
 
 ```bash
 $ export NODE_ENV=development
-$ mage js:serve
+$ ./mage js:serve
 ```
 
 The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
@@ -409,10 +409,10 @@ The workflow for defining messages is as follows:
 After adding messages this way, it needs to be added the locales file `pkg/webui/locales/*.js` by using:
 
 ```bash
-$ mage js:translations
+$ ./mage js:translations
 ```
 
-> Note: When using `mage js:serve`, this command will be run automatically after any change.
+> Note: When using `./mage js:serve`, this command will be run automatically after any change.
 
 The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and committed, any discrepancy in the locales file with the defined messages will lead to a CI failure.
 
@@ -439,7 +439,7 @@ The difference of a development build includes:
 The frontend can then be built using:
 
 ```bash
-$ mage js:build
+$ ./mage js:build
 ```
 
 For development/testing purposes we suggest to run the binaries directly via `go run`:
