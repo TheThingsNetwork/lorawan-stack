@@ -7792,7 +7792,8 @@
         },
         "frm_payload": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "The frame payload of the uplink message.\nThe payload is still encrypted if the skip_payload_crypto field of the EndDevice\nis true, which is indicated by the presence of the app_s_key field."
         },
         "decoded_payload": {
           "type": "object"
@@ -7801,15 +7802,26 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3RxMetadata"
-          }
+          },
+          "description": "A list of metadata for each antenna of each gateway that received this message."
         },
         "settings": {
-          "$ref": "#/definitions/v3TxSettings"
+          "$ref": "#/definitions/v3TxSettings",
+          "description": "Settings for the transmission."
         },
         "received_at": {
           "type": "string",
           "format": "date-time",
           "description": "Server time when the Network Server received the message."
+        },
+        "app_s_key": {
+          "$ref": "#/definitions/v3KeyEnvelope",
+          "description": "The AppSKey of the current session.\nThis field is only present if the skip_payload_crypto field of the EndDevice\nis true.\nCan be used to decrypt uplink payloads and encrypt downlink payloads."
+        },
+        "last_a_f_cnt_down": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The last AFCntDown of the current session.\nThis field is only present if the skip_payload_crypto field of the EndDevice\nis true.\nCan be used with app_s_key to encrypt downlink payloads."
         }
       }
     },
