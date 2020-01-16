@@ -68,6 +68,42 @@ func (Dev) Misspell() error {
 	)
 }
 
+// InitStack initializes the Stack.
+func (Dev) InitStack() error {
+	if mg.Verbose() {
+		fmt.Printf("Initializing the Stack\n")
+	}
+	if err := execGo("run", "./cmd/ttn-lw-stack", "is-db", "init"); err != nil {
+		return err
+	}
+	if err := execGo("run", "./cmd/ttn-lw-stack", "is-db", "create-admin-user",
+		"--id", "admin",
+		"--email", "admin@localhost",
+		"--password", "admin",
+	); err != nil {
+		return err
+	}
+	if err := execGo("run", "./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
+		"--id", "cli",
+		"--name", "Command Line Interface",
+		"--owner", "admin",
+		"--no-secret",
+		"--redirect-uri", "local-callback",
+		"--redirect-uri", "code",
+	); err != nil {
+		return err
+	}
+	return execGo("run", "./cmd/ttn-lw-stack", "is-db", "create-oauth-client",
+		"--id", "console",
+		"--name", "Console",
+		"--owner", "admin",
+		"--secret", "console",
+		"--redirect-uri", "https://localhost:8885/console/oauth/callback",
+		"--redirect-uri", "http://localhost:1885/console/oauth/callback",
+		"--redirect-uri", "/console/oauth/callback",
+	)
+}
+
 func init() {
 	initDeps = append(initDeps, Dev.Certificates)
 }
