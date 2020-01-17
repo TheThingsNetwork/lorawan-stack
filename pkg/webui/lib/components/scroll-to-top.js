@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,33 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.app
-  display: flex
-  flex-direction: column
-  height: 100%
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 
-.main
-  display: flex
-  flex: 1 1 auto
-  +media-query($bp.s)
-    flex-direction: column
+export default function ScrollToTop() {
+  const { pathname } = useLocation()
 
-.content
-  overflow: auto
-  flex: 1
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
 
-.mobile-breadcrumbs
-  display: none
-  +media-query($bp.s)
-    display: block
-
-.desktop-breadcrumbs
-  display: block
-  +media-query($bp.s)
-    display: none
-
-.sidebar
-  +media-query($bp.s)
-    position: sticky
-    top: $header-height-mobile
-    z-index: $zi.nav
+  return null
+}
