@@ -50,14 +50,14 @@ func (f OptionFunc) apply(rs *RetryServer) {
 	f(rs)
 }
 
-// WithBackoff configures the backoff interval for the reconnection attempts.
+// WithBackoff configures the backoff interval for the resubscription attempts.
 func WithBackoff(backoff []time.Duration) Option {
 	return OptionFunc(func(rs *RetryServer) {
 		rs.backoff = backoff
 	})
 }
 
-// WithJitter configures the jitter to be added to the reconnection attempts.
+// WithJitter configures the jitter to be added to the resubscription attempts.
 func WithJitter(jitter float64) Option {
 	return OptionFunc(func(rs *RetryServer) {
 		rs.jitter = jitter
@@ -92,7 +92,7 @@ func (rs RetryServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error
 	return rs.upstream.SendUp(ctx, up)
 }
 
-// Subscribe implements Server by proxying the Subscription object betwen the upstream server and the frontend.
+// Subscribe implements Server by proxying the Subscription object between the upstream server and the frontend.
 func (rs RetryServer) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*Subscription, error) {
 	downstreamSub := NewSubscription(ctx, protocol, &ids)
 	upstreamSub, err := rs.upstream.Subscribe(ctx, protocol, ids)

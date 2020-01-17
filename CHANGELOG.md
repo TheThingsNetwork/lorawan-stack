@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Channel mask encoding in LinkADR MAC command.
 - Device location and payload formatter form submits in the Console.
 - Events processing in the JS SDK.
+- Application Server frontends getting stuck after their associated link is closed.
 
 ### Security
 

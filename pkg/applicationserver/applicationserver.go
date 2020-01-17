@@ -149,12 +149,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}
+	retryIO := io.NewRetryServer(as)
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
 		AS:       as,
 		kekLabel: conf.DeviceKEKLabel,
 	}
-	as.grpc.appAs = iogrpc.New(as, iogrpc.WithMQTTConfigProvider(as))
+	as.grpc.appAs = iogrpc.New(retryIO, iogrpc.WithMQTTConfigProvider(as))
 
 	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
@@ -190,11 +191,11 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 					"protocol", endpoint.Protocol(),
 				)
 			}
-			mqtt.Start(ctx, as, lis, version.Format, endpoint.Protocol())
+			mqtt.Start(ctx, retryIO, lis, version.Format, endpoint.Protocol())
 		}
 	}
 
-	if webhooks, err := conf.Webhooks.NewWebhooks(ctx, as); err != nil {
+	if webhooks, err := conf.Webhooks.NewWebhooks(ctx, retryIO); err != nil {
 		return nil, err
 	} else if webhooks != nil {
 		as.webhooks = webhooks
@@ -206,11 +207,11 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
-	if as.pubsub, err = conf.PubSub.NewPubSub(c, as); err != nil {
+	if as.pubsub, err = conf.PubSub.NewPubSub(c, retryIO); err != nil {
 		return nil, err
 	}
 
-	if as.appPackages, err = conf.ApplicationPackages.NewApplicationPackages(ctx, as); err != nil {
+	if as.appPackages, err = conf.ApplicationPackages.NewApplicationPackages(ctx, retryIO); err != nil {
 		return nil, err
 	} else if as.appPackages != nil {
 		as.defaultSubscribers = append(as.defaultSubscribers, as.appPackages.NewSubscription())

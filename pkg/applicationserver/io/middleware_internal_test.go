@@ -84,7 +84,7 @@ func TestRetryServer(t *testing.T) {
 	case <-time.After(timeout):
 	}
 
-	// Wait for reconnection.
+	// Wait for resubscription.
 	select {
 	case <-time.After(timeout):
 		t.Fatal("Upstream subscription did not occur")
