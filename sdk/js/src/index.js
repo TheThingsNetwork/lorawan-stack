@@ -24,7 +24,7 @@ import Organizations from './service/organizations'
 import Users from './service/users'
 import Auth from './service/auth'
 import EventHandler from './util/events'
-import StackConfiguration from './util/stack-components'
+import StackConfiguration from './util/stack-configuration'
 
 class TtnLw {
   constructor(token, { stackConfig, connectionType, defaultUserId, proxy, axiosConfig }) {
