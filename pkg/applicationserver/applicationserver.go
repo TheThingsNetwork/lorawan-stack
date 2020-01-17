@@ -275,7 +275,11 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	sub := io.NewSubscription(ctx, protocol, &ids)
 	l.subscribeCh <- sub
 	go func() {
-		<-sub.Context().Done()
+		select {
+		case <-l.ctx.Done():
+			sub.Disconnect(l.ctx.Err())
+		case <-sub.Context().Done():
+		}
 		l.unsubscribeCh <- sub
 	}()
 	return sub, nil

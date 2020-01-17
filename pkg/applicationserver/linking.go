@@ -218,7 +218,11 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		sub := sub
 		l.subscribeCh <- sub
 		go func() {
-			<-sub.Context().Done()
+			select {
+			case <-l.ctx.Done():
+				sub.Disconnect(l.ctx.Err())
+			case <-sub.Context().Done():
+			}
 			l.unsubscribeCh <- sub
 		}()
 	}
