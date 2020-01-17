@@ -31,9 +31,9 @@ class Http {
       Authorization = `Bearer ${token}`
     }
 
-    const stackComponents = Object.keys(stackConfig)
+    const stackComponents = stackConfig.availableComponents
     const instances = stackComponents.reduce(function(acc, curr) {
-      const componentUrl = stackConfig[curr]
+      const componentUrl = stackConfig.getComponentUrlByName(curr)
       if (componentUrl) {
         acc[curr] = axios.create({
           baseURL: componentUrl,
@@ -70,7 +70,7 @@ class Http {
 
   async handleRequest(method, endpoint, component, payload = {}, isStream) {
     const parsedComponent = component || this._parseStackComponent(endpoint)
-    if (!this._stackConfig[parsedComponent]) {
+    if (!this._stackConfig.isComponentAvailable(parsedComponent)) {
       // If the component has not been defined in The Things Stack config, make no
       // request and throw an error instead
       throw new Error(
@@ -80,7 +80,7 @@ class Http {
 
     try {
       if (isStream) {
-        const url = this._stackConfig[parsedComponent] + endpoint
+        const url = this._stackConfig.getComponentUrlByName(parsedComponent) + endpoint
         return stream(payload, url)
       }
 
