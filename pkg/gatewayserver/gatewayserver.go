@@ -362,11 +362,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		GatewayIdentifiers: ids,
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{
-				"location_public",
+				"antennas",
 				"downlink_path_constraint",
 				"enforce_duty_cycle",
-				"antennas",
 				"frequency_plan_id",
+				"location_public",
 				"schedule_anytime_delay",
 				"schedule_downlink_late",
 			},
