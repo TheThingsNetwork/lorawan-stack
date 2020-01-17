@@ -17,7 +17,7 @@ import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import Breadcrumb from './breadcrumb'
-import Breadcrumbs from './breadcrumbs'
+import { Breadcrumbs } from './breadcrumbs'
 
 storiesOf('Breadcrumbs', module)
   .addDecorator((story, context) =>

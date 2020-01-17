@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import React from 'react'
+import ReactDom from 'react-dom'
 import classnames from 'classnames'
+import { Container } from 'react-grid-system'
 
 import PropTypes from '../../lib/prop-types'
 
@@ -41,4 +43,27 @@ Breadcrumbs.defaultProps = {
   className: undefined,
 }
 
-export default Breadcrumbs
+const PortalledBreadcrumbs = ({ className, ...rest }) => {
+  // Breadcrumbs can be rendered into multiple containers
+  const containers = document.querySelectorAll('.breadcrumbs, #breadcrumbs')
+  if (containers.length) {
+    const nodes = []
+    containers.forEach(element => {
+      nodes.push(
+        ReactDom.createPortal(
+          <div className={classnames(className, style.breadcrumbsContainer)}>
+            <Container>
+              <Breadcrumbs {...rest} />
+            </Container>
+          </div>,
+          element,
+        ),
+      )
+    })
+    return nodes
+  }
+
+  return null
+}
+
+export { PortalledBreadcrumbs as default, Breadcrumbs }

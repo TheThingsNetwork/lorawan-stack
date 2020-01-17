@@ -16,6 +16,7 @@ import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { ConnectedRouter } from 'connected-react-router'
 import { Route, Switch } from 'react-router-dom'
+import classnames from 'classnames'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
@@ -75,8 +76,10 @@ class ConsoleApp extends React.Component {
               <div id="modal-container" />
               <Header className={style.header} />
               <main className={style.main}>
-                <div id="sidebar" />
+                <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
+                <div className={style.sidebar} id="sidebar" />
                 <div className={style.content}>
+                  <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                   <Switch>
                     {/* routes for registration, privacy policy, other public pages */}
                     <Route path="/login" component={Login} />
