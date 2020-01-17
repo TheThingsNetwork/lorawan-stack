@@ -16,31 +16,6 @@
 
 import { STACK_COMPONENTS } from './constants'
 
-/** Takes a list of allowed components and only returns components that have
- * distinct base urls. Used to subscribe to event streaming sources when the
- * stack uses multiple hosts.
- * @param {Array} stackConfig - The stack config object containing base urls per
- * component.
- * @param {Array} components - Components to return distinct ones from.
- * @returns {Array} An array of components that have distinct base urls.
- */
-export const getComponentsWithDistinctBaseUrls = function(
-  stackConfig,
-  components = STACK_COMPONENTS,
-) {
-  const distinctComponents = components.reduce((collection, component) => {
-    if (
-      Boolean(stackConfig[component]) &&
-      !Object.values(collection).includes(stackConfig[component])
-    ) {
-      return { ...collection, [component]: stackConfig[component] }
-    }
-    return collection
-  }, {})
-
-  return Object.keys(distinctComponents)
-}
-
 class StackConfiguration {
   constructor(stackConfig) {
     if (!Boolean(stackConfig)) {
@@ -102,7 +77,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Identity Server of the stack configuration.
    */
   get isHost() {
-    return this.getComponentHostByName('is')
+    return this.isComponentAvailable('is') && this.getComponentHostByName('is')
   }
 
   /**
@@ -110,7 +85,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Network Server of the stack configuration.
    */
   get nsHost() {
-    return this.getComponentHostName('ns')
+    return this.isComponentAvailable('ns') && this.getComponentHostName('ns')
   }
 
   /**
@@ -118,7 +93,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Application Server of the stack configuration.
    */
   get asHost() {
-    return this.getComponentHostName('as')
+    return this.isComponentAvailable('as') && this.getComponentHostName('as')
   }
 
   /**
@@ -126,12 +101,12 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Join Server of the stack configuration.
    */
   get jsHost() {
-    return this.getComponentHostByName('js')
+    return this.isComponentAvailable('js') && this.getComponentHostByName('js')
   }
 
   /**
    * Avaible stack components getter.
-   * @returns {Array<string>} - A list of avaiable component abbreviations, e.g. [is, as, ns, js].
+   * @returns {Array<string>} - A list of available component abbreviations, e.g. [is, as, ns, js].
    */
   get availableComponents() {
     return Object.keys(this._stackConfig)
@@ -146,10 +121,10 @@ class StackConfiguration {
   getComponentsWithDistinctBaseUrls(components = STACK_COMPONENTS) {
     const distinctComponents = components.reduce((collection, component) => {
       if (
-        Boolean(this._stackConfig[component]) &&
-        !Object.values(collection).includes(this._stackConfig[component])
+        Boolean(this._stackConfig.isComponentAvailable(component)) &&
+        !Object.values(collection).includes(this._stackConfig.getComponentUrlByName(component))
       ) {
-        return { ...collection, [component]: this._stackConfig[component] }
+        return { ...collection, [component]: this._stackConfig.getComponentUrlByName(component) }
       }
       return collection
     }, {})
