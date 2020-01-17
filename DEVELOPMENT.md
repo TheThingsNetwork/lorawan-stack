@@ -27,9 +27,8 @@ You may want to run this commands from time to time.
 
 Now you can initialize the development databases with some defaults.
 
->Note: this requires Docker to be running.
-
 ```bash
+$ ./mage dev:dbStart   # This requires Docker to be running.
 $ ./mage dev:initStack
 ```
 
@@ -40,12 +39,12 @@ This starts a CockroachDB and Redis database in Docker containers, creates a dat
 You can use the following commands to start, stop and erase databases.
 
 ```bash
-$ ./mage dev:dbStart # Starts all databases in a Docker container
-$ ./mage dev:dbStop  # Stops all databases
+$ ./mage dev:dbStart # Starts all databases in a Docker container.
+$ ./mage dev:dbStop  # Stops all databases.
 
-# The contents of the databases will be saved in .dev/data.
+# The contents of the databases will be saved in .env/data
 
-$ ./mage dev:dbErase # Stop all databases and erase storage.
+$ ./mage dev:dbErase # Stops all databases and erase storage.
 ```
 
 ### CockroachDB

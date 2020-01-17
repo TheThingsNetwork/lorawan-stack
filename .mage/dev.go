@@ -80,32 +80,31 @@ func dockerComposeFlags(args ...string) []string {
 	return append(devDockerComposeFlags, args...)
 }
 
-func execDC(args ...string) error {
+func execDockerCompose(args ...string) error {
 	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "docker-compose", dockerComposeFlags(args...)...)
 	return err
 }
 
-// DBStart starts the databases of the development environment
+// DBStart starts the databases of the development environment.
 func (Dev) DBStart() error {
 	if mg.Verbose() {
 		fmt.Printf("Starting dev databases\n")
 	}
-	if err := execDC(append([]string{"up", "-d"}, devDatabases...)...); err != nil {
+	if err := execDockerCompose(append([]string{"up", "-d"}, devDatabases...)...); err != nil {
 		return err
 	}
-
-	return execDC("ps")
+	return execDockerCompose("ps")
 }
 
-// DBStop stops the databases of the development environment
+// DBStop stops the databases of the development environment.
 func (Dev) DBStop() error {
 	if mg.Verbose() {
 		fmt.Printf("Stopping dev databases\n")
 	}
-	return execDC(append([]string{"stop"}, devDatabases...)...)
+	return execDockerCompose(append([]string{"stop"}, devDatabases...)...)
 }
 
-// DBErase erases the databases of the development environment
+// DBErase erases the databases of the development environment.
 func (Dev) DBErase() error {
 	mg.Deps(Dev.DBStop)
 	if mg.Verbose() {
@@ -114,27 +113,26 @@ func (Dev) DBErase() error {
 	return os.RemoveAll(devDataDir)
 }
 
-// DBSQL starts an SQL shell
+// DBSQL starts an SQL shell.
 func (Dev) DBSQL() error {
 	mg.Deps(Dev.DBStart)
 	if mg.Verbose() {
 		fmt.Printf("Starting SQL shell\n")
 	}
-	return execDC("exec", "cockroach", "./cockroach", "sql", "--insecure", "-d", devDatabaseName)
+	return execDockerCompose("exec", "cockroach", "./cockroach", "sql", "--insecure", "-d", devDatabaseName)
 }
 
-// DBRedisCli starts a Redis-CLI shell
+// DBRedisCli starts a Redis-CLI shell.
 func (Dev) DBRedisCli() error {
 	mg.Deps(Dev.DBStart)
 	if mg.Verbose() {
 		fmt.Printf("Starting Redis-CLI shell\n")
 	}
-	return execDC("exec", "redis", "redis-cli")
+	return execDockerCompose("exec", "redis", "redis-cli")
 }
 
 // InitStack initializes the Stack.
 func (Dev) InitStack() error {
-	mg.Deps(Dev.DBStart)
 	if mg.Verbose() {
 		fmt.Printf("Initializing the Stack\n")
 	}
