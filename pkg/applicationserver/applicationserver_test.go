@@ -816,7 +816,7 @@ hardware_versions:
 				},
 			} {
 				t.Run(ctc.Name, func(t *testing.T) {
-					ctx, cancel := context.WithDeadline(ctx, time.Now().Add(2*Timeout))
+					ctx, cancel := context.WithDeadline(ctx, time.Now().Add(4*Timeout))
 					chs := &connChannels{
 						up:          make(chan *ttnpb.ApplicationUp, 1),
 						downPush:    make(chan *ttnpb.DownlinkQueueRequest),
