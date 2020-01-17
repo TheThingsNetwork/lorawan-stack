@@ -24,7 +24,12 @@ export default function() {
     },
     when: {
       created(props) {
-        driver.component = shallow(<SideNavigationItem location={location} {...props} />)
+        driver.component = shallow(<SideNavigationItem location={location} {...props} />, {
+          context: {
+            isMinimized: false,
+            isDrawerOpen: false,
+          },
+        })
 
         return driver
       },
