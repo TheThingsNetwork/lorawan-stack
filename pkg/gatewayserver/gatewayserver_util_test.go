@@ -66,7 +66,7 @@ func startMockIS(ctx context.Context) (*mockIS, string) {
 	return is, lis.Addr().String()
 }
 
-func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) {
+func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string, locationPublic bool) {
 	uid := unique.ID(ctx, ids)
 	is.gateways[uid] = &ttnpb.Gateway{
 		GatewayIdentifiers: ids,
@@ -78,6 +78,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 				},
 			},
 		},
+		LocationPublic: locationPublic,
 	}
 	if key != "" {
 		is.gatewayAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
