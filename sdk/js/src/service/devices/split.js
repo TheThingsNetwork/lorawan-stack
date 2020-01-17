@@ -143,7 +143,7 @@ export async function makeRequests(
   // Check whether the request would query against disabled components
   if (!ignoreDisabledComponents) {
     for (const component of Object.keys(requestTree)) {
-      if (!stackConfig[component]) {
+      if (!stackConfig.isComponentAvailable(component)) {
         throw new Error(
           `Cannot run ${operation.toUpperCase()} end device request which (partially) depends on disabled component: "${component}".`,
         )
@@ -169,7 +169,7 @@ export async function makeRequests(
   ]
 
   // Do a possible IS request first
-  if (stackConfig.is && 'is' in requestTree) {
+  if (stackConfig.isComponentAvailable('is') && 'is' in requestTree) {
     let func
     if (isSet) {
       func = 'Update'
@@ -202,19 +202,19 @@ export async function makeRequests(
   }
 
   // Compose an array of possible api calls to NS, AS, JS
-  if (stackConfig.ns && 'ns' in requestTree) {
+  if (stackConfig.isComponentAvailable('ns') && 'ns' in requestTree) {
     requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction], params, 'ns', {
       ...payload,
       ...Marshaler.pathsToFieldMask(requestTree.ns),
     })
   }
-  if (stackConfig.as && 'as' in requestTree) {
+  if (stackConfig.isComponentAvailable('as') && 'as' in requestTree) {
     requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction], params, 'as', {
       ...payload,
       ...Marshaler.pathsToFieldMask(requestTree.as),
     })
   }
-  if (stackConfig.js && 'js' in requestTree) {
+  if (stackConfig.isComponentAvailable('js') && 'js' in requestTree) {
     requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction], params, 'js', {
       ...payload,
       ...Marshaler.pathsToFieldMask(requestTree.js),

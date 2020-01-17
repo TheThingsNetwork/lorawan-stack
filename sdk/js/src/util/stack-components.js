@@ -102,7 +102,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Identity Server of the stack configuration.
    */
   get isHost() {
-    return this.getComponentHostByName('is')
+    return this.isComponentAvailable('is') && this.getComponentHostByName('is')
   }
 
   /**
@@ -110,7 +110,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Network Server of the stack configuration.
    */
   get nsHost() {
-    return this.getComponentHostName('ns')
+    return this.isComponentAvailable('ns') && this.getComponentHostName('ns')
   }
 
   /**
@@ -118,7 +118,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Application Server of the stack configuration.
    */
   get asHost() {
-    return this.getComponentHostName('as')
+    return this.isComponentAvailable('as') && this.getComponentHostName('as')
   }
 
   /**
@@ -126,7 +126,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Join Server of the stack configuration.
    */
   get jsHost() {
-    return this.getComponentHostByName('js')
+    return this.isComponentAvailable('js') && this.getComponentHostByName('js')
   }
 
   /**
@@ -146,10 +146,10 @@ class StackConfiguration {
   getComponentsWithDistinctBaseUrls(components = STACK_COMPONENTS) {
     const distinctComponents = components.reduce((collection, component) => {
       if (
-        Boolean(this._stackConfig[component]) &&
-        !Object.values(collection).includes(this._stackConfig[component])
+        Boolean(this._stackConfig.isComponentAvailable(component)) &&
+        !Object.values(collection).includes(this._stackConfig.getComponentUrlByName(component))
       ) {
-        return { ...collection, [component]: this._stackConfig[component] }
+        return { ...collection, [component]: this._stackConfig.getComponentUrlByName(component) }
       }
       return collection
     }, {})

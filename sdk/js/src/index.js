@@ -34,7 +34,11 @@ class TtnLw {
     this.config = arguments.config
     this.api = new Api(connectionType, stackConfiguration, axiosConfig, tokenInstance.get())
 
-    this.Applications = new Applications(this.api, { defaultUserId, proxy, stackConfig })
+    this.Applications = new Applications(this.api, {
+      defaultUserId,
+      proxy,
+      stackConfig: stackConfiguration,
+    })
     this.Application = Application.bind(null, this.Applications)
     this.Configuration = new Configuration(this.api.Configuration)
     this.Gateways = new Gateways(this.api, { defaultUserId, proxy, stackConfig })
