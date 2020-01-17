@@ -60,7 +60,7 @@ export default class DeviceAdd extends Component {
     const { activation_mode, ...device } = values
 
     return api.device.create(appId, device, {
-      abp: values.activation_mode === 'abp',
+      otaa: activation_mode === 'otaa',
     })
   }
 
