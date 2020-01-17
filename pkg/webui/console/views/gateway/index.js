@@ -85,8 +85,12 @@ import PropTypes from '../../../lib/prop-types'
       'enforce_duty_cycle',
       'frequency_plan_id',
       'gateway_server_address',
-      'enforce_duty_cycle',
       'antennas',
+      'location_public',
+      'status_public',
+      'auto_update',
+      'schedule_downlink_late',
+      'update_channel',
     ]),
   ({ fetching, gateway }) => fetching || !Boolean(gateway),
 )
