@@ -16,17 +16,21 @@
   list-style-type: none
   padding: 0
   margin: 0
-  transition: max-height $ad.m ease-in-out
   overflow: hidden
 
   & > li:not(:last-child)
     margin-bottom: 0
 
-  &-nested
-    max-height: 0
+  // We need to rely on the child list items for the reveal animation, the
+  // height of the list is variable, making proper slide up transitions impossible.
+  & > li
+    transition: height $ad.m ease-in-out
 
-  &-expanded
-    max-height: 10rem
+  &-nested > li
+    height: 0
+
+  &-expanded > li
+    height: 3.1rem
 
   &-expanded, &-nested
     & li a
