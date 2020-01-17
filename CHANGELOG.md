@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for adjusting the time that the Gateway Server schedules class C messages in advance per gateway.
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - `end-devices use-external-join-server` CLI subcommand, which disassociates and deletes the device from Join Server.
+- Mobile navigation menu to the Console.
 
 ### Changed
 
