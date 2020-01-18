@@ -50,11 +50,11 @@ const EntityTitleSection = ({ entityName, entityId, description, creationDate, c
 }
 
 EntityTitleSection.propTypes = {
-  entityName: PropTypes.string,
-  entityId: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  creationDate: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  creationDate: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  entityId: PropTypes.string.isRequired,
+  entityName: PropTypes.string,
 }
 
 EntityTitleSection.defaultProps = {
@@ -87,9 +87,9 @@ EntityTitleSection.Device = ({ deviceName, deviceId, description, children }) =>
 
 EntityTitleSection.Device.propTypes = {
   children: PropTypes.node.isRequired,
+  description: PropTypes.string,
   deviceId: PropTypes.string.isRequired,
   deviceName: PropTypes.string,
-  description: PropTypes.string,
 }
 
 EntityTitleSection.Device.defaultProps = {
