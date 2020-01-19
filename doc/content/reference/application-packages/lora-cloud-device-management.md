@@ -28,7 +28,7 @@ The package can now be enabled using the `associations set` command:
 # Create a JSON formatted file containing the uplink token
 $ echo '{ "token": "AQEAdqwV67..." }' > package-data.json
 # Create the association
-$ ttn-lw-cli applications packages associations set app1 dev1 200 --data-local-file package-data.json
+$ ttn-lw-cli applications packages associations set app1 dev1 200 --package-name lora-cloud-device-management-v1 --data-local-file package-data.json
 ```
 
 This will enable the package on FPort `200` of the device `dev1` of application `app1`. You can now use the LoRa Cloud Device Management in order to manage your device !
