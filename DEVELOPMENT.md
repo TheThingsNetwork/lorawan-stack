@@ -27,10 +27,9 @@ You may want to run this commands from time to time.
 
 Now you can initialize the development databases with some defaults.
 
->Note: this requires Docker to be running.
-
 ```bash
-$ make dev.stack.init
+$ ./mage dev:dbStart   # This requires Docker to be running.
+$ ./mage dev:initStack
 ```
 
 This starts a CockroachDB and Redis database in Docker containers, creates a database, migrates tables and creates a user `admin` with password `admin`.
@@ -40,25 +39,25 @@ This starts a CockroachDB and Redis database in Docker containers, creates a dat
 You can use the following commands to start, stop and erase databases.
 
 ```bash
-$ make dev.databases.start # Starts all databases in a Docker container
-$ make dev.databases.stop  # Stops all databases
+$ ./mage dev:dbStart # Starts all databases in a Docker container.
+$ ./mage dev:dbStop  # Stops all databases.
 
-# The contents of the databases will be saved in .dev/data.
+# The contents of the databases will be saved in .env/data
 
-$ make dev.databases.erase # Stop all databases and erase storage.
+$ ./mage dev:dbErase # Stops all databases and erase storage.
 ```
 
 ### CockroachDB
 
 CockroachDB is a distributed SQL database that we use in the Identity Server.
 
-You can use `make dev.databases.sql` to enter an SQL shell.
+You can use `./mage dev:dbSQL` to enter an SQL shell.
 
 ### Redis
 
 Redis is an in-memory data store that we use as a database for "hot" data.
 
-You can use `make dev.databases.redis-cli` to enter a Redis-CLI shell.
+You can use `./mage dev:dbRedisCli` to enter a Redis-CLI shell.
 
 ## Project Structure
 
@@ -115,16 +114,16 @@ $ ./mage proto:clean proto:all jsSDK:definitions
 
 ### Documentation
 
-The documentation site for The Things Stack is built from the `doc` folder. 
+The documentation site for The Things Stack is built from the `doc` folder.
 All content is stored as Markdown files in `doc/content`.
 
 In order to build the documentation site with the right theme, you need to run
-`./mage docs:deps` from time to time. 
+`./mage docs:deps` from time to time.
 
 You can start a development server with live reloading by running
 `./mage docs:server`. This command will print the address of the server.
 
-The documentation site can be built by running `./mage docs:build`. This will 
+The documentation site can be built by running `./mage docs:build`. This will
 output the site to `docs/public`.
 
 For more details on how our documentation site is written, see the [Hugo docs](https://gohugo.io/documentation/).
@@ -159,11 +158,11 @@ The folder structure of the frontend looks as follows:
 ├── template.go       go template module used to render the frontend HTML
 ```
 
-For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `mage js:build`, it can be served using:
+For development purposes, the frontend can be run using `webpack-dev-server`. After following the [Getting Started](#getting-started) section to initialize The Things Stack and doing an initial build of the frontend via `./mage js:build`, it can be served using:
 
 ```bash
 $ export NODE_ENV=development
-$ mage js:serve
+$ ./mage js:serve
 ```
 
 The development server runs on `http://localhost:8080` and will proxy all api calls to port `1885`. The serve command watches any changes inside `pkg/webui` and refreshes automatically.
@@ -324,7 +323,7 @@ meaning is obvious from the context.
 
 ### Event Naming
 
-Events are defined with 
+Events are defined with
 
 ```go
 events.Define("event_name", "event description")
@@ -409,10 +408,10 @@ The workflow for defining messages is as follows:
 After adding messages this way, it needs to be added the locales file `pkg/webui/locales/*.js` by using:
 
 ```bash
-$ mage js:translations
+$ ./mage js:translations
 ```
 
-> Note: When using `mage js:serve`, this command will be run automatically after any change.
+> Note: When using `./mage js:serve`, this command will be run automatically after any change.
 
 The message definitions in `pkg/webui/locales` can be used to provide translations in other languages (e.g. `fr.js`). Keep in mind that locale files are checked in and committed, any discrepancy in the locales file with the defined messages will lead to a CI failure.
 
@@ -439,7 +438,7 @@ The difference of a development build includes:
 The frontend can then be built using:
 
 ```bash
-$ mage js:build
+$ ./mage js:build
 ```
 
 For development/testing purposes we suggest to run the binaries directly via `go run`:

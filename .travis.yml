@@ -89,7 +89,7 @@ before_script:
 - |
   if [[ "$RUNTYPE" == "go.test" ]]; then
     set -e
-    make dev.databases.start
+    $MAGE dev:dbStart
   fi
 script:
 - if [[ "$RUNTYPE" == "js" ]]; then $MAGE proto:swaggerClean proto:swagger; fi

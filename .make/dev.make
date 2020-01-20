@@ -14,32 +14,6 @@
 
 # This makefile contains utilities for development purposes.
 
-# Databases
-
-DEV_DATABASES ?= cockroach redis
-DEV_DATABASE_NAME ?= ttn_lorawan_dev
-DEV_DATA_DIR ?= .dev/data
-DEV_DOCKER_COMPOSE := DEV_DATA_DIR=$(DEV_DATA_DIR) DEV_DATABASE_NAME=$(DEV_DATABASE_NAME) docker-compose -p lorawan-stack-dev
-
-dev.databases.start:
-	@$(DEV_DOCKER_COMPOSE) up -d $(DEV_DATABASES)
-	@$(DEV_DOCKER_COMPOSE) ps
-
-dev.databases.stop:
-	@$(DEV_DOCKER_COMPOSE) stop $(DEV_DATABASES)
-
-dev.databases.erase: dev.databases.stop
-	rm -rf $(DEV_DATA_DIR)
-
-dev.databases.sql: dev.databases.start
-	@$(DEV_DOCKER_COMPOSE) exec cockroach ./cockroach sql --insecure -d $(DEV_DATABASE_NAME)
-
-dev.databases.redis-cli: dev.databases.start
-	@$(DEV_DOCKER_COMPOSE) exec redis redis-cli
-
-dev.stack.init: dev.databases.start
-	@$(MAGE) dev:initStack
-
 .PHONY: git.diff
 git.diff:
 	@if [[ ! -z "`git diff`" ]]; then \

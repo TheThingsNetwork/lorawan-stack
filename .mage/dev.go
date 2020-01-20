@@ -21,6 +21,7 @@ import (
 	"runtime"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 )
 
 // Dev namespace.
@@ -66,6 +67,68 @@ func (Dev) Misspell() error {
 		"SECURITY.md",
 		"tools.go",
 	)
+}
+
+var (
+	devDatabases          = []string{"cockroach", "redis"}
+	devDataDir            = ".dev/data"
+	devDatabaseName       = "ttn_lorawan_dev"
+	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
+)
+
+func dockerComposeFlags(args ...string) []string {
+	return append(devDockerComposeFlags, args...)
+}
+
+func execDockerCompose(args ...string) error {
+	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "docker-compose", dockerComposeFlags(args...)...)
+	return err
+}
+
+// DBStart starts the databases of the development environment.
+func (Dev) DBStart() error {
+	if mg.Verbose() {
+		fmt.Printf("Starting dev databases\n")
+	}
+	if err := execDockerCompose(append([]string{"up", "-d"}, devDatabases...)...); err != nil {
+		return err
+	}
+	return execDockerCompose("ps")
+}
+
+// DBStop stops the databases of the development environment.
+func (Dev) DBStop() error {
+	if mg.Verbose() {
+		fmt.Printf("Stopping dev databases\n")
+	}
+	return execDockerCompose(append([]string{"stop"}, devDatabases...)...)
+}
+
+// DBErase erases the databases of the development environment.
+func (Dev) DBErase() error {
+	mg.Deps(Dev.DBStop)
+	if mg.Verbose() {
+		fmt.Printf("Erasing dev databases\n")
+	}
+	return os.RemoveAll(devDataDir)
+}
+
+// DBSQL starts an SQL shell.
+func (Dev) DBSQL() error {
+	mg.Deps(Dev.DBStart)
+	if mg.Verbose() {
+		fmt.Printf("Starting SQL shell\n")
+	}
+	return execDockerCompose("exec", "cockroach", "./cockroach", "sql", "--insecure", "-d", devDatabaseName)
+}
+
+// DBRedisCli starts a Redis-CLI shell.
+func (Dev) DBRedisCli() error {
+	mg.Deps(Dev.DBStart)
+	if mg.Verbose() {
+		fmt.Printf("Starting Redis-CLI shell\n")
+	}
+	return execDockerCompose("exec", "redis", "redis-cli")
 }
 
 // InitStack initializes the Stack.
