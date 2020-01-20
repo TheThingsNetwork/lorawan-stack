@@ -195,65 +195,75 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPubSubFlags)
 
-			var pubsub ttnpb.ApplicationPubSub
-			if err = util.SetFields(&pubsub, setApplicationPubSubFlags); err != nil {
-				return err
-			}
-			pubsub.ApplicationPubSubIdentifiers = *pubsubID
-
-			for name, p := range map[string]struct {
-				provider ttnpb.ApplicationPubSub_Provider
-				flags    *pflag.FlagSet
-				loadData func() error
-			}{
-				"nats": {
-					provider: &ttnpb.ApplicationPubSub_NATS{},
-					flags:    natsProviderApplicationPubSubFlags,
-					loadData: func() error { return nil },
-				},
-				"mqtt": {
-					provider: &ttnpb.ApplicationPubSub_MQTT{},
-					flags:    mqttProviderApplicationPubSubFlags,
-					loadData: func() error {
-						if useTLS, _ := cmd.Flags().GetBool("mqtt.use-tls"); useTLS {
-							for _, name := range []string{
-								"mqtt.tls-ca",
-								"mqtt.tls-client-cert",
-								"mqtt.tls-client-key",
-							} {
-								data, err := getDataBytes(name, cmd.Flags())
-								if err != nil {
-									return err
-								}
-								err = cmd.Flags().Set(name, hex.EncodeToString(data))
-								if err != nil {
-									return err
-								}
-							}
-						}
-						return nil
-					},
-				},
-			} {
-				if enabled, _ := cmd.Flags().GetBool(name); enabled {
-					pubsub.Provider = p.provider
-					if err = p.loadData(); err != nil {
-						return err
-					}
-					if err = util.SetFields(pubsub.Provider, p.flags); err != nil {
-						return err
-					}
-					paths = append(paths, "provider")
-					break
-				}
-			}
-
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
 			}
+			pubsub, err := ttnpb.NewApplicationPubSubRegistryClient(as).Get(ctx, &ttnpb.GetApplicationPubSubRequest{
+				ApplicationPubSubIdentifiers: *pubsubID,
+				FieldMask:                    types.FieldMask{Paths: paths},
+			})
+			if err != nil && !errors.IsNotFound(err) {
+				return err
+			}
+			if pubsub == nil {
+				pubsub = &ttnpb.ApplicationPubSub{ApplicationPubSubIdentifiers: *pubsubID}
+			}
+
+			if err = util.SetFields(pubsub, setApplicationPubSubFlags); err != nil {
+				return err
+			}
+
+			if nats, _ := cmd.Flags().GetBool("nats"); nats {
+				if pubsub.GetNATS() == nil {
+					paths = append(paths, "provider")
+					pubsub.Provider = &ttnpb.ApplicationPubSub_NATS{
+						NATS: &ttnpb.ApplicationPubSub_NATSProvider{},
+					}
+				} else {
+					providerPaths := util.UpdateFieldMask(cmd.Flags(), natsProviderApplicationPubSubFlags)
+					providerPaths = ttnpb.FieldsWithPrefix("provider", providerPaths...)
+					paths = append(paths, providerPaths...)
+				}
+				if err = util.SetFields(pubsub.GetNATS(), natsProviderApplicationPubSubFlags, "nats"); err != nil {
+					return err
+				}
+			}
+
+			if mqtt, _ := cmd.Flags().GetBool("mqtt"); mqtt {
+				if pubsub.GetMQTT() == nil {
+					paths = append(paths, "provider")
+					pubsub.Provider = &ttnpb.ApplicationPubSub_MQTT{
+						MQTT: &ttnpb.ApplicationPubSub_MQTTProvider{},
+					}
+				} else {
+					providerPaths := util.UpdateFieldMask(cmd.Flags(), mqttProviderApplicationPubSubFlags)
+					providerPaths = ttnpb.FieldsWithPrefix("provider", providerPaths...)
+					paths = append(paths, providerPaths...)
+				}
+				if useTLS, _ := cmd.Flags().GetBool("mqtt.use-tls"); useTLS {
+					for _, name := range []string{
+						"mqtt.tls-ca",
+						"mqtt.tls-client-cert",
+						"mqtt.tls-client-key",
+					} {
+						data, err := getDataBytes(name, cmd.Flags())
+						if err != nil {
+							return err
+						}
+						err = cmd.Flags().Set(name, hex.EncodeToString(data))
+						if err != nil {
+							return err
+						}
+					}
+				}
+				if err = util.SetFields(pubsub.GetMQTT(), mqttProviderApplicationPubSubFlags, "mqtt"); err != nil {
+					return err
+				}
+			}
+
 			res, err := ttnpb.NewApplicationPubSubRegistryClient(as).Set(ctx, &ttnpb.SetApplicationPubSubRequest{
-				ApplicationPubSub: pubsub,
+				ApplicationPubSub: *pubsub,
 				FieldMask:         types.FieldMask{Paths: paths},
 			})
 			if err != nil {
