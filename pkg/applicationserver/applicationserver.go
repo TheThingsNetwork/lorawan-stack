@@ -195,7 +195,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		}
 	}
 
-	if webhooks, err := conf.Webhooks.NewWebhooks(ctx, retryIO); err != nil {
+	if webhooks, err := conf.Webhooks.NewWebhooks(ctx, as); err != nil {
 		return nil, err
 	} else if webhooks != nil {
 		as.webhooks = webhooks
@@ -211,7 +211,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
-	if as.appPackages, err = conf.ApplicationPackages.NewApplicationPackages(ctx, retryIO); err != nil {
+	if as.appPackages, err = conf.ApplicationPackages.NewApplicationPackages(ctx, as); err != nil {
 		return nil, err
 	} else if as.appPackages != nil {
 		as.defaultSubscribers = append(as.defaultSubscribers, as.appPackages.NewSubscription())

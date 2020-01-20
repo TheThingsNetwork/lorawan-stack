@@ -105,31 +105,56 @@ func (rs RetryServer) Subscribe(ctx context.Context, protocol string, ids ttnpb.
 		for {
 			select {
 			case up := <-upstreamSub.Up():
+				err := downstreamSub.SendUp(up.Context, up.ApplicationUp)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to send the uplink downstream")
+				}
+			case <-ctx.Done():
 				{
-					err := downstreamSub.SendUp(up.Context, up.ApplicationUp)
-					if err != nil {
-						logger.WithError(err).Error("Failed to send the uplink downstream")
-					}
+					err := ctx.Err()
+					downstreamSub.Disconnect(err)
+					upstreamSub.Disconnect(err)
+					logger.WithError(err).Debug("Parent context cancelled")
+					return
 				}
 			case <-upstreamSub.Context().Done():
 				{
 					err := upstreamSub.Context().Err()
 					if errors.IsCanceled(err) {
+						logger.Debug("Upstream subscription cancelled. Attempting to resubscribe")
+
 						for _, backoff := range rs.backoff {
+							delay := random.Jitter(backoff, rs.jitter)
+
+							select {
+							case <-ctx.Done():
+								err := ctx.Err()
+								logger.WithError(err).Debug("Parent context cancelled while attempting to resubscribe")
+								return
+							case <-downstreamSub.Context().Done():
+								err := downstreamSub.Context().Err()
+								logger.WithError(err).Debug("Downstream subscription cancelled while attempting to resubscribe")
+								return
+							case <-time.After(delay):
+							}
+
 							upstreamSub, err = rs.upstream.Subscribe(ctx, protocol, ids)
 							if err == nil {
+								logger.Debug("Resubscription successful")
 								continue nextUp
 							}
-							time.Sleep(random.Jitter(backoff, rs.jitter))
+							logger.WithError(err).WithField("delay", delay).Debug("Resubscription failed")
 						}
 					}
 					downstreamSub.Disconnect(err)
+					logger.WithError(err).Debug("Upstream resubscription attempts failed. Downstream subscription cancelled")
 					return
 				}
 			case <-downstreamSub.Context().Done():
 				{
 					err := downstreamSub.Context().Err()
 					upstreamSub.Disconnect(err)
+					logger.WithError(err).Debug("Downstream subscription cancelled")
 					return
 				}
 			}
