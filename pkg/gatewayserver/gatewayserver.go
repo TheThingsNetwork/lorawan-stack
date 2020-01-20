@@ -400,13 +400,13 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	}
 
 	// Get all frequency plans and check if they are from the same band.
-	fps := make([]*frequencyplans.FrequencyPlan, len(gtw.FrequencyPlanIDs))
+	fps := make(map[string]*frequencyplans.FrequencyPlan, len(gtw.FrequencyPlanIDs))
 	if len(gtw.FrequencyPlanIDs) > 0 {
 		fp0, err := gs.FrequencyPlans.GetByID(gtw.FrequencyPlanIDs[0])
 		if err != nil {
 			return nil, err
 		}
-		fps[0] = fp0
+		fps[gtw.FrequencyPlanIDs[0]] = fp0
 		for i := 1; i < len(gtw.FrequencyPlanIDs); i++ {
 			fpn, err := gs.FrequencyPlans.GetByID(gtw.FrequencyPlanIDs[i])
 			if err != nil {
@@ -415,13 +415,13 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			if fpn.BandID != fp0.BandID {
 				return nil, errFrequencyPlans
 			}
-			fps[i] = fpn
+			fps[gtw.FrequencyPlanIDs[i]] = fpn
 		}
 	} else {
 		return nil, errFrequencyPlans
 	}
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay, gs.FrequencyPlans)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
 	if err != nil {
 		return nil, err
 	}
@@ -626,7 +626,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 }
 
 // GetFrequencyPlans gets the frequency plans by the gateway identifiers.
-func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) ([]*frequencyplans.FrequencyPlan, error) {
+func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	var err error
 	var callOpt grpc.CallOption
 	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
@@ -656,13 +656,13 @@ func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.Gatewa
 		return nil, err
 	}
 
-	fps := make([]*frequencyplans.FrequencyPlan, len(fpIDs))
-	for i, fpID := range fpIDs {
+	fps := make(map[string]*frequencyplans.FrequencyPlan, len(fpIDs))
+	for _, fpID := range fpIDs {
 		fp, err := gs.FrequencyPlans.GetByID(fpID)
 		if err != nil {
 			return nil, err
 		}
-		fps[i] = fp
+		fps[fpID] = fp
 	}
 	return fps, nil
 }

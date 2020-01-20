@@ -89,7 +89,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	if err != nil {
 		return nil, err
 	}
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, true, nil, s.store)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fps, true, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 }
 
 // GetFrequencyPlans implements io.Server.
-func (s *server) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) ([]*frequencyplans.FrequencyPlan, error) {
+func (s *server) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	var fpID string
 	if gtw, ok := s.gateways[unique.ID(ctx, ids)]; ok {
 		fpID = gtw.FrequencyPlanID
@@ -114,7 +114,9 @@ func (s *server) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentif
 	if err != nil {
 		return nil, err
 	}
-	return []*frequencyplans.FrequencyPlan{fp}, nil
+	fps := make(map[string]*frequencyplans.FrequencyPlan)
+	fps[fpID] = fp
+	return fps, nil
 }
 
 // ClaimDownlink implements io.Server.

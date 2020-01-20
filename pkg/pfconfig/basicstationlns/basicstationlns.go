@@ -73,7 +73,7 @@ func (conf RouterConfig) MarshalJSON() ([]byte, error) {
 
 // GetRouterConfig returns the routerconfig message to be sent to the gateway.
 // Currently as per the basic station docs, all frequency plans have to be from the same region (band) https://doc.sm.tc/station/tcproto.html#router-config-message.
-func GetRouterConfig(fps []*frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time) (RouterConfig, error) {
+func GetRouterConfig(fps map[string]*frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time) (RouterConfig, error) {
 	for _, fp := range fps {
 		if err := fp.Validate(); err != nil {
 			return RouterConfig{}, errFrequencyPlan
@@ -84,7 +84,12 @@ func GetRouterConfig(fps []*frequencyplans.FrequencyPlan, isProd bool, dlTime ti
 	conf.NetID = nil
 
 	// All frequency plans are from the same band, so choosing the first one.
-	band, err := band.GetByID(fps[0].BandID)
+	var fp *frequencyplans.FrequencyPlan
+	for _, v := range fps {
+		fp = v
+		break
+	}
+	band, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan
 	}
@@ -103,7 +108,7 @@ func GetRouterConfig(fps []*frequencyplans.FrequencyPlan, isProd bool, dlTime ti
 	conf.HardwareSpec = fmt.Sprintf("%s/%d", configHardwareSpecPrefix, len(fps))
 
 	// All frequency plans are from the same band, so choosing the first one.
-	drs, err := getDataRatesFromBandID(fps[0].BandID)
+	drs, err := getDataRatesFromBandID(fp.BandID)
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan
 	}
@@ -163,7 +168,7 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 }
 
 // getMinMaxFrequencies extract the minimum and maximum frequencies between all the bands.
-func getMinMaxFrequencies(fps []*frequencyplans.FrequencyPlan) (uint64, uint64, error) {
+func getMinMaxFrequencies(fps map[string]*frequencyplans.FrequencyPlan) (uint64, uint64, error) {
 	var min, max uint64
 	min = math.MaxUint64
 	for _, fp := range fps {

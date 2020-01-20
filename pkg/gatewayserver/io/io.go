@@ -54,7 +54,7 @@ type Server interface {
 	// control.
 	Connect(ctx context.Context, frontend Frontend, ids ttnpb.GatewayIdentifiers) (*Connection, error)
 	// GetFrequencyPlans gets the frequency plans by the gateway identifiers.
-	GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) ([]*frequencyplans.FrequencyPlan, error)
+	GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
 	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
@@ -77,10 +77,9 @@ type Connection struct {
 
 	frontend  Frontend
 	gateway   *ttnpb.Gateway
-	fps       []*frequencyplans.FrequencyPlan
+	fps       map[string]*frequencyplans.FrequencyPlan
 	scheduler *scheduling.Scheduler
 	rtts      *rtts
-	fpStore   *frequencyplans.Store
 
 	upCh     chan *ttnpb.UplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -89,7 +88,7 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps []*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, fpStore *frequencyplans.Store) (*Connection, error) {
+func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps map[string]*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	scheduler, err := scheduling.NewScheduler(ctx, fps, enforceDutyCycle, scheduleAnytimeDelay, nil)
 	if err != nil {
@@ -102,7 +101,6 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		frontend:    frontend,
 		gateway:     gateway,
 		fps:         fps,
-		fpStore:     fpStore,
 		scheduler:   scheduler,
 		rtts:        newRTTs(maxRTTs),
 		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
@@ -277,17 +275,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	if err != nil {
 		return 0, err
 	}
-	var fp *frequencyplans.FrequencyPlan
-	for _, gtwFP := range c.fps {
-		reqFP, err := c.fpStore.GetByID(request.FrequencyPlanID)
-		if err != nil {
-			return 0, err
-		}
-		if gtwFP.BandID == reqFP.BandID {
-			fp = gtwFP
-			break
-		}
-	}
+	fp := c.fps[request.FrequencyPlanID]
 	if fp == nil {
 		return 0, errFrequencyPlanNotConfigured
 	}
@@ -487,7 +475,7 @@ func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 }
 
 // FrequencyPlans returns the frequency plans for the gateway.
-func (c *Connection) FrequencyPlans() []*frequencyplans.FrequencyPlan { return c.fps }
+func (c *Connection) FrequencyPlans() map[string]*frequencyplans.FrequencyPlan { return c.fps }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.

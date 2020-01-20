@@ -72,7 +72,7 @@ var (
 
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
 // If no time source is specified, the system time is used.
-func NewScheduler(ctx context.Context, fps []*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, timeSource TimeSource) (*Scheduler, error) {
+func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, timeSource TimeSource) (*Scheduler, error) {
 	logger := log.FromContext(ctx)
 	if timeSource == nil {
 		timeSource = SystemTimeSource
@@ -88,20 +88,21 @@ func NewScheduler(ctx context.Context, fps []*frequencyplans.FrequencyPlan, enfo
 		scheduleAnytimeDelay = &ScheduleTimeShort
 	}
 
-	for i := 0; i < len(fps)-1; i++ {
-		if fps[i].TimeOffAir != fps[i+1].TimeOffAir {
+	var toa *frequencyplans.TimeOffAir
+	for _, fp := range fps {
+		if toa != nil && fp.TimeOffAir != *toa {
 			return nil, errFrequencyPlansTimeOffAir
 		}
+		toa = &fp.TimeOffAir
 	}
 
-	toa := fps[0].TimeOffAir
 	if toa.Duration < QueueDelay {
 		toa.Duration = QueueDelay
 	}
 
 	s := &Scheduler{
 		clock:                &RolloverClock{},
-		timeOffAir:           toa,
+		timeOffAir:           *toa,
 		fps:                  fps,
 		timeSource:           timeSource,
 		scheduleAnytimeDelay: *scheduleAnytimeDelay,
@@ -172,7 +173,7 @@ func NewScheduler(ctx context.Context, fps []*frequencyplans.FrequencyPlan, enfo
 // Scheduler is a packet scheduler that takes time conflicts and sub-band restrictions into account.
 type Scheduler struct {
 	clock                *RolloverClock
-	fps                  []*frequencyplans.FrequencyPlan
+	fps                  map[string]*frequencyplans.FrequencyPlan
 	timeOffAir           frequencyplans.TimeOffAir
 	timeSource           TimeSource
 	subBands             []*SubBand

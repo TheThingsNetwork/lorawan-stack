@@ -377,7 +377,12 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					return nil
 				}
 				// According to spec, all frequency plans must be from the same band, so choosing the first one.
-				up, err := jreq.ToUplinkMessage(ids, fps[0].BandID, receivedAt)
+				var fp *frequencyplans.FrequencyPlan
+				for _, v := range fps {
+					fp = v
+					break
+				}
+				up, err := jreq.ToUplinkMessage(ids, fp.BandID, receivedAt)
 				if err != nil {
 					logger.WithError(err).Debug("Failed to parse join-request message")
 					return nil
@@ -395,7 +400,12 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					return nil
 				}
 				// According to spec, all frequency plans must be from the same band, so choosing the first one.
-				up, err := updf.ToUplinkMessage(ids, fps[0].BandID, receivedAt)
+				var fp *frequencyplans.FrequencyPlan
+				for _, v := range fps {
+					fp = v
+					break
+				}
+				up, err := updf.ToUplinkMessage(ids, fp.BandID, receivedAt)
 				if err != nil {
 					logger.WithError(err).Debug("Failed to parse uplink data frame")
 					return nil

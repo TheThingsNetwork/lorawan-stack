@@ -953,8 +953,8 @@ func TestGatewayServer(t *testing.T) {
 												},
 											},
 										},
+										FrequencyPlanID: test.EUFrequencyPlanID,
 									},
-									FrequencyPlanID: test.EUFrequencyPlanID,
 								},
 							},
 							ErrorAssertion: errors.IsAborted, // The gateway is not connected.
