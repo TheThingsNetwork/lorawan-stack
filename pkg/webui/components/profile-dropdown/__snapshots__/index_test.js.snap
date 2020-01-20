@@ -22,14 +22,18 @@ exports[`Profile Dropdown is in initial state has dropdown open should match sna
   />
   <Dropdown
     className="dropdown"
+    larger={false}
+    onItemsClick={[Function]}
   >
     <DropdownItem
+      exact={false}
       icon="settings"
       link="/profile-settings"
       title="Profile Settings"
     />
     <DropdownItem
       action={[Function]}
+      exact={false}
       icon="power_settings_new"
       title="Logout"
     />

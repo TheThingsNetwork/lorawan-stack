@@ -12,6 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+.container
+  background-color: white
+  z-index: $zi.nav
+  width: 100%
+  +media-query($bp.m)
+    z-index: $zi.mobile-menu
+    position: fixed
+    height: 0vh
+    & + main
+        margin-top: $header-height
+        +media-query($bp.s)
+          margin-top: $header-height-mobile
+
+    &.mobile-menu-open
+      z-index: $zi.mobile-menu
+      top: 0
+      left: 0
+      height: 100vh
+      background-color: white
+
+      .hamburger img
+        width: 1.5rem
+
 .bar
   border-normal('bottom')
   background: linear-gradient(bottom left, 0% #F8F8F8, 60% white) // @stylint ignore
@@ -22,7 +45,9 @@
   justify-content: space-between
   flex: none
   +media-query($bp.s)
+    height: $header-height-mobile
     background-color: white
+    padding: 0 $ls.xxs
 
 .logo
   display: inline-flex
@@ -41,6 +66,37 @@
   flex-grow: 2
   height: 100%
   max-width: 36rem
+  +media-query($bp.m)
+    display: none
+
+.profile-dropdown
+  +media-query($bp.m)
+    display: none
+
+.mobile-menu
+  reset-button()
+  display: none
+  width: $header-height
+  margin-right: $ls.s * -1
+  height: 100%
+  position: relative
+
+  .hamburger
+    center-absolute()
+    display: block
+    width: 2rem
+    height: 100%
+
+    img
+      center-absolute()
+      width: 2rem
+
+  +media-query($bp.m)
+    display: block
+
+  +media-query($bp.s)
+    width: $header-height-mobile
+    margin-right: $ls.xxs * -1
 
 .left
   display: flex
@@ -59,3 +115,11 @@
   & > div:first-child
     max-width: 15rem
     border-color: $c-divider-dark
+
++media-query($bp.m)
+  .preload-icon
+    opacity: 0
+    font-size: .001px
+    position: absolute
+    top: -1px
+    right: -1px

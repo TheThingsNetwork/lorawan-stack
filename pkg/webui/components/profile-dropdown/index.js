@@ -14,12 +14,13 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
 
 import Icon from '../icon'
 import Dropdown from '../dropdown'
 import PropTypes from '../../lib/prop-types'
 
-import style from './profile-dropdown.styl'
+import styles from './profile-dropdown.styl'
 
 export default class ProfileDropdown extends React.PureComponent {
   state = {
@@ -62,11 +63,11 @@ export default class ProfileDropdown extends React.PureComponent {
   }
 
   render() {
-    const { userId, children, ...rest } = this.props
+    const { userId, className, children, ...rest } = this.props
 
     return (
       <div
-        className={style.container}
+        className={classnames(styles.container, className)}
         onClick={this.toggleDropdown}
         onKeyPress={this.toggleDropdown}
         ref={this.ref}
@@ -74,9 +75,9 @@ export default class ProfileDropdown extends React.PureComponent {
         role="button"
         {...rest}
       >
-        <span className={style.id}>{userId}</span>
+        <span className={styles.id}>{userId}</span>
         <Icon icon="arrow_drop_down" />
-        {this.state.expanded && <Dropdown className={style.dropdown}>{children}</Dropdown>}
+        {this.state.expanded && <Dropdown className={styles.dropdown}>{children}</Dropdown>}
       </div>
     )
   }
@@ -88,6 +89,11 @@ ProfileDropdown.propTypes = {
    * See `<Dropdown />`'s `items` proptypes for details
    */
   children: PropTypes.node.isRequired,
+  className: PropTypes.string,
   /** The id of the current user */
   userId: PropTypes.string.isRequired,
+}
+
+ProfileDropdown.defaultProps = {
+  className: undefined,
 }

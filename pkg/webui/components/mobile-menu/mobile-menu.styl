@@ -1,0 +1,53 @@
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.container
+  display: none
+  flex-direction: column
+  justify-content: space-between
+  +media-query($bp.m)
+    display: flex
+    height: 'calc(100vh - %s)' % $header-height
+  +media-query($bp.s)
+    height: 'calc(100vh - %s)' % $header-height-mobile
+    top: $header-height-mobile
+
+ul.mobile-dropdown
+  border: none
+  position: static
+  overflow: auto
+  width: 100%
+  +media-query($bp.s)
+    li.mobileDropdownItem > a, li.mobileDropdownItem > button
+      padding: $cs.l 0
+
+  hr
+    height: 0.35rem
+    margin: 0
+
+.user-header
+  display: flex
+  justify-content: space-between
+  padding: $cs.xl $cs.l
+  align-items: center
+  border-top: 0.35rem solid $c-divider
+
+.user-icon
+  margin-right: $cs.xs
+
+.user-message
+  display: flex
+  align-items: center
+  b
+    margin-left: $cs.xxs

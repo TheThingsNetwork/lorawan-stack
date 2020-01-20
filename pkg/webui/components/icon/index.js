@@ -39,7 +39,7 @@ const hardcoded = {
   general_settings: 'settings',
   location: 'place',
   user: 'person',
-  user_management: 'people',
+  user_management: 'how_to_reg',
   event: 'info',
   event_create: 'add_circle',
   event_delete: 'remove_circle',
@@ -48,6 +48,7 @@ const hardcoded = {
   downlink: 'arrow_drop_down',
   import_devices: 'playlist_add',
   collaborators: 'people',
+  logout: 'power_settings_new',
 }
 
 const Icon = function({ icon, className, nudgeUp, nudgeDown, small, large, ...rest }) {
