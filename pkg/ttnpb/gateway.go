@@ -23,7 +23,7 @@ func (m *UpdateGatewayRequest) ValidateContext(context.Context) error {
 	if len(m.FieldMask.Paths) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(fieldsWithPrefix("gateway", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("gateway", m.FieldMask.Paths...),
 		"gateway.ids",
 	)...)
 }

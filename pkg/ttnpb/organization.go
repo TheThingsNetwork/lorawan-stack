@@ -23,7 +23,7 @@ func (m *UpdateOrganizationRequest) ValidateContext(context.Context) error {
 	if len(m.FieldMask.Paths) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(fieldsWithPrefix("organization", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("organization", m.FieldMask.Paths...),
 		"organization.ids",
 	)...)
 }

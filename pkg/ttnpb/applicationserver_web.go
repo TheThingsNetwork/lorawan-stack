@@ -27,7 +27,7 @@ func (m *SetApplicationWebhookRequest) ValidateContext(context.Context) error {
 	if len(m.FieldMask.Paths) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(fieldsWithPrefix("webhook", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("webhook", m.FieldMask.Paths...),
 		"webhook.ids",
 	)...)
 }

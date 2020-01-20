@@ -192,7 +192,8 @@ func AddFields(paths []string, addPaths ...string) []string {
 	return paths
 }
 
-func fieldsWithPrefix(prefix string, paths ...string) []string {
+// FieldsWithPrefix returns the paths with each the prefix prepended.
+func FieldsWithPrefix(prefix string, paths ...string) []string {
 	ret := make([]string, 0, len(paths))
 	for _, p := range paths {
 		ret = append(ret, prefix+"."+p)
