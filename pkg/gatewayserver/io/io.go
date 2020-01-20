@@ -255,7 +255,7 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 	return nil
 }
 
-var errFrequencyPlanNotConfigured = errors.DefineInvalidArgument("frequency_plan_not_configured", "frequency plan `{name}` is not configured for this gateway")
+var errFrequencyPlanNotConfigured = errors.DefineInvalidArgument("frequency_plan_not_configured", "frequency plan `{id}` is not configured for this gateway")
 
 // ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
@@ -277,7 +277,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	}
 	fp := c.fps[request.FrequencyPlanID]
 	if fp == nil {
-		return 0, errFrequencyPlanNotConfigured
+		return 0, errFrequencyPlanNotConfigured.WithAttributes("id", request.FrequencyPlanID)
 	}
 
 	phy, err := band.GetByID(fp.BandID)

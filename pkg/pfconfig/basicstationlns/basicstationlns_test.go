@@ -22,21 +22,24 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
 func TestGetRouterConfig(t *testing.T) {
 	for _, tc := range []struct {
-		Name           string
-		FrequencyPlan  frequencyplans.FrequencyPlan
-		Cfg            RouterConfig
-		IsProd         bool
-		ErrorAssertion func(err error) bool
+		Name            string
+		FrequencyPlan   frequencyplans.FrequencyPlan
+		FrequencyPlanID string
+		Cfg             RouterConfig
+		IsProd          bool
+		ErrorAssertion  func(err error) bool
 	}{
 		{
-			Name:          "NilFrequencyPlan",
-			FrequencyPlan: frequencyplans.FrequencyPlan{},
-			Cfg:           RouterConfig{},
+			Name:            "NilFrequencyPlan",
+			FrequencyPlan:   frequencyplans.FrequencyPlan{},
+			FrequencyPlanID: "dummy",
+			Cfg:             RouterConfig{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errFrequencyPlan)
 			},
@@ -46,7 +49,8 @@ func TestGetRouterConfig(t *testing.T) {
 			FrequencyPlan: frequencyplans.FrequencyPlan{
 				BandID: "PinkFloyd",
 			},
-			Cfg: RouterConfig{},
+			FrequencyPlanID: "dummy",
+			Cfg:             RouterConfig{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errFrequencyPlan)
 			},
@@ -72,6 +76,7 @@ func TestGetRouterConfig(t *testing.T) {
 					},
 				},
 			},
+			FrequencyPlanID: "US_902_928",
 			Cfg: RouterConfig{
 				Region:         "US902",
 				HardwareSpec:   "sx1301/1",
@@ -149,6 +154,7 @@ func TestGetRouterConfig(t *testing.T) {
 					},
 				},
 			},
+			FrequencyPlanID: "US_902_928",
 			Cfg: RouterConfig{
 				Region:         "US902",
 				HardwareSpec:   "sx1301/1",
@@ -206,8 +212,7 @@ func TestGetRouterConfig(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			var fps []*frequencyplans.FrequencyPlan
-			fps = append(fps, &tc.FrequencyPlan)
+			fps := map[string]*frequencyplans.FrequencyPlan{tc.FrequencyPlanID: &tc.FrequencyPlan}
 			cfg, err := GetRouterConfig(fps, tc.IsProd, time.Now())
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
@@ -228,52 +233,50 @@ func TestGetRouterConfig(t *testing.T) {
 func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
-		FrequencyPlans []*frequencyplans.FrequencyPlan
+		FrequencyPlans map[string]*frequencyplans.FrequencyPlan
 		Cfg            RouterConfig
 		IsProd         bool
 		ErrorAssertion func(err error) bool
 	}{
 		{
 			Name: "ValidFrequencyPlan",
-			FrequencyPlans: []*frequencyplans.FrequencyPlan{
-				{
-					BandID: "US_902_928",
-					Radios: []frequencyplans.Radio{
-						{
-							Enable:    true,
-							ChipType:  "SX1257",
-							Frequency: 922300000,
-							TxConfiguration: &frequencyplans.RadioTxConfiguration{
-								MinFrequency: 909000000,
-								MaxFrequency: 927000000,
-							},
-						},
-						{
-							Enable:    false,
-							ChipType:  "SX1257",
-							Frequency: 923000000,
+			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{test.USFrequencyPlanID: {
+				BandID: "US_902_928",
+				Radios: []frequencyplans.Radio{
+					{
+						Enable:    true,
+						ChipType:  "SX1257",
+						Frequency: 922300000,
+						TxConfiguration: &frequencyplans.RadioTxConfiguration{
+							MinFrequency: 909000000,
+							MaxFrequency: 927000000,
 						},
 					},
-				},
-				{
-					BandID: "US_902_928",
-					Radios: []frequencyplans.Radio{
-						{
-							Enable:    true,
-							ChipType:  "SX1257",
-							Frequency: 924300000,
-							TxConfiguration: &frequencyplans.RadioTxConfiguration{
-								MinFrequency: 900000000,
-								MaxFrequency: 925000000,
-							},
-						},
-						{
-							Enable:    false,
-							ChipType:  "SX1257",
-							Frequency: 925000000,
-						},
+					{
+						Enable:    false,
+						ChipType:  "SX1257",
+						Frequency: 923000000,
 					},
 				},
+			}, "US_902_928_Custom": {
+				BandID: "US_902_928",
+				Radios: []frequencyplans.Radio{
+					{
+						Enable:    true,
+						ChipType:  "SX1257",
+						Frequency: 924300000,
+						TxConfiguration: &frequencyplans.RadioTxConfiguration{
+							MinFrequency: 900000000,
+							MaxFrequency: 925000000,
+						},
+					},
+					{
+						Enable:    false,
+						ChipType:  "SX1257",
+						Frequency: 925000000,
+					},
+				},
+			},
 			},
 			Cfg: RouterConfig{
 				Region:         "US902",

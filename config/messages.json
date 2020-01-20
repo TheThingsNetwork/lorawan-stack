@@ -3421,7 +3421,7 @@
   },
   "error:pkg/gatewayserver/io:frequency_plan_not_configured": {
     "translations": {
-      "en": "frequency plan `{name}` is not configured for this gateway"
+      "en": "frequency plan `{id}` is not configured for this gateway"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
@@ -3554,7 +3554,7 @@
       "file": "scheduler.go"
     }
   },
-  "error:pkg/gatewayserver/scheduling:frequency_plans_timeoffair": {
+  "error:pkg/gatewayserver/scheduling:frequency_plans_time_off_air": {
     "translations": {
       "en": "frequency plans must have the same time off air value"
     },

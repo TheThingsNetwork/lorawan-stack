@@ -66,7 +66,7 @@ type RTTs interface {
 }
 
 var (
-	errFrequencyPlansTimeOffAir     = errors.DefineInvalidArgument("frequency_plans_timeoffair", "frequency plans must have the same time off air value")
+	errFrequencyPlansTimeOffAir     = errors.DefineInvalidArgument("frequency_plans_time_off_air", "frequency plans must have the same time off air value")
 	errFrequencyPlansOverlapSubBand = errors.DefineInvalidArgument("frequency_plans_overlap_sub_band", "frequency plans must not have overlapping sub bands")
 )
 
