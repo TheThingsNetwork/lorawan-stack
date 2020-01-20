@@ -362,9 +362,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		GatewayIdentifiers: ids,
 		FieldMask: pbtypes.FieldMask{
 			Paths: []string{
+				"antennas",
 				"downlink_path_constraint",
 				"enforce_duty_cycle",
 				"frequency_plan_id",
+				"location_public",
 				"schedule_anytime_delay",
 				"schedule_downlink_late",
 			},
@@ -384,6 +386,8 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			FrequencyPlanID:        fpID,
 			EnforceDutyCycle:       true,
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			Antennas:               []ttnpb.GatewayAntenna{},
+			LocationPublic:         false,
 		}
 	} else if err != nil {
 		return nil, err
