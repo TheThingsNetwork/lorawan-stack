@@ -305,7 +305,7 @@ func MakeUS915Channels() []*ttnpb.MACParameters_Channel {
 	return chs
 }
 
-func MakeDefaultUS915MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MACState {
+func MakeDefaultUS915FSB2MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
 		DeviceClass:    class,
 		LoRaWANVersion: ver,
