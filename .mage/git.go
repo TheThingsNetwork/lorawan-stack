@@ -23,6 +23,7 @@ import (
 
 	"github.com/TheThingsIndustries/magepkg/git"
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 	"golang.org/x/xerrors"
 )
 
@@ -218,4 +219,19 @@ func (g Git) RunHook() error {
 	default:
 		return fmt.Errorf("Unknown hook %s", hook)
 	}
+}
+
+// Diff returns error if `git diff` is not empty
+func (Git) Diff() error {
+	if mg.Verbose() {
+		fmt.Println("Checking git diff")
+	}
+	output, err := sh.Output("git", "diff")
+	if err != nil {
+		return err
+	}
+	if output != "" {
+		return fmt.Errorf("Previous operations have created changes that were not recorded in the repository. Please make those changes on your local machine before pushing them to the repository:\n%s", output)
+	}
+	return nil
 }

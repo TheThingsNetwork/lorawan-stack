@@ -32,7 +32,7 @@ jobs:
     - name: Generate i18n messages
       run: ./mage go:messages
     - name: Check for diff
-      run: make git.diff
+      run: ./mage git:diff
 
   test:
     name: Tests
