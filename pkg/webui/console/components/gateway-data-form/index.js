@@ -37,6 +37,13 @@ const m = defineMessages({
   gatewayDescPlaceholder: 'Description for my new gateway',
   gatewayDescDescription:
     'Optional gateway description; can also be used to save notes about the gateway',
+  statusDescription: 'The status of this gateway may be publicly displayed',
+  locationDescription: 'The location of this gateway may be publicly displayed',
+  scheduleDownlinkLateDescription: 'Enable server-side buffer of downlink messages',
+  autoUpdateDescription: 'Gateway can be updated automatically',
+  updateChannelDescription: 'Channel for gateway automatic updates',
+  enforceDutyCycleDescription:
+    'Recommended for all gateways in order to respect spectrum regulations',
 })
 
 const validationSchema = Yup.object().shape({
@@ -52,9 +59,16 @@ const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong),
+  update_channel: Yup.string()
+    .min(2, sharedMessages.validateTooShort)
+    .max(50, sharedMessages.validateTooLong),
   description: Yup.string().max(2000, sharedMessages.validateTooLong),
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   gateway_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
+  location_public: Yup.boolean().default(false),
+  status_public: Yup.boolean().default(false),
+  schedule_downlink_late: Yup.boolean().default(false),
+  auto_update: Yup.boolean().default(false),
 })
 
 @bind
@@ -117,13 +131,48 @@ class GatewayDataForm extends React.Component {
           name="gateway_server_address"
           component={Input}
         />
+        <Form.Field
+          title={sharedMessages.gatewayLocation}
+          name="location_public"
+          component={Checkbox}
+          label={sharedMessages.public}
+          description={m.locationDescription}
+        />
+        <Form.Field
+          title={sharedMessages.gatewayStatus}
+          name="status_public"
+          component={Checkbox}
+          label={sharedMessages.public}
+          description={m.statusDescription}
+        />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
         <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" required />
+        <Form.Field
+          title={sharedMessages.gatewayScheduleDownlinkLate}
+          name="schedule_downlink_late"
+          component={Checkbox}
+          description={m.scheduleDownlinkLateDescription}
+        />
         <Form.Field
           title={m.dutyCycle}
           name="enforce_duty_cycle"
           component={Checkbox}
           label={m.enforced}
+          description={m.enforceDutyCycleDescription}
+        />
+        <Message component="h4" content={sharedMessages.gatewayUpdateOptions} />
+        <Form.Field
+          title={sharedMessages.automaticUpdates}
+          name="auto_update"
+          component={Checkbox}
+          description={m.autoUpdateDescription}
+        />
+        <Form.Field
+          title={sharedMessages.channel}
+          description={m.updateChannelDescription}
+          placeholder={sharedMessages.stable}
+          name="update_channel"
+          component={Input}
         />
         <SubmitBar>{children}</SubmitBar>
       </Form>

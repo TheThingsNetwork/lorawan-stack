@@ -152,6 +152,11 @@ export default class GatewayGeneralSettings extends React.Component {
       enforce_duty_cycle,
       name,
       description,
+      location_public,
+      status_public,
+      schedule_downlink_late,
+      auto_update,
+      update_channel,
     } = gateway
 
     const initialValues = {
@@ -161,6 +166,11 @@ export default class GatewayGeneralSettings extends React.Component {
       enforce_duty_cycle,
       name,
       description,
+      location_public,
+      status_public,
+      schedule_downlink_late,
+      auto_update,
+      update_channel,
     }
 
     return (
