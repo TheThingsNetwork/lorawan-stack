@@ -73,8 +73,8 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"LinkADRReq",
 			&ttnpb.MACCommand_LinkADRReq{
-				DataRateIndex: 0x5,
-				TxPowerIndex:  0x2,
+				DataRateIndex: 0b0101,
+				TxPowerIndex:  0b0010,
 				ChannelMask: []bool{
 					false, false, true, false, false, false, false, false,
 					false, true, false, false, false, false, false, false,
@@ -82,7 +82,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 				ChannelMaskControl: 1,
 				NbTrans:            1,
 			},
-			[]byte{0x03, 0x52, 0x04, 0x02, 0x11},
+			[]byte{0x03, 0b0101_0010, 0b00000010, 0b00000100, 0b0_001_0001},
 			false,
 		},
 		{

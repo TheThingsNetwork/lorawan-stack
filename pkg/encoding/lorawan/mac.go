@@ -194,8 +194,8 @@ var DefaultMACCommands = MACCommandSpec{
 			}
 			b = append(b, byte((pld.DataRateIndex&0xf)<<4)^byte(pld.TxPowerIndex&0xf))
 			chMask := make([]byte, 2)
-			for i := uint8(0); i < 16 && i < uint8(len(pld.ChannelMask)); i++ {
-				chMask[i/8] = chMask[i/8] ^ boolToByte(pld.ChannelMask[i])<<(i%8)
+			for i, v := range pld.ChannelMask {
+				chMask[(15-i)/8] = chMask[(15-i)/8] ^ boolToByte(v)<<(i%8)
 			}
 			b = append(b, chMask...)
 			b = append(b, byte((pld.ChannelMaskControl&0x7)<<4)^byte(pld.NbTrans&0xf))
@@ -203,10 +203,8 @@ var DefaultMACCommands = MACCommandSpec{
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_LINK_ADR, "LinkADRReq", 4, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			var chMask [16]bool
-			for i := uint8(0); i < 16; i++ {
-				if (b[1+i/8]>>(i%8))&1 == 1 {
-					chMask[i] = true
-				}
+			for i := 0; i < 16; i++ {
+				chMask[i] = (b[1+(15-i)/8]>>(i%8))&1 == 1
 			}
 			cmd.Payload = &ttnpb.MACCommand_LinkADRReq_{
 				LinkADRReq: &ttnpb.MACCommand_LinkADRReq{
