@@ -27,7 +27,7 @@ import sharedMessages from '../../../lib/shared-messages'
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     organization_id: Yup.string()
-      .matches(organizationIdRegexp, sharedMessages.validateAlphanum)
+      .matches(organizationIdRegexp, sharedMessages.validateIdFormat)
       .min(2, sharedMessages.validateTooShort)
       .max(25, sharedMessages.validateTooLong)
       .required(sharedMessages.validateRequired),

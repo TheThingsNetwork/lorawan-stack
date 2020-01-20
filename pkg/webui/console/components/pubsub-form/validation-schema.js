@@ -24,7 +24,7 @@ import { qosLevels } from './qos-options'
 
 export default Yup.object().shape({
   pub_sub_id: Yup.string()
-    .matches(idRegexp, sharedMessages.validateAlphanum)
+    .matches(idRegexp, sharedMessages.validateIdFormat)
     .min(2, sharedMessages.validateTooShort)
     .max(25, sharedMessages.validateTooLong)
     .required(sharedMessages.validateRequired),
@@ -34,7 +34,7 @@ export default Yup.object().shape({
     is: 'nats',
     then: Yup.object().shape({
       username: Yup.string()
-        .matches(idRegexp, sharedMessages.validateAlphanum)
+        .matches(idRegexp, sharedMessages.validateIdFormat)
         .min(2, sharedMessages.validateTooShort)
         .max(100, sharedMessages.validateTooLong)
         .required(sharedMessages.validateRequired),
@@ -60,12 +60,12 @@ export default Yup.object().shape({
         .matches(mqttUrlRegexp, sharedMessages.validateUrl)
         .required(sharedMessages.validateRequired),
       client_id: Yup.string()
-        .matches(idRegexp, sharedMessages.validateAlphanum)
+        .matches(idRegexp, sharedMessages.validateIdFormat)
         .min(2, sharedMessages.validateTooShort)
         .max(23, sharedMessages.validateTooLong)
         .required(sharedMessages.validateRequired),
       username: Yup.string()
-        .matches(idRegexp, sharedMessages.validateAlphanum)
+        .matches(idRegexp, sharedMessages.validateIdFormat)
         .min(2, sharedMessages.validateTooShort)
         .max(100, sharedMessages.validateTooLong)
         .required(sharedMessages.validateRequired),

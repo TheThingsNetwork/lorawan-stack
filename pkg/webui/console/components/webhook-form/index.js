@@ -58,7 +58,7 @@ const headerCheck = headers =>
 
 const validationSchema = Yup.object().shape({
   webhook_id: Yup.string()
-    .matches(webhookIdRegexp, sharedMessages.validateAlphanum)
+    .matches(webhookIdRegexp, sharedMessages.validateIdFormat)
     .min(2, sharedMessages.validateTooShort)
     .max(25, sharedMessages.validateTooLong)
     .required(sharedMessages.validateRequired),
@@ -248,14 +248,14 @@ export default class WebhookForm extends Component {
 }
 
 WebhookForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  onSubmitSuccess: PropTypes.func,
-  onSubmitFailure: PropTypes.func,
-  onDelete: PropTypes.func,
-  onDeleteSuccess: PropTypes.func,
-  onDeleteFailure: PropTypes.func,
-  update: PropTypes.bool.isRequired,
   initialWebhookValue: PropTypes.object,
+  onDelete: PropTypes.func,
+  onDeleteFailure: PropTypes.func,
+  onDeleteSuccess: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
+  onSubmitFailure: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
+  update: PropTypes.bool.isRequired,
 }
 
 WebhookForm.defaultProps = {
