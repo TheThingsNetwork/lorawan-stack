@@ -275,11 +275,21 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	if err != nil {
 		return 0, err
 	}
-	fp := c.fps[request.FrequencyPlanID]
-	if fp == nil {
-		return 0, errFrequencyPlanNotConfigured.WithAttributes("id", request.FrequencyPlanID)
-	}
 
+	var fp *frequencyplans.FrequencyPlan
+	fpID := request.GetFrequencyPlanID()
+	if fpID != "" {
+		fp = c.fps[fpID]
+		if fp == nil {
+			return 0, errFrequencyPlanNotConfigured.WithAttributes("id", request.FrequencyPlanID)
+		}
+	} else {
+		// Backwards compatibility. It's assumed in this case, that there's only one Frequency Plan configured.
+		for _, v := range c.fps {
+			fp = v
+			break
+		}
+	}
 	phy, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return 0, err

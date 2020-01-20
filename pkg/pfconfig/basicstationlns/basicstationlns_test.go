@@ -246,7 +246,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 					{
 						Enable:    true,
 						ChipType:  "SX1257",
-						Frequency: 922300000,
+						Frequency: 924300000,
 						TxConfiguration: &frequencyplans.RadioTxConfiguration{
 							MinFrequency: 909000000,
 							MaxFrequency: 927000000,
@@ -255,7 +255,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 					{
 						Enable:    false,
 						ChipType:  "SX1257",
-						Frequency: 923000000,
+						Frequency: 925000000,
 					},
 				},
 			}, "US_902_928_Custom": {
@@ -309,12 +309,12 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 						Radios: []shared.RFConfig{
 							{
 								Enable:    true,
-								Frequency: 922300000,
+								Frequency: 924300000,
 								TxEnable:  true,
 							},
 							{
 								Enable:    false,
-								Frequency: 923000000,
+								Frequency: 925000000,
 								TxEnable:  false,
 							},
 						},

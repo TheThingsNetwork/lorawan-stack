@@ -162,7 +162,6 @@ func TestFlow(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
-						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
@@ -184,7 +183,6 @@ func TestFlow(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,         // Same as previous.
 						Rx1Frequency:     868100000, // Same as previous.
-						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 			},
