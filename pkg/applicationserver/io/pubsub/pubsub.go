@@ -268,6 +268,15 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 	if err != nil {
 		return err
 	}
+	go func() {
+		// Close the integration if the subscription is cancelled.
+		select {
+		case <-i.sub.Context().Done():
+			err := i.sub.Context().Err()
+			cancel(err)
+		case <-ctx.Done():
+		}
+	}()
 	format, ok := formats[pb.Format]
 	if !ok {
 		return errFormatNotFound.WithAttributes("format", pb.Format)
