@@ -481,7 +481,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					registerReceiveUplink(ctx, conn.Gateway(), msg, host.name)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
-						if ids.JoinEUI != nil && !ids.JoinEUI.IsZero() {
+						if ids.JoinEUI != nil {
 							logger = logger.WithField("join_eui", *ids.JoinEUI)
 						}
 						if ids.DevEUI != nil && !ids.DevEUI.IsZero() {

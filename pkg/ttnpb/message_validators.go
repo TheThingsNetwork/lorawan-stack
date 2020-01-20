@@ -29,8 +29,5 @@ func (p JoinRequestPayload) ValidateContext(context.Context) error {
 	if p.DevEUI.IsZero() {
 		return errMissing("DevEUI")
 	}
-	if p.JoinEUI.IsZero() {
-		return errMissing("JoinEUI")
-	}
 	return p.ValidateFields()
 }

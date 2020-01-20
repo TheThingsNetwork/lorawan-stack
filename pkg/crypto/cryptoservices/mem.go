@@ -70,7 +70,7 @@ var (
 )
 
 func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) ([4]byte, error) {
-	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
+	if dev.JoinEUI == nil {
 		return [4]byte{}, errNoJoinEUI
 	}
 	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
@@ -107,7 +107,7 @@ func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, ver
 	if version.Compare(ttnpb.MAC_V1_1) < 0 {
 		panic("This statement is unreachable. Please version check.")
 	}
-	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
+	if dev.JoinEUI == nil {
 		return nil, errNoJoinEUI
 	}
 	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
@@ -121,7 +121,7 @@ func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, ver
 }
 
 func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error) {
-	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
+	if dev.JoinEUI == nil {
 		return NwkSKeys{}, errNoJoinEUI
 	}
 	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
@@ -158,7 +158,7 @@ func (d *mem) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES12
 var errNoAppKey = errors.DefineCorruption("no_app_key", "no AppKey specified")
 
 func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error) {
-	if dev.JoinEUI == nil || dev.JoinEUI.IsZero() {
+	if dev.JoinEUI == nil {
 		return types.AES128Key{}, errNoJoinEUI
 	}
 	if dev.DevEUI == nil || dev.DevEUI.IsZero() {

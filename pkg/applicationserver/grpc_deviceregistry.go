@@ -173,7 +173,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			"ids.application_ids",
 			"ids.device_id",
 		)
-		if req.EndDevice.JoinEUI != nil && !req.EndDevice.JoinEUI.IsZero() {
+		if req.EndDevice.JoinEUI != nil {
 			sets = ttnpb.AddFields(sets,
 				"ids.join_eui",
 			)

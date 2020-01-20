@@ -256,9 +256,6 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 	if pld.DevEUI.IsZero() {
 		return nil, errNoDevEUI
 	}
-	if pld.JoinEUI.IsZero() {
-		return nil, errNoJoinEUI
-	}
 	logger = logger.WithFields(log.Fields(
 		"join_eui", pld.JoinEUI,
 		"dev_eui", pld.DevEUI,
