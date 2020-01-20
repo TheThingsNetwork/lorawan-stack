@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Respect stack components on different hosts when connected to event sources in the Console.
 - Pagination of search results.
 - Handling OTAA devices registered on an external Join Server in the Console.
+- RxMetadata Location field from Gateway Server.
 
 ### Security
 
