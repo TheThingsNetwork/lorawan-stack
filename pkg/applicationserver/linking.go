@@ -220,7 +220,7 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		go func() {
 			select {
 			case <-l.ctx.Done():
-				sub.Disconnect(l.ctx.Err())
+				// Default subscriptions should not be canceled on link failures.
 			case <-sub.Context().Done():
 			}
 			l.unsubscribeCh <- sub
@@ -251,12 +251,12 @@ var (
 	errLinkFailed = errors.DefineAborted("link", "link failed")
 )
 
-func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers) error {
+func (as *ApplicationServer) cancelLink(ctx context.Context, ids ttnpb.ApplicationIdentifiers, cause error) error {
 	uid := unique.ID(ctx, ids)
 	if val, ok := as.links.Load(uid); ok {
 		l := val.(*link)
 		log.FromContext(ctx).WithField("application_uid", uid).Debug("Unlink")
-		l.cancel(context.Canceled)
+		l.cancel(cause)
 		<-l.closed
 	} else {
 		as.linkErrors.Delete(uid)
@@ -269,7 +269,12 @@ func (as *ApplicationServer) getLink(ctx context.Context, ids ttnpb.ApplicationI
 	val, ok := as.links.Load(uid)
 	if !ok {
 		if val, ok := as.linkErrors.Load(uid); ok {
-			if err := val.(error); !errors.IsCanceled(err) {
+			err := val.(error)
+			switch {
+			case errors.IsAborted(err):
+			case errors.IsUnavailable(err):
+				break
+			default:
 				return nil, errLinkFailed.WithCause(err)
 			}
 		}

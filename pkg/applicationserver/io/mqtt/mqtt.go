@@ -128,7 +128,7 @@ func (c *connection) setup(ctx context.Context) error {
 			case <-c.io.Context().Done():
 				err := c.io.Context().Err()
 				cancel(err)
-				logger.WithError(err).Debug("Subscription cancelled")
+				logger.WithError(err).Debug("Subscription canceled")
 				return
 			case up := <-c.io.Up():
 				logger := logger.WithField("device_uid", unique.ID(up.Context, up.EndDeviceIdentifiers))

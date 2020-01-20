@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ package io_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
@@ -24,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -43,9 +43,10 @@ var (
 			},
 		},
 	}
-	timeout     = (1 << 6) * test.Delay
-	backoff     = []time.Duration{(1 << 4) * test.Delay}
-	errConnLost = errors.New("connection lost")
+	timeout        = (1 << 6) * test.Delay
+	backoff        = []time.Duration{(1 << 4) * test.Delay}
+	errLinkDeleted = errors.DefineAborted("link_deleted", "link deleted")
+	errLinkReset   = errors.DefineUnavailable("link_reset", "link reset")
 )
 
 func TestRetryServer(t *testing.T) {
@@ -77,10 +78,10 @@ func TestRetryServer(t *testing.T) {
 	a.So(downstreamUp.ApplicationUp, should.Resemble, registeredApplicationUp)
 
 	// Cancel upstream subscription gracefully.
-	upstreamSub.Disconnect(nil)
+	upstreamSub.Disconnect(errLinkReset)
 	select {
 	case <-downstreamSub.Context().Done():
-		t.Fatal("Downstream context has been cancelled")
+		t.Fatal("Downstream context has been canceled")
 	case <-time.After(timeout):
 	}
 
@@ -101,8 +102,8 @@ func TestRetryServer(t *testing.T) {
 	a.So(downstreamUp.ApplicationUp, should.Resemble, registeredApplicationUp)
 
 	// Shutdown the link completely.
-	server.SetSubscribeError(errConnLost)
-	upstreamSub.Disconnect(nil)
+	server.SetSubscribeError(errLinkDeleted)
+	upstreamSub.Disconnect(errLinkDeleted)
 
 	// Check that the downstream connection failed.
 	select {
@@ -111,7 +112,7 @@ func TestRetryServer(t *testing.T) {
 	case <-downstreamSub.Context().Done():
 	}
 	err = downstreamSub.Context().Err()
-	a.So(err, should.Equal, errConnLost)
+	a.So(err, should.Resemble, errLinkDeleted)
 }
 
 func newContextWithRightsFetcher(ctx context.Context) context.Context {

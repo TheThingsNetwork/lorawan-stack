@@ -269,7 +269,7 @@ func (ps *PubSub) start(ctx context.Context, pb *ttnpb.ApplicationPubSub) (err e
 		return err
 	}
 	go func() {
-		// Close the integration if the subscription is cancelled.
+		// Close the integration if the subscription is canceled.
 		select {
 		case <-i.sub.Context().Done():
 			err := i.sub.Context().Err()
