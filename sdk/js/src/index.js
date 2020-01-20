@@ -24,17 +24,28 @@ import Organizations from './service/organizations'
 import Users from './service/users'
 import Auth from './service/auth'
 import EventHandler from './util/events'
+import StackConfiguration from './util/stack-configuration'
 
 class TtnLw {
   constructor(token, { stackConfig, connectionType, defaultUserId, proxy, axiosConfig }) {
     const tokenInstance = new Token(token)
-    this.config = arguments.config
-    this.api = new Api(connectionType, stackConfig, axiosConfig, tokenInstance.get())
+    const stackConfiguration = new StackConfiguration(stackConfig)
 
-    this.Applications = new Applications(this.api, { defaultUserId, proxy, stackConfig })
+    this.config = arguments.config
+    this.api = new Api(connectionType, stackConfiguration, axiosConfig, tokenInstance.get())
+
+    this.Applications = new Applications(this.api, {
+      defaultUserId,
+      proxy,
+      stackConfig: stackConfiguration,
+    })
     this.Application = Application.bind(null, this.Applications)
     this.Configuration = new Configuration(this.api.Configuration)
-    this.Gateways = new Gateways(this.api, { defaultUserId, proxy, stackConfig })
+    this.Gateways = new Gateways(this.api, {
+      defaultUserId,
+      proxy,
+      stackConfig: stackConfiguration,
+    })
     this.Js = new Js(this.api.Js)
     this.Ns = new Ns(this.api.Ns)
     this.Organizations = new Organizations(this.api)

@@ -16,7 +16,6 @@
 
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
-import { getComponentsWithDistinctBaseUrls } from '../../util/stack-components'
 import combineStreams from '../../util/combine-streams'
 import Device from '../../entity/device'
 import { notify, EVENTS } from '../../api/stream/shared'
@@ -120,16 +119,8 @@ class Devices {
       ? requestTreeOverwrite
       : splitSetPaths(paths, mergeBase)
 
-    let jsHost
-    try {
-      jsHost = new URL(this._stackConfig.js).hostname
-    } catch (e) {
-      delete requestTree.js
-    }
-
     if (create) {
-      // Skip request to JS if an external js is used
-      if (device.join_server_address !== jsHost) {
+      if (device.join_server_address !== this._stackConfig.jsHost) {
         delete requestTree.js
       }
     } else {
@@ -156,28 +147,15 @@ class Devices {
         requestTree.ns.push(['supports_join'])
       }
 
-      try {
-        const nsHost = new URL(this._stackConfig.ns).hostname
+      if (res.network_server_address !== this._stackConfig.nsHost) {
+        delete requestTree.ns
+      }
 
-        if (res.network_server_address !== nsHost) {
-          delete requestTree.as
-        }
-      } catch (e) {
+      if (res.application_server_address !== this._stackConfig.asHost) {
         delete requestTree.as
       }
 
-      try {
-        const asHost = new URL(this._stackConfig.as).hostname
-
-        if (res.application_server_address !== asHost) {
-          delete requestTree.as
-        }
-      } catch (e) {
-        delete requestTree.as
-      }
-
-      // Skip request to JS if an external js is used
-      if (res.join_server_address !== jsHost) {
+      if (res.join_server_address !== this._stackConfig.jsHost) {
         delete requestTree.js
       }
     }
@@ -453,7 +431,7 @@ class Devices {
     // Event streams can come from multiple stack components. It is necessary to
     // check for stack components on different hosts and open distinct stream
     // connections for any distinct host if need be.
-    const distinctComponents = getComponentsWithDistinctBaseUrls(this._stackConfig, [
+    const distinctComponents = this._stackConfig.getComponentsWithDistinctBaseUrls([
       'is',
       'js',
       'ns',

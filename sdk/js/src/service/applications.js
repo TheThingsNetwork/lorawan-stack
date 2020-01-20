@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import Marshaler from '../util/marshaler'
-import { getComponentsWithDistinctBaseUrls } from '../util/stack-components'
 import combineStreams from '../util/combine-streams'
 import Devices from '../service/devices'
 import Application from '../entity/application'
@@ -188,7 +187,7 @@ class Applications {
     // Event streams can come from multiple stack components. It is necessary to
     // check for stack components on different hosts and open distinct stream
     // connections for any distinct host if need be.
-    const distinctComponents = getComponentsWithDistinctBaseUrls(this._stackConfig, [
+    const distinctComponents = this._stackConfig.getComponentsWithDistinctBaseUrls([
       'is',
       'js',
       'ns',

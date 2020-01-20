@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import StackConfiguration from '../util/stack-configuration'
 import Api from '.'
 
 jest.mock('../../generated/api-definition.json', () => ({
@@ -60,7 +61,15 @@ jest.mock('../../generated/api-definition.json', () => ({
 describe('API', function() {
   let api
   beforeEach(function() {
-    api = new Api('http', { baseURL: 'http://localhost:1885' })
+    api = new Api(
+      'http',
+      new StackConfiguration({
+        is: 'http://localhost:1885',
+        as: 'http://localhost:1885',
+        ns: 'http://localhost:1885',
+        js: 'http://localhost:1885',
+      }),
+    )
     api._connector.handleRequest = jest.fn()
   })
 
