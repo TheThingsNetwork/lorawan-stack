@@ -65,6 +65,10 @@ const validationSchema = Yup.object().shape({
   description: Yup.string().max(2000, sharedMessages.validateTooLong),
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   gateway_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
+  location_public: Yup.boolean().default(false),
+  status_public: Yup.boolean().default(false),
+  schedule_downlink_late: Yup.boolean().default(false),
+  auto_update: Yup.boolean().default(false),
 })
 
 @bind
