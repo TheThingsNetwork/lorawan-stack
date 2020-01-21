@@ -259,7 +259,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"DeviceTimeAns",
 			&ttnpb.MACCommand_DeviceTimeAns{
-				Time: gpstime.Parse(0x42ffffff).Add(0x42 * time.Duration(math.Pow(0.5, 8)*float64(time.Second))).UTC(),
+				Time: gpstime.Parse(0x42ffffff*time.Second + 0x42*time.Duration(math.Pow(0.5, 8)*float64(time.Second))).UTC(),
 			},
 			[]byte{0x0D, 0xff, 0xff, 0xff, 0x42, 0x42},
 			false,
@@ -342,7 +342,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"BeaconFreqReq",
 			&ttnpb.MACCommand_BeaconFreqReq{
-				Frequency: 0x1a2bff9c, // 0x42ffff * 100
+				Frequency: 0x42ffff * 100,
 			},
 			[]byte{0x13, 0xff, 0xff, 0x42},
 			false,

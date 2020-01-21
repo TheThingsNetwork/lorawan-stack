@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 package gpstime_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -25,8 +26,8 @@ import (
 
 var (
 	epoch          = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
-	leap1          = time.Date(1981, time.June, 30, 23, 59, 59, 0, time.UTC).Unix() - epoch.Unix() + 1
-	leap5          = time.Date(1987, time.December, 31, 23, 59, 59, 0, time.UTC).Unix() - epoch.Unix() + 1 + 4
+	leap1          = time.Duration(time.Date(1981, time.June, 30, 23, 59, 59, 0, time.UTC).UnixNano()-epoch.UnixNano()) + time.Second
+	leap5          = time.Duration(time.Date(1987, time.December, 31, 23, 59, 59, 0, time.UTC).UnixNano()-epoch.UnixNano()) + 5*time.Second
 	now            = time.Date(2017, time.October, 24, 23, 53, 30, 0, time.UTC)
 	nowLeaps int64 = 18
 )
@@ -34,83 +35,101 @@ var (
 func TestGPSConversion(t *testing.T) {
 	t.Logf("Leap 1: %d Leap 5: %d", leap1, leap5)
 
-	for _, tc := range []struct {
-		GPS  int64
+	for i, tc := range []struct {
+		GPS  time.Duration
 		Time time.Time
 	}{
 		{
 			// From LoRaWAN 1.1 specification
-			1139322288,
-			time.Date(2016, time.February, 12, 14, 24, 31, 0, time.UTC),
+			GPS:  1139322288 * time.Second,
+			Time: time.Date(2016, time.February, 12, 14, 24, 31, 0, time.UTC),
 		},
 		{
-			now.Unix() - epoch.Unix() + nowLeaps,
-			now,
+			GPS:  time.Duration(now.Unix()-epoch.Unix()+nowLeaps) * time.Second,
+			Time: now,
 		},
 		{
-			42,
-			epoch.Add(42 * time.Second),
+			GPS:  42 * time.Nanosecond,
+			Time: epoch.Add(42 * time.Nanosecond),
 		},
 		{
-			0,
-			epoch,
+			GPS:  42 * time.Second,
+			Time: epoch.Add(42 * time.Second),
 		},
 		{
-			-1,
-			epoch.Add(-1 * time.Second),
-		},
-
-		{
-			leap1 - 2,
-			epoch.Add(time.Second * time.Duration(leap1-2)),
+			Time: epoch,
 		},
 		{
-			leap1 - 1,
-			epoch.Add(time.Second * time.Duration(leap1-1)),
-		},
-		{
-			leap1,
-			epoch.Add(time.Second * time.Duration(leap1)),
-		},
-		{
-			leap1 + 1,
-			epoch.Add(time.Second * time.Duration(leap1)),
-		},
-		{
-			leap1 + 2,
-			epoch.Add(time.Second * time.Duration(leap1+1)),
+			GPS:  -1 * time.Second,
+			Time: epoch.Add(-1 * time.Second),
 		},
 
 		{
-			leap5 - 2,
-			epoch.Add(time.Second * time.Duration(leap5-6)),
+			GPS:  leap1 - 2*time.Second,
+			Time: epoch.Add(leap1 - 2*time.Second),
 		},
 		{
-			leap5 - 1,
-			epoch.Add(time.Second * time.Duration(leap5-5)),
+			GPS:  leap1 - time.Second,
+			Time: epoch.Add(leap1 - time.Second),
 		},
 		{
-			leap5,
-			epoch.Add(time.Second * time.Duration(leap5-4)),
+			GPS:  leap1,
+			Time: epoch.Add(leap1),
 		},
 		{
-			leap5 + 1,
-			epoch.Add(time.Second * time.Duration(leap5-4)),
+			GPS:  leap1 + time.Microsecond,
+			Time: epoch.Add(leap1 + time.Microsecond),
 		},
 		{
-			leap5 + 2,
-			epoch.Add(time.Second * time.Duration(leap5-3)),
+			GPS:  leap1 + time.Millisecond,
+			Time: epoch.Add(leap1 + time.Millisecond),
+		},
+		{
+			GPS:  leap1 + time.Second,
+			Time: epoch.Add(leap1),
+		},
+		{
+			GPS:  leap1 + time.Second + time.Nanosecond,
+			Time: epoch.Add(leap1 + time.Nanosecond),
+		},
+		{
+			GPS:  leap1 + time.Second + time.Millisecond,
+			Time: epoch.Add(leap1 + time.Millisecond),
+		},
+		{
+			GPS:  leap1 + 2*time.Second,
+			Time: epoch.Add(leap1 + time.Second),
+		},
+
+		{
+			GPS:  leap5 - 2*time.Second,
+			Time: epoch.Add(leap5 - 6*time.Second),
+		},
+		{
+			GPS:  leap5 - time.Second,
+			Time: epoch.Add(leap5 - 5*time.Second),
+		},
+		{
+			GPS:  leap5,
+			Time: epoch.Add(leap5 - 4*time.Second),
+		},
+		{
+			GPS:  leap5 + time.Second,
+			Time: epoch.Add(leap5 - 4*time.Second),
+		},
+		{
+			GPS:  leap5 + 2*time.Second,
+			Time: epoch.Add(leap5 - 3*time.Second),
 		},
 	} {
-		a := assertions.New(t)
-		a.So(Parse(tc.GPS).UnixNano(), should.Resemble, tc.Time.UnixNano())
-		if IsLeap(tc.GPS) {
-			a.So(ToGPS(tc.Time), should.Equal, tc.GPS+1)
-		} else {
-			a.So(ToGPS(tc.Time), should.Equal, tc.GPS)
-		}
-		if a.Failed() {
-			t.Errorf("Time: %s, Unix: %d, GPS: %d", tc.Time, tc.Time.Unix(), tc.GPS)
-		}
+		t.Run(fmt.Sprintf("%d/Time:%s/UnixNano:%d/GPS:%d", i, tc.Time, tc.Time.UnixNano(), tc.GPS), func(t *testing.T) {
+			a := assertions.New(t)
+			a.So(Parse(tc.GPS).UnixNano(), should.Resemble, tc.Time.UnixNano())
+			if IsLeapSecond(tc.GPS) {
+				a.So(ToGPS(tc.Time), should.Equal, tc.GPS+time.Second)
+			} else {
+				a.So(ToGPS(tc.Time), should.Equal, tc.GPS)
+			}
+		})
 	}
 }
