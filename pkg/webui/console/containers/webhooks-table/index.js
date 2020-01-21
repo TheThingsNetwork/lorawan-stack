@@ -54,7 +54,7 @@ const headers = [
 
 @bind
 export default class WebhooksTable extends React.Component {
-  static PropTypes = {
+  static propTypes = {
     appId: PropTypes.string.isRequired,
   }
 
