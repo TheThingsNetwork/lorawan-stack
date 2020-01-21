@@ -21,8 +21,8 @@ import (
 	"net/url"
 	"path"
 
-	"go.thethings.network/lorawan-stack/pkg/version"
 	urlutil "go.thethings.network/lorawan-stack/pkg/util/url"
+	"go.thethings.network/lorawan-stack/pkg/version"
 )
 
 // Option is an option for the API client.

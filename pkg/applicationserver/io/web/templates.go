@@ -242,6 +242,17 @@ func (f webhookTemplateField) toPB() *ttnpb.ApplicationWebhookTemplateField {
 	}
 }
 
+type webhookTemplatePaths struct {
+	UplinkMessage  *string `yaml:"uplink-message,omitempty"`
+	JoinAccept     *string `yaml:"join-accept,omitempty"`
+	DownlinkAck    *string `yaml:"downlink-ack,omitempty"`
+	DownlinkNack   *string `yaml:"downlink-nack,omitempty"`
+	DownlinkSent   *string `yaml:"downlink-sent,omitempty"`
+	DownlinkFailed *string `yaml:"downlink-failed,omitempty"`
+	DownlinkQueued *string `yaml:"downlink-queued,omitempty"`
+	LocationSolved *string `yaml:"location-solved,omitempty"`
+}
+
 type webhookTemplate struct {
 	TemplateID           string                 `yaml:"template-id"`
 	Name                 string                 `yaml:"name"`
@@ -254,14 +265,7 @@ type webhookTemplate struct {
 	Format               string                 `yaml:"format"`
 	Fields               []webhookTemplateField `yaml:"fields,omitempty"`
 	CreateDownlinkAPIKey bool                   `yaml:"create-downlink-api-key"`
-	UplinkMessagePath    *string                `yaml:"uplink-message-path,omitempty"`
-	JoinAcceptPath       *string                `yaml:"join-accept-path,omitempty"`
-	DownlinkAckPath      *string                `yaml:"downlink-ack-path,omitempty"`
-	DownlinkNackPath     *string                `yaml:"downlink-nack-path,omitempty"`
-	DownlinkSentPath     *string                `yaml:"downlink-sent-path,omitempty"`
-	DownlinkFailedPath   *string                `yaml:"downlink-failed-path,omitempty"`
-	DownlinkQueuedPath   *string                `yaml:"downlink-queued-path,omitempty"`
-	LocationSolvedPath   *string                `yaml:"location-solved-path,omitempty"`
+	Paths                webhookTemplatePaths   `yaml:"paths,omitempty"`
 }
 
 func (webhookTemplate) pathToMessage(s *string) *ttnpb.ApplicationWebhookTemplate_Message {
@@ -270,6 +274,15 @@ func (webhookTemplate) pathToMessage(s *string) *ttnpb.ApplicationWebhookTemplat
 	}
 	return &ttnpb.ApplicationWebhookTemplate_Message{
 		Path: *s,
+	}
+}
+
+func (webhookTemplate) realFormat(s string) string {
+	switch s {
+	case "pb":
+		return "grpc"
+	default:
+		return s
 	}
 }
 
@@ -293,16 +306,16 @@ func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 		DocumentationURL:     t.DocumentationURL,
 		BaseURL:              t.BaseURL,
 		Headers:              t.Headers,
-		Format:               t.Format,
+		Format:               t.realFormat(t.Format),
 		Fields:               t.pbFields(),
 		CreateDownlinkAPIKey: t.CreateDownlinkAPIKey,
-		UplinkMessage:        t.pathToMessage(t.UplinkMessagePath),
-		JoinAccept:           t.pathToMessage(t.JoinAcceptPath),
-		DownlinkAck:          t.pathToMessage(t.DownlinkAckPath),
-		DownlinkNack:         t.pathToMessage(t.DownlinkNackPath),
-		DownlinkSent:         t.pathToMessage(t.DownlinkSentPath),
-		DownlinkFailed:       t.pathToMessage(t.DownlinkFailedPath),
-		DownlinkQueued:       t.pathToMessage(t.DownlinkQueuedPath),
-		LocationSolved:       t.pathToMessage(t.LocationSolvedPath),
+		UplinkMessage:        t.pathToMessage(t.Paths.UplinkMessage),
+		JoinAccept:           t.pathToMessage(t.Paths.JoinAccept),
+		DownlinkAck:          t.pathToMessage(t.Paths.DownlinkAck),
+		DownlinkNack:         t.pathToMessage(t.Paths.DownlinkNack),
+		DownlinkSent:         t.pathToMessage(t.Paths.DownlinkSent),
+		DownlinkFailed:       t.pathToMessage(t.Paths.DownlinkFailed),
+		DownlinkQueued:       t.pathToMessage(t.Paths.DownlinkQueued),
+		LocationSolved:       t.pathToMessage(t.Paths.LocationSolved),
 	}
 }
