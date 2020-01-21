@@ -372,8 +372,9 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			rxErrs = append(rxErrs, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
 			continue
 		}
-		settings.Time = nil
-		settings.Timestamp = uint32(time.Duration(em.Starts()) / time.Microsecond)
+		if settings.Time == nil {
+			settings.Timestamp = uint32(time.Duration(em.Starts()) / time.Microsecond)
+		}
 		msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &settings,
 		}
