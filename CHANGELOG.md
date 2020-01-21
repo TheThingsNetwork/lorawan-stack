@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handling OTAA devices registered on an external Join Server in the Console.
 - RxMetadata Location field from Gateway Server.
 - Channel mask encoding in LinkADR MAC command.
+- Device location and payload formatter form submits in the Console.
 
 ### Security
 
