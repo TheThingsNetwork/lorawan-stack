@@ -330,8 +330,8 @@ var (
 		"no_fallback_frequency_plan",
 		"gateway `{gateway_uid}` is not registered and no fallback frequency plan defined",
 	)
-	errFrequencyPlans = errors.DefineInvalidArgument(
-		"frequency_plans",
+	errFrequencyPlansNotFromSameBand = errors.DefineInvalidArgument(
+		"frequency_plans_not_from_same_band",
 		"frequency plans must be from the same band",
 	)
 )
@@ -413,12 +413,12 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 				return nil, err
 			}
 			if fpn.BandID != fp0.BandID {
-				return nil, errFrequencyPlans
+				return nil, errFrequencyPlansNotFromSameBand
 			}
 			fps[gtw.FrequencyPlanIDs[i]] = fpn
 		}
 	} else {
-		return nil, errFrequencyPlans
+		return nil, errFrequencyPlansNotFromSameBand
 	}
 
 	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)

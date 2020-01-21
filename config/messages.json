@@ -3626,7 +3626,7 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/gatewayserver:frequency_plans": {
+  "error:pkg/gatewayserver:frequency_plans_not_from_same_band": {
     "translations": {
       "en": "frequency plans must be from the same band"
     },
