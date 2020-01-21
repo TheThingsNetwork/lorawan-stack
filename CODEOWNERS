@@ -47,4 +47,9 @@
 /sdk/js @bafonins @kschiffer @pgalic96
 
 # Clear generated code
+/api/api.md
+/api/api.swagger.json.
+/doc/data/api/*/*.yml
+/pkg/ttnpb/*.pb.*.go
+/pkg/ttnpb/*.pb.go
 /sdk/js/generated
