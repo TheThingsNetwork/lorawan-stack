@@ -193,6 +193,7 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 		for _, md := range up.RxMetadata {
 			md.Time = &goTime
 		}
+		up.Settings.Time = &goTime
 	}
 
 	up.Settings.DataRate = rx.DatR.DataRate
