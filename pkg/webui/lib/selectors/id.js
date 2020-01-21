@@ -31,6 +31,15 @@ export const getDeviceId = function(device = {}) {
 }
 
 export const combineDeviceIds = (appId, devId) => `${appId}/${devId}`
+export const extractDeviceIdFromCombinedId = function(combinedId) {
+  if (typeof combinedId === 'string') {
+    const parts = combinedId.split('/')
+    if (parts.length === 2) {
+      return parts[1]
+    }
+  }
+  return combinedId
+}
 export const getCombinedDeviceId = function(device = {}) {
   const appId = getByPath(device, 'ids.application_ids.application_id')
   const devId = getByPath(device, 'ids.device_id')

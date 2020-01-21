@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { GET_DEV_BASE, GET_DEVICES_LIST_BASE } from '../actions/devices'
-import { combineDeviceIds } from '../../../lib/selectors/id'
+import { combineDeviceIds, extractDeviceIdFromCombinedId } from '../../../lib/selectors/id'
 
 import {
   createEventsSelector,
@@ -36,8 +36,11 @@ export const selectDeviceEntitiesStore = state => selectDeviceStore(state).entit
 export const selectDeviceByIds = (state, appId, devId) =>
   selectDeviceById(state, combineDeviceIds(appId, devId))
 export const selectDeviceById = (state, id) => selectDeviceEntitiesStore(state)[id]
-export const selectSelectedDeviceId = state => selectDeviceStore(state).selectedDevice
-export const selectSelectedDevice = state => selectDeviceById(state, selectSelectedDeviceId(state))
+export const selectSelectedDeviceId = state =>
+  extractDeviceIdFromCombinedId(selectDeviceStore(state).selectedDevice)
+export const selectSelectedCombinedDeviceId = state => selectDeviceStore(state).selectedDevice
+export const selectSelectedDevice = state =>
+  selectDeviceById(state, selectSelectedCombinedDeviceId(state))
 export const selectSelectedDeviceFormatters = state => selectSelectedDevice(state).formatters
 export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
