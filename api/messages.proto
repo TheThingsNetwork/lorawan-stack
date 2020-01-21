@@ -220,6 +220,10 @@ message ApplicationDownlink {
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255, not_in: [224]}];
   uint32 f_cnt = 3;
+
+  // The frame payload of the downlink message.
+  // The payload is encrypted if the skip_payload_crypto field of the EndDevice
+  // is true.
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 5;
   bool confirmed = 6;

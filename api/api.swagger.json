@@ -7384,7 +7384,8 @@
         },
         "frm_payload": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "The frame payload of the downlink message.\nThe payload is encrypted if the skip_payload_crypto field of the EndDevice\nis true."
         },
         "decoded_payload": {
           "type": "object"

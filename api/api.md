@@ -4585,7 +4585,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | `session_key_id` | [`bytes`](#bytes) |  | Join Server issued identifier for the session keys used by this downlink. |
 | `f_port` | [`uint32`](#uint32) |  |  |
 | `f_cnt` | [`uint32`](#uint32) |  |  |
-| `frm_payload` | [`bytes`](#bytes) |  |  |
+| `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the downlink message. The payload is encrypted if the skip_payload_crypto field of the EndDevice is true. |
 | `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
 | `confirmed` | [`bool`](#bool) |  |  |
 | `class_b_c` | [`ApplicationDownlink.ClassBC`](#ttn.lorawan.v3.ApplicationDownlink.ClassBC) |  | Optional gateway and timing information for class B and C. If set, this downlink message will only be transmitted as class B or C downlink. If not set, this downlink message may be transmitted in class A, B and C. |

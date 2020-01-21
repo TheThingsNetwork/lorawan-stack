@@ -655,9 +655,12 @@ func (m *ApplicationJoinAccept) GetReceivedAt() time.Time {
 
 type ApplicationDownlink struct {
 	// Join Server issued identifier for the session keys used by this downlink.
-	SessionKeyID   []byte        `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
-	FPort          uint32        `protobuf:"varint,2,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
-	FCnt           uint32        `protobuf:"varint,3,opt,name=f_cnt,json=fCnt,proto3" json:"f_cnt,omitempty"`
+	SessionKeyID []byte `protobuf:"bytes,1,opt,name=session_key_id,json=sessionKeyId,proto3" json:"session_key_id,omitempty"`
+	FPort        uint32 `protobuf:"varint,2,opt,name=f_port,json=fPort,proto3" json:"f_port,omitempty"`
+	FCnt         uint32 `protobuf:"varint,3,opt,name=f_cnt,json=fCnt,proto3" json:"f_cnt,omitempty"`
+	// The frame payload of the downlink message.
+	// The payload is encrypted if the skip_payload_crypto field of the EndDevice
+	// is true.
 	FRMPayload     []byte        `protobuf:"bytes,4,opt,name=frm_payload,json=frmPayload,proto3" json:"frm_payload,omitempty"`
 	DecodedPayload *types.Struct `protobuf:"bytes,5,opt,name=decoded_payload,json=decodedPayload,proto3" json:"decoded_payload,omitempty"`
 	Confirmed      bool          `protobuf:"varint,6,opt,name=confirmed,proto3" json:"confirmed,omitempty"`
