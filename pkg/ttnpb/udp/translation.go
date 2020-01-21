@@ -325,8 +325,8 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 		scheduled.CodingRate = tx.CodR
 	}
 	if tx.Time != nil {
-		gpsTime := gpstime.Parse(int64(*tx.Tmms))
-		scheduled.Time = &gpsTime
+		t := gpstime.Parse(time.Duration(*tx.Tmms) * time.Millisecond)
+		scheduled.Time = &t
 	}
 	buf, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(tx.Data, "="))
 	if err != nil {
@@ -356,8 +356,8 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 		Tmst: scheduled.Timestamp,
 	}
 	if scheduled.Time != nil {
-		gpsTime := uint64(gpstime.ToGPS(*scheduled.Time))
-		tx.Tmms = &gpsTime
+		t := uint64(gpstime.ToGPS(*scheduled.Time) / time.Millisecond)
+		tx.Tmms = &t
 	} else if scheduled.Timestamp == 0 {
 		tx.Imme = true
 	}
