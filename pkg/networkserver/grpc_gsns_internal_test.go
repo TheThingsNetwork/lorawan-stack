@@ -272,7 +272,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					FrequencyPlanID:      test.EUFrequencyPlanID,
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACState:             MakeDefaultUS915MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
+					MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
 					Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 33),
 					MACSettings: &ttnpb.MACSettings{
 						ResetsFCnt:        &pbtypes.BoolValue{Value: true},
@@ -382,7 +382,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
 					MACState: func() *ttnpb.MACState {
-						macState := MakeDefaultUS915MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1)
+						macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1)
 						macState.PendingApplicationDownlink = makeApplicationDownlink()
 						return macState
 					}(),
@@ -496,7 +496,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					FrequencyPlanID:      test.EUFrequencyPlanID,
 					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACState:             MakeDefaultUS915MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
+					MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
 					Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 33),
 					MACSettings: &ttnpb.MACSettings{
 						ResetsFCnt: &pbtypes.BoolValue{Value: true},

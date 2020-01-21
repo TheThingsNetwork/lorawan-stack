@@ -207,7 +207,7 @@ func TestNewMACState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),
@@ -226,7 +226,7 @@ func TestNewMACState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),

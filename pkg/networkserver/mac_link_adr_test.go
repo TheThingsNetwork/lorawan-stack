@@ -19,6 +19,7 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -156,6 +157,131 @@ func TestNeedsLinkADRReq(t *testing.T) {
 				a.So(res, should.BeFalse)
 			}
 			a.So(dev, should.Resemble, tc.InputDevice)
+		})
+	}
+}
+
+func TestEnqueueLinkADRReq(t *testing.T) {
+	for _, tc := range []struct {
+		Name                        string
+		Band                        band.Band
+		InputDevice, ExpectedDevice *ttnpb.EndDevice
+		MaxDownlinkLength           uint16
+		MaxUplinkLength             uint16
+		State                       macCommandEnqueueState
+		ErrorAssertion              func(*testing.T, error) bool
+	}{
+		{
+			Name: "payload fits/US915 FSB2/1.0.3",
+			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
+			InputDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3),
+			},
+			ExpectedDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState: func() *ttnpb.MACState {
+					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3)
+					macState.PendingRequests = []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_LinkADRReq{
+							ChannelMask: []bool{
+								false, false, false, false, false, false, false, false,
+								false, false, false, false, false, false, true, false,
+							},
+							ChannelMaskControl: 5,
+							NbTrans:            1,
+						}).MACCommand(),
+						(&ttnpb.MACCommand_LinkADRReq{
+							ChannelMask: []bool{
+								false, false, false, false, false, false, false, false,
+								false, false, false, false, false, false, false, false,
+							},
+							ChannelMaskControl: 4,
+							NbTrans:            1,
+						}).MACCommand(),
+					}
+					return macState
+				}(),
+			},
+			MaxDownlinkLength: 42,
+			MaxUplinkLength:   24,
+			State: macCommandEnqueueState{
+				MaxDownLen: 32,
+				MaxUpLen:   20,
+				Ok:         true,
+				QueuedEvents: []events.DefinitionDataClosure{
+					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+						ChannelMask: []bool{
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, true, false,
+						},
+						ChannelMaskControl: 5,
+						NbTrans:            1,
+					}),
+					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
+						ChannelMask: []bool{
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, false, false,
+						},
+						ChannelMaskControl: 4,
+						NbTrans:            1,
+					}),
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+		},
+		{
+			Name: "downlink does not fit/US915 FSB2/1.0.3",
+			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
+			InputDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3),
+			},
+			ExpectedDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3),
+			},
+			MaxDownlinkLength: 7,
+			MaxUplinkLength:   24,
+			State: macCommandEnqueueState{
+				MaxDownLen: 7,
+				MaxUpLen:   24,
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+		},
+		{
+			Name: "uplink does not fit/US915 FSB2/1.1",
+			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
+			InputDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1),
+			},
+			ExpectedDevice: &ttnpb.EndDevice{
+				FrequencyPlanID: test.USFrequencyPlanID,
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1),
+			},
+			MaxDownlinkLength: 42,
+			MaxUplinkLength:   1,
+			State: macCommandEnqueueState{
+				MaxDownLen: 42,
+				MaxUpLen:   1,
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			dev := CopyEndDevice(tc.InputDevice)
+
+			st, err := enqueueLinkADRReq(test.Context(), dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, tc.Band)
+			if !a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				t.FailNow()
+			}
+			a.So(dev, should.Resemble, tc.ExpectedDevice)
+			a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, tc.State.QueuedEvents)
+			st.QueuedEvents = tc.State.QueuedEvents
+			a.So(st, should.Resemble, tc.State)
 		})
 	}
 }
