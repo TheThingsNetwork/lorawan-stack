@@ -187,12 +187,12 @@ func (ts *TemplateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifier
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
 	}
-	template := &ttnpb.ApplicationWebhookTemplate{}
-	err = yaml.Unmarshal(data, template)
+	var template webhookTemplate
+	err = yaml.Unmarshal(data, &template)
 	if err != nil {
 		return nil, errParseFile.WithCause(err)
 	}
-	return template, nil
+	return template.toPB(), nil
 }
 
 func (ts *TemplateStore) getTemplate(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
@@ -222,4 +222,87 @@ func applyWebhookTemplateFieldMask(dst, src *ttnpb.ApplicationWebhookTemplate, p
 		dst = &ttnpb.ApplicationWebhookTemplate{}
 	}
 	return dst, dst.SetFields(src, paths...)
+}
+
+type webhookTemplateField struct {
+	ID           string `yaml:"id"`
+	Name         string `yaml:"name"`
+	Description  string `yaml:"description"`
+	Secret       bool   `yaml:"secret"`
+	DefaultValue string `yaml:"default-value"`
+}
+
+func (f webhookTemplateField) toPB() *ttnpb.ApplicationWebhookTemplateField {
+	return &ttnpb.ApplicationWebhookTemplateField{
+		ID:           f.ID,
+		Name:         f.Name,
+		Description:  f.Description,
+		Secret:       f.Secret,
+		DefaultValue: f.DefaultValue,
+	}
+}
+
+type webhookTemplate struct {
+	TemplateID           string                 `yaml:"template-id"`
+	Name                 string                 `yaml:"name"`
+	Description          string                 `yaml:"description"`
+	LogoURL              string                 `yaml:"logo-url"`
+	InfoURL              string                 `yaml:"info-url"`
+	DocumentationURL     string                 `yaml:"documentation-url"`
+	BaseURL              string                 `yaml:"base-url"`
+	Headers              map[string]string      `yaml:"headers,omitempty"`
+	Format               string                 `yaml:"format"`
+	Fields               []webhookTemplateField `yaml:"fields,omitempty"`
+	CreateDownlinkAPIKey bool                   `yaml:"create-downlink-api-key"`
+	UplinkMessagePath    *string                `yaml:"uplink-message-path,omitempty"`
+	JoinAcceptPath       *string                `yaml:"join-accept-path,omitempty"`
+	DownlinkAckPath      *string                `yaml:"downlink-ack-path,omitempty"`
+	DownlinkNackPath     *string                `yaml:"downlink-nack-path,omitempty"`
+	DownlinkSentPath     *string                `yaml:"downlink-sent-path,omitempty"`
+	DownlinkFailedPath   *string                `yaml:"downlink-failed-path,omitempty"`
+	DownlinkQueuedPath   *string                `yaml:"downlink-queued-path,omitempty"`
+	LocationSolvedPath   *string                `yaml:"location-solved-path,omitempty"`
+}
+
+func (webhookTemplate) pathToMessage(s *string) *ttnpb.ApplicationWebhookTemplate_Message {
+	if s == nil {
+		return nil
+	}
+	return &ttnpb.ApplicationWebhookTemplate_Message{
+		Path: *s,
+	}
+}
+
+func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
+	var fields []*ttnpb.ApplicationWebhookTemplateField
+	for _, f := range t.Fields {
+		fields = append(fields, f.toPB())
+	}
+	return fields
+}
+
+func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
+	return &ttnpb.ApplicationWebhookTemplate{
+		ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
+			TemplateID: t.TemplateID,
+		},
+		Name:                 t.Name,
+		Description:          t.Description,
+		LogoURL:              t.LogoURL,
+		InfoURL:              t.InfoURL,
+		DocumentationURL:     t.DocumentationURL,
+		BaseURL:              t.BaseURL,
+		Headers:              t.Headers,
+		Format:               t.Format,
+		Fields:               t.pbFields(),
+		CreateDownlinkAPIKey: t.CreateDownlinkAPIKey,
+		UplinkMessage:        t.pathToMessage(t.UplinkMessagePath),
+		JoinAccept:           t.pathToMessage(t.JoinAcceptPath),
+		DownlinkAck:          t.pathToMessage(t.DownlinkAckPath),
+		DownlinkNack:         t.pathToMessage(t.DownlinkNackPath),
+		DownlinkSent:         t.pathToMessage(t.DownlinkSentPath),
+		DownlinkFailed:       t.pathToMessage(t.DownlinkFailedPath),
+		DownlinkQueued:       t.pathToMessage(t.DownlinkQueuedPath),
+		LocationSolved:       t.pathToMessage(t.LocationSolvedPath),
+	}
 }
