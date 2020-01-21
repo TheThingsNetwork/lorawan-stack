@@ -420,9 +420,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
 				sets = append(sets, "ids.dev_addr")
 			}
-			_, _, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
-			if err != nil {
-				return nil, nil, err
+			if ttnpb.HasAnyField(sets,
+				"frequency_plan_id",
+				"lorawan_phy_version",
+			) {
+				_, _, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+				if err != nil {
+					return nil, nil, err
+				}
 			}
 			return &req.EndDevice, sets, nil
 		}
