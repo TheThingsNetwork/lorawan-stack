@@ -17,7 +17,7 @@ package web
 import (
 	"context"
 	"fmt"
-	"path"
+	"net/url"
 	"sync"
 	"time"
 
@@ -40,7 +40,7 @@ type TemplatesConfig struct {
 // TemplateStore contains the webhook templates.
 type TemplateStore struct {
 	fetcher fetch.Interface
-	baseURL string
+	baseURL *url.URL
 
 	templateIDs          []string
 	templateIDsMu        sync.Mutex
@@ -69,19 +69,28 @@ func (c TemplatesConfig) NewTemplateStore() (*TemplateStore, error) {
 	default:
 		return nil, nil
 	}
+	baseURL, err := url.Parse(c.LogoBaseURL)
+	if err != nil {
+		return nil, err
+	}
 	return &TemplateStore{
 		fetcher:   fetcher,
-		baseURL:   c.LogoBaseURL,
+		baseURL:   baseURL,
 		templates: make(map[string]queryResult),
 	}, nil
 }
 
 // prependBaseURL prepends the base URL and the template ID to the LogoURL, if it is available.
-func (ts *TemplateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTemplate) {
+func (ts *TemplateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTemplate) error {
 	if template.LogoURL == "" {
-		return
+		return nil
 	}
-	template.LogoURL = path.Join(ts.baseURL, template.TemplateID, template.LogoURL)
+	logoURL, err := url.Parse(template.LogoURL)
+	if err != nil {
+		return err
+	}
+	template.LogoURL = ts.baseURL.ResolveReference(logoURL).String()
+	return nil
 }
 
 // GetTemplate returns the template with the given identifiers.
@@ -94,7 +103,10 @@ func (ts *TemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicat
 	if err != nil {
 		return nil, err
 	}
-	ts.prependBaseURL(template)
+	err = ts.prependBaseURL(template)
+	if err != nil {
+		return nil, err
+	}
 	return template, nil
 }
 
@@ -119,7 +131,10 @@ func (ts *TemplateStore) ListTemplates(ctx context.Context, req *ttnpb.ListAppli
 			return nil, err
 		}
 
-		ts.prependBaseURL(template)
+		err = ts.prependBaseURL(template)
+		if err != nil {
+			return nil, err
+		}
 
 		templates.Templates = append(templates.Templates, template)
 	}
