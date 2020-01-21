@@ -172,7 +172,7 @@ var (
 
 // Set implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if req.EndDevice.JoinEUI == nil || req.EndDevice.JoinEUI.IsZero() {
+	if req.EndDevice.JoinEUI == nil {
 		return nil, errNoJoinEUI
 	}
 	if req.EndDevice.DevEUI == nil || req.EndDevice.DevEUI.IsZero() {

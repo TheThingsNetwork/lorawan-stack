@@ -88,7 +88,7 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIde
 
 // GetByEUI gets device by joinEUI, devEUI.
 func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.ContextualEndDevice, error) {
-	if joinEUI.IsZero() || devEUI.IsZero() {
+	if devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
 
@@ -219,7 +219,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if err != nil {
 				return nil, err
 			}
-			if updated.JoinEUI == nil || updated.DevEUI == nil || updated.JoinEUI.IsZero() || updated.DevEUI.IsZero() {
+			if updated.JoinEUI == nil || updated.DevEUI == nil || updated.DevEUI.IsZero() {
 				return nil, errInvalidIdentifiers
 			}
 		} else {
@@ -308,7 +308,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 // SetByEUI sets device by joinEUI, devEUI.
 // SetByEUI will only succeed if the device is set via SetByID first.
 func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devEUI types.EUI64, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error) {
-	if joinEUI.IsZero() || devEUI.IsZero() {
+	if devEUI.IsZero() {
 		return nil, errInvalidIdentifiers
 	}
 	ek := r.euiKey(joinEUI, devEUI)
@@ -378,7 +378,7 @@ func (r *KeyRegistry) idKey(joinEUI, devEUI types.EUI64, id []byte) string {
 
 // GetByID gets session keys by joinEUI, devEUI, id.
 func (r *KeyRegistry) GetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
-	if joinEUI.IsZero() || devEUI.IsZero() || len(id) == 0 {
+	if devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
 
@@ -393,7 +393,7 @@ func (r *KeyRegistry) GetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 
 // SetByID sets session keys by joinEUI, devEUI, id.
 func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, gets []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error) {
-	if joinEUI.IsZero() || devEUI.IsZero() || len(id) == 0 {
+	if devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers
 	}
 	ik := r.idKey(joinEUI, devEUI, id)

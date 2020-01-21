@@ -37,7 +37,7 @@ func (ids EndDeviceIdentifiers) IsZero() bool {
 		ids.GetApplicationID() == "" &&
 		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
 		(ids.DevEUI == nil || ids.DevEUI.IsZero()) &&
-		(ids.JoinEUI == nil || ids.JoinEUI.IsZero())
+		ids.JoinEUI == nil
 }
 
 // IsZero returns true if all identifiers have zero-values.

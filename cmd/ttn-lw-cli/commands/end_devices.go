@@ -661,7 +661,9 @@ var (
 				}
 			}
 			if inputDecoder != nil {
-				list := &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{}
+				list := &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
+					JoinEUI: &joinEUI,
+				}
 				for {
 					var ids ttnpb.EndDeviceIdentifiers
 					_, err := inputDecoder.Decode(&ids)
@@ -672,9 +674,6 @@ var (
 						return err
 					}
 					ids.ApplicationIdentifiers = *appID
-					if !joinEUI.IsZero() {
-						list.JoinEUI = &joinEUI
-					}
 					list.EndDeviceIDs = append(list.EndDeviceIDs, ids)
 				}
 				req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_List{
@@ -686,22 +685,17 @@ var (
 					if err := startDevEUI.UnmarshalText([]byte(startDevEUIHex)); err != nil {
 						return err
 					}
-					r := &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-						StartDevEUI: startDevEUI,
-					}
-					if !joinEUI.IsZero() {
-						r.JoinEUI = &joinEUI
-					}
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_Range{
-						Range: r,
+						Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
+							StartDevEUI: startDevEUI,
+							JoinEUI:     &joinEUI,
+						},
 					}
 				} else {
-					fromData := &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{}
-					if !joinEUI.IsZero() {
-						fromData.JoinEUI = &joinEUI
-					}
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_FromData{
-						FromData: fromData,
+						FromData: &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{
+							JoinEUI: &joinEUI,
+						},
 					}
 				}
 			}
