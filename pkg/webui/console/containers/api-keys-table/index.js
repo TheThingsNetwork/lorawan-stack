@@ -73,8 +73,14 @@ const headers = [
 ]
 
 export default class ApiKeysTable extends Component {
+  static propTypes = {
+    baseDataSelector: PropTypes.func.isRequired,
+    getItemsAction: PropTypes.func.isRequired,
+    pageSize: PropTypes.number.isRequired,
+  }
+
   render() {
-    const { pageSize, baseDataSelector, getItemsAction, entityId } = this.props
+    const { pageSize, baseDataSelector, getItemsAction } = this.props
 
     return (
       <FetchTable
@@ -84,16 +90,8 @@ export default class ApiKeysTable extends Component {
         pageSize={pageSize}
         baseDataSelector={baseDataSelector}
         getItemsAction={getItemsAction}
-        id={entityId}
         tableTitle={<Message content={sharedMessages.apiKeys} />}
       />
     )
   }
-}
-
-ApiKeysTable.propTypes = {
-  baseDataSelector: PropTypes.func.isRequired,
-  entityId: PropTypes.string,
-  getItemsAction: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
 }

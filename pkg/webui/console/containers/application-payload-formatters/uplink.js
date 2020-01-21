@@ -67,7 +67,7 @@ const m = defineMessages({
 class ApplicationPayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
-    formatters: PropTypes.object.isRequired,
+    formatters: PropTypes.formatters.isRequired,
     linked: PropTypes.bool.isRequired,
     updateLinkSuccess: PropTypes.func.isRequired,
   }

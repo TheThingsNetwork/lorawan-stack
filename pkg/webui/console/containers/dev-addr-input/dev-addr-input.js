@@ -87,28 +87,31 @@ const DevAddrInput = function(props) {
 }
 
 DevAddrInput.propTypes = {
-  className: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onBlur: PropTypes.func.isRequired,
-  onFocus: PropTypes.func,
-  fetching: PropTypes.bool,
-  error: PropTypes.bool,
-  warning: PropTypes.bool,
-  onDevAddrGenerate: PropTypes.func.isRequired,
-  generatedDevAddr: PropTypes.string,
-  value: PropTypes.string,
-  disabled: PropTypes.bool,
   autoFocus: PropTypes.bool,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  error: PropTypes.bool,
+  fetching: PropTypes.bool,
+  generatedDevAddr: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onDevAddrGenerate: PropTypes.func.isRequired,
+  onFocus: PropTypes.func,
+  value: PropTypes.string,
+  warning: PropTypes.bool,
 }
 
 DevAddrInput.defaultProps = {
+  className: undefined,
   onFocus: () => null,
   fetching: false,
   disabled: false,
   error: false,
   warning: false,
   autoFocus: false,
+  value: undefined,
+  generatedDevAddr: undefined,
 }
 
 export default DevAddrInput

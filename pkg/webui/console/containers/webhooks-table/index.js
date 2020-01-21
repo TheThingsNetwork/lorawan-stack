@@ -20,6 +20,7 @@ import FetchTable from '../fetch-table'
 import Message from '../../../lib/components/message'
 
 import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 
 import { getWebhooksList } from '../../../console/store/actions/webhooks'
 import {
@@ -53,6 +54,10 @@ const headers = [
 
 @bind
 export default class WebhooksTable extends React.Component {
+  static PropTypes = {
+    appId: PropTypes.string.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
