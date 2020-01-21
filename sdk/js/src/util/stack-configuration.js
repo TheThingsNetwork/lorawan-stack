@@ -85,7 +85,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Network Server of the stack configuration.
    */
   get nsHost() {
-    return this.isComponentAvailable('ns') && this.getComponentHostName('ns')
+    return this.isComponentAvailable('ns') && this.getComponentHostByName('ns')
   }
 
   /**
@@ -93,7 +93,7 @@ class StackConfiguration {
    * @returns {?string} - The hostname of the Application Server of the stack configuration.
    */
   get asHost() {
-    return this.isComponentAvailable('as') && this.getComponentHostName('as')
+    return this.isComponentAvailable('as') && this.getComponentHostByName('as')
   }
 
   /**
