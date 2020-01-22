@@ -274,7 +274,7 @@ class ApplicationLink extends React.Component {
     return (
       <Container className={style.main}>
         <PageTitle title={sharedMessages.link} values={{ appId }} />
-        <Row>
+        <Row className={style.linkContainer}>
           <Col lg={6} md={12}>
             <Message component="h3" content={m.linkSettings} />
             <Form
