@@ -19,6 +19,8 @@
   display: flex
   &:not(:last-child)
     margin-right: $cs.l
+    +media-query($bp.s)
+      margin-right: $cs.xs
 
 .icon
   color: $c-icon-fill
@@ -27,3 +29,7 @@
 .value
   font-weight: bold
   margin-right: $cs.xxs
+
+.message
+  +media-query($bp.s)
+    display: none

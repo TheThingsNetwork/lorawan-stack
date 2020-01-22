@@ -28,6 +28,7 @@ const KeyValueTag = ({ icon, keyMessage, value }) => {
       <React.Fragment>
         <span className={style.value}>{value} </span>
         <Message
+          className={style.message}
           content={keyMessage}
           values={{ count: typeof value === 'number' ? value : undefined }}
         />
