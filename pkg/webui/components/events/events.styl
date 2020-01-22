@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+.container
+  overflow: auto
+
+.list-container
+  min-width: 60rem
+  box-sizing: border-box
+
 .header,
 .footer
   padding: $cs.xs $cs.s
@@ -48,6 +55,8 @@
   align-items: center
   font-size: $fs.s
   color: $tc-subtle-gray
+  +media-query($bp.m)
+    justify-content: flex-start
 
   &-truncated
     color: $c-warning
@@ -56,9 +65,13 @@
       margin-left: $cs.xxs
 
 .list
-  min-height: 500px
+  min-height: 20rem
   height: 70vh
   overflow-y: scroll
+
+  +media-query($bp.m)
+    min-height: 20rem
+    height: 54vh
 
   &-item
     transition: background-color $ad.s linear
@@ -69,15 +82,3 @@
 .event,
 .event-data
   padding: $cs.xs $cs.s
-
-+media-query($bp.xs)
-  .header
-    flex-direction: column
-
-    &-actions
-      position: static
-      order: 1
-      align-self: flex-end
-
-    &-columns
-      order: 2
