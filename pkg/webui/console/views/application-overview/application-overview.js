@@ -141,7 +141,7 @@ class ApplicationOverview extends React.Component {
           <IntlHelmet title={sharedMessages.overview} />
           <Row>
             <Col sm={12} lg={6}>
-              <DataSheet data={sheetData} />
+              <DataSheet data={sheetData} className={style.generalInformation} />
             </Col>
             <Col sm={12} lg={6}>
               <ApplicationEvents appId={appId} widget />
