@@ -162,12 +162,35 @@ message ApplicationUplink {
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255, not_in: [224]}];
   uint32 f_cnt = 3;
+
+  // The frame payload of the uplink message.
+  // The payload is still encrypted if the skip_payload_crypto field of the EndDevice
+  // is true, which is indicated by the presence of the app_s_key field.
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
+
   google.protobuf.Struct decoded_payload = 5;
+
+  // A list of metadata for each antenna of each gateway that received this message.
   repeated RxMetadata rx_metadata = 6 [(validate.rules).repeated.min_items = 1];
+
+  // Settings for the transmission.
   TxSettings settings = 7 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+
   // Server time when the Network Server received the message.
   google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+
+  // The AppSKey of the current session.
+  // This field is only present if the skip_payload_crypto field of the EndDevice
+  // is true.
+  // Can be used to decrypt uplink payloads and encrypt downlink payloads.
+  KeyEnvelope app_s_key = 9;
+  // The last AFCntDown of the current session.
+  // This field is only present if the skip_payload_crypto field of the EndDevice
+  // is true.
+  // Can be used with app_s_key to encrypt downlink payloads.
+  uint32 last_a_f_cnt_down = 10;
+
+  // next: 11
 }
 
 message ApplicationLocation {
@@ -197,6 +220,10 @@ message ApplicationDownlink {
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255, not_in: [224]}];
   uint32 f_cnt = 3;
+
+  // The frame payload of the downlink message.
+  // The payload is encrypted if the skip_payload_crypto field of the EndDevice
+  // is true.
   bytes frm_payload = 4 [(gogoproto.customname) = "FRMPayload"];
   google.protobuf.Struct decoded_payload = 5;
   bool confirmed = 6;

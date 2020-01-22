@@ -1863,6 +1863,7 @@ SDKs are responsible for combining (if desired) the three.
 | `provisioning_data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Vendor-specific provisioning data. Stored in Join Server. |
 | `multicast` | [`bool`](#bool) |  | Indicates whether this device represents a multicast group. |
 | `claim_authentication_code` | [`EndDeviceAuthenticationCode`](#ttn.lorawan.v3.EndDeviceAuthenticationCode) |  | Authentication code to claim ownership of the end device. Stored in Join Server. |
+| `skip_payload_crypto` | [`bool`](#bool) |  | Skip decryption of uplink payloads and encryption of downlink payloads. |
 
 #### Field Rules
 
@@ -4584,7 +4585,7 @@ The UplinkMessageProcessor service processes uplink messages.
 | `session_key_id` | [`bytes`](#bytes) |  | Join Server issued identifier for the session keys used by this downlink. |
 | `f_port` | [`uint32`](#uint32) |  |  |
 | `f_cnt` | [`uint32`](#uint32) |  |  |
-| `frm_payload` | [`bytes`](#bytes) |  |  |
+| `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the downlink message. The payload is encrypted if the skip_payload_crypto field of the EndDevice is true. |
 | `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
 | `confirmed` | [`bool`](#bool) |  |  |
 | `class_b_c` | [`ApplicationDownlink.ClassBC`](#ttn.lorawan.v3.ApplicationDownlink.ClassBC) |  | Optional gateway and timing information for class B and C. If set, this downlink message will only be transmitted as class B or C downlink. If not set, this downlink message may be transmitted in class A, B and C. |
@@ -4709,11 +4710,13 @@ The UplinkMessageProcessor service processes uplink messages.
 | `session_key_id` | [`bytes`](#bytes) |  | Join Server issued identifier for the session keys used by this uplink. |
 | `f_port` | [`uint32`](#uint32) |  |  |
 | `f_cnt` | [`uint32`](#uint32) |  |  |
-| `frm_payload` | [`bytes`](#bytes) |  |  |
+| `frm_payload` | [`bytes`](#bytes) |  | The frame payload of the uplink message. The payload is still encrypted if the skip_payload_crypto field of the EndDevice is true, which is indicated by the presence of the app_s_key field. |
 | `decoded_payload` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  |  |
-| `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated |  |
-| `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  |  |
+| `rx_metadata` | [`RxMetadata`](#ttn.lorawan.v3.RxMetadata) | repeated | A list of metadata for each antenna of each gateway that received this message. |
+| `settings` | [`TxSettings`](#ttn.lorawan.v3.TxSettings) |  | Settings for the transmission. |
 | `received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Server time when the Network Server received the message. |
+| `app_s_key` | [`KeyEnvelope`](#ttn.lorawan.v3.KeyEnvelope) |  | The AppSKey of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used to decrypt uplink payloads and encrypt downlink payloads. |
+| `last_a_f_cnt_down` | [`uint32`](#uint32) |  | The last AFCntDown of the current session. This field is only present if the skip_payload_crypto field of the EndDevice is true. Can be used with app_s_key to encrypt downlink payloads. |
 
 #### Field Rules
 

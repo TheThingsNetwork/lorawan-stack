@@ -391,6 +391,41 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 				var zero time.Time
 				dst.ReceivedAt = zero
 			}
+		case "app_s_key":
+			if len(subs) > 0 {
+				var newDst, newSrc *KeyEnvelope
+				if (src == nil || src.AppSKey == nil) && dst.AppSKey == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.AppSKey
+				}
+				if dst.AppSKey != nil {
+					newDst = dst.AppSKey
+				} else {
+					newDst = &KeyEnvelope{}
+					dst.AppSKey = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.AppSKey = src.AppSKey
+				} else {
+					dst.AppSKey = nil
+				}
+			}
+		case "last_a_f_cnt_down":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_a_f_cnt_down' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastAFCntDown = src.LastAFCntDown
+			} else {
+				var zero uint32
+				dst.LastAFCntDown = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

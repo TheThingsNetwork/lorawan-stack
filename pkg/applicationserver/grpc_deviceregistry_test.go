@@ -267,6 +267,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"formatters",
 					"session",
+					"skip_payload_crypto",
 				})
 				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
 			},

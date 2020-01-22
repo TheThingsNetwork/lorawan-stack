@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `mac_settings.desired_ping_slot_frequency` end device field, which defines the desired frequency of the class B ping slot that will be configured via MAC commands.
 - Mobile navigation menu to the Console.
 - View and edit all Gateway settings from the Console.
+- `skip_payload_crypto` end device field, which makes the Application Server skip decryption of uplink payloads and encryption of downlink payloads.
+- `app_s_key` and `last_a_f_cnt_down` uplink message fields, which are set if the `skip_payload_crypto` end device field is true.
 
 ### Changed
 

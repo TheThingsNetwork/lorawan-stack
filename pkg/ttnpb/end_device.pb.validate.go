@@ -2181,6 +2181,8 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "skip_payload_crypto":
+			// no validation rules for SkipPayloadCrypto
 		default:
 			return EndDeviceValidationError{
 				field:  name,

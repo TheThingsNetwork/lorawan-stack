@@ -2096,6 +2096,15 @@
       "file": "linking.go"
     }
   },
+  "error:pkg/applicationserver:payload_crypto_disabled": {
+    "translations": {
+      "en": "payload crypto is disabled"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:version_unavailable": {
     "translations": {
       "en": "end device version is unavailable in the repository"
