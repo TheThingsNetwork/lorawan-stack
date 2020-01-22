@@ -19,6 +19,13 @@
   align-items: center
   overflow: hidden
 
+  +media-query($bp.s)
+    overflow: auto
+    margin-right: $ls.xxs * -1
+
+    &::-webkit-scrollbar
+      display: none
+
   &-container
     border-normal('bottom')
     box-sizing: border-box
