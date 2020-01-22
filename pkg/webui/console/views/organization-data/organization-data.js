@@ -24,8 +24,6 @@ import OrganizationEvents from '../../containers/organization-events'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 
-import style from './organization-data.styl'
-
 const m = defineMessages({
   orgData: 'Organization Data',
 })
@@ -45,7 +43,7 @@ export default class Data extends React.Component {
       <Container>
         <PageTitle hideHeading title={m.orgData} />
         <Row>
-          <Col className={style.wrapper}>
+          <Col>
             <OrganizationEvents orgId={orgId} />
           </Col>
         </Row>
