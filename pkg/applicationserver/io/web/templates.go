@@ -277,15 +277,6 @@ func (webhookTemplate) pathToMessage(s *string) *ttnpb.ApplicationWebhookTemplat
 	}
 }
 
-func (webhookTemplate) realFormat(s string) string {
-	switch s {
-	case "pb":
-		return "grpc"
-	default:
-		return s
-	}
-}
-
 func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
 	var fields []*ttnpb.ApplicationWebhookTemplateField
 	for _, f := range t.Fields {
@@ -306,7 +297,7 @@ func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
 		DocumentationURL:     t.DocumentationURL,
 		BaseURL:              t.BaseURL,
 		Headers:              t.Headers,
-		Format:               t.realFormat(t.Format),
+		Format:               t.Format,
 		Fields:               t.pbFields(),
 		CreateDownlinkAPIKey: t.CreateDownlinkAPIKey,
 		UplinkMessage:        t.pathToMessage(t.Paths.UplinkMessage),
