@@ -85,11 +85,15 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 			FrequencyPlanID:    test.EUFrequencyPlanID,
 		}
 	}
+	fp, err := s.store.GetByID(gtw.FrequencyPlanID)
+	if err != nil {
+		return nil, err
+	}
 	fps, err := s.GetFrequencyPlans(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, true, nil)
+	conn, err := io.NewConnection(ctx, frontend, gtw, fp.BandID, fps, true, nil)
 	if err != nil {
 		return nil, err
 	}

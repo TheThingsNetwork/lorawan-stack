@@ -78,6 +78,7 @@ type Connection struct {
 	frontend  Frontend
 	gateway   *ttnpb.Gateway
 	fps       map[string]*frequencyplans.FrequencyPlan
+	bandID    string
 	scheduler *scheduling.Scheduler
 	rtts      *rtts
 
@@ -88,7 +89,7 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps map[string]*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
+func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, bandID string, fps map[string]*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
 	ctx, cancelCtx := errorcontext.New(ctx)
 	scheduler, err := scheduling.NewScheduler(ctx, fps, enforceDutyCycle, scheduleAnytimeDelay, nil)
 	if err != nil {
@@ -100,6 +101,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 
 		frontend:    frontend,
 		gateway:     gateway,
+		bandID:      bandID,
 		fps:         fps,
 		scheduler:   scheduler,
 		rtts:        newRTTs(maxRTTs),
@@ -256,6 +258,7 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 }
 
 var errFrequencyPlanNotConfigured = errors.DefineInvalidArgument("frequency_plan_not_configured", "frequency plan `{id}` is not configured for this gateway")
+var errNoFrequencyPlanIDInTxRequest = errors.DefineInvalidArgument("no_frequency_plan_id_in_tx_request", "no frequency plan ID in tx request")
 
 // ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
@@ -284,7 +287,10 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			return 0, errFrequencyPlanNotConfigured.WithAttributes("id", request.FrequencyPlanID)
 		}
 	} else {
-		// Backwards compatibility. It's assumed in this case, that there's only one Frequency Plan configured.
+		// Backwards compatibility. If there's no FrequencyPlanID in the TxRequest, then there must be only one Frequency Plan configured.
+		if len(c.fps) != 1 {
+			return 0, errNoFrequencyPlanIDInTxRequest
+		}
 		for _, v := range c.fps {
 			fp = v
 			break
@@ -486,6 +492,10 @@ func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 
 // FrequencyPlans returns the frequency plans for the gateway.
 func (c *Connection) FrequencyPlans() map[string]*frequencyplans.FrequencyPlan { return c.fps }
+
+// BandID returns the common band ID for the frequency plans in this connection.
+// TODO: Handle mixed bands (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
+func (c *Connection) BandID() string { return c.bandID }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.

@@ -213,7 +213,7 @@ func TestGetRouterConfig(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			fps := map[string]*frequencyplans.FrequencyPlan{tc.FrequencyPlanID: &tc.FrequencyPlan}
-			cfg, err := GetRouterConfig(fps, tc.IsProd, time.Now())
+			cfg, err := GetRouterConfig(tc.FrequencyPlan.BandID, fps, tc.IsProd, time.Now())
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -233,13 +233,15 @@ func TestGetRouterConfig(t *testing.T) {
 func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
+		BandID         string
 		FrequencyPlans map[string]*frequencyplans.FrequencyPlan
 		Cfg            RouterConfig
 		IsProd         bool
 		ErrorAssertion func(err error) bool
 	}{
 		{
-			Name: "ValidFrequencyPlan",
+			Name:   "ValidFrequencyPlan",
+			BandID: "US_902_928",
 			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{test.USFrequencyPlanID: {
 				BandID: "US_902_928",
 				Radios: []frequencyplans.Radio{
@@ -366,7 +368,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			cfg, err := GetRouterConfig(tc.FrequencyPlans, tc.IsProd, time.Now())
+			cfg, err := GetRouterConfig(tc.BandID, tc.FrequencyPlans, tc.IsProd, time.Now())
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)

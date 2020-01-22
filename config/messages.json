@@ -3446,6 +3446,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/io:no_frequency_plan_id_in_tx_request": {
+    "translations": {
+      "en": "no frequency plan ID in tx request"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/gatewayserver/io:no_rx_delay": {
     "translations": {
       "en": "no Rx delay provided for class A downlink"

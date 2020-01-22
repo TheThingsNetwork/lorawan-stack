@@ -399,10 +399,13 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
+	var bandID string
+
 	// Get all frequency plans and check if they are from the same band.
 	fps := make(map[string]*frequencyplans.FrequencyPlan, len(gtw.FrequencyPlanIDs))
 	if len(gtw.FrequencyPlanIDs) > 0 {
 		fp0, err := gs.FrequencyPlans.GetByID(gtw.FrequencyPlanIDs[0])
+		bandID = fp0.BandID
 		if err != nil {
 			return nil, err
 		}
@@ -421,7 +424,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, errFrequencyPlansNotFromSameBand
 	}
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
+	conn, err := io.NewConnection(ctx, frontend, gtw, bandID, fps, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
 	if err != nil {
 		return nil, err
 	}
