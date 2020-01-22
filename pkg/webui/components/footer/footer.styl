@@ -20,8 +20,7 @@
   padding: $cs.xs
   color: $tc-subtle-gray
   flex: none
-  +media-query($bp.s)
-    background-color: white
+  background-color: white
 
 .link
   text-decoration: underline
@@ -38,3 +37,7 @@
   margin-left: $cs.xs
   &:not(:last-child)
     margin-right: $cs.xs
+
+.claim
+  +media-query($bp.s)
+    display: none

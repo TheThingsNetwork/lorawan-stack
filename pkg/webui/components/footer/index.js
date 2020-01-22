@@ -33,7 +33,7 @@ const Footer = function({ className, links, supportLink }) {
   return (
     <footer className={classnames(className, style.footer)}>
       <div>
-        <span>
+        <span className={style.claim}>
           <Message content={m.footer} /> –{' '}
         </span>
         <a className={style.link} href="https://www.thethingsnetwork.org">
