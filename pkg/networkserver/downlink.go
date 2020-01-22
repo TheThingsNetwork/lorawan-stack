@@ -181,7 +181,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 				enqueueDutyCycleReq,
 				enqueueRxParamSetupReq,
 				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) macCommandEnqueueState {
-					return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, scheduleAt, ns.defaultMACSettings)
+					return enqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
 				},
 				enqueueNewChannelReq,
 				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) macCommandEnqueueState {
@@ -254,7 +254,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 				spec[cmd.CID].ExpectAnswer &&
 				dev.MACState.DeviceClass == ttnpb.CLASS_C &&
 				dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 &&
-				nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).Before(timeNow()) {
+				nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).Before(scheduleAt) {
 				logger.Debug("Use confirmed downlink to get immediate answer")
 				mType = ttnpb.MType_CONFIRMED_DOWN
 			}
@@ -353,7 +353,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 				})
 				// TODO: Check if following downlinks must be dropped (https://github.com/TheThingsNetwork/lorawan-stack/issues/1653).
 
-			case down.ClassBC.GetAbsoluteTime() != nil && down.ClassBC.AbsoluteTime.Before(timeNow()):
+			case down.ClassBC.GetAbsoluteTime() != nil && down.ClassBC.AbsoluteTime.Before(scheduleAt):
 				logger.Debug("Drop expired downlink")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
@@ -477,7 +477,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	ctx = log.NewContext(ctx, logger)
 
 	needsAck := mType == ttnpb.MType_CONFIRMED_DOWN || len(dev.MACState.PendingRequests) > 0
-	if class == ttnpb.CLASS_C && needsAck && nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).After(timeNow().Add(nsScheduleWindow)) {
+	if class == ttnpb.CLASS_C && needsAck && nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).After(scheduleAt) {
 		return nil, genState, errConfirmedDownlinkTooSoon
 	}
 

@@ -119,6 +119,7 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 	case deviceNeedsADRParamSetupReq(dev, phy),
 		deviceNeedsBeaconFreqReq(dev),
 		deviceNeedsBeaconTimingReq(dev),
+		deviceNeedsDevStatusReq(dev, defaults, t),
 		deviceNeedsDLChannelReq(dev),
 		deviceNeedsDutyCycleReq(dev),
 		deviceNeedsLinkADRReq(dev),
@@ -130,8 +131,7 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 		deviceNeedsTxParamSetupReq(dev, phy):
 		return true
 	}
-	statusAt, ok := deviceNeedsDevStatusReqAt(dev, defaults)
-	return ok && t.After(statusAt)
+	return false
 }
 
 func lastUplink(ups ...*ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
