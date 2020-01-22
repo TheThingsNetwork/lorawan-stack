@@ -74,7 +74,7 @@ const Step = React.memo(props => {
   )
 })
 
-Step.displayName = 'Step'
+Step.displayName = 'Stepper.Step'
 
 Step.defaultProps = {
   active: false,
