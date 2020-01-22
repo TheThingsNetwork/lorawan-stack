@@ -40,8 +40,58 @@ const m = defineMessages({
 
 @bind
 class EditForm extends React.Component {
+  static propTypes = {
+    /** The API key to be edited */
+    apiKey: PropTypes.apiKey,
+    /**
+     * Called on key deletion.
+     * Receives the identifier of the API key as an argument.
+     */
+    onDelete: PropTypes.func.isRequired,
+    /**
+     * Called after unsuccessful deletion of the API key.
+     * Receives the error object as an argument.
+     */
+    onDeleteFailure: PropTypes.func,
+    /**
+     * Called after successful deletion of the API key.
+     * Receives the identifier of the API key as an argument.
+     */
+    onDeleteSuccess: PropTypes.func.isRequired,
+    /**
+     * Called on form submission.
+     * Receives the updated key object as an argument.
+     */
+    onEdit: PropTypes.func.isRequired,
+    /**
+     * Called after unsuccessful update of the API key.
+     * Receives the error object as an argument.
+     */
+    onEditFailure: PropTypes.func,
+    /**
+     * Called after successful update of the API key.
+     * Receives the key object as an argument.
+     */
+    onEditSuccess: PropTypes.func,
+    /**
+     * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL'
+     */
+    pseudoRights: PropTypes.arrayOf(PropTypes.string),
+    /** The list of rights */
+    rights: PropTypes.arrayOf(PropTypes.string),
+  }
+
   state = {
     error: null,
+  }
+
+  static defaultProps = {
+    apiKey: undefined,
+    rights: [],
+    onEditFailure: () => null,
+    onEditSuccess: () => null,
+    onDeleteFailure: () => null,
+    pseudoRights: [],
   }
 
   async handleEdit(values) {
@@ -154,60 +204,6 @@ class EditForm extends React.Component {
       </ApiKeyForm>
     )
   }
-}
-
-EditForm.propTypes = {
-  /** The API key to be edited */
-  apiKey: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    rights: PropTypes.arrayOf(PropTypes.string).isRequired,
-    name: PropTypes.string,
-  }),
-  /** The list of rights */
-  rights: PropTypes.arrayOf(PropTypes.string),
-  /**
-   * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL'
-   */
-  pseudoRights: PropTypes.arrayOf(PropTypes.string),
-  /**
-   * Called on form submission.
-   * Receives the updated key object as an argument.
-   */
-  onEdit: PropTypes.func.isRequired,
-  /**
-   * Called after successful update of the API key.
-   * Receives the key object as an argument.
-   */
-  onEditSuccess: PropTypes.func,
-  /**
-   * Called after unsuccessful update of the API key.
-   * Receives the error object as an argument.
-   */
-  onEditFailure: PropTypes.func,
-  /**
-   * Called on key deletion.
-   * Receives the identifier of the API key as an argument.
-   */
-  onDelete: PropTypes.func.isRequired,
-  /**
-   * Called after successful deletion of the API key.
-   * Receives the identifier of the API key as an argument.
-   */
-  onDeleteSuccess: PropTypes.func,
-  /**
-   * Called after unsuccessful deletion of the API key.
-   * Receives the error object as an argument.
-   */
-  onDeleteFailure: PropTypes.func,
-}
-
-EditForm.defaultProps = {
-  rights: [],
-  onEditSuccess: () => null,
-  onEditFailure: () => null,
-  onDeleteSuccess: () => null,
-  onDeleteFailure: () => null,
-  pseudoRights: [],
 }
 
 export default EditForm

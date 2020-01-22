@@ -196,12 +196,12 @@ class PayloadFormattersForm extends React.Component {
 }
 
 PayloadFormattersForm.propTypes = {
-  initialType: PropTypes.oneOf(Object.values(TYPES)).isRequired,
   initialParameter: PropTypes.string,
-  onSubmit: PropTypes.func.isRequired,
-  onSubmitSuccess: PropTypes.func,
-  onSubmitFailure: PropTypes.func,
+  initialType: PropTypes.oneOf(Object.values(TYPES)).isRequired,
   linked: PropTypes.bool.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  onSubmitFailure: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
   uplink: PropTypes.bool.isRequired,
 }
 

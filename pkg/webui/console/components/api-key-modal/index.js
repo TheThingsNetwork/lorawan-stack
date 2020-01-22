@@ -78,9 +78,14 @@ const ApiKeyModal = function(props) {
 }
 
 ApiKeyModal.propTypes = {
-  visible: PropTypes.bool.isRequired,
+  rights: PropTypes.rights,
   secret: PropTypes.string,
-  rights: PropTypes.arrayOf(PropTypes.string),
+  visible: PropTypes.bool.isRequired,
+}
+
+ApiKeyModal.defaultProps = {
+  rights: undefined,
+  secret: undefined,
 }
 
 export default ApiKeyModal

@@ -75,6 +75,7 @@ PropTypes.event = PropTypes.shape({
 PropTypes.events = PropTypes.arrayOf(PropTypes.event)
 
 PropTypes.gateway = PropTypes.shape({
+  antennas: PropTypes.Array,
   ids: PropTypes.shape({
     gateway_id: PropTypes.string.isRequired,
   }).isRequired,
@@ -168,11 +169,21 @@ PropTypes.env = PropTypes.shape({
 PropTypes.device = PropTypes.shape({
   ids: PropTypes.shape({
     device_id: PropTypes.string.isRequired,
+    application_ids: PropTypes.shape({
+      application_id: PropTypes.string.isRequired,
+    }),
   }).isRequired,
   name: PropTypes.string,
   created_at: PropTypes.string,
   updated_at: PropTypes.string,
   description: PropTypes.string,
+  locations: PropTypes.shape({
+    // User is an object containing latitude and longitude property of number.
+    user: PropTypes.shape({
+      latitude: PropTypes.number,
+      longitude: PropTypes.number,
+    }),
+  }),
   lorawan_phy_version: PropTypes.string,
   lorawan_version: PropTypes.string,
   supports_join: PropTypes.bool,

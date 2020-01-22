@@ -43,6 +43,17 @@ const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.id
 
 @bind
 export default class CollaboratorForm extends Component {
+  static defaultProps = {
+    onSubmitFailure: () => null,
+    onDelete: () => null,
+    onDeleteSuccess: () => null,
+    onDeleteFailure: () => null,
+    pseudoRights: [],
+    error: '',
+    collaborator: undefined,
+    update: false,
+  }
+
   static propTypes = {
     collaborator: PropTypes.collaborator,
     error: PropTypes.error,
@@ -51,14 +62,13 @@ export default class CollaboratorForm extends Component {
     onDeleteSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
-    onSubmitSuccess: PropTypes.func,
+    onSubmitSuccess: PropTypes.func.isRequired,
     pseudoRights: PropTypes.rights,
     rights: PropTypes.rights.isRequired,
     update: PropTypes.bool,
   }
 
   static defaultProps = {
-    onSubmitSuccess: () => null,
     onSubmitFailure: () => null,
     onDelete: () => null,
     onDeleteSuccess: () => null,
