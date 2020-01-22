@@ -16,11 +16,11 @@
 .cell
   padding: $cs.m
 
-  &:first-child
-    padding-right: $cs.s
+  +media-query($bp.s)
+    padding: $cs.m $cs.xs
 
-  &:last-child
-    padding-left: $cs.s
+  &:first-child, &:last-child
+    padding-right: $cs.s
 
   &:last-child:not(&-centered)
     text-align: right
