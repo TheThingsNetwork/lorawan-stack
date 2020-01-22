@@ -19,6 +19,14 @@
   display: flex
   margin: 0
 
+  +media-query($bp.s)
+    margin-right: $ls.xxs * -1
+    overflow: auto
+    background: linear-gradient(right, rgba(0,0,0,.1), white 5rem)
+
+    &::-webkit-scrollbar
+      display: none
+
   .icon
     margin-right: $cs.xs
 
