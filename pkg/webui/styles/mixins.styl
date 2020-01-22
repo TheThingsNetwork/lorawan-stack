@@ -123,13 +123,15 @@ center-absolute()
   transform: translate(-50%, -50%)
 
 
-// Fullscreen forces an element to be full screen using position absolute
-full-screen()
-  position: absolute
-  top: 0
-  left: 0
-  width: 100vw
-  height: 100vh
+// Fullscreen forces an element to be full screen using position fixed
+full-screen($padding = 0)
+  position: fixed
+  top: $padding
+  left: $padding
+  right: $padding
+  bottom: $padding
+  width: auto
+  height: auto
   transform: translate(0, 0)
   max-width: initial
   max-height: initial
@@ -248,6 +250,10 @@ media-query-min($min)
 
 media-query-between($min, $max)
   @media screen and (min-width: $min + 1) and (max-width: $max)
+    {block} // @stylint ignore
+
+media-query-height($max)
+  @media screen and (max-height: $max)
     {block} // @stylint ignore
 
 
