@@ -3437,6 +3437,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/io:no_gps_sync": {
+    "translations": {
+      "en": "gateway time is not GPS synchronized"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/gatewayserver/io:no_rx_delay": {
     "translations": {
       "en": "no Rx delay provided for class A downlink"
