@@ -40,24 +40,24 @@ const headers = [
   {
     name: 'name',
     displayName: sharedMessages.name,
-    width: 24,
+    width: 22,
     sortable: true,
   },
   {
     name: 'ids.eui',
     displayName: sharedMessages.gatewayEUI,
-    width: 24,
+    width: 20,
     sortable: true,
     sortKey: 'gateway_eui',
   },
   {
     name: 'frequency_plan_id',
     displayName: sharedMessages.frequencyPlan,
-    width: 14,
+    width: 16,
   },
   {
     name: 'status',
-    width: 14,
+    width: 18,
     displayName: sharedMessages.status,
     render(status) {
       let indicator = 'unknown'
