@@ -22,7 +22,6 @@ import (
 	"net/http"
 	"os"
 	"runtime/debug"
-	"strconv"
 	"time"
 
 	"github.com/getsentry/raven-go"
@@ -195,14 +194,6 @@ func New(ctx context.Context, opts ...Option) *Server {
 				Host: req.Host,
 				URI:  req.RequestURI,
 			}
-
-			q := req.URL.Query()
-			md.Page, _ = strconv.ParseUint(q.Get("page"), 10, 64)
-			if md.Page == 0 {
-				md.Page = 1
-			}
-			md.Limit, _ = strconv.ParseUint(q.Get("limit"), 10, 64)
-
 			return md.ToMetadata()
 		}),
 		runtime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {

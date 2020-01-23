@@ -16,8 +16,6 @@ package redis
 
 import (
 	"context"
-
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 )
 
 type paginationOptionsKeyType struct{}
@@ -32,13 +30,6 @@ type paginationOptions struct {
 
 // NewContextWithPagination instructs the store to paginate the results.
 func NewContextWithPagination(ctx context.Context, limit, page int64, total *int64) context.Context {
-	md := rpcmetadata.FromIncomingContext(ctx)
-	if limit == 0 && md.Limit != 0 {
-		limit = int64(md.Limit)
-	}
-	if page == 0 && md.Page != 0 {
-		page = int64(md.Page)
-	}
 	if page == 0 {
 		page = 1
 	}

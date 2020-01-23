@@ -17,7 +17,6 @@ package rpcmetadata
 
 import (
 	"context"
-	"strconv"
 	"strings"
 
 	"google.golang.org/grpc/metadata"
@@ -32,12 +31,6 @@ type MD struct {
 	ServiceVersion string
 	NetAddress     string
 	AllowInsecure  bool
-
-	// Limit is the limit of elements to display per-page.
-	Limit uint64
-
-	// Page is the page of elements to display.
-	Page uint64
 
 	// Host is the hostname the request is directed to.
 	Host string
@@ -74,12 +67,6 @@ func (m MD) ToMetadata() metadata.MD {
 	}
 	if m.URI != "" {
 		pairs = append(pairs, "uri", m.URI)
-	}
-	if m.Limit != 0 {
-		pairs = append(pairs, "limit", strconv.FormatUint(m.Limit, 10))
-	}
-	if m.Page != 0 {
-		pairs = append(pairs, "page", strconv.FormatUint(m.Page, 10))
 	}
 	return metadata.Pairs(pairs...)
 }
@@ -122,12 +109,6 @@ func FromMetadata(md metadata.MD) (m MD) {
 	}
 	if uri, ok := md["uri"]; ok && len(uri) > 0 {
 		m.URI = uri[len(uri)-1]
-	}
-	if limit, ok := md["limit"]; ok && len(limit) > 0 {
-		m.Limit, _ = strconv.ParseUint(limit[len(limit)-1], 10, 64)
-	}
-	if page, ok := md["page"]; ok && len(page) > 0 {
-		m.Page, _ = strconv.ParseUint(page[len(page)-1], 10, 64)
 	}
 	return
 }

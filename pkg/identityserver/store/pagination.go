@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"github.com/jinzhu/gorm"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 )
 
 type paginationOptionsKeyType struct{}
@@ -36,13 +35,6 @@ type paginationOptions struct {
 // WithPagination instructs the store to paginate the results, and set the total
 // number of results into total.
 func WithPagination(ctx context.Context, limit, page uint32, total *uint64) context.Context {
-	md := rpcmetadata.FromIncomingContext(ctx)
-	if limit == 0 && md.Limit != 0 {
-		limit = uint32(md.Limit)
-	}
-	if page == 0 && md.Page != 0 {
-		page = uint32(md.Page)
-	}
 	if page == 0 {
 		page = 1
 	}

@@ -21,7 +21,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/pkg/redis"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
@@ -29,53 +28,44 @@ func TestPagination(t *testing.T) {
 	a := assertions.New(t)
 
 	for _, tc := range []struct {
-		md     rpcmetadata.MD
-		limit  int64
-		offset int64
+		limit          int64
+		page           int64
+		expectedLimit  uint64
+		expectedOffset uint64
 	}{
 		{
-			md:     rpcmetadata.MD{Limit: 10, Page: 1},
-			limit:  10,
-			offset: 0,
+			limit:          0,
+			page:           0,
+			expectedLimit:  0,
+			expectedOffset: 0,
 		},
 		{
-			md:     rpcmetadata.MD{Limit: 10, Page: 2},
-			limit:  10,
-			offset: 10,
+			limit:          10,
+			page:           0,
+			expectedLimit:  10,
+			expectedOffset: 0,
 		},
 		{
-			md:     rpcmetadata.MD{Limit: 10, Page: 3},
-			limit:  10,
-			offset: 20,
+			limit:          10,
+			page:           1,
+			expectedLimit:  10,
+			expectedOffset: 0,
 		},
 		{
-			md:     rpcmetadata.MD{Limit: 0, Page: 1},
-			limit:  0,
-			offset: 0,
-		},
-		{
-			md:     rpcmetadata.MD{Limit: 0, Page: 2},
-			limit:  0,
-			offset: 0,
+			limit:          10,
+			page:           2,
+			expectedLimit:  10,
+			expectedOffset: 10,
 		},
 	} {
-		t.Run(fmt.Sprintf("limitAndOffsetFromContext, limit:%v, offset:%v", tc.md.Limit, tc.md.Page),
+		t.Run(fmt.Sprintf("limitAndOffsetFromContext, limit:%v, offset:%v", tc.limit, tc.page),
 			func(t *testing.T) {
-				ctx := tc.md.ToIncomingContext(test.Context())
-
-				ctx = redis.NewContextWithPagination(ctx, 0, 0, nil)
+				ctx := redis.NewContextWithPagination(test.Context(), tc.limit, tc.page, nil)
 
 				limit, offset := redis.PaginationLimitAndOffsetFromContext(ctx)
 
-				a.So(limit, should.Equal, tc.limit)
-				a.So(offset, should.Equal, tc.offset)
-
-				ctx = redis.NewContextWithPagination(test.Context(), int64(tc.md.Limit), int64(tc.md.Page), nil)
-
-				limit, offset = redis.PaginationLimitAndOffsetFromContext(ctx)
-
-				a.So(limit, should.Equal, tc.limit)
-				a.So(offset, should.Equal, tc.offset)
+				a.So(limit, should.Equal, tc.expectedLimit)
+				a.So(offset, should.Equal, tc.expectedOffset)
 			},
 		)
 	}
