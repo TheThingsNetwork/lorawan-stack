@@ -17,7 +17,7 @@ package web
 import (
 	"context"
 	"fmt"
-	"path"
+	"net/url"
 	"sync"
 	"time"
 
@@ -40,7 +40,7 @@ type TemplatesConfig struct {
 // TemplateStore contains the webhook templates.
 type TemplateStore struct {
 	fetcher fetch.Interface
-	baseURL string
+	baseURL *url.URL
 
 	templateIDs          []string
 	templateIDsMu        sync.Mutex
@@ -69,19 +69,28 @@ func (c TemplatesConfig) NewTemplateStore() (*TemplateStore, error) {
 	default:
 		return nil, nil
 	}
+	baseURL, err := url.Parse(c.LogoBaseURL)
+	if err != nil {
+		return nil, err
+	}
 	return &TemplateStore{
 		fetcher:   fetcher,
-		baseURL:   c.LogoBaseURL,
+		baseURL:   baseURL,
 		templates: make(map[string]queryResult),
 	}, nil
 }
 
 // prependBaseURL prepends the base URL and the template ID to the LogoURL, if it is available.
-func (ts *TemplateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTemplate) {
+func (ts *TemplateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTemplate) error {
 	if template.LogoURL == "" {
-		return
+		return nil
 	}
-	template.LogoURL = path.Join(ts.baseURL, template.TemplateID, template.LogoURL)
+	logoURL, err := url.Parse(template.LogoURL)
+	if err != nil {
+		return err
+	}
+	template.LogoURL = ts.baseURL.ResolveReference(logoURL).String()
+	return nil
 }
 
 // GetTemplate returns the template with the given identifiers.
@@ -94,7 +103,10 @@ func (ts *TemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicat
 	if err != nil {
 		return nil, err
 	}
-	ts.prependBaseURL(template)
+	err = ts.prependBaseURL(template)
+	if err != nil {
+		return nil, err
+	}
 	return template, nil
 }
 
@@ -119,7 +131,10 @@ func (ts *TemplateStore) ListTemplates(ctx context.Context, req *ttnpb.ListAppli
 			return nil, err
 		}
 
-		ts.prependBaseURL(template)
+		err = ts.prependBaseURL(template)
+		if err != nil {
+			return nil, err
+		}
 
 		templates.Templates = append(templates.Templates, template)
 	}
@@ -172,12 +187,12 @@ func (ts *TemplateStore) template(ids ttnpb.ApplicationWebhookTemplateIdentifier
 	if err != nil {
 		return nil, errFetchFailed.WithCause(err)
 	}
-	template := &ttnpb.ApplicationWebhookTemplate{}
-	err = yaml.Unmarshal(data, template)
+	var template webhookTemplate
+	err = yaml.Unmarshal(data, &template)
 	if err != nil {
 		return nil, errParseFile.WithCause(err)
 	}
-	return template, nil
+	return template.toPB(), nil
 }
 
 func (ts *TemplateStore) getTemplate(ids ttnpb.ApplicationWebhookTemplateIdentifiers) (t *ttnpb.ApplicationWebhookTemplate, err error) {
@@ -207,4 +222,91 @@ func applyWebhookTemplateFieldMask(dst, src *ttnpb.ApplicationWebhookTemplate, p
 		dst = &ttnpb.ApplicationWebhookTemplate{}
 	}
 	return dst, dst.SetFields(src, paths...)
+}
+
+type webhookTemplateField struct {
+	ID           string `yaml:"id"`
+	Name         string `yaml:"name"`
+	Description  string `yaml:"description"`
+	Secret       bool   `yaml:"secret"`
+	DefaultValue string `yaml:"default-value"`
+}
+
+func (f webhookTemplateField) toPB() *ttnpb.ApplicationWebhookTemplateField {
+	return &ttnpb.ApplicationWebhookTemplateField{
+		ID:           f.ID,
+		Name:         f.Name,
+		Description:  f.Description,
+		Secret:       f.Secret,
+		DefaultValue: f.DefaultValue,
+	}
+}
+
+type webhookTemplatePaths struct {
+	UplinkMessage  *string `yaml:"uplink-message,omitempty"`
+	JoinAccept     *string `yaml:"join-accept,omitempty"`
+	DownlinkAck    *string `yaml:"downlink-ack,omitempty"`
+	DownlinkNack   *string `yaml:"downlink-nack,omitempty"`
+	DownlinkSent   *string `yaml:"downlink-sent,omitempty"`
+	DownlinkFailed *string `yaml:"downlink-failed,omitempty"`
+	DownlinkQueued *string `yaml:"downlink-queued,omitempty"`
+	LocationSolved *string `yaml:"location-solved,omitempty"`
+}
+
+type webhookTemplate struct {
+	TemplateID           string                 `yaml:"template-id"`
+	Name                 string                 `yaml:"name"`
+	Description          string                 `yaml:"description"`
+	LogoURL              string                 `yaml:"logo-url"`
+	InfoURL              string                 `yaml:"info-url"`
+	DocumentationURL     string                 `yaml:"documentation-url"`
+	BaseURL              string                 `yaml:"base-url"`
+	Headers              map[string]string      `yaml:"headers,omitempty"`
+	Format               string                 `yaml:"format"`
+	Fields               []webhookTemplateField `yaml:"fields,omitempty"`
+	CreateDownlinkAPIKey bool                   `yaml:"create-downlink-api-key"`
+	Paths                webhookTemplatePaths   `yaml:"paths,omitempty"`
+}
+
+func (webhookTemplate) pathToMessage(s *string) *ttnpb.ApplicationWebhookTemplate_Message {
+	if s == nil {
+		return nil
+	}
+	return &ttnpb.ApplicationWebhookTemplate_Message{
+		Path: *s,
+	}
+}
+
+func (t webhookTemplate) pbFields() []*ttnpb.ApplicationWebhookTemplateField {
+	var fields []*ttnpb.ApplicationWebhookTemplateField
+	for _, f := range t.Fields {
+		fields = append(fields, f.toPB())
+	}
+	return fields
+}
+
+func (t webhookTemplate) toPB() *ttnpb.ApplicationWebhookTemplate {
+	return &ttnpb.ApplicationWebhookTemplate{
+		ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
+			TemplateID: t.TemplateID,
+		},
+		Name:                 t.Name,
+		Description:          t.Description,
+		LogoURL:              t.LogoURL,
+		InfoURL:              t.InfoURL,
+		DocumentationURL:     t.DocumentationURL,
+		BaseURL:              t.BaseURL,
+		Headers:              t.Headers,
+		Format:               t.Format,
+		Fields:               t.pbFields(),
+		CreateDownlinkAPIKey: t.CreateDownlinkAPIKey,
+		UplinkMessage:        t.pathToMessage(t.Paths.UplinkMessage),
+		JoinAccept:           t.pathToMessage(t.Paths.JoinAccept),
+		DownlinkAck:          t.pathToMessage(t.Paths.DownlinkAck),
+		DownlinkNack:         t.pathToMessage(t.Paths.DownlinkNack),
+		DownlinkSent:         t.pathToMessage(t.Paths.DownlinkSent),
+		DownlinkFailed:       t.pathToMessage(t.Paths.DownlinkFailed),
+		DownlinkQueued:       t.pathToMessage(t.Paths.DownlinkQueued),
+		LocationSolved:       t.pathToMessage(t.Paths.LocationSolved),
+	}
 }
