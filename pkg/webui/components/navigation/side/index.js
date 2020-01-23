@@ -65,9 +65,15 @@ export class SideNavigation extends Component {
     const { isDrawerOpen } = this.state
 
     if (!isDrawerOpen) {
+      // Disable body scrolling
+      document.body.classList.add(style.scrollLock)
+
       document.addEventListener('mousedown', this.onClickOutside)
       this.setState({ isDrawerOpen: true })
     } else {
+      // Enable body scrolling
+      document.body.classList.remove(style.scrollLock)
+
       document.addEventListener('mousedown', this.onClickOutside)
       this.setState({ isDrawerOpen: false })
     }
