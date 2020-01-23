@@ -21,7 +21,7 @@ func init() {
 		{Frequency: 2425000000, MinDataRate: 0, MaxDataRate: 7},
 		{Frequency: 2479000000, MinDataRate: 0, MaxDataRate: 7},
 	}
-	ism2400BeaconChannel := uint32(2422000000)
+	const ism2400BeaconFrequency = 2422000000
 	ism_2400 = Band{
 		ID: ISM_2400,
 
@@ -107,9 +107,9 @@ func init() {
 		Beacon: Beacon{
 			DataRateIndex:    3,
 			CodingRate:       "4/8",
-			BroadcastChannel: func(_ float64) uint32 { return ism2400BeaconChannel },
-			PingSlotChannels: []uint32{ism2400BeaconChannel},
+			ComputeFrequency: func(_ float64) uint64 { return ism2400BeaconFrequency },
 		},
+		PingSlotFrequency: uint64Ptr(ism2400BeaconFrequency),
 
 		regionalParameters1_0:       bandIdentity,
 		regionalParameters1_0_1:     bandIdentity,
