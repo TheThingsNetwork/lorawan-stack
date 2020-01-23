@@ -428,6 +428,7 @@ var builtin = New(
 	"overview",
 	"owner",
 	"owners",
+	"packetbroker",
 	"page",
 	"pager",
 	"pages",
