@@ -570,10 +570,7 @@ func TestUnmarshalIdentifiers(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
-			msg := &ttnpb.UplinkMessage{
-				RawPayload: tc.Bytes,
-			}
-			ids, err := GetUplinkMessageIdentifiers(msg)
+			ids, err := GetUplinkMessageIdentifiers(tc.Bytes)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -627,10 +624,7 @@ func TestUnmarshalResilience(t *testing.T) {
 				a.So(err, should.NotBeNil)
 			}, should.NotPanic)
 			a.So(func() {
-				msg := &ttnpb.UplinkMessage{
-					RawPayload: tc,
-				}
-				_, err := GetUplinkMessageIdentifiers(msg)
+				_, err := GetUplinkMessageIdentifiers(tc)
 				a.So(err, should.NotBeNil)
 			}, should.NotPanic)
 		})
