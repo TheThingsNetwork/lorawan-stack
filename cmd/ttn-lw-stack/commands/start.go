@@ -239,7 +239,7 @@ var startCommand = &cobra.Command{
 			}
 		}
 
-		if start.GatewayConfigurationServer {
+		if start.GatewayConfigurationServer || startDefault {
 			logger.Info("Setting up Gateway Configuration Server")
 			gcs, err := gatewayconfigurationserver.New(c, &config.GCS)
 			if err != nil {
