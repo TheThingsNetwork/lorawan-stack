@@ -37,8 +37,6 @@ func TestRequestMetadata(t *testing.T) {
 		ServiceType:    "component",
 		ServiceVersion: "1.2.3-dev",
 		NetAddress:     "localhost",
-		Limit:          12,
-		Page:           34,
 		Host:           "hostfoo",
 		URI:            "fooURI",
 	}
