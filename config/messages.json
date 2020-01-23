@@ -5975,6 +5975,51 @@
       "file": "server.go"
     }
   },
+  "error:pkg/packetbrokeragent:data_rate": {
+    "translations": {
+      "en": "invalid data rate index `{index}` in region `{region}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "agent.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:message_identifiers": {
+    "translations": {
+      "en": "invalid message identifiers"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "agent.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:no_phy_payload": {
+    "translations": {
+      "en": "no PHYPayload in message"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "agent.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:no_tls_certificate": {
+    "translations": {
+      "en": "no TLS certificate configured"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:wrap_uplink_tokens": {
+    "translations": {
+      "en": "wrap uplink tokens"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "agent.go"
+    }
+  },
   "error:pkg/pfconfig/basicstationlns:frequency_plan": {
     "translations": {
       "en": "invalid frequency plan `{name}`"

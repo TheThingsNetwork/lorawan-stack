@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,20 +16,23 @@ package packetbrokeragent
 
 import (
 	"context"
-	"crypto/tls"
+	"fmt"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	packetbroker "go.packetbroker.org/api/v1beta1"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
-
-// Config configures Packet Broker clients.
-type Config struct {
-	Address     string
-	Certificate *tls.Certificate
-}
 
 // Agent implements the Packet Broker Agent component, acting as Home Network.
 //
@@ -38,8 +41,14 @@ type Agent struct {
 	*component.Component
 	ctx context.Context
 
+	dataPlaneAddress     string
+	netID                types.NetID
+	homeNetworkTLSConfig TLSConfig
+	subscriptionGroup    string
+	devAddrPrefixes      []types.DevAddrPrefix
+
 	grpc struct {
-		nsGs *nsGsServer
+		nsGs ttnpb.NsGsServer
 	}
 }
 
@@ -48,6 +57,17 @@ func New(c *component.Component, conf *Config) (*Agent, error) {
 	a := &Agent{
 		Component: c,
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "packetbroker/agent"),
+
+		dataPlaneAddress:     conf.DataPlaneAddress,
+		netID:                conf.NetID,
+		homeNetworkTLSConfig: conf.HomeNetwork.TLS,
+		subscriptionGroup:    conf.SubscriptionGroup,
+		devAddrPrefixes:      conf.DevAddrPrefixes,
+	}
+	a.grpc.nsGs = &ttnpb.UnimplementedNsGsServer{}
+
+	if conf.HomeNetwork.Enable {
+		c.RegisterTask(c.Context(), "pb_subscribe_uplink", a.subscribeUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
 	}
 
 	c.RegisterGRPC(a)
@@ -71,4 +91,199 @@ func (a *Agent) RegisterServices(s *grpc.Server) {
 
 // RegisterHandlers registers gRPC handlers.
 func (a *Agent) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
+}
+
+func (a *Agent) dialContext(ctx context.Context, config TLSConfig, target string) (*grpc.ClientConn, error) {
+	cert, err := config.loadCertificate(ctx, a.KeyVault)
+	if err != nil {
+		return nil, err
+	}
+	tlsConfig, err := a.GetTLSClientConfig(ctx, component.WithTLSCertificates(cert))
+	if err != nil {
+		return nil, err
+	}
+	opts := append(rpcclient.DefaultDialOptions(ctx),
+		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+		grpc.WithBlock(),
+		grpc.FailOnNonTempDialError(true),
+	)
+	return grpc.DialContext(ctx, target, opts...)
+}
+
+func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
+	devAddrPrefixes := make([]*packetbroker.RoutingFilter_MACPayload_DevAddrPrefix, len(a.devAddrPrefixes))
+	for i, p := range a.devAddrPrefixes {
+		devAddrPrefixes[i] = &packetbroker.RoutingFilter_MACPayload_DevAddrPrefix{
+			Value:  p.DevAddr.MarshalNumber(),
+			Length: uint32(p.Length),
+		}
+	}
+	return []*packetbroker.RoutingFilter{
+		// Subscribe to MAC payload based on DevAddrPrefixes.
+		{
+			Message: &packetbroker.RoutingFilter_Mac{
+				Mac: &packetbroker.RoutingFilter_MACPayload{
+					DevAddrPrefixes: devAddrPrefixes,
+				},
+			},
+		},
+		// Subscribe to any join-request.
+		{
+			Message: &packetbroker.RoutingFilter_JoinRequest_{
+				JoinRequest: &packetbroker.RoutingFilter_JoinRequest{
+					EuiPrefixes: []*packetbroker.RoutingFilter_JoinRequest_EUIPrefixes{},
+				},
+			},
+		},
+	}
+}
+
+func (a *Agent) subscribeUplink(ctx context.Context) error {
+	ctx = log.NewContextWithField(ctx, "namespace", "packetbroker/agent")
+
+	conn, err := a.dialContext(ctx, a.homeNetworkTLSConfig, a.dataPlaneAddress)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:%s", events.NewCorrelationID()))
+
+	client := packetbroker.NewRouterHomeNetworkDataClient(conn)
+	stream, err := client.Subscribe(ctx, &packetbroker.SubscribeHomeNetworkRequest{
+		HomeNetworkNetId: a.netID.MarshalNumber(),
+		Filters:          a.getSubscriptionFilters(),
+	})
+	if err != nil {
+		return err
+	}
+
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			return err
+		}
+		up := msg.Message
+		if up == nil {
+			continue
+		}
+		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:uplink:%s", msg.Id))
+		var forwarderNetID types.NetID
+		forwarderNetID.UnmarshalNumber(msg.ForwarderNetId)
+		ctx = log.NewContextWithFields(ctx, log.Fields(
+			"message_id", msg.Id,
+			"from_forwarder_net_id", forwarderNetID,
+			"from_forwarder_id", msg.ForwarderId,
+		))
+		if err := a.handleUplink(ctx, up); err != nil {
+			log.FromContext(ctx).WithError(err).Debug("Failed to handle uplink message")
+		}
+	}
+	return nil
+}
+
+var (
+	errNoPHYPayload       = errors.DefineFailedPrecondition("no_phy_payload", "no PHYPayload in message")
+	errMessageIdentifiers = errors.DefineFailedPrecondition("message_identifiers", "invalid message identifiers")
+	errDataRate           = errors.DefineFailedPrecondition("data_rate", "invalid data rate index `{index}` in region `{region}`")
+	errWrapUplinkTokens   = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
+)
+
+func (a *Agent) handleUplink(ctx context.Context, msg *packetbroker.UplinkMessage) error {
+	receivedAt := time.Now()
+	logger := log.FromContext(ctx)
+
+	phyPayload := msg.GetPhyPayload().GetValue()
+	if phyPayload.GetValue() == nil || len(phyPayload.GetDeksEncrypted()) > 0 {
+		return errNoPHYPayload
+	}
+
+	ids, err := lorawan.GetUplinkMessageIdentifiers(phyPayload.Value)
+	if err != nil {
+		return errMessageIdentifiers
+	}
+
+	if ids.JoinEUI != nil {
+		logger = logger.WithField("join_eui", *ids.JoinEUI)
+	}
+	if ids.DevEUI != nil && !ids.DevEUI.IsZero() {
+		logger = logger.WithField("dev_eui", *ids.DevEUI)
+	}
+	if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
+		logger = logger.WithField("dev_addr", *ids.DevAddr)
+	}
+	logger.Debug("Received plain message")
+
+	dataRate, ok := fromPBDataRate(msg.GatewayRegion, int(msg.DataRateIndex))
+	if !ok {
+		return errDataRate.WithAttributes(
+			"index", msg.DataRateIndex,
+			"region", msg.GatewayRegion,
+		)
+	}
+
+	uplinkToken, err := wrapUplinkTokens(msg.ForwarderUplinkToken, msg.GatewayUplinkToken)
+	if err != nil {
+		return errWrapUplinkTokens.WithCause(err)
+	}
+
+	up := &ttnpb.UplinkMessage{
+		RawPayload: phyPayload.Value,
+		Settings: ttnpb.TxSettings{
+			DataRate:      dataRate,
+			DataRateIndex: ttnpb.DataRateIndex(msg.DataRateIndex),
+			Frequency:     msg.Frequency,
+		},
+		ReceivedAt:     receivedAt,
+		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+	}
+
+	if gtwMd := msg.GatewayMetadata; gtwMd != nil {
+		if locMd := gtwMd.Localization; locMd.GetValue() != nil && len(locMd.DeksEncrypted) == 0 {
+			var loc packetbroker.GatewayMetadataLocalization
+			if err := loc.Unmarshal(locMd.Value); err != nil {
+				logger.WithError(err).Debug("Failed to unmarshal localization gateway metadata")
+			} else if terrestrial := loc.GetTerrestrial(); terrestrial != nil {
+				for _, ant := range terrestrial.Antennas {
+					up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
+						GatewayIdentifiers:    cluster.PacketBrokerID,
+						AntennaIndex:          ant.Index,
+						FineTimestamp:         ant.FineTimestamp.GetValue(),
+						RSSI:                  ant.SignalQuality.GetChannelRssi(),
+						SignalRSSI:            ant.SignalQuality.GetSignalRssi(),
+						RSSIStandardDeviation: ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
+						SNR:                   ant.SignalQuality.GetSnr(),
+						FrequencyOffset:       ant.SignalQuality.GetFrequencyOffset(),
+						Location:              fromPBLocation(ant.Location),
+						UplinkToken:           uplinkToken,
+					})
+				}
+			}
+		}
+		if sigMd := gtwMd.SignalQuality; len(up.RxMetadata) == 0 && sigMd.GetValue() != nil && len(sigMd.DeksEncrypted) == 0 {
+			var sig packetbroker.GatewayMetadataSignalQuality
+			if err := sig.Unmarshal(sigMd.Value); err != nil {
+				logger.WithError(err).Debug("Failed to unmarshal signal quality gateway metadata")
+			} else if terrestrial := sig.GetTerrestrial(); terrestrial != nil {
+				for _, ant := range terrestrial.Antennas {
+					up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
+						GatewayIdentifiers:    cluster.PacketBrokerID,
+						AntennaIndex:          ant.Index,
+						RSSI:                  ant.Value.GetChannelRssi(),
+						SignalRSSI:            ant.Value.GetSignalRssi(),
+						RSSIStandardDeviation: ant.Value.GetRssiStandardDeviation().GetValue(),
+						SNR:                   ant.Value.GetSnr(),
+						FrequencyOffset:       ant.Value.GetFrequencyOffset(),
+						UplinkToken:           uplinkToken,
+					})
+				}
+			}
+		}
+	}
+
+	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	if err != nil {
+		return err
+	}
+	_, err = ttnpb.NewGsNsClient(conn).HandleUplink(ctx, up, a.WithClusterAuth())
+	return err
 }

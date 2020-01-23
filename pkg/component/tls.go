@@ -50,6 +50,13 @@ func WithTLSClientAuth(auth tls.ClientAuthType, cas *x509.CertPool, verify func(
 	})
 }
 
+// WithTLSCertificates sets TLS certificates.
+func WithTLSCertificates(certificates ...tls.Certificate) TLSConfigOption {
+	return TLSConfigOptionFunc(func(c *tls.Config) {
+		c.Certificates = certificates
+	})
+}
+
 // WithNextProtos appends the given protocols to NextProtos.
 func WithNextProtos(protos ...string) TLSConfigOption {
 	return TLSConfigOptionFunc(func(c *tls.Config) {
