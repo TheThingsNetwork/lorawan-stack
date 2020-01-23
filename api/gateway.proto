@@ -100,7 +100,15 @@ message Gateway {
   string gateway_server_address = 9 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
   bool auto_update = 10;
   string update_channel = 11;
+
+  // Frequency plan ID of the gateway.
+  // This equals the first element of the frequency_plan_ids field.
   string frequency_plan_id = 12 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
+
+  // Frequency plan IDs of the gateway.
+  // The first element equals the frequency_plan_id field.
+  repeated string frequency_plan_ids = 20 [(gogoproto.customname) = "FrequencyPlanIDs", (validate.rules).repeated.max_items = 8, (validate.rules).repeated.items.string.max_len = 64];
+
   repeated GatewayAntenna antennas = 13 [(gogoproto.nullable) = false];
   // The status of this gateway may be publicly displayed.
   bool status_public = 14;
@@ -117,6 +125,8 @@ message Gateway {
   DownlinkPathConstraint downlink_path_constraint = 18 [(validate.rules).enum.defined_only = true];
   // Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.
   google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+
+  // next: 21
 }
 
 message Gateways {

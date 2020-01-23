@@ -754,6 +754,7 @@ func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, 
 		"attempt_rx2", rx2,
 		"downlink_class", req.Class,
 		"downlink_priority", req.Priority,
+		"frequency_plan", req.FrequencyPlanID,
 	}
 	if rx1 {
 		pairs = append(pairs,
@@ -1036,6 +1037,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	if genState.ApplicationDownlink != nil {
 		ctx = events.ContextWithCorrelationID(ctx, genState.ApplicationDownlink.CorrelationIDs...)
 	}
+	req.FrequencyPlanID = dev.FrequencyPlanID
 	req.Priority = genDown.Priority
 
 	down, err := ns.scheduleDownlinkByPaths(
@@ -1164,6 +1166,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						return dev, nil, nil
 					}
 					req.Priority = ns.downlinkPriorities.JoinAccept
+					req.FrequencyPlanID = dev.FrequencyPlanID
 
 					down, err := ns.scheduleDownlinkByPaths(
 						log.NewContext(ctx, loggerWithTxRequestFields(logger, req, rx1, rx2).WithField("rx1_delay", req.Rx1Delay)),
@@ -1256,6 +1259,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					Class:            dev.MACState.DeviceClass,
 					Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
 					Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
+					FrequencyPlanID:  dev.FrequencyPlanID,
 				}
 
 				genDown, genState, err := ns.generateDownlink(ctx, dev, phy, dev.MACState.DeviceClass, timeNow().Add(nsScheduleWindow),

@@ -57,6 +57,10 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if err := validateContactInfo(req.Gateway.ContactInfo); err != nil {
 		return nil, err
 	}
+	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
+		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err = store.GetGatewayStore(db).CreateGateway(ctx, &req.Gateway)
 		if err != nil {
@@ -90,7 +94,15 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+
+	// Backwards compatibility for frequency_plan_id field.
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "frequency_plan_ids")
+		}
+	}
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
+
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
 		if ttnpb.HasOnlyAllowedFields(req.FieldMask.Paths, ttnpb.PublicGatewayFields...) {
 			defer func() { gtw = gtw.PublicSafe() }()
@@ -114,6 +126,12 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	if err != nil {
 		return nil, err
 	}
+
+	// Backwards compatibility for frequency_plan_id field.
+	if len(gtw.FrequencyPlanIDs) > 0 {
+		gtw.FrequencyPlanID = gtw.FrequencyPlanIDs[0]
+	}
+
 	return gtw, nil
 }
 
@@ -138,7 +156,14 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 }
 
 func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatewaysRequest) (gtws *ttnpb.Gateways, err error) {
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
+	// Backwards compatibility for frequency_plan_id field.
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "frequency_plan_ids")
+		}
+	}
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, getPaths, []string{"frequency_plan_id"})
+
 	var includeIndirect bool
 	if req.Collaborator == nil {
 		authInfo, err := is.authInfo(ctx)
@@ -188,16 +213,23 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		if err != nil {
 			return err
 		}
-		for i, gtw := range gtws.Gateways {
-			if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO) != nil {
-				gtws.Gateways[i] = gtw.PublicSafe()
-			}
-		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	for i, gtw := range gtws.Gateways {
+		// Backwards compatibility for frequency_plan_id field.
+		if len(gtw.FrequencyPlanIDs) > 0 {
+			gtw.FrequencyPlanID = gtw.FrequencyPlanIDs[0]
+		}
+
+		if rights.RequireGateway(ctx, gtw.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_INFO) != nil {
+			gtws.Gateways[i] = gtw.PublicSafe()
+		}
+	}
+
 	return gtws, nil
 }
 
@@ -205,7 +237,18 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	if err = rights.RequireGateway(ctx, req.GatewayIdentifiers, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
-	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, nil, getPaths)
+
+	// Backwards compatibility for frequency_plan_id field.
+	if ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_id") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "frequency_plan_ids") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "frequency_plan_ids")
+		}
+	}
+	if len(req.FrequencyPlanIDs) == 0 && req.FrequencyPlanID != "" {
+		req.FrequencyPlanIDs = []string{req.FrequencyPlanID}
+	}
+
+	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask.Paths, nil, append(getPaths, "frequency_plan_id"))
 	if len(req.FieldMask.Paths) == 0 {
 		req.FieldMask.Paths = updatePaths
 	}

@@ -953,6 +953,7 @@ func TestGatewayServer(t *testing.T) {
 												},
 											},
 										},
+										FrequencyPlanID: test.EUFrequencyPlanID,
 									},
 								},
 							},
@@ -973,6 +974,33 @@ func TestGatewayServer(t *testing.T) {
 															GatewayID: registeredGatewayID,
 														},
 													}, 10000000),
+												},
+											},
+										},
+										Priority:         ttnpb.TxSchedulePriority_NORMAL,
+										Rx1Delay:         ttnpb.RX_DELAY_1,
+										Rx1DataRateIndex: 5,
+										Rx1Frequency:     868100000,
+										FrequencyPlanID:  test.EUFrequencyPlanID,
+									},
+								},
+							},
+						},
+						{
+							Name: "ValidClassAWithoutFrequencyPlanInTxRequest",
+							Message: &ttnpb.DownlinkMessage{
+								RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
+								Settings: &ttnpb.DownlinkMessage_Request{
+									Request: &ttnpb.TxRequest{
+										Class: ttnpb.CLASS_A,
+										DownlinkPaths: []*ttnpb.DownlinkPath{
+											{
+												Path: &ttnpb.DownlinkPath_UplinkToken{
+													UplinkToken: io.MustUplinkToken(ttnpb.GatewayAntennaIdentifiers{
+														GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															GatewayID: registeredGatewayID,
+														},
+													}, 20000000),
 												},
 											},
 										},
@@ -1006,6 +1034,7 @@ func TestGatewayServer(t *testing.T) {
 										Rx1Delay:         ttnpb.RX_DELAY_1,
 										Rx1DataRateIndex: 5,
 										Rx1Frequency:     868100000,
+										FrequencyPlanID:  test.EUFrequencyPlanID,
 									},
 								},
 							},
@@ -1017,6 +1046,33 @@ func TestGatewayServer(t *testing.T) {
 						},
 						{
 							Name: "ValidClassC",
+							Message: &ttnpb.DownlinkMessage{
+								RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
+								Settings: &ttnpb.DownlinkMessage_Request{
+									Request: &ttnpb.TxRequest{
+										Class: ttnpb.CLASS_C,
+										DownlinkPaths: []*ttnpb.DownlinkPath{
+											{
+												Path: &ttnpb.DownlinkPath_Fixed{
+													Fixed: &ttnpb.GatewayAntennaIdentifiers{
+														GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															GatewayID: registeredGatewayID,
+														},
+													},
+												},
+											},
+										},
+										Priority:         ttnpb.TxSchedulePriority_NORMAL,
+										Rx1Delay:         ttnpb.RX_DELAY_1,
+										Rx1DataRateIndex: 5,
+										Rx1Frequency:     868100000,
+										FrequencyPlanID:  test.EUFrequencyPlanID,
+									},
+								},
+							},
+						},
+						{
+							Name: "ValidClassCWithoutFrequencyPlanInTxRequest",
 							Message: &ttnpb.DownlinkMessage{
 								RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
 								Settings: &ttnpb.DownlinkMessage_Request{

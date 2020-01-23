@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -169,9 +170,15 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
-	fp, err := s.server.GetFrequencyPlan(ctx, ids)
+	fps, err := s.server.GetFrequencyPlans(ctx, ids)
 	if err != nil {
 		return nil, err
+	}
+	// TODO: Support multiple frequency plans (https://github.com/TheThingsNetwork/lorawan-stack/issues/1820)
+	var fp *frequencyplans.FrequencyPlan
+	for _, v := range fps {
+		fp = v
+		break
 	}
 	return fp.ToConcentratorConfig()
 }

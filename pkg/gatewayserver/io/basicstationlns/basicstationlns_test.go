@@ -36,7 +36,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	pfconfig "go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
+	pfconfig "go.thethings.network/lorawan-stack/pkg/pfconfig/basicstationlns"
+	"go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
@@ -468,7 +469,7 @@ func TestVersion(t *testing.T) {
 				Protocol: 2,
 				Features: "prod gps",
 			},
-			ExpectedRouterConfig: messages.RouterConfig{
+			ExpectedRouterConfig: pfconfig.RouterConfig{
 				Region:         "EU863",
 				HardwareSpec:   "sx1301/1",
 				FrequencyRange: []int{863000000, 870000000},
@@ -482,12 +483,12 @@ func TestVersion(t *testing.T) {
 					{7, 250, 0},
 					{0, 0, 0},
 				},
-				SX1301Config: []pfconfig.SX1301Config{
+				SX1301Config: []shared.SX1301Config{
 					{
 						LoRaWANPublic: true,
 						ClockSource:   1,
 						AntennaGain:   0,
-						Radios: []pfconfig.RFConfig{
+						Radios: []shared.RFConfig{
 							{
 								Enable:     true,
 								Frequency:  867500000,
@@ -503,7 +504,7 @@ func TestVersion(t *testing.T) {
 								RSSIOffset: -166,
 							},
 						},
-						Channels: []pfconfig.IFConfig{
+						Channels: []shared.IFConfig{
 							{Enable: true, Radio: 0, IFValue: 600000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IFValue: 1000000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
@@ -513,9 +514,9 @@ func TestVersion(t *testing.T) {
 							{Enable: true, Radio: 0, IFValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IFValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &pfconfig.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
-						FSKChannel:          &pfconfig.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
-						TxLUTConfigs:        []pfconfig.TxLUTConfig{},
+						LoRaStandardChannel: &shared.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
+						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
+						TxLUTConfigs:        []shared.TxLUTConfig{},
 					},
 				},
 			},
@@ -547,7 +548,7 @@ func TestVersion(t *testing.T) {
 				Protocol: 2,
 				Features: "rmtsh gps",
 			},
-			ExpectedRouterConfig: messages.RouterConfig{
+			ExpectedRouterConfig: pfconfig.RouterConfig{
 				Region:         "EU863",
 				HardwareSpec:   "sx1301/1",
 				FrequencyRange: []int{863000000, 870000000},
@@ -564,12 +565,12 @@ func TestVersion(t *testing.T) {
 				NoCCA:       true,
 				NoDwellTime: true,
 				NoDutyCycle: true,
-				SX1301Config: []pfconfig.SX1301Config{
+				SX1301Config: []shared.SX1301Config{
 					{
 						LoRaWANPublic: true,
 						ClockSource:   1,
 						AntennaGain:   0,
-						Radios: []pfconfig.RFConfig{
+						Radios: []shared.RFConfig{
 							{
 								Enable:     true,
 								Frequency:  867500000,
@@ -585,7 +586,7 @@ func TestVersion(t *testing.T) {
 								RSSIOffset: -166,
 							},
 						},
-						Channels: []pfconfig.IFConfig{
+						Channels: []shared.IFConfig{
 							{Enable: true, Radio: 0, IFValue: 600000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IFValue: 1000000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
@@ -595,9 +596,9 @@ func TestVersion(t *testing.T) {
 							{Enable: true, Radio: 0, IFValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IFValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &pfconfig.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
-						FSKChannel:          &pfconfig.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
-						TxLUTConfigs:        []pfconfig.TxLUTConfig{},
+						LoRaStandardChannel: &shared.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
+						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
+						TxLUTConfigs:        []shared.TxLUTConfig{},
 					},
 				},
 			},
@@ -640,11 +641,11 @@ func TestVersion(t *testing.T) {
 			}()
 			select {
 			case res := <-resCh:
-				var response messages.RouterConfig
+				var response pfconfig.RouterConfig
 				if err := json.Unmarshal(res, &response); err != nil {
 					t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 				}
-				response.MuxTime = tc.ExpectedRouterConfig.(messages.RouterConfig).MuxTime
+				response.MuxTime = tc.ExpectedRouterConfig.(pfconfig.RouterConfig).MuxTime
 				a.So(response, should.Resemble, tc.ExpectedRouterConfig)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
@@ -852,6 +853,7 @@ func TestTraffic(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 				CorrelationIDs: []string{"correlation1", "correlation2"},
@@ -1087,6 +1089,7 @@ func TestRTT(t *testing.T) {
 						Rx1Delay:         ttnpb.RX_DELAY_1,
 						Rx1DataRateIndex: 5,
 						Rx1Frequency:     868100000,
+						FrequencyPlanID:  test.EUFrequencyPlanID,
 					},
 				},
 				CorrelationIDs: []string{"correlation1", "correlation2"},

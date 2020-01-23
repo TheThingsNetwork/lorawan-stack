@@ -2493,7 +2493,8 @@ Gateway is the message that defines a gateway on the network.
 | `gateway_server_address` | [`string`](#string) |  | The address of the Gateway Server to connect to. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `auto_update` | [`bool`](#bool) |  |  |
 | `update_channel` | [`string`](#string) |  |  |
-| `frequency_plan_id` | [`string`](#string) |  |  |
+| `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID of the gateway. This equals the first element of the frequency_plan_ids field. |
+| `frequency_plan_ids` | [`string`](#string) | repeated | Frequency plan IDs of the gateway. The first element equals the frequency_plan_id field. |
 | `antennas` | [`GatewayAntenna`](#ttn.lorawan.v3.GatewayAntenna) | repeated |  |
 | `status_public` | [`bool`](#bool) |  | The status of this gateway may be publicly displayed. |
 | `location_public` | [`bool`](#bool) |  | The location of this gateway may be publicly displayed. |
@@ -2513,6 +2514,7 @@ Gateway is the message that defines a gateway on the network.
 | `version_ids` | <p>`message.required`: `true`</p> |
 | `gateway_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
+| `frequency_plan_ids` | <p>`repeated.items.string.max_len`: `64`</p> |
 | `downlink_path_constraint` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.Gateway.AttributesEntry">Message `Gateway.AttributesEntry`</a>
@@ -4147,6 +4149,7 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | `rx2_frequency` | [`uint64`](#uint64) |  | Frequency (Hz) for Rx2. |
 | `priority` | [`TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling. Requests with a higher priority are allocated more channel time than messages with a lower priority, in duty-cycle limited regions. A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object. |
 | `absolute_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the downlink message should be transmitted. This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots. This requires the gateway to have GPS time sychronization. If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations. |
+| `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID from which the frequencies in this message are retrieved. |
 | `advanced` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 #### Field Rules
@@ -4157,6 +4160,7 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | `rx1_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `rx2_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `priority` | <p>`enum.defined_only`: `true`</p> |
+| `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.TxSettings">Message `TxSettings`</a>
 

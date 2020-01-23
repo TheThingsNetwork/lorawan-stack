@@ -53,8 +53,8 @@ type Server interface {
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
 	Connect(ctx context.Context, frontend Frontend, ids ttnpb.GatewayIdentifiers) (*Connection, error)
-	// GetFrequencyPlan gets the specified frequency plan by the gateway identifiers.
-	GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error)
+	// GetFrequencyPlans gets the frequency plans by the gateway identifiers.
+	GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
 	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
@@ -77,7 +77,8 @@ type Connection struct {
 
 	frontend  Frontend
 	gateway   *ttnpb.Gateway
-	fp        *frequencyplans.FrequencyPlan
+	fps       map[string]*frequencyplans.FrequencyPlan
+	bandID    string
 	scheduler *scheduling.Scheduler
 	rtts      *rtts
 
@@ -88,9 +89,9 @@ type Connection struct {
 }
 
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
+func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, bandID string, fps map[string]*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
 	ctx, cancelCtx := errorcontext.New(ctx)
-	scheduler, err := scheduling.NewScheduler(ctx, fp, enforceDutyCycle, scheduleAnytimeDelay, nil)
+	scheduler, err := scheduling.NewScheduler(ctx, fps, enforceDutyCycle, scheduleAnytimeDelay, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +101,8 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 
 		frontend:    frontend,
 		gateway:     gateway,
-		fp:          fp,
+		bandID:      bandID,
+		fps:         fps,
 		scheduler:   scheduler,
 		rtts:        newRTTs(maxRTTs),
 		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
@@ -255,6 +257,9 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 	return nil
 }
 
+var errFrequencyPlanNotConfigured = errors.DefineInvalidArgument("frequency_plan_not_configured", "frequency plan `{id}` is not configured for this gateway")
+var errNoFrequencyPlanIDInTxRequest = errors.DefineInvalidArgument("no_frequency_plan_id_in_tx_request", "no frequency plan ID in tx request")
+
 // ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
 func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
@@ -273,7 +278,25 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	if err != nil {
 		return 0, err
 	}
-	phy, err := band.GetByID(c.fp.BandID)
+
+	var fp *frequencyplans.FrequencyPlan
+	fpID := request.GetFrequencyPlanID()
+	if fpID != "" {
+		fp = c.fps[fpID]
+		if fp == nil {
+			return 0, errFrequencyPlanNotConfigured.WithAttributes("id", request.FrequencyPlanID)
+		}
+	} else {
+		// Backwards compatibility. If there's no FrequencyPlanID in the TxRequest, then there must be only one Frequency Plan configured.
+		if len(c.fps) != 1 {
+			return 0, errNoFrequencyPlanIDInTxRequest
+		}
+		for _, v := range c.fps {
+			fp = v
+			break
+		}
+	}
+	phy, err := band.GetByID(fp.BandID)
 	if err != nil {
 		return 0, err
 	}
@@ -309,7 +332,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
 		}
 		// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
-		maxPHYLength := phy.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(c.fp.DwellTime.GetDownlinks()) + 5
+		maxPHYLength := phy.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()) + 5
 		if len(msg.RawPayload) > int(maxPHYLength) {
 			return 0, errTooLong.WithAttributes(
 				"payload_length", len(msg.RawPayload),
@@ -321,10 +344,10 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if sb, ok := phy.FindSubBand(rx.frequency); ok {
 			eirp = sb.MaxEIRP
 		}
-		if c.fp.MaxEIRP != nil {
-			eirp = *c.fp.MaxEIRP
+		if fp.MaxEIRP != nil {
+			eirp = *fp.MaxEIRP
 		}
-		if sb, ok := c.fp.FindSubBand(rx.frequency); ok && sb.MaxEIRP != nil {
+		if sb, ok := fp.FindSubBand(rx.frequency); ok && sb.MaxEIRP != nil {
 			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
@@ -467,8 +490,12 @@ func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 	return c.rtts.Stats()
 }
 
-// FrequencyPlan returns the frequency plan for the gateway.
-func (c *Connection) FrequencyPlan() *frequencyplans.FrequencyPlan { return c.fp }
+// FrequencyPlans returns the frequency plans for the gateway.
+func (c *Connection) FrequencyPlans() map[string]*frequencyplans.FrequencyPlan { return c.fps }
+
+// BandID returns the common band ID for the frequency plans in this connection.
+// TODO: Handle mixed bands (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
+func (c *Connection) BandID() string { return c.bandID }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.

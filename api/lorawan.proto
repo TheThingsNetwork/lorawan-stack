@@ -333,6 +333,9 @@ message TxRequest {
   // If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations.
   google.protobuf.Timestamp absolute_time = 9 [(gogoproto.stdtime) = true];
 
+  // Frequency plan ID from which the frequencies in this message are retrieved.
+  string frequency_plan_id = 10 [(gogoproto.customname) = "FrequencyPlanID", (validate.rules).string.max_len = 64];
+
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API
   // - field names are written in snake_case

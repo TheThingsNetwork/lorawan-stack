@@ -65,9 +65,14 @@ type RTTs interface {
 	Stats() (min, max, median time.Duration, count int)
 }
 
+var (
+	errFrequencyPlansTimeOffAir     = errors.DefineInvalidArgument("frequency_plans_time_off_air", "frequency plans must have the same time off air value")
+	errFrequencyPlansOverlapSubBand = errors.DefineInvalidArgument("frequency_plans_overlap_sub_band", "frequency plans must not have overlapping sub bands")
+)
+
 // NewScheduler instantiates a new Scheduler for the given frequency plan.
 // If no time source is specified, the system time is used.
-func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, timeSource TimeSource) (*Scheduler, error) {
+func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration, timeSource TimeSource) (*Scheduler, error) {
 	logger := log.FromContext(ctx)
 	if timeSource == nil {
 		timeSource = SystemTimeSource
@@ -83,41 +88,75 @@ func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforce
 		scheduleAnytimeDelay = &ScheduleTimeShort
 	}
 
-	toa := fp.TimeOffAir
+	var toa *frequencyplans.TimeOffAir
+	for _, fp := range fps {
+		if toa != nil && fp.TimeOffAir != *toa {
+			return nil, errFrequencyPlansTimeOffAir
+		}
+		toa = &fp.TimeOffAir
+	}
+
 	if toa.Duration < QueueDelay {
 		toa.Duration = QueueDelay
 	}
+
 	s := &Scheduler{
 		clock:                &RolloverClock{},
-		respectsDwellTime:    fp.RespectsDwellTime,
-		timeOffAir:           toa,
+		timeOffAir:           *toa,
+		fps:                  fps,
 		timeSource:           timeSource,
 		scheduleAnytimeDelay: *scheduleAnytimeDelay,
 	}
 	if enforceDutyCycle {
-		if subBands := fp.SubBands; len(subBands) > 0 {
-			for _, subBand := range subBands {
-				params := SubBandParameters{
-					MinFrequency: subBand.MinFrequency,
-					MaxFrequency: subBand.MaxFrequency,
-					DutyCycle:    subBand.DutyCycle,
+		for _, fp := range fps {
+			if subBands := fp.SubBands; len(subBands) > 0 {
+				for _, subBand := range subBands {
+					params := SubBandParameters{
+						MinFrequency: subBand.MinFrequency,
+						MaxFrequency: subBand.MaxFrequency,
+						DutyCycle:    subBand.DutyCycle,
+					}
+					sb := NewSubBand(ctx, params, s.clock, nil)
+					var isIdentical bool
+					for _, subBand := range s.subBands {
+						if subBand.IsIdentical(sb) {
+							isIdentical = true
+							break
+						}
+						if subBand.HasOverlap(sb) {
+							return nil, errFrequencyPlansOverlapSubBand
+						}
+					}
+					if !isIdentical {
+						s.subBands = append(s.subBands, sb)
+					}
 				}
-				sb := NewSubBand(ctx, params, s.clock, nil)
-				s.subBands = append(s.subBands, sb)
-			}
-		} else {
-			band, err := band.GetByID(fp.BandID)
-			if err != nil {
-				return nil, err
-			}
-			for _, subBand := range band.SubBands {
-				params := SubBandParameters{
-					MinFrequency: subBand.MinFrequency,
-					MaxFrequency: subBand.MaxFrequency,
-					DutyCycle:    subBand.DutyCycle,
+			} else {
+				band, err := band.GetByID(fp.BandID)
+				if err != nil {
+					return nil, err
 				}
-				sb := NewSubBand(ctx, params, s.clock, nil)
-				s.subBands = append(s.subBands, sb)
+				for _, subBand := range band.SubBands {
+					params := SubBandParameters{
+						MinFrequency: subBand.MinFrequency,
+						MaxFrequency: subBand.MaxFrequency,
+						DutyCycle:    subBand.DutyCycle,
+					}
+					sb := NewSubBand(ctx, params, s.clock, nil)
+					var isIdentical bool
+					for _, subBand := range s.subBands {
+						if subBand.IsIdentical(sb) {
+							isIdentical = true
+							break
+						}
+						if subBand.HasOverlap(sb) {
+							return nil, errFrequencyPlansOverlapSubBand
+						}
+					}
+					if !isIdentical {
+						s.subBands = append(s.subBands, sb)
+					}
+				}
 			}
 		}
 	} else {
@@ -134,7 +173,7 @@ func NewScheduler(ctx context.Context, fp *frequencyplans.FrequencyPlan, enforce
 // Scheduler is a packet scheduler that takes time conflicts and sub-band restrictions into account.
 type Scheduler struct {
 	clock                *RolloverClock
-	respectsDwellTime    func(isDownlink bool, frequency uint64, duration time.Duration) bool
+	fps                  map[string]*frequencyplans.FrequencyPlan
 	timeOffAir           frequencyplans.TimeOffAir
 	timeSource           TimeSource
 	subBands             []*SubBand
@@ -161,10 +200,17 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings, star
 	if err != nil {
 		return Emission{}, err
 	}
-	if !s.respectsDwellTime(true, settings.Frequency, d) {
-		return Emission{}, errDwellTime
+	for _, fp := range s.fps {
+		if fp.RespectsDwellTime(true, settings.Frequency, d) {
+			return NewEmission(starts, d), nil
+		}
 	}
-	return NewEmission(starts, d), nil
+	return Emission{}, errDwellTime
+}
+
+// SubBandCount returns the number of sub bands in the scheduler.
+func (s *Scheduler) SubBandCount() int {
+	return len(s.subBands)
 }
 
 var (

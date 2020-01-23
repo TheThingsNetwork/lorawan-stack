@@ -85,11 +85,15 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 			FrequencyPlanID:    test.EUFrequencyPlanID,
 		}
 	}
-	fp, err := s.GetFrequencyPlan(ctx, ids)
+	fp, err := s.store.GetByID(gtw.FrequencyPlanID)
 	if err != nil {
 		return nil, err
 	}
-	conn, err := io.NewConnection(ctx, frontend, gtw, fp, true, nil)
+	fps, err := s.GetFrequencyPlans(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	conn, err := io.NewConnection(ctx, frontend, gtw, fp.BandID, fps, true, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -102,15 +106,21 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 	return conn, nil
 }
 
-// GetFrequencyPlan implements io.Server.
-func (s *server) GetFrequencyPlan(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*frequencyplans.FrequencyPlan, error) {
+// GetFrequencyPlans implements io.Server.
+func (s *server) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	var fpID string
 	if gtw, ok := s.gateways[unique.ID(ctx, ids)]; ok {
 		fpID = gtw.FrequencyPlanID
 	} else {
 		fpID = test.EUFrequencyPlanID
 	}
-	return s.store.GetByID(fpID)
+	fp, err := s.store.GetByID(fpID)
+	if err != nil {
+		return nil, err
+	}
+	fps := make(map[string]*frequencyplans.FrequencyPlan)
+	fps[fpID] = fp
+	return fps, nil
 }
 
 // ClaimDownlink implements io.Server.

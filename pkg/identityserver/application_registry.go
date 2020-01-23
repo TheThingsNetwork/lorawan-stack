@@ -169,16 +169,18 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		if err != nil {
 			return err
 		}
-		for i, app := range apps.Applications {
-			if rights.RequireApplication(ctx, app.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_INFO) != nil {
-				apps.Applications[i] = app.PublicSafe()
-			}
-		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	for i, app := range apps.Applications {
+		if rights.RequireApplication(ctx, app.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_INFO) != nil {
+			apps.Applications[i] = app.PublicSafe()
+		}
+	}
+
 	return apps, nil
 }
 
