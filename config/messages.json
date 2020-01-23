@@ -3428,15 +3428,6 @@
       "file": "io.go"
     }
   },
-  "error:pkg/gatewayserver/io:no_gps_sync": {
-    "translations": {
-      "en": "gateway time is not GPS synchronized"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io",
-      "file": "io.go"
-    }
-  },
   "error:pkg/gatewayserver/io:no_absolute_time": {
     "translations": {
       "en": "no absolute time provided for class B downlink"
@@ -3449,6 +3440,15 @@
   "error:pkg/gatewayserver/io:no_frequency_plan_id_in_tx_request": {
     "translations": {
       "en": "no frequency plan ID in tx request"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:no_gps_sync": {
+    "translations": {
+      "en": "gateway time is not GPS synchronized"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
