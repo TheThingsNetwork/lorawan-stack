@@ -23,7 +23,7 @@ func (m *UpdateUserRequest) ValidateContext(context.Context) error {
 	if len(m.FieldMask.Paths) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(fieldsWithPrefix("user", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("user", m.FieldMask.Paths...),
 		"user.ids",
 	)...)
 }

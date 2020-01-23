@@ -23,7 +23,7 @@ func (m *SetApplicationLinkRequest) ValidateContext(context.Context) error {
 	if len(m.FieldMask.Paths) == 0 {
 		return m.ValidateFields()
 	}
-	return m.ValidateFields(append(fieldsWithPrefix("link", m.FieldMask.Paths...),
+	return m.ValidateFields(append(FieldsWithPrefix("link", m.FieldMask.Paths...),
 		"application_ids",
 	)...)
 }
