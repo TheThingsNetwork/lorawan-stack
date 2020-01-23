@@ -30,9 +30,6 @@ import (
 // fractStep defines (1/2)^8 second step used in DeviceTimeAns payload.
 const fractStep = 3906250 * time.Nanosecond
 
-// maxGPSTime defines the maximum time allowed in the DeviceTime MAC command.
-const maxGPSTime int64 = 1<<32 - 1
-
 // MACCommandDescriptor descibes a MAC command.
 type MACCommandDescriptor struct {
 	InitiatedByDevice bool
@@ -623,18 +620,19 @@ var DefaultMACCommands = MACCommandSpec{
 		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDeviceTimeAns()
 
-			sec := gpstime.ToGPS(pld.Time)
-			if sec > maxGPSTime {
-				return nil, errExpectedLowerOrEqual("Time", maxGPSTime)(sec)
+			t := gpstime.ToGPS(pld.Time)
+			sec := t / time.Second
+			if sec > math.MaxUint32 {
+				return nil, errExpectedLowerOrEqual("Time", uint32(math.MaxUint32))(sec)
 			}
 			b = appendUint32(b, uint32(sec), 4)
-			b = append(b, byte(time.Duration(pld.Time.Nanosecond())/fractStep))
+			b = append(b, byte((t-sec*time.Second)/fractStep))
 			return b, nil
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DEVICE_TIME, "DeviceTimeAns", 5, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DeviceTimeAns_{
 				DeviceTimeAns: &ttnpb.MACCommand_DeviceTimeAns{
-					Time: gpstime.Parse(int64(parseUint32(b[0:4]))).Add(time.Duration(b[4]) * fractStep),
+					Time: gpstime.Parse(time.Duration(parseUint32(b[0:4]))*time.Second + time.Duration(b[4])*fractStep),
 				},
 			}
 			return nil

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,9 @@ import (
 	"time"
 )
 
-// 1980-01-06T00:00:00+00:00
-const gpsEpochSec = 315964800
+var gpsEpoch = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
 
-// Leap seconds in GPS time
+// Leap seconds represented as seconds since GPS epoch.
 var leaps = [...]int64{
 	46828800,
 	78364801,
@@ -45,40 +44,45 @@ var leaps = [...]int64{
 	1341118800,
 }
 
-// IsLeap reports whether the given GPS time, sec seconds since January 6, 1980 UTC, is a leap second in UTC.
-func IsLeap(sec int64) bool {
-	i := int64(len(leaps)) - 1
-	for ; i >= 0; i-- {
-		if sec > leaps[i] {
+func seconds(d time.Duration) int64 {
+	return int64(d / time.Second)
+}
+
+// IsLeap reports whether the given time.Duration elapsed since GPS epoch (January 6, 1980 UTC) is a leap second in UTC.
+func IsLeapSecond(d time.Duration) bool {
+	dSec := seconds(d)
+	for i := len(leaps) - 1; i >= 0; i-- {
+		if dSec > leaps[i] {
 			return false
 		}
-		if sec == leaps[i] {
+		if dSec == leaps[i] {
 			return true
 		}
 	}
 	return false
 }
 
-// Parse returns the local Time corresponding to the given Time time, sec seconds since January 6, 1980 UTC.
-func Parse(sec int64) time.Time {
+// Parse returns the UTC Time corresponding to the given time.Duration elapsed since GPS epoch (January 6, 1980 UTC).
+func Parse(d time.Duration) time.Time {
+	dSec := seconds(d)
 	i := int64(len(leaps))
 	for ; i > 0; i-- {
-		if sec > leaps[i-1] {
+		if dSec > leaps[i-1] {
 			break
 		}
 	}
-	return time.Unix(sec+gpsEpochSec-i, 0)
+	return gpsEpoch.Add(d - time.Duration(i)*time.Second)
 }
 
-// ToGPS returns t as a ToGPS time, the number of seconds elapsed since January 6, 1980 UTC.
-func ToGPS(t time.Time) int64 {
-	sec := t.Unix() - gpsEpochSec
-
+// ToGPS returns t as time.Duration elapsed since GPS epoch (January 6, 1980 UTC).
+func ToGPS(t time.Time) time.Duration {
+	d := t.Sub(gpsEpoch)
+	dSec := seconds(d)
 	i := int64(len(leaps))
 	for ; i > 0; i-- {
-		if sec > leaps[i-1]-i {
+		if dSec > leaps[i-1]-i {
 			break
 		}
 	}
-	return sec + i
+	return d + time.Duration(i)*time.Second
 }

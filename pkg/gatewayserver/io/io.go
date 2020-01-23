@@ -213,6 +213,7 @@ var (
 	errNotAllowed       = errors.DefineFailedPrecondition("not_allowed", "downlink not allowed")
 	errNotTxRequest     = errors.DefineInvalidArgument("not_tx_request", "downlink message is not a Tx request")
 	errNoAbsoluteTime   = errors.DefineInvalidArgument("no_absolute_time", "no absolute time provided for class B downlink")
+	errNoGPSSync        = errors.DefineFailedPrecondition("no_gps_sync", "gateway time is not GPS synchronized")
 	errNoRxDelay        = errors.DefineInvalidArgument("no_rx_delay", "no Rx delay provided for class A downlink")
 	errNoUplinkToken    = errors.DefineInvalidArgument("no_uplink_token", "no uplink token provided for class A downlink")
 	errDownlinkPath     = errors.DefineInvalidArgument("downlink_path", "invalid downlink path")
@@ -354,6 +355,10 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			if request.AbsoluteTime == nil {
 				return 0, errNoAbsoluteTime
 			}
+			if !c.scheduler.IsGatewayTimeSynced() {
+				rxErrs = append(rxErrs, errNoGPSSync)
+				continue
+			}
 			f = c.scheduler.ScheduleAt
 			settings.Time = request.AbsoluteTime
 		case ttnpb.CLASS_C:
@@ -372,8 +377,12 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			rxErrs = append(rxErrs, errRxWindowSchedule.WithCause(err).WithAttributes("window", i+1))
 			continue
 		}
-		settings.Time = nil
-		settings.Timestamp = uint32(time.Duration(em.Starts()) / time.Microsecond)
+		if settings.Time == nil || !c.scheduler.IsGatewayTimeSynced() {
+			settings.Time = nil
+			settings.Timestamp = uint32(time.Duration(em.Starts()) / time.Microsecond)
+		} else {
+			settings.Timestamp = 0
+		}
 		msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &settings,
 		}

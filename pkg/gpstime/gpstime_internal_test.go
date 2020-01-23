@@ -16,15 +16,22 @@ package gpstime
 
 import (
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
-func TestIsGPSLeap(t *testing.T) {
+func TestIsLeapSecond(t *testing.T) {
 	a := assertions.New(t)
 	for _, v := range leaps {
-		a.So(IsLeap(v), should.BeTrue)
-		a.So(IsLeap(v+1), should.BeFalse)
+		a.So(IsLeapSecond(time.Duration(v)*time.Second-time.Millisecond), should.BeFalse)
+		a.So(IsLeapSecond(time.Duration(v)*time.Second-time.Microsecond), should.BeFalse)
+		a.So(IsLeapSecond(time.Duration(v)*time.Second-time.Nanosecond), should.BeFalse)
+		a.So(IsLeapSecond(time.Duration(v)*time.Second), should.BeTrue)
+		a.So(IsLeapSecond(time.Duration(v)*time.Second+time.Nanosecond), should.BeTrue)
+		a.So(IsLeapSecond(time.Duration(v)*time.Second+time.Microsecond), should.BeTrue)
+		a.So(IsLeapSecond(time.Duration(v)*time.Second+999*time.Millisecond), should.BeTrue)
+		a.So(IsLeapSecond(time.Duration(v)*time.Second+time.Second), should.BeFalse)
 	}
 }
