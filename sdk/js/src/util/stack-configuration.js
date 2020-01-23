@@ -121,10 +121,10 @@ class StackConfiguration {
   getComponentsWithDistinctBaseUrls(components = STACK_COMPONENTS) {
     const distinctComponents = components.reduce((collection, component) => {
       if (
-        Boolean(this._stackConfig.isComponentAvailable(component)) &&
-        !Object.values(collection).includes(this._stackConfig.getComponentUrlByName(component))
+        Boolean(this.isComponentAvailable(component)) &&
+        !Object.values(collection).includes(this.getComponentUrlByName(component))
       ) {
-        return { ...collection, [component]: this._stackConfig.getComponentUrlByName(component) }
+        return { ...collection, [component]: this.getComponentUrlByName(component) }
       }
       return collection
     }, {})
