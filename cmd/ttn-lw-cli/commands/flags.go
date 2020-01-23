@@ -182,6 +182,7 @@ func getSearchEndDevicesRequest(flagSet *pflag.FlagSet) (req *ttnpb.SearchEndDev
 		DevAddrContains:     devAddrContains,
 		Limit:               baseReq.Limit,
 		Page:                baseReq.Page,
+		Order:               baseReq.Order,
 	}, opt, getTotal
 }
 
