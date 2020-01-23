@@ -149,12 +149,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopClient: interopCl,
 		interopID:     conf.Interop.ID,
 	}
+	retryIO := io.NewRetryServer(as)
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
 		AS:       as,
 		kekLabel: conf.DeviceKEKLabel,
 	}
-	as.grpc.appAs = iogrpc.New(as, iogrpc.WithMQTTConfigProvider(as))
+	as.grpc.appAs = iogrpc.New(retryIO, iogrpc.WithMQTTConfigProvider(as))
 
 	ctx, cancel := context.WithCancel(as.Context())
 	defer func() {
@@ -190,7 +191,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 					"protocol", endpoint.Protocol(),
 				)
 			}
-			mqtt.Start(ctx, as, lis, version.Format, endpoint.Protocol())
+			mqtt.Start(ctx, retryIO, lis, version.Format, endpoint.Protocol())
 		}
 	}
 
@@ -206,7 +207,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
-	if as.pubsub, err = conf.PubSub.NewPubSub(c, as); err != nil {
+	if as.pubsub, err = conf.PubSub.NewPubSub(c, retryIO); err != nil {
 		return nil, err
 	}
 
@@ -275,7 +276,11 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	sub := io.NewSubscription(ctx, protocol, &ids)
 	l.subscribeCh <- sub
 	go func() {
-		<-sub.Context().Done()
+		select {
+		case <-l.ctx.Done():
+			sub.Disconnect(l.ctx.Err())
+		case <-sub.Context().Done():
+		}
 		l.unsubscribeCh <- sub
 	}()
 	return sub, nil
