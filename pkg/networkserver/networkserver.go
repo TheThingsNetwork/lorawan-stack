@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -44,12 +45,12 @@ const (
 	fOptsCapacity = 15
 )
 
-// WindowEndFunc is a function, which is used by Network Server to determine the end of deduplication and cooldown windows.
-type WindowEndFunc func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time
+// windowEndFunc is a function, which is used by Network Server to determine the end of deduplication and cooldown windows.
+type windowEndFunc func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time
 
-// NewWindowEndAfterFunc returns a WindowEndFunc, which closes
+// makeWindowEndAfterFunc returns a windowEndFunc, which closes
 // the returned channel after at least duration d after up.ServerTime or if the context is done.
-func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
+func makeWindowEndAfterFunc(d time.Duration) windowEndFunc {
 	return func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
 		ch := make(chan time.Time, 1)
 
@@ -69,6 +70,19 @@ func NewWindowEndAfterFunc(d time.Duration) WindowEndFunc {
 			ch <- end
 		}()
 		return ch
+	}
+}
+
+// newDevAddrFunc is a function, which is used by Network Server to derive new DevAddrs.
+type newDevAddrFunc func(ctx context.Context, dev *ttnpb.EndDevice) types.DevAddr
+
+// makeNewDevAddrFunc returns a newDevAddrFunc, which derives DevAddrs using specified prefixes.
+func makeNewDevAddrFunc(ps ...types.DevAddrPrefix) newDevAddrFunc {
+	return func(ctx context.Context, dev *ttnpb.EndDevice) types.DevAddr {
+		var devAddr types.DevAddr
+		random.Read(devAddr[:])
+		p := ps[random.Intn(len(ps))]
+		return devAddr.WithPrefix(p)
 	}
 }
 
@@ -98,8 +112,8 @@ type NetworkServer struct {
 
 	devices DeviceRegistry
 
-	netID           types.NetID
-	devAddrPrefixes []types.DevAddrPrefix
+	netID      types.NetID
+	newDevAddr newDevAddrFunc
 
 	applicationServers *sync.Map // string -> *applicationUpStream
 	applicationUplinks ApplicationUplinkQueue
@@ -112,8 +126,8 @@ type NetworkServer struct {
 	downlinkTasks      DownlinkTaskQueue
 	downlinkPriorities DownlinkPriorities
 
-	deduplicationDone WindowEndFunc
-	collectionDone    WindowEndFunc
+	deduplicationDone windowEndFunc
+	collectionDone    windowEndFunc
 
 	defaultMACSettings ttnpb.MACSettings
 
@@ -125,24 +139,17 @@ type NetworkServer struct {
 // Option configures the NetworkServer.
 type Option func(ns *NetworkServer)
 
-// WithDeduplicationDoneFunc overrides the default WindowEndFunc, which
-// is used to determine the end of uplink metadata deduplication.
-func WithDeduplicationDoneFunc(f WindowEndFunc) Option {
-	return func(ns *NetworkServer) {
-		ns.deduplicationDone = f
-	}
-}
-
-// WithCollectionDoneFunc overrides the default WindowEndFunc, which
-// is used to determine the end of uplink duplicate collection.
-func WithCollectionDoneFunc(f WindowEndFunc) Option {
-	return func(ns *NetworkServer) {
-		ns.collectionDone = f
-	}
-}
-
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
+	switch {
+	case conf.DeduplicationWindow == 0:
+		return nil, errInvalidConfiguration.WithCause(errors.New("DeduplicationWindow must be greater than 0"))
+	case conf.CooldownWindow == 0:
+		return nil, errInvalidConfiguration.WithCause(errors.New("CooldownWindow must be greater than 0"))
+	case conf.DownlinkTasks == nil:
+		return nil, errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified"))
+	}
+
 	devAddrPrefixes := conf.DevAddrPrefixes
 	if len(devAddrPrefixes) == 0 {
 		devAddr, err := types.NewDevAddr(conf.NetID, nil)
@@ -178,18 +185,28 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	}
 
 	ns := &NetworkServer{
-		Component:               c,
-		ctx:                     ctx,
-		netID:                   conf.NetID,
-		devAddrPrefixes:         devAddrPrefixes,
-		applicationServers:      &sync.Map{},
-		applicationUplinks:      conf.ApplicationUplinks,
-		devices:                 conf.Devices,
-		downlinkTasks:           conf.DownlinkTasks,
-		metadataAccumulators:    &sync.Map{},
-		metadataAccumulatorPool: &sync.Pool{},
-		hashPool:                &sync.Pool{},
-		downlinkPriorities:      downlinkPriorities,
+		Component:            c,
+		ctx:                  ctx,
+		netID:                conf.NetID,
+		newDevAddr:           makeNewDevAddrFunc(devAddrPrefixes...),
+		applicationServers:   &sync.Map{},
+		applicationUplinks:   conf.ApplicationUplinks,
+		deduplicationDone:    makeWindowEndAfterFunc(conf.DeduplicationWindow),
+		collectionDone:       makeWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow),
+		devices:              conf.Devices,
+		downlinkTasks:        conf.DownlinkTasks,
+		metadataAccumulators: &sync.Map{},
+		metadataAccumulatorPool: &sync.Pool{
+			New: func() interface{} {
+				return &metadataAccumulator{}
+			},
+		},
+		hashPool: &sync.Pool{
+			New: func() interface{} {
+				return fnv.New64a()
+			},
+		},
+		downlinkPriorities: downlinkPriorities,
 		defaultMACSettings: ttnpb.MACSettings{
 			ClassBTimeout:         conf.DefaultMACSettings.ClassBTimeout,
 			ClassCTimeout:         conf.DefaultMACSettings.ClassCTimeout,
@@ -198,13 +215,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		interopClient:  interopCl,
 		deviceKEKLabel: conf.DeviceKEKLabel,
 	}
-	ns.hashPool.New = func() interface{} {
-		return fnv.New64a()
-	}
-	ns.metadataAccumulatorPool.New = func() interface{} {
-		return &metadataAccumulator{}
-	}
-
 	if conf.DefaultMACSettings.ADRMargin != nil {
 		ns.defaultMACSettings.ADRMargin = &pbtypes.FloatValue{Value: *conf.DefaultMACSettings.ADRMargin}
 	}
@@ -226,26 +236,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 
 	for _, opt := range opts {
 		opt(ns)
-	}
-
-	switch {
-	case ns.deduplicationDone == nil && conf.DeduplicationWindow == 0:
-		return nil, errInvalidConfiguration.WithCause(errors.New("DeduplicationWindow is zero and WithDeduplicationDoneFunc not specified"))
-	case ns.collectionDone == nil && conf.DeduplicationWindow == 0:
-		return nil, errInvalidConfiguration.WithCause(errors.New("DeduplicationWindow is zero and WithCollectionDoneFunc not specified"))
-	case ns.collectionDone == nil && conf.CooldownWindow == 0:
-		return nil, errInvalidConfiguration.WithCause(errors.New("CooldownWindow is zero and WithCollectionDoneFunc not specified"))
-	}
-
-	if ns.downlinkTasks == nil {
-		return nil, errInvalidConfiguration.WithCause(errors.New("DownlinkTasks is not specified"))
-	}
-
-	if ns.deduplicationDone == nil {
-		ns.deduplicationDone = NewWindowEndAfterFunc(conf.DeduplicationWindow)
-	}
-	if ns.collectionDone == nil {
-		ns.collectionDone = NewWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow)
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsNs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("networkserver"))

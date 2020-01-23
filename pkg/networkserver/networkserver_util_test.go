@@ -1270,34 +1270,15 @@ type TestEnvironment struct {
 func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplication bool, opts ...Option) (*NetworkServer, context.Context, TestEnvironment, func()) {
 	t.Helper()
 
-	logger := test.GetLogger(t)
-
-	ctx := test.ContextWithT(test.Context(), t)
-	ctx = log.NewContext(ctx, logger)
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-
 	authCh := make(chan test.ClusterAuthRequest)
 	getPeerCh := make(chan test.ClusterGetPeerRequest)
 	eventsPublishCh := make(chan test.EventPubSubPublishRequest)
 
-	c := component.MustNew(
-		logger,
-		&component.Config{},
-		component.WithClusterNew(func(context.Context, *config.Cluster, ...cluster.Option) (cluster.Cluster, error) {
-			return &test.MockCluster{
-				AuthFunc:    test.MakeClusterAuthChFunc(authCh),
-				GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),
-				JoinFunc:    test.ClusterJoinNilFunc,
-				WithVerifiedSourceFunc: func(ctx context.Context) context.Context {
-					return clusterauth.NewContext(ctx, nil)
-				},
-			}, nil
-		}),
-	)
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
-
 	var collectionDoneCh, deduplicationDoneCh chan WindowEndRequest
 	if stubDeduplication {
+		conf.CooldownWindow = 42
+		conf.DeduplicationWindow = 42
+
 		collectionDoneCh = make(chan WindowEndRequest)
 		deduplicationDoneCh = make(chan WindowEndRequest)
 
@@ -1339,10 +1320,24 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplicati
 	}
 
 	ns := test.Must(New(
-		c,
+		componenttest.NewComponent(
+			t,
+			&component.Config{},
+			component.WithClusterNew(func(context.Context, *config.Cluster, ...cluster.Option) (cluster.Cluster, error) {
+				return &test.MockCluster{
+					AuthFunc:    test.MakeClusterAuthChFunc(authCh),
+					GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),
+					JoinFunc:    test.ClusterJoinNilFunc,
+					WithVerifiedSourceFunc: func(ctx context.Context) context.Context {
+						return clusterauth.NewContext(ctx, nil)
+					},
+				}, nil
+			}),
+		),
 		&conf,
 		opts...,
 	)).(*NetworkServer)
+	ns.Component.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 	if ns.interopClient == nil {
 		m, mEnv, closeM := newMockInteropClient(t)
@@ -1353,6 +1348,9 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplicati
 
 	componenttest.StartComponent(t, ns.Component)
 
+	ctx := test.ContextWithT(test.Context(), t)
+	ctx = log.NewContext(ctx, ns.Logger())
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	return ns, ctx, env, func() {
 		cancel()
 		for _, f := range closeFuncs {

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/band"
-	"go.thethings.network/lorawan-stack/pkg/component"
-	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -31,77 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
-
-func TestNewDevAddr(t *testing.T) {
-	a := assertions.New(t)
-
-	// Use DevAddr prefix from NetID.
-	{
-		ns := test.Must(New(
-			componenttest.NewComponent(t, &component.Config{}),
-			&Config{
-				NetID:               types.NetID{0x00, 0x00, 0x13},
-				DeduplicationWindow: 42,
-				CooldownWindow:      42,
-				DownlinkTasks: &MockDownlinkTaskQueue{
-					PopFunc: DownlinkTaskPopBlockFunc,
-				},
-			})).(*NetworkServer)
-
-		if !a.So(ns.devAddrPrefixes, should.HaveLength, 1) {
-			t.FailNow()
-		}
-		a.So(ns.devAddrPrefixes[0], should.Resemble, types.DevAddrPrefix{
-			DevAddr: types.DevAddr{0x26, 0, 0, 0},
-			Length:  7,
-		})
-
-		devAddr := ns.newDevAddr(test.Context(), nil)
-		a.So(devAddr.HasPrefix(ns.devAddrPrefixes[0]), should.BeTrue)
-	}
-
-	// Configured DevAddr prefixes.
-	{
-		ns := test.Must(New(
-			componenttest.NewComponent(t, &component.Config{}),
-			&Config{
-				NetID: types.NetID{0x00, 0x00, 0x13},
-				DevAddrPrefixes: []types.DevAddrPrefix{
-					{
-						DevAddr: types.DevAddr{0x26, 0x01, 0x00, 0x00},
-						Length:  16,
-					},
-					{
-						DevAddr: types.DevAddr{0x26, 0xff, 0x01, 0x00},
-						Length:  24,
-					},
-					{
-						DevAddr: types.DevAddr{0x27, 0x00, 0x00, 0x00},
-						Length:  8,
-					},
-				},
-				DeduplicationWindow: 42,
-				CooldownWindow:      42,
-				DownlinkTasks: &MockDownlinkTaskQueue{
-					PopFunc: DownlinkTaskPopBlockFunc,
-				},
-			})).(*NetworkServer)
-
-		seen := map[types.DevAddrPrefix]int{}
-		for i := 0; i < 100; i++ {
-			devAddr := ns.newDevAddr(test.Context(), nil)
-			for _, prefix := range ns.devAddrPrefixes {
-				if devAddr.HasPrefix(prefix) {
-					seen[prefix]++
-					break
-				}
-			}
-		}
-		a.So(seen[ns.devAddrPrefixes[0]], should.BeGreaterThan, 0)
-		a.So(seen[ns.devAddrPrefixes[1]], should.BeGreaterThan, 0)
-		a.So(seen[ns.devAddrPrefixes[2]], should.BeGreaterThan, 0)
-	}
-}
 
 func TestMatchAndHandleUplink(t *testing.T) {
 	netID := test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)

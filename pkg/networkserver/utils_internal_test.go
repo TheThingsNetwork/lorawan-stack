@@ -24,6 +24,22 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+// WithDeduplicationDoneFunc overrides the default windowEndFunc, which
+// is used to determine the end of uplink metadata deduplication.
+func WithDeduplicationDoneFunc(f windowEndFunc) Option {
+	return func(ns *NetworkServer) {
+		ns.deduplicationDone = f
+	}
+}
+
+// WithCollectionDoneFunc overrides the default windowEndFunc, which
+// is used to determine the end of uplink duplicate collection.
+func WithCollectionDoneFunc(f windowEndFunc) Option {
+	return func(ns *NetworkServer) {
+		ns.collectionDone = f
+	}
+}
+
 func TestNewMACState(t *testing.T) {
 	for _, tc := range []struct {
 		Name               string
