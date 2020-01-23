@@ -49,7 +49,7 @@ export class SideNavigationItem extends React.PureComponent {
   static defaultProps = {
     className: undefined,
     children: undefined,
-    exact: true,
+    exact: false,
     icon: undefined,
     isActive: false,
     isMinimized: false,
