@@ -41,6 +41,7 @@ import (
 	jsredis "go.thethings.network/lorawan-stack/pkg/joinserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
 	nsredis "go.thethings.network/lorawan-stack/pkg/networkserver/redis"
+	"go.thethings.network/lorawan-stack/pkg/packetbrokeragent"
 	"go.thethings.network/lorawan-stack/pkg/qrcodegenerator"
 	"go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/web"
@@ -49,7 +50,7 @@ import (
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
 
 var startCommand = &cobra.Command{
-	Use:   "start [is|gs|ns|as|js|console|gcs|dtc|qrg|all]... [flags]",
+	Use:   "start [is|gs|ns|as|js|console|gcs|dtc|qrg|pba|all]... [flags]",
 	Short: "Start The Things Stack",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var start struct {
@@ -62,6 +63,7 @@ var startCommand = &cobra.Command{
 			GatewayConfigurationServer bool
 			DeviceTemplateConverter    bool
 			QRCodeGenerator            bool
+			PacketBrokerAgent          bool
 		}
 		startDefault := len(args) == 0
 		for _, arg := range args {
@@ -92,6 +94,8 @@ var startCommand = &cobra.Command{
 				start.DeviceTemplateConverter = true
 			case "qrg":
 				start.QRCodeGenerator = true
+			case "pba":
+				start.PacketBrokerAgent = true
 			case "all":
 				start.IdentityServer = true
 				start.GatewayServer = true
@@ -102,6 +106,7 @@ var startCommand = &cobra.Command{
 				start.GatewayConfigurationServer = true
 				start.DeviceTemplateConverter = true
 				start.QRCodeGenerator = true
+				start.PacketBrokerAgent = true
 			default:
 				return errUnknownComponent.WithAttributes("component", arg)
 			}
@@ -269,6 +274,15 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeQRCodeGenerator.WithCause(err)
 			}
 			_ = qrg
+		}
+
+		if start.PacketBrokerAgent {
+			logger.Info("Setting up Packet Broker Agent")
+			pba, err := packetbrokeragent.New(c, &config.PBA)
+			if err != nil {
+				return shared.ErrInitializePacketBrokerAgent.WithCause(err)
+			}
+			_ = pba
 		}
 
 		if rootRedirect != nil {
