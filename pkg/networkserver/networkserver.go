@@ -139,6 +139,8 @@ type NetworkServer struct {
 // Option configures the NetworkServer.
 type Option func(ns *NetworkServer)
 
+var DefaultOptions []Option
+
 // New returns new NetworkServer.
 func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, error) {
 	switch {
@@ -234,6 +236,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		ns.defaultMACSettings.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *conf.DefaultMACSettings.StatusCountPeriodicity}
 	}
 
+	if len(opts) == 0 {
+		opts = DefaultOptions
+	}
 	for _, opt := range opts {
 		opt(ns)
 	}
