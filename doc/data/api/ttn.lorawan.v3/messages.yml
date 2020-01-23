@@ -142,6 +142,10 @@ ApplicationDownlink:
     type: uint32
     default: 0
   - name: frm_payload
+    comment: |2
+       The frame payload of the downlink message.
+       The payload is encrypted if the skip_payload_crypto field of the EndDevice
+       is true.
     type: bytes
     default: ""
   - name: decoded_payload
@@ -404,7 +408,7 @@ ApplicationPackageAssociation:
   - name: package_name
     type: string
     rules:
-      max_len: 20
+      max_len: 36
       pattern: ^[a-z0-9](?:[-]?[a-z0-9]){2,}$
     default: ""
   - name: data
@@ -736,6 +740,10 @@ ApplicationUplink:
     type: uint32
     default: 0
   - name: frm_payload
+    comment: |2
+       The frame payload of the uplink message.
+       The payload is still encrypted if the skip_payload_crypto field of the EndDevice
+       is true, which is indicated by the presence of the app_s_key field.
     type: bytes
     default: ""
   - name: decoded_payload
@@ -744,6 +752,8 @@ ApplicationUplink:
       name: Struct
     default: {}
   - name: rx_metadata
+    comment: |2
+       A list of metadata for each antenna of each gateway that received this message.
     rules:
       min_items: 1
     repeated:
@@ -751,6 +761,8 @@ ApplicationUplink:
         name: RxMetadata
     default: []
   - name: settings
+    comment: |2
+       Settings for the transmission.
     message:
       name: TxSettings
     rules:
@@ -763,6 +775,23 @@ ApplicationUplink:
       package: google.protobuf
       name: Timestamp
     default: "0001-01-01T00:00:00Z"
+  - name: app_s_key
+    comment: |2
+       The AppSKey of the current session.
+       This field is only present if the skip_payload_crypto field of the EndDevice
+       is true.
+       Can be used to decrypt uplink payloads and encrypt downlink payloads.
+    message:
+      name: KeyEnvelope
+    default: {}
+  - name: last_a_f_cnt_down
+    comment: |2
+       The last AFCntDown of the current session.
+       This field is only present if the skip_payload_crypto field of the EndDevice
+       is true.
+       Can be used with app_s_key to encrypt downlink payloads.
+    type: uint32
+    default: 0
 ApplicationWebhook:
   name: ApplicationWebhook
   fields:
@@ -820,6 +849,12 @@ ApplicationWebhook:
     map_value:
       type: string
     default: {}
+  - name: downlink_api_key
+    comment: |2
+       The API key to be used for downlink queue operations.
+       The field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged).
+    type: string
+    default: ""
   - name: uplink_message
     message:
       name: ApplicationWebhook.Message
@@ -946,6 +981,11 @@ ApplicationWebhookTemplate:
       message:
         name: ApplicationWebhookTemplateField
     default: []
+  - name: create_downlink_api_key
+    comment: |2
+       Control the creation of the downlink queue operations API key.
+    type: bool
+    default: false
   - name: uplink_message
     message:
       name: ApplicationWebhookTemplate.Message
@@ -2102,7 +2142,7 @@ EndDevice:
     default: false
   - name: resets_join_nonces
     comment: |2
-       Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant). Stored in Join Server.
+       Whether the device resets the join and dev nonces (not LoRaWAN compliant). Stored in Join Server.
        Copied on creation from template identified by version_ids, if any or from the home Network Server device profile, if any.
     type: bool
     default: false
@@ -2283,6 +2323,11 @@ EndDevice:
     message:
       name: EndDeviceAuthenticationCode
     default: {}
+  - name: skip_payload_crypto
+    comment: |2
+       Skip decryption of uplink payloads and encryption of downlink payloads.
+    type: bool
+    default: false
 EndDeviceAuthenticationCode:
   name: EndDeviceAuthenticationCode
   comment: |2
@@ -2498,7 +2543,7 @@ EndDeviceVersion:
     default: false
   - name: resets_join_nonces
     comment: |2
-       Whether the device resets the join and dev nonces (not LoRaWAN 1.1 compliant).
+       Whether the device resets the join and dev nonces (not LoRaWAN compliant).
     type: bool
     default: false
   - name: default_formatters
@@ -2852,6 +2897,13 @@ Gateway:
     rules:
       defined_only: true
     default: DOWNLINK_PATH_CONSTRAINT_NONE
+  - name: schedule_anytime_delay
+    comment: |2
+       Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.
+    message:
+      package: google.protobuf
+      name: Duration
+    default: 0s
 GatewayAntenna:
   name: GatewayAntenna
   comment: |2
@@ -3907,6 +3959,15 @@ ListApplicationsRequest:
        Order the results by this field path (must be present in the field mask).
        Default ordering is by ID. Prepend with a minus (-) to reverse the order.
     type: string
+    rules:
+      in:
+      - ""
+      - application_id
+      - -application_id
+      - name
+      - -name
+      - created_at
+      - -created_at
     default: ""
   - name: limit
     comment: |2
@@ -3958,6 +4019,15 @@ ListClientsRequest:
        Order the results by this field path (must be present in the field mask).
        Default ordering is by ID. Prepend with a minus (-) to reverse the order.
     type: string
+    rules:
+      in:
+      - ""
+      - client_id
+      - -client_id
+      - name
+      - -name
+      - created_at
+      - -created_at
     default: ""
   - name: limit
     comment: |2
@@ -3990,6 +4060,21 @@ ListEndDevicesRequest:
        Order the results by this field path (must be present in the field mask).
        Default ordering is by ID. Prepend with a minus (-) to reverse the order.
     type: string
+    rules:
+      in:
+      - ""
+      - device_id
+      - -device_id
+      - join_eui
+      - -join_eui
+      - dev_eui
+      - -dev_eui
+      - name
+      - -name
+      - description
+      - -description
+      - created_at
+      - -created_at
     default: ""
   - name: limit
     comment: |2
@@ -4078,6 +4163,17 @@ ListGatewaysRequest:
        Order the results by this field path (must be present in the field mask).
        Default ordering is by ID. Prepend with a minus (-) to reverse the order.
     type: string
+    rules:
+      in:
+      - ""
+      - gateway_id
+      - -gateway_id
+      - gateway_eui
+      - -gateway_eui
+      - name
+      - -name
+      - created_at
+      - -created_at
     default: ""
   - name: limit
     comment: |2
@@ -4126,6 +4222,11 @@ ListOAuthAccessTokensRequest:
        Order the results by this field path (must be present in the field mask).
        Default ordering is by ID. Prepend with a minus (-) to reverse the order.
     type: string
+    rules:
+      in:
+      - ""
+      - created_at
+      - -created_at
     default: ""
   - name: limit
     comment: |2
@@ -4153,6 +4254,11 @@ ListOAuthClientAuthorizationsRequest:
        Order the results by this field path (must be present in the field mask).
        Default ordering is by ID. Prepend with a minus (-) to reverse the order.
     type: string
+    rules:
+      in:
+      - ""
+      - created_at
+      - -created_at
     default: ""
   - name: limit
     comment: |2
@@ -4228,6 +4334,15 @@ ListOrganizationsRequest:
        Order the results by this field path (must be present in the field mask).
        Default ordering is by ID. Prepend with a minus (-) to reverse the order.
     type: string
+    rules:
+      in:
+      - ""
+      - organization_id
+      - -organization_id
+      - name
+      - -name
+      - created_at
+      - -created_at
     default: ""
   - name: limit
     comment: |2
@@ -4276,6 +4391,52 @@ ListUserSessionsRequest:
        Order the results by this field path (must be present in the field mask).
        Default ordering is by ID. Prepend with a minus (-) to reverse the order.
     type: string
+    rules:
+      in:
+      - ""
+      - created_at
+      - -created_at
+    default: ""
+  - name: limit
+    comment: |2
+       Limit the number of results per page.
+    type: uint32
+    rules:
+      lte: 1000
+    default: 0
+  - name: page
+    comment: |2
+       Page number for pagination. 0 is interpreted as 1.
+    type: uint32
+    default: 0
+ListUsersRequest:
+  name: ListUsersRequest
+  fields:
+  - name: field_mask
+    message:
+      package: google.protobuf
+      name: FieldMask
+    default: {}
+  - name: order
+    comment: |2
+       Order the results by this field path (must be present in the field mask).
+       Default ordering is by ID. Prepend with a minus (-) to reverse the order.
+    type: string
+    rules:
+      in:
+      - ""
+      - user_id
+      - -user_id
+      - name
+      - -name
+      - primary_email_address
+      - -primary_email_address
+      - state
+      - -state
+      - admin
+      - -admin
+      - created_at
+      - -created_at
     default: ""
   - name: limit
     comment: |2
@@ -5015,10 +5176,9 @@ MACParameters:
   - name: ping_slot_data_rate_index
     comment: |2
        Data rate index of the class B ping slot.
+       This field is deprecated, use ping_slot_data_rate_index_value instead.
     enum:
       name: DataRateIndex
-    rules:
-      defined_only: true
     default: DATA_RATE_0
   - name: beacon_frequency
     comment: |2
@@ -5064,6 +5224,12 @@ MACParameters:
        ADR: number of messages to wait after setting ADRAckReq and before changing TxPower or DataRate.
     message:
       name: ADRAckDelayExponentValue
+    default: {}
+  - name: ping_slot_data_rate_index_value
+    comment: |2
+       Data rate index of the class B ping slot.
+    message:
+      name: DataRateIndexValue
     default: {}
 MACParameters.Channel:
   name: MACParameters.Channel
@@ -5153,6 +5319,16 @@ MACSettings:
   - name: ping_slot_frequency
     comment: |2
        Frequency of the class B ping slot (Hz).
+       If unset, the default value from Network Server configuration will be used.
+    message:
+      package: google.protobuf
+      name: UInt64Value
+    rules:
+      gte: 100000
+    default: null
+  - name: beacon_frequency
+    comment: |2
+       Frequency of the class B beacon (Hz).
        If unset, the default value from Network Server configuration will be used.
     message:
       package: google.protobuf
@@ -5317,6 +5493,33 @@ MACSettings:
     message:
       name: ADRAckDelayExponentValue
     default: {}
+  - name: desired_ping_slot_data_rate_index
+    comment: |2
+       The data rate index of the class B ping slot Network Server should configure device to use via MAC commands.
+       If unset, the default value from Network Server configuration will be used.
+    message:
+      name: DataRateIndexValue
+    default: {}
+  - name: desired_ping_slot_frequency
+    comment: |2
+       The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands.
+       If unset, the default value from Network Server configuration or regional parameters specification will be used.
+    message:
+      package: google.protobuf
+      name: UInt64Value
+    rules:
+      gte: 100000
+    default: null
+  - name: desired_beacon_frequency
+    comment: |2
+       The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.
+       If unset, the default value from Network Server configuration will be used.
+    message:
+      package: google.protobuf
+      name: UInt64Value
+    rules:
+      gte: 100000
+    default: null
 MACState:
   name: MACState
   comment: |2
@@ -5374,11 +5577,9 @@ MACState:
   - name: ping_slot_periodicity
     comment: |2
        Periodicity of the class B ping slot.
-    enum:
-      name: PingSlotPeriod
-    rules:
-      defined_only: true
-    default: PING_EVERY_1S
+    message:
+      name: PingSlotPeriodValue
+    default: {}
   - name: pending_application_downlink
     comment: |2
        A confirmed application downlink, for which an acknowledgment is expected to arrive.
@@ -5422,6 +5623,22 @@ MACState:
        Set to false every time a successful downlink scheduling attempt is made.
     type: bool
     default: false
+  - name: recent_uplinks
+    comment: |2
+       Recent data uplink messages sorted by time.
+       The number of messages stored may depend on configuration.
+    repeated:
+      message:
+        name: UplinkMessage
+    default: []
+  - name: recent_downlinks
+    comment: |2
+       Recent data downlink messages sorted by time.
+       The number of messages stored may depend on configuration.
+    repeated:
+      message:
+        name: DownlinkMessage
+    default: []
 MACState.JoinAccept:
   name: MACState.JoinAccept
   fields:
@@ -7016,8 +7233,6 @@ UplinkMessage:
       required: true
     default: {}
   - name: rx_metadata
-    rules:
-      min_items: 1
     repeated:
       message:
         name: RxMetadata

@@ -1724,6 +1724,15 @@ UserRegistry:
       http:
       - method: GET
         path: /users/{user_ids.user_id}
+    List:
+      name: List
+      input:
+        name: ListUsersRequest
+      output:
+        name: Users
+      http:
+      - method: GET
+        path: /users
     Update:
       name: Update
       input:
