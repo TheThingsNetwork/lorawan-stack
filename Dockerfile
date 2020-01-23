@@ -14,7 +14,7 @@ RUN chmod 755 /bin/ttn-lw-cli
 
 COPY public /srv/ttn-lorawan/public
 
-EXPOSE 1700/udp 1882 8882 1883 8883 1884 8884 1885 8885 1887 8887
+EXPOSE 1700/udp 1881 8881 1882 8882 1883 8883 1884 8884 1885 8885 1887 8887
 
 RUN mkdir /srv/ttn-lorawan/public/blob
 
