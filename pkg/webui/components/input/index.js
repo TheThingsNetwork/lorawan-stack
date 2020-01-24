@@ -209,10 +209,14 @@ class Input extends React.Component {
   }
 
   onChange(evt) {
-    const { onChange } = this.props
+    const { onChange, type } = this.props
     const { value } = evt.target
 
-    onChange(value)
+    if (type === 'number') {
+      onChange(parseFloat(value))
+    } else {
+      onChange(value)
+    }
   }
 
   onKeyDown(evt) {
