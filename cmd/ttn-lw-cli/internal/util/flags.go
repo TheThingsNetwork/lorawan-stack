@@ -312,6 +312,13 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 				fs.StringSlice(name, nil, "")
 				return
 			}
+
+		case "go.thethings.network/lorawan-stack/pkg/types":
+			switch el.Name() {
+			case "DevAddrPrefix":
+				fs.StringSlice(name, nil, "")
+				return
+			}
 		}
 
 		switch el.Kind() {
