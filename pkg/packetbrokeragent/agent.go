@@ -35,6 +35,9 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
+// EndDeviceIdentifiersContextFiller fills the parent context based on the end device identifiers.
+type EndDeviceIdentifiersContextFiller func(parent context.Context, ids ttnpb.EndDeviceIdentifiers) (context.Context, error)
+
 // Agent implements the Packet Broker Agent component, acting as Home Network.
 //
 // Agent exposes the NsGs interface for scheduling downlink.
@@ -48,13 +51,26 @@ type Agent struct {
 	subscriptionGroup    string
 	devAddrPrefixes      []types.DevAddrPrefix
 
+	contextFillers []EndDeviceIdentifiersContextFiller
+
 	grpc struct {
 		nsGs ttnpb.NsGsServer
 	}
 }
 
+// Option configures Agent.
+type Option func(*Agent)
+
+// WithEndDeviceIdentifiersContextFiller returns an Option that appends the given filler to the end device identifiers
+// context fillers.
+func WithEndDeviceIdentifiersContextFiller(filler EndDeviceIdentifiersContextFiller) Option {
+	return func(a *Agent) {
+		a.contextFillers = append(a.contextFillers, filler)
+	}
+}
+
 // New returns a new Packet Broker Agent.
-func New(c *component.Component, conf *Config) (*Agent, error) {
+func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	a := &Agent{
 		Component: c,
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "packetbroker/agent"),
@@ -66,6 +82,9 @@ func New(c *component.Component, conf *Config) (*Agent, error) {
 		devAddrPrefixes:      conf.DevAddrPrefixes,
 	}
 	a.grpc.nsGs = &ttnpb.UnimplementedNsGsServer{}
+	for _, opt := range opts {
+		opt(a)
+	}
 
 	if conf.HomeNetwork.Enable {
 		c.RegisterTask(c.Context(), "pb_subscribe_uplink", a.subscribeUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
@@ -275,6 +294,12 @@ func (a *Agent) handleUplink(ctx context.Context, msg *packetbroker.UplinkMessag
 		}
 	}
 
+	for _, filler := range a.contextFillers {
+		var err error
+		if ctx, err = filler(ctx, ids); err != nil {
+			return err
+		}
+	}
 	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
 	if err != nil {
 		return err
