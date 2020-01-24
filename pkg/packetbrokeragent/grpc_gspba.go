@@ -16,15 +16,34 @@ package packetbrokeragent
 
 import (
 	"context"
+	"fmt"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 type gsPbaServer struct {
+	upstreamCh chan *ttnpb.GatewayUplinkMessage
 }
 
 // PublishUplink is called by the Gateway Server when an uplink message arrives and needs to get forwarded to Packet Broker.
 func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplinkMessage) (*pbtypes.Empty, error) {
-	return nil, nil
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
+	ctx = events.ContextWithCorrelationID(ctx, append(
+		up.CorrelationIDs,
+		fmt.Sprintf("pba:uplink:%s", events.NewCorrelationID()),
+	)...)
+	up.CorrelationIDs = events.CorrelationIDsFromContext(ctx)
+
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case s.upstreamCh <- up:
+		return ttnpb.Empty, nil
+	}
 }

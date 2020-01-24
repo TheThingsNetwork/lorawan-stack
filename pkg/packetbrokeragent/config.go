@@ -28,7 +28,8 @@ import (
 type Config struct {
 	DataPlaneAddress  string            `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
 	NetID             types.NetID       `name:"net-id" description:"LoRa Alliance NetID"`
-	HomeNetwork       HomeNetworkConfig `name:"home-network" description:"Home Network configuration for subscribing uplink and publishing downlink"`
+	HomeNetwork       HomeNetworkConfig `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
+	Forwarder         ForwarderConfig   `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
 	SubscriptionGroup string            `name:"subscription-group" description:"Group name uniquely identifying this environment"`
 }
 
@@ -37,6 +38,13 @@ type HomeNetworkConfig struct {
 	Enable          bool                  `name:"enable" description:"Enable Home Network role"`
 	TLS             TLSConfig             `name:"tls"`
 	DevAddrPrefixes []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
+}
+
+// ForwarderConfig defines configuration of the Forwarder role.
+type ForwarderConfig struct {
+	Enable bool      `name:"enable" description:"Enable Forwarder role"`
+	TLS    TLSConfig `name:"tls"`
+	ID     string    `name:"id" description:"ID of the Forwarder"`
 }
 
 // TLSConfig contains TLS configuration for connecting to Packet Broker.

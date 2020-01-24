@@ -5975,9 +5975,9 @@
       "file": "server.go"
     }
   },
-  "error:pkg/packetbrokeragent:data_rate": {
+  "error:pkg/packetbrokeragent:decode_payload": {
     "translations": {
-      "en": "invalid data rate index `{index}` in region `{region}`"
+      "en": "decode LoRaWAN payload"
     },
     "description": {
       "package": "pkg/packetbrokeragent",
@@ -6018,6 +6018,42 @@
     "description": {
       "package": "pkg/packetbrokeragent",
       "file": "config.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unknown_band": {
+    "translations": {
+      "en": "unknown band `{band_id}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unknown_data_rate": {
+    "translations": {
+      "en": "unknown data rate in region `{region}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unsupported_lorawan_version": {
+    "translations": {
+      "en": "unsupported LoRaWAN version `{version}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
+    }
+  },
+  "error:pkg/packetbrokeragent:unsupported_m_type": {
+    "translations": {
+      "en": "unsupported LoRaWAN MType `{m_type}`"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "translation.go"
     }
   },
   "error:pkg/packetbrokeragent:wrap_uplink_tokens": {

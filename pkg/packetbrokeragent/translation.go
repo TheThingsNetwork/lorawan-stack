@@ -16,6 +16,7 @@ package packetbrokeragent
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"time"
 
@@ -23,12 +24,13 @@ import (
 	packetbroker "go.packetbroker.org/api/v1"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var regionBands = map[packetbroker.Region]string{
+var fromPBRegion = map[packetbroker.Region]string{
 	packetbroker.Region_EU_863_870: band.EU_863_870,
 	packetbroker.Region_US_902_928: band.US_902_928,
 	packetbroker.Region_CN_779_787: band.CN_779_787,
@@ -41,8 +43,21 @@ var regionBands = map[packetbroker.Region]string{
 	packetbroker.Region_RU_864_870: band.RU_864_870,
 }
 
+var toPBRegion = map[string]packetbroker.Region{
+	band.EU_863_870: packetbroker.Region_EU_863_870,
+	band.US_902_928: packetbroker.Region_US_902_928,
+	band.CN_779_787: packetbroker.Region_CN_779_787,
+	band.EU_433:     packetbroker.Region_EU_433,
+	band.AU_915_928: packetbroker.Region_AU_915_928,
+	band.CN_470_510: packetbroker.Region_CN_470_510,
+	band.AS_923:     packetbroker.Region_AS_923,
+	band.KR_920_923: packetbroker.Region_KR_920_923,
+	band.IN_865_867: packetbroker.Region_IN_865_867,
+	band.RU_864_870: packetbroker.Region_RU_864_870,
+}
+
 func fromPBDataRate(region packetbroker.Region, index int) (ttnpb.DataRate, bool) {
-	bandID, ok := regionBands[region]
+	bandID, ok := fromPBRegion[region]
 	if !ok {
 		return ttnpb.DataRate{}, false
 	}
@@ -56,6 +71,23 @@ func fromPBDataRate(region packetbroker.Region, index int) (ttnpb.DataRate, bool
 	return phy.DataRates[index].Rate, true
 }
 
+func toPBDataRateIndex(region packetbroker.Region, dr ttnpb.DataRate) (uint32, bool) {
+	bandID, ok := fromPBRegion[region]
+	if !ok {
+		return 0, false
+	}
+	phy, err := band.GetByID(bandID)
+	if err != nil {
+		return 0, false
+	}
+	for i, phyDR := range phy.DataRates {
+		if phyDR.Rate.Equal(dr) {
+			return uint32(i), true
+		}
+	}
+	return 0, false
+}
+
 func fromPBLocation(loc *packetbroker.Location) *ttnpb.Location {
 	if loc == nil {
 		return nil
@@ -65,6 +97,18 @@ func fromPBLocation(loc *packetbroker.Location) *ttnpb.Location {
 		Latitude:  loc.Latitude,
 		Altitude:  int32(loc.Altitude),
 		Accuracy:  int32(loc.Accuracy),
+	}
+}
+
+func toPBLocation(loc *ttnpb.Location) *packetbroker.Location {
+	if loc == nil {
+		return nil
+	}
+	return &packetbroker.Location{
+		Longitude: loc.Longitude,
+		Latitude:  loc.Latitude,
+		Altitude:  float32(loc.Altitude),
+		Accuracy:  float32(loc.Accuracy),
 	}
 }
 
@@ -89,14 +133,169 @@ func unwrapUplinkTokens(token []byte) (forwarder, gateway []byte, err error) {
 }
 
 var (
-	errDataRate         = errors.DefineFailedPrecondition("data_rate", "invalid data rate index `{index}` in region `{region}`")
-	errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
+	errDecodePayload             = errors.DefineInvalidArgument("decode_payload", "decode LoRaWAN payload")
+	errUnsupportedLoRaWANVersion = errors.DefineAborted("unsupported_lorawan_version", "unsupported LoRaWAN version `{version}`")
+	errUnknownBand               = errors.DefineFailedPrecondition("unknown_band", "unknown band `{band_id}`")
+	errUnknownDataRate           = errors.DefineFailedPrecondition("unknown_data_rate", "unknown data rate in region `{region}`")
+	errUnsupportedMType          = errors.DefineAborted("unsupported_m_type", "unsupported LoRaWAN MType `{m_type}`")
 )
+
+func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage) (*packetbroker.UplinkMessage, error) {
+	msg.Payload = &ttnpb.Message{}
+	if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
+		return nil, errDecodePayload.WithCause(err)
+	}
+	if msg.Payload.Major != ttnpb.Major_LORAWAN_R1 {
+		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
+			"version", msg.Payload.Major,
+		)
+	}
+
+	hash := sha256.Sum256(msg.RawPayload)
+	up := &packetbroker.UplinkMessage{
+		PhyPayload: &packetbroker.UplinkMessage_PHYPayload{
+			Teaser: &packetbroker.PHYPayloadTeaser{
+				Hash: hash[:],
+			},
+			Value: &packetbroker.UplinkMessage_PHYPayload_Plain{
+				Plain: msg.RawPayload,
+			},
+		},
+		Frequency: msg.Settings.Frequency,
+	}
+
+	var ok bool
+	if up.GatewayRegion, ok = toPBRegion[msg.BandID]; !ok {
+		return nil, errUnknownBand.WithAttributes("band_id", msg.BandID)
+	}
+	if up.DataRateIndex, ok = toPBDataRateIndex(up.GatewayRegion, msg.Settings.DataRate); !ok {
+		return nil, errUnknownDataRate.WithAttributes("region", up.GatewayRegion)
+	}
+
+	switch pld := msg.Payload.Payload.(type) {
+	case *ttnpb.Message_JoinRequestPayload:
+		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_JoinRequest{
+			JoinRequest: &packetbroker.PHYPayloadTeaser_JoinRequestTeaser{
+				JoinEui:  pld.JoinRequestPayload.JoinEUI.MarshalNumber(),
+				DevEui:   pld.JoinRequestPayload.DevEUI.MarshalNumber(),
+				DevNonce: uint32(pld.JoinRequestPayload.DevNonce.MarshalNumber()),
+			},
+		}
+	case *ttnpb.Message_MACPayload:
+		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_Mac{
+			Mac: &packetbroker.PHYPayloadTeaser_MACPayloadTeaser{
+				Confirmed:        pld.MACPayload.Ack,
+				DevAddr:          pld.MACPayload.DevAddr.MarshalNumber(),
+				FOpts:            len(pld.MACPayload.FOpts) > 0,
+				FCnt:             pld.MACPayload.FCnt,
+				FPort:            pld.MACPayload.FPort,
+				FrmPayloadLength: uint32(len(pld.MACPayload.FRMPayload)),
+			},
+		}
+	default:
+		return nil, errUnsupportedMType.WithAttributes("m_type", msg.Payload.MType)
+	}
+
+	var gatewayReceiveTime *time.Time
+	var uplinkToken []byte
+	if len(msg.RxMetadata) > 0 {
+		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
+		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
+		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
+		for _, md := range msg.RxMetadata {
+			var rssiStandardDeviation *pbtypes.FloatValue
+			if md.RSSIStandardDeviation > 0 {
+				rssiStandardDeviation = &pbtypes.FloatValue{
+					Value: md.RSSIStandardDeviation,
+				}
+			}
+
+			sqAnt := &packetbroker.GatewayMetadataSignalQuality_Terrestrial_Antenna{
+				Index: md.AntennaIndex,
+				Value: &packetbroker.TerrestrialGatewayAntennaSignalQuality{
+					ChannelRssi:           md.ChannelRSSI,
+					SignalRssi:            md.SignalRSSI,
+					RssiStandardDeviation: rssiStandardDeviation,
+					Snr:                   md.SNR,
+					FrequencyOffset:       md.FrequencyOffset,
+				},
+			}
+			signalQuality.Antennas = append(signalQuality.Antennas, sqAnt)
+
+			if md.Location != nil {
+				if localization == nil {
+					localization = &packetbroker.GatewayMetadataLocalization_Terrestrial{}
+				}
+				locAnt := &packetbroker.GatewayMetadataLocalization_Terrestrial_Antenna{
+					Index:         md.AntennaIndex,
+					Location:      toPBLocation(md.Location),
+					SignalQuality: sqAnt.Value,
+				}
+				if md.FineTimestamp > 0 {
+					teaser.FineTimestamp = true
+					locAnt.FineTimestamp = &pbtypes.UInt64Value{
+						Value: md.FineTimestamp,
+					}
+				}
+				localization.Antennas = append(localization.Antennas, locAnt)
+			}
+
+			if md.Time != nil {
+				t := *md.Time
+				if gatewayReceiveTime == nil || t.Before(*gatewayReceiveTime) {
+					gatewayReceiveTime = &t
+				}
+			}
+			if len(uplinkToken) == 0 {
+				uplinkToken = md.UplinkToken
+			}
+		}
+
+		up.GatewayMetadata = &packetbroker.UplinkMessage_GatewayMetadata{
+			Teaser: &packetbroker.GatewayMetadataTeaser{
+				Value: &packetbroker.GatewayMetadataTeaser_Terrestrial_{
+					Terrestrial: &teaser,
+				},
+			},
+			SignalQuality: &packetbroker.UplinkMessage_GatewayMetadata_PlainSignalQuality{
+				PlainSignalQuality: &packetbroker.GatewayMetadataSignalQuality{
+					Value: &packetbroker.GatewayMetadataSignalQuality_Terrestrial_{
+						Terrestrial: &signalQuality,
+					},
+				},
+			},
+		}
+		if localization != nil {
+			up.GatewayMetadata.Localization = &packetbroker.UplinkMessage_GatewayMetadata_PlainLocalization{
+				PlainLocalization: &packetbroker.GatewayMetadataLocalization{
+					Value: &packetbroker.GatewayMetadataLocalization_Terrestrial_{
+						Terrestrial: localization,
+					},
+				},
+			}
+		}
+	}
+
+	if t, err := pbtypes.TimestampProto(msg.ReceivedAt); err == nil {
+		up.ForwarderReceiveTime = t
+	}
+	if gatewayReceiveTime != nil {
+		if t, err := pbtypes.TimestampProto(*gatewayReceiveTime); err == nil {
+			up.GatewayReceiveTime = t
+		}
+	}
+	// TODO: Set uplink token when NsPba is implemented.
+	// up.ForwarderUplinkToken = uplinkToken
+
+	return up, nil
+}
+
+var errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
 
 func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	dataRate, ok := fromPBDataRate(msg.GatewayRegion, int(msg.DataRateIndex))
 	if !ok {
-		return nil, errDataRate.WithAttributes(
+		return nil, errUnknownDataRate.WithAttributes(
 			"index", msg.DataRateIndex,
 			"region", msg.GatewayRegion,
 		)

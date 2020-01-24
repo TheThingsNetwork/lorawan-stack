@@ -21,17 +21,21 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	packetbroker "go.packetbroker.org/api/v1"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
+
+const upstreamBufferSize = 64
 
 // EndDeviceIdentifiersContextFiller fills the parent context based on the end device identifiers.
 type EndDeviceIdentifiersContextFiller func(parent context.Context, ids ttnpb.EndDeviceIdentifiers) (context.Context, error)
@@ -43,13 +47,16 @@ type Agent struct {
 	*component.Component
 	ctx context.Context
 
-	dataPlaneAddress     string
-	netID                types.NetID
-	homeNetworkTLSConfig TLSConfig
-	subscriptionGroup    string
-	devAddrPrefixes      []types.DevAddrPrefix
+	dataPlaneAddress  string
+	netID             types.NetID
+	forwarderConfig   ForwarderConfig
+	homeNetworkConfig HomeNetworkConfig
+	subscriptionGroup string
+	devAddrPrefixes   []types.DevAddrPrefix
 
 	contextFillers []EndDeviceIdentifiersContextFiller
+
+	upstreamCh chan *ttnpb.GatewayUplinkMessage
 
 	grpc struct {
 		nsPba ttnpb.NsPbaServer
@@ -92,21 +99,31 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		Component: c,
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "packetbroker/agent"),
 
-		dataPlaneAddress:     conf.DataPlaneAddress,
-		netID:                conf.NetID,
-		homeNetworkTLSConfig: conf.HomeNetwork.TLS,
-		subscriptionGroup:    conf.SubscriptionGroup,
-		devAddrPrefixes:      devAddrPrefixes,
+		dataPlaneAddress:  conf.DataPlaneAddress,
+		netID:             conf.NetID,
+		forwarderConfig:   conf.Forwarder,
+		homeNetworkConfig: conf.HomeNetwork,
+		subscriptionGroup: conf.SubscriptionGroup,
+		devAddrPrefixes:   devAddrPrefixes,
+
+		upstreamCh: make(chan *ttnpb.GatewayUplinkMessage, upstreamBufferSize),
 	}
 	a.grpc.nsPba = &ttnpb.UnimplementedNsPbaServer{}
-	a.grpc.gsPba = &gsPbaServer{}
+	a.grpc.gsPba = &gsPbaServer{
+		upstreamCh: a.upstreamCh,
+	}
 	for _, opt := range opts {
 		opt(a)
 	}
 
+	if conf.Forwarder.Enable {
+		c.RegisterTask(c.Context(), "pb_forward_uplink", a.forwardUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
+	}
 	if conf.HomeNetwork.Enable {
 		c.RegisterTask(c.Context(), "pb_subscribe_uplink", a.subscribeUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
 	}
+
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GsPba", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(a)
 	return a, nil
@@ -149,6 +166,35 @@ func (a *Agent) dialContext(ctx context.Context, config TLSConfig, target string
 	return grpc.DialContext(ctx, target, opts...)
 }
 
+func (a *Agent) forwardUplink(ctx context.Context) error {
+	ctx = log.NewContextWithField(ctx, "namespace", "packetbroker/agent")
+
+	conn, err := a.dialContext(ctx, a.forwarderConfig.TLS, a.dataPlaneAddress)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:%s", events.NewCorrelationID()))
+
+	client := packetbroker.NewRouterForwarderDataClient(conn)
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case up := <-a.upstreamCh:
+			// TODO: Convert in translation.go
+			// msg := &packetbroker.UplinkMessage{}
+			// TODO: Add stub for encryption
+			_ = up
+			_ = client
+
+			// if _, err := client.Publish(ctx, msg); err != nil {
+			// 	log.FromContext(ctx).WithError(err).Debug("Failed to handle uplink message")
+			// }
+		}
+	}
+}
+
 func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 	devAddrPrefixes := make([]*packetbroker.RoutingFilter_MACPayload_DevAddrPrefix, len(a.devAddrPrefixes))
 	for i, p := range a.devAddrPrefixes {
@@ -181,7 +227,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		"home_network_net_id", a.netID,
 	))
 
-	conn, err := a.dialContext(ctx, a.homeNetworkTLSConfig, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx, a.homeNetworkConfig.TLS, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
@@ -201,7 +247,9 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 
 	for {
 		msg, err := stream.Recv()
-		if err != nil {
+		if err == context.Canceled {
+			return nil
+		} else if err != nil {
 			return err
 		}
 		up := msg.Message
