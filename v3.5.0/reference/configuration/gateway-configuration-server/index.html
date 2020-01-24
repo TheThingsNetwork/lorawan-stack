@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Gateway Configuration Server Options | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/reference/configuration/gateway-configuration-server/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Gateway Configuration Server Options">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Gateway Configuration Server Options">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/reference/configuration/gateway-configuration-server/">
+  <meta name="twitter:title" content="Gateway Configuration Server Options" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Configuration</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/reference/configuration/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/the-things-stack/" class="">Generic Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/identity-server/" class="">Identity Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/gateway-server/" class="">Gateway Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/network-server/" class="">Network Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/application-server/" class="">Application Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/join-server/" class="">Join Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/console/" class="">Console Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/cli/" class="">Command-Line Interface Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/gateway-configuration-server/" class="is-active">Gateway Configuration Server Options</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Gateway Configuration Server Options</h1>
+
+<div class="content"><h2 id="security-options">Security Options</h2>
+<ul>
+<li><code>gcs.require-auth</code>: Require authentication for the HTTP endpoints</li>
+</ul>
+<h2 id="basic-station-cups-options">Basic Station CUPS Options</h2>
+<p>The <code>gcs.basic-station</code> options configure the GCS to handle Basic Station CUPS requests.</p>
+<ul>
+<li><code>gcs.basic-station.allow-cups-uri-update</code>: Allow CUPS URI updates</li>
+<li><code>gcs.basic-station.default.lns-uri</code>: The default LNS URI that the gateways should use. If no Gateway Server address is registered, the default value is used.</li>
+<li><code>gcs.basic-station.owner-for-unknown.account-type</code>: Type of account to register unknown gateways to (user|organization)</li>
+<li><code>gcs.basic-station.owner-for-unknown.api-key</code>: API Key to use for unknown gateway registration</li>
+<li><code>gcs.basic-station.owner-for-unknown.id</code>: ID of the account to register unknown gateways to</li>
+<li><code>gcs.basic-station.require-explicit-enable</code>: Require gateways to explicitly enable CUPS</li>
+</ul>
+<h2 id="the-things-kickstarter-gateway-options">The Things Kickstarter Gateway Options</h2>
+<p>The <code>gcs.the-things-gateway.firmware-url</code> and <code>gcs.the-things-gateway.update-channel</code> options configure the source of firmware updates for The Things Kickstarter Gateway.</p>
+<ul>
+<li><code>gcs.the-things-gateway.default.firmware-url</code>: The default URL to the firmware storage</li>
+<li><code>gcs.the-things-gateway.default.mqtt-server</code>: The default MQTT server that the gateways should use. If no Gateway Server address is registered, the default value is used. The format is <code>mqtts://&lt;IP-or-Address&gt;:port</code>.</li>
+<li><code>gcs.the-things-gateway.default.update-channel</code>: The default update channel that the gateways should use</li>
+</ul>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/reference/configuration/cli/">← Command-Line Interface Options</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by KrishnaIyer on 18 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/39f4d9bc166c58a30251f78de526c68baf2ac3f3">
+      doc: Remove default values from reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/configuration/gateway-configuration-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

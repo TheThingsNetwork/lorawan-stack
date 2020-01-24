@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Instantiation | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/instantiation/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Instantiation">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Instantiation">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/reference/webhook-templates/instantiation/">
+  <meta name="twitter:title" content="Instantiation" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Webhook Templates</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/format/" class="">Format</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/instantiation/" class="is-active">Instantiation</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Instantiation</h1>
+
+<div class="content"><p>The process through which a webhook template becomes a webhook integration is called instantiation. Instantiation is done by the Console after the user has filled in the values of the the template fields. This page describes how the template and the values are combined into the final webhook instance.</p>
+<h2 id="instantiation-of-header-values">Instantiation of Header Values</h2>
+<p>The fields are directly replaced in the values of the headers using the syntax <code>{field-id}</code>. Consider the following fragment of a webhook template, describing the available template fields and the headers to be sent to the endpoint:</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="k">fields</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="k">id</span><span class="p">:</span><span class="w"> </span>token<span class="w">
+</span><span class="w">  </span><span class="k">name</span><span class="p">:</span><span class="w"> </span>Authentication<span class="w"> </span>token<span class="w">
+</span><span class="w">  </span><span class="k">description</span><span class="p">:</span><span class="w"> </span>The<span class="w"> </span>token<span class="w"> </span>used<span class="w"> </span>for<span class="w"> </span>authentication<span class="w">
+</span><span class="w">  </span><span class="k">secret</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">  </span><span class="k">default-value</span><span class="p">:</span><span class="w">
+</span><span class="w"></span><span class="k">headers</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="k">Authorization</span><span class="p">:</span><span class="w"> </span>Bearer<span class="w"> </span>{token}<span class="w">
+</span></code></pre></div><p>If the user has filled in the value of <code>token</code> with <code>Zpdc7jWMvYzVTeNQ</code>, then the resulting webhook will contain a header named <code>Authorization</code> with the value <code>Bearer Zpdc7jWMvYzVTeNQ</code>.</p>
+<h2 id="instantiation-of-urls-and-paths">Instantiation of URLs and Paths</h2>
+<p>The fields are replaced inside the URLs and the paths according to the <a href="https://tools.ietf.org/html/rfc6570">RFC6570</a> format. Consider the following fragment of a webhook template, describing the available template fields and the paths of the endpoint.</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="k">fields</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="k">id</span><span class="p">:</span><span class="w"> </span>username<span class="w">
+</span><span class="w">  </span><span class="k">name</span><span class="p">:</span><span class="w"> </span>Username<span class="w">
+</span><span class="w">  </span><span class="k">description</span><span class="p">:</span><span class="w"> </span>The<span class="w"> </span>username<span class="w"> </span>used<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>service<span class="w">
+</span><span class="w">  </span><span class="k">secret</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span><span class="w">  </span><span class="k">default-value</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="k">id</span><span class="p">:</span><span class="w"> </span>create<span class="w">
+</span><span class="w">  </span><span class="k">name</span><span class="p">:</span><span class="w"> </span>Create<span class="w"> </span>device<span class="w">
+</span><span class="w">  </span><span class="k">description</span><span class="p">:</span><span class="w"> </span>If<span class="w"> </span>set<span class="w"> </span>to<span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span>the<span class="w"> </span>device<span class="w"> </span>will<span class="w"> </span>automatically<span class="w"> </span>be<span class="w"> </span>created<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>first<span class="w"> </span>uplink<span class="w">
+</span><span class="w">  </span><span class="k">secret</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span><span class="w">  </span><span class="k">default-value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w"></span><span class="k">baseurl</span><span class="p">:</span><span class="w"> </span>https<span class="p">:</span>//www.example.com/lora{/username}<span class="w">
+</span><span class="w"></span><span class="k">paths</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="k">uplink-message</span><span class="p">:</span><span class="w"> </span>/uplink{<span class="p">?</span>create}<span class="w">
+</span></code></pre></div><p>If the user has filled in the value of <code>username</code> with <code>user1</code> and the value of <code>create</code> with <code>true</code>, then the resulting webhook will have its base URL set to <code>https://www.example.com/lora/user1</code> and the uplink messages will be sent to <code>https://www.example.com/lora/user1?create=true</code> (the uplink messages path will be set to <code>/uplink?create=true</code>).</p></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/reference/webhook-templates/format/">← Format</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Adrian-Stefan Mares on 21 Jan 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/63a042427a8b37582ac84ebf1d0f2a2ca1c7467b">
+      doc: Use updated webhook template format
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/webhook-templates/instantiation.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

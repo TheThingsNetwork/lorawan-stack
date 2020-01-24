@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Mapping Templates | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/reference/end-device-templates/mapping/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Mapping Templates">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Mapping Templates">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/reference/end-device-templates/mapping/">
+  <meta name="twitter:title" content="Mapping Templates" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">End Device Templates</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/reference/end-device-templates/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/end-device-templates/creating/" class="">Creating Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/end-device-templates/converting/" class="">Converting Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/end-device-templates/executing/" class="">Executing Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/end-device-templates/mapping/" class="is-active">Mapping Templates</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/end-device-templates/assigning-euis/" class="">Assigning EUIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Mapping Templates</h1>
+
+<div class="content"><div class="notification is-primary">
+  <h3 class="has-text-light">Command-line interface only</h3>
+  <p>The instructions below use the command-line interface (CLI).</p>
+  <div class="buttons">
+    <a class="button is-primary is-inverted is-outlined" href="https://thethingsstack.io/v3.5.0/guides/getting-started/cli/#installation">Learn how to install the CLI</a>
+  </div>
+</div>
+
+<p>You can use the <code>end-device templates map</code> command to map input templates with a mapping file to create new device templates. This allows for combining fields from different device template files.</p>
+<p>The matching from input to a mapping template is, in order, by mapping key (<code>mapping_key</code>), end device identifiers (<code>ids.application_id</code> and <code>ids.device_id</code>) and <code>DevEUI</code> (<code>ids.dev_eui</code>). If you don't specify a mapping key, end device identifiers nor <code>DevEUI</code>, the mapping entry always matches. This is useful for mapping many end device templates with a generic template.</p>
+<p>Typical use cases are:</p>
+<ol>
+<li>Assigning identifiers from a mapping file to device templates matching on mapping key.</li>
+<li>Mapping a device profile (i.e. MAC and PHY versions, frequency plan and class B/C support) from a mapping file to many end device templates.</li>
+</ol>
+<h2 id="example">Example</h2>
+<p>This example shows creating a generic device profile that is mapped with provisioning data for secure elements to create device templates.</p>
+<p>First, create a mapping file with a device profile:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-device template extend <span class="se">\
+</span><span class="se"></span>  --frequency-plan-id EU_863_870 <span class="se">\
+</span><span class="se"></span>  --lorawan-version 1.0.3 <span class="se">\
+</span><span class="se"></span>  --lorawan-phy-version 1.0.3-a <span class="se">\
+</span><span class="se"></span>  --supports-join <span class="se">\
+</span><span class="se"></span>  --supports-class-c <span class="se">\
+</span><span class="se"></span>  --version-ids.brand-id <span class="s2">&#34;thethingsproducts&#34;</span> <span class="se">\
+</span><span class="se"></span>  --version-ids.model-id <span class="s2">&#34;genericnode&#34;</span> <span class="se">\
+</span><span class="se"></span>  --version-ids.hardware-version <span class="s2">&#34;1.0&#34;</span> <span class="se">\
+</span><span class="se"></span>  --version-ids.firmware-version <span class="s2">&#34;1.0&#34;</span> &gt; profile.json
+</code></pre></div><p>The mapping file <code>profile.json</code> contains the following entries (omitting empty fields).</p>
+<!-- raw HTML omitted -->
+<p>Second, convert the provisioning data to a device templates file to <code>provisioningdata.json</code>.</p>
+<blockquote>
+<p>This example uses a <strong>Microchip ATECC608A-MAHTN-T Manifest File</strong>. This file contains provisioning data for The Things Industries Join Server. You can <a href="microchip-atecc608a-mahtn-t-example.json">download the example file</a>.</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-file example.json &gt; provisioningdata.json
+</code></pre></div><p>Third, map the two files to <code>templates.json</code>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ cat provisioningdata.json <span class="se">\
+</span><span class="se"></span>  <span class="p">|</span> ttn-lw-cli end-device template map --mapping-local-file profile.json &gt; templates.json
+</code></pre></div><p>This returns the device templates with provisioning data and device profile combined.</p>
+<!-- raw HTML omitted -->
+<pre><code>  }
+},
+&quot;created_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+&quot;updated_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+&quot;version_ids&quot;: {
+  &quot;brand_id&quot;: &quot;thethingsproducts&quot;,
+  &quot;model_id&quot;: &quot;genericnode&quot;,
+  &quot;hardware_version&quot;: &quot;1.0&quot;,
+  &quot;firmware_version&quot;: &quot;1.0&quot;
+},
+&quot;supports_class_c&quot;: true,
+&quot;lorawan_version&quot;: &quot;1.0.3&quot;,
+&quot;lorawan_phy_version&quot;: &quot;1.0.3-a&quot;,
+&quot;frequency_plan_id&quot;: &quot;EU_863_870&quot;,
+&quot;supports_join&quot;: true,
+&quot;provisioner_id&quot;: &quot;microchip&quot;,
+&quot;provisioning_data&quot;: {
+    &quot;distributor&quot;: {
+          &quot;organizationName&quot;: &quot;Microchip Technology Inc&quot;,
+          &quot;organizationalUnitName&quot;: &quot;Microchip Direct&quot;
+        },
+    &quot;groupId&quot;: &quot;J2D3YNT8Y8WJDC27&quot;,
+    &quot;manufacturer&quot;: {
+          &quot;organizationName&quot;: &quot;Microchip Technology Inc&quot;,
+          &quot;organizationalUnitName&quot;: &quot;Secure Products Group&quot;
+        },
+    &quot;model&quot;: &quot;ATECC608A&quot;,
+    ...
+    &quot;uniqueId&quot;: &quot;0123d34fb176c66f27&quot;,
+    &quot;version&quot;: 1
+  }
+</code></pre>
+<p>},
+&ldquo;field_mask&rdquo;: {
+&ldquo;paths&rdquo;: [
+&ldquo;lorawan_phy_version&rdquo;,
+&ldquo;supports_join&rdquo;,
+&ldquo;frequency_plan_id&rdquo;,
+&ldquo;lorawan_version&rdquo;,
+&ldquo;version_ids.hardware_version&rdquo;,
+&ldquo;version_ids.firmware_version&rdquo;,
+&ldquo;version_ids.model_id&rdquo;,
+&ldquo;provisioner_id&rdquo;,
+&ldquo;provisioning_data&rdquo;,
+&ldquo;version_ids.brand_id&rdquo;,
+&ldquo;supports_class_c&rdquo;
+]
+}
+}
+{
+&ldquo;end_device&rdquo;: {
+&ldquo;ids&rdquo;: {
+&ldquo;application_ids&rdquo;: {</p>
+<pre><code>  }
+},
+&quot;created_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+&quot;updated_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+&quot;version_ids&quot;: {
+  &quot;brand_id&quot;: &quot;thethingsproducts&quot;,
+  &quot;model_id&quot;: &quot;genericnode&quot;,
+  &quot;hardware_version&quot;: &quot;1.0&quot;,
+  &quot;firmware_version&quot;: &quot;1.0&quot;
+},
+&quot;supports_class_c&quot;: true,
+&quot;lorawan_version&quot;: &quot;1.0.3&quot;,
+&quot;lorawan_phy_version&quot;: &quot;1.0.3-a&quot;,
+&quot;frequency_plan_id&quot;: &quot;EU_863_870&quot;,
+&quot;supports_join&quot;: true,
+&quot;provisioner_id&quot;: &quot;microchip&quot;,
+&quot;provisioning_data&quot;: {
+    &quot;distributor&quot;: {
+          &quot;organizationName&quot;: &quot;Microchip Technology Inc&quot;,
+          &quot;organizationalUnitName&quot;: &quot;Microchip Direct&quot;
+        },
+    &quot;groupId&quot;: &quot;J2D3YNT8Y8WJDC27&quot;,
+    &quot;manufacturer&quot;: {
+          &quot;organizationName&quot;: &quot;Microchip Technology Inc&quot;,
+          &quot;organizationalUnitName&quot;: &quot;Secure Products Group&quot;
+        },
+    &quot;model&quot;: &quot;ATECC608A&quot;,
+    ...
+    &quot;uniqueId&quot;: &quot;012350172871677127&quot;,
+    &quot;version&quot;: 1
+  }
+</code></pre>
+<p>},
+&ldquo;field_mask&rdquo;: {
+&ldquo;paths&rdquo;: [
+&ldquo;version_ids.firmware_version&rdquo;,
+&ldquo;lorawan_phy_version&rdquo;,
+&ldquo;provisioner_id&rdquo;,
+&ldquo;provisioning_data&rdquo;,
+&ldquo;frequency_plan_id&rdquo;,
+&ldquo;supports_class_c&rdquo;,
+&ldquo;version_ids.model_id&rdquo;,
+&ldquo;supports_join&rdquo;,
+&ldquo;version_ids.brand_id&rdquo;,
+&ldquo;lorawan_version&rdquo;,
+&ldquo;version_ids.hardware_version&rdquo;
+]
+}
+}</p>
+<pre><code>&lt;/details&gt;
+
+Fourth, you can personalize these devices by assigning the `JoinEUI` and `DevEUI` to `devices.json`, see [Assigning EUIs](/v3.5.0/reference/end-device-templates/assigning-euis/):
+
+```bash
+$ cat templates.json \
+  | ttn-lw-cli end-device template assign-euis 70b3d57ed0000000 70b3d57ed0000001 &gt; devices.json
+</code></pre><!-- raw HTML omitted -->
+<pre><code>  },
+  &quot;dev_eui&quot;: &quot;70B3D57ED0000001&quot;,
+  &quot;join_eui&quot;: &quot;70B3D57ED0000000&quot;
+},
+&quot;created_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+&quot;updated_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+&quot;version_ids&quot;: {
+  &quot;brand_id&quot;: &quot;thethingsproducts&quot;,
+  &quot;model_id&quot;: &quot;genericnode&quot;,
+  &quot;hardware_version&quot;: &quot;1.0&quot;,
+  &quot;firmware_version&quot;: &quot;1.0&quot;
+},
+&quot;supports_class_c&quot;: true,
+&quot;lorawan_version&quot;: &quot;1.0.3&quot;,
+&quot;lorawan_phy_version&quot;: &quot;1.0.3-a&quot;,
+&quot;frequency_plan_id&quot;: &quot;EU_863_870&quot;,
+&quot;supports_join&quot;: true,
+&quot;provisioner_id&quot;: &quot;microchip&quot;,
+&quot;provisioning_data&quot;: {
+    &quot;distributor&quot;: {
+          &quot;organizationName&quot;: &quot;Microchip Technology Inc&quot;,
+          &quot;organizationalUnitName&quot;: &quot;Microchip Direct&quot;
+        },
+    &quot;groupId&quot;: &quot;J2D3YNT8Y8WJDC27&quot;,
+    &quot;manufacturer&quot;: {
+          &quot;organizationName&quot;: &quot;Microchip Technology Inc&quot;,
+          &quot;organizationalUnitName&quot;: &quot;Secure Products Group&quot;
+        },
+    &quot;model&quot;: &quot;ATECC608A&quot;,
+    ...
+    &quot;uniqueId&quot;: &quot;0123d34fb176c66f27&quot;,
+    &quot;version&quot;: 1
+  }
+</code></pre>
+<p>},
+&ldquo;field_mask&rdquo;: {
+&ldquo;paths&rdquo;: [
+&ldquo;provisioner_id&rdquo;,
+&ldquo;ids.device_id&rdquo;,
+&ldquo;frequency_plan_id&rdquo;,
+&ldquo;lorawan_phy_version&rdquo;,
+&ldquo;provisioning_data&rdquo;,
+&ldquo;ids.dev_eui&rdquo;,
+&ldquo;supports_join&rdquo;,
+&ldquo;version_ids.firmware_version&rdquo;,
+&ldquo;version_ids.hardware_version&rdquo;,
+&ldquo;version_ids.brand_id&rdquo;,
+&ldquo;ids.join_eui&rdquo;,
+&ldquo;lorawan_version&rdquo;,
+&ldquo;version_ids.model_id&rdquo;,
+&ldquo;supports_class_c&rdquo;
+]
+}
+}
+{
+&ldquo;end_device&rdquo;: {
+&ldquo;ids&rdquo;: {
+&ldquo;device_id&rdquo;: &ldquo;eui-70b3d57ed0000002&rdquo;,
+&ldquo;application_ids&rdquo;: {</p>
+<pre><code>  },
+  &quot;dev_eui&quot;: &quot;70B3D57ED0000002&quot;,
+  &quot;join_eui&quot;: &quot;70B3D57ED0000000&quot;
+},
+&quot;created_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+&quot;updated_at&quot;: &quot;0001-01-01T00:00:00Z&quot;,
+&quot;version_ids&quot;: {
+  &quot;brand_id&quot;: &quot;thethingsproducts&quot;,
+  &quot;model_id&quot;: &quot;genericnode&quot;,
+  &quot;hardware_version&quot;: &quot;1.0&quot;,
+  &quot;firmware_version&quot;: &quot;1.0&quot;
+},
+&quot;supports_class_c&quot;: true,
+&quot;lorawan_version&quot;: &quot;1.0.3&quot;,
+&quot;lorawan_phy_version&quot;: &quot;1.0.3-a&quot;,
+&quot;frequency_plan_id&quot;: &quot;EU_863_870&quot;,
+&quot;supports_join&quot;: true,
+&quot;provisioner_id&quot;: &quot;microchip&quot;,
+&quot;provisioning_data&quot;: {
+    &quot;distributor&quot;: {
+          &quot;organizationName&quot;: &quot;Microchip Technology Inc&quot;,
+          &quot;organizationalUnitName&quot;: &quot;Microchip Direct&quot;
+        },
+    &quot;groupId&quot;: &quot;J2D3YNT8Y8WJDC27&quot;,
+    &quot;manufacturer&quot;: {
+          &quot;organizationName&quot;: &quot;Microchip Technology Inc&quot;,
+          &quot;organizationalUnitName&quot;: &quot;Secure Products Group&quot;
+        },
+    &quot;model&quot;: &quot;ATECC608A&quot;,
+    ...
+    &quot;uniqueId&quot;: &quot;012350172871677127&quot;,
+    &quot;version&quot;: 1
+  }
+</code></pre>
+<p>},
+&ldquo;field_mask&rdquo;: {
+&ldquo;paths&rdquo;: [
+&ldquo;ids.join_eui&rdquo;,
+&ldquo;ids.dev_eui&rdquo;,
+&ldquo;version_ids.firmware_version&rdquo;,
+&ldquo;provisioning_data&rdquo;,
+&ldquo;frequency_plan_id&rdquo;,
+&ldquo;provisioner_id&rdquo;,
+&ldquo;version_ids.model_id&rdquo;,
+&ldquo;lorawan_version&rdquo;,
+&ldquo;ids.device_id&rdquo;,
+&ldquo;version_ids.brand_id&rdquo;,
+&ldquo;supports_class_c&rdquo;,
+&ldquo;version_ids.hardware_version&rdquo;,
+&ldquo;lorawan_phy_version&rdquo;,
+&ldquo;supports_join&rdquo;
+]
+}
+}</p>
+<pre><code>&lt;/details&gt;
+
+Finally, you can create these devices in your The Things Stack application `test-app`, see [Executing Templates](/v3.5.0/reference/end-device-templates/executing/).
+
+```bash
+$ cat devices.json \
+  | ttn-lw-cli end-device template execute \
+  | ttn-lw-cli device create --application-id test-app
+</code></pre></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/reference/end-device-templates/executing/">← Executing Templates</a>
+<a class="button is-pulled-right" href="/v3.5.0/reference/end-device-templates/assigning-euis/">Assigning EUIs →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by MathieuMonneret on 04 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/d357ac372b5b801262eb38e7a0dbddb393db11d4">
+      doc: Add tts shortcode
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/end-device-templates/mapping.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

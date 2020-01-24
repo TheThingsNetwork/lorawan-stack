@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>HTTP Webhooks | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/reference/application-server-data/webhooks/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="HTTP Webhooks">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="HTTP Webhooks">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/reference/application-server-data/webhooks/">
+  <meta name="twitter:title" content="HTTP Webhooks" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Application Server Data</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/reference/application-server-data/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/application-server-data/webhooks/" class="is-active">HTTP Webhooks</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/application-server-data/mqtt/" class="">MQTT Server</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">HTTP Webhooks</h1>
+
+<div class="content"><p>The webhooks feature allows the Application Server to send application related messages to specific HTTP(S) endpoints.</p>
+<h2 id="creating-a-webhook">Creating a Webhook</h2>
+<p>Creating a webhook requires you to have an HTTP(S) endpoint available.</p>
+<p>In your application select the <strong>Webhooks</strong> submenu from the <strong>Integrations</strong> side menu. Clicking on the <strong>+ Add Webhook</strong> button will open the Webhook creation screen. Fill in your webhook ID, format and base URL.</p>
+<figure>
+    <img src="webhook-creation.png"
+         alt="Webhook creation screen"/> 
+</figure>
+
+<p>The paths are appended to the base URL. So, the Application Server will perform <code>POST</code> requests on the endpoint <code>https://app.example.com/lorahooks/join</code> for join-accepts and <code>https://app.example.com/lorahooks/up</code> for uplink messages. Clicking the <strong>Add Webhook</strong> button will create the Webhook.</p>
+<blockquote>
+<p>Note: If you don't have an endpoint available for testing, use for example <a href="https://postb.in">PostBin</a>.</p>
+</blockquote>
+<h2 id="scheduling-downlinks">Scheduling Downlinks</h2>
+<p>You can schedule downlink messages using webhooks too. This requires an API key with traffic writing rights, which can be created using the Console. In your application, select the <strong>API Keys</strong> sidemenu and click on the <strong>+ Add API Key</strong> button. You can now fill in the name and the rights of your API key.</p>
+<figure>
+    <img src="api-key-creation.png"
+         alt="API key creation screen"/> 
+</figure>
+
+<p>Click on the <strong>Create API Key</strong> button in order to create the API key. This will open the API key information screen.</p>
+<figure>
+    <img src="api-key-created.png"
+         alt="API key created"/> 
+</figure>
+
+<p>Make sure to save your API key at this point, since it will no longer be retrievable after you leave the page. You can now pass the API key as bearer token on the <code>Authorization</code> header.</p>
+<p>The downlink queue operation paths are:</p>
+<ul>
+<li>For push: <code>/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push</code></li>
+<li>For replace: <code>/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/replace</code></li>
+</ul>
+<p>For example:</p>
+<pre><code>$ curl https://thethings.example.com/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
+  -X POST \
+  -H 'Authorization: Bearer NNSXS.VEEBURF3KR77ZR..' \
+  --data '{&quot;downlinks&quot;:[{&quot;frm_payload&quot;:&quot;vu8=&quot;,&quot;f_port&quot;:15,&quot;priority&quot;:&quot;NORMAL&quot;}]}'
+</code></pre><p>Will push a downlink to the end device <code>dev1</code> of the application <code>app1</code> using the webhook <code>wh1</code>.</p>
+<p>You can also save the API key in the webhook configuration page using the the <strong>Downlink API Key</strong> field. The Application Server will provide it to your endpoint using the <code>X-Downlink-Apikey</code> header and the push and replace operations paths using the <code>X-Downlink-Push</code> and <code>X-Downlink-Replace</code> headers.</p></div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/reference/application-server-data/">← Application Server Data</a>
+<a class="button is-pulled-right" href="/v3.5.0/reference/application-server-data/mqtt/">MQTT Server →</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Adrian-Stefan Mares on 13 Jan 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/470c96ad31eb3a9b5a38c2e379882f9152a5c5ba">
+      doc: Migrate webhooks and MQTT guides to Hugo Page Bundles
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/application-server-data/webhooks/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

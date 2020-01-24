@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Format | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/format/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Format">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Format">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/reference/webhook-templates/format/">
+  <meta name="twitter:title" content="Format" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Webhook Templates</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/format/" class="is-active">Format</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/instantiation/" class="">Instantiation</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Format</h1>
+
+<div class="content"><p>Webhook templates are described using the <a href="https://yaml.org/">YAML</a> language. Their format is very closely related to that of a normal webhook integration, but with additional fields added.</p>
+<h2 id="service-description">Service Description</h2>
+<p>All of the webhook templates must contain the following fields which describe the service provided by the template to the user.</p>
+<ul>
+<li><code>template-id</code>: The unique identifier of the template.</li>
+<li><code>name</code>: The (human readable) name of the service.</li>
+<li><code>description</code>: The description of the service.</li>
+<li><code>logo-url</code>: The URL of the logo of the service.</li>
+<li><code>info-url</code>: The URL of the main page of the service.</li>
+<li><code>documentation-url</code>: The URL of the documentation of the service.</li>
+</ul>
+<blockquote>
+<p>Note: The difference between <code>documentation-url</code> and <code>info-url</code> is that <code>info-url</code> should lead to the home page of the service (i.e. <code>https://www.thethingsnetwork.org/</code>), while <code>documentation-url</code> should lead directly to the location of the documentation (i.e. <code>https://www.thethingsnetwork.org/docs/applications/example/</code>).</p>
+</blockquote>
+<h2 id="template-fields">Template Fields</h2>
+<p>Templates can contain fields which will be filled by the user on instantiation. The fields are provided as a list named <code>fields</code> in the body of the webhook template and contain the following fields:</p>
+<ul>
+<li><code>id</code>: The unique identifier of the field. The ID is only referenced internally and not shown to the user.</li>
+<li><code>name</code>: The (human readable) name of the field.</li>
+<li><code>description</code>: The description of the field.</li>
+<li><code>secret</code>: Controls if the contents of the field should be hidden. To be used in the case of secrets such as passwords, tokens or API keys.</li>
+<li><code>default-value</code>: The value which should be pre filled for the user initially.</li>
+</ul>
+<p>For more information on the instantiation process, see <a href="https://thethingsstack.io/v3.5.0/reference/webhook-templates/instantiation/">Instantiation</a>.</p>
+<h2 id="endpoint">Endpoint</h2>
+<p>The endpoint of the webhook can be configured using the following fields:</p>
+<ul>
+<li><code>format</code>: The format which the endpoint expects. Currently <code>json</code> and <code>protobuf</code> are supported.</li>
+<li><code>headers</code>: A mapping between the names of the headers and their values. The values can contain template fields.</li>
+<li><code>create-downlink-api-key</code>: Controls if an API Key specific to the service should be created on instantiation.</li>
+<li><code>baseurl</code>: The base URL of the endpoint. Can contain template fields.</li>
+</ul>
+<p>The message paths are provided in the <code>paths</code> object which can contain the following message types:</p>
+<ul>
+<li><code>uplink-message</code>: The path to which uplink messages will be sent. Can contain template fields.</li>
+<li><code>join-accept</code>: The path to which join accept messages will be sent. Can contain template fields.</li>
+<li><code>downlink-ack</code>: The path to which downlink acknowledgements will be sent. Can contain template fields.</li>
+<li><code>downlink-nack</code>: The path to which downlink not-acknowledged messages will be sent. Can contain template fields.</li>
+<li><code>downlink-sent</code>: The path to which downlink sent will be sent. Can contain template fields.</li>
+<li><code>downlink-failed</code>: The path to which downlink failures will be sent. Can contain template fields.</li>
+<li><code>downlink-queued</code>: The path to which downlink queued status will be sent. Can contain template fields.</li>
+<li><code>location-solved</code>: The path to which the location of the device will be sent when resolved. Can contain template fields.</li>
+</ul>
+<blockquote>
+<p>Note: Not all of the messages types must be handled by the service. By omitting the field in the <code>paths</code> object the message type will be disabled in the final webhook and the related messages will not be passed to the endpoint.</p>
+</blockquote></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/reference/webhook-templates/">← Webhook Templates</a>
+<a class="button is-pulled-right" href="/v3.5.0/reference/webhook-templates/instantiation/">Instantiation →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Adrian-Stefan Mares on 22 Jan 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/4978b98a4583ac589fae9045f3919c52089ca92e">
+      as,doc: Use correct naming for the Protobuf format
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/webhook-templates/format.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Network Server | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/components/network-server/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Network Server">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Network Server">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/components/network-server/">
+  <meta name="twitter:title" content="Network Server" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">Network Server</h1>
+
+<div class="content"><p>The Network Server handles the LoRaWAN network layer, including MAC commands, regional parameters and adaptive data rate (ADR).</p>
+<h2 id="device-management">Device Management</h2>
+<p>Network Servers expose <a href="https://thethingsstack.io/v3.5.0/reference/api/end_device/#the-nsenddeviceregistry-service">NsEndDeviceRegistry</a> service for end device management. Typical clients of this service are <a href="https://thethingsstack.io/v3.5.0/components/console/">Console</a> and <a href="https://thethingsstack.io/v3.5.0/components/cli/">CLI</a>.</p>
+<p>Network Servers store device MAC configuration, MAC state and network session keys.</p>
+<p>Change of device MAC configuration may trigger a downlink message.</p>
+<h2 id="application-downlink-queue-management-and-linking">Application Downlink Queue Management and Linking</h2>
+<p>Network Servers let <a href="https://thethingsstack.io/v3.5.0/components/gateway-server/">Application Servers</a> push, replace and list application downlinks as well as link applications via gRPC API.</p>
+<p>Change of application downlink queue may trigger a downlink message.</p>
+<p>Once the link is established, Network Server will send application-specific uplink messages to the client via the link. There can be at most one active link per-appplication.</p>
+<p>In case link is not active, but Network Server has application-specific uplink messages to send, those messages will be queued and sent once the link is established.</p>
+<h2 id="downlink-scheduling">Downlink Scheduling</h2>
+<p>Network Servers maintain internal downlink task queue. Each downlink task has an execution time associated with it, which tasks are sorted by in ascending order. Whenever a downlink task is ready to execute, it is executed as soon as possible.</p>
+<h3 id="join-accept">Join-accept</h3>
+<p>In case a pending session exists and join-accept is queued for the device, it is scheduled.</p>
+<h3 id="data-downlink">Data downlink</h3>
+<p>In case a pending session does not exist or join-accept for it has already been sent, Network Server attempts to genererate and schedule data downlink in the active session.</p>
+<h2 id="uplink-handling">Uplink Handling</h2>
+<p>Network Servers receive uplinks from <a href="https://thethingsstack.io/v3.5.0/components/gateway-server/">Gateway Servers</a> via gRPC.</p>
+<p>Network Servers process the uplinks received and handle accordingly. The first step is matching the uplink to a device. In case an uplink cannot be matched to a device stored in Network Server, it is dropped.</p>
+<h3 id="join-request">Join-request</h3>
+<p>If join-request is received:</p>
+<ol>
+<li>Device is matched using the <code>DevEUI</code> and <code>JoinEUI</code> pair present in the join-request, which uniquely identifies the device.</li>
+<li>New <code>DevAddr</code> is assigned to the device and new MAC state is derived for the device.</li>
+<li>If <a href="https://thethingsstack.io/v3.5.0/components/join-server/">Join Server</a> is present in the cluster, Network Server sends a join-request message to the cluster-local <a href="https://thethingsstack.io/v3.5.0/components/join-server/">Join Server</a>.</li>
+<li>If <a href="https://thethingsstack.io/v3.5.0/components/join-server/">Join Server</a> is not present in the cluster or the device is not provisioned in the cluster-local <a href="https://thethingsstack.io/v3.5.0/components/join-server/">Join Server</a>, Network Server sends a join-request message to the <a href="https://thethingsstack.io/v3.5.0/components/join-server/">Join Server</a> discovered via <a href="https://thethingsstack.io/v3.5.0/reference/interop-repository/">interoperability configuration</a>.</li>
+<li>If a <a href="https://thethingsstack.io/v3.5.0/components/join-server/">Join Server</a> accepted the join-request, join-accept message may be enqueued for the device and application-specific uplink messages carrying relevant information about join-accept is sent to linked <a href="https://thethingsstack.io/v3.5.0/components/application-server/">Application Server</a>.</li>
+</ol>
+<h3 id="data-uplink">Data uplink</h3>
+<p>If data uplink is received:</p>
+<ol>
+<li>Device is matched using the <code>DevAddr</code> present in the data uplink. Matching is performed by comparing the session context and MAC state, as well as performing the MIC check. Since several devices may have identical <code>DevAddr</code>s, the Network Server may need to go through several stored devices before matching the device.</li>
+<li>The Network Server processes the MAC commands, if such are present in the frame and updates MAC state accordingly.</li>
+<li>If ADR bit is set in data uplink, Network Server runs the ADR algorithm and updates MAC state accordingly.</li>
+<li>If data uplink is successfully processed, downlink may be enqueued for the device and one or more application-specific uplink messages carrying relevant information about join-accept are sent to linked <a href="https://thethingsstack.io/v3.5.0/components/application-server/">Application Server</a>.</li>
+</ol></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/components/gateway-server/">← Gateway Server</a>
+<a class="button is-pulled-right" href="/v3.5.0/components/application-server/">Application Server →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Roman Volosatovs on 22 Nov 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/168a5275212b96316777a4eb9264cf9b7cfdb68f">
+      doc: Add Network Server documentation
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/components/network-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

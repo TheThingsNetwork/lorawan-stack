@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>The Things Kickstarter Gateway | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/guides/connecting-gateways/thethingskickstartergateway/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="The Things Kickstarter Gateway">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="The Things Kickstarter Gateway">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/guides/connecting-gateways/thethingskickstartergateway/">
+  <meta name="twitter:title" content="The Things Kickstarter Gateway" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Connecting Gateways</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/guides/connecting-gateways/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/guides/connecting-gateways/kerlinkwirnetistation/" class="">Kerlink Wirnet iStation</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/guides/connecting-gateways/kerlinkwirnetstation/" class="">Kerlink Wirnet Station</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/guides/connecting-gateways/nasysoutdoorgateway/" class="">NASys LoRaWAN Outdoor Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/guides/connecting-gateways/tektelickonamicro/" class="">Tektelic Kona Micro IoT LoRaWAN Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/guides/connecting-gateways/thethingskickstartergateway/" class="is-active">The Things Kickstarter Gateway</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">The Things Kickstarter Gateway</h1>
+
+<div class="content"><p>The Things Kickstarter Gateway is a LoRaWAN gateway, whose technical specifications can be found in <a href="https://www.thethingsnetwork.org/docs/gateways/gateway/">the official documentation</a>. This page guides you to connect it to The Things Stack.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>User account on The Things Stack with rights to create Gateways and API Keys.</li>
+<li>The Things Gateway running the latest firmware (a minimum of <code>v1.0.7</code> is necessary).</li>
+</ol>
+<h2 id="registration">Registration</h2>
+<p>Create a gateway by following the instructions for the <a href="https://thethingsstack.io/v3.5.0/guides/getting-started/console/#create-gateway">Console</a> or the <a href="https://thethingsstack.io/v3.5.0/guides/getting-started/cli/#create-gateway">CLI</a>. Choose a <strong>Gateway ID</strong>. An <strong>EUI</strong> is not necessary.</p>
+<p>Create an API Key with Gateway Link rights for this gateway using the same instructions. Copy the key and save it for later use.</p>
+<h2 id="configuration">Configuration</h2>
+<p>Open the front panel of the gateway casing.</p>
+<p>While the gateway is powered on, hold the pink reset button for 5 seconds (until each of the 5 LEDs illuminate). This erases the existing configuration on the gateway.</p>
+<p>The gateway will now expose a WiFi Access Point whose SSID is of the form <code>TheThings-Gateway-xxxxx</code>, to which you should now connect using password <code>thethings</code>.</p>
+<p>In a web browser, open the gateway's configuration page by navigating to http://192.168.84.1/</p>
+<figure>
+    <img src="ttkg-config-window.png"
+         alt="TTKG Configuration Window"/> 
+</figure>
+
+<p>Enter the following fields:</p>
+<ol>
+<li><strong>Name</strong>: the <strong>Gateway ID</strong> that you chose earlier.</li>
+<li>Choose the WiFi network from the drop down and enter a password if necessary.</li>
+</ol>
+<p>Click the <strong>Show Advanced Options</strong> button and enter the following fields:</p>
+<ol>
+<li><strong>Account Server</strong>: The URL of The Things Stack. If you followed the <a href="https://thethingsstack.io/v3.5.0/guides/getting-started/">Getting Started guide</a> this is the same as what you use instead of <code>https://thethings.example.com</code>.</li>
+<li><strong>Gateway Key</strong>: The API Key that you created earlier.</li>
+<li>Click <strong>Save</strong> when done.</li>
+</ol>
+<p>This will apply the setting and reboot the gateway. If all the steps have been followed correctly, your gateway will now connect to The Things Stack.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>If the gateway does not connect to the The Things Stack after a few minutes, disconnect and reconnect the power supply to power-cycle the gateway.</p>
+</div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/guides/connecting-gateways/tektelickonamicro/">← Tektelic Kona Micro IoT LoRaWAN Gateway</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Roman Volosatovs on 11 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/29011a4c96b5a5ed17b68eb8f326dde970e40090">
+      doc: Remove inaccurate ID specification in TTKG connection guide
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/connecting-gateways/thethingskickstartergateway/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

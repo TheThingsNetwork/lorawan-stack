@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>User Management with the Console | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/guides/user-management/console/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="User Management with the Console">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="User Management with the Console">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/guides/user-management/console/">
+  <meta name="twitter:title" content="User Management with the Console" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Basic User Management</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/guides/user-management/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/guides/user-management/console/" class="is-active">User Management with the Console</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/guides/user-management/cli/" class="">User Management with the CLI</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">User Management with the Console</h1>
+
+<div class="content"><p>User management can be found in the user dropdown in the top right corner of the Console.</p>
+<figure>
+    <img src="dropdown.png"
+         alt="User Dropdown"/> 
+</figure>
+
+<h2 id="listing-users">Listing Users</h2>
+<p>The list of users is shown immediately after going to <strong>User Management</strong> in the user dropdown.</p>
+<figure>
+    <img src="users-list.png"
+         alt="User List"/> 
+</figure>
+
+<h2 id="searching-for-users">Searching for Users</h2>
+<p>You can search for users by ID using the search field above the list of users. It is currently not possible to search for users by other fields than the user ID using the Console, but you can <a href="/v3.5.0/guides/user-management/cli/#searching-for-users">do this with the CLI</a>.</p>
+<h2 id="creating-users">Creating Users</h2>
+<p>It is currently not possible to create users in the Console, but users can register themselves, or you can <a href="/v3.5.0/guides/user-management/cli/#creating-users">create them with the CLI</a>.</p>
+<h2 id="inviting-users">Inviting Users</h2>
+<p>It is currently not possible to invite users from the Console, but you can <a href="/v3.5.0/guides/user-management/cli/#inviting-users">do this with the CLI</a>.</p>
+<h2 id="updating-users">Updating Users</h2>
+<p>In order to update a user, select that user from the list. You'll now see the edit view.</p>
+<figure>
+    <img src="users-edit.png"
+         alt="Editing a User"/> 
+</figure>
+
+<p>After making the changes to the user, click <strong>Save Changes</strong> to update the user.</p>
+<h2 id="deleting-users">Deleting Users</h2>
+<p>In the bottom of the edit view, you can click <strong>Delete User</strong> to delete the user.</p>
+<figure>
+    <img src="users-delete.png"
+         alt="Deleting a User"/> 
+</figure>
+
+<blockquote>
+<p><strong>NOTE:</strong> When deleting users, their user IDs stay reserved in the system, it is not possible to create a new user with the same user ID. In most cases you'll probably want to update a user to set its state to &ldquo;suspended&rdquo; instead.</p>
+</blockquote>
+</div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/guides/user-management/">← Basic User Management</a>
+<a class="button is-pulled-right" href="/v3.5.0/guides/user-management/cli/">User Management with the CLI →</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 27 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/e6bcede58a38816f4dbd683a6a96a502f171e965">
+      doc: Clarify user search in Console
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/user-management/console/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

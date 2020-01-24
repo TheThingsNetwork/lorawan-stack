@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Application Webhook APIs | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/reference/api/application_webhooks/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Application Webhook APIs">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Application Webhook APIs">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/reference/api/application_webhooks/">
+  <meta name="twitter:title" content="Application Webhook APIs" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">API</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/reference/api/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/authentication/" class="">Authentication</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/application/" class="">Application APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/application_server/" class="">Application Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/application_webhooks/" class="is-active">Application Webhook APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/application_pub_sub/" class="">Application Pub-Sub APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/gateway/" class="">Gateway APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/gateway_server/" class="">Gateway Server APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/end_device/" class="">End Device APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/end_device_claiming/" class="">End Device Claiming APIs</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/api/network_server/" class="">Network Server APIs</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Application Webhook APIs</h1>
+
+<div class="content"><h2 id="the-applicationwebhookregistry-service">The <code>ApplicationWebhookRegistry</code> service</h2>
+
+<h3>Method <code>ApplicationWebhookRegistry.GetFormats</code></h3>
+
+<p>
+  Request: <code>google.protobuf.Empty</code>
+  <br>
+  Response: <a href="#message:ApplicationWebhookFormats"><code>ApplicationWebhookFormats</code></a>
+</p>
+<p><code>GET</code> <code>/api/v3/as/webhook-formats</code></p>
+
+
+<h3>Method <code>ApplicationWebhookRegistry.Set</code></h3>
+
+<p>
+  Request: <a href="#message:SetApplicationWebhookRequest"><code>SetApplicationWebhookRequest</code></a>
+  <br>
+  Response: <a href="#message:ApplicationWebhook"><code>ApplicationWebhook</code></a>
+</p>
+<p><code>PUT</code> <code>/api/v3/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}</code></p>
+<p><code>POST</code> <code>/api/v3/as/webhooks/{webhook.ids.application_ids.application_id}</code></p>
+
+
+<h3>Method <code>ApplicationWebhookRegistry.Get</code></h3>
+
+<p>
+  Request: <a href="#message:GetApplicationWebhookRequest"><code>GetApplicationWebhookRequest</code></a>
+  <br>
+  Response: <a href="#message:ApplicationWebhook"><code>ApplicationWebhook</code></a>
+</p>
+<p><code>GET</code> <code>/api/v3/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}</code></p>
+
+
+<h3>Method <code>ApplicationWebhookRegistry.List</code></h3>
+
+<p>
+  Request: <a href="#message:ListApplicationWebhooksRequest"><code>ListApplicationWebhooksRequest</code></a>
+  <br>
+  Response: <a href="#message:ApplicationWebhooks"><code>ApplicationWebhooks</code></a>
+</p>
+<p><code>GET</code> <code>/api/v3/as/webhooks/{application_ids.application_id}</code></p>
+
+
+<h3>Method <code>ApplicationWebhookRegistry.Delete</code></h3>
+
+<p>
+  Request: <a href="#message:ApplicationWebhookIdentifiers"><code>ApplicationWebhookIdentifiers</code></a>
+  <br>
+  Response: <code>google.protobuf.Empty</code>
+</p>
+<p><code>DELETE</code> <code>/api/v3/as/webhooks/{application_ids.application_id}/{webhook_id}</code></p>
+
+<h2 id="messages">Messages</h2>
+<h3 id="message:ApplicationWebhook">Message <code>ApplicationWebhook</code></h3>
+
+<dl>
+  <dt>
+    <code>ids</code>
+    (<a href="#message:ApplicationWebhookIdentifiers"><code>ApplicationWebhookIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>created_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>updated_at</code>
+    (<code>google.protobuf.Timestamp</code>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>base_url</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>uri</code></p>
+      <p>Base URL to which the message's path is appended.</p>
+  </dd>
+  <dt>
+    <code>headers</code>
+    (map of <code>string</code> to <code>string</code>)
+  </dt>
+  <dd>
+      <p>HTTP headers to use.</p>
+  </dd>
+  <dt>
+    <code>format</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>20</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+      <p>The format to use for the body.
+Supported values depend on the Application Server configuration.</p>
+  </dd>
+  <dt>
+    <code>template_ids</code>
+    (<a href="#message:ApplicationWebhookTemplateIdentifiers"><code>ApplicationWebhookTemplateIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p>The ID of the template that was used to create the Webhook.</p>
+  </dd>
+  <dt>
+    <code>template_fields</code>
+    (map of <code>string</code> to <code>string</code>)
+  </dt>
+  <dd>
+      <p>The value of the fields used by the template. Maps field.id to the value.</p>
+  </dd>
+  <dt>
+    <code>downlink_api_key</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>The API key to be used for downlink queue operations.
+The field is provided for convenience reasons, and can contain API keys with additional rights (albeit this is discouraged).</p>
+  </dd>
+  <dt>
+    <code>uplink_message</code>
+    (<a href="#message:ApplicationWebhook.Message"><code>ApplicationWebhook.Message</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>join_accept</code>
+    (<a href="#message:ApplicationWebhook.Message"><code>ApplicationWebhook.Message</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>downlink_ack</code>
+    (<a href="#message:ApplicationWebhook.Message"><code>ApplicationWebhook.Message</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>downlink_nack</code>
+    (<a href="#message:ApplicationWebhook.Message"><code>ApplicationWebhook.Message</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>downlink_sent</code>
+    (<a href="#message:ApplicationWebhook.Message"><code>ApplicationWebhook.Message</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>downlink_failed</code>
+    (<a href="#message:ApplicationWebhook.Message"><code>ApplicationWebhook.Message</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>downlink_queued</code>
+    (<a href="#message:ApplicationWebhook.Message"><code>ApplicationWebhook.Message</code></a>)
+  </dt>
+  <dd>
+  </dd>
+  <dt>
+    <code>location_solved</code>
+    (<a href="#message:ApplicationWebhook.Message"><code>ApplicationWebhook.Message</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "ids": {},
+  "created_at": "0001-01-01T00:00:00Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "base_url": "",
+  "headers": {},
+  "format": "",
+  "template_ids": {},
+  "template_fields": {},
+  "downlink_api_key": "",
+  "uplink_message": {},
+  "join_accept": {},
+  "downlink_ack": {},
+  "downlink_nack": {},
+  "downlink_sent": {},
+  "downlink_failed": {},
+  "downlink_queued": {},
+  "location_solved": {},
+}</code></pre>
+</details>
+
+<h3 id="message:ApplicationWebhook.Message">Message <code>ApplicationWebhook.Message</code></h3>
+
+<dl>
+  <dt>
+    <code>path</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p>Path to append to the base URL.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "path": "",
+}</code></pre>
+</details>
+
+<h3 id="message:ApplicationWebhookFormats">Message <code>ApplicationWebhookFormats</code></h3>
+
+<dl>
+  <dt>
+    <code>formats</code>
+    (map of <code>string</code> to <code>string</code>)
+  </dt>
+  <dd>
+      <p>Format and description.</p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "formats": {},
+}</code></pre>
+</details>
+
+<h3 id="message:ApplicationWebhookIdentifiers">Message <code>ApplicationWebhookIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>webhook_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "application_ids": {},
+  "webhook_id": "",
+}</code></pre>
+</details>
+
+<h3 id="message:ApplicationWebhooks">Message <code>ApplicationWebhooks</code></h3>
+
+<dl>
+  <dt>
+    <code>webhooks</code>
+    (repeated <a href="#message:ApplicationWebhook"><code>ApplicationWebhook</code></a>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "webhooks": [],
+}</code></pre>
+</details>
+
+<h3 id="message:ApplicationWebhookTemplateIdentifiers">Message <code>ApplicationWebhookTemplateIdentifiers</code></h3>
+
+<dl>
+  <dt>
+    <code>template_id</code>
+    (<code>string</code>)
+  </dt>
+  <dd>
+      <p><code>max_len</code>: <code>36</code></p>
+      <p><code>pattern</code>: <code>^[a-z0-9](?:[-]?[a-z0-9]){2,}$</code></p>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "template_id": "",
+}</code></pre>
+</details>
+
+<h3 id="message:GetApplicationWebhookRequest">Message <code>GetApplicationWebhookRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>ids</code>
+    (<a href="#message:ApplicationWebhookIdentifiers"><code>ApplicationWebhookIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "ids": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+<h3 id="message:ListApplicationWebhooksRequest">Message <code>ListApplicationWebhooksRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>application_ids</code>
+    (<a href="#message:ApplicationIdentifiers"><code>ApplicationIdentifiers</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "application_ids": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+<h3 id="message:SetApplicationWebhookRequest">Message <code>SetApplicationWebhookRequest</code></h3>
+
+<dl>
+  <dt>
+    <code>webhook</code>
+    (<a href="#message:ApplicationWebhook"><code>ApplicationWebhook</code></a>)
+  </dt>
+  <dd>
+      <p><code>required</code></p>
+  </dd>
+  <dt>
+    <code>field_mask</code>
+    (<code>google.protobuf.FieldMask</code>)
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<details><summary>Show object example</summary>
+<pre><code>{
+  "webhook": {},
+  "field_mask": {},
+}</code></pre>
+</details>
+
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/reference/api/application_server/">← Application Server APIs</a>
+<a class="button is-pulled-right" href="/v3.5.0/reference/api/application_pub_sub/">Application Pub-Sub APIs →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Hylke Visser on 17 Oct 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/5975dcc259f691e7a0c17deb45116865f32c71de">
+      doc: Increase heading level for API reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/api/application_webhooks.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

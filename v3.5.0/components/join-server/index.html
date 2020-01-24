@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Join Server | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/components/join-server/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Join Server">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Join Server">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/components/join-server/">
+  <meta name="twitter:title" content="Join Server" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column">
+
+<h1 class="title is-size-2">Join Server</h1>
+
+<div class="content"><p>The Join Server handles the LoRaWAN join flow, including Network and Application Server authentication and session key generation.</p>
+<h2 id="join-procedure">Join procedure</h2>
+<p>Join Servers receive join-requests from <a href="https://thethingsstack.io/v3.5.0/components/network-server/">Network Servers</a> via gRPC and issue join-accepts for registered devices if join-request validation passes.</p>
+<p>In case a join-request is accepted, the Join Server derives session security context, which contains the session keys and is identified by a session key ID. Join Servers encrypt derived network and application session keys using key encryption keys(KEKs) shared between <a href="https://thethingsstack.io/v3.5.0/components/network-server/">Network Servers</a> and <a href="https://thethingsstack.io/v3.5.0/components/application-server/">Application Servers</a> respectively and include the session keys in the join-accepts in encrypted form.</p>
+<h2 id="device-management">Device Management</h2>
+<p>Join Servers expose <a href="https://thethingsstack.io/v3.5.0/reference/api/end_device/#the-jsenddeviceregistry-service">JsEndDeviceRegistry</a> service for end device management. Typical clients of this service are <a href="https://thethingsstack.io/v3.5.0/components/console/">Console</a> and <a href="https://thethingsstack.io/v3.5.0/components/cli/">CLI</a>.</p>
+<p>Join Servers store device root and session keys.</p>
+<h2 id="session-key-retrieval">Session Key Retrieval</h2>
+<p>Join Servers expose RPCs for retrieval of session keys given session key ID.</p>
+<h2 id="interoperability">Interoperability</h2>
+<p>Join Servers expose AS-JS, vNS-JS and hNS-JS services as defined by LoRaWAN Backend Interface 1.0 spec.</p></div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/components/application-server/">← Application Server</a>
+<a class="button is-pulled-right" href="/v3.5.0/components/console/">Console →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Roman Volosatovs on 16 Jan 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/2f98b56a1564c297865318da4e31074ebf5c5659">
+      doc: Add Join-Server documentation
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/components/join-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

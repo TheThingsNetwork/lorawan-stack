@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Gateway Server Options | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.5.0/reference/configuration/gateway-server/" />
+  <link rel="icon" type="image/png" href="/v3.5.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.5.0/css/theme.min.5dd32f3470ed0dd51c1ada307d7e441a0a62b2395c6d9d889baf20c980d6413f.css" integrity="sha256-XdMvNHDtDdUcGtowfX5EGgpisjlcbZ2Im68gyYDWQT8=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Gateway Server Options">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Gateway Server Options">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.5.0/reference/configuration/gateway-server/">
+  <meta name="twitter:title" content="Gateway Server Options" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.5.0/">
+        <img src="/v3.5.0/img/TTS-logo.svg">
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.5.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.5.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.5.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.5.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.5.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Configuration</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.5.0/reference/configuration/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/the-things-stack/" class="">Generic Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/identity-server/" class="">Identity Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/gateway-server/" class="is-active">Gateway Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/network-server/" class="">Network Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/application-server/" class="">Application Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/join-server/" class="">Join Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/console/" class="">Console Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/cli/" class="">Command-Line Interface Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.5.0/reference/configuration/gateway-configuration-server/" class="">Gateway Configuration Server Options</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Gateway Server Options</h1>
+
+<div class="content"><h2 id="forwarding-options">Forwarding Options</h2>
+<p>The Gateway Server forwards traffic to upstream hosts based on the <code>gs.forward</code> parameter.</p>
+<ul>
+<li><code>gs.forward</code>: Forward the DevAddr prefixes to the specified hosts. This parameter accepts a string in the format <code>name=devaddrprefixes</code></li>
+</ul>
+<h2 id="security-options">Security Options</h2>
+<ul>
+<li><code>gs.require-registered-gateways</code>: Require the gateways to be registered in the Identity Server</li>
+</ul>
+<h2 id="basic-station-options">Basic Station Options</h2>
+<p>The Gateway Server supports connection of gateways using the Basic Station protocol.</p>
+<ul>
+<li><code>gs.basic-station.listen</code>: Address for the Basic Station frontend to listen on</li>
+<li><code>gs.basic-station.listen-tls</code>: Address for the Basic Station frontend to listen on (with TLS)</li>
+<li><code>gs.basic-station.use-traffic-tls-address</code>: Use WSS for the traffic address regardless of the TLS setting</li>
+</ul>
+<p>The frequency plan to use for unregistered gateways can be set using <code>gs.basic-station.fallback-frequency-plan-id</code>. Note that <code>gs.require-registered-gateways</code> must be set to false for this to take effect.</p>
+<ul>
+<li><code>gs.basic-station.fallback-frequency-plan-id</code>: Fallback frequency plan ID for non-registered gateways</li>
+</ul>
+<h2 id="mqtt-options">MQTT Options</h2>
+<p>The Gateway Server exposes an MQTT server for connecting gateways via MQTT.</p>
+<ul>
+<li><code>gs.mqtt.listen</code>: Address for the MQTT frontend to listen on</li>
+<li><code>gs.mqtt.listen-tls</code>: Address for the MQTTS frontend to listen on</li>
+<li><code>gs.mqtt.public-address</code>: Public address of the MQTT frontend</li>
+<li><code>gs.mqtt.public-tls-address</code>: Public address of the MQTTs frontend</li>
+</ul>
+<h2 id="mqtt-v2-options">MQTT V2 Options</h2>
+<p>The Gateway Server exposes an second MQTT server for connecting gateways that use the V2 MQTT format.</p>
+<ul>
+<li><code>gs.mqtt-v2.listen</code>: Address for the MQTT frontend to listen on</li>
+<li><code>gs.mqtt-v2.listen-tls</code>: Address for the MQTTS frontend to listen on</li>
+<li><code>gs.mqtt-v2.public-address</code>: Public address of the MQTT frontend</li>
+<li><code>gs.mqtt-v2.public-tls-address</code>: Public address of the MQTTs frontend</li>
+</ul>
+<h2 id="udp-options">UDP Options</h2>
+<p>The Gateway Server supports the connection of gateways using the Semtech UDP protocol.</p>
+<ul>
+<li><code>gs.udp.listeners</code>: Listen addresses with (optional) fallback frequency plan ID for non-registered gateways. This parameter accepts as string in the format <code>listen-address=frequency-plan-id</code></li>
+<li><code>gs.udp.schedule-late-time</code>: Time in advance to send downlink to the gateway when scheduling late</li>
+</ul>
+<p>Options are available to configure connection behavior of UDP gateways.</p>
+<ul>
+<li><code>gs.udp.connection-expires</code>: Time after which a connection of a gateway expires</li>
+<li><code>gs.udp.downlink-path-expires</code>: Time after which a downlink path to a gateway expires</li>
+<li><code>gs.udp.addr-change-block</code>: Time to block traffic when a gateway's address changes</li>
+</ul>
+<p>Using the <code>packet-buffer</code> and <code>packet-handlers</code> options, the throughput of UDP packets can be configured.</p>
+<ul>
+<li><code>gs.udp.packet-buffer</code>: Buffer size of unhandled packets</li>
+<li><code>gs.udp.packet-handlers</code>: Number of concurrent packet handlers</li>
+</ul>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.5.0/reference/configuration/identity-server/">← Identity Server Options</a>
+<a class="button is-pulled-right" href="/v3.5.0/reference/configuration/network-server/">Network Server Options →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.5.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.5.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.5.0/components/">Components</a></p>
+        <p><a class="" href="/v3.5.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by KrishnaIyer on 18 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/39f4d9bc166c58a30251f78de526c68baf2ac3f3">
+      doc: Remove default values from reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/configuration/gateway-server.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.5.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
