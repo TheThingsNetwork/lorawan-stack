@@ -51,13 +51,7 @@ import PropTypes from '../../../lib/prop-types'
 )
 @withBreadcrumb('apps.single.api-keys.add', function(props) {
   const appId = props.appId
-  return (
-    <Breadcrumb
-      path={`/applications/${appId}/api-keys/add`}
-      icon="add"
-      content={sharedMessages.add}
-    />
-  )
+  return <Breadcrumb path={`/applications/${appId}/api-keys/add`} content={sharedMessages.add} />
 })
 @bind
 export default class ApplicationApiKeyAdd extends React.Component {

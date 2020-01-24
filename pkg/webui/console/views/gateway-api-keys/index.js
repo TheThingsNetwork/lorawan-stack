@@ -35,11 +35,7 @@ import PropTypes from '../../../lib/prop-types'
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
 @withBreadcrumb('gateways.single.api-keys', ({ gtwId }) => (
-  <Breadcrumb
-    path={`/gateways/${gtwId}/api-keys`}
-    icon="api_keys"
-    content={sharedMessages.apiKeys}
-  />
+  <Breadcrumb path={`/gateways/${gtwId}/api-keys`} content={sharedMessages.apiKeys} />
 ))
 export default class GatewayApiKeys extends React.Component {
   static propTypes = {

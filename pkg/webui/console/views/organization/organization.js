@@ -43,7 +43,7 @@ import {
     orgId,
     organization: { name },
   } = props
-  return <Breadcrumb path={`/organizations/${orgId}`} icon="organization" content={name || orgId} />
+  return <Breadcrumb path={`/organizations/${orgId}`} content={name || orgId} />
 })
 class Organization extends React.Component {
   static propTypes = {

@@ -100,7 +100,6 @@ import PropTypes from '../../../lib/prop-types'
   return (
     <Breadcrumb
       path={`/gateways/${gtwId}/collaborators/${collaboratorType}/${collaboratorId}`}
-      icon="general_settings"
       content={sharedMessages.edit}
     />
   )

@@ -100,7 +100,7 @@ import PropTypes from '../../../lib/prop-types'
     gateway: { name },
   } = props
 
-  return <Breadcrumb path={`/gateways/${gtwId}`} icon="gateway" content={name || gtwId} />
+  return <Breadcrumb path={`/gateways/${gtwId}`} content={name || gtwId} />
 })
 @withEnv
 export default class Gateway extends React.Component {

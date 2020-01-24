@@ -30,13 +30,7 @@ import UserManagement from './admin-user-management'
 
 @withFeatureRequirement(mayManageUsers, { redirect: '/' })
 @withBreadcrumb('admin.user-management', function() {
-  return (
-    <Breadcrumb
-      path={'/admin/user-management'}
-      icon="user_management"
-      content={sharedMessages.userManagement}
-    />
-  )
+  return <Breadcrumb path={'/admin/user-management'} content={sharedMessages.userManagement} />
 })
 export default class UserManagementRouter extends Component {
   static propTypes = {

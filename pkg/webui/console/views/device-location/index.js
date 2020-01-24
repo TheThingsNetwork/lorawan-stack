@@ -80,7 +80,6 @@ const getRegistryLocation = function(locations) {
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/location`}
-      icon="location"
       content={sharedMessages.location}
     />
   )

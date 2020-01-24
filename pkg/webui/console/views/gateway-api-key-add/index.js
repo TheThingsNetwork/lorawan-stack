@@ -55,9 +55,7 @@ import PropTypes from '../../../lib/prop-types'
 @withBreadcrumb('gtws.single.api-keys.add', function(props) {
   const gtwId = props.gtwId
 
-  return (
-    <Breadcrumb path={`/gateways/${gtwId}/api-keys/add`} icon="add" content={sharedMessages.add} />
-  )
+  return <Breadcrumb path={`/gateways/${gtwId}/api-keys/add`} content={sharedMessages.add} />
 })
 @bind
 export default class GatewayApiKeyAdd extends React.Component {

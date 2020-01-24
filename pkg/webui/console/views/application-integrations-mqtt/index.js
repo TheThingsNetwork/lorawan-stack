@@ -57,11 +57,7 @@ const m = defineMessages({
   const { appId } = props
 
   return (
-    <Breadcrumb
-      path={`/applications/${appId}/integrations/mqtt`}
-      icon="extension"
-      content={sharedMessages.mqtt}
-    />
+    <Breadcrumb path={`/applications/${appId}/integrations/mqtt`} content={sharedMessages.mqtt} />
   )
 })
 export default class ApplicationMqtt extends React.Component {

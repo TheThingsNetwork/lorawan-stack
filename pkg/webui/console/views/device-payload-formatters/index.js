@@ -60,7 +60,6 @@ const m = defineMessages({
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/payload-formatters`}
-      icon="link"
       content={sharedMessages.payloadFormatters}
     />
   )

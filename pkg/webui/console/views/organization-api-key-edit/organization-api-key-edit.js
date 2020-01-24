@@ -27,11 +27,7 @@ import PropTypes from '../../../lib/prop-types'
   const { orgId, keyId } = props
 
   return (
-    <Breadcrumb
-      path={`/organizations/${orgId}/api-keys/${keyId}`}
-      icon="general_settings"
-      content={sharedMessages.edit}
-    />
+    <Breadcrumb path={`/organizations/${orgId}/api-keys/${keyId}`} content={sharedMessages.edit} />
   )
 })
 class OrganizationApiKeyEdit extends React.Component {

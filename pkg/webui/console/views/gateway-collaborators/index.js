@@ -36,11 +36,7 @@ import PropTypes from '../../../lib/prop-types'
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
 @withBreadcrumb('gtws.single.collaborators', ({ gtwId }) => (
-  <Breadcrumb
-    path={`/gateways/${gtwId}/collaborators`}
-    icon="organization"
-    content={sharedMessages.collaborators}
-  />
+  <Breadcrumb path={`/gateways/${gtwId}/collaborators`} content={sharedMessages.collaborators} />
 ))
 export default class GatewayCollaborators extends React.Component {
   static propTypes = {

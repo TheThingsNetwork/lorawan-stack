@@ -89,7 +89,6 @@ const webhookEntitySelector = [
   return (
     <Breadcrumb
       path={`/applications/${appId}/integrations/${webhookId}`}
-      icon="general_settings"
       content={sharedMessages.edit}
     />
   )

@@ -41,11 +41,7 @@ import PropTypes from '../../../lib/prop-types'
 @withBreadcrumb('apps.single.integrations.add', function(props) {
   const { appId } = props
   return (
-    <Breadcrumb
-      path={`/applications/${appId}/integrations/add`}
-      icon="add"
-      content={sharedMessages.add}
-    />
+    <Breadcrumb path={`/applications/${appId}/integrations/add`} content={sharedMessages.add} />
   )
 })
 @bind

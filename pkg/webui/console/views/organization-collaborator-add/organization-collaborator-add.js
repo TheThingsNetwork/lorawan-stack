@@ -27,11 +27,7 @@ import PropTypes from '../../../lib/prop-types'
   const { orgId } = props
 
   return (
-    <Breadcrumb
-      path={`/organizations/${orgId}/collaborators/add`}
-      icon="add"
-      content={sharedMessages.add}
-    />
+    <Breadcrumb path={`/organizations/${orgId}/collaborators/add`} content={sharedMessages.add} />
   )
 })
 class OrganizationCollaboratorAdd extends React.Component {

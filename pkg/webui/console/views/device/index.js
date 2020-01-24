@@ -102,13 +102,7 @@ import style from './device.styl'
     appId,
     device: { name },
   } = props
-  return (
-    <Breadcrumb
-      path={`/applications/${appId}/devices/${devId}`}
-      icon="device"
-      content={name || devId}
-    />
-  )
+  return <Breadcrumb path={`/applications/${appId}/devices/${devId}`} content={name || devId} />
 })
 @withEnv
 export default class Device extends React.Component {

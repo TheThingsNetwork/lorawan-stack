@@ -100,7 +100,6 @@ const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.id
   return (
     <Breadcrumb
       path={`/applications/${appId}/collaborators/${collaboratorType}/${collaboratorId}`}
-      icon="general_settings"
       content={sharedMessages.edit}
     />
   )

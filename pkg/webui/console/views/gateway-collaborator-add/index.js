@@ -60,13 +60,7 @@ import PropTypes from '../../../lib/prop-types'
 )
 @withBreadcrumb('gtws.single.collaborators.add', function(props) {
   const gtwId = props.gtwId
-  return (
-    <Breadcrumb
-      path={`/gateways/${gtwId}/collaborators/add`}
-      icon="add"
-      content={sharedMessages.add}
-    />
-  )
+  return <Breadcrumb path={`/gateways/${gtwId}/collaborators/add`} content={sharedMessages.add} />
 })
 @bind
 export default class GatewayCollaboratorAdd extends React.Component {
