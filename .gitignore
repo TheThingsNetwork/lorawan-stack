@@ -99,6 +99,7 @@ node_modules/
 # Keypair
 cert.pem
 key.pem
+ca.pem
 
 # Development data directory
 .dev/
