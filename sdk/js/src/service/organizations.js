@@ -60,6 +60,15 @@ class Organizations {
     return Marshaler.payloadSingleResponse(response)
   }
 
+  async search(params, selector) {
+    const response = await this._api.EntityRegistrySearch.SearchOrganizations(undefined, {
+      ...params,
+      ...Marshaler.selectorToFieldMask(selector),
+    })
+
+    return Marshaler.payloadListResponse('organizations', response)
+  }
+
   // Create
 
   async create(userId, organization) {

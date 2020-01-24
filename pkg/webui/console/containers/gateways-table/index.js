@@ -102,9 +102,9 @@ export default class GatewaysTable extends React.Component {
         addMessage={sharedMessages.addGateway}
         headers={headers}
         getItemsAction={this.getGatewaysList}
-        searchItemsAction={this.getGatewaysList}
         baseDataSelector={this.baseDataSelector}
         tableTitle={<Message content={sharedMessages.gateways} />}
+        searchable
         {...this.props}
       />
     )

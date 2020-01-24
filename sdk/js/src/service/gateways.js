@@ -62,6 +62,15 @@ class Gateways {
     return Marshaler.unwrapGateway(response)
   }
 
+  async search(params, selector) {
+    const response = await this._api.EntityRegistrySearch.SearchGateways(undefined, {
+      ...params,
+      ...Marshaler.selectorToFieldMask(selector),
+    })
+
+    return Marshaler.payloadListResponse('gateways', response)
+  }
+
   // Update
 
   async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {

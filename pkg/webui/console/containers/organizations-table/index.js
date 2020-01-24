@@ -81,9 +81,9 @@ export default class OrganizationsTable extends Component {
         addMessage={sharedMessages.addOrganization}
         tableTitle={<Message content={sharedMessages.organizations} />}
         getItemsAction={this.getOrganizationsList}
-        searchItemsAction={this.getOrganizationsList}
         baseDataSelector={this.baseDataSelector}
         pageSize={pageSize}
+        searchable
       />
     )
   }

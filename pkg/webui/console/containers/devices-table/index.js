@@ -136,9 +136,9 @@ class DevicesTable extends React.Component {
         actionItems={this.importButton}
         tableTitle={<Message content={sharedMessages.devices} />}
         getItemsAction={this.getDevicesList}
-        searchItemsAction={this.getDevicesList}
         itemPathPrefix={devicePathPrefix}
         baseDataSelector={this.baseDataSelector}
+        searchable
         {...this.props}
       />
     )

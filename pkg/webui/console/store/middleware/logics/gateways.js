@@ -73,7 +73,6 @@ const getGatewaysLogic = createRequestLogic({
             page,
             limit,
             id_contains: query,
-            name_contains: query,
             order,
           },
           selectors,

@@ -107,9 +107,10 @@ class Applications {
     return this._responseTransform(response)
   }
 
-  async search(params) {
-    const response = await this._api.EntityRegistrySearch.SearchApplications({
-      queryParams: params,
+  async search(params, selector) {
+    const response = await this._api.EntityRegistrySearch.SearchApplications(undefined, {
+      ...params,
+      ...Marshaler.selectorToFieldMask(selector),
     })
 
     return this._responseTransform(response, false)
