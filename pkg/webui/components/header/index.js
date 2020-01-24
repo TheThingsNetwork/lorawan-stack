@@ -16,7 +16,6 @@ import React, { useState, useCallback } from 'react'
 import classnames from 'classnames'
 
 import Logo from '../../containers/logo'
-import Link from '../link'
 import NavigationBar from '../navigation/bar'
 import ProfileDropdown from '../profile-dropdown'
 import MobileMenu from '../mobile-menu'
@@ -61,9 +60,7 @@ const Header = function({
     <header {...rest} className={classNames}>
       <div className={style.bar}>
         <div className={style.left}>
-          <Link to="/" className={style.logo}>
-            {logo}
-          </Link>
+          {logo}
           {!isGuest && <NavigationBar className={style.navList}>{navigationEntries}</NavigationBar>}
         </div>
         {!isGuest && (
