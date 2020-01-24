@@ -16,8 +16,8 @@ import React, { Component } from 'react'
 import { Switch, Route } from 'react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import BreadcrumbView from '../../../lib/components/breadcrumb-view'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import Breadcrumbs from '../../../components/breadcrumbs'
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import IntlHelmet from '../../../lib/components/intl-helmet'
@@ -45,14 +45,15 @@ export default class UserManagementRouter extends Component {
   render() {
     const { match } = this.props
     return (
-      <BreadcrumbView>
+      <React.Fragment>
+        <Breadcrumbs />
         <IntlHelmet title={sharedMessages.userManagement} />
         <Switch>
           <Route exact path={`${match.path}`} component={UserManagement} />
           <Route path={`${match.path}/:userId`} component={UserEdit} />
           <NotFoundRoute />
         </Switch>
-      </BreadcrumbView>
+      </React.Fragment>
     )
   }
 }

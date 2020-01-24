@@ -16,7 +16,6 @@ exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
       depth={0}
       exact={false}
       isActive={false}
-      isMinimized={false}
       location={
         Object {
           "pathname": "/",
@@ -29,7 +28,6 @@ exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
       depth={0}
       exact={false}
       isActive={false}
-      isMinimized={false}
       location={
         Object {
           "pathname": "/",

@@ -14,35 +14,80 @@
 
 .navigation
   border-normal(right)
+  background-color: white
   max-width: 18rem
   min-width: 16rem
   height: 100%
   display: flex
   flex-direction: column
   justify-content: space-between
+  +media-query($bp.s)
+    max-width: none
+    width: 100%
 
   &-minimized
     min-width: auto
     display: inline-flex
 
-  &-button
+  .minimize-button
     align-self: center
+    +media-query($bp.s)
+      display: none
+
+.mobile-header
+  display: none
+  align-items: center
+  +media-query($bp.s)
+    border-normal(bottom)
+    display: flex
+    padding: $cs.m $cs.s
+
+  .expand-icon
+    margin-right: $cs.s
+    font-size: 2rem
+    color: $tc-subtle-gray
+
 
 .header
+  border-normal(bottom)
   display: flex
-  align-content: center
+  align-items: center
   padding: $cs.xl $cs.l
   font-weight: 600
 
-  &-minimized
-    padding: $cs.l $cs.m
-    display: inline-block
+  +media-query-min($bp.s)
+    &-minimized
+      padding: $cs.l $cs.m
+      display: inline-block
 
-    .message
-      display: none
+      .message
+        display: none
 
-    .icon
-      margin-right: 0
+      .icon
+        margin-right: 0
+
+.body
+  height: 100%
+  display: flex
+  flex-direction: column
+  justify-content: space-between
+
+.drawer
+  background-color: white
+  z-index: $zi.nav
+  overflow: auto
+  +media-query($bp.s)
+    display: block
+    position: fixed
+    top: $header-height-mobile
+    left: -60vw
+    bottom: 0
+    width: 60vw
+    transition: left 330ms cubic-bezier(.18,.71,.3,.99), box-shadow 330ms cubic-bezier(.18,.71,.3,.99)
+
+    &-open
+      box-shadow: 0 0 13rem 2rem rgba(0,0,0,.4)
+      left: 0
 
 .message
   display: block
@@ -51,5 +96,8 @@
   text-overflow: ellipsis
 
 .icon
-  nudge('down', 3px)
   margin-right: $cs.xs
+
+.scroll-lock
+  +media-query($bp.s)
+    overflow: hidden

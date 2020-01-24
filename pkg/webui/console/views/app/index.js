@@ -16,10 +16,12 @@ import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { ConnectedRouter } from 'connected-react-router'
 import { Route, Switch } from 'react-router-dom'
+import classnames from 'classnames'
 
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
 import ErrorView from '../../../lib/components/error-view'
+import ScrollToTop from '../../../lib/components/scroll-to-top'
 import dev from '../../../lib/dev'
 import PropTypes from '../../../lib/prop-types'
 import { ToastContainer } from '../../../components/toast'
@@ -66,6 +68,7 @@ class ConsoleApp extends React.Component {
       <React.Fragment>
         <ToastContainer />
         <ConnectedRouter history={history}>
+          <ScrollToTop />
           <ErrorView ErrorComponent={FullViewError}>
             <div className={style.app}>
               <IntlHelmet
@@ -75,8 +78,10 @@ class ConsoleApp extends React.Component {
               <div id="modal-container" />
               <Header className={style.header} />
               <main className={style.main}>
-                <div id="sidebar" />
+                <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
+                <div className={style.sidebar} id="sidebar" />
                 <div className={style.content}>
+                  <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                   <Switch>
                     {/* routes for registration, privacy policy, other public pages */}
                     <Route path="/login" component={Login} />

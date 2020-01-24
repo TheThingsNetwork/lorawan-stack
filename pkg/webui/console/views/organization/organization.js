@@ -17,10 +17,10 @@ import { Switch, Route } from 'react-router'
 
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import Breadcrumbs from '../../../components/breadcrumbs'
 import IntlHelmet from '../../../lib/components/intl-helmet'
 import { withEnv } from '../../../lib/components/env'
 import SideNavigation from '../../../components/navigation/side'
-import BreadcrumbView from '../../../lib/components/breadcrumb-view'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 import NotFoundRoute from '../../../lib/components/not-found-route'
@@ -70,7 +70,8 @@ class Organization extends React.Component {
     } = this.props
 
     return (
-      <BreadcrumbView>
+      <React.Fragment>
+        <Breadcrumbs />
         <IntlHelmet titleTemplate={`%s - ${organization.name || orgId} - ${env.siteName}`} />
         <SideNavigation header={{ title: organization.name || orgId, icon: 'organization' }}>
           {mayViewOrganizationInformation.check(rights) && (
@@ -115,7 +116,7 @@ class Organization extends React.Component {
           <Route path={`${path}/collaborators`} component={OrganizationCollaborators} />
           <NotFoundRoute />
         </Switch>
-      </BreadcrumbView>
+      </React.Fragment>
     )
   }
 }

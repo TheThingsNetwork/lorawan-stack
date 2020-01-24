@@ -23,10 +23,13 @@ import SideNavigationList from '../list'
 import NavigationLink from '../../link'
 import Message from '../../../../lib/components/message'
 import Icon from '../../../icon'
+import SideNavigationContext from '../context'
 
 import style from './item.styl'
 
 export class SideNavigationItem extends React.PureComponent {
+  static contextType = SideNavigationContext
+
   static propTypes = {
     children: PropTypes.node,
     className: PropTypes.string,
@@ -37,8 +40,6 @@ export class SideNavigationItem extends React.PureComponent {
     icon: PropTypes.string,
     /** A flag specifying whether the side navigation item is active or not */
     isActive: PropTypes.bool,
-    /** A flag specifying whether the side navigation item is minimized or not */
-    isMinimized: PropTypes.bool,
     location: PropTypes.location.isRequired,
     /** The path of the linkable side navigation item */
     path: PropTypes.string,
@@ -52,7 +53,6 @@ export class SideNavigationItem extends React.PureComponent {
     exact: false,
     icon: undefined,
     isActive: false,
-    isMinimized: false,
     depth: 0,
     path: undefined,
   }
@@ -81,18 +81,9 @@ export class SideNavigationItem extends React.PureComponent {
   }
 
   render() {
-    const {
-      className,
-      children,
-      title,
-      depth,
-      icon,
-      path,
-      exact,
-      isMinimized,
-      isActive,
-    } = this.props
+    const { className, children, title, depth, icon, path, exact, isActive } = this.props
     const { isExpanded } = this.state
+    const { isMinimized, onLeafItemClick } = this.context
 
     return (
       <li
@@ -112,7 +103,14 @@ export class SideNavigationItem extends React.PureComponent {
             children={children}
           />
         ) : (
-          <LinkItem title={title} icon={icon} exact={exact} path={path} depth={depth} />
+          <LinkItem
+            onClick={onLeafItemClick}
+            title={title}
+            icon={icon}
+            exact={exact}
+            path={path}
+            depth={depth}
+          />
         )}
       </li>
     )
@@ -159,7 +157,7 @@ CollapsableItem.propTypes = {
   icon: PropTypes.string,
   isActive: PropTypes.bool.isRequired,
   isExpanded: PropTypes.bool.isRequired,
-  isMinimized: PropTypes.bool.isRequired,
+  isMinimized: PropTypes.bool,
   onClick: PropTypes.func.isRequired,
   title: PropTypes.message.isRequired,
 }
@@ -167,10 +165,12 @@ CollapsableItem.propTypes = {
 CollapsableItem.defaultProps = {
   children: undefined,
   icon: undefined,
+  isMinimized: false,
 }
 
-const LinkItem = ({ title, icon, exact, path }) => (
+const LinkItem = ({ onClick, title, icon, exact, path }) => (
   <NavigationLink
+    onClick={onClick}
     className={style.link}
     activeClassName={style.linkActive}
     exact={exact}
@@ -184,6 +184,7 @@ const LinkItem = ({ title, icon, exact, path }) => (
 LinkItem.propTypes = {
   exact: PropTypes.bool.isRequired,
   icon: PropTypes.string,
+  onClick: PropTypes.func,
   path: PropTypes.string,
   title: PropTypes.message.isRequired,
 }

@@ -24,6 +24,7 @@ import Icon from '../../icon'
 import Message from '../../../lib/components/message'
 import SideNavigationList from './list'
 import SideNavigationItem from './item'
+import SideNavigationContext from './context'
 
 import style from './side.styl'
 
@@ -48,6 +49,8 @@ export class SideNavigation extends Component {
   state = {
     /** A flag specifying whether the side navigation is minimized or not */
     isMinimized: false,
+    /** A flag specifying whether the drawer is currently open (in mobile screensizes) */
+    isDrawerOpen: false,
   }
 
   @bind
@@ -58,50 +61,48 @@ export class SideNavigation extends Component {
   }
 
   @bind
-  onItemExpand(index, linkSelected) {
-    this.setState(function(prev) {
-      const oldItemsExpanded = prev.itemsExpanded
-      const oldMinimized = prev.isMinimized
+  onDrawerExpandClick() {
+    const { isDrawerOpen } = this.state
 
-      // make sure that no more links are active
-      if (linkSelected) {
-        const itemsExpanded = Object.keys(oldItemsExpanded)
-          .map(idx => +idx)
-          .reduce(function(acc, idx) {
-            const { isOpen, isLink } = oldItemsExpanded[idx] || {}
-            if (index === idx) {
-              acc[idx] = { isOpen: true, isLink: true }
-            } else if (isLink) {
-              acc[idx] = { isOpen, isLink: false }
-            } else {
-              acc[idx] = oldItemsExpanded[idx]
-            }
+    if (!isDrawerOpen) {
+      // Disable body scrolling
+      document.body.classList.add(style.scrollLock)
 
-            return acc
-          }, {})
+      document.addEventListener('mousedown', this.onClickOutside)
+      this.setState({ isDrawerOpen: true })
+    } else {
+      // Enable body scrolling
+      document.body.classList.remove(style.scrollLock)
 
-        return { itemsExpanded }
-      }
+      document.addEventListener('mousedown', this.onClickOutside)
+      this.setState({ isDrawerOpen: false })
+    }
+  }
 
-      const { isOpen = false, isLink = false } = oldItemsExpanded[index] || {}
+  @bind
+  onClickOutside(e) {
+    const { isDrawerOpen } = this.state
+    if (isDrawerOpen && this.node && !this.node.contains(e.target)) {
+      this.setState({ isDrawerOpen: false })
+    }
+  }
 
-      const shouldOpen = oldMinimized || !isOpen
-      const shouldLink = isLink || linkSelected
-      const shouldMinimize = oldMinimized && linkSelected
+  @bind
+  onLeafItemClick() {
+    const { isDrawerOpen } = this.state
+    if (isDrawerOpen) {
+      this.onDrawerExpandClick()
+    }
+  }
 
-      return {
-        itemsExpanded: {
-          ...oldItemsExpanded,
-          [index]: { isOpen: shouldOpen, isLink: shouldLink },
-        },
-        isMinimized: shouldMinimize,
-      }
-    })
+  @bind
+  ref(node) {
+    this.node = node
   }
 
   render() {
     const { className, header, children } = this.props
-    const { isMinimized, itemsExpanded } = this.state
+    const { isMinimized, isDrawerOpen } = this.state
 
     const navigationClassNames = classnames(className, style.navigation, {
       [style.navigationMinimized]: isMinimized,
@@ -110,39 +111,43 @@ export class SideNavigation extends Component {
       [style.headerMinimized]: isMinimized,
     })
 
+    const drawerClassNames = classnames(style.drawer, { [style.drawerOpen]: isDrawerOpen })
+
     return (
-      <nav className={navigationClassNames}>
-        <div>
-          <div className={headerClassNames}>
-            <Icon className={style.icon} icon={header.icon} />
-            <Message className={style.message} content={header.title} />
-          </div>
-          <SideNavigationList
-            itemsExpanded={itemsExpanded}
-            onItemExpand={this.onItemExpand}
-            isMinimized={isMinimized}
-          >
-            {React.Children.map(children, child => {
-              if (child.type === SideNavigationItem) {
-                return React.cloneElement(
-                  child,
-                  { ...child.props, isMinimized },
-                  child.props.children,
-                )
-              }
-              return child
-            })}
-          </SideNavigationList>
+      <nav className={navigationClassNames} ref={this.ref}>
+        <div className={style.mobileHeader} onClick={this.onDrawerExpandClick}>
+          <Icon className={style.expandIcon} icon="more_vert" />
+          <Icon className={style.icon} icon={header.icon} />
+          <Message className={style.message} content={header.title} />
         </div>
-        <Button
-          className={style.navigationButton}
-          naked
-          secondary
-          icon={isMinimized ? 'keyboard_arrow_right' : 'keyboard_arrow_left'}
-          message={isMinimized ? null : m.hideSidebar}
-          onClick={this.onToggle}
-          data-hook="side-nav-hide-button"
-        />
+        <div className={style.body}>
+          <div className={drawerClassNames}>
+            <div className={headerClassNames}>
+              <Icon className={style.icon} icon={header.icon} />
+              <Message className={style.message} content={header.title} />
+            </div>
+            <SideNavigationContext.Provider
+              value={{ isMinimized, onLeafItemClick: this.onLeafItemClick }}
+            >
+              <SideNavigationList
+                onListClick={this.onDrawerExpandClick}
+                isMinimized={isMinimized}
+                className={style.navigationList}
+              >
+                {children}
+              </SideNavigationList>
+            </SideNavigationContext.Provider>
+          </div>
+          <Button
+            naked
+            secondary
+            className={style.minimizeButton}
+            icon={isMinimized ? 'keyboard_arrow_right' : 'keyboard_arrow_left'}
+            message={isMinimized ? null : m.hideSidebar}
+            onClick={this.onToggle}
+            data-hook="side-nav-hide-button"
+          />
+        </div>
       </nav>
     )
   }

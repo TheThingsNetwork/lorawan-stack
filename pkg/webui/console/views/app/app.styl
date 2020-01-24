@@ -20,7 +20,25 @@
 .main
   display: flex
   flex: 1 1 auto
+  +media-query($bp.s)
+    flex-direction: column
 
 .content
   overflow: auto
   flex: 1
+
+.mobile-breadcrumbs
+  display: none
+  +media-query($bp.s)
+    display: block
+
+.desktop-breadcrumbs
+  display: block
+  +media-query($bp.s)
+    display: none
+
+.sidebar
+  +media-query($bp.s)
+    position: sticky
+    top: $header-height-mobile
+    z-index: $zi.nav

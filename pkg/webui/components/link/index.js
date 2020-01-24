@@ -44,6 +44,7 @@ const Link = function(props) {
     target,
     showVisited,
     intl,
+    onClick,
   } = props
 
   const formattedTitle = formatTitle(title, titleValues, intl.formatMessage)
@@ -60,6 +61,7 @@ const Link = function(props) {
       replace={replace}
       to={to}
       target={target}
+      onClick={onClick}
     >
       {children}
     </RouterLink>
