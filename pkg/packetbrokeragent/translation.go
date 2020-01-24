@@ -17,7 +17,7 @@ package packetbrokeragent
 import (
 	"encoding/json"
 
-	packetbroker "go.packetbroker.org/api/v1beta1"
+	packetbroker "go.packetbroker.org/api/v1beta2"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )

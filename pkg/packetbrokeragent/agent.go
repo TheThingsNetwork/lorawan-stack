@@ -19,8 +19,9 @@ import (
 	"fmt"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	packetbroker "go.packetbroker.org/api/v1beta1"
+	packetbroker "go.packetbroker.org/api/v1beta2"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -178,7 +179,6 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 			log.FromContext(ctx).WithError(err).Debug("Failed to handle uplink message")
 		}
 	}
-	return nil
 }
 
 var (
@@ -192,12 +192,12 @@ func (a *Agent) handleUplink(ctx context.Context, msg *packetbroker.UplinkMessag
 	receivedAt := time.Now()
 	logger := log.FromContext(ctx)
 
-	phyPayload := msg.GetPhyPayload().GetValue()
-	if phyPayload.GetValue() == nil || len(phyPayload.GetDeksEncrypted()) > 0 {
+	phyPayload := msg.GetPhyPayload().GetPlain()
+	if len(phyPayload) == 0 {
 		return errNoPHYPayload
 	}
 
-	ids, err := lorawan.GetUplinkMessageIdentifiers(phyPayload.Value)
+	ids, err := lorawan.GetUplinkMessageIdentifiers(phyPayload)
 	if err != nil {
 		return errMessageIdentifiers
 	}
@@ -227,7 +227,7 @@ func (a *Agent) handleUplink(ctx context.Context, msg *packetbroker.UplinkMessag
 	}
 
 	up := &ttnpb.UplinkMessage{
-		RawPayload: phyPayload.Value,
+		RawPayload: phyPayload,
 		Settings: ttnpb.TxSettings{
 			DataRate:      dataRate,
 			DataRateIndex: ttnpb.DataRateIndex(msg.DataRateIndex),
@@ -237,45 +237,40 @@ func (a *Agent) handleUplink(ctx context.Context, msg *packetbroker.UplinkMessag
 		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 	}
 
+	var receiveTime *time.Time
+	if t, err := pbtypes.TimestampFromProto(msg.GatewayReceiveTime); err == nil {
+		receiveTime = &t
+	}
 	if gtwMd := msg.GatewayMetadata; gtwMd != nil {
-		if locMd := gtwMd.Localization; locMd.GetValue() != nil && len(locMd.DeksEncrypted) == 0 {
-			var loc packetbroker.GatewayMetadataLocalization
-			if err := loc.Unmarshal(locMd.Value); err != nil {
-				logger.WithError(err).Debug("Failed to unmarshal localization gateway metadata")
-			} else if terrestrial := loc.GetTerrestrial(); terrestrial != nil {
-				for _, ant := range terrestrial.Antennas {
-					up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-						GatewayIdentifiers:    cluster.PacketBrokerID,
-						AntennaIndex:          ant.Index,
-						FineTimestamp:         ant.FineTimestamp.GetValue(),
-						RSSI:                  ant.SignalQuality.GetChannelRssi(),
-						SignalRSSI:            ant.SignalQuality.GetSignalRssi(),
-						RSSIStandardDeviation: ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
-						SNR:                   ant.SignalQuality.GetSnr(),
-						FrequencyOffset:       ant.SignalQuality.GetFrequencyOffset(),
-						Location:              fromPBLocation(ant.Location),
-						UplinkToken:           uplinkToken,
-					})
-				}
+		if md := gtwMd.GetPlainLocalization().GetTerrestrial(); md != nil {
+			for _, ant := range md.Antennas {
+				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
+					GatewayIdentifiers:    cluster.PacketBrokerGatewayID,
+					AntennaIndex:          ant.Index,
+					Time:                  receiveTime,
+					FineTimestamp:         ant.FineTimestamp.GetValue(),
+					RSSI:                  ant.SignalQuality.GetChannelRssi(),
+					SignalRSSI:            ant.SignalQuality.GetSignalRssi(),
+					RSSIStandardDeviation: ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
+					SNR:                   ant.SignalQuality.GetSnr(),
+					FrequencyOffset:       ant.SignalQuality.GetFrequencyOffset(),
+					Location:              fromPBLocation(ant.Location),
+					UplinkToken:           uplinkToken,
+				})
 			}
-		}
-		if sigMd := gtwMd.SignalQuality; len(up.RxMetadata) == 0 && sigMd.GetValue() != nil && len(sigMd.DeksEncrypted) == 0 {
-			var sig packetbroker.GatewayMetadataSignalQuality
-			if err := sig.Unmarshal(sigMd.Value); err != nil {
-				logger.WithError(err).Debug("Failed to unmarshal signal quality gateway metadata")
-			} else if terrestrial := sig.GetTerrestrial(); terrestrial != nil {
-				for _, ant := range terrestrial.Antennas {
-					up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-						GatewayIdentifiers:    cluster.PacketBrokerID,
-						AntennaIndex:          ant.Index,
-						RSSI:                  ant.Value.GetChannelRssi(),
-						SignalRSSI:            ant.Value.GetSignalRssi(),
-						RSSIStandardDeviation: ant.Value.GetRssiStandardDeviation().GetValue(),
-						SNR:                   ant.Value.GetSnr(),
-						FrequencyOffset:       ant.Value.GetFrequencyOffset(),
-						UplinkToken:           uplinkToken,
-					})
-				}
+		} else if md := gtwMd.GetPlainSignalQuality().GetTerrestrial(); md != nil {
+			for _, ant := range md.Antennas {
+				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
+					GatewayIdentifiers:    cluster.PacketBrokerGatewayID,
+					AntennaIndex:          ant.Index,
+					Time:                  receiveTime,
+					RSSI:                  ant.Value.GetChannelRssi(),
+					SignalRSSI:            ant.Value.GetSignalRssi(),
+					RSSIStandardDeviation: ant.Value.GetRssiStandardDeviation().GetValue(),
+					SNR:                   ant.Value.GetSnr(),
+					FrequencyOffset:       ant.Value.GetFrequencyOffset(),
+					UplinkToken:           uplinkToken,
+				})
 			}
 		}
 	}
