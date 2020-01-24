@@ -44,6 +44,9 @@ var defaultTaskBackoff = [...]time.Duration{
 	1 * time.Second,
 }
 
+// TaskBackoffDial is a backoff to use for tasks that are dialing services.
+var TaskBackoffDial = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
+
 type task struct {
 	ctx     context.Context
 	id      string

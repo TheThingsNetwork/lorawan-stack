@@ -44,8 +44,6 @@ func (as *ApplicationServer) linkAll(ctx context.Context) error {
 	)
 }
 
-var linkBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
-
 func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.ApplicationIdentifiers) {
 	ctx = log.NewContextWithField(ctx, "application_uid", unique.ID(ctx, ids))
 	as.StartTask(ctx, "link", func(ctx context.Context) error {
@@ -75,7 +73,7 @@ func (as *ApplicationServer) startLinkTask(ctx context.Context, ids ttnpb.Applic
 		default:
 			return err
 		}
-	}, component.TaskRestartOnFailure, 0.1, linkBackoff...)
+	}, component.TaskRestartOnFailure, 0.1, component.TaskBackoffDial...)
 }
 
 type upstreamTrafficHandler func(context.Context, *ttnpb.ApplicationUp, *link) error
