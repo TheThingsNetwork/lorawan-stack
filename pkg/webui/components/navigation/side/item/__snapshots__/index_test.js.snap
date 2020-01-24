@@ -14,7 +14,7 @@ exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
   >
     <SideNavigationItem
       depth={0}
-      exact={true}
+      exact={false}
       isActive={false}
       isMinimized={false}
       location={
@@ -27,7 +27,7 @@ exports[`SideNavigationItem is collapsable should match snapshot 1`] = `
     />
     <SideNavigationItem
       depth={0}
-      exact={true}
+      exact={false}
       isActive={false}
       isMinimized={false}
       location={
@@ -48,7 +48,7 @@ exports[`SideNavigationItem is flat should match snapshot 1`] = `
 >
   <LinkItem
     depth={0}
-    exact={true}
+    exact={false}
     path="/test-title"
     title="test-title"
   />
