@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	packetbroker "go.packetbroker.org/api/v1beta2"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
@@ -69,8 +68,23 @@ func WithEndDeviceIdentifiersContextFiller(filler EndDeviceIdentifiersContextFil
 	}
 }
 
+var errNetID = errors.DefineFailedPrecondition("net_id", "invalid NetID `{net_id}`")
+
 // New returns a new Packet Broker Agent.
 func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
+	devAddrPrefixes := append(conf.DevAddrPrefixes[:0:0], conf.DevAddrPrefixes...)
+	if len(devAddrPrefixes) == 0 {
+		devAddr, err := types.NewDevAddr(conf.NetID, nil)
+		if err != nil {
+			return nil, errNetID.WithAttributes("net_id", conf.NetID).WithCause(err)
+		}
+		devAddrPrefix := types.DevAddrPrefix{
+			DevAddr: devAddr,
+			Length:  uint8(conf.NetID.IDBits()),
+		}
+		devAddrPrefixes = append(devAddrPrefixes, devAddrPrefix)
+	}
+
 	a := &Agent{
 		Component: c,
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "packetbroker/agent"),
@@ -79,7 +93,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		netID:                conf.NetID,
 		homeNetworkTLSConfig: conf.HomeNetwork.TLS,
 		subscriptionGroup:    conf.SubscriptionGroup,
-		devAddrPrefixes:      conf.DevAddrPrefixes,
+		devAddrPrefixes:      devAddrPrefixes,
 	}
 	a.grpc.nsGs = &ttnpb.UnimplementedNsGsServer{}
 	for _, opt := range opts {
@@ -200,23 +214,29 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	}
 }
 
-var (
-	errNoPHYPayload       = errors.DefineFailedPrecondition("no_phy_payload", "no PHYPayload in message")
-	errMessageIdentifiers = errors.DefineFailedPrecondition("message_identifiers", "invalid message identifiers")
-	errDataRate           = errors.DefineFailedPrecondition("data_rate", "invalid data rate index `{index}` in region `{region}`")
-	errWrapUplinkTokens   = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
-)
+var errNoPHYPayload = errors.DefineFailedPrecondition("no_phy_payload", "no PHYPayload in message")
+
+func (a *Agent) decryptUplink(ctx context.Context, msg *packetbroker.UplinkMessage) error {
+	// TODO: Obtain KEK, decrypt PHYPayload and gateway metadata (https://github.com/TheThingsIndustries/lorawan-stack/issues/1919).
+	if msg.PhyPayload.GetPlain() == nil {
+		return errNoPHYPayload
+	}
+	return nil
+}
+
+var errMessageIdentifiers = errors.DefineFailedPrecondition("message_identifiers", "invalid message identifiers")
 
 func (a *Agent) handleUplink(ctx context.Context, msg *packetbroker.UplinkMessage) error {
 	receivedAt := time.Now()
 	logger := log.FromContext(ctx)
 
-	phyPayload := msg.GetPhyPayload().GetPlain()
-	if len(phyPayload) == 0 {
-		return errNoPHYPayload
+	if err := a.decryptUplink(ctx, msg); err != nil {
+		logger.WithError(err).Debug("Failed to decrypt message")
+		return err
 	}
+	logger.Debug("Received uplink message")
 
-	ids, err := lorawan.GetUplinkMessageIdentifiers(phyPayload)
+	ids, err := lorawan.GetUplinkMessageIdentifiers(msg.PhyPayload.GetPlain())
 	if err != nil {
 		return errMessageIdentifiers
 	}
@@ -230,68 +250,10 @@ func (a *Agent) handleUplink(ctx context.Context, msg *packetbroker.UplinkMessag
 	if ids.DevAddr != nil && !ids.DevAddr.IsZero() {
 		logger = logger.WithField("dev_addr", *ids.DevAddr)
 	}
-	logger.Debug("Received plain message")
 
-	dataRate, ok := fromPBDataRate(msg.GatewayRegion, int(msg.DataRateIndex))
-	if !ok {
-		return errDataRate.WithAttributes(
-			"index", msg.DataRateIndex,
-			"region", msg.GatewayRegion,
-		)
-	}
-
-	uplinkToken, err := wrapUplinkTokens(msg.ForwarderUplinkToken, msg.GatewayUplinkToken)
+	up, err := fromPBUplink(ctx, msg, receivedAt)
 	if err != nil {
-		return errWrapUplinkTokens.WithCause(err)
-	}
-
-	up := &ttnpb.UplinkMessage{
-		RawPayload: phyPayload,
-		Settings: ttnpb.TxSettings{
-			DataRate:      dataRate,
-			DataRateIndex: ttnpb.DataRateIndex(msg.DataRateIndex),
-			Frequency:     msg.Frequency,
-		},
-		ReceivedAt:     receivedAt,
-		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
-	}
-
-	var receiveTime *time.Time
-	if t, err := pbtypes.TimestampFromProto(msg.GatewayReceiveTime); err == nil {
-		receiveTime = &t
-	}
-	if gtwMd := msg.GatewayMetadata; gtwMd != nil {
-		if md := gtwMd.GetPlainLocalization().GetTerrestrial(); md != nil {
-			for _, ant := range md.Antennas {
-				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIdentifiers:    cluster.PacketBrokerGatewayID,
-					AntennaIndex:          ant.Index,
-					Time:                  receiveTime,
-					FineTimestamp:         ant.FineTimestamp.GetValue(),
-					RSSI:                  ant.SignalQuality.GetChannelRssi(),
-					SignalRSSI:            ant.SignalQuality.GetSignalRssi(),
-					RSSIStandardDeviation: ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
-					SNR:                   ant.SignalQuality.GetSnr(),
-					FrequencyOffset:       ant.SignalQuality.GetFrequencyOffset(),
-					Location:              fromPBLocation(ant.Location),
-					UplinkToken:           uplinkToken,
-				})
-			}
-		} else if md := gtwMd.GetPlainSignalQuality().GetTerrestrial(); md != nil {
-			for _, ant := range md.Antennas {
-				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIdentifiers:    cluster.PacketBrokerGatewayID,
-					AntennaIndex:          ant.Index,
-					Time:                  receiveTime,
-					RSSI:                  ant.Value.GetChannelRssi(),
-					SignalRSSI:            ant.Value.GetSignalRssi(),
-					RSSIStandardDeviation: ant.Value.GetRssiStandardDeviation().GetValue(),
-					SNR:                   ant.Value.GetSnr(),
-					FrequencyOffset:       ant.Value.GetFrequencyOffset(),
-					UplinkToken:           uplinkToken,
-				})
-			}
-		}
+		return err
 	}
 
 	for _, filler := range a.contextFillers {

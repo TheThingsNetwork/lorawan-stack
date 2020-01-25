@@ -15,10 +15,16 @@
 package packetbrokeragent
 
 import (
+	"context"
 	"encoding/json"
+	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	packetbroker "go.packetbroker.org/api/v1beta2"
 	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -72,4 +78,83 @@ func wrapUplinkTokens(forwarder, gateway []byte) ([]byte, error) {
 		return nil, nil
 	}
 	return json.Marshal(compoundUplinkToken{forwarder, gateway})
+}
+
+func unwrapUplinkTokens(token []byte) (forwarder, gateway []byte, err error) {
+	var t compoundUplinkToken
+	if json.Unmarshal(token, &t); err != nil {
+		return nil, nil, err
+	}
+	return t.Forwarder, t.Gateway, nil
+}
+
+var (
+	errDataRate         = errors.DefineFailedPrecondition("data_rate", "invalid data rate index `{index}` in region `{region}`")
+	errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
+)
+
+func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
+	dataRate, ok := fromPBDataRate(msg.GatewayRegion, int(msg.DataRateIndex))
+	if !ok {
+		return nil, errDataRate.WithAttributes(
+			"index", msg.DataRateIndex,
+			"region", msg.GatewayRegion,
+		)
+	}
+
+	uplinkToken, err := wrapUplinkTokens(msg.ForwarderUplinkToken, msg.GatewayUplinkToken)
+	if err != nil {
+		return nil, errWrapUplinkTokens.WithCause(err)
+	}
+
+	up := &ttnpb.UplinkMessage{
+		RawPayload: msg.PhyPayload.GetPlain(),
+		Settings: ttnpb.TxSettings{
+			DataRate:      dataRate,
+			DataRateIndex: ttnpb.DataRateIndex(msg.DataRateIndex),
+			Frequency:     msg.Frequency,
+		},
+		ReceivedAt:     receivedAt,
+		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+	}
+
+	var receiveTime *time.Time
+	if t, err := pbtypes.TimestampFromProto(msg.GatewayReceiveTime); err == nil {
+		receiveTime = &t
+	}
+	if gtwMd := msg.GatewayMetadata; gtwMd != nil {
+		if md := gtwMd.GetPlainLocalization().GetTerrestrial(); md != nil {
+			for _, ant := range md.Antennas {
+				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
+					GatewayIdentifiers:    cluster.PacketBrokerGatewayID,
+					AntennaIndex:          ant.Index,
+					Time:                  receiveTime,
+					FineTimestamp:         ant.FineTimestamp.GetValue(),
+					RSSI:                  ant.SignalQuality.GetChannelRssi(),
+					SignalRSSI:            ant.SignalQuality.GetSignalRssi(),
+					RSSIStandardDeviation: ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
+					SNR:                   ant.SignalQuality.GetSnr(),
+					FrequencyOffset:       ant.SignalQuality.GetFrequencyOffset(),
+					Location:              fromPBLocation(ant.Location),
+					UplinkToken:           uplinkToken,
+				})
+			}
+		} else if md := gtwMd.GetPlainSignalQuality().GetTerrestrial(); md != nil {
+			for _, ant := range md.Antennas {
+				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
+					GatewayIdentifiers:    cluster.PacketBrokerGatewayID,
+					AntennaIndex:          ant.Index,
+					Time:                  receiveTime,
+					RSSI:                  ant.Value.GetChannelRssi(),
+					SignalRSSI:            ant.Value.GetSignalRssi(),
+					RSSIStandardDeviation: ant.Value.GetRssiStandardDeviation().GetValue(),
+					SNR:                   ant.Value.GetSnr(),
+					FrequencyOffset:       ant.Value.GetFrequencyOffset(),
+					UplinkToken:           uplinkToken,
+				})
+			}
+		}
+	}
+
+	return up, nil
 }
