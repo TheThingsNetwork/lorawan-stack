@@ -71,7 +71,7 @@ func (Dev) Misspell() error {
 
 var (
 	devDatabases          = []string{"cockroach", "redis"}
-	devDataDir            = ".dev/data"
+	devDataDir            = ".env/data"
 	devDatabaseName       = "ttn_lorawan_dev"
 	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
 )
