@@ -20,7 +20,7 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	packetbroker "go.packetbroker.org/api/v1beta2"
+	packetbroker "go.packetbroker.org/api/v1beta3"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/errors"

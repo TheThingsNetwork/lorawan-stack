@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	packetbroker "go.packetbroker.org/api/v1beta2"
+	packetbroker "go.packetbroker.org/api/v1beta3"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -167,9 +167,7 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 		// Subscribe to any join-request.
 		{
 			Message: &packetbroker.RoutingFilter_JoinRequest_{
-				JoinRequest: &packetbroker.RoutingFilter_JoinRequest{
-					EuiPrefixes: []*packetbroker.RoutingFilter_JoinRequest_EUIPrefixes{},
-				},
+				JoinRequest: &packetbroker.RoutingFilter_JoinRequest{},
 			},
 		},
 	}
