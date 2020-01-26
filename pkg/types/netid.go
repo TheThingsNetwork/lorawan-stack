@@ -86,6 +86,7 @@ var errNetIDOverflow = errors.DefineInvalidArgument("net_id_overflow", "NetID ov
 
 // UnmarshalNumber unmarshals the NetID from a numeric value.
 func (id *NetID) UnmarshalNumber(netID uint32) error {
+	*id = [3]byte{}
 	if netID > 0xFFFFFF {
 		return errNetIDOverflow
 	}
