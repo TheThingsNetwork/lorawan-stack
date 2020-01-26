@@ -167,7 +167,11 @@ func (a *Agent) dialContext(ctx context.Context, config TLSConfig, target string
 }
 
 func (a *Agent) forwardUplink(ctx context.Context) error {
-	ctx = log.NewContextWithField(ctx, "namespace", "packetbroker/agent")
+	ctx = log.NewContextWithFields(ctx, log.Fields(
+		"namespace", "packetbroker/agent",
+		"forwarder_net_id", a.netID,
+		"forwarder_id", a.forwarderConfig.ID,
+	))
 
 	conn, err := a.dialContext(ctx, a.forwarderConfig.TLS, a.dataPlaneAddress)
 	if err != nil {
@@ -176,21 +180,47 @@ func (a *Agent) forwardUplink(ctx context.Context) error {
 	defer conn.Close()
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:conn:%s", events.NewCorrelationID()))
 
+	logger := log.FromContext(ctx)
+	logger.Info("Connected as Forwarder")
+
 	client := packetbroker.NewRouterForwarderDataClient(conn)
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case up := <-a.upstreamCh:
-			// TODO: Convert in translation.go
-			// msg := &packetbroker.UplinkMessage{}
-			// TODO: Add stub for encryption
-			_ = up
-			_ = client
-
-			// if _, err := client.Publish(ctx, msg); err != nil {
-			// 	log.FromContext(ctx).WithError(err).Debug("Failed to handle uplink message")
-			// }
+			msg, err := toPBUplink(ctx, up)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to convert outgoing uplink message")
+				continue
+			}
+			if err := a.encryptUplink(ctx, msg); err != nil {
+				logger.WithError(err).Warn("Failed to encrypt outgoing uplink message")
+				continue
+			}
+			req := &packetbroker.PublishUplinkMessageRequest{
+				ForwarderNetId: a.netID.MarshalNumber(),
+				ForwarderId:    a.forwarderConfig.ID,
+				Message:        msg,
+			}
+			ctx, cancel := context.WithCancel(ctx)
+			progress, err := client.Publish(ctx, req)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to publish uplink message")
+				cancel()
+				continue
+			}
+			status, err := progress.Recv()
+			if err != nil {
+				logger.WithError(err).Warn("Failed to receive published uplink message status")
+				cancel()
+				continue
+			}
+			logger.WithFields(log.Fields(
+				"message_id", status.Id,
+				"state", status.State,
+			)).Info("Publish uplink message state changed")
+			cancel()
 		}
 	}
 }
@@ -203,7 +233,7 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 			Length: uint32(p.Length),
 		}
 	}
-	return []*packetbroker.RoutingFilter{
+	filters := []*packetbroker.RoutingFilter{
 		// Subscribe to MAC payload based on DevAddrPrefixes.
 		{
 			Message: &packetbroker.RoutingFilter_Mac{
@@ -219,6 +249,24 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 			},
 		},
 	}
+	if a.forwarderConfig.Enable {
+		// Add self to blacklist to avoid looping traffic via Packet Broker.
+		forwardersBlacklist := &packetbroker.RoutingFilter_ForwarderBlacklist{
+			ForwarderBlacklist: &packetbroker.ForwarderIdentifiers{
+				List: []*packetbroker.ForwarderIdentifier{
+					{
+						NetId:       a.netID.MarshalNumber(),
+						ForwarderId: a.forwarderConfig.ID,
+					},
+				},
+			},
+		}
+		for _, f := range filters {
+			f.Forwarders = forwardersBlacklist
+		}
+	}
+
+	return filters
 }
 
 func (a *Agent) subscribeUplink(ctx context.Context) error {
