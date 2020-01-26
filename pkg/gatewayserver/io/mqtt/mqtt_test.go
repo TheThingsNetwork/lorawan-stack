@@ -245,7 +245,7 @@ func TestTraffic(t *testing.T) {
 					if tc.OK {
 						a.So(time.Since(up.ReceivedAt), should.BeLessThan, timeout)
 						up.ReceivedAt = time.Time{}
-						a.So(up, should.Resemble, tc.Message)
+						a.So(up.UplinkMessage, should.Resemble, tc.Message)
 					} else {
 						t.Fatalf("Did not expect uplink message, but have %v", up)
 					}

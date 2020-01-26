@@ -18,36 +18,35 @@ package ns
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"google.golang.org/grpc"
 )
+
+// Cluster provides cluster operations.
+type Cluster interface {
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) (*grpc.ClientConn, error)
+	WithClusterAuth() grpc.CallOption
+	ClaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
+	UnclaimIDs(ctx context.Context, ids ttnpb.Identifiers) error
+}
 
 // Handler is the upstream handler.
 type Handler struct {
 	ctx             context.Context
-	hostname        string
-	c               *component.Component
+	cluster         Cluster
 	devAddrPrefixes []types.DevAddrPrefix
 }
 
-var errNotFound = errors.DefineNotFound("network_server_not_found", "network server not found for ids `ids`")
-
 // NewHandler returns a new upstream handler.
-func NewHandler(ctx context.Context, hostname string, c *component.Component, devAddrPrefixes []types.DevAddrPrefix) *Handler {
+func NewHandler(ctx context.Context, cluster Cluster, devAddrPrefixes []types.DevAddrPrefix) *Handler {
 	return &Handler{
 		ctx:             ctx,
-		hostname:        hostname,
-		c:               c,
+		cluster:         cluster,
 		devAddrPrefixes: devAddrPrefixes,
 	}
-}
-
-// GetHostName implements upstream.Handler.
-func (h *Handler) GetHostName() string {
-	return h.hostname
 }
 
 // GetDevAddrPrefixes implements upstream.Handler.
@@ -56,7 +55,7 @@ func (h *Handler) GetDevAddrPrefixes() []types.DevAddrPrefix {
 }
 
 // Setup implements upstream.Handler.
-func (h *Handler) Setup() error {
+func (h *Handler) Setup(context.Context) error {
 	return nil
 }
 
@@ -66,30 +65,26 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	if conn.Frontend().SupportsDownlinkClaim() {
 		return nil
 	}
-	h.c.ClaimIDs(ctx, ids)
+	h.cluster.ClaimIDs(ctx, ids)
 	select {
 	case <-ctx.Done():
-		h.c.UnclaimIDs(ctx, ids)
+		h.cluster.UnclaimIDs(ctx, ids)
 		return ctx.Err()
 	default:
 		return nil
 	}
 }
 
+var errNetworkServerNotFound = errors.DefineNotFound("network_server_not_found", "Network Server not found")
+
 // HandleUplink implements upstream.Handler.
-func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.UplinkMessage) error {
-	nsConn, err := h.c.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+func (h *Handler) HandleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
+	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
 	if err != nil {
-		return errNotFound.WithCause(err).WithAttributes("ids", ids)
+		return errNetworkServerNotFound.WithCause(err)
 	}
-	client := ttnpb.NewGsNsClient(nsConn)
-	if h.hostname == "cluster" {
-		_, err := client.HandleUplink(ctx, msg, h.c.WithClusterAuth())
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	_, err = ttnpb.NewGsNsClient(nsConn).HandleUplink(ctx, msg.UplinkMessage, h.cluster.WithClusterAuth())
+	return err
 }
 
 // HandleStatus implements upstream.Handler.

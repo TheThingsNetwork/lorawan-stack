@@ -82,7 +82,7 @@ type Connection struct {
 	scheduler *scheduling.Scheduler
 	rtts      *rtts
 
-	upCh     chan *ttnpb.UplinkMessage
+	upCh     chan *ttnpb.GatewayUplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
 	statusCh chan *ttnpb.GatewayStatus
 	txAckCh  chan *ttnpb.TxAcknowledgment
@@ -105,7 +105,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		fps:         fps,
 		scheduler:   scheduler,
 		rtts:        newRTTs(maxRTTs),
-		upCh:        make(chan *ttnpb.UplinkMessage, bufferSize),
+		upCh:        make(chan *ttnpb.GatewayUplinkMessage, bufferSize),
 		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
 		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
 		txAckCh:     make(chan *ttnpb.TxAcknowledgment, bufferSize),
@@ -170,10 +170,15 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		}
 	}
 
+	msg := &ttnpb.GatewayUplinkMessage{
+		UplinkMessage: up,
+		BandID:        c.bandID,
+	}
+
 	select {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
-	case c.upCh <- up:
+	case c.upCh <- msg:
 		atomic.AddUint64(&c.uplinks, 1)
 		atomic.StoreInt64(&c.lastUplinkTime, up.ReceivedAt.UnixNano())
 	default:
@@ -257,8 +262,10 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 	return nil
 }
 
-var errFrequencyPlanNotConfigured = errors.DefineInvalidArgument("frequency_plan_not_configured", "frequency plan `{id}` is not configured for this gateway")
-var errNoFrequencyPlanIDInTxRequest = errors.DefineInvalidArgument("no_frequency_plan_id_in_tx_request", "no frequency plan ID in tx request")
+var (
+	errFrequencyPlanNotConfigured   = errors.DefineInvalidArgument("frequency_plan_not_configured", "frequency plan `{id}` is not configured for this gateway")
+	errNoFrequencyPlanIDInTxRequest = errors.DefineInvalidArgument("no_frequency_plan_id_in_tx_request", "no frequency plan ID in tx request")
+)
 
 // ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
@@ -442,7 +449,7 @@ func (c *Connection) Status() <-chan *ttnpb.GatewayStatus {
 }
 
 // Up returns the upstream channel.
-func (c *Connection) Up() <-chan *ttnpb.UplinkMessage {
+func (c *Connection) Up() <-chan *ttnpb.GatewayUplinkMessage {
 	return c.upCh
 }
 

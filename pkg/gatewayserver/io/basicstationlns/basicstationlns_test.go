@@ -951,7 +951,7 @@ func TestTraffic(t *testing.T) {
 						up.RawPayload = nil
 						up.RxMetadata[0].UplinkToken = nil
 						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
-						a.So(up, should.Resemble, &expectedUp)
+						a.So(up.UplinkMessage, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}

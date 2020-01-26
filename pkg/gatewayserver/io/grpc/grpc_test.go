@@ -350,7 +350,7 @@ func TestTraffic(t *testing.T) {
 						expected := tc.UplinkMessages[ups]
 						up.ReceivedAt = expected.ReceivedAt
 						up.RxMetadata[0].UplinkToken = expected.RxMetadata[0].UplinkToken
-						a.So(up, should.Resemble, expected)
+						a.So(up.UplinkMessage, should.Resemble, expected)
 						ups++
 					case status := <-conn.Status():
 						a.So(needStatus, should.BeTrue)

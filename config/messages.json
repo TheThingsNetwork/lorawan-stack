@@ -3673,7 +3673,7 @@
   },
   "error:pkg/gatewayserver/upstream/ns:network_server_not_found": {
     "translations": {
-      "en": "network server not found for ids `ids`"
+      "en": "Network Server not found"
     },
     "description": {
       "package": "pkg/gatewayserver/upstream/ns",
@@ -3808,7 +3808,7 @@
   },
   "error:pkg/gatewayserver:upstream": {
     "translations": {
-      "en": "failed to setup upstream `{hostname}`"
+      "en": "failed to setup upstream `{name}`"
     },
     "description": {
       "package": "pkg/gatewayserver",

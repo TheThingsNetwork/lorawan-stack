@@ -103,7 +103,7 @@ var (
 		"failed to start frontend listener `{protocol}` on address `{address}`",
 	)
 	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
-	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{hostname}`")
+	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
 	errUpstreamType        = errors.DefineUnimplemented("upstream_type_not_implemented", "upstream `{name}` not implemented")
 	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}` is invalid")
 )
@@ -223,26 +223,17 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	for name, prefix := range gs.forward {
-		if name == "" {
-			gs.upstreamHandlers["cluster"] = ns.NewHandler(ctx, "cluster", c, prefix)
-		} else {
-			str := strings.SplitN(name, ":", 2)
-			if len(str) != 2 {
-				return nil, errInvalidUpstreamName.WithAttributes("name", name)
-			}
-			switch str[0] {
-			case "ttn.lorawan.v3.GsNs":
-				gs.upstreamHandlers[str[1]] = ns.NewHandler(ctx, str[1], c, prefix)
-			default:
-				return nil, errUpstreamType.WithAttributes("name", name)
-			}
+		var handler upstream.Handler
+		switch name {
+		case "", "cluster":
+			handler = ns.NewHandler(ctx, c, prefix)
+		default:
+			return nil, errInvalidUpstreamName.WithAttributes("name", name)
 		}
-	}
-
-	for _, handler := range gs.upstreamHandlers {
-		if err := handler.Setup(); err != nil {
-			return nil, errSetupUpstream.WithCause(err).WithAttributes("hostname", handler.GetHostName())
+		if err := handler.Setup(ctx); err != nil {
+			return nil, errSetupUpstream.WithCause(err).WithAttributes("name", name)
 		}
+		gs.upstreamHandlers[name] = handler
 	}
 
 	c.RegisterGRPC(gs)
@@ -433,13 +424,13 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	logger.Info("Connected")
 	go gs.handleUpstream(conn)
 
-	for _, handler := range gs.upstreamHandlers {
-		go func(handler upstream.Handler) {
-			logger := log.FromContext(ctx).WithField("handler", handler.GetHostName())
+	for name, handler := range gs.upstreamHandlers {
+		go func(name string, handler upstream.Handler) {
+			logger := log.FromContext(ctx).WithField("handler", name)
 			if err := handler.ConnectGateway(conn.Context(), ids, conn); err != nil {
 				logger.WithError(err).Warn("Failed to connect gateway on upstream")
 			}
-		}(handler)
+		}(name, handler)
 	}
 	return conn, nil
 }
@@ -504,8 +495,8 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			case item := <-host.handleCh:
 				ctx := item.ctx
 				switch msg := item.val.(type) {
-				case *ttnpb.UplinkMessage:
-					registerReceiveUplink(ctx, conn.Gateway(), msg, host.name)
+				case *ttnpb.GatewayUplinkMessage:
+					registerReceiveUplink(ctx, conn.Gateway(), msg.UplinkMessage, host.name)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
 						if ids.JoinEUI != nil {
@@ -518,7 +509,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 							logger = logger.WithField("dev_addr", *ids.DevAddr)
 						}
 						logger.Debug("Drop message")
-						registerDropUplink(ctx, conn.Gateway(), msg, host.name, err)
+						registerDropUplink(ctx, conn.Gateway(), msg.UplinkMessage, host.name, err)
 					}
 					ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
 					if err != nil {
@@ -529,19 +520,21 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					if handler == nil {
 						break
 					}
-					if err := handler.HandleUplink(ctx, conn.Gateway().GatewayIdentifiers, ids, msg); err != nil {
+					if err := handler.HandleUplink(ctx, ids, msg); err != nil {
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
 						break
 					}
-					registerForwardUplink(ctx, conn.Gateway(), msg, item.host.name)
+					registerForwardUplink(ctx, conn.Gateway(), msg.UplinkMessage, item.host.name)
 				case *ttnpb.GatewayStatus:
 					registerReceiveStatus(ctx, conn.Gateway(), msg)
-					for _, handler := range gs.upstreamHandlers {
-						if err := handler.HandleStatus(ctx, conn.Gateway().GatewayIdentifiers, msg); err != nil {
-							registerForwardStatus(ctx, conn.Gateway(), msg, item.host.name)
-						} else {
-							registerDropStatus(ctx, conn.Gateway(), msg, item.host.name, err)
-						}
+					handler := item.host.handler(nil)
+					if handler == nil {
+						break
+					}
+					if err := handler.HandleStatus(ctx, conn.Gateway().GatewayIdentifiers, msg); err != nil {
+						registerForwardStatus(ctx, conn.Gateway(), msg, item.host.name)
+					} else {
+						registerDropStatus(ctx, conn.Gateway(), msg, item.host.name, err)
 					}
 				}
 			}
@@ -549,7 +542,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 	}
 
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
-	for _, handler := range gs.upstreamHandlers {
+	for name, handler := range gs.upstreamHandlers {
 		passDevAddr := func(prefixes []types.DevAddrPrefix, devAddr types.DevAddr) bool {
 			for _, prefix := range prefixes {
 				if devAddr.HasPrefix(prefix) {
@@ -559,7 +552,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 			return false
 		}
 		hosts = append(hosts, &upstreamHost{
-			name: handler.GetHostName(),
+			name: name,
 			handler: func(ids *ttnpb.EndDeviceIdentifiers) upstream.Handler {
 				if ids != nil && ids.DevAddr != nil && !passDevAddr(handler.GetDevAddrPrefixes(), *ids.DevAddr) {
 					return nil

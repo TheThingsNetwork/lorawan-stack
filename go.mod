@@ -65,6 +65,7 @@ require (
 	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/google/rpmpack v0.0.0-20191226140753-aa36bfddb3a0 // indirect
 	github.com/google/wire v0.4.0 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20190328170749-bb2674552d8f // indirect
 	github.com/goreleaser/goreleaser v0.124.1
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.1
