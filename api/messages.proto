@@ -157,6 +157,12 @@ message TxAcknowledgment {
   Result result = 2 [(validate.rules).enum.defined_only = true];
 }
 
+message GatewayUplinkMessage {
+  UplinkMessage message = 1 [(gogoproto.embed) = true, (validate.rules).message.required = true];
+  // LoRaWAN band ID of the gateway.
+  string band_id = 2 [(gogoproto.customname) = "BandID"];
+}
+
 message ApplicationUplink {
   // Join Server issued identifier for the session keys used by this uplink.
   bytes session_key_id = 1 [(gogoproto.customname) = "SessionKeyID", (validate.rules).bytes.max_len = 2048];

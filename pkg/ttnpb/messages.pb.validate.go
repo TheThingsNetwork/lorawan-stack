@@ -462,6 +462,108 @@ var _ interface {
 	ErrorName() string
 } = TxAcknowledgmentValidationError{}
 
+// ValidateFields checks the field values on GatewayUplinkMessage with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GatewayUplinkMessage) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = GatewayUplinkMessageFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "message":
+
+			if m.UplinkMessage == nil {
+				return GatewayUplinkMessageValidationError{
+					field:  "message",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.UplinkMessage).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayUplinkMessageValidationError{
+						field:  "message",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "band_id":
+			// no validation rules for BandID
+		default:
+			return GatewayUplinkMessageValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// GatewayUplinkMessageValidationError is the validation error returned by
+// GatewayUplinkMessage.ValidateFields if the designated constraints aren't met.
+type GatewayUplinkMessageValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GatewayUplinkMessageValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GatewayUplinkMessageValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GatewayUplinkMessageValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GatewayUplinkMessageValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GatewayUplinkMessageValidationError) ErrorName() string {
+	return "GatewayUplinkMessageValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GatewayUplinkMessageValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGatewayUplinkMessage.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GatewayUplinkMessageValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GatewayUplinkMessageValidationError{}
+
 // ValidateFields checks the field values on ApplicationUplink with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

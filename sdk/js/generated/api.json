@@ -19270,6 +19270,45 @@
           ]
         },
         {
+          "name": "GatewayUplinkMessage",
+          "longName": "GatewayUplinkMessage",
+          "fullName": "ttn.lorawan.v3.GatewayUplinkMessage",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "message",
+              "description": "",
+              "label": "",
+              "type": "UplinkMessage",
+              "longType": "UplinkMessage",
+              "fullType": "ttn.lorawan.v3.UplinkMessage",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "band_id",
+              "description": "LoRaWAN band ID of the gateway.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "MessagePayloadFormatters",
           "longName": "MessagePayloadFormatters",
           "fullName": "ttn.lorawan.v3.MessagePayloadFormatters",
@@ -21981,6 +22020,40 @@
                   ]
                 }
               }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lorawan-stack/api/packetbrokeragent.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": false,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [],
+      "services": [
+        {
+          "name": "GsPba",
+          "longName": "GsPba",
+          "fullName": "ttn.lorawan.v3.GsPba",
+          "description": "The GsPba service connects a Gateway Server to a Packet Broker Agent.",
+          "methods": [
+            {
+              "name": "PublishUplink",
+              "description": "",
+              "requestType": "GatewayUplinkMessage",
+              "requestLongType": "GatewayUplinkMessage",
+              "requestFullType": "ttn.lorawan.v3.GatewayUplinkMessage",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
             }
           ]
         }
