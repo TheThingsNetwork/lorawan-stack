@@ -26,17 +26,17 @@ import (
 
 // Config configures Packet Broker clients.
 type Config struct {
-	DataPlaneAddress  string                `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
-	NetID             types.NetID           `name:"net-id" description:"LoRa Alliance NetID"`
-	HomeNetwork       RoleConfig            `name:"home-network" description:"Home Network configuration for subscribing uplink and publishing downlink"`
-	SubscriptionGroup string                `name:"subscription-group" description:"Group name uniquely identifying this environment"`
-	DevAddrPrefixes   []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
+	DataPlaneAddress  string            `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
+	NetID             types.NetID       `name:"net-id" description:"LoRa Alliance NetID"`
+	HomeNetwork       HomeNetworkConfig `name:"home-network" description:"Home Network configuration for subscribing uplink and publishing downlink"`
+	SubscriptionGroup string            `name:"subscription-group" description:"Group name uniquely identifying this environment"`
 }
 
-// RoleConfig defines the configuration of a Packet Broker role.
-type RoleConfig struct {
-	Enable bool      `name:"enable" description:"Enable role"`
-	TLS    TLSConfig `name:"tls"`
+// HomeNetworkConfig defines the configuration of the Home Network role.
+type HomeNetworkConfig struct {
+	Enable          bool                  `name:"enable" description:"Enable Home Network role"`
+	TLS             TLSConfig             `name:"tls"`
+	DevAddrPrefixes []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
 }
 
 // TLSConfig contains TLS configuration for connecting to Packet Broker.

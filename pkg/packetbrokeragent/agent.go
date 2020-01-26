@@ -72,17 +72,20 @@ var errNetID = errors.DefineFailedPrecondition("net_id", "invalid NetID `{net_id
 
 // New returns a new Packet Broker Agent.
 func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
-	devAddrPrefixes := append(conf.DevAddrPrefixes[:0:0], conf.DevAddrPrefixes...)
-	if len(devAddrPrefixes) == 0 {
-		devAddr, err := types.NewDevAddr(conf.NetID, nil)
-		if err != nil {
-			return nil, errNetID.WithAttributes("net_id", conf.NetID).WithCause(err)
+	var devAddrPrefixes []types.DevAddrPrefix
+	if hn := conf.HomeNetwork; hn.Enable {
+		devAddrPrefixes = append(devAddrPrefixes, hn.DevAddrPrefixes...)
+		if len(devAddrPrefixes) == 0 {
+			devAddr, err := types.NewDevAddr(conf.NetID, nil)
+			if err != nil {
+				return nil, errNetID.WithAttributes("net_id", conf.NetID).WithCause(err)
+			}
+			devAddrPrefix := types.DevAddrPrefix{
+				DevAddr: devAddr,
+				Length:  uint8(conf.NetID.IDBits()),
+			}
+			devAddrPrefixes = append(devAddrPrefixes, devAddrPrefix)
 		}
-		devAddrPrefix := types.DevAddrPrefix{
-			DevAddr: devAddr,
-			Length:  uint8(conf.NetID.IDBits()),
-		}
-		devAddrPrefixes = append(devAddrPrefixes, devAddrPrefix)
 	}
 
 	a := &Agent{
@@ -190,6 +193,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	log.FromContext(ctx).Debug("Subscribed as Home Network")
 
 	for {
 		msg, err := stream.Recv()
