@@ -8,8 +8,8 @@ weight: 4
 
 Once you created or converted a template, you can execute the template with the `end-device templates execute` command to obtain an end device that can be created.
 
->The examples use a template that has been created as follows:
->```bash
+```bash
+# The examples use a template that has been created as follows:
 $ ttn-lw-cli end-device template extend \
   --lorawan-version 1.0.3 \
   --lorawan-phy-version 1.0.3-a \
