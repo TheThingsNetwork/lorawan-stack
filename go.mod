@@ -105,6 +105,7 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	go.opencensus.io v0.22.3
+	go.packetbroker.org/api v1.0.2
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
 	gocloud.dev v0.19.0
 	gocloud.dev/pubsub/natspubsub v0.19.0
