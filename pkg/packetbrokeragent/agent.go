@@ -38,7 +38,7 @@ type EndDeviceIdentifiersContextFiller func(parent context.Context, ids ttnpb.En
 
 // Agent implements the Packet Broker Agent component, acting as Home Network.
 //
-// Agent exposes the NsGs interface for scheduling downlink.
+// Agent exposes the NsPba interface for publishing downlink.
 type Agent struct {
 	*component.Component
 	ctx context.Context
@@ -52,7 +52,7 @@ type Agent struct {
 	contextFillers []EndDeviceIdentifiersContextFiller
 
 	grpc struct {
-		nsGs ttnpb.NsGsServer
+		nsPba ttnpb.NsPbaServer
 	}
 }
 
@@ -97,7 +97,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		subscriptionGroup:    conf.SubscriptionGroup,
 		devAddrPrefixes:      devAddrPrefixes,
 	}
-	a.grpc.nsGs = &ttnpb.UnimplementedNsGsServer{}
+	a.grpc.nsPba = &ttnpb.UnimplementedNsPbaServer{}
 	for _, opt := range opts {
 		opt(a)
 	}
@@ -122,7 +122,7 @@ func (a *Agent) Roles() []ttnpb.ClusterRole {
 
 // RegisterServices registers services provided by a at s.
 func (a *Agent) RegisterServices(s *grpc.Server) {
-	ttnpb.RegisterNsGsServer(s, a.grpc.nsGs)
+	ttnpb.RegisterNsPbaServer(s, a.grpc.nsPba)
 }
 
 // RegisterHandlers registers gRPC handlers.
