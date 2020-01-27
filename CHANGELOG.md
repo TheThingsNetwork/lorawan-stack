@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Crashes on Gateway Server start when traffic flow started while The Things Stack was still starting.
+
 ### Security
 
 ## [3.5.0] (2020-01-24)

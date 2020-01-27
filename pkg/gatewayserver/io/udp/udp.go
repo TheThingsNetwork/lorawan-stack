@@ -77,8 +77,8 @@ type srv struct {
 func (*srv) Protocol() string            { return "udp" }
 func (*srv) SupportsDownlinkClaim() bool { return true }
 
-// Start starts the UDP frontend.
-func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) {
+// Serve serves the UDP frontend.
+func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) error {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/udp")
 	var firewall Firewall
 	if config.AddrChangeBlock > 0 {
@@ -92,7 +92,6 @@ func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 		packetCh: make(chan encoding.Packet, config.PacketBuffer),
 		firewall: firewall,
 	}
-	go s.read()
 	go s.gc()
 	go func() {
 		<-ctx.Done()
@@ -101,9 +100,10 @@ func Start(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	for i := 0; i < config.PacketHandlers; i++ {
 		go s.handlePackets()
 	}
+	return s.read()
 }
 
-func (s *srv) read() {
+func (s *srv) read() error {
 	var buf [65507]byte
 	for {
 		n, addr, err := s.conn.ReadFromUDP(buf[:])
@@ -111,7 +111,7 @@ func (s *srv) read() {
 			if s.ctx.Err() == nil {
 				log.FromContext(s.ctx).WithError(err).Warn("Read failed")
 			}
-			return
+			return err
 		}
 		now := time.Now()
 
