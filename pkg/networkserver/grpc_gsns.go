@@ -762,7 +762,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	var addrMatches []*ttnpb.EndDevice
 	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleDataUplinkGetPaths[:],
-		func(dev *ttnpb.EndDevice) bool {
+		func(ctx context.Context, dev *ttnpb.EndDevice) bool {
 			addrMatches = append(addrMatches, dev)
 			return true
 		}); err != nil {
@@ -808,8 +808,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 
 	var handleErr bool
-	stored, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
-		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	stored, ctx, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
+		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during uplink handling, drop")
 				handleErr = true
@@ -950,7 +950,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	dev, err := ns.devices.GetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
+	dev, ctx, err := ns.devices.GetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
@@ -1091,14 +1091,14 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	registerMergeMetadata(ctx, up)
 
 	var invalidatedQueue []*ttnpb.ApplicationDownlink
-	dev, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
+	dev, ctx, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
 			"queued_application_downlinks",
 			"recent_uplinks",
 		},
-		func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during join-request handling, drop")
 				return nil, nil, errOutdatedData

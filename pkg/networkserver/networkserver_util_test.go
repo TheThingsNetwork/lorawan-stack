@@ -558,14 +558,14 @@ var _ DeviceRegistry = MockDeviceRegistry{}
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
-	GetByEUIFunc    func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error)
-	GetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error)
-	RangeByAddrFunc func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error
-	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	GetByEUIFunc    func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error)
+	GetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
+	RangeByAddrFunc func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error
+	SetByIDFunc     func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 }
 
 // GetByEUI calls GetByEUIFunc if set and panics otherwise.
-func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	if m.GetByEUIFunc == nil {
 		panic("GetByEUI called, but not set")
 	}
@@ -573,7 +573,7 @@ func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.
 }
 
 // GetByID calls GetByIDFunc if set and panics otherwise.
-func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	if m.GetByIDFunc == nil {
 		panic("GetByID called, but not set")
 	}
@@ -581,7 +581,7 @@ func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.Application
 }
 
 // RangeByAddr calls RangeByAddrFunc if set and panics otherwise.
-func (m MockDeviceRegistry) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
+func (m MockDeviceRegistry) RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
 	if m.RangeByAddrFunc == nil {
 		panic("RangeByAddr called, but not set")
 	}
@@ -589,19 +589,20 @@ func (m MockDeviceRegistry) RangeByAddr(ctx context.Context, devAddr types.DevAd
 }
 
 // SetByID calls SetByIDFunc if set and panics otherwise.
-func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	if m.SetByIDFunc == nil {
 		panic("SetByID called, but not set")
 	}
 	return m.SetByIDFunc(ctx, appID, devID, paths, f)
 }
 
-type deviceAndError struct {
-	Device *ttnpb.EndDevice
-	Error  error
+type contextualDeviceAndError struct {
+	Device  *ttnpb.EndDevice
+	Context context.Context
+	Error   error
 }
 
-type DeviceRegistryGetByEUIResponse deviceAndError
+type DeviceRegistryGetByEUIResponse contextualDeviceAndError
 
 type DeviceRegistryGetByEUIRequest struct {
 	Context  context.Context
@@ -611,8 +612,8 @@ type DeviceRegistryGetByEUIRequest struct {
 	Response chan<- DeviceRegistryGetByEUIResponse
 }
 
-func MakeDeviceRegistryGetByEUIChFunc(reqCh chan<- DeviceRegistryGetByEUIRequest) func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, error) {
-	return func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+func MakeDeviceRegistryGetByEUIChFunc(reqCh chan<- DeviceRegistryGetByEUIRequest) func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.EndDevice, context.Context, error) {
+	return func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 		respCh := make(chan DeviceRegistryGetByEUIResponse)
 		reqCh <- DeviceRegistryGetByEUIRequest{
 			Context:  ctx,
@@ -622,11 +623,11 @@ func MakeDeviceRegistryGetByEUIChFunc(reqCh chan<- DeviceRegistryGetByEUIRequest
 			Response: respCh,
 		}
 		resp := <-respCh
-		return resp.Device, resp.Error
+		return resp.Device, resp.Context, resp.Error
 	}
 }
 
-type DeviceRegistryGetByIDResponse deviceAndError
+type DeviceRegistryGetByIDResponse contextualDeviceAndError
 
 type DeviceRegistryGetByIDRequest struct {
 	Context                context.Context
@@ -636,8 +637,8 @@ type DeviceRegistryGetByIDRequest struct {
 	Response               chan<- DeviceRegistryGetByIDResponse
 }
 
-func MakeDeviceRegistryGetByIDChFunc(reqCh chan<- DeviceRegistryGetByIDRequest) func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error) {
-	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+func MakeDeviceRegistryGetByIDChFunc(reqCh chan<- DeviceRegistryGetByIDRequest) func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, context.Context, error) {
+	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 		respCh := make(chan DeviceRegistryGetByIDResponse)
 		reqCh <- DeviceRegistryGetByIDRequest{
 			Context:                ctx,
@@ -647,7 +648,7 @@ func MakeDeviceRegistryGetByIDChFunc(reqCh chan<- DeviceRegistryGetByIDRequest) 
 			Response:               respCh,
 		}
 		resp := <-respCh
-		return resp.Device, resp.Error
+		return resp.Device, resp.Context, resp.Error
 	}
 }
 
@@ -655,12 +656,12 @@ type DeviceRegistryRangeByAddrRequest struct {
 	Context  context.Context
 	DevAddr  types.DevAddr
 	Paths    []string
-	Func     func(*ttnpb.EndDevice) bool
+	Func     func(context.Context, *ttnpb.EndDevice) bool
 	Response chan<- error
 }
 
-func MakeDeviceRegistryRangeByAddrChFunc(reqCh chan<- DeviceRegistryRangeByAddrRequest) func(context.Context, types.DevAddr, []string, func(*ttnpb.EndDevice) bool) error {
-	return func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
+func MakeDeviceRegistryRangeByAddrChFunc(reqCh chan<- DeviceRegistryRangeByAddrRequest) func(context.Context, types.DevAddr, []string, func(context.Context, *ttnpb.EndDevice) bool) error {
+	return func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
 		respCh := make(chan error)
 		reqCh <- DeviceRegistryRangeByAddrRequest{
 			Context:  ctx,
@@ -673,19 +674,19 @@ func MakeDeviceRegistryRangeByAddrChFunc(reqCh chan<- DeviceRegistryRangeByAddrR
 	}
 }
 
-type DeviceRegistrySetByIDResponse deviceAndError
+type DeviceRegistrySetByIDResponse contextualDeviceAndError
 
 type DeviceRegistrySetByIDRequest struct {
 	Context                context.Context
 	ApplicationIdentifiers ttnpb.ApplicationIdentifiers
 	DeviceID               string
 	Paths                  []string
-	Func                   func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)
+	Func                   func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)
 	Response               chan<- DeviceRegistrySetByIDResponse
 }
 
-func MakeDeviceRegistrySetByIDChFunc(reqCh chan<- DeviceRegistrySetByIDRequest) func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func MakeDeviceRegistrySetByIDChFunc(reqCh chan<- DeviceRegistrySetByIDRequest) func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+	return func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 		respCh := make(chan DeviceRegistrySetByIDResponse)
 		reqCh <- DeviceRegistrySetByIDRequest{
 			Context:                ctx,
@@ -696,7 +697,7 @@ func MakeDeviceRegistrySetByIDChFunc(reqCh chan<- DeviceRegistrySetByIDRequest) 
 			Response:               respCh,
 		}
 		resp := <-respCh
-		return resp.Device, resp.Error
+		return resp.Device, resp.Context, resp.Error
 	}
 }
 

@@ -173,7 +173,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.ping_slot_data_rate_index_value")
 	}
 
-	dev, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
+	dev, ctx, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
 	if err != nil {
 		return nil, err
 	}
@@ -402,7 +402,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	var evt events.Event
-	dev, err = ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, ctx, err = ns.devices.SetByID(ctx, req.EndDevice.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDevice.EndDeviceIdentifiers.DeviceID, gets, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if ttnpb.HasAnyField(sets, "version_ids") {
 			// TODO: Apply version IDs (https://github.com/TheThingsIndustries/lorawan-stack/issues/1544)
 		}
@@ -589,7 +589,7 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 		return nil, err
 	}
 	var evt events.Event
-	_, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
 			evt = evtDeleteEndDevice(ctx, req, nil)
 		}

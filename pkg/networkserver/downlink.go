@@ -1104,7 +1104,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		var queuedApplicationUplinks []*ttnpb.ApplicationUp
 		var queuedEvents []events.Event
 		var nextDownlinkAt time.Time
-		_, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
+		_, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
 			[]string{
 				"frequency_plan_id",
 				"last_dev_status_received_at",
@@ -1118,7 +1118,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"recent_uplinks",
 				"session",
 			},
-			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 				if dev == nil {
 					logger.Warn("Device not found")
 					return nil, nil, nil

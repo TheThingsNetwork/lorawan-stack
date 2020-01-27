@@ -53,39 +53,47 @@ func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 }
 
 // GetByID gets device by appID, devID.
-func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
 		DeviceID:               devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 
 	defer trace.StartRegion(ctx, "get end device by id").End()
 
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.GetProto(r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
-	return ttnpb.FilterGetEndDevice(pb, paths...)
+	pb, err := ttnpb.FilterGetEndDevice(pb, paths...)
+	if err != nil {
+		return nil, ctx, err
+	}
+	return pb, ctx, nil
 }
 
 // GetByEUI gets device by joinEUI, devEUI.
-func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	defer trace.StartRegion(ctx, "get end device by eui").End()
 
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.FindProto(r.Redis, r.euiKey(joinEUI, devEUI), func(uid string) (string, error) {
 		return r.uidKey(uid), nil
 	}).ScanProto(pb); err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
-	return ttnpb.FilterGetEndDevice(pb, paths...)
+	pb, err := ttnpb.FilterGetEndDevice(pb, paths...)
+	if err != nil {
+		return nil, ctx, err
+	}
+	return pb, ctx, nil
 }
 
 // RangeByAddr ranges over devices by addr.
-func (r *DeviceRegistry) RangeByAddr(ctx context.Context, addr types.DevAddr, paths []string, f func(*ttnpb.EndDevice) bool) error {
+func (r *DeviceRegistry) RangeByAddr(ctx context.Context, addr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error {
 	defer trace.StartRegion(ctx, "range end devices by dev_addr").End()
 
 	return ttnredis.FindProtos(r.Redis, r.addrKey(addr), r.uidKey).Range(func() (proto.Message, func() (bool, error)) {
@@ -95,7 +103,7 @@ func (r *DeviceRegistry) RangeByAddr(ctx context.Context, addr types.DevAddr, pa
 			if err != nil {
 				return false, err
 			}
-			return f(pb), nil
+			return f(ctx, pb), nil
 		}
 	})
 }
@@ -133,13 +141,13 @@ func equalEUI64(x, y *types.EUI64) bool {
 }
 
 // SetByID sets device by appID, devID.
-func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(ctx context.Context, pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIdentifiers: appID,
 		DeviceID:               devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
 	uid := unique.ID(ctx, ids)
 	uk := r.uidKey(uid)
@@ -169,7 +177,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		}
 
 		var sets []string
-		pb, sets, err = f(pb)
+		pb, sets, err = f(ctx, pb)
 		if err != nil {
 			return err
 		}
@@ -307,7 +315,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		return nil
 	}, uk)
 	if err != nil {
-		return nil, err
+		return nil, ctx, err
 	}
-	return pb, nil
+	return pb, ctx, nil
 }

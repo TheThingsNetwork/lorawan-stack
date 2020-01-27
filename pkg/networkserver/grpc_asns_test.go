@@ -284,7 +284,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
 		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
-		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.DownlinkQueueRequest
 		ErrorAssertion func(*testing.T, error) bool
 		AddCalls       uint64
@@ -308,10 +308,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				err := errors.New("SetByIDFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -349,7 +349,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -367,14 +367,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(nil)
+				dev, sets, err := f(ctx, nil)
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
-					return nil, errors.New("Error was expected")
+					return nil, ctx, errors.New("Error was expected")
 				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -413,7 +413,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -430,7 +430,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -451,11 +451,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
-					return nil, errors.New("Error was expected")
+					return nil, ctx, errors.New("Error was expected")
 				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -495,7 +495,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -512,7 +512,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -536,7 +536,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 				if !a.So(err, should.BeNil) {
-					return nil, err
+					return nil, ctx, err
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"queued_application_downlinks",
@@ -562,7 +562,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						{SessionKeyID: []byte("testSession"), FCnt: 42},
 					},
 				})
-				return dev, nil
+				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -600,7 +600,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				a.So([]time.Time{start, at.Add(NSScheduleWindow()), time.Now()}, should.BeChronological)
 				return nil
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -617,7 +617,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -641,7 +641,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 				if !a.So(err, should.BeNil) {
-					return nil, err
+					return nil, ctx, err
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"queued_application_downlinks",
@@ -667,7 +667,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						{SessionKeyID: []byte("testSession"), FCnt: 42},
 					},
 				})
-				return dev, nil
+				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -701,7 +701,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -713,7 +713,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -737,7 +737,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 				})
 				a.So(dev.QueuedApplicationDownlinks, should.BeNil)
-				return dev, nil
+				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -766,7 +766,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -778,7 +778,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -802,7 +802,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 				if !a.So(err, should.BeNil) {
-					return nil, err
+					return nil, ctx, err
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"queued_application_downlinks",
@@ -824,7 +824,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 					},
 				})
-				return dev, nil
+				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -853,7 +853,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -865,7 +865,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -889,7 +889,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 				if !a.So(err, should.BeNil) {
-					return nil, err
+					return nil, ctx, err
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"queued_application_downlinks",
@@ -911,7 +911,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 					},
 				})
-				return dev, nil
+				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -931,7 +931,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
-						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&setByIDCalls, 1)
 							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 						},
@@ -982,7 +982,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
 		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
-		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.DownlinkQueueRequest
 		ErrorAssertion func(*testing.T, error) bool
 		AddCalls       uint64
@@ -1006,10 +1006,10 @@ func TestDownlinkQueuePush(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				err := errors.New("SetByIDFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1047,7 +1047,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -1066,14 +1066,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"session",
 				})
 
-				dev, sets, err := f(nil)
+				dev, sets, err := f(ctx, nil)
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
-					return nil, errors.New("Error was expected")
+					return nil, ctx, errors.New("Error was expected")
 				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1112,7 +1112,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1129,7 +1129,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1150,11 +1150,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
-					return nil, errors.New("Error was expected")
+					return nil, ctx, errors.New("Error was expected")
 				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1194,7 +1194,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1211,7 +1211,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1235,7 +1235,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				})
 				if !a.So(err, should.BeNil) {
-					return nil, err
+					return nil, ctx, err
 				}
 				a.So(sets, should.HaveSameElementsDeep, []string{
 					"queued_application_downlinks",
@@ -1265,7 +1265,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						{SessionKeyID: []byte("testSession"), FCnt: 42},
 					},
 				})
-				return dev, nil
+				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1298,7 +1298,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				test.MustTFromContext(ctx).Error(err)
 				return err
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1315,7 +1315,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1344,7 +1344,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					},
 				})
 				if !a.So(err, should.BeNil) {
-					return nil, err
+					return nil, ctx, err
 				}
 				a.So(sets, should.Resemble, []string{
 					"queued_application_downlinks",
@@ -1379,7 +1379,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						{SessionKeyID: []byte("testSession"), FCnt: 42},
 					},
 				})
-				return dev, nil
+				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1417,7 +1417,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1434,7 +1434,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1459,11 +1459,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
-					return nil, errors.New("Error was expected")
+					return nil, ctx, errors.New("Error was expected")
 				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1508,7 +1508,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1525,7 +1525,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1546,11 +1546,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
-					return nil, errors.New("Error was expected")
+					return nil, ctx, errors.New("Error was expected")
 				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1595,7 +1595,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				a.So([]time.Time{start, at, time.Now()}, should.BeChronological)
 				return nil
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1612,7 +1612,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(&ttnpb.EndDevice{
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1627,11 +1627,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
-					return nil, errors.New("Error was expected")
+					return nil, ctx, errors.New("Error was expected")
 				}
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1662,7 +1662,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
-						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&setByIDCalls, 1)
 							return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 						},
@@ -1710,7 +1710,7 @@ func TestDownlinkQueueList(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
-		GetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
+		GetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.EndDeviceIdentifiers
 		Downlinks      *ttnpb.ApplicationDownlinks
 		ErrorAssertion func(*testing.T, error) bool
@@ -1729,10 +1729,10 @@ func TestDownlinkQueueList(t *testing.T) {
 					},
 				})
 			},
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				err := errors.New("GetByIDFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
-				return nil, err
+				return nil, ctx, err
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
 				DeviceID:               "test-dev-id",
@@ -1760,7 +1760,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					},
 				})
 			},
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -1773,7 +1773,7 @@ func TestDownlinkQueueList(t *testing.T) {
 						DeviceID:               "test-dev-id",
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
 					},
-				}, nil
+				}, ctx, nil
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
 				DeviceID:               "test-dev-id",
@@ -1796,7 +1796,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					},
 				})
 			},
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
@@ -1818,7 +1818,7 @@ func TestDownlinkQueueList(t *testing.T) {
 						{SessionKeyID: []byte("testSession"), FCnt: 0},
 						{SessionKeyID: []byte("testSession"), FCnt: 42},
 					},
-				}, nil
+				}, ctx, nil
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
 				DeviceID:               "test-dev-id",
@@ -1842,7 +1842,7 @@ func TestDownlinkQueueList(t *testing.T) {
 				componenttest.NewComponent(t, &component.Config{}),
 				&Config{
 					Devices: &MockDeviceRegistry{
-						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, error) {
+						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&getByIDCalls, 1)
 							return tc.GetByIDFunc(ctx, appID, devID, gets)
 						},
