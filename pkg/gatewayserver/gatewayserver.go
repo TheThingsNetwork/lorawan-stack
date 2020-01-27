@@ -511,7 +511,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 						logger.Debug("Drop message")
 						registerDropUplink(ctx, conn.Gateway(), msg.UplinkMessage, host.name, err)
 					}
-					ids, err := lorawan.GetUplinkMessageIdentifiers(msg)
+					ids, err := lorawan.GetUplinkMessageIdentifiers(msg.UplinkMessage)
 					if err != nil {
 						drop(ttnpb.EndDeviceIdentifiers{}, err)
 						break
