@@ -16,6 +16,7 @@ import React from 'react'
 import classnames from 'classnames'
 
 import PropTypes from '../../lib/prop-types'
+import Link from '../link'
 
 import style from './logo.styl'
 
@@ -28,11 +29,15 @@ const Logo = function({ className, logo, secondaryLogo, vertical }) {
   return (
     <div className={classname}>
       <div className={style.logo}>
-        <img {...logo} />
+        <Link className={style.logoContainer} to="/">
+          <img {...logo} />
+        </Link>
       </div>
       {Boolean(secondaryLogo) && (
         <div className={style.secondaryLogo}>
-          <img {...secondaryLogo} />
+          <div id="secondary-logo" className={style.secondaryLogoContainer}>
+            <img {...secondaryLogo} />
+          </div>
         </div>
       )}
     </div>
