@@ -219,7 +219,7 @@ func (a *Agent) forwardUplink(ctx context.Context) error {
 			logger.WithFields(log.Fields(
 				"message_id", status.Id,
 				"state", status.State,
-			)).Info("Publish uplink message state changed")
+			)).Debug("Publish uplink message state changed")
 			cancel()
 		}
 	}
