@@ -3815,6 +3815,15 @@
       "file": "ns.go"
     }
   },
+  "error:pkg/gatewayserver/upstream/packetbroker:packet_broker_agent_not_found": {
+    "translations": {
+      "en": "Packet Broker Agent not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/upstream/packetbroker",
+      "file": "packetbroker.go"
+    }
+  },
   "error:pkg/gatewayserver:empty_identifiers": {
     "translations": {
       "en": "empty identifiers"
