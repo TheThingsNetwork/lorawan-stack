@@ -3029,6 +3029,12 @@
       "http": []
     }
   },
+  "NsPba": {
+    "PublishDownlink": {
+      "file": "lorawan-stack/api/packetbrokeragent.proto",
+      "http": []
+    }
+  },
   "EndDeviceQRCodeGenerator": {
     "GetFormat": {
       "file": "lorawan-stack/api/qrcodegenerator.proto",

@@ -381,6 +381,7 @@
   - [Service `OrganizationRegistry`](#ttn.lorawan.v3.OrganizationRegistry)
 - [File `lorawan-stack/api/packetbrokeragent.proto`](#lorawan-stack/api/packetbrokeragent.proto)
   - [Service `GsPba`](#ttn.lorawan.v3.GsPba)
+  - [Service `NsPba`](#ttn.lorawan.v3.NsPba)
 - [File `lorawan-stack/api/picture.proto`](#lorawan-stack/api/picture.proto)
   - [Message `Picture`](#ttn.lorawan.v3.Picture)
   - [Message `Picture.Embedded`](#ttn.lorawan.v3.Picture.Embedded)
@@ -5425,6 +5426,14 @@ The GsPba service connects a Gateway Server to a Packet Broker Agent.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `PublishUplink` | [`GatewayUplinkMessage`](#ttn.lorawan.v3.GatewayUplinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) |  |
+
+### <a name="ttn.lorawan.v3.NsPba">Service `NsPba`</a>
+
+The NsPba service connects a Network Server to a Packet Broker Agent.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `PublishDownlink` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router. |
 
 ## <a name="lorawan-stack/api/picture.proto">File `lorawan-stack/api/picture.proto`</a>
 

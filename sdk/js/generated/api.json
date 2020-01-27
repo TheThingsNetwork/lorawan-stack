@@ -22182,6 +22182,26 @@
               "responseStreaming": false
             }
           ]
+        },
+        {
+          "name": "NsPba",
+          "longName": "NsPba",
+          "fullName": "ttn.lorawan.v3.NsPba",
+          "description": "The NsPba service connects a Network Server to a Packet Broker Agent.",
+          "methods": [
+            {
+              "name": "PublishDownlink",
+              "description": "PublishDownlink instructs the Packet Broker Agent to publish a downlink message to Packet Broker Router.",
+              "requestType": "DownlinkMessage",
+              "requestLongType": "DownlinkMessage",
+              "requestFullType": "ttn.lorawan.v3.DownlinkMessage",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
+            }
+          ]
         }
       ]
     },
