@@ -187,7 +187,7 @@ func (a *Agent) forwardUplink(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			return ctx.Err()
 		case up := <-a.upstreamCh:
 			msg, err := toPBUplink(ctx, up)
 			if err != nil {
@@ -295,9 +295,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 
 	for {
 		msg, err := stream.Recv()
-		if err == context.Canceled {
-			return nil
-		} else if err != nil {
+		if err != nil {
 			return err
 		}
 		up := msg.Message
