@@ -583,7 +583,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				select {
 				case host.handleCh <- item:
 				case <-time.After(upstreamHandlerBusyTimeout):
-					logger.WithField("host", host).Warn("Upstream handlers busy, drop message")
+					logger.WithField("name", host.name).Warn("Upstream handler busy, drop message")
 					switch msg := val.(type) {
 					case *ttnpb.UplinkMessage:
 						registerFailUplink(ctx, conn.Gateway(), msg, host.name)
