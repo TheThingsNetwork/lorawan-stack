@@ -110,10 +110,14 @@ func TestAuthentication(t *testing.T) {
 			clientOpts.SetPassword(tc.Key)
 			client := mqtt.NewClient(clientOpts)
 			token := client.Connect()
-			if !token.WaitTimeout(timeout) {
-				t.Fatal("Connection timeout")
-			}
-			if tc.OK && !a.So(token.Error(), should.BeNil) {
+			if tc.OK {
+				if !token.WaitTimeout(timeout) {
+					t.Fatal("Connection timeout")
+				}
+				if !a.So(token.Error(), should.BeNil) {
+					t.FailNow()
+				}
+			} else if token.Wait() && !a.So(token.Error(), should.NotBeNil) {
 				t.FailNow()
 			}
 			client.Disconnect(uint(timeout / time.Millisecond))
