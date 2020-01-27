@@ -25,7 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
-var defaultBackoff = []time.Duration{100 * time.Millisecond, 1 * time.Second, 10 * time.Second}
+var defaultBackoff = []time.Duration{500 * time.Millisecond, 1 * time.Second, 2 * time.Second, 5 * time.Second, 10 * time.Second}
 
 const defaultJitter = 0.15
 
@@ -92,6 +92,18 @@ func (rs RetryServer) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) error
 	return rs.upstream.SendUp(ctx, up)
 }
 
+func (rs RetryServer) shouldRetry(err error) bool {
+	switch {
+	case errors.IsFailedPrecondition(err),
+		errors.IsUnauthenticated(err),
+		errors.IsPermissionDenied(err),
+		errors.IsInvalidArgument(err):
+		return false
+	default:
+		return true
+	}
+}
+
 // Subscribe implements Server by proxying the Subscription object between the upstream server and the frontend.
 func (rs RetryServer) Subscribe(ctx context.Context, protocol string, ids ttnpb.ApplicationIdentifiers) (*Subscription, error) {
 	downstreamSub := NewSubscription(ctx, protocol, &ids)
@@ -117,9 +129,8 @@ func (rs RetryServer) Subscribe(ctx context.Context, protocol string, ids ttnpb.
 				return
 			case <-upstreamSub.Context().Done():
 				err := upstreamSub.Context().Err()
-				if errors.IsUnavailable(err) {
+				if rs.shouldRetry(err) {
 					logger.Debug("Upstream subscription canceled. Attempting to resubscribe")
-
 					for _, backoff := range rs.backoff {
 						delay := random.Jitter(backoff, rs.jitter)
 						select {

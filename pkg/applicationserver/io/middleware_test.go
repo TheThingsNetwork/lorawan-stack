@@ -16,6 +16,7 @@ package io_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -23,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -43,10 +43,9 @@ var (
 			},
 		},
 	}
-	timeout        = (1 << 6) * test.Delay
-	backoff        = []time.Duration{(1 << 4) * test.Delay}
-	errLinkDeleted = errors.DefineAborted("link_deleted", "link deleted")
-	errLinkReset   = errors.DefineUnavailable("link_reset", "link reset")
+	timeout     = (1 << 6) * test.Delay
+	backoff     = []time.Duration{(1 << 4) * test.Delay}
+	errConnLost = errors.New("connection lost")
 )
 
 func TestRetryServer(t *testing.T) {
@@ -78,7 +77,7 @@ func TestRetryServer(t *testing.T) {
 	a.So(downstreamUp.ApplicationUp, should.Resemble, registeredApplicationUp)
 
 	// Cancel upstream subscription gracefully.
-	upstreamSub.Disconnect(errLinkReset)
+	upstreamSub.Disconnect(context.Canceled)
 	select {
 	case <-downstreamSub.Context().Done():
 		t.Fatal("Downstream context has been canceled")
@@ -102,8 +101,8 @@ func TestRetryServer(t *testing.T) {
 	a.So(downstreamUp.ApplicationUp, should.Resemble, registeredApplicationUp)
 
 	// Shutdown the link completely.
-	server.SetSubscribeError(errLinkDeleted)
-	upstreamSub.Disconnect(errLinkDeleted)
+	server.SetSubscribeError(errConnLost)
+	upstreamSub.Disconnect(errConnLost)
 
 	// Check that the downstream connection failed.
 	select {
@@ -112,7 +111,7 @@ func TestRetryServer(t *testing.T) {
 	case <-downstreamSub.Context().Done():
 	}
 	err = downstreamSub.Context().Err()
-	a.So(err, should.Resemble, errLinkDeleted)
+	a.So(err, should.Resemble, errConnLost)
 }
 
 func newContextWithRightsFetcher(ctx context.Context) context.Context {
