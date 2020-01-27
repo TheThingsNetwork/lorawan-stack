@@ -24,9 +24,9 @@ Make sure to copy your API key now, since it will no longer be visible after lea
 
 There are many MQTT clients available. Great clients are `mosquitto_pub` and `mosquitto_sub`, part of [Mosquitto](https://mosquitto.org).
 
->Tip: when using `mosquitto_sub`, pass the `-d` flag to see the topics messages get published on. For example:
->
->```bash
+```bash
+# Tip: when using `mosquitto_sub`, pass the `-d` flag to see the topics messages get published on. 
+# For example:
 $ mosquitto_sub -h thethings.example.com -t "#" -u app1 -P "NNSXS.VEEBURF3KR77ZR.." -d
 ```
 
@@ -146,9 +146,8 @@ For example, to send an unconfirmed downlink message to the device `dev1` in app
 
 >Hint: Use [this handy tool](https://v2.cryptii.com/hexadecimal/base64) to convert hexadecimal to base64.
 
->If you use `mosquitto_pub`, use the following command:
->
->```bash
+```bash
+# If you use `mosquitto_pub`, use the following command:
 $ mosquitto_pub -h thethings.example.com \
   -t "v3/app1/devices/dev1/down/push" \
   -u app1 -P "NNSXS.VEEBURF3KR77ZR.." \
