@@ -74,13 +74,7 @@ import PropTypes from '../../../lib/prop-types'
 @withBreadcrumb('gtws.single.api-keys.edit', function(props) {
   const { gtwId, keyId } = props
 
-  return (
-    <Breadcrumb
-      path={`/gateways/${gtwId}/api-keys/${keyId}`}
-      icon="general_settings"
-      content={sharedMessages.edit}
-    />
-  )
+  return <Breadcrumb path={`/gateways/${gtwId}/api-keys/${keyId}`} content={sharedMessages.edit} />
 })
 @bind
 export default class GatewayApiKeyEdit extends React.Component {

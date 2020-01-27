@@ -58,7 +58,6 @@ const m = defineMessages({
   return (
     <Breadcrumb
       path={`/applications/${appId}/payload-formatters/uplink`}
-      icon="uplink"
       content={sharedMessages.uplink}
     />
   )

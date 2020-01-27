@@ -91,7 +91,7 @@ import PropTypes from '../../../lib/prop-types'
     appId,
     application: { name },
   } = props
-  return <Breadcrumb path={`/applications/${appId}`} icon="application" content={name || appId} />
+  return <Breadcrumb path={`/applications/${appId}`} content={name || appId} />
 })
 @withEnv
 export default class Application extends React.Component {

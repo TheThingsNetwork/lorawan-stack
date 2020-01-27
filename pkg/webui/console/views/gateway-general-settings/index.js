@@ -71,7 +71,6 @@ const m = defineMessages({
   return (
     <Breadcrumb
       path={`/gateways/${gtwId}/general-settings`}
-      icon="general_settings"
       content={sharedMessages.generalSettings}
     />
   )

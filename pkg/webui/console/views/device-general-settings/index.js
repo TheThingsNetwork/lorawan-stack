@@ -83,7 +83,6 @@ const getComponentBaseUrl = config => {
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/general-settings`}
-      icon="general_settings"
       content={sharedMessages.generalSettings}
     />
   )

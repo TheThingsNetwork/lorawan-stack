@@ -37,7 +37,6 @@ import PropTypes from '../../../lib/prop-types'
 @withBreadcrumb('apps.single.integrations.pubsubs', ({ appId }) => (
   <Breadcrumb
     path={`/applications/${appId}/integrations/pubsubs`}
-    icon="extension"
     content={sharedMessages.pubsubs}
   />
 ))

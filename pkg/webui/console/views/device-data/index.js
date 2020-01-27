@@ -41,7 +41,6 @@ import PropTypes from '../../../lib/prop-types'
   return (
     <Breadcrumb
       path={`/applications/${appId}/devices/${devId}/data`}
-      icon="data"
       content={sharedMessages.data}
     />
   )

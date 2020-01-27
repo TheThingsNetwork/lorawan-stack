@@ -16,13 +16,12 @@ import React from 'react'
 import classnames from 'classnames'
 
 import { Link } from 'react-router-dom'
-import Icon from '../../icon'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 
 import style from './breadcrumb.styl'
 
-const Breadcrumb = function({ className, path, content, icon, isLast }) {
+const Breadcrumb = function({ className, path, content, isLast }) {
   const isRawText = typeof content === 'string' || typeof content === 'number'
   let Component
   let componentProps
@@ -36,7 +35,6 @@ const Breadcrumb = function({ className, path, content, icon, isLast }) {
 
   return (
     <Component {...componentProps}>
-      {icon && <Icon className={style.icon} icon={icon} />}
       {isRawText ? <span>{content}</span> : <Message content={content} />}
     </Component>
   )
@@ -46,8 +44,6 @@ Breadcrumb.propTypes = {
   className: PropTypes.string,
   /** The content of the breadcrumb */
   content: PropTypes.message.isRequired,
-  /** The name of the icon to display within the breadcrumb */
-  icon: PropTypes.string,
   /** The flag for rendering last breadcrumb as plain text */
   isLast: PropTypes.bool,
   /** The path for a breadcrumb */
@@ -56,7 +52,6 @@ Breadcrumb.propTypes = {
 
 Breadcrumb.defaultProps = {
   className: undefined,
-  icon: null,
   isLast: false,
 }
 

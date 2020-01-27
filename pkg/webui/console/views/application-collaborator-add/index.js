@@ -58,11 +58,7 @@ import PropTypes from '../../../lib/prop-types'
 @withBreadcrumb('apps.single.collaborators.add', function(props) {
   const appId = props.appId
   return (
-    <Breadcrumb
-      path={`/applications/${appId}/collaborators/add`}
-      icon="add"
-      content={sharedMessages.add}
-    />
+    <Breadcrumb path={`/applications/${appId}/collaborators/add`} content={sharedMessages.add} />
   )
 })
 @bind

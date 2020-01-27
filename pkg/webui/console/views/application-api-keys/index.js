@@ -35,11 +35,7 @@ import PropTypes from '../../../lib/prop-types'
   redirect: ({ appId }) => `/applications/${appId}`,
 })
 @withBreadcrumb('apps.single.api-keys', ({ appId }) => (
-  <Breadcrumb
-    path={`/applications/${appId}/api-keys`}
-    icon="api_keys"
-    content={sharedMessages.apiKeys}
-  />
+  <Breadcrumb path={`/applications/${appId}/api-keys`} content={sharedMessages.apiKeys} />
 ))
 export default class ApplicationAccess extends React.Component {
   static propTypes = {

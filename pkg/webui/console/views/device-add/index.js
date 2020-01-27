@@ -40,13 +40,7 @@ import style from './device-add-single.styl'
 )
 @withBreadcrumb('devices.add', function(props) {
   const { appId } = props
-  return (
-    <Breadcrumb
-      path={`/applications/${appId}/devices/add`}
-      icon="add"
-      content={sharedMessages.add}
-    />
-  )
+  return <Breadcrumb path={`/applications/${appId}/devices/add`} content={sharedMessages.add} />
 })
 export default class DeviceAdd extends Component {
   static propTypes = {

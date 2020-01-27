@@ -38,7 +38,6 @@ import PropTypes from '../../../lib/prop-types'
 @withBreadcrumb('apps.single.collaborators', ({ appId }) => (
   <Breadcrumb
     path={`/applications/${appId}/collaborators`}
-    icon="organization"
     content={sharedMessages.collaborators}
   />
 ))

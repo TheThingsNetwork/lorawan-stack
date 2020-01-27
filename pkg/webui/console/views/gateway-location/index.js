@@ -76,13 +76,7 @@ const getRegistryLocation = function(antennas) {
 )
 @withBreadcrumb('gateway.single.data', function(props) {
   const { gtwId } = props
-  return (
-    <Breadcrumb
-      path={`/gateways/${gtwId}/location`}
-      icon="location"
-      content={sharedMessages.location}
-    />
-  )
+  return <Breadcrumb path={`/gateways/${gtwId}/location`} content={sharedMessages.location} />
 })
 @withFeatureRequirement(mayViewOrEditGatewayLocation, {
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,

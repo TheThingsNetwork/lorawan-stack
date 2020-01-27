@@ -30,7 +30,6 @@ import PropTypes from '../../../lib/prop-types'
   return (
     <Breadcrumb
       path={`/organizations/${orgId}/collaborators/${collaboratorType}/${collaboratorId}`}
-      icon="general_settings"
       content={sharedMessages.edit}
     />
   )

@@ -88,7 +88,6 @@ const pubsubEntitySelector = [
   return (
     <Breadcrumb
       path={`/applications/${appId}/integrations/${pubsubId}`}
-      icon="general_settings"
       content={sharedMessages.edit}
     />
   )

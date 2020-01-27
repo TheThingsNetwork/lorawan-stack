@@ -36,11 +36,7 @@ import { selectSelectedOrganizationId } from '../../store/selectors/organization
   redirect: ({ orgId }) => `/organizations/${orgId}`,
 })
 @withBreadcrumb('org.single.api-keys', ({ orgId }) => (
-  <Breadcrumb
-    path={`/organizations/${orgId}/api-keys`}
-    icon="api_keys"
-    content={sharedMessages.apiKeys}
-  />
+  <Breadcrumb path={`/organizations/${orgId}/api-keys`} content={sharedMessages.apiKeys} />
 ))
 class OrganizationApiKeys extends React.Component {
   static propTypes = {

@@ -51,7 +51,6 @@ const m = defineMessages({
 @withBreadcrumb('orgs.single.general-settings', ({ orgId }) => (
   <Breadcrumb
     path={`/organizations/${orgId}/general-settings`}
-    icon="general_settings"
     content={sharedMessages.generalSettings}
   />
 ))

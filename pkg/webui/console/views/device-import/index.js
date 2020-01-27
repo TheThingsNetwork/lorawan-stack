@@ -32,11 +32,7 @@ import style from './device-import.styl'
 @withBreadcrumb('devices.import', function(props) {
   const { appId } = props
   return (
-    <Breadcrumb
-      path={`/applications/${appId}/devices/import`}
-      icon="import_devices"
-      content={sharedMessages.import}
-    />
+    <Breadcrumb path={`/applications/${appId}/devices/import`} content={sharedMessages.import} />
   )
 })
 export default class DeviceAddBulk extends Component {

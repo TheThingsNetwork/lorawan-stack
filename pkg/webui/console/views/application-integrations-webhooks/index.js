@@ -37,7 +37,6 @@ import PropTypes from '../../../lib/prop-types'
 @withBreadcrumb('apps.single.integrations.webhooks', ({ appId }) => (
   <Breadcrumb
     path={`/applications/${appId}/integrations/webhooks`}
-    icon="extension"
     content={sharedMessages.webhooks}
   />
 ))

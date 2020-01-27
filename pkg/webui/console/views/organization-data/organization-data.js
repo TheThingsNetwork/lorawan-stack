@@ -31,13 +31,7 @@ const m = defineMessages({
 })
 
 @withBreadcrumb('orgs.single.data', function(props) {
-  return (
-    <Breadcrumb
-      path={`/organizations/${props.orgId}/data`}
-      icon="data"
-      content={sharedMessages.data}
-    />
-  )
+  return <Breadcrumb path={`/organizations/${props.orgId}/data`} content={sharedMessages.data} />
 })
 export default class Data extends React.Component {
   static propTypes = {

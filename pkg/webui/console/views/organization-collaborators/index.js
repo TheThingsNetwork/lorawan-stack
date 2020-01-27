@@ -42,7 +42,6 @@ import { selectSelectedOrganizationId } from '../../store/selectors/organization
   return (
     <Breadcrumb
       path={`/organizations/${orgId}/collaborators`}
-      icon="organization"
       content={sharedMessages.collaborators}
     />
   )

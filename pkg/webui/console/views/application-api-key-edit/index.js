@@ -76,11 +76,7 @@ import PropTypes from '../../../lib/prop-types'
   const { appId, keyId } = props
 
   return (
-    <Breadcrumb
-      path={`/applications/${appId}/api-keys/${keyId}`}
-      icon="general_settings"
-      content={sharedMessages.edit}
-    />
+    <Breadcrumb path={`/applications/${appId}/api-keys/${keyId}`} content={sharedMessages.edit} />
   )
 })
 @bind

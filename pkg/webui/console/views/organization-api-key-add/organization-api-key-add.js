@@ -26,13 +26,7 @@ import PropTypes from '../../../lib/prop-types'
 
 @withBreadcrumb('orgs.single.api-keys.add', function(props) {
   const orgId = props.orgId
-  return (
-    <Breadcrumb
-      path={`/organizations/${orgId}/api-keys/add`}
-      icon="add"
-      content={sharedMessages.add}
-    />
-  )
+  return <Breadcrumb path={`/organizations/${orgId}/api-keys/add`} content={sharedMessages.add} />
 })
 class OrganizationApiKeyAdd extends React.Component {
   static propTypes = {
