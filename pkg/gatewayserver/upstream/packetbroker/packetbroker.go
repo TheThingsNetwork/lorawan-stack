@@ -65,7 +65,7 @@ func (h *Handler) ConnectGateway(context.Context, ttnpb.GatewayIdentifiers, *io.
 var errPacketBrokerAgentNotFound = errors.DefineNotFound("packet_broker_agent_not_found", "Packet Broker Agent not found")
 
 // HandleUplink implements upstream.Handler.
-func (h *Handler) HandleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
+func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
 	pbaConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, ids)
 	if err != nil {
 		return errPacketBrokerAgentNotFound.WithCause(err)
