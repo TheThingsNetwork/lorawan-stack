@@ -136,6 +136,7 @@ export default class Gateway extends React.Component {
               title={sharedMessages.overview}
               path={matchedUrl}
               icon="overview"
+              exact
             />
           )}
           {mayViewGatewayEvents.check(rights) && (
