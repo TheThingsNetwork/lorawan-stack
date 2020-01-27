@@ -6164,6 +6164,15 @@
       "file": "netid.go"
     }
   },
+  "error:pkg/types:net_id_overflow": {
+    "translations": {
+      "en": "NetID overflow"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "netid.go"
+    }
+  },
   "error:pkg/types:net_id_type": {
     "translations": {
       "en": "NetID type must be lower or equal to 7"

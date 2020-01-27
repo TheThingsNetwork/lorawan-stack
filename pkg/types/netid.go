@@ -77,6 +77,25 @@ func (id *NetID) UnmarshalText(data []byte) error {
 	return unmarshalTextBytes(id[:], data)
 }
 
+// MarshalNumber returns the numeric value.
+func (id NetID) MarshalNumber() uint32 {
+	return uint32(id[0])<<16 | uint32(id[1])<<8 | uint32(id[2])
+}
+
+var errNetIDOverflow = errors.DefineInvalidArgument("net_id_overflow", "NetID overflow")
+
+// UnmarshalNumber unmarshals the NetID from a numeric value.
+func (id *NetID) UnmarshalNumber(netID uint32) error {
+	*id = [3]byte{}
+	if netID > 0xFFFFFF {
+		return errNetIDOverflow
+	}
+	id[0] = byte(netID >> 16)
+	id[1] = byte(netID >> 8)
+	id[2] = byte(netID)
+	return nil
+}
+
 // Type returns NetID type.
 func (id NetID) Type() byte {
 	return id[0] >> 5

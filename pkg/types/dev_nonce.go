@@ -15,6 +15,7 @@
 package types
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"strings"
 )
@@ -44,6 +45,17 @@ func (dn DevNonce) Marshal() ([]byte, error) { return dn.MarshalBinary() }
 
 // MarshalTo implements the MarshalerTo function required by generated protobuf.
 func (dn DevNonce) MarshalTo(data []byte) (int, error) { return marshalBinaryBytesTo(data, dn[:]) }
+
+// MarshalNumber returns the DevNonce in decimal form.
+func (dn DevNonce) MarshalNumber() uint16 {
+	return binary.BigEndian.Uint16(dn[:])
+}
+
+// UnmarshalNumber retrieves the DevNonce from decimal form.
+func (dn *DevNonce) UnmarshalNumber(n uint16) {
+	*dn = [2]byte{}
+	binary.BigEndian.PutUint16(dn[:], n)
+}
 
 // Unmarshal implements the proto.Unmarshaler interface.
 func (dn *DevNonce) Unmarshal(data []byte) error { return dn.UnmarshalBinary(data) }

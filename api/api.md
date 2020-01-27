@@ -2357,6 +2357,7 @@ Power state of the device.
 | `DEVICE_CLAIMING_SERVER` | 9 |  |
 | `GATEWAY_CONFIGURATION_SERVER` | 10 |  |
 | `QR_CODE_GENERATOR` | 11 |  |
+| `PACKET_BROKER_AGENT` | 12 |  |
 
 ### <a name="ttn.lorawan.v3.DownlinkPathConstraint">Enum `DownlinkPathConstraint`</a>
 

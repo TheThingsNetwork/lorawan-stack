@@ -223,9 +223,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	for name, prefix := range gs.forward {
+		if name == "" {
+			name = "cluster"
+		}
 		var handler upstream.Handler
 		switch name {
-		case "", "cluster":
+		case "cluster":
 			handler = ns.NewHandler(ctx, c, prefix)
 		default:
 			return nil, errInvalidUpstreamName.WithAttributes("name", name)
@@ -482,7 +485,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 						logger.Debug("Drop message")
 						registerDropUplink(ctx, conn.Gateway(), msg.UplinkMessage, host.name, err)
 					}
-					ids, err := lorawan.GetUplinkMessageIdentifiers(msg.UplinkMessage)
+					ids, err := lorawan.GetUplinkMessageIdentifiers(msg.RawPayload)
 					if err != nil {
 						drop(ttnpb.EndDeviceIdentifiers{}, err)
 						break
@@ -514,6 +517,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
 	for name, handler := range gs.upstreamHandlers {
+		handler := handler
 		passDevAddr := func(prefixes []types.DevAddrPrefix, devAddr types.DevAddr) bool {
 			for _, prefix := range prefixes {
 				if devAddr.HasPrefix(prefix) {
@@ -579,7 +583,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 				select {
 				case host.handleCh <- item:
 				case <-time.After(upstreamHandlerBusyTimeout):
-					logger.WithField("host", host).Warn("Upstream handlers busy, drop message")
+					logger.WithField("name", host.name).Warn("Upstream handler busy, drop message")
 					switch msg := val.(type) {
 					case *ttnpb.UplinkMessage:
 						registerFailUplink(ctx, conn.Gateway(), msg, host.name)

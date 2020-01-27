@@ -17,9 +17,10 @@ package applicationserver
 import (
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func init() {
-	linkBackoff = []time.Duration{(1 << 5) * test.Delay}
+	component.TaskBackoffDial = []time.Duration{(1 << 5) * test.Delay}
 }
