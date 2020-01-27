@@ -14,6 +14,9 @@
 
 .container
   overflow: auto
+  box-sizing: border-box
+  +media-query($bp.s)
+    scrollbar-width: none
 
 .list-container
   min-width: 60rem
