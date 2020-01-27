@@ -58,6 +58,8 @@ func openDriverTopic(client mqtt.Client, topicName string, timeout time.Duration
 	return dt, nil
 }
 
+var errPublishFailed = errors.Define("publish_failed", "publish to MQTT topic failed")
+
 // SendBatch implements driver.Topic.
 func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 	if t == nil || t.client == nil {
@@ -77,8 +79,11 @@ func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 		if err != nil {
 			return err
 		}
-		if token := t.client.Publish(t.topic, t.qos, false, body); !token.WaitTimeout(t.timeout) {
-			return convertToCancelled(token.Error())
+		token := t.client.Publish(t.topic, t.qos, false, body)
+		if !token.WaitTimeout(timeout) {
+			return errPublishFailed.WithCause(context.DeadlineExceeded)
+		} else if token.Error() != nil {
+			return errPublishFailed.WithCause(token.Error())
 		}
 	}
 	return nil
@@ -168,6 +173,8 @@ func OpenSubscription(client mqtt.Client, topicName string, timeout time.Duratio
 	return pubsub.NewSubscription(ds, nil, nil), nil
 }
 
+var errSubscribeFailed = errors.Define("subscribe_failed", "subscribe to MQTT topic failed")
+
 func openDriverSubscription(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Subscription, error) {
 	if client == nil {
 		return nil, errNilClient
@@ -176,8 +183,11 @@ func openDriverSubscription(client mqtt.Client, topicName string, timeout time.D
 	handler := func(_ mqtt.Client, msg mqtt.Message) {
 		subCh <- msg
 	}
-	if token := client.Subscribe(topicName, qos, handler); !token.WaitTimeout(timeout) {
-		return nil, convertToCancelled(token.Error())
+	token := client.Subscribe(topicName, qos, handler)
+	if !token.WaitTimeout(timeout) {
+		return nil, errSubscribeFailed.WithCause(context.DeadlineExceeded)
+	} else if token.Error() != nil {
+		return nil, errSubscribeFailed.WithCause(token.Error())
 	}
 	ds := &subscription{
 		client:  client,
@@ -248,13 +258,18 @@ func (*subscription) ErrorCode(err error) gcerrors.ErrorCode {
 	return toErrorCode(err)
 }
 
+var errUnsubscribeFailed = errors.Define("unsubscribe_failed", "unsubscribe from MQTT topic failed")
+
 // Close implements driver.Subscription.
 func (s *subscription) Close() error {
 	if s == nil || s.client == nil {
 		return nil
 	}
-	if token := s.client.Unsubscribe(s.topic); !token.WaitTimeout(s.timeout) {
-		return convertToCancelled(token.Error())
+	token := s.client.Unsubscribe(s.topic)
+	if !token.WaitTimeout(timeout) {
+		return errUnsubscribeFailed.WithCause(context.DeadlineExceeded)
+	} else if token.Error() != nil {
+		return errUnsubscribeFailed.WithCause(token.Error())
 	}
 	return nil
 }
@@ -275,12 +290,4 @@ func toErrorCode(err error) gcerrors.ErrorCode {
 	default:
 		return gcerrors.Unknown
 	}
-}
-
-// convertToCancelled returns the error if it is not nil, or context.DeadlineExceeded otherwise.
-func convertToCancelled(err error) error {
-	if err != nil {
-		return err
-	}
-	return context.DeadlineExceeded
 }
