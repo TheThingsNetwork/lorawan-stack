@@ -517,6 +517,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
 	for name, handler := range gs.upstreamHandlers {
+		handler := handler
 		passDevAddr := func(prefixes []types.DevAddrPrefix, devAddr types.DevAddr) bool {
 			for _, prefix := range prefixes {
 				if devAddr.HasPrefix(prefix) {
