@@ -133,7 +133,11 @@ func TestOpenConnection(t *testing.T) {
 				clientOpts.AddBroker(lis.Addr().String())
 				client := paho_mqtt.NewClient(clientOpts)
 				a.So(client, should.NotBeNil)
-				if token := client.Connect(); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
+				token := client.Connect()
+				if !token.WaitTimeout(timeout) {
+					t.Fatal("Connection timeout")
+				}
+				if !a.So(token.Error(), should.BeNil) {
 					t.FailNow()
 				}
 				return client
@@ -159,7 +163,11 @@ func TestOpenConnection(t *testing.T) {
 				clientOpts.SetTLSConfig(clientTLSConfig)
 				client := paho_mqtt.NewClient(clientOpts)
 				a.So(client, should.NotBeNil)
-				if token := client.Connect(); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
+				token := client.Connect()
+				if !token.WaitTimeout(timeout) {
+					t.Fatal("Connection timeout")
+				}
+				if !a.So(token.Error(), should.BeNil) {
 					t.FailNow()
 				}
 				return client
@@ -216,7 +224,11 @@ func TestOpenConnection(t *testing.T) {
 						client := utc.createClient(t, a)
 						defer client.Disconnect(uint(timeout / time.Millisecond))
 
-						if token := client.Publish(tc.topicName, 2, false, "foobar"); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
+						token := client.Publish(tc.topicName, 2, false, "foobar")
+						if !token.WaitTimeout(timeout) {
+							t.Fatal("Publish timeout")
+						}
+						if !a.So(token.Error(), should.BeNil) {
 							t.FailNow()
 						}
 
@@ -285,9 +297,13 @@ func TestOpenConnection(t *testing.T) {
 
 						upCh := make(chan paho_mqtt.Message, 10)
 						defer close(upCh)
-						if token := client.Subscribe(tc.topicName, 2, func(_ paho_mqtt.Client, msg paho_mqtt.Message) {
+						token := client.Subscribe(tc.topicName, 2, func(_ paho_mqtt.Client, msg paho_mqtt.Message) {
 							upCh <- msg
-						}); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
+						})
+						if !token.WaitTimeout(timeout) {
+							t.Fatal("Subscribe timeout")
+						}
+						if !a.So(token.Error(), should.BeNil) {
 							t.FailNow()
 						}
 

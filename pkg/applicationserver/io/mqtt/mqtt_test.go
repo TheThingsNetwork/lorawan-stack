@@ -111,13 +111,17 @@ func TestAuthentication(t *testing.T) {
 			clientOpts.SetPassword(tc.Key)
 			client := mqtt.NewClient(clientOpts)
 			token := client.Connect()
-			if ok := token.WaitTimeout(timeout); tc.OK {
-				if a.So(ok, should.BeTrue) && a.So(token.Error(), should.BeNil) {
-					client.Disconnect(uint(timeout / time.Millisecond))
+			if tc.OK {
+				if !token.WaitTimeout(timeout) {
+					t.Fatal("Connection timeout")
 				}
-			} else {
-				a.So(ok, should.BeFalse)
+				if !a.So(token.Error(), should.BeNil) {
+					t.FailNow()
+				}
+			} else if token.Wait() && !a.So(token.Error(), should.NotBeNil) {
+				t.FailNow()
 			}
+			client.Disconnect(uint(timeout / time.Millisecond))
 		})
 	}
 }
@@ -160,9 +164,11 @@ func TestTraffic(t *testing.T) {
 	clientOpts.SetUsername(registeredApplicationUID)
 	clientOpts.SetPassword(registeredApplicationKey)
 	client := mqtt.NewClient(clientOpts)
-	if token := client.Connect(); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
-		t.FailNow()
-	} else if !a.So(token.Error(), should.BeNil) {
+	token := client.Connect()
+	if !token.WaitTimeout(timeout) {
+		t.Fatal("Connection timeout")
+	}
+	if !a.So(token.Error(), should.BeNil) {
 		t.FailNow()
 	}
 
@@ -241,16 +247,19 @@ func TestTraffic(t *testing.T) {
 					a.So(err, should.BeNil)
 					upCh <- up
 				}
-				if token := client.Subscribe(tc.Topic, 1, handler); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
-					t.FailNow()
-				} else if !a.So(token.Error(), should.BeNil) {
+				token := client.Subscribe(tc.Topic, 1, handler)
+				if !token.WaitTimeout(timeout) {
+					t.Fatal("Subscribe timeout")
+				}
+				if !a.So(token.Error(), should.BeNil) {
 					t.FailNow()
 				}
 				defer func() {
 					token := client.Unsubscribe(tc.Topic)
-					if !a.So(token.WaitTimeout(timeout), should.BeTrue) {
-						t.FailNow()
-					} else if !a.So(token.Error(), should.BeNil) {
+					if !token.WaitTimeout(timeout) {
+						t.Fatal("Unsubscribe timeout")
+					}
+					if !a.So(token.Error(), should.BeNil) {
 						t.FailNow()
 					}
 				}()
@@ -359,7 +368,11 @@ func TestTraffic(t *testing.T) {
 				a := assertions.New(t)
 				buf, err := jsonpb.TTN().Marshal(tc.Message)
 				a.So(err, should.BeNil)
-				if token := client.Publish(tc.Topic, 1, false, buf); !a.So(token.WaitTimeout(timeout), should.BeTrue) {
+				token := client.Publish(tc.Topic, 1, false, buf)
+				if !token.WaitTimeout(timeout) {
+					t.Fatal("Publish timeout")
+				}
+				if !a.So(token.Error(), should.BeNil) {
 					t.FailNow()
 				}
 				res, err := as.DownlinkQueueList(ctx, tc.IDs)
