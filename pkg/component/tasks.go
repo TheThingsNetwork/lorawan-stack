@@ -77,7 +77,7 @@ func (c *Component) StartTask(ctx context.Context, id string, fn TaskFunc, resta
 		for {
 			invocation++
 			err := fn(ctx)
-			if err != nil {
+			if err != nil && err != context.Canceled {
 				logger.WithField("invocation", invocation).WithError(err).Warn("Task failed")
 			}
 			switch restart {
