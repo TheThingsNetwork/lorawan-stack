@@ -22,6 +22,7 @@ import (
 	mqtt_topic "github.com/TheThingsIndustries/mystique/pkg/topic"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"gocloud.dev/pubsub"
 )
@@ -40,6 +41,8 @@ func (c *connection) Shutdown(_ context.Context) error {
 	c.Disconnect(uint(timeout / time.Millisecond))
 	return nil
 }
+
+var errConnectFailed = errors.Define("connect_failed", "connection to MQTT server failed")
 
 // OpenConnection implements provider.Provider using the mqtt driver.
 func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *provider.Connection, err error) {
@@ -60,8 +63,11 @@ func (impl) OpenConnection(ctx context.Context, target provider.Target) (pc *pro
 		clientOpts.SetTLSConfig(config)
 	}
 	client := mqtt.NewClient(clientOpts)
-	if token := client.Connect(); !token.WaitTimeout(timeout) {
-		return nil, convertToCancelled(token.Error())
+	token := client.Connect()
+	if !token.WaitTimeout(timeout) {
+		return nil, errConnectFailed.WithCause(context.DeadlineExceeded)
+	} else if token.Error() != nil {
+		return nil, errConnectFailed.WithCause(token.Error())
 	}
 	pc = &provider.Connection{
 		ProviderConnection: &connection{

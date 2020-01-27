@@ -1709,9 +1709,45 @@
       "file": "tls.go"
     }
   },
+  "error:pkg/applicationserver/io/pubsub/provider/mqtt:connect_failed": {
+    "translations": {
+      "en": "connection to MQTT server failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
+      "file": "provider.go"
+    }
+  },
   "error:pkg/applicationserver/io/pubsub/provider/mqtt:nil_client": {
     "translations": {
       "en": "client is nil"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
+      "file": "driver.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/provider/mqtt:publish_failed": {
+    "translations": {
+      "en": "publish to MQTT topic failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
+      "file": "driver.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/provider/mqtt:subscribe_failed": {
+    "translations": {
+      "en": "subscribe to MQTT topic failed"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
+      "file": "driver.go"
+    }
+  },
+  "error:pkg/applicationserver/io/pubsub/provider/mqtt:unsubscribe_failed": {
+    "translations": {
+      "en": "unsubscribe from MQTT topic failed"
     },
     "description": {
       "package": "pkg/applicationserver/io/pubsub/provider/mqtt",
