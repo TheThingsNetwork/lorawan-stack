@@ -223,9 +223,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	for name, prefix := range gs.forward {
+		if name == "" {
+			name = "cluster"
+		}
 		var handler upstream.Handler
 		switch name {
-		case "", "cluster":
+		case "cluster":
 			handler = ns.NewHandler(ctx, c, prefix)
 		default:
 			return nil, errInvalidUpstreamName.WithAttributes("name", name)
