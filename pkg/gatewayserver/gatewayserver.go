@@ -321,10 +321,6 @@ var (
 		"no_fallback_frequency_plan",
 		"gateway `{gateway_uid}` is not registered and no fallback frequency plan defined",
 	)
-	errFrequencyPlansNotFromSameBand = errors.DefineInvalidArgument(
-		"frequency_plans_not_from_same_band",
-		"frequency plans must be from the same band",
-	)
 )
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
@@ -361,9 +357,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 				"downlink_path_constraint",
 				"enforce_duty_cycle",
 				"frequency_plan_id",
+				"frequency_plan_ids",
 				"location_public",
 				"schedule_anytime_delay",
-				"frequency_plan_ids",
 				"schedule_downlink_late",
 			},
 		},
@@ -390,32 +386,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, err
 	}
 
-	var bandID string
-
-	// Get all frequency plans and check if they are from the same band.
-	fps := make(map[string]*frequencyplans.FrequencyPlan, len(gtw.FrequencyPlanIDs))
-	if len(gtw.FrequencyPlanIDs) > 0 {
-		fp0, err := gs.FrequencyPlans.GetByID(gtw.FrequencyPlanIDs[0])
-		bandID = fp0.BandID
-		if err != nil {
-			return nil, err
-		}
-		fps[gtw.FrequencyPlanIDs[0]] = fp0
-		for i := 1; i < len(gtw.FrequencyPlanIDs); i++ {
-			fpn, err := gs.FrequencyPlans.GetByID(gtw.FrequencyPlanIDs[i])
-			if err != nil {
-				return nil, err
-			}
-			if fpn.BandID != fp0.BandID {
-				return nil, errFrequencyPlansNotFromSameBand
-			}
-			fps[gtw.FrequencyPlanIDs[i]] = fpn
-		}
-	} else {
-		return nil, errFrequencyPlansNotFromSameBand
-	}
-
-	conn, err := io.NewConnection(ctx, frontend, gtw, bandID, fps, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
+	conn, err := io.NewConnection(ctx, frontend, gtw, gs.FrequencyPlans, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
 	if err != nil {
 		return nil, err
 	}

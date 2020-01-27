@@ -3482,6 +3482,24 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/io:frequency_plans_not_from_same_band": {
+    "translations": {
+      "en": "frequency plans must be from the same band"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
+  "error:pkg/gatewayserver/io:inconsistent_frequency_plans": {
+    "translations": {
+      "en": "inconsistent frequency plans configuration"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io",
+      "file": "io.go"
+    }
+  },
   "error:pkg/gatewayserver/io:no_absolute_time": {
     "translations": {
       "en": "no absolute time provided for class B downlink"
@@ -3683,15 +3701,6 @@
   "error:pkg/gatewayserver:empty_identifiers": {
     "translations": {
       "en": "empty identifiers"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "gatewayserver.go"
-    }
-  },
-  "error:pkg/gatewayserver:frequency_plans_not_from_same_band": {
-    "translations": {
-      "en": "frequency plans must be from the same band"
     },
     "description": {
       "package": "pkg/gatewayserver",

@@ -27,6 +27,7 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mock"
@@ -67,6 +68,7 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
+	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
@@ -162,6 +164,7 @@ func TestTraffic(t *testing.T) {
 			},
 		},
 	})
+	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
@@ -480,6 +483,7 @@ func TestConcentratorConfig(t *testing.T) {
 			},
 		},
 	})
+	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
@@ -532,6 +536,7 @@ func TestMQTTConfig(t *testing.T) {
 			},
 		},
 	})
+	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 	srv := New(gs,
 		WithMQTTConfigProvider(&mockMQTTConfigProvider{

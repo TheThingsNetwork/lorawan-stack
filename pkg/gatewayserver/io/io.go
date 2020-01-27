@@ -75,12 +75,13 @@ type Connection struct {
 	ctx       context.Context
 	cancelCtx errorcontext.CancelFunc
 
-	frontend  Frontend
-	gateway   *ttnpb.Gateway
-	fps       map[string]*frequencyplans.FrequencyPlan
-	bandID    string
-	scheduler *scheduling.Scheduler
-	rtts      *rtts
+	frontend   Frontend
+	gateway    *ttnpb.Gateway
+	gatewayFPs map[string]*frequencyplans.FrequencyPlan
+	bandID     string
+	fps        *frequencyplans.Store
+	scheduler  *scheduling.Scheduler
+	rtts       *rtts
 
 	upCh     chan *ttnpb.GatewayUplinkMessage
 	downCh   chan *ttnpb.DownlinkMessage
@@ -88,10 +89,46 @@ type Connection struct {
 	txAckCh  chan *ttnpb.TxAcknowledgment
 }
 
+var (
+	errInconsistentFrequencyPlans = errors.DefineCorruption(
+		"inconsistent_frequency_plans",
+		"inconsistent frequency plans configuration",
+	)
+	errFrequencyPlansNotFromSameBand = errors.DefineInvalidArgument(
+		"frequency_plans_not_from_same_band",
+		"frequency plans must be from the same band",
+	)
+)
+
 // NewConnection instantiates a new gateway connection.
-func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, bandID string, fps map[string]*frequencyplans.FrequencyPlan, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
+func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gateway, fps *frequencyplans.Store, enforceDutyCycle bool, scheduleAnytimeDelay *time.Duration) (*Connection, error) {
+	gatewayFPs := make(map[string]*frequencyplans.FrequencyPlan, len(gateway.FrequencyPlanIDs))
+	fp0ID := gateway.FrequencyPlanID
+	fp0, err := fps.GetByID(fp0ID)
+	if err != nil {
+		return nil, err
+	}
+	gatewayFPs[fp0ID] = fp0
+	bandID := fp0.BandID
+
+	if len(gateway.FrequencyPlanIDs) > 0 {
+		if gateway.FrequencyPlanIDs[0] != fp0ID {
+			return nil, errInconsistentFrequencyPlans
+		}
+		for i := 1; i < len(gateway.FrequencyPlanIDs); i++ {
+			fpn, err := fps.GetByID(gateway.FrequencyPlanIDs[i])
+			if err != nil {
+				return nil, err
+			}
+			if fpn.BandID != fp0.BandID {
+				return nil, errFrequencyPlansNotFromSameBand
+			}
+			gatewayFPs[gateway.FrequencyPlanIDs[i]] = fpn
+		}
+	}
+
 	ctx, cancelCtx := errorcontext.New(ctx)
-	scheduler, err := scheduling.NewScheduler(ctx, fps, enforceDutyCycle, scheduleAnytimeDelay, nil)
+	scheduler, err := scheduling.NewScheduler(ctx, gatewayFPs, enforceDutyCycle, scheduleAnytimeDelay, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +138,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 
 		frontend:    frontend,
 		gateway:     gateway,
+		gatewayFPs:  gatewayFPs,
 		bandID:      bandID,
 		fps:         fps,
 		scheduler:   scheduler,
@@ -289,16 +327,23 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 	var fp *frequencyplans.FrequencyPlan
 	fpID := request.GetFrequencyPlanID()
 	if fpID != "" {
-		fp = c.fps[fpID]
+		fp = c.gatewayFPs[fpID]
 		if fp == nil {
-			return 0, errFrequencyPlanNotConfigured.WithAttributes("id", request.FrequencyPlanID)
+			// The requested frequency plan is not configured for the gateway. Load the plan and enforce that it's in the same band.
+			fp, err = c.fps.GetByID(fpID)
+			if err != nil {
+				return 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanID)
+			}
+			if fp.BandID != c.bandID {
+				return 0, errFrequencyPlansNotFromSameBand
+			}
 		}
 	} else {
 		// Backwards compatibility. If there's no FrequencyPlanID in the TxRequest, then there must be only one Frequency Plan configured.
-		if len(c.fps) != 1 {
+		if len(c.gatewayFPs) != 1 {
 			return 0, errNoFrequencyPlanIDInTxRequest
 		}
-		for _, v := range c.fps {
+		for _, v := range c.gatewayFPs {
 			fp = v
 			break
 		}
@@ -498,7 +543,7 @@ func (c *Connection) RTTStats() (min, max, median time.Duration, count int) {
 }
 
 // FrequencyPlans returns the frequency plans for the gateway.
-func (c *Connection) FrequencyPlans() map[string]*frequencyplans.FrequencyPlan { return c.fps }
+func (c *Connection) FrequencyPlans() map[string]*frequencyplans.FrequencyPlan { return c.gatewayFPs }
 
 // BandID returns the common band ID for the frequency plans in this connection.
 // TODO: Handle mixed bands (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
