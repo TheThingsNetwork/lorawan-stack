@@ -70,8 +70,12 @@ func createHarnessMaker(broker string) func(context.Context, *testing.T) (driver
 		clientOpts := paho_mqtt.NewClientOptions()
 		clientOpts.AddBroker(broker)
 		client := paho_mqtt.NewClient(clientOpts)
-		if token := client.Connect(); !token.WaitTimeout(timeout) {
-			return nil, token.Error()
+		token := client.Connect()
+		if !token.WaitTimeout(timeout) {
+			t.Fatal("Connection timeout")
+		}
+		if err := token.Error(); err != nil {
+			t.Fatal(err)
 		}
 		return &harness{client: client}, nil
 	}
