@@ -304,6 +304,52 @@ func (dst *TxAcknowledgment) SetFields(src *TxAcknowledgment, paths ...string) e
 	return nil
 }
 
+func (dst *GatewayUplinkMessage) SetFields(src *GatewayUplinkMessage, paths ...string) error {
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		switch name {
+		case "message":
+			if len(subs) > 0 {
+				var newDst, newSrc *UplinkMessage
+				if (src == nil || src.UplinkMessage == nil) && dst.UplinkMessage == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UplinkMessage
+				}
+				if dst.UplinkMessage != nil {
+					newDst = dst.UplinkMessage
+				} else {
+					newDst = &UplinkMessage{}
+					dst.UplinkMessage = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UplinkMessage = src.UplinkMessage
+				} else {
+					dst.UplinkMessage = nil
+				}
+			}
+		case "band_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'band_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.BandID = src.BandID
+			} else {
+				var zero string
+				dst.BandID = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		switch name {

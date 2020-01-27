@@ -116,7 +116,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 						MaxFrequency: subBand.MaxFrequency,
 						DutyCycle:    subBand.DutyCycle,
 					}
-					sb := NewSubBand(ctx, params, s.clock, nil)
+					sb := NewSubBand(params, s.clock, nil)
 					var isIdentical bool
 					for _, subBand := range s.subBands {
 						if subBand.IsIdentical(sb) {
@@ -142,7 +142,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 						MaxFrequency: subBand.MaxFrequency,
 						DutyCycle:    subBand.DutyCycle,
 					}
-					sb := NewSubBand(ctx, params, s.clock, nil)
+					sb := NewSubBand(params, s.clock, nil)
 					var isIdentical bool
 					for _, subBand := range s.subBands {
 						if subBand.IsIdentical(sb) {
@@ -164,9 +164,10 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 			MinFrequency: 0,
 			MaxFrequency: math.MaxUint64,
 		}
-		sb := NewSubBand(ctx, noDutyCycleParams, s.clock, nil)
+		sb := NewSubBand(noDutyCycleParams, s.clock, nil)
 		s.subBands = append(s.subBands, sb)
 	}
+	go s.gc(ctx)
 	return s, nil
 }
 
@@ -191,6 +192,28 @@ func (s *Scheduler) findSubBand(frequency uint64) (*SubBand, error) {
 		}
 	}
 	return nil, errSubBandNotFound.WithAttributes("frequency", frequency)
+}
+
+func (s *Scheduler) gc(ctx context.Context) error {
+	ticker := time.NewTicker(DutyCycleWindow / 2)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+			s.mu.RLock()
+			serverTime, ok := s.clock.FromServerTime(time.Now())
+			s.mu.RUnlock()
+			if !ok {
+				continue
+			}
+			to := serverTime - ConcentratorTime(DutyCycleWindow)
+			for _, subBand := range s.subBands {
+				subBand.gc(to)
+			}
+		}
+	}
 }
 
 var errDwellTime = errors.DefineFailedPrecondition("dwell_time", "packet exceeds dwell time restriction")

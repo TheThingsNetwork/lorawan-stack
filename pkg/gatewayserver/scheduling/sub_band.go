@@ -15,7 +15,6 @@
 package scheduling
 
 import (
-	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -60,7 +59,7 @@ type SubBand struct {
 }
 
 // NewSubBand returns a new SubBand considering the given duty-cycle, clock and optionally duty-cycle ceilings.
-func NewSubBand(ctx context.Context, params SubBandParameters, clock Clock, ceilings DutyCycleCeilings) *SubBand {
+func NewSubBand(params SubBandParameters, clock Clock, ceilings DutyCycleCeilings) *SubBand {
 	if ceilings == nil {
 		ceilings = DefaultDutyCycleCeilings
 	}
@@ -72,36 +71,21 @@ func NewSubBand(ctx context.Context, params SubBandParameters, clock Clock, ceil
 	if sb.DutyCycle == 0 {
 		sb.DutyCycle = 1
 	}
-	go sb.gc(ctx)
 	return sb
 }
 
-func (sb *SubBand) gc(ctx context.Context) error {
-	ticker := time.NewTicker(DutyCycleWindow / 2)
-	for {
-		select {
-		case <-ctx.Done():
-			ticker.Stop()
-			return ctx.Err()
-		case <-ticker.C:
-			serverTime, ok := sb.clock.FromServerTime(time.Now())
-			if !ok {
-				continue
-			}
-			from := serverTime - ConcentratorTime(DutyCycleWindow)
-			sb.mu.Lock()
-			expired := 0
-			for _, em := range sb.emissions {
-				if em.Ends() < from {
-					expired++
-				} else {
-					break
-				}
-			}
-			sb.emissions = sb.emissions[expired:]
-			sb.mu.Unlock()
+func (sb *SubBand) gc(to ConcentratorTime) {
+	sb.mu.Lock()
+	expired := 0
+	for _, em := range sb.emissions {
+		if em.Ends() < to {
+			expired++
+		} else {
+			break
 		}
 	}
+	sb.emissions = sb.emissions[expired:]
+	sb.mu.Unlock()
 }
 
 // Comprises returns whether the given frequency falls in the sub-band.

@@ -24,16 +24,14 @@ import (
 
 // Handler represents the upstream handler that connects to an upstream host.
 type Handler interface {
-	// GetHostName returns the hostname of the upstream.
-	GetHostName() string
 	// GetDevAddrPrefixes returns the device addr prefixes for this upstream handler. It's used to claim an uplink based on it's DevAddr.
 	GetDevAddrPrefixes() []types.DevAddrPrefix
 	// Setup performs all the preparation necessary to connect the handler to a particular upstream host.
-	Setup() error
+	Setup(context.Context) error
 	// ConnectGateway informs the upstream handler that a particular gateway is connected to the front end.
 	ConnectGateway(context.Context, ttnpb.GatewayIdentifiers, *io.Connection) error
-	// HandleUp handles ttnpb.UplinkMessage.
-	HandleUplink(context.Context, ttnpb.GatewayIdentifiers, ttnpb.EndDeviceIdentifiers, *ttnpb.UplinkMessage) error
+	// HandleUp handles ttnpb.GatewayUplinkMessage.
+	HandleUplink(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.GatewayUplinkMessage) error
 	// HandleStatus handles ttnpb.GatewayStatus.
 	HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error
 }

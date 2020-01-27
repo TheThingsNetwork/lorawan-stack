@@ -85,15 +85,7 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 			FrequencyPlanID:    test.EUFrequencyPlanID,
 		}
 	}
-	fp, err := s.store.GetByID(gtw.FrequencyPlanID)
-	if err != nil {
-		return nil, err
-	}
-	fps, err := s.GetFrequencyPlans(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-	conn, err := io.NewConnection(ctx, frontend, gtw, fp.BandID, fps, true, nil)
+	conn, err := io.NewConnection(ctx, frontend, gtw, s.FrequencyPlans, true, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -142,6 +134,9 @@ func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifi
 
 func (s *server) RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway) {
 	uid := unique.ID(ctx, ids)
+	if len(gateway.FrequencyPlanIDs) > 0 {
+		gateway.FrequencyPlanID = gateway.FrequencyPlanIDs[0]
+	}
 	s.gateways[uid] = gateway
 }
 
