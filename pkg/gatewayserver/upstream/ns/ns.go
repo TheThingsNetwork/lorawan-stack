@@ -78,7 +78,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 var errNetworkServerNotFound = errors.DefineNotFound("network_server_not_found", "Network Server not found")
 
 // HandleUplink implements upstream.Handler.
-func (h *Handler) HandleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
+func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
 	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
 	if err != nil {
 		return errNetworkServerNotFound.WithCause(err)

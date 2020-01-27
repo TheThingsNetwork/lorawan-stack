@@ -98,7 +98,7 @@ func TestNSHandler(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			err := h.HandleUplink(ctx, tc.EndDeviceIdentifiers, tc.Message)
+			err := h.HandleUplink(ctx, ttnpb.GatewayIdentifiers{}, tc.EndDeviceIdentifiers, tc.Message)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Error sending upstream message: %v", err)
 			}

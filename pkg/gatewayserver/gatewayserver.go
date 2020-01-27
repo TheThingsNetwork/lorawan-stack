@@ -491,7 +491,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 					if handler == nil {
 						break
 					}
-					if err := handler.HandleUplink(ctx, ids, msg); err != nil {
+					if err := handler.HandleUplink(ctx, conn.Gateway().GatewayIdentifiers, ids, msg); err != nil {
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
 						break
 					}
