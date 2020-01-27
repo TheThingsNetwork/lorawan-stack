@@ -27,7 +27,6 @@ import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
 import api from '../../api'
-import style from './device-add-single.styl'
 
 @connect(
   state => ({
@@ -71,7 +70,7 @@ export default class DeviceAdd extends Component {
       <Container>
         <PageTitle title={sharedMessages.addDevice} />
         <Row>
-          <Col className={style.form} lg={8} md={12}>
+          <Col lg={8} md={12}>
             <DeviceDataForm
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
