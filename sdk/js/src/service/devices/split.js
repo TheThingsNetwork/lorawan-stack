@@ -108,7 +108,7 @@ export async function makeRequests(
   operation,
   requestTree,
   params,
-  payload,
+  payload = {},
   ignoreNotFound = false,
 ) {
   const isCreate = operation === 'create'
@@ -136,6 +136,24 @@ export async function makeRequests(
 
       return { ...res, hasErrored: true, error }
     }
+  }
+
+  // Split end device payload per stack component.
+  function splitPayload(payload = {}, paths, base = {}) {
+    if (!Boolean(payload.end_device)) {
+      return payload
+    }
+
+    const { end_device } = payload
+
+    const result = traverse(base)
+    const endDevice = traverse(end_device)
+
+    for (const path of paths) {
+      result.set(path, endDevice.get(path))
+    }
+
+    return Marshaler.payload(result.value, 'end_device')
   }
 
   const requests = new Array(3)
@@ -168,6 +186,8 @@ export async function makeRequests(
     { component: 'is', hasAttempted: false, hasErrored: false },
   ]
 
+  const { end_device = {} } = payload
+
   // Do a possible IS request first
   if (stackConfig.isComponentAvailable('is') && 'is' in requestTree) {
     let func
@@ -180,12 +200,13 @@ export async function makeRequests(
     } else {
       func = 'Get'
     }
+
     result[3] = await requestWrapper(
       api.EndDeviceRegistry[func],
       params,
       'is',
       {
-        ...payload,
+        ...splitPayload(payload, requestTree.is, { ids: end_device.ids }),
         ...Marshaler.pathsToFieldMask(requestTree.is),
       },
       false,
@@ -204,19 +225,19 @@ export async function makeRequests(
   // Compose an array of possible api calls to NS, AS, JS
   if (stackConfig.isComponentAvailable('ns') && 'ns' in requestTree) {
     requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction], params, 'ns', {
-      ...payload,
+      ...splitPayload(payload, requestTree.ns),
       ...Marshaler.pathsToFieldMask(requestTree.ns),
     })
   }
   if (stackConfig.isComponentAvailable('as') && 'as' in requestTree) {
     requests[1] = requestWrapper(api.AsEndDeviceRegistry[rpcFunction], params, 'as', {
-      ...payload,
+      ...splitPayload(payload, requestTree.as),
       ...Marshaler.pathsToFieldMask(requestTree.as),
     })
   }
   if (stackConfig.isComponentAvailable('js') && 'js' in requestTree) {
     requests[2] = requestWrapper(api.JsEndDeviceRegistry[rpcFunction], params, 'js', {
-      ...payload,
+      ...splitPayload(payload, requestTree.js, { ids: end_device.ids }),
       ...Marshaler.pathsToFieldMask(requestTree.js),
     })
   }
