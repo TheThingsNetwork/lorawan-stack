@@ -220,7 +220,10 @@ func (as *ApplicationServer) link(ctx context.Context, ids ttnpb.ApplicationIden
 		go func() {
 			select {
 			case <-l.ctx.Done():
-				// Default subscriptions should not be canceled on link failures.
+				// Default subscriptions should not be canceled on link failures,
+				// and they should skip the subscribe channel since it will get
+				// closed.
+				return
 			case <-sub.Context().Done():
 			}
 			l.unsubscribeCh <- sub

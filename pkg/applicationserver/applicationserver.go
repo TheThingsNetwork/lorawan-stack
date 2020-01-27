@@ -278,7 +278,10 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	go func() {
 		select {
 		case <-l.ctx.Done():
+			// Disconnect the subscription in order to avoid leaking it,
+			// and skip the unsubscribe channel since it will get closed.
 			sub.Disconnect(l.ctx.Err())
+			return
 		case <-sub.Context().Done():
 		}
 		l.unsubscribeCh <- sub
