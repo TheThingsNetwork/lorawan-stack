@@ -281,6 +281,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -289,13 +290,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(nil)
+						dev, sets, err := req.Func(req.Context, nil)
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -319,7 +321,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
-				case setRespCh <- DeviceRegistrySetByIDResponse{}:
+				case setRespCh <- DeviceRegistrySetByIDResponse{
+					Context: setCtx,
+				}:
 				}
 
 				select {
@@ -407,6 +411,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -415,13 +420,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -446,7 +452,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: getDevice,
+					Device:  getDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -541,6 +548,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -549,13 +557,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -580,7 +589,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: getDevice,
+					Device:  getDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -656,6 +666,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -664,13 +675,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -698,7 +710,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: getDevice,
+					Device:  getDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -768,6 +781,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -776,13 +790,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -807,7 +822,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: getDevice,
+					Device:  getDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -907,6 +923,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -915,13 +932,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -951,7 +969,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: getDevice,
+					Device:  getDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -1051,6 +1070,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -1059,13 +1079,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -1090,7 +1111,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: getDevice,
+					Device:  getDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -1208,6 +1230,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -1216,13 +1239,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -1254,7 +1278,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -1385,6 +1410,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -1393,13 +1419,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -1431,7 +1458,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -1567,6 +1595,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -1575,13 +1604,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -1705,7 +1735,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: getDevice,
+					Device:  getDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -1822,6 +1853,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -1830,13 +1862,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -2014,7 +2047,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -2132,6 +2166,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -2140,13 +2175,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -2327,7 +2363,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -2445,6 +2482,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -2453,13 +2491,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -2635,7 +2674,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -2730,6 +2770,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -2738,13 +2779,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -2769,7 +2811,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: getDevice,
+					Device:  getDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -2889,6 +2932,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -2897,13 +2941,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -3084,7 +3129,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -3219,6 +3265,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -3227,13 +3274,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -3481,7 +3529,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -3612,6 +3661,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -3620,13 +3670,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -3799,7 +3850,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -3930,6 +3982,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -3938,13 +3991,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -4080,7 +4134,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 
@@ -4234,6 +4289,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -4242,13 +4298,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -4379,7 +4436,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: CopyEndDevice(getDevice),
+					Device:  CopyEndDevice(getDevice),
+					Context: setCtx,
 				}:
 				}
 
@@ -4510,6 +4568,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -4518,13 +4577,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -4548,7 +4608,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
-				case setRespCh <- DeviceRegistrySetByIDResponse{}:
+				case setRespCh <- DeviceRegistrySetByIDResponse{
+					Context: setCtx,
+				}:
 				}
 
 				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
@@ -4687,6 +4749,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -4695,13 +4758,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -4731,7 +4795,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
-				case setRespCh <- DeviceRegistrySetByIDResponse{}:
+				case setRespCh <- DeviceRegistrySetByIDResponse{
+					Context: setCtx,
+				}:
 				}
 
 				select {
@@ -4875,6 +4941,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				var setRespCh chan<- DeviceRegistrySetByIDResponse
+				var setCtx context.Context
 				setFuncRespCh := make(chan DeviceRegistrySetByIDRequestFuncResponse)
 				select {
 				case <-ctx.Done():
@@ -4883,13 +4950,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case req := <-env.DeviceRegistry.SetByID:
 					setRespCh = req.Response
+					setCtx = req.Context
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.Resemble, getPaths)
 
 					go func() {
-						dev, sets, err := req.Func(CopyEndDevice(getDevice))
+						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
 						setFuncRespCh <- DeviceRegistrySetByIDRequestFuncResponse{
 							Device: dev,
 							Paths:  sets,
@@ -5017,7 +5085,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
 
 				case setRespCh <- DeviceRegistrySetByIDResponse{
-					Device: setDevice,
+					Device:  setDevice,
+					Context: setCtx,
 				}:
 				}
 

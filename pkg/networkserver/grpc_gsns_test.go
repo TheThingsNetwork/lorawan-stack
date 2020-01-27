@@ -632,7 +632,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Error: errTest,
+						Context: req.Context,
+						Error:   errTest,
 					}
 				}
 
@@ -665,14 +666,14 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:            time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs := events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -682,12 +683,13 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(reqCtx, makeOTAAIdentifiers(nil), ErrABPJoinRequest))
+					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), ErrABPJoinRequest))
 				}), should.BeTrue) {
 					return false
 				}
@@ -722,14 +724,14 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:            time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs := events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -739,12 +741,13 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(reqCtx, makeOTAAIdentifiers(nil), ErrABPJoinRequest))
+					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), ErrABPJoinRequest))
 				}), should.BeTrue) {
 					return false
 				}
@@ -784,7 +787,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -792,7 +795,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -802,13 +805,14 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
 				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
 					},
 					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
@@ -846,7 +850,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(ok, should.BeTrue) {
 						return false
 					}
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(reqCtx, makeOTAAIdentifiers(nil), err))
+					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), err))
 				}), should.BeTrue) {
 					return false
 				}
@@ -886,7 +890,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -894,7 +898,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -904,7 +908,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
@@ -950,7 +955,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(ok, should.BeTrue) {
 						return false
 					}
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(reqCtx, makeOTAAIdentifiers(nil), err))
+					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), err))
 				}), should.BeTrue) {
 					return false
 				}
@@ -990,7 +995,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -998,7 +1003,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -1008,12 +1013,13 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
@@ -1024,7 +1030,7 @@ func TestHandleUplink(t *testing.T) {
 
 				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
 					func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 							a.So(id, should.Equal, netID) &&
 							a.So(req, should.NotBeNil) &&
 							a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
@@ -1060,7 +1066,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(ok, should.BeTrue) {
 						return false
 					}
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(reqCtx, makeOTAAIdentifiers(nil), err))
+					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), err))
 				}), should.BeTrue) {
 					return false
 				}
@@ -1100,7 +1106,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -1108,7 +1114,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -1118,12 +1124,13 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
@@ -1134,7 +1141,7 @@ func TestHandleUplink(t *testing.T) {
 
 				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
 					func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 							a.So(id, should.Equal, netID) &&
 							a.So(req, should.NotBeNil) &&
 							a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
@@ -1173,7 +1180,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(ok, should.BeTrue) {
 						return false
 					}
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(reqCtx, makeOTAAIdentifiers(nil), err))
+					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), err))
 				}), should.BeTrue) {
 					return false
 				}
@@ -1218,7 +1225,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -1226,7 +1233,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -1236,12 +1243,13 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
 						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
 				},
@@ -1259,7 +1267,7 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
 					func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
 						joinReq = req
-						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 							a.So(id, should.Equal, netID) &&
 							a.So(req, should.NotBeNil) &&
 							a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
@@ -1291,7 +1299,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
+					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
 				}), should.BeTrue) {
 					return false
 				}
@@ -1302,11 +1310,12 @@ func TestHandleUplink(t *testing.T) {
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(reqCtx, makeOTAAIdentifiers(nil), len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
+				var setCtx context.Context
 				var recentUp *ttnpb.UplinkMessage
 				select {
 				case <-ctx.Done():
@@ -1314,11 +1323,11 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, reqCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
-					dev, sets, err := req.Func(&ttnpb.EndDevice{
+					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1357,6 +1366,7 @@ func TestHandleUplink(t *testing.T) {
 						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers:       *makeOTAAIdentifiers(nil),
@@ -1366,11 +1376,12 @@ func TestHandleUplink(t *testing.T) {
 							CreatedAt:                  start,
 							UpdatedAt:                  time.Now(),
 						},
+						Context: setCtx,
 					}
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
 						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
@@ -1381,7 +1392,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 							{
 								CorrelationIDs:       reqCorrelationIDs,
@@ -1451,7 +1462,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -1459,7 +1470,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -1469,7 +1480,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
@@ -1478,7 +1490,7 @@ func TestHandleUplink(t *testing.T) {
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
 					},
 					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
@@ -1510,7 +1522,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
+					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
 				}), should.BeTrue) {
 					return false
 				}
@@ -1519,11 +1531,12 @@ func TestHandleUplink(t *testing.T) {
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(reqCtx, makeOTAAIdentifiers(nil), len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
+				var setCtx context.Context
 				var recentUp *ttnpb.UplinkMessage
 				select {
 				case <-ctx.Done():
@@ -1531,11 +1544,11 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, reqCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
-					dev, sets, err := req.Func(&ttnpb.EndDevice{
+					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1574,13 +1587,15 @@ func TestHandleUplink(t *testing.T) {
 						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
-						Error: errTest,
+						Error:   errTest,
+						Context: setCtx,
 					}
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					a.So(ev, should.ResembleEvent, EvtDropJoinRequest(reqCtx, makeOTAAIdentifiers(nil), errTest))
+					a.So(ev, should.ResembleEvent, EvtDropJoinRequest(setCtx, makeOTAAIdentifiers(nil), errTest))
 					return true
 				}), should.BeTrue) {
 					return false
@@ -1634,7 +1649,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -1642,7 +1657,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -1652,7 +1667,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
@@ -1663,7 +1679,7 @@ func TestHandleUplink(t *testing.T) {
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
 					},
 					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
@@ -1700,7 +1716,7 @@ func TestHandleUplink(t *testing.T) {
 				now = clock.Add(time.Nanosecond)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
+					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
 				}), should.BeTrue) {
 					return false
 				}
@@ -1709,11 +1725,12 @@ func TestHandleUplink(t *testing.T) {
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(reqCtx, makeOTAAIdentifiers(nil), len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
+				var setCtx context.Context
 				var recentUp *ttnpb.UplinkMessage
 				select {
 				case <-ctx.Done():
@@ -1721,11 +1738,11 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, reqCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
-					dev, sets, err := req.Func(&ttnpb.EndDevice{
+					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1764,6 +1781,7 @@ func TestHandleUplink(t *testing.T) {
 						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers:       *makeOTAAIdentifiers(nil),
@@ -1773,11 +1791,12 @@ func TestHandleUplink(t *testing.T) {
 							CreatedAt:                  start,
 							UpdatedAt:                  time.Now(),
 						},
+						Context: setCtx,
 					}
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
 						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
@@ -1788,7 +1807,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 							{
 								CorrelationIDs:       reqCorrelationIDs,
@@ -1860,7 +1879,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -1868,7 +1887,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -1878,7 +1897,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
@@ -1889,7 +1909,7 @@ func TestHandleUplink(t *testing.T) {
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
 					},
 					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
@@ -1923,7 +1943,7 @@ func TestHandleUplink(t *testing.T) {
 				now = clock.Add(time.Nanosecond)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
+					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
 				}), should.BeTrue) {
 					return false
 				}
@@ -1932,11 +1952,12 @@ func TestHandleUplink(t *testing.T) {
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(reqCtx, makeOTAAIdentifiers(nil), len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
+				var setCtx context.Context
 				var recentUp *ttnpb.UplinkMessage
 				select {
 				case <-ctx.Done():
@@ -1944,11 +1965,11 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, reqCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
-					dev, sets, err := req.Func(&ttnpb.EndDevice{
+					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1987,6 +2008,7 @@ func TestHandleUplink(t *testing.T) {
 						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers:       *makeOTAAIdentifiers(nil),
@@ -1996,11 +2018,12 @@ func TestHandleUplink(t *testing.T) {
 							CreatedAt:                  start,
 							UpdatedAt:                  time.Now(),
 						},
+						Context: setCtx,
 					}
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
 						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
@@ -2011,7 +2034,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 							{
 								CorrelationIDs:       reqCorrelationIDs,
@@ -2083,7 +2106,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:    time.Now(),
 				}
 
-				var reqCtx context.Context
+				var getCtx context.Context
 				var reqCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -2091,7 +2114,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCtx = req.Context
+					getCtx = context.WithValue(req.Context, struct{}{}, "get")
 					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(reqCorrelationIDs, should.Contain, id)
@@ -2101,7 +2124,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.DevEUI, should.Resemble, devEUI)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
 					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device: CopyEndDevice(getDevice),
+						Device:  CopyEndDevice(getDevice),
+						Context: getCtx,
 					}
 				}
 
@@ -2112,7 +2136,7 @@ func TestHandleUplink(t *testing.T) {
 				var joinReq *ttnpb.JoinRequest
 				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
 					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
 							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
 					},
 					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
@@ -2149,7 +2173,7 @@ func TestHandleUplink(t *testing.T) {
 				now = clock.Add(time.Nanosecond)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(reqCtx, makeOTAAIdentifiers(nil), nil))
+					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
 				}), should.BeTrue) {
 					return false
 				}
@@ -2158,11 +2182,12 @@ func TestHandleUplink(t *testing.T) {
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(reqCtx, makeOTAAIdentifiers(nil), len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
+				var setCtx context.Context
 				var recentUp *ttnpb.UplinkMessage
 				select {
 				case <-ctx.Done():
@@ -2170,11 +2195,11 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, reqCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
-					dev, sets, err := req.Func(&ttnpb.EndDevice{
+					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -2213,6 +2238,7 @@ func TestHandleUplink(t *testing.T) {
 						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers:       *makeOTAAIdentifiers(nil),
@@ -2222,11 +2248,12 @@ func TestHandleUplink(t *testing.T) {
 							CreatedAt:                  start,
 							UpdatedAt:                  time.Now(),
 						},
+						Context: setCtx,
 					}
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
 						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
@@ -2237,7 +2264,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, reqCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 							{
 								CorrelationIDs:       reqCorrelationIDs,
@@ -2352,17 +2379,17 @@ func TestHandleUplink(t *testing.T) {
 					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
 					a.So(req.DevAddr, should.Resemble, devAddr)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					a.So(req.Func(CopyEndDevice(rangeDevice)), should.BeTrue)
+					a.So(req.Func(ctx, CopyEndDevice(rangeDevice)), should.BeTrue)
 					multicastDevice := CopyEndDevice(rangeDevice)
 					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
 					multicastDevice.Multicast = true
-					a.So(req.Func(multicastDevice), should.BeTrue)
+					a.So(req.Func(ctx, multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
 					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(fCntTooHighDevice), should.BeTrue)
+					a.So(req.Func(ctx, fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
 				}
 
@@ -2373,6 +2400,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now = clock.Add(time.Nanosecond)
 
+				var setCtx context.Context
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
@@ -2383,7 +2411,7 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					dev, sets, err := req.Func(CopyEndDevice(rangeDevice))
+					dev, sets, err := req.Func(ctx, CopyEndDevice(rangeDevice))
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
@@ -2422,6 +2450,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(dev.MACState, should.Resemble, macState)
 
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2434,12 +2463,13 @@ func TestHandleUplink(t *testing.T) {
 							CreatedAt:            start,
 							UpdatedAt:            now,
 						},
+						Context: setCtx,
 					}
 					mds = recentUp.RxMetadata
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
 						a.So(startAt, should.Resemble, start.Add(time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
@@ -2450,7 +2480,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 							{
 								CorrelationIDs:       upCorrelationIDs,
@@ -2484,25 +2514,25 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(setCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
+					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(upCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
+					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(setCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
+					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
 					return false
 				}
@@ -2581,17 +2611,17 @@ func TestHandleUplink(t *testing.T) {
 					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
 					a.So(req.DevAddr, should.Resemble, devAddr)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					a.So(req.Func(CopyEndDevice(rangeDevice)), should.BeTrue)
+					a.So(req.Func(ctx, CopyEndDevice(rangeDevice)), should.BeTrue)
 					multicastDevice := CopyEndDevice(rangeDevice)
 					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
 					multicastDevice.Multicast = true
-					a.So(req.Func(multicastDevice), should.BeTrue)
+					a.So(req.Func(ctx, multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
 					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(fCntTooHighDevice), should.BeTrue)
+					a.So(req.Func(ctx, fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
 				}
 
@@ -2602,6 +2632,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now = clock.Add(time.Nanosecond)
 
+				var setCtx context.Context
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
@@ -2612,7 +2643,7 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					dev, sets, err := req.Func(CopyEndDevice(rangeDevice))
+					dev, sets, err := req.Func(ctx, CopyEndDevice(rangeDevice))
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
@@ -2651,6 +2682,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(dev.MACState, should.Resemble, macState)
 
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2663,12 +2695,13 @@ func TestHandleUplink(t *testing.T) {
 							CreatedAt:            start,
 							UpdatedAt:            now,
 						},
+						Context: setCtx,
 					}
 					mds = recentUp.RxMetadata
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
 						a.So(startAt, should.Resemble, start.Add(time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
@@ -2679,7 +2712,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 							{
 								CorrelationIDs:       upCorrelationIDs,
@@ -2713,25 +2746,25 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(setCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
+					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(upCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
+					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(setCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
+					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
 					return false
 				}
@@ -2810,17 +2843,17 @@ func TestHandleUplink(t *testing.T) {
 					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
 					a.So(req.DevAddr, should.Resemble, devAddr)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					a.So(req.Func(CopyEndDevice(rangeDevice)), should.BeTrue)
+					a.So(req.Func(ctx, CopyEndDevice(rangeDevice)), should.BeTrue)
 					multicastDevice := CopyEndDevice(rangeDevice)
 					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
 					multicastDevice.Multicast = true
-					a.So(req.Func(multicastDevice), should.BeTrue)
+					a.So(req.Func(ctx, multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
 					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(fCntTooHighDevice), should.BeTrue)
+					a.So(req.Func(ctx, fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
 				}
 
@@ -2831,6 +2864,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now = clock.Add(time.Nanosecond)
 
+				var setCtx context.Context
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
@@ -2843,7 +2877,7 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
 					updatedDevice := CopyEndDevice(rangeDevice)
 					updatedDevice.UpdatedAt = time.Now()
-					dev, sets, err := req.Func(updatedDevice)
+					dev, sets, err := req.Func(ctx, updatedDevice)
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
@@ -2882,6 +2916,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(dev.MACState, should.Resemble, macState)
 
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -2894,12 +2929,13 @@ func TestHandleUplink(t *testing.T) {
 							CreatedAt:            start,
 							UpdatedAt:            now,
 						},
+						Context: setCtx,
 					}
 					mds = recentUp.RxMetadata
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
 						a.So(startAt, should.Resemble, start.Add(time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
@@ -2910,7 +2946,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 							{
 								CorrelationIDs:       upCorrelationIDs,
@@ -2944,25 +2980,25 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(setCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
+					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(upCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
+					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(setCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
+					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
 					return false
 				}
@@ -3044,16 +3080,16 @@ func TestHandleUplink(t *testing.T) {
 					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
 					a.So(req.DevAddr, should.Resemble, devAddr)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					a.So(req.Func(CopyEndDevice(rangeDevice)), should.BeTrue)
+					a.So(req.Func(ctx, CopyEndDevice(rangeDevice)), should.BeTrue)
 					multicastDevice := CopyEndDevice(rangeDevice)
 					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
 					multicastDevice.Multicast = true
-					a.So(req.Func(multicastDevice), should.BeTrue)
+					a.So(req.Func(ctx, multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(fCntTooHighDevice), should.BeTrue)
+					a.So(req.Func(ctx, fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
 				}
 
@@ -3064,6 +3100,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now = clock.Add(time.Nanosecond)
 
+				var setCtx context.Context
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
@@ -3074,7 +3111,7 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					dev, sets, err := req.Func(CopyEndDevice(rangeDevice))
+					dev, sets, err := req.Func(ctx, CopyEndDevice(rangeDevice))
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
@@ -3113,6 +3150,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(dev.MACState, should.Resemble, macState)
 
+					setCtx = context.WithValue(req.Context, struct{}{}, "set")
 					req.Response <- DeviceRegistrySetByIDResponse{
 						Device: &ttnpb.EndDevice{
 							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
@@ -3125,12 +3163,13 @@ func TestHandleUplink(t *testing.T) {
 							CreatedAt:            start,
 							UpdatedAt:            now,
 						},
+						Context: setCtx,
 					}
 					mds = recentUp.RxMetadata
 				}
 
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, upCtx) &&
+					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
 						a.So(startAt, should.Resemble, start.Add(time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
@@ -3141,19 +3180,19 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(upCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
+					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(setCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(upCtx, rangeDevice.EndDeviceIdentifiers, nil))
+					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
 				}), should.BeTrue) {
 					return false
 				}
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(upCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
+					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(setCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
 				}), should.BeTrue) {
 					return false
 				}

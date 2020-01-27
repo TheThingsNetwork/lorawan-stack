@@ -223,8 +223,8 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 		)
 	}
 
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, gets,
-		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, ctx, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, gets,
+		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
@@ -280,7 +280,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 
 	logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, req.EndDeviceIdentifiers))
 
-	dev, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
+	dev, ctx, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"frequency_plan_id",
 			"last_dev_status_received_at",
@@ -294,7 +294,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 			"recent_uplinks",
 			"session",
 		},
-		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound
 			}
@@ -342,7 +342,7 @@ func (ns *NetworkServer) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDe
 	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 		return nil, err
 	}
-	dev, err := ns.devices.GetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID, []string{"queued_application_downlinks"})
+	dev, ctx, err := ns.devices.GetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID, []string{"queued_application_downlinks"})
 	if err != nil {
 		return nil, err
 	}
