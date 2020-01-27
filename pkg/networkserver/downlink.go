@@ -932,8 +932,8 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	ctx = events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
 
 	rx1, rx2, paths := downlinkPathsForClassA(rxDelay, dev.MACState.RecentUplinks...)
-	if !rx1 && !rx2 {
-		logger.Warn("Rx1 and Rx2 are expired, skip class A downlink slot")
+	if len(paths) == 0 {
+		logger.Warn("No downlink path available, skip class A downlink slot")
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
@@ -943,10 +943,15 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			),
 		}
 	}
-	if len(paths) == 0 {
-		logger.Warn("No downlink path available, skip class A downlink slot")
+	if !rx1 && !rx2 {
+		logger.Warn("Rx1 and Rx2 are expired, skip class A downlink slot")
+		dev.MACState.QueuedResponses = nil
+		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths: sets,
+			SetPaths: append(sets,
+				"mac_state.queued_responses",
+				"mac_state.rx_windows_available",
+			),
 		}
 	}
 	if dev.MACState.DeviceClass != ttnpb.CLASS_A && !rx1 && rx2 && len(dev.MACState.QueuedResponses) == 0 {
@@ -1148,16 +1153,19 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					rxDelay := ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second)
 
 					rx1, rx2, paths := downlinkPathsForClassA(rxDelay, up)
-					if !rx1 && !rx2 {
-						logger.Warn("Rx1 and Rx2 are expired, skip downlink slot")
+					if len(paths) == 0 {
+						logger.Warn("No downlink path available, skip join-accept downlink slot")
 						dev.PendingMACState.RxWindowsAvailable = false
 						return dev, []string{
 							"pending_mac_state.rx_windows_available",
 						}, nil
 					}
-					if len(paths) == 0 {
-						logger.Warn("No downlink path available, skip downlink slot")
-						return dev, nil, nil
+					if !rx1 && !rx2 {
+						logger.Warn("Rx1 and Rx2 are expired, skip join-accept downlink slot")
+						dev.PendingMACState.RxWindowsAvailable = false
+						return dev, []string{
+							"pending_mac_state.rx_windows_available",
+						}, nil
 					}
 
 					req, err := txRequestFromUplink(phy, dev.PendingMACState, rx1, rx2, rxDelay, up)
