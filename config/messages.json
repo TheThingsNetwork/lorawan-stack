@@ -2024,15 +2024,6 @@
       "file": "linking.go"
     }
   },
-  "error:pkg/applicationserver:link_deleted": {
-    "translations": {
-      "en": "link deleted"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "grpc.go"
-    }
-  },
   "error:pkg/applicationserver:link_mode": {
     "translations": {
       "en": "invalid link mode `{value}`"
@@ -2040,15 +2031,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "config.go"
-    }
-  },
-  "error:pkg/applicationserver:link_reset": {
-    "translations": {
-      "en": "link reset"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "grpc.go"
     }
   },
   "error:pkg/applicationserver:listen_frontend": {
