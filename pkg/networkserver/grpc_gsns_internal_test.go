@@ -156,11 +156,13 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		}
 	}
 
+	deviceCtx := context.WithValue(test.Context(), struct{}{}, 42)
+
 	for _, tc := range []struct {
 		Name            string
 		Uplink          *ttnpb.UplinkMessage
 		Deduplicated    bool
-		Devices         []*ttnpb.EndDevice
+		Devices         []contextualEndDevice
 		DeviceAssertion func(ctx context.Context, dev *matchedDevice, up *ttnpb.UplinkMessage) bool
 		ErrorAssertion  func(ctx context.Context, err error) bool
 	}{
@@ -193,17 +195,20 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					Timestamp: 42,
 				},
 			),
-			Devices: []*ttnpb.EndDevice{
+			Devices: []contextualEndDevice{
 				{
-					EndDeviceIdentifiers: *makeABPIdentifiers(devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
-					Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 33),
-					MACSettings: &ttnpb.MACSettings{
-						ResetsFCnt:        &pbtypes.BoolValue{Value: true},
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+					Context: deviceCtx,
+					EndDevice: &ttnpb.EndDevice{
+						EndDeviceIdentifiers: *makeABPIdentifiers(devAddr),
+						FrequencyPlanID:      test.EUFrequencyPlanID,
+						LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
+						LoRaWANVersion:       ttnpb.MAC_V1_1,
+						MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
+						Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 33),
+						MACSettings: &ttnpb.MACSettings{
+							ResetsFCnt:        &pbtypes.BoolValue{Value: true},
+							Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+						},
 					},
 				},
 			},
@@ -219,8 +224,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
-					logger:              dev.logger,
 					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
+					Context:             dev.Context,
 					ChannelIndex:        1,
 					DataRateIndex:       ttnpb.DATA_RATE_2,
 					DeferredMACHandlers: dev.DeferredMACHandlers,
@@ -249,6 +254,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 
 				if !a.So([]time.Time{start, dev.Device.Session.StartedAt, time.Now()}, should.BeChronological) ||
 					!a.So(dev.DeferredMACHandlers, should.HaveLength, 1) ||
+					!a.So(dev.Context, should.HaveParentContext, deviceCtx) ||
 					!a.So(dev, should.HaveEmptyDiff, expectedDev) {
 					return false
 				}
@@ -302,21 +308,24 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					Timestamp: 42,
 				},
 			),
-			Devices: []*ttnpb.EndDevice{
+			Devices: []contextualEndDevice{
 				{
-					EndDeviceIdentifiers: *makeABPIdentifiers(devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACState: func() *ttnpb.MACState {
-						macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1)
-						macState.PendingApplicationDownlink = makeApplicationDownlink()
-						return macState
-					}(),
-					Session: makeSession(ttnpb.MAC_V1_1, devAddr, 33),
-					MACSettings: &ttnpb.MACSettings{
-						ResetsFCnt:        &pbtypes.BoolValue{Value: true},
-						Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+					Context: deviceCtx,
+					EndDevice: &ttnpb.EndDevice{
+						EndDeviceIdentifiers: *makeABPIdentifiers(devAddr),
+						FrequencyPlanID:      test.EUFrequencyPlanID,
+						LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
+						LoRaWANVersion:       ttnpb.MAC_V1_1,
+						MACState: func() *ttnpb.MACState {
+							macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1)
+							macState.PendingApplicationDownlink = makeApplicationDownlink()
+							return macState
+						}(),
+						Session: makeSession(ttnpb.MAC_V1_1, devAddr, 33),
+						MACSettings: &ttnpb.MACSettings{
+							ResetsFCnt:        &pbtypes.BoolValue{Value: true},
+							Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+						},
 					},
 				},
 			},
@@ -332,8 +341,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
-					logger:              dev.logger,
 					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
+					Context:             dev.Context,
 					ChannelIndex:        1,
 					DataRateIndex:       ttnpb.DATA_RATE_2,
 					DeferredMACHandlers: dev.DeferredMACHandlers,
@@ -364,6 +373,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				}
 				if !a.So([]time.Time{start, dev.Device.Session.StartedAt, time.Now()}, should.BeChronological) ||
 					!a.So(dev.DeferredMACHandlers, should.HaveLength, 1) ||
+					!a.So(dev.Context, should.HaveParentContext, deviceCtx) ||
 					!a.So(dev, should.HaveEmptyDiff, expectedDev) {
 					return false
 				}
@@ -417,16 +427,19 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					Timestamp: 42,
 				},
 			),
-			Devices: []*ttnpb.EndDevice{
+			Devices: []contextualEndDevice{
 				{
-					EndDeviceIdentifiers: *makeABPIdentifiers(devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
-					Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 33),
-					MACSettings: &ttnpb.MACSettings{
-						ResetsFCnt: &pbtypes.BoolValue{Value: true},
+					Context: deviceCtx,
+					EndDevice: &ttnpb.EndDevice{
+						EndDeviceIdentifiers: *makeABPIdentifiers(devAddr),
+						FrequencyPlanID:      test.EUFrequencyPlanID,
+						LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
+						LoRaWANVersion:       ttnpb.MAC_V1_1,
+						MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
+						Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 33),
+						MACSettings: &ttnpb.MACSettings{
+							ResetsFCnt: &pbtypes.BoolValue{Value: true},
+						},
 					},
 				},
 			},
@@ -442,8 +455,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
-					logger:              dev.logger,
 					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
+					Context:             dev.Context,
 					ChannelIndex:        1,
 					DataRateIndex:       ttnpb.DATA_RATE_2,
 					DeferredMACHandlers: dev.DeferredMACHandlers,
@@ -470,6 +483,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				}
 				if !a.So([]time.Time{start, dev.Device.Session.StartedAt, time.Now()}, should.BeChronological) ||
 					!a.So(dev.DeferredMACHandlers, should.HaveLength, 1) ||
+					!a.So(dev.Context, should.HaveParentContext, deviceCtx) ||
 					!a.So(dev, should.HaveEmptyDiff, expectedDev) {
 					return false
 				}
@@ -526,30 +540,33 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					Timestamp: 42,
 				},
 			),
-			Devices: []*ttnpb.EndDevice{
+			Devices: []contextualEndDevice{
 				{
-					EndDeviceIdentifiers: *makeABPIdentifiers(devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACState: func() *ttnpb.MACState {
-						macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
-						macState.PendingApplicationDownlink = makeApplicationDownlink()
-						macState.RecentDownlinks = []*ttnpb.DownlinkMessage{
-							{
-								Payload: &ttnpb.Message{
-									MHDR: ttnpb.MHDR{
-										MType: ttnpb.MType_CONFIRMED_DOWN,
-									},
-									Payload: &ttnpb.Message_MACPayload{
-										MACPayload: &ttnpb.MACPayload{},
+					Context: deviceCtx,
+					EndDevice: &ttnpb.EndDevice{
+						EndDeviceIdentifiers: *makeABPIdentifiers(devAddr),
+						FrequencyPlanID:      test.EUFrequencyPlanID,
+						LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
+						LoRaWANVersion:       ttnpb.MAC_V1_1,
+						MACState: func() *ttnpb.MACState {
+							macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+							macState.PendingApplicationDownlink = makeApplicationDownlink()
+							macState.RecentDownlinks = []*ttnpb.DownlinkMessage{
+								{
+									Payload: &ttnpb.Message{
+										MHDR: ttnpb.MHDR{
+											MType: ttnpb.MType_CONFIRMED_DOWN,
+										},
+										Payload: &ttnpb.Message_MACPayload{
+											MACPayload: &ttnpb.MACPayload{},
+										},
 									},
 								},
-							},
-						}
-						return macState
-					}(),
-					Session: makeSession(ttnpb.MAC_V1_1, devAddr, 10),
+							}
+							return macState
+						}(),
+						Session: makeSession(ttnpb.MAC_V1_1, devAddr, 10),
+					},
 				},
 			},
 			DeviceAssertion: func(ctx context.Context, dev *matchedDevice, up *ttnpb.UplinkMessage) bool {
@@ -574,8 +591,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 				}
 				expectedDev := &matchedDevice{
-					logger:              dev.logger,
 					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
+					Context:             dev.Context,
 					ChannelIndex:        1,
 					DataRateIndex:       ttnpb.DATA_RATE_2,
 					DeferredMACHandlers: dev.DeferredMACHandlers,
@@ -600,6 +617,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 				}
 				if !a.So(dev.DeferredMACHandlers, should.HaveLength, 1) ||
+					!a.So(dev.Context, should.HaveParentContext, deviceCtx) ||
 					!a.So(dev, should.HaveEmptyDiff, expectedDev) {
 					return false
 				}
@@ -632,7 +650,14 @@ func TestMatchAndHandleUplink(t *testing.T) {
 
 			<-env.DownlinkTasks.Pop
 
-			dev, err := ns.matchAndHandleDataUplink(ctx, CopyUplinkMessage(tc.Uplink), tc.Deduplicated, CopyEndDevices(tc.Devices...)...)
+			devs := append(tc.Devices[:0:0], tc.Devices...)
+			for i, dev := range devs {
+				devs[i] = contextualEndDevice{
+					Context:   dev.Context,
+					EndDevice: CopyEndDevice(dev.EndDevice),
+				}
+			}
+			dev, err := ns.matchAndHandleDataUplink(CopyUplinkMessage(tc.Uplink), tc.Deduplicated, devs...)
 			a.So(tc.DeviceAssertion(ctx, dev, CopyUplinkMessage(tc.Uplink)), should.BeTrue)
 			a.So(tc.ErrorAssertion(ctx, err), should.BeTrue)
 		})
