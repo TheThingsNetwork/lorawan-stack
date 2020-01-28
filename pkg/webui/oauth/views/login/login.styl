@@ -17,14 +17,19 @@
   display: flex
   justify-content: center
   align-items: center
+  padding: $ls.xs 0
+  +media-query($bp.s)
+    height: auto
 
   & > div
+    nudge('up', 4%)
+    nudge('left', 2%)
     display: flex
     justify-content: center
     align-items: center
-    nudge('up', 4%)
-    nudge('left', 2%)
+    box-sizing: border-box
     +media-query($bp.s)
+      width: 100%
       flex-direction: column
       top: 0
       left: 0
