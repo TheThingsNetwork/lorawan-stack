@@ -54,7 +54,9 @@ class LocationForm extends Component {
     /** The handler for the submit function of the form */
     onSubmit: PropTypes.func.isRequired,
     /** The validation schema of the form */
-    validationSchema: PropTypes.shape({}).isRequired,
+    validationSchema: PropTypes.shape({
+      cast: PropTypes.func.isRequired,
+    }).isRequired,
   }
 
   static defaultProps = {
@@ -76,12 +78,12 @@ class LocationForm extends Component {
   }
 
   async onSubmit(values, { resetForm, setSubmitting }) {
-    const { onSubmit, entityId } = this.props
+    const { onSubmit, entityId, validationSchema } = this.props
 
     this.setState({ error: '' })
 
     try {
-      await onSubmit(values)
+      await onSubmit(validationSchema.cast(values))
       resetForm()
       toast({
         title: entityId,
