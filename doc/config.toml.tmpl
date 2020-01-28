@@ -26,6 +26,11 @@ pygmentsUseClasses = true
   github_repository_edit = "https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content"
   version = "{{.CurrentVersion}}"
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
 [menu]
   [[menu.right]]
     name = "GitHub"
