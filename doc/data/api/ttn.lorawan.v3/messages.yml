@@ -548,6 +548,10 @@ ApplicationPubSub:
     message:
       name: ApplicationPubSub.MQTTProvider
     default: {}
+  - name: aws_iot
+    message:
+      name: ApplicationPubSub.AWSIoTProvider
+    default: {}
   - name: base_topic
     comment: Base topic name to which the messages topic is appended.
     type: string
@@ -606,6 +610,76 @@ ApplicationPubSub:
     field_names:
     - nats
     - mqtt
+    - aws_iot
+ApplicationPubSub.AWSIoTProvider:
+  name: ApplicationPubSub.AWSIoTProvider
+  fields:
+  - name: region
+    comment: The AWS region.
+    type: string
+    rules:
+      in:
+      - ap-east-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-south-1
+      - ap-southeast-1
+      - ap-southeast-2
+      - ca-central-1
+      - eu-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - me-south-1
+      - sa-east-1
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+    default: ""
+  - name: access_key
+    comment: If set, the integration will use an AWS access key.
+    message:
+      name: ApplicationPubSub.AWSIoTProvider.AccessKey
+    default: {}
+  - name: assume_role
+    comment: If set, the integration will assume the given role during operation.
+    message:
+      name: ApplicationPubSub.AWSIoTProvider.AssumeRole
+    default: {}
+  - name: endpoint_address
+    comment: |-
+      The endpoint address to connect to. If the endpoint address is left empty,
+      the integration will try to discover it.
+    type: string
+    default: ""
+ApplicationPubSub.AWSIoTProvider.AccessKey:
+  name: ApplicationPubSub.AWSIoTProvider.AccessKey
+  fields:
+  - name: access_key_id
+    type: string
+    default: ""
+  - name: secret_access_key
+    type: string
+    default: ""
+  - name: session_token
+    type: string
+    default: ""
+ApplicationPubSub.AWSIoTProvider.AssumeRole:
+  name: ApplicationPubSub.AWSIoTProvider.AssumeRole
+  fields:
+  - name: arn
+    type: string
+    default: ""
+  - name: external_id
+    type: string
+    default: ""
+  - name: session_duration
+    message:
+      package: google.protobuf
+      name: Duration
+    default: 0s
 ApplicationPubSub.MQTTProvider:
   name: ApplicationPubSub.MQTTProvider
   comment: The MQTT provider settings.

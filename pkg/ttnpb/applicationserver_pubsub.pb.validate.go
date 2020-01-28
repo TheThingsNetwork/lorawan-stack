@@ -364,7 +364,7 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 			}
 			if len(subs) == 0 {
 				subs = []string{
-					"nats", "mqtt",
+					"nats", "mqtt", "aws_iot",
 				}
 			}
 			for name, subs := range _processPaths(subs) {
@@ -396,6 +396,22 @@ func (m *ApplicationPubSub) ValidateFields(paths ...string) error {
 						if err := v.ValidateFields(subs...); err != nil {
 							return ApplicationPubSubValidationError{
 								field:  "mqtt",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "aws_iot":
+					w, ok := m.Provider.(*ApplicationPubSub_AWSIoT)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetAWSIoT()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ApplicationPubSubValidationError{
+								field:  "aws_iot",
 								reason: "embedded message failed validation",
 								cause:  err,
 							}
@@ -1207,6 +1223,144 @@ var _ interface {
 	ErrorName() string
 } = ApplicationPubSub_MQTTProviderValidationError{}
 
+// ValidateFields checks the field values on ApplicationPubSub_AWSIoTProvider
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *ApplicationPubSub_AWSIoTProvider) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationPubSub_AWSIoTProviderFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "region":
+
+			if _, ok := _ApplicationPubSub_AWSIoTProvider_Region_InLookup[m.GetRegion()]; !ok {
+				return ApplicationPubSub_AWSIoTProviderValidationError{
+					field:  "region",
+					reason: "value must be in list [ap-east-1 ap-northeast-1 ap-northeast-2 ap-south-1 ap-southeast-1 ap-southeast-2 ca-central-1 eu-central-1 eu-north-1 eu-west-1 eu-west-2 eu-west-3 me-south-1 sa-east-1 us-east-1 us-east-2 us-west-1 us-west-2]",
+				}
+			}
+
+		case "access_key":
+
+			if v, ok := interface{}(m.GetAccessKey()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPubSub_AWSIoTProviderValidationError{
+						field:  "access_key",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "assume_role":
+
+			if v, ok := interface{}(m.GetAssumeRole()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPubSub_AWSIoTProviderValidationError{
+						field:  "assume_role",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "endpoint_address":
+			// no validation rules for EndpointAddress
+		default:
+			return ApplicationPubSub_AWSIoTProviderValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationPubSub_AWSIoTProviderValidationError is the validation error
+// returned by ApplicationPubSub_AWSIoTProvider.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationPubSub_AWSIoTProviderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationPubSub_AWSIoTProviderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationPubSub_AWSIoTProviderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationPubSub_AWSIoTProviderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationPubSub_AWSIoTProviderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationPubSub_AWSIoTProviderValidationError) ErrorName() string {
+	return "ApplicationPubSub_AWSIoTProviderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationPubSub_AWSIoTProviderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationPubSub_AWSIoTProvider.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationPubSub_AWSIoTProviderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationPubSub_AWSIoTProviderValidationError{}
+
+var _ApplicationPubSub_AWSIoTProvider_Region_InLookup = map[string]struct{}{
+	"ap-east-1":      {},
+	"ap-northeast-1": {},
+	"ap-northeast-2": {},
+	"ap-south-1":     {},
+	"ap-southeast-1": {},
+	"ap-southeast-2": {},
+	"ca-central-1":   {},
+	"eu-central-1":   {},
+	"eu-north-1":     {},
+	"eu-west-1":      {},
+	"eu-west-2":      {},
+	"eu-west-3":      {},
+	"me-south-1":     {},
+	"sa-east-1":      {},
+	"us-east-1":      {},
+	"us-east-2":      {},
+	"us-west-1":      {},
+	"us-west-2":      {},
+}
+
 // ValidateFields checks the field values on ApplicationPubSub_Message with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -1297,3 +1451,190 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ApplicationPubSub_MessageValidationError{}
+
+// ValidateFields checks the field values on
+// ApplicationPubSub_AWSIoTProvider_AccessKey with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *ApplicationPubSub_AWSIoTProvider_AccessKey) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationPubSub_AWSIoTProvider_AccessKeyFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "access_key_id":
+			// no validation rules for AccessKeyID
+		case "secret_access_key":
+			// no validation rules for SecretAccessKey
+		case "session_token":
+			// no validation rules for SessionToken
+		default:
+			return ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError is the validation
+// error returned by ApplicationPubSub_AWSIoTProvider_AccessKey.ValidateFields
+// if the designated constraints aren't met.
+type ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError) ErrorName() string {
+	return "ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationPubSub_AWSIoTProvider_AccessKey.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationPubSub_AWSIoTProvider_AccessKeyValidationError{}
+
+// ValidateFields checks the field values on
+// ApplicationPubSub_AWSIoTProvider_AssumeRole with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *ApplicationPubSub_AWSIoTProvider_AssumeRole) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ApplicationPubSub_AWSIoTProvider_AssumeRoleFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "arn":
+			// no validation rules for ARN
+		case "external_id":
+			// no validation rules for ExternalID
+		case "session_duration":
+
+			if v, ok := interface{}(m.GetSessionDuration()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{
+						field:  "session_duration",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError is the validation
+// error returned by
+// ApplicationPubSub_AWSIoTProvider_AssumeRole.ValidateFields if the
+// designated constraints aren't met.
+type ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError) ErrorName() string {
+	return "ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplicationPubSub_AWSIoTProvider_AssumeRole.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplicationPubSub_AWSIoTProvider_AssumeRoleValidationError{}

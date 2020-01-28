@@ -17,6 +17,7 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
@@ -71,12 +72,41 @@ message ApplicationPubSub {
     // HTTP headers to use on MQTT-over-Websocket connections.
     map<string,string> headers = 11;
   }
+
+  message AWSIoTProvider {
+    // The AWS region.
+    string region = 1 [(validate.rules).string = { in: ["ap-east-1", "ap-northeast-1", "ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-3", "me-south-1", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2"] }];
+
+    message AccessKey {
+      string access_key_id = 1 [(gogoproto.customname) = "AccessKeyID"];
+      string secret_access_key = 2;
+      string session_token = 3;
+    }
+
+    // If set, the integration will use an AWS access key.
+    AccessKey access_key = 2;
+
+    message AssumeRole {
+      string arn = 1 [(gogoproto.customname) = "ARN"];
+      string external_id = 2 [(gogoproto.customname) = "ExternalID"];
+      google.protobuf.Duration session_duration = 3 [(gogoproto.stdduration) = true];
+    }
+
+    // If set, the integration will assume the given role during operation.
+    AssumeRole assume_role = 3;
+
+    // The endpoint address to connect to. If the endpoint address is left empty,
+    // the integration will try to discover it.
+    string endpoint_address = 4;
+  }
+
   // The provider for the PubSub.
   oneof provider {
     option (validate.required) = true;
 
     NATSProvider nats = 17 [(gogoproto.customname) = "NATS"];
     MQTTProvider mqtt = 25 [(gogoproto.customname) = "MQTT"];
+    AWSIoTProvider aws_iot = 101 [(gogoproto.customname) = "AWSIoT"];
   };
 
   // Base topic name to which the messages topic is appended.

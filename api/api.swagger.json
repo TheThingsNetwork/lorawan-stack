@@ -7340,6 +7340,34 @@
     }
   },
   "definitions": {
+    "AWSIoTProviderAccessKey": {
+      "type": "object",
+      "properties": {
+        "access_key_id": {
+          "type": "string"
+        },
+        "secret_access_key": {
+          "type": "string"
+        },
+        "session_token": {
+          "type": "string"
+        }
+      }
+    },
+    "AWSIoTProviderAssumeRole": {
+      "type": "object",
+      "properties": {
+        "arn": {
+          "type": "string"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "session_duration": {
+          "type": "string"
+        }
+      }
+    },
     "ApplicationDownlinkClassBC": {
       "type": "object",
       "properties": {
@@ -7354,6 +7382,27 @@
           "type": "string",
           "format": "date-time",
           "description": "Absolute time when the downlink message should be transmitted.\nThis requires the gateway to have GPS time synchronization.\nIf the time is in the past or if there is a scheduling conflict, the downlink message fails.\nIf null, the time is selected based on slot availability. This is recommended in class B mode."
+        }
+      }
+    },
+    "ApplicationPubSubAWSIoTProvider": {
+      "type": "object",
+      "properties": {
+        "region": {
+          "type": "string",
+          "description": "The AWS region."
+        },
+        "access_key": {
+          "$ref": "#/definitions/AWSIoTProviderAccessKey",
+          "description": "If set, the integration will use an AWS access key."
+        },
+        "assume_role": {
+          "$ref": "#/definitions/AWSIoTProviderAssumeRole",
+          "description": "If set, the integration will assume the given role during operation."
+        },
+        "endpoint_address": {
+          "type": "string",
+          "description": "The endpoint address to connect to. If the endpoint address is left empty,\nthe integration will try to discover it."
         }
       }
     },
@@ -8895,6 +8944,9 @@
         },
         "mqtt": {
           "$ref": "#/definitions/ApplicationPubSubMQTTProvider"
+        },
+        "aws_iot": {
+          "$ref": "#/definitions/ApplicationPubSubAWSIoTProvider"
         },
         "base_topic": {
           "type": "string",
