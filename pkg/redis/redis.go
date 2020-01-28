@@ -89,12 +89,14 @@ func newRedisClient(conf config.Redis) *redis.Client {
 			SentinelAddrs: conf.Failover.Addresses,
 			Password:      conf.Password,
 			DB:            conf.Database,
+			PoolSize:      conf.PoolSize,
 		})
 	}
 	return redis.NewClient(&redis.Options{
 		Addr:     conf.Address,
 		Password: conf.Password,
 		DB:       conf.Database,
+		PoolSize: conf.PoolSize,
 	})
 }
 

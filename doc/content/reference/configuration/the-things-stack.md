@@ -110,6 +110,7 @@ Redis configuration options:
 - `redis.password`: Password of the Redis server
 - `redis.database`: Redis database to use
 - `redis.namespace`: Namespace for Redis keys
+- `redis.pool-size`: The maximum size of the connection pool
 
 If connecting to a single Redis instance:
 
@@ -154,6 +155,7 @@ When using the `redis` backend, the global [Redis configuration]({{< ref "#redis
 - `events.redis.password`: Password of the Redis server
 - `events.redis.database`: Redis database to use
 - `events.redis.namespace`: Namespace for Redis keys
+- `events.redis.pool-size`: The maximum size of the connection pool
 
 With the `cloud` backend, the configured publish and subscribe URLs are passed to [the Go CDK](https://gocloud.dev/howto/pubsub/).
 

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Responsive side navigation (inside entity views) to the Console.
 - Overall responsiveness of the Console.
+- Support for custom Redis connection pool sizes (see `--redis.pool-size`).
 
 ### Changed
 
