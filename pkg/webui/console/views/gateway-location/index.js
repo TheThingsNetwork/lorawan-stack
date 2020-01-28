@@ -81,7 +81,6 @@ const getRegistryLocation = function(antennas) {
 @withFeatureRequirement(mayViewOrEditGatewayLocation, {
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
-@bind
 export default class GatewayLocation extends React.Component {
   static propTypes = {
     gateway: PropTypes.gateway.isRequired,
@@ -89,6 +88,7 @@ export default class GatewayLocation extends React.Component {
     updateGateway: PropTypes.func.isRequired,
   }
 
+  @bind
   async handleSubmit(values) {
     const { gateway, gtwId, updateGateway } = this.props
 
@@ -118,6 +118,7 @@ export default class GatewayLocation extends React.Component {
     await updateGateway(gtwId, patch)
   }
 
+  @bind
   async handleDelete() {
     const { gateway, gtwId, updateGateway } = this.props
     const registryLocation = getRegistryLocation(gateway.antennas)

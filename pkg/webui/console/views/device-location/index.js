@@ -84,7 +84,6 @@ const getRegistryLocation = function(locations) {
     />
   )
 })
-@bind
 export default class DeviceGeneralSettings extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -93,6 +92,7 @@ export default class DeviceGeneralSettings extends React.Component {
     updateDevice: PropTypes.func.isRequired,
   }
 
+  @bind
   async handleSubmit(values) {
     const { device, appId, devId, updateDevice } = this.props
 
@@ -121,6 +121,7 @@ export default class DeviceGeneralSettings extends React.Component {
     await updateDevice(appId, devId, patch)
   }
 
+  @bind
   async handleDelete() {
     const { device, devId, appId, updateDevice } = this.props
     const registryLocation = getRegistryLocation(device.locations)

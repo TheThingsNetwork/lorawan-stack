@@ -37,7 +37,6 @@ const m = defineMessages({
   deleteSuccess: 'The location has been removed successfully',
 })
 
-@bind
 class LocationForm extends Component {
   static propTypes = {
     entityId: PropTypes.string.isRequired,
@@ -77,6 +76,7 @@ class LocationForm extends Component {
     error: '',
   }
 
+  @bind
   async onSubmit(values, { resetForm, setSubmitting }) {
     const { onSubmit, entityId, validationSchema } = this.props
 
@@ -96,6 +96,7 @@ class LocationForm extends Component {
     }
   }
 
+  @bind
   async onDelete() {
     const { onDelete, entityId } = this.props
 
