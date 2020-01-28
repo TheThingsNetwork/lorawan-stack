@@ -26,6 +26,9 @@
     min-width: 6rem
     padding-right: $cs.xs
 
+  +media-query($bp.m)
+    margin-bottom: $ls.xs
+
 tr.group-heading
   height: auto
   vertical-align: bottom
@@ -37,6 +40,8 @@ tr.group-heading
     font-weight: 600
     width: 33%
     white-space: nowrap
+    +media-query($bp.s)
+      width: 50%
 
 .sub th
   padding-left: $cs.l

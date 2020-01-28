@@ -58,10 +58,11 @@ class Table extends React.Component {
   static Empty = Empty
 
   render() {
-    const { className, children, ...rest } = this.props
+    const { className, children, minWidth, ...rest } = this.props
     const tableClassNames = classnames(className, style.table)
+    const minWidthProp = Boolean(minWidth) ? { style: { minWidth } } : {}
     return (
-      <table className={tableClassNames} {...rest}>
+      <table className={tableClassNames} {...minWidthProp} {...rest}>
         {children}
       </table>
     )
@@ -71,11 +72,13 @@ class Table extends React.Component {
 Table.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
+  minWidth: PropTypes.string,
 }
 
 Table.defaultProps = {
   className: undefined,
   children: undefined,
+  minWidth: undefined,
 }
 
 export default Table

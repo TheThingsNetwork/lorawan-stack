@@ -23,6 +23,7 @@
 .title
   text-margin-top($ls.m)
   text-margin-bottom($cs.m)
+  font-weight: bold
 
 .id
   one-liner()
@@ -45,7 +46,11 @@
 
 .creation-date
   color: $tc-subtle-gray
+  +media-query($bp.s)
+    display: none
 
 .h-rule
   margin-top: 0
   margin-bottom: $ls.m
+  +media-query($bp.s)
+    margin-bottom: $ls.s

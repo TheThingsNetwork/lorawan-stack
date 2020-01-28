@@ -32,7 +32,7 @@
       max-width: 780px
 
     +media-query($bp.s)
-      full-screen()
+      full-screen($ls.xxs)
       border: 0
       border-radius: 0
       justify-content: space-between
@@ -110,14 +110,14 @@
   & > div:last-child
     display: flex
     align-items: center
-    +media-query($bp.xxs)
-      flex-direction: column
+    +media-query($bp.s)
+      flex-direction: row
       justify-content: flex-end
       align-items: stretch
 
       button:not(:last-child)
         margin-right: 0
-        margin-bottom: $cs.s
+        margin-right: $cs.s
 
 .logo
   width: 170px

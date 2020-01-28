@@ -79,6 +79,7 @@ class Organization extends React.Component {
               title={sharedMessages.overview}
               icon="overview"
               path={matchedUrl}
+              exact
             />
           )}
           <SideNavigation.Item

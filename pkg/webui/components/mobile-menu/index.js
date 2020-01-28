@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
@@ -30,6 +30,11 @@ const m = defineMessages({
 })
 
 const MobileMenu = ({ className, children, user, onItemsClick, onLogout }) => {
+  const handleLogoutClick = useCallback(() => {
+    onItemsClick()
+    onLogout()
+  }, [onItemsClick, onLogout])
+
   return (
     <div className={classnames(className, style.container)}>
       <Dropdown
@@ -40,19 +45,26 @@ const MobileMenu = ({ className, children, user, onItemsClick, onLogout }) => {
       >
         {children}
       </Dropdown>
-      <div className={style.userHeader}>
-        <div className={style.userMessage}>
-          <Icon className={style.userIcon} icon="person" nudgeUp />
-          <Message
-            className={style.userMessage}
-            content={m.loggedInAs}
-            values={{ userId: user.ids.user_id, b: (...chunks) => <b key="1"> {chunks}</b> }}
-          />
+      {Boolean(user) && (
+        <div className={style.userHeader}>
+          <div className={style.userMessage}>
+            <Icon className={style.userIcon} icon="person" nudgeUp />
+            <Message
+              className={style.userMessage}
+              content={m.loggedInAs}
+              values={{ userId: user.ids.user_id, b: (...chunks) => <b key="1"> {chunks}</b> }}
+            />
+          </div>
+          <div>
+            <Button
+              message={sharedMessages.logout}
+              icon="logout"
+              onClick={handleLogoutClick}
+              naked
+            />
+          </div>
         </div>
-        <div>
-          <Button message={sharedMessages.logout} icon="logout" onClick={onLogout} naked />
-        </div>
-      </div>
+      )}
     </div>
   )
 }

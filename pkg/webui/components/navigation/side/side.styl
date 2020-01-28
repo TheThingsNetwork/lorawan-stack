@@ -21,6 +21,7 @@
   display: flex
   flex-direction: column
   justify-content: space-between
+  box-sizing: border-box
   +media-query($bp.s)
     max-width: none
     width: 100%
@@ -83,6 +84,7 @@
     left: -60vw
     bottom: 0
     width: 60vw
+    max-width: 20rem
     transition: left 330ms cubic-bezier(.18,.71,.3,.99), box-shadow 330ms cubic-bezier(.18,.71,.3,.99)
 
     &-open

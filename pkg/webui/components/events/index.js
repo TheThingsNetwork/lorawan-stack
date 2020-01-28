@@ -143,19 +143,21 @@ class Events extends React.Component {
     const footer = <Footer truncated={truncated} />
 
     return (
-      <List
-        bordered
-        size="none"
-        className={className}
-        listClassName={style.list}
-        header={header}
-        footer={footer}
-        items={limitedEvents}
-        renderItem={this.renderEvent}
-        rowKey={this.getEventkey}
-        emptyMessage={sharedMessages.noEvents}
-        emptyMessageValues={{ entityId: emitterId }}
-      />
+      <div className={style.container}>
+        <List
+          bordered
+          size="none"
+          className={classnames(style.listContainer, className)}
+          listClassName={style.list}
+          header={header}
+          footer={footer}
+          items={limitedEvents}
+          renderItem={this.renderEvent}
+          rowKey={this.getEventkey}
+          emptyMessage={sharedMessages.noEvents}
+          emptyMessageValues={{ entityId: emitterId }}
+        />
+      </div>
     )
   }
 }

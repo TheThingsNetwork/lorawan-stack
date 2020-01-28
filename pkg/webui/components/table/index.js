@@ -14,6 +14,8 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
+import classnames from 'classnames'
+
 import PropTypes from '../../lib/prop-types'
 import getByPath from '../../lib/get-by-path'
 
@@ -97,6 +99,8 @@ class Tabular extends React.Component {
       </Table.Row>
     )
 
+    const minWidth = `${headers.length * 10}rem`
+
     const paginatedData = this.handlePagination(data)
     const rows =
       paginatedData.length > 0 ? (
@@ -137,9 +141,9 @@ class Tabular extends React.Component {
     ) : null
 
     return (
-      <div className={className}>
+      <div className={classnames(style.container, className)}>
         <Overlay visible={loading} loading={loading}>
-          <Table>
+          <Table minWidth={minWidth}>
             <Table.Head>{columns}</Table.Head>
             <Table.Body>{rows}</Table.Body>
             <Table.Footer>{pagination}</Table.Footer>

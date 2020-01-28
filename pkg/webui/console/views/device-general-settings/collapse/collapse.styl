@@ -16,24 +16,23 @@
   border-normal('bottom')
 
 .header
-  display: block
+  horizontalize()
+  align-items: center
   position: relative
-  padding-right: $ls.xl
-  padding-top: $ls.s
-  padding-bottom: $ls.s
+  padding: $ls.s 0
+
+  .content
+    padding-right: $cs.s
 
   .title
     margin-top:0
-    margin-bottom: $cs.xs
+    margin-bottom: $cs.s
 
   .description
-    one-liner()
+    text-margin-top()
+
+  .expand-button
+    min-width: 5.5rem
 
 .content
   display: block
-
-.expand-button
-  position: absolute
-  right: 0
-  top: 50%
-  transform: translateY(-50%)

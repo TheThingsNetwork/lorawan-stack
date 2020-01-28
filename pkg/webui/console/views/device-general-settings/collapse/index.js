@@ -42,15 +42,19 @@ const Collapse = props => {
   return (
     <section className={cls}>
       <div className={style.header}>
-        <Message className={style.title} component="h3" content={title} />
-        <Message className={style.description} component="p" content={description} />
-        <Button
-          secondary
-          className={style.expandButton}
-          disabled={disabled}
-          message={collapsed ? m.expand : m.collapse}
-          onClick={onCollapsedChange}
-        />
+        <div className={style.content}>
+          <Message className={style.title} component="h3" content={title} />
+          <Message className={style.description} component="p" content={description} />
+        </div>
+        <div className={style.button}>
+          <Button
+            secondary
+            className={style.expandButton}
+            disabled={disabled}
+            message={collapsed ? m.expand : m.collapse}
+            onClick={onCollapsedChange}
+          />
+        </div>
       </div>
       {isOpen && <div className={style.content}>{children}</div>}
     </section>

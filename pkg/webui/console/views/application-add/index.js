@@ -39,8 +39,6 @@ import { mayCreateApplications, mayLinkApplication } from '../../lib/feature-che
 
 import api from '../../api'
 
-import style from './application-add.styl'
-
 const m = defineMessages({
   applicationName: 'Application Name',
   appIdPlaceholder: 'my-new-application',
@@ -193,8 +191,8 @@ export default class Add extends React.Component {
     return (
       <Container>
         <PageTitle tall title={sharedMessages.addApplication} />
-        <Row className={style.wrapper}>
-          <Col className={style.form} md={10} lg={9}>
+        <Row>
+          <Col md={10} lg={9}>
             <Form
               error={error}
               onSubmit={this.handleSubmit}

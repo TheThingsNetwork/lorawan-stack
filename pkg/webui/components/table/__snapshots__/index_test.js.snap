@@ -1,12 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Table has clickable rows should match snapshot 1`] = `
-<div>
+<div
+  className="container"
+>
   <Overlay
     loading={false}
     visible={false}
   >
-    <Table>
+    <Table
+      minWidth="20rem"
+    >
       <Component>
         <Row
           body={true}
@@ -80,12 +84,16 @@ exports[`Table has clickable rows should match snapshot 1`] = `
 `;
 
 exports[`Table has no data provided should match snapshot 1`] = `
-<div>
+<div
+  className="container"
+>
   <Overlay
     loading={false}
     visible={false}
   >
-    <Table>
+    <Table
+      minWidth="20rem"
+    >
       <Component>
         <Row
           body={true}
@@ -119,12 +127,16 @@ exports[`Table has no data provided should match snapshot 1`] = `
 `;
 
 exports[`Table is paginated should match snapshot 1`] = `
-<div>
+<div
+  className="container"
+>
   <Overlay
     loading={false}
     visible={false}
   >
-    <Table>
+    <Table
+      minWidth="20rem"
+    >
       <Component>
         <Row
           body={true}
@@ -224,12 +236,16 @@ exports[`Table is paginated should match snapshot 1`] = `
 `;
 
 exports[`Table is sortable should match snapshot 1`] = `
-<div>
+<div
+  className="container"
+>
   <Overlay
     loading={false}
     visible={false}
   >
-    <Table>
+    <Table
+      minWidth="30rem"
+    >
       <Component>
         <Row
           body={true}

@@ -16,12 +16,15 @@
   display: flex
   justify-content: space-between
   align-items: center
+  padding: $cs.s 0
+  flex-wrap: wrap
 
   &.top-rule
     border-normal('bottom')
 
   &-left
     flex-basis: auto
+    padding: $cs.xxs $cs.s $cs.xxs 0
 
   &-right
     flex: 1
@@ -29,10 +32,13 @@
     justify-content: flex-end
     align-items: center
     max-width: 26rem
-    min-height: 3.8rem
+    +media-query($bp.s)
+      max-width: none
 
-.search-bar:not(:last-child)
-  margin-right: $cs.xs
+.search-bar
+  min-width: 5rem
+  &:not(:last-child)
+    margin-right: $cs.xs
 
 .page
   margin-top: $ls.s
@@ -43,3 +49,5 @@
 .table-title
   padding-left: $cs.m
   color: $tc-deep-gray
+  +media-query($bp.s)
+    padding-left: 0

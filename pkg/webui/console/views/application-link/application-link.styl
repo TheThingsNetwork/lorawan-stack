@@ -22,3 +22,9 @@
     margin-bottom: $ls.xs
   &-data
     margin-bottom: $ls.xs
+
+.link-container
+  & > div:last-child
+    margin-bottom: $ls.xs
+  +media-query($bp.m)
+    flex-direction: column-reverse
