@@ -65,7 +65,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, assoc *ttnpb.App
 		Payload:   objects.Hex(message.FRMPayload),
 		DR:        uint8(settings.DataRateIndex),
 		Freq:      uint32(settings.GetFrequency()),
-		Timestamp: float64(settings.Timestamp),
+		Timestamp: float64(message.ReceivedAt.UTC().Unix()),
 	}
 
 	var data packageData
