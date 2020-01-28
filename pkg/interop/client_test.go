@@ -1023,7 +1023,7 @@ paths:
 		},
 
 		{
-			Name: "Backend Interfaces 1.1/Success",
+			Name: "Backend Interfaces 1.1/Success/With Session Key ID",
 			NewServer: func(t *testing.T) *httptest.Server {
 				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
@@ -1155,6 +1155,158 @@ paths:
 					RawPayload: []byte{0x20, 0x4d, 0x67, 0x50, 0x73, 0xbb, 0x41, 0x53, 0xb2, 0x36, 0x53, 0xef, 0xa8, 0x2c, 0x1f, 0x3a, 0x49, 0xe1, 0x9c, 0x2a, 0x86, 0x96, 0xc9, 0xa3, 0x4b, 0xf4, 0x92, 0x67, 0x47, 0x79, 0xe4, 0xbe, 0xfa},
 					SessionKeys: ttnpb.SessionKeys{
 						SessionKeyID: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							KEKLabel:     "ns:000000",
+							EncryptedKey: []byte{0xeb, 0x56, 0xfe, 0x66, 0x81, 0x99, 0x9f, 0x25, 0xd5, 0x48, 0xcf, 0xed, 0xd4, 0xa6, 0x52, 0x8b, 0x33, 0x1b, 0xb5, 0xad, 0xe1, 0xca, 0xf1, 0x7f},
+						},
+						AppSKey: &ttnpb.KeyEnvelope{
+							KEKLabel:     "as:010042",
+							EncryptedKey: []byte{0x2a, 0x19, 0x5c, 0xc9, 0x3c, 0xa5, 0x4a, 0xd8, 0x2c, 0xfb, 0x36, 0xc8, 0x3d, 0x91, 0x45, 0x0f, 0x3d, 0x2d, 0x52, 0x35, 0x56, 0xf1, 0x3e, 0x69},
+						},
+					},
+				})
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+
+		{
+			Name: "Backend Interfaces 1.1/Success/Without Session Key ID",
+			NewServer: func(t *testing.T) *httptest.Server {
+				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					a := assertions.New(t)
+					a.So(r.Method, should.Equal, http.MethodPost)
+
+					b, err := ioutil.ReadAll(r.Body)
+					a.So(err, should.BeNil)
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","SenderNSID":"42FFFF","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+`)
+					a.So(r.Body.Close(), should.BeNil)
+
+					_, err = w.Write([]byte(`{
+  "ProtocolVersion": "1.1",
+  "TransactionID": 0,
+  "MessageType": "JoinAns",
+  "ReceiverToken": "01",
+  "SenderID": "70B3D57ED0000000",
+  "ReceiverID": "000000",
+  "ReceiverNSID": "000000",
+  "PHYPayload": "204D675073BB4153B23653EFA82C1F3A49E19C2A8696C9A34BF492674779E4BEFA",
+  "Result": {
+    "ResultCode": "Success"
+  },
+  "Lifetime": 0,
+  "NwkSKey": {
+    "KEKLabel": "ns:000000",
+    "AESKey": "EB56FE6681999F25D548CFEDD4A6528B331BB5ADE1CAF17F"
+  },
+  "AppSKey": {
+    "KEKLabel": "as:010042",
+    "AESKey": "2A195CC93CA54AD82CFB36C83D91450F3D2D523556F13E69"
+  }
+}`))
+					a.So(err, should.BeNil)
+				}))
+			},
+			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
+				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confPath := filepath.Join(confDir, InteropClientConfigurationName)
+				js1Path := filepath.Join(confDir, "test-js-1.yml")
+				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
+				js3Path := filepath.Join(confDir, "test-js-3.yml")
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+
+				rel := func(path string) string {
+					return test.Must(filepath.Rel(confDir, path)).(string)
+				}
+
+				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+   - file: %s
+     join-euis:
+        - 0000000000000000/0
+        - 70b3d57ed0001000/52
+
+   - file: %s
+     join-euis:
+        - 70b3d57ed0000000/40
+
+   - file: %s
+     join-euis:
+        - 70b3d57ed0000000/39
+        - 70b3d83ed0000000/30`,
+					rel(js1Path),
+					rel(js2Path),
+					rel(js3Path),
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+port: 12345
+protocol: BI1.0
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   SomeHeader: Some foo bar
+   TestHeader: baz`,
+					RootCAPath,
+					ClientCertPath,
+					ClientKeyPath,
+				)), 0644))
+
+				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
+				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+port: %d
+protocol: BI1.1
+paths:
+   app-s-key: test-app-s-key-path
+   home-ns: test-home-ns-path
+tls:
+   root-ca: %s
+   certificate: %s
+   key: %s
+headers:
+   Authorization: Custom foo bar
+   TestHeader: baz`,
+					fqdn,
+					port,
+					filepath.Join("..", RootCAPath),
+					filepath.Join("..", ClientCertPath),
+					filepath.Join("..", ClientKeyPath),
+				)), 0644))
+
+				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+protocol: BI1.0
+paths:
+   join: test-join-path
+   rejoin: test-rejoin-path`,
+				), 0644))
+
+				return config.InteropClient{
+						Directory:            confDir,
+						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
+					}, func() error {
+						return os.RemoveAll(confDir)
+					}
+			},
+			NetID:   types.NetID{0x42, 0xff, 0xff},
+			Request: makeJoinRequest(),
+			ResponseAssertion: func(t *testing.T, resp *ttnpb.JoinResponse) bool {
+				a := assertions.New(t)
+				if !a.So(GeneratedSessionKeyID(resp.SessionKeyID), should.BeTrue) {
+					return false
+				}
+				return a.So(resp, should.Resemble, &ttnpb.JoinResponse{
+					RawPayload: []byte{0x20, 0x4d, 0x67, 0x50, 0x73, 0xbb, 0x41, 0x53, 0xb2, 0x36, 0x53, 0xef, 0xa8, 0x2c, 0x1f, 0x3a, 0x49, 0xe1, 0x9c, 0x2a, 0x86, 0x96, 0xc9, 0xa3, 0x4b, 0xf4, 0x92, 0x67, 0x47, 0x79, 0xe4, 0xbe, 0xfa},
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: resp.SessionKeyID,
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KEKLabel:     "ns:000000",
 							EncryptedKey: []byte{0xeb, 0x56, 0xfe, 0x66, 0x81, 0x99, 0x9f, 0x25, 0xd5, 0x48, 0xcf, 0xed, 0xd4, 0xa6, 0x52, 0x8b, 0x33, 0x1b, 0xb5, 0xad, 0xe1, 0xca, 0xf1, 0x7f},

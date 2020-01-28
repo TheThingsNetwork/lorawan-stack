@@ -4391,6 +4391,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:generate_session_key_id": {
+    "translations": {
+      "en": "failed to generate session key ID"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "client.go"
+    }
+  },
   "error:pkg/interop:invalid_length": {
     "translations": {
       "en": "invalid length"

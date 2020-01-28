@@ -17,6 +17,7 @@ package interop
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -29,6 +30,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -236,6 +238,12 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 	}, nil
 }
 
+var (
+	errGenerateSessionKeyID = errors.Define("generate_session_key_id", "failed to generate session key ID")
+
+	generatedSessionKeyIDPrefix = []byte("ttn-lw-interop-generated:")
+)
+
 // HandleJoinRequest performs Join request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
 	pld := req.Payload.GetJoinRequestPayload()
@@ -285,10 +293,22 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) <= 0 {
 		fNwkSIntKey = interopAns.NwkSKey
 	}
+
+	sessionKeyID := []byte(interopAns.SessionKeyID)
+	if len(sessionKeyID) == 0 {
+		log.FromContext(ctx).Debug("Interop join-accept does not contain session key ID, generate random ID")
+		id, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+		if err != nil {
+			return nil, errGenerateSessionKeyID
+		}
+		sessionKeyID = make([]byte, 0, len(generatedSessionKeyIDPrefix)+len(id))
+		sessionKeyID = append(sessionKeyID, generatedSessionKeyIDPrefix...)
+		sessionKeyID = append(sessionKeyID, id[:]...)
+	}
 	return &ttnpb.JoinResponse{
 		RawPayload: interopAns.PHYPayload,
 		SessionKeys: ttnpb.SessionKeys{
-			SessionKeyID: []byte(interopAns.SessionKeyID),
+			SessionKeyID: sessionKeyID,
 			FNwkSIntKey:  (*ttnpb.KeyEnvelope)(fNwkSIntKey),
 			SNwkSIntKey:  (*ttnpb.KeyEnvelope)(interopAns.SNwkSIntKey),
 			NwkSEncKey:   (*ttnpb.KeyEnvelope)(interopAns.NwkSEncKey),
@@ -296,6 +316,11 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 		},
 		Lifetime: time.Duration(interopAns.Lifetime) * time.Second,
 	}, nil
+}
+
+// GeneratedSessionKeyID returns whether the session key ID is generated locally and not by the Join Server.
+func GeneratedSessionKeyID(id []byte) bool {
+	return bytes.HasPrefix(id, generatedSessionKeyIDPrefix)
 }
 
 func makeJoinServerHTTPRequestFunc(scheme, dns, fqdn string, port uint32, rpcPaths jsRPCPaths, headers map[string]string) func(types.EUI64, func(jsRPCPaths) string, interface{}) (*http.Request, error) {

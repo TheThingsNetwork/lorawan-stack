@@ -489,7 +489,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 			return ttnpb.KeyEnvelope{}, err
 		}
 	}
-	if as.interopClient != nil {
+	if as.interopClient != nil && !interop.GeneratedSessionKeyID(sessionKeyID) {
 		res, err := as.interopClient.GetAppSKey(ctx, as.interopID, req)
 		if err == nil {
 			return res.AppSKey, nil

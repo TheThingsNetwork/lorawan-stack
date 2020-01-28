@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Crashes on Gateway Server start when traffic flow started while The Things Stack was still starting.
+- Not detecting session change in Application Server when interop Join Server did not provide a `SessionKeyID`.
 
 ### Security
 
