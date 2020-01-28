@@ -2363,7 +2363,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:            start,
 				}
 
-				var upCtx context.Context
+				var rangeCtx context.Context
 				var upCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -2371,7 +2371,6 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCtx = req.Context
 					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(upCorrelationIDs, should.Contain, id)
@@ -2379,17 +2378,18 @@ func TestHandleUplink(t *testing.T) {
 					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
 					a.So(req.DevAddr, should.Resemble, devAddr)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					a.So(req.Func(ctx, CopyEndDevice(rangeDevice)), should.BeTrue)
+					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
+					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
 					multicastDevice := CopyEndDevice(rangeDevice)
 					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
 					multicastDevice.Multicast = true
-					a.So(req.Func(ctx, multicastDevice), should.BeTrue)
+					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
 					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(ctx, fCntTooHighDevice), should.BeTrue)
+					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
 				}
 
@@ -2407,7 +2407,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, upCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
@@ -2595,7 +2595,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:            start,
 				}
 
-				var upCtx context.Context
+				var rangeCtx context.Context
 				var upCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -2603,7 +2603,6 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCtx = req.Context
 					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(upCorrelationIDs, should.Contain, id)
@@ -2611,17 +2610,18 @@ func TestHandleUplink(t *testing.T) {
 					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
 					a.So(req.DevAddr, should.Resemble, devAddr)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					a.So(req.Func(ctx, CopyEndDevice(rangeDevice)), should.BeTrue)
+					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
+					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
 					multicastDevice := CopyEndDevice(rangeDevice)
 					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
 					multicastDevice.Multicast = true
-					a.So(req.Func(ctx, multicastDevice), should.BeTrue)
+					a.So(req.Func(context.WithValue(req.Context, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
 					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(ctx, fCntTooHighDevice), should.BeTrue)
+					a.So(req.Func(context.WithValue(req.Context, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
 				}
 
@@ -2639,7 +2639,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, upCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
@@ -2827,7 +2827,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:            start,
 				}
 
-				var upCtx context.Context
+				var rangeCtx context.Context
 				var upCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -2835,7 +2835,6 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCtx = req.Context
 					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(upCorrelationIDs, should.Contain, id)
@@ -2843,17 +2842,18 @@ func TestHandleUplink(t *testing.T) {
 					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
 					a.So(req.DevAddr, should.Resemble, devAddr)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					a.So(req.Func(ctx, CopyEndDevice(rangeDevice)), should.BeTrue)
+					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
+					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
 					multicastDevice := CopyEndDevice(rangeDevice)
 					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
 					multicastDevice.Multicast = true
-					a.So(req.Func(ctx, multicastDevice), should.BeTrue)
+					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
 					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(ctx, fCntTooHighDevice), should.BeTrue)
+					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
 				}
 
@@ -2871,7 +2871,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, upCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
@@ -3064,7 +3064,7 @@ func TestHandleUplink(t *testing.T) {
 					UpdatedAt:            start,
 				}
 
-				var upCtx context.Context
+				var rangeCtx context.Context
 				var upCorrelationIDs []string
 				select {
 				case <-ctx.Done():
@@ -3072,7 +3072,6 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCtx = req.Context
 					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
 					for _, id := range correlationIDs {
 						a.So(upCorrelationIDs, should.Contain, id)
@@ -3080,16 +3079,17 @@ func TestHandleUplink(t *testing.T) {
 					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
 					a.So(req.DevAddr, should.Resemble, devAddr)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					a.So(req.Func(ctx, CopyEndDevice(rangeDevice)), should.BeTrue)
+					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
+					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
 					multicastDevice := CopyEndDevice(rangeDevice)
 					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
 					multicastDevice.Multicast = true
-					a.So(req.Func(ctx, multicastDevice), should.BeTrue)
+					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
 					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(ctx, fCntTooHighDevice), should.BeTrue)
+					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
 				}
 
@@ -3107,7 +3107,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 
 				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, upCtx)
+					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
 					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])

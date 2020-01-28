@@ -147,9 +147,9 @@ func makeDeferredMACHandler(dev *ttnpb.EndDevice, f macHandler) macHandler {
 }
 
 type matchedDevice struct {
-	logger log.Interface
-	phy    band.Band
+	phy band.Band
 
+	Context                  context.Context
 	ChannelIndex             uint8
 	DataRateIndex            ttnpb.DataRateIndex
 	DeferredMACHandlers      []macHandler
@@ -167,20 +167,19 @@ func (d *matchedDevice) deferMACHandler(f macHandler) {
 	d.DeferredMACHandlers = append(d.DeferredMACHandlers, makeDeferredMACHandler(d.Device, f))
 }
 
+type contextualEndDevice struct {
+	context.Context
+	*ttnpb.EndDevice
+}
+
 // matchAndHandleDataUplink tries to match the data uplink message with a device and returns the matched device.
-func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage, deduplicated bool, devs ...*ttnpb.EndDevice) (*matchedDevice, error) {
+func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, deduplicated bool, devs ...contextualEndDevice) (*matchedDevice, error) {
 	if len(up.RawPayload) < 4 {
 		return nil, errRawPayloadTooShort
 	}
 	macPayloadBytes := up.RawPayload[:len(up.RawPayload)-4]
 
 	pld := up.Payload.GetMACPayload()
-
-	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"dev_addr", pld.DevAddr,
-		"uplink_f_cnt", pld.FCnt,
-		"payload_length", len(macPayloadBytes),
-	))
 
 	type device struct {
 		matchedDevice
@@ -194,19 +193,27 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 			continue
 		}
 
-		_, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+		ctx := dev.Context
+
+		logger := log.FromContext(ctx).WithFields(log.Fields(
+			"dev_addr", pld.DevAddr,
+			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
+			"payload_length", len(macPayloadBytes),
+			"uplink_f_cnt", pld.FCnt,
+		))
+		ctx = log.NewContext(ctx, logger)
+
+		_, phy, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to get device's versioned band, skip")
 			continue
 		}
 
-		drIdx, err := searchDataRate(up.Settings.DataRate, dev, ns.FrequencyPlans)
+		drIdx, err := searchDataRate(up.Settings.DataRate, dev.EndDevice, ns.FrequencyPlans)
 		if err != nil {
 			logger.WithError(err).Debug("Failed to determine data rate index of uplink, skip")
 			continue
 		}
-
-		logger := logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 
 		pendingApplicationDownlink := dev.GetMACState().GetPendingApplicationDownlink()
 
@@ -218,19 +225,20 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 				"full_f_cnt_up", pld.FCnt,
 				"transmission", 1,
 			))
+			ctx := log.NewContext(ctx, logger)
 
-			pendingDev := dev
+			pendingDev := dev.EndDevice
 			if dev.Session != nil && dev.MACState != nil && dev.Session.DevAddr == pld.DevAddr {
 				logger.Error("Same DevAddr was assigned to a device in two consecutive sessions")
-				pendingDev = copyEndDevice(dev)
+				pendingDev = copyEndDevice(dev.EndDevice)
 			}
 			pendingDev.MACState = pendingDev.PendingMACState
 			pendingDev.PendingMACState = nil
 
 			matches = append(matches, device{
 				matchedDevice: matchedDevice{
-					logger:        logger,
 					phy:           phy,
+					Context:       ctx,
 					DataRateIndex: drIdx,
 					Device:        pendingDev,
 					FCnt:          pld.FCnt,
@@ -275,6 +283,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 			"pending_session", false,
 			"supports_32_bit_f_cnt", true,
 		))
+		ctx = log.NewContext(ctx, logger)
 
 		if fCnt == dev.Session.LastFCntUp && len(dev.MACState.RecentUplinks) > 0 {
 			nbTrans, lastAt := transmissionNumber(macPayloadBytes, dev.MACState.RecentUplinks...)
@@ -284,6 +293,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 				"full_f_cnt_up", dev.Session.LastFCntUp,
 				"transmission", nbTrans,
 			))
+			ctx = log.NewContext(ctx, logger)
 			if nbTrans < 2 || lastAt.IsZero() {
 				logger.Debug("Repeated FCnt value, but frame is not a retransmission, skip")
 				continue
@@ -297,6 +307,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 				"max_retransmission_delay", maxDelay,
 				"retransmission_delay", delay,
 			))
+			ctx = log.NewContext(ctx, logger)
 
 			if delay > maxDelay {
 				logger.Warn("Retransmission delay exceeds maximum, skip")
@@ -308,10 +319,10 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 			}
 			matches = append(matches, device{
 				matchedDevice: matchedDevice{
-					logger:        logger,
 					phy:           phy,
+					Context:       ctx,
 					DataRateIndex: drIdx,
-					Device:        dev,
+					Device:        dev.EndDevice,
 					FCnt:          dev.Session.LastFCntUp,
 					NbTrans:       nbTrans,
 				},
@@ -322,12 +333,12 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 		}
 
 		if fCnt < dev.Session.LastFCntUp {
-			if !resetsFCnt(dev, ns.defaultMACSettings) {
+			if !resetsFCnt(dev.EndDevice, ns.defaultMACSettings) {
 				logger.Debug("FCnt too low, skip")
 				continue
 			}
 
-			macState, err := newMACState(dev, ns.FrequencyPlans, ns.defaultMACSettings)
+			macState, err := newMACState(dev.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to generate new MAC state")
 				continue
@@ -340,15 +351,15 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 			gap := fCntResetGap(dev.Session.LastFCntUp, pld.FCnt)
 			matches = append(matches, device{
 				matchedDevice: matchedDevice{
-					logger: logger.WithFields(log.Fields(
+					phy: phy,
+					Context: log.NewContextWithFields(ctx, log.Fields(
 						"f_cnt_gap", gap,
 						"f_cnt_reset", true,
 						"full_f_cnt_up", pld.FCnt,
 						"transmission", 1,
 					)),
-					phy:           phy,
 					DataRateIndex: drIdx,
-					Device:        dev,
+					Device:        dev.EndDevice,
 					FCnt:          pld.FCnt,
 					FCntReset:     true,
 					NbTrans:       1,
@@ -361,26 +372,27 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 		}
 
 		logger = logger.WithField("transmission", 1)
+		ctx = log.NewContext(ctx, logger)
 
-		if fCnt != pld.FCnt && resetsFCnt(dev, ns.defaultMACSettings) {
-			macState, err := newMACState(dev, ns.FrequencyPlans, ns.defaultMACSettings)
+		if fCnt != pld.FCnt && resetsFCnt(dev.EndDevice, ns.defaultMACSettings) {
+			macState, err := newMACState(dev.EndDevice, ns.FrequencyPlans, ns.defaultMACSettings)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to generate new MAC state")
 				continue
 			}
 			if !macState.LoRaWANVersion.HasMaxFCntGap() || uint(pld.FCnt) <= phy.MaxFCntGap {
-				dev := copyEndDevice(dev)
+				dev := copyEndDevice(dev.EndDevice)
 				dev.MACState = macState
 
 				gap := fCntResetGap(dev.Session.LastFCntUp, pld.FCnt)
 				matches = append(matches, device{
 					matchedDevice: matchedDevice{
-						logger: logger.WithFields(log.Fields(
+						phy: phy,
+						Context: log.NewContextWithFields(ctx, log.Fields(
 							"f_cnt_gap", gap,
 							"f_cnt_reset", true,
 							"full_f_cnt_up", pld.FCnt,
 						)),
-						phy:           phy,
 						DataRateIndex: drIdx,
 						Device:        dev,
 						FCnt:          pld.FCnt,
@@ -400,6 +412,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 			"f_cnt_reset", false,
 			"full_f_cnt_up", fCnt,
 		))
+		ctx = log.NewContext(ctx, logger)
 
 		if fCnt == math.MaxUint32 {
 			logger.Debug("FCnt too high, skip")
@@ -411,10 +424,10 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 		}
 		matches = append(matches, device{
 			matchedDevice: matchedDevice{
-				logger:        logger,
 				phy:           phy,
+				Context:       ctx,
 				DataRateIndex: drIdx,
-				Device:        dev,
+				Device:        dev.EndDevice,
 				FCnt:          fCnt,
 				NbTrans:       1,
 			},
@@ -435,7 +448,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, up *ttnpb
 
 matchLoop:
 	for i, match := range matches {
-		logger := match.logger.WithField("match_attempt", i)
+		ctx := match.Context
+		logger := log.FromContext(ctx).WithField("match_attempt", i)
 
 		session := match.Device.Session
 		if match.Pending {
@@ -760,25 +774,27 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	logger.Debug("Match device")
 
-	var addrMatches []*ttnpb.EndDevice
+	var addrMatches []contextualEndDevice
 	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, dev *ttnpb.EndDevice) bool {
-			addrMatches = append(addrMatches, dev)
+			addrMatches = append(addrMatches, contextualEndDevice{
+				Context:   ctx,
+				EndDevice: dev,
+			})
 			return true
 		}); err != nil {
 		logger.WithError(err).Warn("Failed to find devices in registry by DevAddr")
 		return err
 	}
 
-	matched, err := ns.matchAndHandleDataUplink(ctx, up, false, addrMatches...)
+	matched, err := ns.matchAndHandleDataUplink(up, false, addrMatches...)
 	if err != nil {
 		registerDropDataUplink(ctx, up, err)
 		logger.WithError(err).Debug("Failed to match device")
 		return err
 	}
-
-	logger = matched.logger
-	ctx = log.NewContext(ctx, matched.logger)
+	ctx = matched.Context
+	logger = log.FromContext(ctx)
 
 	logger.Debug("Matched device")
 
@@ -817,7 +833,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			}
 
 			if !stored.CreatedAt.Equal(matched.Device.CreatedAt) || !stored.UpdatedAt.Equal(matched.Device.UpdatedAt) {
-				matched, err = ns.matchAndHandleDataUplink(ctx, up, true, stored)
+				matched, err = ns.matchAndHandleDataUplink(up, true, contextualEndDevice{
+					Context:   ctx,
+					EndDevice: stored,
+				})
 				if err != nil {
 					handleErr = true
 					return nil, nil, errOutdatedData.WithCause(err)
