@@ -19,6 +19,7 @@ import (
 	"crypto/x509"
 	"net"
 	"net/http"
+	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/interop"
 )
@@ -29,9 +30,15 @@ func (c *Component) RegisterInterop(s interop.Registerer) {
 }
 
 func (c *Component) serveInterop(lis net.Listener) error {
-	return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c.interop.ServeHTTP(w, r)
-	}))
+	srv := http.Server{
+		Handler:           c.interop,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	go func() {
+		<-c.Context().Done()
+		srv.Close()
+	}()
+	return srv.Serve(lis)
 }
 
 func (c *Component) interopEndpoints() []Endpoint {
