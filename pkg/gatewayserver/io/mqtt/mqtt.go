@@ -44,26 +44,26 @@ type srv struct {
 	lis    mqttnet.Listener
 }
 
-// Start starts the MQTT frontend.
-func Start(ctx context.Context, server io.Server, listener net.Listener, format Format, protocol string) {
+// Serve serves the MQTT frontend.
+func Serve(ctx context.Context, server io.Server, listener net.Listener, format Format, protocol string) error {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/mqtt")
 	ctx = mqttlog.NewContext(ctx, mqtt.Logger(log.FromContext(ctx)))
 	s := &srv{ctx, server, format, mqttnet.NewListener(listener, protocol)}
-	go s.accept()
 	go func() {
 		<-ctx.Done()
 		s.lis.Close()
 	}()
+	return s.accept()
 }
 
-func (s *srv) accept() {
+func (s *srv) accept() error {
 	for {
 		mqttConn, err := s.lis.Accept()
 		if err != nil {
 			if s.ctx.Err() == nil {
 				log.FromContext(s.ctx).WithError(err).Warn("Accept failed")
 			}
-			return
+			return err
 		}
 
 		go func() {

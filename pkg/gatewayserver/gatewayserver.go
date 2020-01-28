@@ -130,29 +130,53 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		opt(gs)
 	}
 
-	ctx, cancel := context.WithCancel(gs.Context())
-	defer func() {
-		if err != nil {
-			cancel()
+	// Setup forwarding table.
+	for name, prefix := range gs.forward {
+		if name == "" {
+			name = "cluster"
 		}
-	}()
-
-	for addr, fallbackFrequencyPlanID := range conf.UDP.Listeners {
-		var conn *net.UDPConn
-		conn, err = gs.ListenUDP(addr)
-		if err != nil {
-			return nil, errListenFrontend.WithCause(err).WithAttributes(
-				"protocol", "udp",
-				"address", addr,
-			)
+		var handler upstream.Handler
+		switch name {
+		case "cluster":
+			handler = ns.NewHandler(gs.Context(), c, prefix)
+		default:
+			return nil, errInvalidUpstreamName.WithAttributes("name", name)
 		}
-		lisCtx := ctx
-		if fallbackFrequencyPlanID != "" {
-			lisCtx = frequencyplans.WithFallbackID(ctx, fallbackFrequencyPlanID)
+		if err := handler.Setup(gs.Context()); err != nil {
+			return nil, errSetupUpstream.WithCause(err).WithAttributes("name", name)
 		}
-		udp.Start(lisCtx, gs, conn, conf.UDP.Config)
+		gs.upstreamHandlers[name] = handler
 	}
 
+	// Register gRPC services.
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.RegisterGRPC(gs)
+
+	// Start UDP listeners.
+	for addr, fallbackFrequencyPlanID := range conf.UDP.Listeners {
+		addr := addr
+		fallbackFrequencyPlanID := fallbackFrequencyPlanID
+		gs.RegisterTask(gs.Context(), fmt.Sprintf("serve_udp/%s", addr),
+			func(ctx context.Context) error {
+				var conn *net.UDPConn
+				conn, err = gs.ListenUDP(addr)
+				if err != nil {
+					return errListenFrontend.WithCause(err).WithAttributes(
+						"protocol", "udp",
+						"address", addr,
+					)
+				}
+				defer conn.Close()
+				lisCtx := ctx
+				if fallbackFrequencyPlanID != "" {
+					lisCtx = frequencyplans.WithFallbackID(ctx, fallbackFrequencyPlanID)
+				}
+				return udp.Serve(lisCtx, gs, conn, conf.UDP.Config)
+			}, component.TaskRestartOnFailure)
+	}
+
+	// Start MQTT listeners.
 	for _, version := range []struct {
 		Format mqtt.Format
 		Config config.MQTT
@@ -170,76 +194,64 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			component.NewTCPEndpoint(version.Config.Listen, "MQTT"),
 			component.NewTLSEndpoint(version.Config.ListenTLS, "MQTT"),
 		} {
+			version := version
+			endpoint := endpoint
 			if endpoint.Address() == "" {
 				continue
 			}
-			l, err := gs.ListenTCP(endpoint.Address())
-			var lis net.Listener
-			if err == nil {
-				lis, err = endpoint.Listen(l)
-			}
-			if err != nil {
-				return nil, errListenFrontend.WithCause(err).WithAttributes(
-					"address", endpoint.Address(),
-					"protocol", endpoint.Protocol(),
-				)
-			}
-			mqtt.Start(ctx, gs, lis, version.Format, endpoint.Protocol())
+			gs.RegisterTask(gs.Context(), fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
+				func(ctx context.Context) error {
+					l, err := gs.ListenTCP(endpoint.Address())
+					var lis net.Listener
+					if err == nil {
+						lis, err = endpoint.Listen(l)
+					}
+					if err != nil {
+						return errListenFrontend.WithCause(err).WithAttributes(
+							"address", endpoint.Address(),
+							"protocol", endpoint.Protocol(),
+						)
+					}
+					defer lis.Close()
+					return mqtt.Serve(ctx, gs, lis, version.Format, endpoint.Protocol())
+				}, component.TaskRestartOnFailure)
 		}
 	}
 
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayserver"))
-	bsCtx := ctx
+	// Start Basic Station listeners.
+	bsCtx := gs.Context()
 	if conf.BasicStation.FallbackFrequencyPlanID != "" {
-		bsCtx = frequencyplans.WithFallbackID(ctx, conf.BasicStation.FallbackFrequencyPlanID)
+		bsCtx = frequencyplans.WithFallbackID(bsCtx, conf.BasicStation.FallbackFrequencyPlanID)
 	}
-
 	bsWebServer := basicstationlns.New(bsCtx, gs, conf.BasicStation.UseTrafficTLSAddress)
 	for _, endpoint := range []component.Endpoint{
 		component.NewTCPEndpoint(conf.BasicStation.Listen, "Basic Station"),
 		component.NewTLSEndpoint(conf.BasicStation.ListenTLS, "Basic Station", component.WithNextProtos("h2", "http/1.1")),
 	} {
+		endpoint := endpoint
 		if endpoint.Address() == "" {
 			continue
 		}
-		l, err := gs.ListenTCP(endpoint.Address())
-		var lis net.Listener
-		if err == nil {
-			lis, err = endpoint.Listen(l)
-		}
-		if err != nil {
-			return nil, errListenFrontend.WithCause(err).WithAttributes(
-				"address", endpoint.Address(),
-				"protocol", endpoint.Protocol(),
-			)
-		}
-		go func() error {
-			return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				bsWebServer.ServeHTTP(w, r)
-			}))
-		}()
+		gs.RegisterTask(gs.Context(), fmt.Sprintf("serve_basicstation/%s", endpoint.Address()),
+			func(ctx context.Context) error {
+				l, err := gs.ListenTCP(endpoint.Address())
+				var lis net.Listener
+				if err == nil {
+					lis, err = endpoint.Listen(l)
+				}
+				if err != nil {
+					return errListenFrontend.WithCause(err).WithAttributes(
+						"address", endpoint.Address(),
+						"protocol", endpoint.Protocol(),
+					)
+				}
+				defer lis.Close()
+				return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					bsWebServer.ServeHTTP(w, r)
+				}))
+			}, component.TaskRestartOnFailure)
 	}
 
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsGs", cluster.HookName, c.ClusterAuthUnaryHook())
-
-	for name, prefix := range gs.forward {
-		if name == "" {
-			name = "cluster"
-		}
-		var handler upstream.Handler
-		switch name {
-		case "cluster":
-			handler = ns.NewHandler(ctx, c, prefix)
-		default:
-			return nil, errInvalidUpstreamName.WithAttributes("name", name)
-		}
-		if err := handler.Setup(ctx); err != nil {
-			return nil, errSetupUpstream.WithCause(err).WithAttributes("name", name)
-		}
-		gs.upstreamHandlers[name] = handler
-	}
-
-	c.RegisterGRPC(gs)
 	return gs, nil
 }
 

@@ -118,6 +118,8 @@ func TestGatewayServer(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
+	time.Sleep(timeout) // Wait for tasks to be started.
+
 	for _, publicLocation := range []bool{true, false} {
 		is.add(ctx, ttnpb.GatewayIdentifiers{
 			GatewayID: registeredGatewayID,

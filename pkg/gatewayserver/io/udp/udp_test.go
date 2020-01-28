@@ -71,7 +71,7 @@ func TestConnection(t *testing.T) {
 		t.FailNow()
 	}
 
-	Start(ctx, gs, lis, testConfig)
+	go Serve(ctx, gs, lis, testConfig)
 
 	connections := &sync.Map{}
 	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
@@ -211,7 +211,7 @@ func TestTraffic(t *testing.T) {
 		t.FailNow()
 	}
 
-	Start(ctx, gs, lis, testConfig)
+	go Serve(ctx, gs, lis, testConfig)
 
 	connections := &sync.Map{}
 	eui1 := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
