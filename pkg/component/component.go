@@ -23,6 +23,7 @@ import (
 	"os/signal"
 	"sort"
 	"strings"
+	"sync"
 	"syscall"
 
 	"github.com/getsentry/raven-go"
@@ -78,7 +79,8 @@ type Component struct {
 
 	loopback *grpc.ClientConn
 
-	tcpListeners map[string]*listener
+	tcpListeners   map[string]*listener
+	tcpListenersMu sync.Mutex
 
 	fillers []fillcontext.Filler
 
@@ -335,6 +337,8 @@ func (c *Component) Run() error {
 func (c *Component) Close() {
 	c.cancelCtx()
 
+	c.tcpListenersMu.Lock()
+	defer c.tcpListenersMu.Unlock()
 	for _, l := range c.tcpListeners {
 		err := l.lis.Close()
 		if err != nil && c.ctx.Err() == nil {

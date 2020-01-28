@@ -71,6 +71,8 @@ func (l *listener) Close() error {
 
 // ListenTCP listens on a TCP address and allows for TCP and TLS on the same port.
 func (c *Component) ListenTCP(address string) (Listener, error) {
+	c.tcpListenersMu.Lock()
+	defer c.tcpListenersMu.Unlock()
 	l, ok := c.tcpListeners[address]
 	if !ok {
 		c.logger.WithField("address", address).Debug("Creating listener")
