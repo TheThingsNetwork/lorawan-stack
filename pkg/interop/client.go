@@ -296,7 +296,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 
 	sessionKeyID := []byte(interopAns.SessionKeyID)
 	if len(sessionKeyID) == 0 {
-		log.FromContext(ctx).Debug("Interop join-accept does not contain session key ID, use random ID")
+		log.FromContext(ctx).Debug("Interop join-accept does not contain session key ID, generate random ID")
 		id, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
 		if err != nil {
 			return nil, errGenerateSessionKeyID
