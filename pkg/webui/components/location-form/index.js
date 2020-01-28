@@ -132,6 +132,7 @@ class LocationForm extends Component {
           <Message component="h4" content={formTitle} />
           <Form.Field
             type="number"
+            step="any"
             title={sharedMessages.latitude}
             description={sharedMessages.latitudeDesc}
             name="latitude"
@@ -140,6 +141,7 @@ class LocationForm extends Component {
           />
           <Form.Field
             type="number"
+            step="any"
             title={sharedMessages.longitude}
             description={sharedMessages.longitudeDesc}
             name="longitude"
@@ -148,6 +150,7 @@ class LocationForm extends Component {
           />
           <Form.Field
             type="number"
+            step="1"
             title={sharedMessages.altitude}
             description={sharedMessages.altitudeDesc}
             name="altitude"
