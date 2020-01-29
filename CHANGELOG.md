@@ -9,10 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Responsive side navigation (inside entity views) to the Console.
-- Overall responsiveness of the Console.
-- Support for custom Redis connection pool sizes (see `--redis.pool-size`).
-
 ### Changed
 
 ### Deprecated
@@ -21,10 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Security
+
+## [3.5.1] (2020-01-29)
+
+### Added
+
+- Responsive side navigation (inside entity views) to the Console.
+- Overall responsiveness of the Console.
+- Support for configuring Redis connection pool sizes with `redis.pool-size` options.
+
+### Fixed
+
 - Crashes on Gateway Server start when traffic flow started while The Things Stack was still starting.
 - Not detecting session change in Application Server when interop Join Server did not provide a `SessionKeyID`.
-
-### Security
 
 ## [3.5.0] (2020-01-24)
 
@@ -573,7 +579,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.0...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.1...HEAD
+[3.5.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.2...v3.5.0
 [3.4.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.1...v3.4.2
 [3.4.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.4.0...v3.4.1
