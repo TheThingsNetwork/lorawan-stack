@@ -129,6 +129,7 @@ type Redis struct {
 	Password  string        `name:"password" description:"Password of the Redis server"`
 	Database  int           `name:"database" description:"Redis database to use"`
 	Namespace []string      `name:"namespace" description:"Namespace for Redis keys"`
+	PoolSize  int           `name:"pool-size" description:"The maximum number of database connections"`
 	Failover  RedisFailover `name:"failover" description:"Redis failover configuration"`
 }
 
