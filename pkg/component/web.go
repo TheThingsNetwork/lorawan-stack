@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"strings"
+	"time"
 
 	"github.com/heptiolabs/healthcheck"
 	echo "github.com/labstack/echo/v4"
@@ -85,7 +86,15 @@ func (c *Component) RegisterReadinessCheck(name string, check healthcheck.Check)
 }
 
 func (c *Component) serveWeb(lis net.Listener) error {
-	return http.Serve(lis, c)
+	srv := http.Server{
+		Handler:           c,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	go func() {
+		<-c.Context().Done()
+		srv.Close()
+	}()
+	return srv.Serve(lis)
 }
 
 func (c *Component) webEndpoints() []Endpoint {

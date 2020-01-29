@@ -246,9 +246,16 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					)
 				}
 				defer lis.Close()
-				return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					bsWebServer.ServeHTTP(w, r)
-				}))
+
+				srv := http.Server{
+					Handler:           bsWebServer,
+					ReadHeaderTimeout: 5 * time.Second,
+				}
+				go func() {
+					<-ctx.Done()
+					srv.Close()
+				}()
+				return srv.Serve(lis)
 			}, component.TaskRestartOnFailure)
 	}
 
