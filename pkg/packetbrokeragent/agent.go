@@ -412,7 +412,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, msg *packetbroker.Uplin
 		logger.WithError(err).Warn("Failed to decrypt message")
 		return err
 	}
-	logger.Info("Received uplink message")
+	logger.Debug("Received uplink message")
 
 	ids, err := lorawan.GetUplinkMessageIdentifiers(msg.PhyPayload.GetPlain())
 	if err != nil {
