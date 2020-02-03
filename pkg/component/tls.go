@@ -168,7 +168,9 @@ func (c *Component) GetTLSClientConfig(ctx context.Context, opts ...TLSConfigOpt
 		if err != nil {
 			return nil, err
 		}
-		res.RootCAs = x509.NewCertPool()
+		if res.RootCAs, err = x509.SystemCertPool(); err != nil {
+			res.RootCAs = x509.NewCertPool()
+		}
 		res.RootCAs.AppendCertsFromPEM(pem)
 	}
 	res.InsecureSkipVerify = conf.InsecureSkipVerify
