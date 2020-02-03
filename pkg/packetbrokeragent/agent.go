@@ -17,6 +17,8 @@ package packetbrokeragent
 import (
 	"context"
 	"fmt"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -183,12 +185,52 @@ func (a *Agent) forwardUplink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Connected as Forwarder")
 
+	uplinkCh := make(chan *ttnpb.GatewayUplinkMessage)
+	defer close(uplinkCh)
+
+	wg := &sync.WaitGroup{}
+	defer wg.Wait()
+	var workers int32
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case msg := <-a.upstreamCh:
+			select {
+			case uplinkCh <- msg:
+			default:
+				if atomic.LoadInt32(&workers) < a.forwarderConfig.WorkerPool.MaximumWorkerCount {
+					wg.Add(1)
+					atomic.AddInt32(&workers, 1)
+					go func() {
+						if err := a.runForwarder(ctx, conn, uplinkCh); err != nil {
+							logger.WithError(err).Warn("Forwarder stopped")
+						}
+						wg.Done()
+						atomic.AddInt32(&workers, -1)
+					}()
+				}
+				select {
+				case uplinkCh <- msg:
+				case <-time.After(a.homeNetworkConfig.WorkerPool.BusyTimeout):
+					logger.Warn("Forwarder busy, drop message")
+				}
+			}
+		}
+	}
+}
+
+func (a *Agent) runForwarder(ctx context.Context, conn *grpc.ClientConn, uplinkCh <-chan *ttnpb.GatewayUplinkMessage) error {
+	logger := log.FromContext(ctx)
 	client := packetbroker.NewRouterForwarderDataClient(conn)
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case up := <-a.upstreamCh:
+		case <-time.After(a.forwarderConfig.WorkerPool.IdleTimeout):
+			return nil
+		case up := <-uplinkCh:
 			msg, err := toPBUplink(ctx, up)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to convert outgoing uplink message")
@@ -293,32 +335,75 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	logger := log.FromContext(ctx)
 	logger.Info("Subscribed as Home Network")
 
+	uplinkCh := make(chan *packetbroker.RoutedUplinkMessage)
+	defer close(uplinkCh)
+
+	wg := &sync.WaitGroup{}
+	defer wg.Wait()
+	var workers int32
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
 			return err
 		}
-		up := msg.Message
-		if up == nil {
-			continue
+		select {
+		case uplinkCh <- msg:
+		default:
+			if atomic.LoadInt32(&workers) < a.homeNetworkConfig.WorkerPool.MaximumWorkerCount {
+				wg.Add(1)
+				atomic.AddInt32(&workers, 1)
+				go func() {
+					if err := a.handleUplink(ctx, uplinkCh); err != nil {
+						logger.WithError(err).Warn("Home Network subscriber stopped")
+					}
+					wg.Done()
+					atomic.AddInt32(&workers, -1)
+				}()
+			}
+			select {
+			case uplinkCh <- msg:
+			case <-time.After(a.homeNetworkConfig.WorkerPool.BusyTimeout):
+				logger.Warn("Home Network subscriber busy, drop message")
+			}
 		}
-		ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:uplink:%s", msg.Id))
-		var forwarderNetID types.NetID
-		forwarderNetID.UnmarshalNumber(msg.ForwarderNetId)
-		ctx = log.NewContextWithFields(ctx, log.Fields(
-			"message_id", msg.Id,
-			"from_forwarder_net_id", forwarderNetID,
-			"from_forwarder_id", msg.ForwarderId,
-		))
-		if err := a.handleUplink(ctx, up); err != nil {
-			logger.WithError(err).Debug("Failed to handle incoming uplink message")
+	}
+}
+
+func (a *Agent) handleUplink(ctx context.Context, uplinkCh <-chan *packetbroker.RoutedUplinkMessage) error {
+	logger := log.FromContext(ctx)
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(a.homeNetworkConfig.WorkerPool.IdleTimeout):
+			return nil
+		case msg := <-uplinkCh:
+			up := msg.Message
+			if up == nil {
+				continue
+			}
+			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:uplink:%s", msg.Id))
+			var forwarderNetID types.NetID
+			forwarderNetID.UnmarshalNumber(msg.ForwarderNetId)
+			ctx = log.NewContextWithFields(ctx, log.Fields(
+				"message_id", msg.Id,
+				"from_forwarder_net_id", forwarderNetID,
+				"from_forwarder_id", msg.ForwarderId,
+			))
+			if err := a.handleUplinkMessage(ctx, up); err != nil {
+				logger.WithError(err).Debug("Failed to handle incoming uplink message")
+			}
 		}
 	}
 }
 
 var errMessageIdentifiers = errors.DefineFailedPrecondition("message_identifiers", "invalid message identifiers")
 
-func (a *Agent) handleUplink(ctx context.Context, msg *packetbroker.UplinkMessage) error {
+func (a *Agent) handleUplinkMessage(ctx context.Context, msg *packetbroker.UplinkMessage) error {
 	receivedAt := time.Now()
 	logger := log.FromContext(ctx)
 

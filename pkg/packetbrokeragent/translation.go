@@ -126,7 +126,7 @@ func wrapUplinkTokens(forwarder, gateway []byte) ([]byte, error) {
 
 func unwrapUplinkTokens(token []byte) (forwarder, gateway []byte, err error) {
 	var t compoundUplinkToken
-	if json.Unmarshal(token, &t); err != nil {
+	if err := json.Unmarshal(token, &t); err != nil {
 		return nil, nil, err
 	}
 	return t.Forwarder, t.Gateway, nil

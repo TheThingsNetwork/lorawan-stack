@@ -17,6 +17,7 @@ package packetbrokeragent
 import (
 	"context"
 	"crypto/tls"
+	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
@@ -38,13 +39,15 @@ type HomeNetworkConfig struct {
 	Enable          bool                  `name:"enable" description:"Enable Home Network role"`
 	TLS             TLSConfig             `name:"tls"`
 	DevAddrPrefixes []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
+	WorkerPool      WorkerPoolConfig      `name:"worker-pool" description:"Workers pool configuration"`
 }
 
 // ForwarderConfig defines configuration of the Forwarder role.
 type ForwarderConfig struct {
-	Enable bool      `name:"enable" description:"Enable Forwarder role"`
-	TLS    TLSConfig `name:"tls"`
-	ID     string    `name:"id" description:"ID of the Forwarder"`
+	Enable     bool             `name:"enable" description:"Enable Forwarder role"`
+	TLS        TLSConfig        `name:"tls"`
+	ID         string           `name:"id" description:"ID of the Forwarder"`
+	WorkerPool WorkerPoolConfig `name:"worker-pool" description:"Workers pool configuration"`
 }
 
 // TLSConfig contains TLS configuration for connecting to Packet Broker.
@@ -53,6 +56,13 @@ type TLSConfig struct {
 	Certificate string             `name:"certificate" description:"Location of TLS certificate"`
 	Key         string             `name:"key" description:"Location of TLS private key"`
 	KeyVault    config.TLSKeyVault `name:"key-vault"`
+}
+
+// WorkerPoolConfig contains the worker pool configuration for a Packet Broker role.
+type WorkerPoolConfig struct {
+	MaximumWorkerCount int32         `name:"maximum-worker-count" description:"The maximum amount of active workers"`
+	IdleTimeout        time.Duration `name:"idle-timeout" description:"The maximum amount of time workers stay idle before they stop"`
+	BusyTimeout        time.Duration `name:"busy-timeout" description:"The maximum amount of time a message can wait before it is dropped"`
 }
 
 var errNoTLSCertificate = errors.DefineFailedPrecondition("no_tls_certificate", "no TLS certificate configured")
