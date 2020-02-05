@@ -1383,7 +1383,7 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow())) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
 				},
 					nil,
@@ -1798,7 +1798,7 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow())) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
 				},
 					errTest,
@@ -2025,7 +2025,7 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow())) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
 				},
 					nil,
@@ -2255,7 +2255,7 @@ func TestHandleUplink(t *testing.T) {
 				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
 					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
 						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow())) &&
+						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(5*time.Second-NSScheduleWindow()-GSScheduleWindow())) &&
 						a.So(replace, should.BeTrue)
 				},
 					nil,
