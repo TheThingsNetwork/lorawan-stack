@@ -55,6 +55,13 @@ const validationSchema = Yup.object().shape({
     .required(sharedMessages.validateRequired),
 })
 
+// We consider location of an entity set iff at least one coordinate is set,
+// i.e. longitude, altitude, latitude.
+const hasLocationSet = location =>
+  typeof location.altitude !== 'undefined' ||
+  typeof location.latitude !== 'undefined' ||
+  typeof location.longitude !== 'undefined'
+
 class LocationForm extends Component {
   static propTypes = {
     entityId: PropTypes.string.isRequired,
@@ -131,7 +138,7 @@ class LocationForm extends Component {
     const { initialValues, formTitle } = this.props
     const { error } = this.state
 
-    const entryExists = initialValues.latitude && initialValues.altitude && initialValues.longitude
+    const entryExists = hasLocationSet(initialValues)
 
     return (
       <React.Fragment>
