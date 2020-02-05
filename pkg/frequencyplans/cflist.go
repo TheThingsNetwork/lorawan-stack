@@ -48,27 +48,24 @@ func CFList(fp FrequencyPlan, version ttnpb.PHYVersion) *ttnpb.CFList {
 }
 
 func chMaskCFList(fp FrequencyPlan, phy band.Band) *ttnpb.CFList {
-	cfList := &ttnpb.CFList{
-		Type:    ttnpb.CFListType_CHANNEL_MASKS,
-		ChMasks: []bool{},
-	}
-
-	for _, bandChannel := range phy.UplinkChannels {
-		var channelEnabled bool
+	chMasks := make([]bool, len(phy.UplinkChannels))
+outer:
+	for i, bandChannel := range phy.UplinkChannels {
 		for _, fpChannel := range fp.UplinkChannels {
 			if fpChannel.Frequency == bandChannel.Frequency {
-				channelEnabled = true
+				chMasks[i] = true
+				continue outer
 			}
 		}
-		cfList.ChMasks = append(cfList.ChMasks, channelEnabled)
 	}
-
-	return cfList
+	return &ttnpb.CFList{
+		Type:    ttnpb.CFListType_CHANNEL_MASKS,
+		ChMasks: chMasks[:],
+	}
 }
 
 func frequenciesCFList(fp FrequencyPlan, phy band.Band) *ttnpb.CFList {
-	cfList := &ttnpb.CFList{Type: ttnpb.CFListType_FREQUENCIES}
-
+	freqs := make([]uint32, 0, 5)
 outer:
 	for _, fpChannel := range fp.UplinkChannels {
 		for _, bandChannel := range phy.UplinkChannels {
@@ -76,11 +73,13 @@ outer:
 				continue outer
 			}
 		}
-		cfList.Freq = append(cfList.Freq, uint32(fpChannel.Frequency/phy.FreqMultiplier))
-		if len(cfList.Freq) == 5 {
+		freqs = append(freqs, uint32(fpChannel.Frequency/phy.FreqMultiplier))
+		if len(freqs) == 5 {
 			break
 		}
 	}
-
-	return cfList
+	return &ttnpb.CFList{
+		Type: ttnpb.CFListType_FREQUENCIES,
+		Freq: freqs,
+	}
 }
