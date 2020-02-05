@@ -82,7 +82,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 				ChannelMaskControl: 1,
 				NbTrans:            1,
 			},
-			[]byte{0x03, 0b0101_0010, 0b00000010, 0b00000100, 0b0_001_0001},
+			[]byte{0x03, 0b0101_0010, 0b00000100, 0b00000010, 0b0_001_0001},
 			false,
 		},
 		{

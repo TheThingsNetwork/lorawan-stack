@@ -232,13 +232,13 @@ func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
 		// Fill remaining space with zeros.
 		dst = append(dst, bytes.Repeat([]byte{0x0}, 15-n*3)...)
 	case 1:
-		n := len(msg.ChMasks)
+		n := uint(len(msg.ChMasks))
 		if n > 96 {
 			return nil, errExpectedLengthLowerOrEqual("CFListChMasks", 96)(n)
 		}
-		for i := uint(0); i < uint(n); i += 8 {
+		for i := uint(0); i < n; i += 8 {
 			var b byte
-			for j := uint(0); j < 8; j++ {
+			for j := uint(0); j < 8 && i+j < n; j++ {
 				if msg.ChMasks[i+j] {
 					b |= (1 << j)
 				}
@@ -246,7 +246,7 @@ func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
 			dst = append(dst, b)
 		}
 		// Fill remaining space with zeros.
-		dst = append(dst, bytes.Repeat([]byte{0x0}, 15-(n+7)/8)...)
+		dst = append(dst, bytes.Repeat([]byte{0x0}, int(15-(n+7)/8))...)
 	}
 	dst = append(dst, byte(msg.Type))
 	return dst, nil
