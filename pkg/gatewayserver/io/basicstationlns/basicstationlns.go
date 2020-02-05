@@ -171,26 +171,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := c.Request().Context()
-	var md metadata.MD
-
-	if auth != "" {
-		if !strings.Contains(auth, "Bearer") {
-			auth = fmt.Sprintf("Bearer %s", auth)
-		}
-		md = metadata.New(map[string]string{
-			"id":            id,
-			"authorization": auth,
-		})
-	}
-
-	if ctxMd, ok := metadata.FromIncomingContext(s.ctx); ok {
-		md = metadata.Join(ctxMd, md)
-	}
-	ctx = metadata.NewIncomingContext(s.ctx, md)
-	// If a fallback frequency is defined in the server context, inject it into local the context.
-	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
-		ctx = frequencyplans.WithFallbackID(ctx, fallback)
-	}
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"endpoint", "traffic",
@@ -216,6 +196,26 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
+
+	var md metadata.MD
+	if auth != "" {
+		if !strings.Contains(auth, "Bearer") {
+			auth = fmt.Sprintf("Bearer %s", auth)
+		}
+		md = metadata.New(map[string]string{
+			"id":            ids.GatewayID,
+			"authorization": auth,
+		})
+	}
+
+	if ctxMd, ok := metadata.FromIncomingContext(s.ctx); ok {
+		md = metadata.Join(ctxMd, md)
+	}
+	ctx = metadata.NewIncomingContext(s.ctx, md)
+	// If a fallback frequency is defined in the server context, inject it into local the context.
+	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
+		ctx = frequencyplans.WithFallbackID(ctx, fallback)
+	}
 
 	// For gateways with valid EUIs and no auth, we provide the link rights ourselves as in the udp frontend.
 	if auth == "" {
