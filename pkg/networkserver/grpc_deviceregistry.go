@@ -424,7 +424,13 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				"frequency_plan_id",
 				"lorawan_phy_version",
 			) {
-				_, _, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+				if !ttnpb.HasAnyField(sets, "frequency_plan_id") {
+					req.EndDevice.FrequencyPlanID = dev.FrequencyPlanID
+				}
+				if !ttnpb.HasAnyField(sets, "lorawan_phy_version") {
+					req.EndDevice.LoRaWANPHYVersion = dev.LoRaWANPHYVersion
+				}
+				_, _, err := getDeviceBandVersion(&req.EndDevice, ns.FrequencyPlans)
 				if err != nil {
 					return nil, nil, err
 				}
