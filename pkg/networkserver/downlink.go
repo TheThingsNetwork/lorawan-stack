@@ -74,7 +74,7 @@ func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.Appli
 	if down.GetClassBC() != nil {
 		pairs = append(pairs, "class_b_c", true)
 		if down.ClassBC.GetAbsoluteTime() != nil {
-			pairs = append(pairs, "abs_time", *down.ClassBC.AbsoluteTime)
+			pairs = append(pairs, "absolute_time", *down.ClassBC.AbsoluteTime)
 		}
 		if len(down.ClassBC.GetGateways()) > 0 {
 			pairs = append(pairs, "fixed_gateway_count", len(down.ClassBC.Gateways))
@@ -135,6 +135,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 		"mac_version", dev.MACState.LoRaWANVersion,
 		"phy_version", dev.LoRaWANPHYVersion,
+		"schedule_at", scheduleAt,
 	))
 	logger := log.FromContext(ctx)
 
@@ -264,6 +265,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		"mac_len", len(cmdBuf),
 		"max_down_len", maxDownLen,
 	))
+	ctx = log.NewContext(ctx, logger)
 
 	var needsDownlink bool
 	var up *ttnpb.UplinkMessage
@@ -294,6 +296,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		"ack", pld.FHDR.FCtrl.Ack,
 		"adr", pld.FHDR.FCtrl.ADR,
 	))
+	ctx = log.NewContext(ctx, logger)
 
 	if len(cmdBuf) <= fOptsCapacity {
 		appDowns := dev.QueuedApplicationDownlinks[:0:0]
@@ -366,7 +369,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 			case down.ClassBC != nil && class == ttnpb.CLASS_A:
 				appDowns = append(appDowns, dev.QueuedApplicationDownlinks[i:]...)
-				logger.Debug("Skip class B/C downlink for class A downlink")
+				logger.Debug("Skip class B/C downlink for class A downlink slot")
 				if dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.MACState.QueuedResponses) == 0 {
 					genState.NeedsDownlinkQueueUpdate = len(dev.QueuedApplicationDownlinks) != len(appDowns)
 					dev.QueuedApplicationDownlinks = appDowns
@@ -429,6 +432,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		"f_port", pld.FPort,
 		"m_type", mType,
 	))
+	ctx = log.NewContext(ctx, logger)
 
 	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
@@ -470,6 +474,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	pld.FHDR.FCtrl.FPending = fPending || len(dev.QueuedApplicationDownlinks) > 0
 
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
+	ctx = log.NewContext(ctx, logger)
 
 	needsAck := mType == ttnpb.MType_CONFIRMED_DOWN || len(dev.MACState.PendingRequests) > 0
 	if class == ttnpb.CLASS_C && needsAck && nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).After(timeNow().Add(nsScheduleWindow)) {
@@ -1217,7 +1222,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					return dev, nil, nil
 				}
 
-				logger = logger.WithField("device_class", dev.MACState.DeviceClass)
+				logger = logger.WithFields(log.Fields(
+					"dev_addr", dev.Session.DevAddr,
+					"device_class", dev.MACState.DeviceClass,
+				))
 				ctx = log.NewContext(ctx, logger)
 
 				if !dev.MACState.RxWindowsAvailable {

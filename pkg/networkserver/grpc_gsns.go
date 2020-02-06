@@ -196,10 +196,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		ctx := dev.Context
 
 		logger := log.FromContext(ctx).WithFields(log.Fields(
-			"dev_addr", pld.DevAddr,
 			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-			"payload_length", len(macPayloadBytes),
-			"uplink_f_cnt", pld.FCnt,
+			"mac_payload_len", len(macPayloadBytes),
 		))
 		ctx = log.NewContext(ctx, logger)
 
@@ -570,7 +568,6 @@ matchLoop:
 				pld := cmd.GetLinkADRAns()
 				dupCount := 0
 				if match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-					logger.Debug("Count LinkADR duplicates")
 					for _, dup := range cmds {
 						if dup.CID != ttnpb.CID_LINK_ADR {
 							break
@@ -581,7 +578,6 @@ matchLoop:
 						}
 						dupCount++
 					}
-					logger.WithField("duplicate_count", dupCount).Debug("Counted LinkADR duplicates")
 				}
 				if err != nil {
 					break
@@ -663,6 +659,8 @@ matchLoop:
 			logger.WithError(err).Debug("Failed to determine channel index of uplink, skip")
 			continue
 		}
+		logger = logger.WithField("channel_index", chIdx)
+		ctx = log.NewContext(ctx, logger)
 		match.ChannelIndex = chIdx
 
 		var computedMIC [4]byte
@@ -796,6 +794,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"dev_addr", pld.DevAddr,
 		"f_opts_len", len(pld.FOpts),
 		"f_port", pld.FPort,
+		"frequency", up.Settings.Frequency,
 		"frm_payload_len", len(pld.FRMPayload),
 		"uplink_f_cnt", pld.FCnt,
 	))
