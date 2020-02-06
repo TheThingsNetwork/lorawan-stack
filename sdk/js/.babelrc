@@ -4,7 +4,8 @@
   ],
   "plugins": [
     "@babel/plugin-transform-runtime",
-    "@babel/plugin-transform-strict-mode"
+    "@babel/plugin-transform-strict-mode",
+    "lodash"
   ],
   "sourceMaps": "inline"
 }

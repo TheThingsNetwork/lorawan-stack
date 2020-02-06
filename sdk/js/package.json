@@ -25,6 +25,7 @@
     "@babel/plugin-transform-runtime": "^7.6.2",
     "@babel/plugin-transform-strict-mode": "^7.2.0",
     "@babel/preset-env": "^7.7.1",
+    "babel-plugin-lodash": "^3.3.4",
     "eslint": "^6.2.2",
     "jest": "^24.9.0",
     "prettier": "^1.18.2"
@@ -46,6 +47,7 @@
   "dependencies": {
     "arraybuffer-to-string": "^1.0.2",
     "axios": "^0.19.0",
+    "lodash": "^4.17.15",
     "proxy-polyfill": "^0.3.0",
     "query-string": "^6.2.0",
     "traverse": "^0.6.6",
