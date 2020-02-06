@@ -532,12 +532,15 @@ matchLoop:
 
 			case match.Device.MACState.DeviceClass != ttnpb.CLASS_B:
 				logger.WithField("previous_class", match.Device.MACState.DeviceClass).Debug("Switch device class to class B")
+				match.QueuedEvents = append(match.QueuedEvents, evtClassBSwitch.BindData(match.Device.MACState.DeviceClass))
 				match.Device.MACState.DeviceClass = ttnpb.CLASS_B
 			}
 		} else if match.Device.MACState.DeviceClass == ttnpb.CLASS_B {
 			if match.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && match.Device.SupportsClassC {
+				match.QueuedEvents = append(match.QueuedEvents, evtClassCSwitch.BindData(ttnpb.CLASS_B))
 				match.Device.MACState.DeviceClass = ttnpb.CLASS_C
 			} else {
+				match.QueuedEvents = append(match.QueuedEvents, evtClassASwitch.BindData(ttnpb.CLASS_B))
 				match.Device.MACState.DeviceClass = ttnpb.CLASS_A
 			}
 		}

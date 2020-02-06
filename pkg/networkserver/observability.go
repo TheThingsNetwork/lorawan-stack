@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -83,6 +84,13 @@ func defineEnqueueMACRequestEvent(name, desc string) func() events.Definition {
 	)
 }
 
+func defineClassSwitchEvent(class rune) func() events.Definition {
+	return events.DefineFunc(
+		fmt.Sprintf("ns.class.switch.%c", class), fmt.Sprintf("switched to class %c", unicode.ToUpper(class)),
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+}
+
 var (
 	evtBeginApplicationLink = events.Define(
 		"ns.application.begin_link", "begin application link",
@@ -134,6 +142,10 @@ var (
 		"ns.mac.proprietary.receive", "proprietary MAC command received",
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 	)
+
+	evtClassASwitch = defineClassSwitchEvent('a')()
+	evtClassBSwitch = defineClassSwitchEvent('b')()
+	evtClassCSwitch = defineClassSwitchEvent('c')()
 )
 
 const (
