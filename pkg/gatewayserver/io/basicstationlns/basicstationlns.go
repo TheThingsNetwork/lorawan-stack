@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"net/http"
 	"regexp"
 	"strings"
 	"sync/atomic"
@@ -370,7 +371,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					},
 				}
 				if err := conn.HandleStatus(stat); err != nil {
-					logger.WithError(err).Warn("Failed to send status message")
+					logger.WithError(err).Warn("Failed to send version response message")
 				}
 
 			case messages.TypeUpstreamJoinRequest:
@@ -454,10 +455,27 @@ func recordRTT(conn *io.Connection, receivedAt time.Time, refTime float64) {
 	}
 }
 
+type errorMessage struct {
+	Message string `json:"message"`
+}
+
 // errorHandler is an echo.HTTPErrorHandler.
 func errorHandler(err error, c echo.Context) {
 	if httpErr, ok := err.(*echo.HTTPError); ok {
 		c.JSON(httpErr.Code, httpErr.Message)
 		return
+	}
+
+	statusCode, description := http.StatusInternalServerError, ""
+	if ttnErr, ok := errors.From(err); ok {
+		if !errors.IsInternal(ttnErr) {
+			description = ttnErr.Error()
+		}
+		statusCode = errors.ToHTTPStatusCode(ttnErr)
+	}
+	if description != "" {
+		c.JSON(statusCode, errorMessage{description})
+	} else {
+		c.NoContent(statusCode)
 	}
 }
