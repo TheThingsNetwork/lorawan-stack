@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
@@ -28,10 +29,16 @@ type gsPbaServer struct {
 	upstreamCh chan *ttnpb.GatewayUplinkMessage
 }
 
+var errForwarderDisabled = errors.DefineFailedPrecondition("forwarder_disabled", "Forwarder is disabled")
+
 // PublishUplink is called by the Gateway Server when an uplink message arrives and needs to get forwarded to Packet Broker.
 func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplinkMessage) (*pbtypes.Empty, error) {
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
+	}
+
+	if s.upstreamCh == nil {
+		return nil, errForwarderDisabled
 	}
 
 	ctx = events.ContextWithCorrelationID(ctx, append(

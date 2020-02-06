@@ -5993,6 +5993,15 @@
       "file": "translation.go"
     }
   },
+  "error:pkg/packetbrokeragent:forwarder_disabled": {
+    "translations": {
+      "en": "Forwarder is disabled"
+    },
+    "description": {
+      "package": "pkg/packetbrokeragent",
+      "file": "grpc_gspba.go"
+    }
+  },
   "error:pkg/packetbrokeragent:message_identifiers": {
     "translations": {
       "en": "invalid message identifiers"

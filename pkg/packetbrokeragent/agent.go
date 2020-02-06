@@ -107,8 +107,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		homeNetworkConfig: conf.HomeNetwork,
 		subscriptionGroup: conf.SubscriptionGroup,
 		devAddrPrefixes:   devAddrPrefixes,
-
-		upstreamCh: make(chan *ttnpb.GatewayUplinkMessage, upstreamBufferSize),
+	}
+	if a.forwarderConfig.Enable {
+		a.upstreamCh = make(chan *ttnpb.GatewayUplinkMessage, upstreamBufferSize)
 	}
 	a.grpc.nsPba = &ttnpb.UnimplementedNsPbaServer{}
 	a.grpc.gsPba = &gsPbaServer{
@@ -118,10 +119,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		opt(a)
 	}
 
-	if conf.Forwarder.Enable {
+	if a.forwarderConfig.Enable {
 		c.RegisterTask(c.Context(), "pb_forward_uplink", a.forwardUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
 	}
-	if conf.HomeNetwork.Enable {
+	if a.forwarderConfig.Enable {
 		c.RegisterTask(c.Context(), "pb_subscribe_uplink", a.subscribeUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
 	}
 
