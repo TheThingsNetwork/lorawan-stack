@@ -94,6 +94,7 @@ func (c *connection) setup(ctx context.Context) error {
 	ctx, cancel := errorcontext.New(ctx)
 	c.session = session.New(ctx, c.mqtt, c.deliver)
 	if err := c.session.ReadConnect(); err != nil {
+		cancel(err)
 		return err
 	}
 	ctx = c.io.Context()
