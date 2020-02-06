@@ -13,20 +13,19 @@
 // limitations under the License.
 
 import Marshaler from '../util/marshaler'
+import { createDefaultsEmitterFromFieldMask } from '../util/create-defaults-emitter'
+
+const userDefaultsEmitter = createDefaultsEmitterFromFieldMask((fmKey, value) => {
+  // Ensure to set STATE_REQUESTED if needed, which gets stripped as null
+  // value from the backend response
+  if (fmKey === 'state' && !Boolean(value)) {
+    return 'STATE_REQUESTED'
+  }
+})
 
 class Users {
   constructor(registry) {
     this._api = registry
-  }
-
-  _addState(fieldMask, user) {
-    // Ensure to set STATE_REQUESTED if needed, which gets stripped as null
-    // value from the backend response
-    if (fieldMask && fieldMask.field_mask.paths.includes('state') && !('state' in user)) {
-      user.state = 'STATE_REQUESTED'
-    }
-
-    return user
   }
 
   async getAll(params, selector) {
@@ -36,10 +35,9 @@ class Users {
       ...fieldMask,
     })
 
-    const users = Marshaler.payloadListResponse('users', response)
-    users.users.map(user => this._addState(fieldMask, user))
-
-    return users
+    return Marshaler.payloadListResponse('users', response, user =>
+      userDefaultsEmitter(user, fieldMask.field_mask.paths),
+    )
   }
 
   async search(params, selector) {
@@ -49,10 +47,9 @@ class Users {
       ...fieldMask,
     })
 
-    const users = Marshaler.payloadListResponse('users', response)
-    users.users.map(user => this._addState(fieldMask, user))
-
-    return users
+    return Marshaler.payloadListResponse('users', response, user =>
+      userDefaultsEmitter(user, fieldMask.field_mask.paths),
+    )
   }
 
   async getById(id, selector) {
@@ -64,9 +61,9 @@ class Users {
       fieldMask,
     )
 
-    const user = this._addState(fieldMask, Marshaler.payloadSingleResponse(response))
-
-    return user
+    return Marshaler.payloadSingleResponse(response, user =>
+      userDefaultsEmitter(user, fieldMask.field_mask.paths),
+    )
   }
 
   async deleteById(id) {
