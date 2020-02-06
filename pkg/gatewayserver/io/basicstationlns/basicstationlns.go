@@ -201,7 +201,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	var md metadata.MD
 	if auth != "" {
-		if !strings.Contains(auth, "Bearer") {
+		if !strings.HasPrefix(auth, "Bearer ") {
 			auth = fmt.Sprintf("Bearer %s", auth)
 		}
 		md = metadata.New(map[string]string{
