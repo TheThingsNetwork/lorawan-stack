@@ -172,7 +172,6 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 
 	var genState generateDownlinkState
-	mType := ttnpb.MType_UNCONFIRMED_DOWN
 	cmdBuf := make([]byte, 0, maxDownLen)
 	if !dev.Multicast && len(lostResps) == 0 {
 		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) macCommandEnqueueState, 0, 13)
@@ -249,14 +248,6 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			cmdBuf, err = spec.AppendDownlink(phy, cmdBuf, *cmd)
 			if err != nil {
 				return nil, generateDownlinkState{}, errEncodeMAC.WithCause(err)
-			}
-			if mType == ttnpb.MType_UNCONFIRMED_DOWN &&
-				spec[cmd.CID].ExpectAnswer &&
-				dev.MACState.DeviceClass == ttnpb.CLASS_C &&
-				dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 &&
-				nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).Before(scheduleAt) {
-				logger.Debug("Use confirmed downlink to get immediate answer")
-				mType = ttnpb.MType_CONFIRMED_DOWN
 			}
 		}
 	}
@@ -410,6 +401,8 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 		}
 		dev.QueuedApplicationDownlinks = appDowns
 	}
+
+	mType := ttnpb.MType_UNCONFIRMED_DOWN
 	switch {
 	case genState.ApplicationDownlink != nil:
 		loggerWithApplicationDownlinkFields(logger, genState.ApplicationDownlink).Debug("Add application downlink to buffer")
@@ -425,6 +418,12 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 
 	default:
 		return nil, genState, errNoDownlink
+	}
+	if mType == ttnpb.MType_UNCONFIRMED_DOWN && len(dev.MACState.PendingRequests) > 0 &&
+		(dev.MACState.DeviceClass == ttnpb.CLASS_B ||
+			dev.MACState.DeviceClass == ttnpb.CLASS_C && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0) {
+		logger.Debug("Use confirmed downlink to get immediate answer")
+		mType = ttnpb.MType_CONFIRMED_DOWN
 	}
 
 	logger = logger.WithFields(log.Fields(
