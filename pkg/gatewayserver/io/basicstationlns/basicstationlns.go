@@ -69,16 +69,18 @@ func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
 func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool) *echo.Echo {
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
+
 	webServer := echo.New()
 	webServer.Logger = web.NewNoopLogger()
 	webServer.HTTPErrorHandler = errorHandler
 	webServer.Use(
 		middleware.ID(""),
 		echomiddleware.BodyLimit("16M"),
+		middleware.Log(log.FromContext(ctx)),
 		middleware.Recover(),
 	)
 
-	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 	s := &srv{
 		ctx:                  ctx,
 		server:               server,
@@ -123,7 +125,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	}
 
 	if req.EUI.IsZero() {
-		writeDiscoverError(s.ctx, ws, "Empty router EUI provided")
+		writeDiscoverError(ctx, ws, "Empty router EUI provided")
 		return errEmptyGatewayEUI
 	}
 
@@ -133,7 +135,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to fetch gateway")
-		writeDiscoverError(s.ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
+		writeDiscoverError(ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
 		return err
 	}
 
@@ -153,7 +155,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	data, err = json.Marshal(res)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to marshal response message")
-		writeDiscoverError(s.ctx, ws, "Router not provisioned")
+		writeDiscoverError(ctx, ws, "Router not provisioned")
 		return err
 	}
 	if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
@@ -208,12 +210,12 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		})
 	}
 
-	if ctxMd, ok := metadata.FromIncomingContext(s.ctx); ok {
+	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
 		md = metadata.Join(ctxMd, md)
 	}
-	ctx = metadata.NewIncomingContext(s.ctx, md)
+	ctx = metadata.NewIncomingContext(ctx, md)
 	// If a fallback frequency is defined in the server context, inject it into local the context.
-	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
+	if fallback, ok := frequencyplans.FallbackIDFromContext(ctx); ok {
 		ctx = frequencyplans.WithFallbackID(ctx, fallback)
 	}
 
