@@ -733,7 +733,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 				})
 				a.So(err, should.BeNil)
-				a.So(sets, should.Resemble, []string{
+				a.So(sets, should.HaveSameElementsDeep, []string{
 					"queued_application_downlinks",
 				})
 				a.So(dev.QueuedApplicationDownlinks, should.BeNil)
@@ -1346,7 +1346,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
-				a.So(sets, should.Resemble, []string{
+				a.So(sets, should.HaveSameElementsDeep, []string{
 					"queued_application_downlinks",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
