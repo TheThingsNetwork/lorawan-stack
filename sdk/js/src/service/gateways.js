@@ -12,10 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { cloneDeep } from 'lodash'
 import Marshaler from '../util/marshaler'
 import combineStreams from '../util/combine-streams'
+import { createDefaultsEmitterFromFieldMask } from '../util/create-defaults-emitter'
 import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
+
+const gatewayDefaultsEmitter = createDefaultsEmitterFromFieldMask((fmKey, value) => {
+  if (fmKey === 'antennas' && Array.isArray(value)) {
+    // Set zero coordinates for each antenna swallowed by the backend if the location exists.
+    const antennas = value
+
+    return antennas.map(ant => {
+      const antenna = cloneDeep(ant)
+
+      if (!('altitude' in antenna.location)) {
+        antenna.location.altitude = 0
+      }
+      if (!('longitude' in antenna.location)) {
+        antenna.location.longitude = 0
+      }
+      if (!('latitude' in antenna.location)) {
+        antenna.location.latitude = 0
+      }
+
+      return antenna
+    })
+  }
+})
 
 class Gateways {
   constructor(api, { defaultUserId, stackConfig, proxy = true }) {
@@ -59,7 +84,9 @@ class Gateways {
       fieldMask,
     )
 
-    return Marshaler.unwrapGateway(response)
+    return Marshaler.unwrapGateway(response, gtw =>
+      gatewayDefaultsEmitter(gtw, fieldMask.field_mask.paths),
+    )
   }
 
   async search(params, selector) {
