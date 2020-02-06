@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"net/http"
 	"regexp"
 	"strings"
 	"sync/atomic"
@@ -69,16 +70,18 @@ func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
 func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool) *echo.Echo {
+	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
+
 	webServer := echo.New()
 	webServer.Logger = web.NewNoopLogger()
 	webServer.HTTPErrorHandler = errorHandler
 	webServer.Use(
 		middleware.ID(""),
 		echomiddleware.BodyLimit("16M"),
+		middleware.Log(log.FromContext(ctx)),
 		middleware.Recover(),
 	)
 
-	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 	s := &srv{
 		ctx:                  ctx,
 		server:               server,
@@ -123,7 +126,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	}
 
 	if req.EUI.IsZero() {
-		writeDiscoverError(s.ctx, ws, "Empty router EUI provided")
+		writeDiscoverError(ctx, ws, "Empty router EUI provided")
 		return errEmptyGatewayEUI
 	}
 
@@ -133,7 +136,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to fetch gateway")
-		writeDiscoverError(s.ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
+		writeDiscoverError(ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
 		return err
 	}
 
@@ -153,7 +156,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	data, err = json.Marshal(res)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to marshal response message")
-		writeDiscoverError(s.ctx, ws, "Router not provisioned")
+		writeDiscoverError(ctx, ws, "Router not provisioned")
 		return err
 	}
 	if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
@@ -171,26 +174,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := c.Request().Context()
-	var md metadata.MD
-
-	if auth != "" {
-		if !strings.Contains(auth, "Bearer") {
-			auth = fmt.Sprintf("Bearer %s", auth)
-		}
-		md = metadata.New(map[string]string{
-			"id":            id,
-			"authorization": auth,
-		})
-	}
-
-	if ctxMd, ok := metadata.FromIncomingContext(s.ctx); ok {
-		md = metadata.Join(ctxMd, md)
-	}
-	ctx = metadata.NewIncomingContext(s.ctx, md)
-	// If a fallback frequency is defined in the server context, inject it into local the context.
-	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
-		ctx = frequencyplans.WithFallbackID(ctx, fallback)
-	}
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"endpoint", "traffic",
@@ -216,6 +199,26 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "gateway_uid", uid)
+
+	var md metadata.MD
+	if auth != "" {
+		if !strings.HasPrefix(auth, "Bearer ") {
+			auth = fmt.Sprintf("Bearer %s", auth)
+		}
+		md = metadata.New(map[string]string{
+			"id":            ids.GatewayID,
+			"authorization": auth,
+		})
+	}
+
+	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
+		md = metadata.Join(ctxMd, md)
+	}
+	ctx = metadata.NewIncomingContext(ctx, md)
+	// If a fallback frequency is defined in the server context, inject it into local the context.
+	if fallback, ok := frequencyplans.FallbackIDFromContext(ctx); ok {
+		ctx = frequencyplans.WithFallbackID(ctx, fallback)
+	}
 
 	// For gateways with valid EUIs and no auth, we provide the link rights ourselves as in the udp frontend.
 	if auth == "" {
@@ -368,7 +371,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					},
 				}
 				if err := conn.HandleStatus(stat); err != nil {
-					logger.WithError(err).Warn("Failed to send status message")
+					logger.WithError(err).Warn("Failed to send version response message")
 				}
 
 			case messages.TypeUpstreamJoinRequest:
@@ -452,10 +455,27 @@ func recordRTT(conn *io.Connection, receivedAt time.Time, refTime float64) {
 	}
 }
 
+type errorMessage struct {
+	Message string `json:"message"`
+}
+
 // errorHandler is an echo.HTTPErrorHandler.
 func errorHandler(err error, c echo.Context) {
 	if httpErr, ok := err.(*echo.HTTPError); ok {
 		c.JSON(httpErr.Code, httpErr.Message)
 		return
+	}
+
+	statusCode, description := http.StatusInternalServerError, ""
+	if ttnErr, ok := errors.From(err); ok {
+		if !errors.IsInternal(ttnErr) {
+			description = ttnErr.Error()
+		}
+		statusCode = errors.ToHTTPStatusCode(ttnErr)
+	}
+	if description != "" {
+		c.JSON(statusCode, errorMessage{description})
+	} else {
+		c.NoContent(statusCode)
 	}
 }
