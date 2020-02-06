@@ -1157,7 +1157,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 
-	startAt := up.ReceivedAt.Add(phy.JoinAcceptDelay1 - nsScheduleWindow)
+	startAt := up.ReceivedAt.Add(phy.JoinAcceptDelay1 - nsScheduleWindow - gsScheduleWindow)
 	logger.WithField("start_at", startAt).Debug("Add downlink task for join-accept")
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task for join-accept")
