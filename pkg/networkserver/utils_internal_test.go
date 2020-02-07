@@ -15,11 +15,19 @@
 package networkserver
 
 import (
+	"context"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/gpstime"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
@@ -262,6 +270,451 @@ func TestNewMACState(t *testing.T) {
 			}
 			a.So(macState, should.Resemble, tc.MACState)
 			a.So(pb, should.Resemble, tc.Device)
+		})
+	}
+}
+
+func TestBeaconTimeBefore(t *testing.T) {
+	for _, tc := range []struct {
+		Time     time.Time
+		Expected time.Duration
+	}{
+		{
+			Time:     gpstime.Parse(0),
+			Expected: 0,
+		},
+		{
+			Time:     gpstime.Parse(time.Nanosecond),
+			Expected: 0,
+		},
+		{
+			Time:     gpstime.Parse(beaconPeriod - time.Second),
+			Expected: 0,
+		},
+		{
+			Time:     gpstime.Parse(beaconPeriod),
+			Expected: beaconPeriod,
+		},
+		{
+			Time:     gpstime.Parse(beaconPeriod + time.Second),
+			Expected: beaconPeriod,
+		},
+		{
+			Time:     gpstime.Parse(2*beaconPeriod - time.Second),
+			Expected: beaconPeriod,
+		},
+		{
+			Time:     gpstime.Parse(10 * beaconPeriod),
+			Expected: 10 * beaconPeriod,
+		},
+		{
+			Time:     gpstime.Parse(10*beaconPeriod + time.Second),
+			Expected: 10 * beaconPeriod,
+		},
+	} {
+		t.Run(fmt.Sprintf("%s", tc.Time), func(t *testing.T) {
+			a := assertions.New(t)
+			ret := beaconTimeBefore(tc.Time)
+			a.So(ret, should.Equal, tc.Expected)
+		})
+	}
+}
+
+func computePingOffset(beaconTime uint32, devAddr types.DevAddr, pingPeriod uint16) uint16 {
+	return test.Must(crypto.ComputePingOffset(beaconTime, devAddr, pingPeriod)).(uint16)
+}
+
+func TestNextPingSlotAfter(t *testing.T) {
+	const beaconTime = 10000 * beaconPeriod
+	beaconAt := gpstime.Parse(beaconTime)
+	devAddr := types.DevAddr{0x01, 0x34, 0x07, 0x29}
+
+	pingSlotTime := func(pingPeriod uint16, n uint16) time.Time {
+		return beaconAt.Add(tBeaconDelay + beaconReserved + time.Duration(computePingOffset(uint32(beaconTime/time.Second), devAddr, pingPeriod)+n*pingPeriod)*pingSlotLen)
+	}
+
+	for _, tc := range []struct {
+		Name         string
+		Device       *ttnpb.EndDevice
+		EarliestAt   time.Time
+		ExpectedTime time.Time
+		ExpectedOk   bool
+	}{
+		{
+			Name:   "no MAC state/no session/no devAddr",
+			Device: &ttnpb.EndDevice{},
+		},
+		{
+			Name: "no session/no devAddr",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+			},
+		},
+		{
+			Name: "no devAddr",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{},
+				Session:  &ttnpb.Session{},
+			},
+		},
+		{
+			Name:       "earliestAt:beaconAt;periodicity:0",
+			EarliestAt: beaconAt,
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_1S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<5, 0),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "earliestAt:beaconAt;periodicity:1",
+			EarliestAt: beaconAt,
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_2S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<6, 0),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "earliestAt:beaconAt;periodicity:2",
+			EarliestAt: beaconAt,
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_4S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<7, 0),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "earliestAt:beaconAt;periodicity:3",
+			EarliestAt: beaconAt,
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_8S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<8, 0),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "earliestAt:beaconAt;periodicity:4",
+			EarliestAt: beaconAt,
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<9, 0),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "earliestAt:beaconAt+12s120ms15ns;periodicity:3",
+			EarliestAt: beaconAt.Add(12*time.Second + 120*time.Millisecond + 1*time.Microsecond + 500*time.Nanosecond),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_8S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<8, 1),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "earliestAt:beaconAt+20s;periodicity:4",
+			EarliestAt: beaconAt.Add(20 * time.Second),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<9, 1),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "earliestAt:beaconAt+38s;periodicity:4",
+			EarliestAt: beaconAt.Add(38 * time.Second),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<9, 2),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "earliestAt:beaconAt+50s;periodicity:4",
+			EarliestAt: beaconAt.Add(50 * time.Second),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: devAddr,
+				},
+			},
+			ExpectedTime: pingSlotTime(1<<9, 3),
+			ExpectedOk:   true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			ctx := test.Context()
+			ctx = log.NewContext(ctx, test.GetLogger(t))
+
+			ret, ok := nextPingSlotAt(ctx, tc.Device, tc.EarliestAt)
+			if a.So(ok, should.Equal, tc.ExpectedOk) {
+				a.So(ret, should.Resemble, tc.ExpectedTime)
+			}
+			if ok {
+				earliestAt := ret
+				ret, ok = nextPingSlotAt(ctx, tc.Device, earliestAt)
+				a.So(ok, should.BeTrue)
+				a.So(ret, should.Resemble, earliestAt)
+			}
+		})
+	}
+}
+
+func TestNextDataDownlinkAfter(t *testing.T) {
+	nextPingSlotAfter := func(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) time.Time {
+		pingSlotAfter, ok := nextPingSlotAfter(ctx, dev, earliestAt)
+		if !ok {
+			panic(fmt.Sprintf("failed to compute next ping slot after %v", earliestAt))
+		}
+		return pingSlotAfter
+	}
+
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	type TestCase struct {
+		Name         string
+		Device       *ttnpb.EndDevice
+		EarliestAt   time.Time
+		ExpectedTime time.Time
+		ExpectedOk   bool
+	}
+	for _, tc := range []TestCase{
+		{
+			Name:   "no MAC state",
+			Device: &ttnpb.EndDevice{},
+		},
+		{
+			Name:       "unicast/class A/Rx1,Rx2 available",
+			EarliestAt: time.Unix(42, 0),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_4,
+					},
+					LoRaWANVersion:     ttnpb.MAC_V1_0_3,
+					DeviceClass:        ttnpb.CLASS_A,
+					RxWindowsAvailable: true,
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						{
+							Payload: &ttnpb.Message{
+								Payload: &ttnpb.Message_MACPayload{
+									MACPayload: &ttnpb.MACPayload{},
+								},
+							},
+							ReceivedAt: time.Unix(41, 0),
+						},
+					},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+			},
+			ExpectedTime: time.Unix(41+4, 0),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "unicast/class A/Rx windows closed",
+			EarliestAt: time.Unix(42, 0),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_4,
+					},
+					LoRaWANVersion: ttnpb.MAC_V1_0_3,
+					DeviceClass:    ttnpb.CLASS_A,
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						{
+							Payload: &ttnpb.Message{
+								Payload: &ttnpb.Message_MACPayload{
+									MACPayload: &ttnpb.MACPayload{},
+								},
+							},
+							ReceivedAt: time.Unix(41, 0),
+						},
+					},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+			},
+		},
+		{
+			Name:       "unicast/class B/Rx1,Rx2 available",
+			EarliestAt: gpstime.Parse(beaconPeriod + time.Second),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_4,
+					},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
+						Value: ttnpb.PING_EVERY_2S,
+					},
+					LoRaWANVersion:     ttnpb.MAC_V1_0_3,
+					DeviceClass:        ttnpb.CLASS_B,
+					RxWindowsAvailable: true,
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						{
+							Payload: &ttnpb.Message{
+								Payload: &ttnpb.Message_MACPayload{
+									MACPayload: &ttnpb.MACPayload{},
+								},
+							},
+							ReceivedAt: gpstime.Parse(beaconPeriod),
+						},
+					},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+			},
+			ExpectedTime: gpstime.Parse(beaconPeriod + 4*time.Second),
+			ExpectedOk:   true,
+		},
+		func() TestCase {
+			dev := &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_4,
+					},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
+						Value: ttnpb.PING_EVERY_2S,
+					},
+					LoRaWANVersion: ttnpb.MAC_V1_0_3,
+					DeviceClass:    ttnpb.CLASS_B,
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						{
+							Payload: &ttnpb.Message{
+								Payload: &ttnpb.Message_MACPayload{
+									MACPayload: &ttnpb.MACPayload{},
+								},
+							},
+							ReceivedAt: gpstime.Parse(beaconPeriod),
+						},
+					},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+			}
+			earliestAt := gpstime.Parse(beaconPeriod + time.Second)
+			return TestCase{
+				Name:         "unicast/class B/Rx windows closed",
+				Device:       dev,
+				EarliestAt:   earliestAt,
+				ExpectedTime: nextPingSlotAfter(ctx, dev, earliestAt),
+				ExpectedOk:   true,
+			}
+		}(),
+		{
+			Name:       "unicast/class C/Rx1,Rx2 available",
+			EarliestAt: time.Unix(42, 0),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_4,
+					},
+					LoRaWANVersion:     ttnpb.MAC_V1_0_3,
+					DeviceClass:        ttnpb.CLASS_C,
+					RxWindowsAvailable: true,
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						{
+							Payload: &ttnpb.Message{
+								Payload: &ttnpb.Message_MACPayload{
+									MACPayload: &ttnpb.MACPayload{},
+								},
+							},
+							ReceivedAt: time.Unix(41, 0),
+						},
+					},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+			},
+			ExpectedTime: time.Unix(41+4, 0),
+			ExpectedOk:   true,
+		},
+		{
+			Name:       "unicast/class C/Rx windows closed",
+			EarliestAt: time.Unix(42, 0),
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					CurrentParameters: ttnpb.MACParameters{
+						Rx1Delay: ttnpb.RX_DELAY_4,
+					},
+					LoRaWANVersion: ttnpb.MAC_V1_0_3,
+					DeviceClass:    ttnpb.CLASS_C,
+					RecentUplinks: []*ttnpb.UplinkMessage{
+						{
+							Payload: &ttnpb.Message{
+								Payload: &ttnpb.Message_MACPayload{
+									MACPayload: &ttnpb.MACPayload{},
+								},
+							},
+							ReceivedAt: time.Unix(41, 0),
+						},
+					},
+				},
+				Session: &ttnpb.Session{
+					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				},
+			},
+			ExpectedTime: time.Unix(42, 0),
+			ExpectedOk:   true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			ctx := log.NewContext(ctx, test.GetLogger(t))
+			ret, ok := nextDataDownlinkAfter(ctx, tc.Device, test.Must(band.GetByID(band.EU_863_870)).(band.Band), ttnpb.MACSettings{}, tc.EarliestAt)
+			if a.So(ok, should.Equal, tc.ExpectedOk) {
+				a.So(ret, should.Resemble, tc.ExpectedTime)
+			}
 		})
 	}
 }

@@ -457,7 +457,9 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	ctx = log.NewContext(ctx, logger)
 
 	needsAck := mType == ttnpb.MType_CONFIRMED_DOWN || len(dev.MACState.PendingRequests) > 0
-	if class == ttnpb.CLASS_C && needsAck && nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).After(scheduleAt) {
+	if needsAck &&
+		(class == ttnpb.CLASS_B && nextConfirmedClassBDownlinkAt(dev, ns.defaultMACSettings).After(scheduleAt) ||
+			class == ttnpb.CLASS_C && nextConfirmedClassCDownlinkAt(dev, ns.defaultMACSettings).After(scheduleAt)) {
 		return nil, genState, errConfirmedDownlinkTooSoon
 	}
 
@@ -724,10 +726,14 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 			errs = append(errs, err)
 			continue
 		}
-		logger.WithField("delay", res.Delay).Debug("Scheduled downlink")
+		transmitAt := timeNow().Add(res.Delay)
+		logger.WithFields(log.Fields(
+			"transmission_delay", res.Delay,
+			"transmit_at", transmitAt,
+		)).Debug("Scheduled downlink")
 		return &scheduledDownlink{
 			Message:    down,
-			TransmitAt: timeNow().Add(res.Delay),
+			TransmitAt: transmitAt,
 		}, nil
 	}
 	return nil, downlinkSchedulingError(errs)
@@ -1261,27 +1267,39 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						return dev, sets, nil
 					}
 				}
-
-				switch dev.MACState.DeviceClass {
-				case ttnpb.CLASS_A:
-					return dev, sets, nil
-
-				case ttnpb.CLASS_B:
-					// TODO: Support Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/19).
-					logger.Warn("Class B downlinks are not supported, skip class B/C downlink slot")
+				if dev.MACState.DeviceClass == ttnpb.CLASS_A {
 					return dev, sets, nil
 				}
 
 				// Class B/C data downlink
-				req := &ttnpb.TxRequest{
-					Class:            dev.MACState.DeviceClass,
-					Rx2DataRateIndex: dev.MACState.CurrentParameters.Rx2DataRateIndex,
-					Rx2Frequency:     dev.MACState.CurrentParameters.Rx2Frequency,
-					FrequencyPlanID:  dev.FrequencyPlanID,
+				downAt, ok := nextDataDownlinkAfter(ctx, dev, phy, ns.defaultMACSettings, timeNow().UTC().Add(gsScheduleWindow()))
+				if !ok {
+					logger.Debug("No class B/C downlink available, skip downlink slot")
+					return dev, sets, nil
+				}
+				if downAt.After(timeNow().Add(2*gsScheduleWindow() + nsScheduleWindow())) {
+					nextDownlinkAt = downAt
+					logger.WithField("retry_at", nextDownlinkAt).Info("Class B/C downlink scheduling attempt performed too soon, retry attempt")
+					return dev, sets, nil
 				}
 
-				genDown, genState, err := ns.generateDownlink(ctx, dev, phy, dev.MACState.DeviceClass, timeNow().Add(nsScheduleWindow),
-					phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+				var drIdx ttnpb.DataRateIndex
+				var freq uint64
+				switch dev.MACState.DeviceClass {
+				case ttnpb.CLASS_B:
+					if dev.MACState.CurrentParameters.PingSlotDataRateIndexValue == nil {
+						logger.Error("Device is in class B mode, but ping slot data rate index is not known")
+						return dev, sets, nil
+					}
+					drIdx = dev.MACState.CurrentParameters.PingSlotDataRateIndexValue.Value
+					freq = dev.MACState.CurrentParameters.PingSlotFrequency
+				case ttnpb.CLASS_C:
+					drIdx = dev.MACState.CurrentParameters.Rx2DataRateIndex
+					freq = dev.MACState.CurrentParameters.Rx2Frequency
+				}
+
+				genDown, genState, err := ns.generateDownlink(ctx, dev, phy, dev.MACState.DeviceClass, downAt,
+					phy.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
 					maxUpLength,
 				)
 				if genState.NeedsDownlinkQueueUpdate {
@@ -1301,7 +1319,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				if genState.ApplicationDownlink != nil {
 					ctx = events.ContextWithCorrelationID(ctx, genState.ApplicationDownlink.CorrelationIDs...)
 				}
-				req.Priority = genDown.Priority
 
 				var paths []downlinkPath
 				if fixedPaths := genState.ApplicationDownlink.GetClassBC().GetGateways(); len(fixedPaths) > 0 {
@@ -1327,17 +1344,24 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						return dev, sets, nil
 					}
 				}
-				if absTime := genState.ApplicationDownlink.GetClassBC().GetAbsoluteTime(); absTime != nil {
-					if absTime.After(timeNow().Add(gsScheduleWindow + nsScheduleWindow)) {
-						nextDownlinkAt = absTime.Add(-gsScheduleWindow)
-						logger.WithField("retry_at", nextDownlinkAt).Info("Downlink scheduled too soon, retry attempt")
-						queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, false)
-						if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "queued_application_downlinks") {
-							dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
-						}
-						return dev, sets, nil
-					}
-					req.AbsoluteTime = absTime
+
+				req := &ttnpb.TxRequest{
+					Class:            dev.MACState.DeviceClass,
+					Priority:         genDown.Priority,
+					Rx2DataRateIndex: drIdx,
+					Rx2Frequency:     freq,
+					FrequencyPlanID:  dev.FrequencyPlanID,
+				}
+				switch {
+				case req.Class == ttnpb.CLASS_B && downAt.IsZero():
+					logger.Error("Class B downlink with no absolute time generated")
+					return dev, sets, nil
+
+				case genState.ApplicationDownlink.GetClassBC().GetAbsoluteTime() != nil:
+					req.AbsoluteTime = genState.ApplicationDownlink.GetClassBC().GetAbsoluteTime()
+
+				case req.Class == ttnpb.CLASS_B, req.Class == ttnpb.CLASS_C && downAt.After(timeNow().Add(gsScheduleWindow())):
+					req.AbsoluteTime = &downAt
 				}
 
 				down, err := ns.scheduleDownlinkByPaths(

@@ -18,12 +18,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/gpstime"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -54,6 +58,20 @@ func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 		return defaults.UseADR.Value
 	}
 	return true
+}
+
+// DefaultClassBTimeout is the default time-out for the device to respond to class B downlink messages.
+// When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
+const DefaultClassBTimeout = time.Minute
+
+func deviceClassBTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	if dev.MACSettings != nil && dev.MACSettings.ClassBTimeout != nil {
+		return *dev.MACSettings.ClassBTimeout
+	}
+	if defaults.ClassBTimeout != nil {
+		return *defaults.ClassBTimeout
+	}
+	return DefaultClassBTimeout
 }
 
 // DefaultClassCTimeout is the default time-out for the device to respond to class C downlink messages.
@@ -192,11 +210,73 @@ func nextClassADataDownlinkSlotAfter(dev *ttnpb.EndDevice, earliestAt time.Time)
 	}
 }
 
-func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Time {
-	if dev.GetMACState().GetLastConfirmedDownlinkAt() == nil {
+const (
+	tBeaconDelay   = 1*time.Microsecond + 500*time.Nanosecond
+	beaconPeriod   = 128 * time.Second
+	beaconReserved = 2*time.Second + 120*time.Millisecond
+	pingSlotCount  = 4096
+	pingSlotLen    = 30 * time.Millisecond
+)
+
+func beaconTimeBefore(t time.Time) time.Duration {
+	return gpstime.ToGPS(t) / beaconPeriod * beaconPeriod
+}
+
+// nextPingSlotAfter returns the time of next available class B ping slot, which will always be after earliest.
+func nextPingSlotAfter(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
+	if dev.GetMACState() == nil || dev.GetSession() == nil || dev.Session.DevAddr.IsZero() || dev.MACState.PingSlotPeriodicity == nil {
+		log.FromContext(ctx).Warn("Insufficient data to compute next ping slot")
+		return time.Time{}, false
+	}
+	pingNb := uint16(1 << (7 - dev.MACState.PingSlotPeriodicity.Value))
+	pingPeriod := uint16(1 << (5 + dev.MACState.PingSlotPeriodicity.Value))
+
+	for beaconTime := beaconTimeBefore(earliestAt); beaconTime < math.MaxInt64; beaconTime += beaconPeriod {
+		pingOffset, err := crypto.ComputePingOffset(uint32(beaconTime/time.Second), dev.Session.DevAddr, pingPeriod)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Failed to compute ping offset")
+			return time.Time{}, false
+		}
+
+		t := gpstime.Parse(beaconTime + tBeaconDelay + beaconReserved + time.Duration(pingOffset)*pingSlotLen).UTC()
+		if !earliestAt.After(t) {
+			return t, true
+		}
+		sub := earliestAt.Sub(t)
+		if sub >= beaconPeriod {
+			panic(fmt.Errorf("difference between earliestAt and first ping slot must be below '%s', got '%s'", beaconPeriod, sub))
+		}
+		pingPeriodDuration := time.Duration(pingPeriod) * pingSlotLen
+		n := sub / pingPeriodDuration
+		if int64(n) >= int64(pingNb) {
+			continue
+		}
+		t = t.Add(n * pingPeriodDuration)
+		if !earliestAt.After(t) {
+			return t, true
+		}
+		if int64(n+1) == int64(pingNb) {
+			continue
+		}
+		return t.Add(pingPeriodDuration), true
+	}
+	return time.Time{}, false
+}
+
+func nextConfirmedClassBDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Time {
+	if dev.GetMACState() == nil || dev.MACState.LastConfirmedDownlinkAt == nil || dev.MACState.RxWindowsAvailable {
 		return time.Time{}
 	}
-	if dev.GetMACState().GetRxWindowsAvailable() {
+	if len(dev.MACState.RecentUplinks) > 0 {
+		if lastUplink(dev.MACState.RecentUplinks...).ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
+			return time.Time{}
+		}
+	}
+	return dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassBTimeout(dev, defaults))
+}
+
+func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Time {
+	if dev.GetMACState() == nil || dev.MACState.LastConfirmedDownlinkAt == nil || dev.MACState.RxWindowsAvailable {
 		return time.Time{}
 	}
 	if len(dev.MACState.RecentUplinks) > 0 {
@@ -219,42 +299,86 @@ func nextDataDownlinkAfter(ctx context.Context, dev *ttnpb.EndDevice, phy band.B
 			return downAt, true
 		}
 	}
-	switch dev.MACState.DeviceClass {
-	case ttnpb.CLASS_A, ttnpb.CLASS_B:
+	if dev.MACState.DeviceClass == ttnpb.CLASS_A {
 		return time.Time{}, false
-	case ttnpb.CLASS_C:
-		now := timeNow().UTC()
-		confirmedAt := nextConfirmedClassCDownlinkAt(dev, defaults)
-		if confirmedAt.Before(now) {
-			confirmedAt = now
+	}
+
+	var earliestConfirmedAt time.Time
+	switch dev.MACState.DeviceClass {
+	case ttnpb.CLASS_B:
+		var ok bool
+		earliestAt, ok = nextPingSlotAfter(ctx, dev, earliestAt)
+		if !ok {
+			log.FromContext(ctx).Warn("Failed to compute next available unconfirmed downlink ping slot for class B device")
+			return time.Time{}, false
 		}
-		if deviceNeedsMACRequestsAt(ctx, dev, confirmedAt, phy, defaults) {
-			return confirmedAt, true
-		}
-		var absTime time.Time
-		if len(dev.QueuedApplicationDownlinks) > 0 {
-			classBC := dev.QueuedApplicationDownlinks[0].ClassBC
-			if classBC == nil || classBC.AbsoluteTime == nil || classBC.AbsoluteTime.IsZero() {
-				return now, true
-			}
-			absTime = classBC.AbsoluteTime.UTC()
+		earliestConfirmedAt, ok = nextPingSlotAfter(ctx, dev, nextConfirmedClassBDownlinkAt(dev, defaults))
+		if !ok {
+			log.FromContext(ctx).Warn("Failed to compute next available confirmed downlink ping slot for class B device")
+			return time.Time{}, false
 		}
 
-		statusAt, ok := deviceNeedsDevStatusReqAt(dev, defaults)
-		if !ok {
-			if absTime.IsZero() {
-				return time.Time{}, false
-			}
-			return absTime.Add(-gsScheduleWindow), true
-		}
-		// NOTE: statusAt is after confirmedAt, otherwise deviceNeedsMACRequestsAt call above would evaluate to true.
-		if statusAt.After(absTime) {
-			return absTime.Add(-gsScheduleWindow), true
-		}
-		return statusAt, true
+	case ttnpb.CLASS_C:
+		earliestConfirmedAt = nextConfirmedClassCDownlinkAt(dev, defaults)
 	default:
 		panic(fmt.Sprintf("Unmatched device class: %v", dev.MACState.DeviceClass))
 	}
+	if earliestConfirmedAt.Before(earliestAt) {
+		earliestConfirmedAt = earliestAt
+	}
+
+	var absTime time.Time
+	for _, down := range dev.QueuedApplicationDownlinks {
+		if down.ClassBC == nil || down.ClassBC.AbsoluteTime == nil || down.ClassBC.AbsoluteTime.IsZero() {
+			if down.Confirmed {
+				return earliestConfirmedAt, true
+			}
+			return earliestAt, true
+		}
+		t := down.ClassBC.AbsoluteTime
+		if t.Before(earliestAt) || down.Confirmed && t.Before(earliestConfirmedAt) {
+			// This downlink will never be scheduled, hence continue to next one.
+			continue
+		}
+		if t.After(earliestConfirmedAt) {
+			// NOTE: There may be MAC commands available to send earlier than t.
+			absTime = t.UTC()
+			break
+		}
+		// t is in (earliestAt;earliestConfirmedAt] range.
+		return t.UTC(), true
+	}
+	if deviceNeedsMACRequestsAt(ctx, dev, earliestConfirmedAt, phy, defaults) {
+		return earliestConfirmedAt, true
+	}
+
+	statusAt, ok := deviceNeedsDevStatusReqAt(dev, defaults)
+	if !ok {
+		if absTime.IsZero() {
+			return time.Time{}, false
+		}
+		return absTime, true
+	}
+
+	// NOTE: statusAt is after earliestConfirmedAt, otherwise deviceNeedsMACRequestsAt call above would evaluate to true.
+	if !absTime.IsZero() && statusAt.After(absTime) {
+		return absTime, true
+	}
+	if dev.MACState.DeviceClass != ttnpb.CLASS_B {
+		return statusAt, true
+	}
+
+	t, ok := nextPingSlotAfter(ctx, dev, statusAt)
+	if !ok {
+		if absTime.IsZero() {
+			return time.Time{}, false
+		}
+		return absTime, true
+	}
+	if !absTime.IsZero() && absTime.Before(t) {
+		return absTime, true
+	}
+	return t, true
 }
 
 func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (*ttnpb.MACState, error) {
