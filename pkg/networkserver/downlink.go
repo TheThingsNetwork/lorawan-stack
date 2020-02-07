@@ -361,12 +361,6 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 			case down.ClassBC != nil && class == ttnpb.CLASS_A:
 				appDowns = append(appDowns, dev.QueuedApplicationDownlinks[i:]...)
 				logger.Debug("Skip class B/C downlink for class A downlink slot")
-				if dev.MACState.DeviceClass != ttnpb.CLASS_A && len(dev.MACState.QueuedResponses) == 0 {
-					genState.NeedsDownlinkQueueUpdate = len(dev.QueuedApplicationDownlinks) != len(appDowns)
-					dev.QueuedApplicationDownlinks = appDowns
-					return nil, genState, errNoDownlink
-				}
-				appDowns = append(appDowns, dev.QueuedApplicationDownlinks[i:]...)
 				break outer
 
 			case len(down.FRMPayload) > int(maxDownLen):
@@ -956,12 +950,6 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
-		}
-	}
-	if dev.MACState.DeviceClass != ttnpb.CLASS_A && !rx1 && rx2 && len(dev.MACState.QueuedResponses) == 0 {
-		logger.Debug("Skip Rx2-only Class A downlink for non-class A device")
-		return downlinkAttemptResult{
-			SetPaths: sets,
 		}
 	}
 
