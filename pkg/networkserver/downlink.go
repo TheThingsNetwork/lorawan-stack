@@ -1208,6 +1208,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					logger.Warn("Unknown MAC state, skip downlink slot")
 					return dev, nil, nil
 				}
+				if dev.Session == nil {
+					logger.Warn("Unknown session, skip downlink slot")
+					return dev, nil, nil
+				}
 
 				logger = logger.WithFields(log.Fields(
 					"dev_addr", dev.Session.DevAddr,
