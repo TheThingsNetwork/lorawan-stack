@@ -56,6 +56,20 @@ func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 	return true
 }
 
+// DefaultClassCTimeout is the default time-out for the device to respond to class C downlink messages.
+// When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
+const DefaultClassCTimeout = 15 * time.Second
+
+func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	if dev.MACSettings != nil && dev.MACSettings.ClassCTimeout != nil {
+		return *dev.MACSettings.ClassCTimeout
+	}
+	if defaults.ClassCTimeout != nil {
+		return *defaults.ClassCTimeout
+	}
+	return DefaultClassCTimeout
+}
+
 func getDeviceBandVersion(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, band.Band, error) {
 	fp, err := fps.GetByID(dev.FrequencyPlanID)
 	if err != nil {
@@ -162,16 +176,16 @@ func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time
 	return deviceNeedsMACRequestsAt(ctx, dev, t, phy, defaults)
 }
 
-func nextClassADataDownlinkSlot(dev *ttnpb.EndDevice) (time.Time, bool) {
+func nextClassADataDownlinkSlotAfter(dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
 	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.MACState.RecentUplinks) == 0 {
 		return time.Time{}, false
 	}
 	rx1 := lastUplink(dev.MACState.RecentUplinks...).ReceivedAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
 	rx2 := rx1.Add(time.Second)
 	switch {
-	case rx2.Before(timeNow()):
+	case rx2.Before(earliestAt):
 		return time.Time{}, false
-	case rx1.After(timeNow()):
+	case rx1.After(earliestAt):
 		return rx1, true
 	default:
 		return rx2, true
@@ -193,16 +207,16 @@ func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSetti
 	return dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, defaults))
 }
 
-// nextDataDownlinkAt returns the time.Time when the downlink should be scheduled on the Gateway Server
-// and whether or not there is a data downlink to schedule.
-func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings) (time.Time, bool) {
+// nextDataDownlinkAfter returns the time.Time after earliestAt when a data downlink
+// should be transmitted to the device by the gateway and whether or not there is a data downlink to schedule.
+func nextDataDownlinkAfter(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings, earliestAt time.Time) (time.Time, bool) {
 	if dev.MACState == nil {
 		return time.Time{}, false
 	}
 	if !dev.Multicast {
-		downAt, ok := nextClassADataDownlinkSlot(dev)
+		downAt, ok := nextClassADataDownlinkSlotAfter(dev, earliestAt)
 		if ok && needsClassADataDownlinkAt(ctx, dev, downAt, phy, defaults) {
-			return downAt.Add(-gsScheduleWindow), true
+			return downAt, true
 		}
 	}
 	switch dev.MACState.DeviceClass {

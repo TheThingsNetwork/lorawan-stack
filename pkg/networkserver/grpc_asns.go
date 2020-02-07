@@ -156,7 +156,7 @@ func validateApplicationDownlinks(session ttnpb.Session, macState *ttnpb.MACStat
 		case multicast && len(down.GetClassBC().GetGateways()) == 0:
 			return unmatchedQueue, unmatchedDowns, errNoPath
 
-		case down.GetClassBC().GetAbsoluteTime() != nil && down.GetClassBC().GetAbsoluteTime().Before(timeNow()):
+		case down.GetClassBC().GetAbsoluteTime() != nil && down.GetClassBC().GetAbsoluteTime().Before(timeNow().Add(scheduleWindow())):
 			return unmatchedQueue, unmatchedDowns, errExpiredDownlink
 		}
 		minFCnt = down.FCnt + 1
@@ -255,12 +255,12 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 		downAt = timeNow().UTC()
 	} else {
 		var ok bool
-		downAt, ok = nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+		downAt, ok = nextDataDownlinkAfter(ctx, dev, phy, ns.defaultMACSettings, timeNow().UTC())
 		if !ok {
 			return ttnpb.Empty, nil
 		}
+		downAt = downAt.Add(-scheduleWindow())
 	}
-	downAt = downAt.Add(-nsScheduleWindow)
 	log.FromContext(ctx).WithField("start_at", downAt).Debug("Add downlink task after downlink queue replace")
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to add downlink task after downlink queue replace")
@@ -324,12 +324,12 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 		downAt = timeNow().UTC()
 	} else {
 		var ok bool
-		downAt, ok = nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+		downAt, ok = nextDataDownlinkAfter(ctx, dev, phy, ns.defaultMACSettings, timeNow().UTC())
 		if !ok {
 			return ttnpb.Empty, nil
 		}
+		downAt = downAt.Add(-scheduleWindow())
 	}
-	downAt = downAt.Add(-nsScheduleWindow)
 	log.FromContext(ctx).WithField("start_at", downAt).Debug("Add downlink task after downlink queue push")
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to add downlink task after downlink queue push")

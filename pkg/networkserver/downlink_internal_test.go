@@ -276,7 +276,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						popFuncRespCh <- req.Func(req.Context, ttnpb.EndDeviceIdentifiers{
 							ApplicationIdentifiers: appID,
 							DeviceID:               devID,
-						}, time.Now())
+						}, time.Now().UTC())
 					}()
 				}
 

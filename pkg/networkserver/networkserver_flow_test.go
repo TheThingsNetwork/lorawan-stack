@@ -978,7 +978,7 @@ func TestFlow(t *testing.T) {
 						CooldownWindow:      (1 << 6) * test.Delay,
 					}
 
-					ns, ctx, env, stop := StartTest(t, conf, (1<<13)*test.Delay, false)
+					ns, ctx, env, stop := StartTest(t, conf, (1<<15)*test.Delay, false)
 					defer stop()
 
 					handleFlowTest(ctx, ns.LoopbackConn(), conf, env)

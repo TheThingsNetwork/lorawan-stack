@@ -43,6 +43,12 @@ const (
 
 	// fOptsCapacity is the maximum length of FOpts in bytes.
 	fOptsCapacity = 15
+
+	// infrastructureDelay represents a time interval Network Server uses as a buffer to account for infrastructure delay.
+	infrastructureDelay = time.Second
+
+	// networkInitiatedDownlinkInterval is the minimum time.Duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink.
+	networkInitiatedDownlinkInterval = time.Second
 )
 
 // windowEndFunc is a function, which is used by Network Server to determine the end of deduplication and cooldown windows.

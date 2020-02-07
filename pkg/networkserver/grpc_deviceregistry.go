@@ -576,12 +576,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		downAt = timeNow().UTC()
 	} else {
 		var ok bool
-		downAt, ok = nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+		downAt, ok = nextDataDownlinkAfter(ctx, dev, phy, ns.defaultMACSettings, timeNow().UTC())
 		if !ok {
 			return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 		}
+		downAt = downAt.Add(-scheduleWindow())
 	}
-	downAt = downAt.Add(-nsScheduleWindow)
 	log.FromContext(ctx).WithField("start_at", downAt).Debug("Add downlink task after device set")
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to add downlink task after device set")

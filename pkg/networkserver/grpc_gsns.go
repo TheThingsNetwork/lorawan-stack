@@ -912,11 +912,11 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return err
 	}
 
-	downAt, ok := nextDataDownlinkAt(ctx, stored, matched.phy, ns.defaultMACSettings)
+	downAt, ok := nextDataDownlinkAfter(ctx, stored, matched.phy, ns.defaultMACSettings, timeNow().UTC())
 	if !ok {
 		logger.Debug("No downlink to send or windows expired, avoid adding downlink task after data uplink")
 	} else {
-		downAt = downAt.Add(-nsScheduleWindow)
+		downAt = downAt.Add(-scheduleWindow())
 		logger.WithField("start_at", downAt).Debug("Add downlink task after data uplink")
 		if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
 			logger.WithError(err).Error("Failed to add downlink task after data uplink")
@@ -1185,7 +1185,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 
-	startAt := up.ReceivedAt.Add(phy.JoinAcceptDelay1 - nsScheduleWindow - gsScheduleWindow)
+	startAt := up.ReceivedAt.Add(phy.JoinAcceptDelay1 - scheduleWindow())
 	logger.WithField("start_at", startAt).Debug("Add downlink task for join-accept")
 	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task for join-accept")

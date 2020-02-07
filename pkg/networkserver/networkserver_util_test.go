@@ -67,10 +67,6 @@ var (
 	Timeout = (1 << 10) * test.Delay
 )
 
-func init() {
-	nsScheduleWindow = time.Hour // Ensure downlink tasks are added quickly
-}
-
 var timeNowMu sync.RWMutex
 
 func SetTimeNow(f func() time.Time) func() {
@@ -105,11 +101,15 @@ func (m *MockClock) Now() time.Time {
 }
 
 func NSScheduleWindow() time.Duration {
-	return nsScheduleWindow
+	return nsScheduleWindow()
 }
 
 func GSScheduleWindow() time.Duration {
-	return gsScheduleWindow
+	return gsScheduleWindow()
+}
+
+func ScheduleWindow() time.Duration {
+	return scheduleWindow()
 }
 
 // CopyEndDevice returns a deep copy of ttnpb.EndDevice pb.

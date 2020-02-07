@@ -48,20 +48,6 @@ type DownlinkTaskQueue interface {
 	Pop(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error
 }
 
-// DefaultClassCTimeout is the default time-out for the device to respond to class C downlink messages.
-// When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
-const DefaultClassCTimeout = 15 * time.Second
-
-func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
-	if dev.MACSettings != nil && dev.MACSettings.ClassCTimeout != nil {
-		return *dev.MACSettings.ClassCTimeout
-	}
-	if defaults.ClassCTimeout != nil {
-		return *defaults.ClassCTimeout
-	}
-	return DefaultClassCTimeout
-}
-
 func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.ApplicationDownlink) log.Interface {
 	pairs := []interface{}{
 		"confirmed", down.Confirmed,
@@ -123,6 +109,7 @@ func (s generateDownlinkState) appendApplicationUplinks(ups []*ttnpb.Application
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
+// Note, that generateDownlink assumes scheduleAt is the earliest possible time a downlink can be scheduled for the device.
 func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, class ttnpb.Class, scheduleAt time.Time, maxDownLen, maxUpLen uint16) (*generatedDownlink, generateDownlinkState, error) {
 	if dev.MACState == nil {
 		return nil, generateDownlinkState{}, errUnknownMACState
@@ -850,11 +837,20 @@ loop:
 // downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
 const downlinkRetryInterval = 2 * time.Second
 
-// gsScheduleWindow is the time interval, which is sufficient for GS to ensure downlink is scheduled.
-const gsScheduleWindow = 30 * time.Second
+// gsScheduleWindow returns minimum time.Duration between downlink being sent to GS for transmission and it being transmitted to the device by the gateway.
+func gsScheduleWindow() time.Duration {
+	return 500 * time.Millisecond
+}
 
-// nsScheduleWindow is the time interval, which is sufficient for NS to ensure downlink is scheduled.
-var nsScheduleWindow = 100 * time.Millisecond
+// nsScheduleWindow returns minimum time.Duration between downlink being added to the queue and it being sent to GS for transmission.
+func nsScheduleWindow() time.Duration {
+	return 100 * time.Millisecond
+}
+
+// scheduleWindow returns minimum time.Duration between downlink being added to the queue and it being transmitted to the device by the gateway.
+func scheduleWindow() time.Duration {
+	return nsScheduleWindow() + gsScheduleWindow()
+}
 
 func recordDataDownlink(dev *ttnpb.EndDevice, genDown *generatedDownlink, genState generateDownlinkState, down *scheduledDownlink, defaults ttnpb.MACSettings) {
 	if genState.ApplicationDownlink == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && genDown.FCnt > dev.Session.LastNFCntDown {
@@ -877,7 +873,7 @@ type downlinkAttemptResult struct {
 	applicationUpAppender func([]*ttnpb.ApplicationUp, bool) []*ttnpb.ApplicationUp
 
 	SetPaths     []string
-	DownAt       time.Time
+	TransmitAt   time.Time
 	Scheduled    bool
 	QueuedEvents []events.Event
 }
@@ -1074,7 +1070,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			"session",
 		),
 		applicationUpAppender: genState.appendApplicationUplinks,
-		DownAt:                down.TransmitAt,
+		TransmitAt:            down.TransmitAt,
 		QueuedEvents:          genState.Events,
 		Scheduled:             true,
 	}
@@ -1238,14 +1234,9 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					queuedEvents = append(queuedEvents, a.QueuedEvents...)
 					queuedApplicationUplinks = a.AppendApplicationUplinks(queuedApplicationUplinks...)
 					if a.Scheduled {
-						t, hasNext := nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+						t, hasNext := nextDataDownlinkAfter(ctx, dev, phy, ns.defaultMACSettings, a.TransmitAt.Add(networkInitiatedDownlinkInterval))
 						if hasNext {
-							earliestAt := a.DownAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
-							if t.Before(earliestAt) {
-								nextDownlinkAt = earliestAt
-							} else {
-								nextDownlinkAt = t
-							}
+							nextDownlinkAt = t
 						}
 						return dev, sets, nil
 					}
@@ -1279,17 +1270,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 				}
 				if err != nil {
-					switch {
-					case errors.Resemble(err, errNoDownlink):
-						logger.Debug("No class B/C downlink to send, skip class B/C downlink slot")
-
-					case errors.Resemble(err, errConfirmedDownlinkTooSoon):
-						nextDownlinkAt = dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, ns.defaultMACSettings))
-						logger.WithField("retry_at", nextDownlinkAt).Info("Confirmed downlink scheduled too soon, retry")
-
-					default:
-						logger.WithError(err).Warn("Failed to generate class B/C downlink, skip class B/C downlink slot")
-					}
+					logger.WithError(err).Warn("Failed to generate class B/C downlink, skip class B/C downlink slot")
 					queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, false)
 					if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "queued_application_downlinks") {
 						dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
@@ -1409,14 +1390,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				if genState.ApplicationDownlink != nil {
 					sets = append(sets, "queued_application_downlinks")
 				}
-				t, hasNext := nextDataDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
+
+				t, hasNext := nextDataDownlinkAfter(ctx, dev, phy, ns.defaultMACSettings, down.TransmitAt.Add(networkInitiatedDownlinkInterval))
 				if hasNext {
-					earliestAt := down.TransmitAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
-					if t.Before(earliestAt) {
-						nextDownlinkAt = earliestAt
-					} else {
-						nextDownlinkAt = t
-					}
+					nextDownlinkAt = t
 				}
 				return dev, append(sets,
 					"mac_state.last_confirmed_downlink_at",
@@ -1446,7 +1423,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 			return err
 		}
 		if !nextDownlinkAt.IsZero() {
-			nextDownlinkAt = nextDownlinkAt.Add(-nsScheduleWindow)
+			nextDownlinkAt = nextDownlinkAt.Add(-scheduleWindow())
 			logger.WithField("start_at", nextDownlinkAt).Debug("Add downlink task after downlink attempt")
 			if err := ns.downlinkTasks.Add(ctx, devID, nextDownlinkAt, true); err != nil {
 				addErr = true
