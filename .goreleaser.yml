@@ -115,11 +115,16 @@ snapcrafts:
     grade: stable
     confinement: strict
     publish: true
+    plugs:
+      personal-files:
+        read:
+        - $HOME/.ttn-lw-stack.yml
+        - $HOME/.ttn-lw-cli.yml
     apps:
       ttn-lw-stack:
-        plugs: [ home, network, network-bind ]
+        plugs: [ home, network, network-bind, personal-files ]
       ttn-lw-cli:
-        plugs: [ home, network, network-bind ]
+        plugs: [ home, network, network-bind, personal-files ]
 
 brews:
   - name: ttn-lw-stack
