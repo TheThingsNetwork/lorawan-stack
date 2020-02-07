@@ -15,13 +15,46 @@
 /* eslint-disable no-invalid-this, no-await-in-loop */
 
 import traverse from 'traverse'
+import { cloneDeep } from 'lodash'
 import Marshaler from '../../util/marshaler'
 import combineStreams from '../../util/combine-streams'
+import { createDefaultsEmitterFromFieldMask } from '../../util/create-defaults-emitter'
 import Device from '../../entity/device'
 import { notify, EVENTS } from '../../api/stream/shared'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
+
+const deviceDefaultsEmitter = createDefaultsEmitterFromFieldMask((fmKey, value) => {
+  if (fmKey === 'locations' && Boolean(value) && Boolean(value.user)) {
+    // Set zero coordinates swallowed by the backend if the location exists.
+    const locations = cloneDeep(value)
+
+    if (!('altitude' in locations.user)) {
+      locations.user.altitude = 0
+    }
+
+    if (!('longitude' in locations.user)) {
+      locations.user.longitude = 0
+    }
+
+    if (!('latitude' in locations.user)) {
+      locations.user.latitude = 0
+    }
+
+    return locations
+  }
+
+  if (
+    (fmKey === 'locations.user.longitude' ||
+      fmKey === 'locations.user.latitude' ||
+      fmKey === 'locations.user.altitude') &&
+    !Boolean(value)
+  ) {
+    // Check for the direct coordinate field mask
+    return 0
+  }
+})
 
 /**
  * Devices Class provides an abstraction on all devices and manages data
@@ -315,7 +348,10 @@ class Devices {
       ignoreNotFound,
     )
 
-    return this._responseTransform(response)
+    const { field_mask } = Marshaler.selectorToFieldMask(selector)
+    const device = deviceDefaultsEmitter(Marshaler.unwrapDevice(response), field_mask.paths)
+
+    return this._proxy ? new Device(device, this._api) : device
   }
 
   async updateById(applicationId, deviceId, patch) {
@@ -325,7 +361,12 @@ class Devices {
       patch.supports_join = true
     }
 
-    return this._responseTransform(response)
+    const device = deviceDefaultsEmitter(
+      Marshaler.unwrapDevice(response),
+      Marshaler.fieldMaskFromPatch(patch),
+    )
+
+    return this._proxy ? new Device(device, this._api) : device
   }
 
   async create(applicationId, device, { otaa = false }) {
