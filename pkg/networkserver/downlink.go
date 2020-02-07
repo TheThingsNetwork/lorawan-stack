@@ -952,8 +952,13 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	req, err := txRequestFromUplink(phy, dev.MACState, rx1, rx2, rxDelay, up)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to generate Tx request from uplink, skip class A downlink slot")
+		dev.MACState.QueuedResponses = nil
+		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths: sets,
+			SetPaths: append(sets,
+				"mac_state.queued_responses",
+				"mac_state.rx_windows_available",
+			),
 		}
 	}
 
@@ -1007,8 +1012,13 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		rx2 = len(genDown.Payload) <= int(phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
 		if !rx1 && !rx2 {
 			logger.Error("Generated downlink payload size does not fit neither Rx1, nor Rx2, skip class A downlink slot")
+			dev.MACState.QueuedResponses = nil
+			dev.MACState.RxWindowsAvailable = false
 			return downlinkAttemptResult{
-				SetPaths:              sets,
+				SetPaths: append(sets,
+					"mac_state.queued_responses",
+					"mac_state.rx_windows_available",
+				),
 				applicationUpAppender: genState.appendApplicationUplinks,
 			}
 		}
@@ -1020,8 +1030,13 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			if genState.ApplicationDownlink != nil {
 				dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
 			}
+			dev.MACState.QueuedResponses = nil
+			dev.MACState.RxWindowsAvailable = false
 			return downlinkAttemptResult{
-				SetPaths:              sets,
+				SetPaths: append(sets,
+					"mac_state.queued_responses",
+					"mac_state.rx_windows_available",
+				),
 				applicationUpAppender: genState.appendApplicationUplinks,
 			}
 		}
@@ -1049,8 +1064,13 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		if genState.ApplicationDownlink != nil {
 			dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
 		}
+		dev.MACState.QueuedResponses = nil
+		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths:              sets,
+			SetPaths: append(sets,
+				"mac_state.queued_responses",
+				"mac_state.rx_windows_available",
+			),
 			applicationUpAppender: genState.appendApplicationUplinks,
 		}
 	}
