@@ -893,7 +893,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths: append(sets,
+			SetPaths: ttnpb.AddFields(sets,
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
@@ -917,7 +917,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths: append(sets,
+			SetPaths: ttnpb.AddFields(sets,
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
@@ -931,7 +931,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths: append(sets,
+			SetPaths: ttnpb.AddFields(sets,
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
@@ -942,7 +942,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths: append(sets,
+			SetPaths: ttnpb.AddFields(sets,
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
@@ -955,7 +955,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths: append(sets,
+			SetPaths: ttnpb.AddFields(sets,
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
@@ -986,7 +986,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		maxUpLength,
 	)
 	if genState.NeedsDownlinkQueueUpdate {
-		sets = append(sets,
+		sets = ttnpb.AddFields(sets,
 			"queued_application_downlinks",
 		)
 	}
@@ -1015,7 +1015,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			dev.MACState.QueuedResponses = nil
 			dev.MACState.RxWindowsAvailable = false
 			return downlinkAttemptResult{
-				SetPaths: append(sets,
+				SetPaths: ttnpb.AddFields(sets,
 					"mac_state.queued_responses",
 					"mac_state.rx_windows_available",
 				),
@@ -1033,7 +1033,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			dev.MACState.QueuedResponses = nil
 			dev.MACState.RxWindowsAvailable = false
 			return downlinkAttemptResult{
-				SetPaths: append(sets,
+				SetPaths: ttnpb.AddFields(sets,
 					"mac_state.queued_responses",
 					"mac_state.rx_windows_available",
 				),
@@ -1067,7 +1067,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
 		return downlinkAttemptResult{
-			SetPaths: append(sets,
+			SetPaths: ttnpb.AddFields(sets,
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
@@ -1075,11 +1075,11 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		}
 	}
 	if genState.ApplicationDownlink != nil {
-		sets = append(sets, "queued_application_downlinks")
+		sets = ttnpb.AddFields(sets, "queued_application_downlinks")
 	}
 	recordDataDownlink(dev, genDown, genState, down, ns.defaultMACSettings)
 	return downlinkAttemptResult{
-		SetPaths: append(sets,
+		SetPaths: ttnpb.AddFields(sets,
 			"mac_state.last_confirmed_downlink_at",
 			"mac_state.pending_application_downlink",
 			"mac_state.pending_requests",
@@ -1250,7 +1250,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				var sets []string
 				if dev.MACState.RxWindowsAvailable {
 					a := ns.attemptClassADataDownlink(ctx, dev, phy, fp, maxUpLength)
-					sets = append(sets, a.SetPaths...)
+					sets = ttnpb.AddFields(sets, a.SetPaths...)
 					queuedEvents = append(queuedEvents, a.QueuedEvents...)
 					queuedApplicationUplinks = a.AppendApplicationUplinks(queuedApplicationUplinks...)
 					if a.Scheduled {
@@ -1372,7 +1372,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 									},
 								})
 								if !genState.NeedsDownlinkQueueUpdate {
-									sets = append(sets, "queued_application_downlinks")
+									sets = ttnpb.AddFields(sets, "queued_application_downlinks")
 								}
 								return dev, sets, nil
 							}
@@ -1391,7 +1391,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 									},
 								})
 								if !genState.NeedsDownlinkQueueUpdate {
-									sets = append(sets, "queued_application_downlinks")
+									sets = ttnpb.AddFields(sets, "queued_application_downlinks")
 								}
 								return dev, sets, nil
 							}
@@ -1408,14 +1408,14 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				queuedEvents = append(queuedEvents, genState.Events...)
 				queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, true)
 				if genState.ApplicationDownlink != nil {
-					sets = append(sets, "queued_application_downlinks")
+					sets = ttnpb.AddFields(sets, "queued_application_downlinks")
 				}
 
 				t, hasNext := nextDataDownlinkAfter(ctx, dev, phy, ns.defaultMACSettings, down.TransmitAt.Add(networkInitiatedDownlinkInterval))
 				if hasNext {
 					nextDownlinkAt = t
 				}
-				return dev, append(sets,
+				return dev, ttnpb.AddFields(sets,
 					"mac_state.last_confirmed_downlink_at",
 					"mac_state.pending_application_downlink",
 					"mac_state.pending_requests",
