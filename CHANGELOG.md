@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ns.down.data.schedule.success` and `ns.down.join.schedule.success` events, which are triggered when Network Server successfully schedules a respective downlink on Gateway Server.
 - `ns.down.data.schedule.fail` and `ns.down.join.schedule.fail` events, which are triggered when Network Server fails to schedule a respective downlink on Gateway Server.
 - Specify gRPC port and OAuth server address when generating a CLI config file with `ttn-lw-cli use` (see `--grpc-port` and `--oauth-server-address` options).
+- Guide to connect MikroTik Routerboard
 
 ### Changed
 
