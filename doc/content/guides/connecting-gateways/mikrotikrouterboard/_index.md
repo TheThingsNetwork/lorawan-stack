@@ -8,7 +8,7 @@ MikroTik Routerboard wAP LoRa8 kit is a LoRaWAN gateway that contains a pre-inst
 
 There are multiple interfaces to configure the gateway parameters. This page guides you to connect it to {{% tts %}} using the [MikroTik Mobile App](https://mikrotik.com/mobile_app) for Android/iOS.
 
-## Physical connections
+## Physical Connections
 
 The MikroTik Routerboard wAP LoRa8 kit comes with a PoE adapter. The following image shows the proper connections to the device.
 
