@@ -48,7 +48,6 @@ const m = defineMessages({
     />
   )
 })
-@bind
 export default class ApplicationPubsubEdit extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -58,6 +57,7 @@ export default class ApplicationPubsubEdit extends Component {
     updatePubsub: PropTypes.func.isRequired,
   }
 
+  @bind
   async handleSubmit(pubsub) {
     const { pubsub: originalPubsub, updatePubsub } = this.props
 
@@ -66,6 +66,7 @@ export default class ApplicationPubsubEdit extends Component {
     await updatePubsub(patch)
   }
 
+  @bind
   handleSubmitSuccess() {
     toast({
       message: m.updateSuccess,
@@ -73,6 +74,7 @@ export default class ApplicationPubsubEdit extends Component {
     })
   }
 
+  @bind
   async handleDelete() {
     const {
       appId,
@@ -84,6 +86,7 @@ export default class ApplicationPubsubEdit extends Component {
     await api.application.pubsubs.delete(appId, pubsubId)
   }
 
+  @bind
   async handleDeleteSuccess() {
     const { navigateToList } = this.props
 
