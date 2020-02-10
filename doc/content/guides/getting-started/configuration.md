@@ -78,18 +78,18 @@ Next, we'll have a look at the configuration options for your private deployment
 First we'll make sure that {{% tts %}} uses the correct databases.
 
 ```bash
-TTN_LW_IS_DATABASE_URI="postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable"
-TTN_LW_REDIS_ADDRESS="redis:6379"
+TTN_LW_IS_DATABASE_URI=postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable
+TTN_LW_REDIS_ADDRESS=redis:6379
 ```
 
 Then we'll configure TLS with Let's Encrypt. Since we're deploying {{% tts %}} on `thethings.example.com`, we configure it to only request certificates for that host, and to also use it as the default host.
 
 ```bash
-TTN_LW_TLS_SOURCE="acme"
-TTN_LW_TLS_ACME_DIR="/var/lib/acme"
-TTN_LW_TLS_ACME_EMAIL="your@email.com"
-TTN_LW_TLS_ACME_HOSTS="thethings.example.com"
-TTN_LW_TLS_ACME_DEFAULT_HOST="thethings.example.com"
+TTN_LW_TLS_SOURCE=acme
+TTN_LW_TLS_ACME_DIR=/var/lib/acme
+TTN_LW_TLS_ACME_EMAIL=your@email.com
+TTN_LW_TLS_ACME_HOSTS=thethings.example.com
+TTN_LW_TLS_ACME_DEFAULT_HOST=thethings.example.com
 ```
 
 Next, we'll configure the HTTP server with keys for encrypting and verifying cookies, and with passwords for endpoints that you may want to keep for internal use.
@@ -101,26 +101,26 @@ TTN_LW_HTTP_METRICS_PASSWORD=... # choose a password
 TTN_LW_HTTP_PPROF_PASSWORD=...   # choose a password
 ```
 
-{{% tts %}} sends emails to users, so we need to configure how those are sent. 
+{{% tts %}} sends emails to users, so we need to configure how those are sent.
 
 ```bash
-TTN_LW_IS_EMAIL_SENDER_NAME="{{% tts %}}"
-TTN_LW_IS_EMAIL_SENDER_ADDRESS="noreply@thethings.example.com"
-TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL="https://thethings.example.com/console"
-TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="https://thethings.example.com/oauth"
+TTN_LW_IS_EMAIL_SENDER_NAME={{% tts %}}
+TTN_LW_IS_EMAIL_SENDER_ADDRESS=noreply@thethings.example.com
+TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL=https://thethings.example.com/console
+TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=https://thethings.example.com/oauth
 ```
 
 You can either use Sendgrid or an SMTP server. If you don't set up an email provider, {{% tts %}} will print emails to the server log.
 
 ```bash
-TTN_LW_IS_EMAIL_PROVIDER="sendgrid"
+TTN_LW_IS_EMAIL_PROVIDER=sendgrid
 TTN_LW_IS_EMAIL_SENDGRID_API_KEY=... # enter Sendgrid API key
 ```
 
 or
 
 ```bash
-TTN_LW_IS_EMAIL_PROVIDER="smtp"
+TTN_LW_IS_EMAIL_PROVIDER=smtp
 TTN_LW_IS_EMAIL_SMTP_ADDRESS=...  # enter mail server address
 TTN_LW_IS_EMAIL_SMTP_USERNAME=... # enter username
 TTN_LW_IS_EMAIL_SMTP_PASSWORD=... # enter password
@@ -129,22 +129,22 @@ TTN_LW_IS_EMAIL_SMTP_PASSWORD=... # enter password
 Finally, we need to configure the Web UI to use `thethings.example.com`.
 
 ```bash
-TTN_LW_IS_OAUTH_UI_CANONICAL_URL="https://thethings.example.com/oauth"
-TTN_LW_IS_OAUTH_UI_IS_BASE_URL="https://thethings.example.com/api/v3"
+TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://thethings.example.com/oauth
+TTN_LW_IS_OAUTH_UI_IS_BASE_URL=https://thethings.example.com/api/v3
 
-TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="https://thethings.example.com/oauth/authorize"
-TTN_LW_CONSOLE_OAUTH_TOKEN_URL="https://thethings.example.com/oauth/token"
+TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=https://thethings.example.com/oauth/authorize
+TTN_LW_CONSOLE_OAUTH_TOKEN_URL=https://thethings.example.com/oauth/token
 
-TTN_LW_CONSOLE_UI_CANONICAL_URL="https://thethings.example.com/console"
-TTN_LW_CONSOLE_UI_IS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_GS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_NS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_AS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_JS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_EDTC_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_QRG_BASE_URL="https://thethings.example.com/api/v3"
+TTN_LW_CONSOLE_UI_CANONICAL_URL=https://thethings.example.com/console
+TTN_LW_CONSOLE_UI_IS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_GS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_NS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_AS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_JS_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_EDTC_BASE_URL=https://thethings.example.com/api/v3
+TTN_LW_CONSOLE_UI_QRG_BASE_URL=https://thethings.example.com/api/v3
 
-TTN_LW_CONSOLE_OAUTH_CLIENT_ID="console"
+TTN_LW_CONSOLE_OAUTH_CLIENT_ID=console
 TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET=... # choose or generate a secret
 ```
 
