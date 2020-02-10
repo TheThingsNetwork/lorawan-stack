@@ -142,7 +142,7 @@ class Marshaler {
     // whitelist allows and strip all other paths.
     if (whitelist) {
       paths = whitelist.reduce((acc, e) => {
-        if (paths.some(path => path.startsWith(e))) {
+        if (paths.includes(e)) {
           acc.push(e)
         }
         return acc
