@@ -37,4 +37,13 @@ const getWebhooksLogic = createRequestLogic({
   },
 })
 
-export default [getWebhookLogic, getWebhooksLogic]
+const updateWebhookLogic = createRequestLogic({
+  type: webhooks.UPDATE_WEBHOOK,
+  async process({ action }) {
+    const { appId, webhookId, patch } = action.payload
+
+    return api.application.webhooks.update(appId, webhookId, patch)
+  },
+})
+
+export default [getWebhookLogic, getWebhooksLogic, updateWebhookLogic]
