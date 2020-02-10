@@ -18,6 +18,7 @@ import Message from '../../../../lib/components/message'
 import Event from '../..'
 import PropTypes from '../../../../lib/prop-types'
 import { getEntityId } from '../../../../lib/selectors/id'
+import { formatMessageData } from '..'
 
 class DefaultEvent extends React.PureComponent {
   static propTypes = {
@@ -39,7 +40,7 @@ class DefaultEvent extends React.PureComponent {
     const { className, event, widget, overviewClassName, expandedClassName } = this.props
 
     const entityId = getEntityId(event.identifiers[0])
-
+    const data = formatMessageData(event.data)
     const content = <Message content={{ id: `event:${event.name}` }} />
 
     return (
@@ -51,6 +52,7 @@ class DefaultEvent extends React.PureComponent {
         content={content}
         emitter={entityId}
         widget={widget}
+        data={data}
       />
     )
   }

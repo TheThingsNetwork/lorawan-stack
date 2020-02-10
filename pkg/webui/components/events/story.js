@@ -556,6 +556,28 @@ const events = [
     ],
     origin: 'htdvissermbp',
   },
+  {
+    name: 'gs.up.drop',
+    time: '2020-02-07T12:30:40.588851469Z',
+    identifiers: [{ gateway_ids: { gateway_id: 'kerlink-ifemtocell', eui: '7276FF003903007D' } }],
+    data: {
+      '@type': 'type.googleapis.com/ttn.lorawan.v3.ErrorDetails',
+      namespace: 'pkg/gatewayserver',
+      name: 'host_handle',
+      message_format: 'host `{host}` failed to handle message',
+      attributes: {
+        host: 'cluster',
+      },
+      cause: {
+        namespace: 'pkg/networkserver',
+        name: 'device_not_found',
+        message_format: 'device not found',
+        correlation_id: 'df971dc6e7c5402596576816401ade98',
+        code: 5,
+      },
+      code: 5,
+    },
+  },
 ]
 
 const getRandomEvent = function() {

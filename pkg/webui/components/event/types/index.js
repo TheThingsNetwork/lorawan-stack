@@ -49,4 +49,28 @@ const getEventComponentByName = function(name) {
   return { component, type }
 }
 
-export { getEventComponentByName as default, getEventActionByName, getEventDataType }
+const formatMessageData = function(data) {
+  if (!data) {
+    return null
+  }
+
+  const { '@type': t, ...rest } = data
+  const type = getEventDataType(t)
+
+  switch (type) {
+    case 'UplinkMessage':
+    case 'DownlinkMessage':
+    case 'ApplicationUp':
+    case 'ErrorDetails':
+      return rest
+    default:
+      return null
+  }
+}
+
+export {
+  getEventComponentByName as default,
+  getEventActionByName,
+  getEventDataType,
+  formatMessageData,
+}
