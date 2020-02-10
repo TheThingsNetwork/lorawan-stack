@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Updating `supports_class_c` field in the Device General Settings Page in the Console.
+
 ### Security
 
 ## [3.5.2] (2020-02-06)
