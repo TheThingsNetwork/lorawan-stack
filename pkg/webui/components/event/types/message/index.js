@@ -20,9 +20,9 @@ import Message from '../../../../lib/components/message'
 import Icon from '../../../icon'
 import PropTypes from '../../../../lib/prop-types'
 import { getEntityId } from '../../../../lib/selectors/id'
-import formatMessageData from './format-message'
-
 import style from './message.styl'
+
+import { formatMessageData } from '..'
 
 @bind
 class MessageEvent extends React.PureComponent {
