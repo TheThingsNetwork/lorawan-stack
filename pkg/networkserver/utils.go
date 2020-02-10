@@ -330,13 +330,13 @@ func nextDataDownlinkAfter(ctx context.Context, dev *ttnpb.EndDevice, phy band.B
 	var absTime time.Time
 	for _, down := range dev.QueuedApplicationDownlinks {
 		if down.ClassBC == nil || down.ClassBC.AbsoluteTime == nil || down.ClassBC.AbsoluteTime.IsZero() {
-			if down.Confirmed {
+			if down.Confirmed || deviceNeedsMACRequestsAt(ctx, dev, earliestAt, phy, defaults) {
 				return earliestConfirmedAt, true
 			}
 			return earliestAt, true
 		}
-		t := down.ClassBC.AbsoluteTime
-		if t.Before(earliestAt) || down.Confirmed && t.Before(earliestConfirmedAt) {
+		t := *down.ClassBC.AbsoluteTime
+		if t.Before(earliestAt) || t.Before(earliestConfirmedAt) && (down.Confirmed || deviceNeedsMACRequestsAt(ctx, dev, t, phy, defaults)) {
 			// This downlink will never be scheduled, hence continue to next one.
 			continue
 		}
