@@ -37,4 +37,13 @@ const getPubsubsLogic = createRequestLogic({
   },
 })
 
-export default [getPubsubLogic, getPubsubsLogic]
+const updatePubsubsLogic = createRequestLogic({
+  type: pubsubs.UPDATE_PUBSUB,
+  async process({ action }) {
+    const { appId, pubsubId, patch } = action.payload
+
+    return api.application.pubsubs.update(appId, pubsubId, patch)
+  },
+})
+
+export default [getPubsubLogic, getPubsubsLogic, updatePubsubsLogic]
