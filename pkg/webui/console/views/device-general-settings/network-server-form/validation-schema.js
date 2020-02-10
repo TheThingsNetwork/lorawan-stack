@@ -35,6 +35,7 @@ const validationSchema = Yup.object()
     lorawan_version: Yup.string().required(sharedMessages.validateRequired),
     lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
     frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
+    supports_class_c: Yup.boolean().default(false),
     session: Yup.object().when(
       ['_activation_mode', 'lorawan_version', '_joined'],
       (mode, version, isJoined, schema) => {
