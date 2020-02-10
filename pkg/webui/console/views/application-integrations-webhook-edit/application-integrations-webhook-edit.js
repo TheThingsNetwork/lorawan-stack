@@ -48,7 +48,6 @@ const m = defineMessages({
     />
   )
 })
-@bind
 export default class ApplicationWebhookEdit extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -58,6 +57,7 @@ export default class ApplicationWebhookEdit extends Component {
     webhook: PropTypes.webhook.isRequired,
   }
 
+  @bind
   async handleSubmit(updatedWebhook) {
     const { webhook: originalWebhook, updateWebhook } = this.props
 
@@ -72,6 +72,7 @@ export default class ApplicationWebhookEdit extends Component {
     await updateWebhook(patch)
   }
 
+  @bind
   handleSubmitSuccess() {
     toast({
       message: m.updateSuccess,
@@ -79,6 +80,7 @@ export default class ApplicationWebhookEdit extends Component {
     })
   }
 
+  @bind
   async handleDelete() {
     const {
       appId,
@@ -90,6 +92,7 @@ export default class ApplicationWebhookEdit extends Component {
     await api.application.webhooks.delete(appId, webhookId)
   }
 
+  @bind
   async handleDeleteSuccess() {
     const { navigateToList } = this.props
 
