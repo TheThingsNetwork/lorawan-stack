@@ -206,10 +206,27 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 			logger.WithError(err).Debug("Failed to determine data rate index of uplink, skip")
 			continue
 		}
+		dr, ok := phy.DataRates[drIdx]
+		if !ok {
+			logger.Debug("Data rate not found, skip")
+			continue
+		}
 
 		pendingApplicationDownlink := dev.GetMACState().GetPendingApplicationDownlink()
 
-		if !pld.Ack && dev.PendingSession != nil && dev.PendingMACState != nil && dev.PendingSession.DevAddr == pld.DevAddr {
+		uplinkDwellTime := func(macState *ttnpb.MACState) bool {
+			if macState.CurrentParameters.UplinkDwellTime != nil {
+				return macState.CurrentParameters.UplinkDwellTime.Value
+			}
+			// Assume no dwell time if current value unknown.
+			return false
+		}
+
+		if !pld.Ack &&
+			dev.PendingSession != nil &&
+			dev.PendingMACState != nil &&
+			dev.PendingSession.DevAddr == pld.DevAddr &&
+			(!dev.PendingMACState.LoRaWANVersion.IgnoreUplinksExceedingLengthLimit() || len(up.RawPayload)-5 <= int(dr.MaxMACPayloadSize(uplinkDwellTime(dev.PendingMACState)))) {
 			logger := logger.WithFields(log.Fields(
 				"mac_version", dev.PendingMACState.LoRaWANVersion,
 				"pending_session", true,
@@ -242,10 +259,14 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 			})
 		}
 
-		if dev.Session == nil || dev.MACState == nil || dev.Session.DevAddr != pld.DevAddr {
+		switch {
+		case dev.Session == nil,
+			dev.MACState == nil,
+			dev.Session.DevAddr != pld.DevAddr,
+			dev.MACState.LoRaWANVersion.IgnoreUplinksExceedingLengthLimit() && len(up.RawPayload)-5 > int(dr.MaxMACPayloadSize(uplinkDwellTime(dev.MACState))):
 			continue
-		}
-		if pld.Ack && len(dev.MACState.RecentDownlinks) == 0 {
+
+		case pld.Ack && len(dev.MACState.RecentDownlinks) == 0:
 			logger.Debug("Uplink contains ACK, but no downlink was sent to device, skip")
 			continue
 		}

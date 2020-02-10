@@ -708,7 +708,14 @@ func (v MACVersion) EncryptFOpts() bool {
 // HasMaxFCntGap reports whether v defines a MaxFCntGap.
 // HasMaxFCntGap panics, if v.Validate() returns non-nil error.
 func (v MACVersion) HasMaxFCntGap() bool {
-	return v.Compare(MAC_V1_1) < 0
+	return v.Compare(MAC_V1_0_4) < 0
+}
+
+// IgnoreUplinksExceedingLengthLimit reports whether v requires Network Server to
+// silently drop uplinks exceeding selected data rate payload length limits.
+// IgnoreUplinksExceedingLengthLimit panics, if v.Validate() returns non-nil error.
+func (v MACVersion) IgnoreUplinksExceedingLengthLimit() bool {
+	return v.Compare(MAC_V1_0_4) >= 0 && v.Compare(MAC_V1_1) < 0
 }
 
 // Validate reports whether v represents a valid PHYVersion.
