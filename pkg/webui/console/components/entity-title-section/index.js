@@ -17,9 +17,9 @@ import { Container, Row, Col } from 'react-grid-system'
 import classnames from 'classnames'
 
 import DateTime from '../../../lib/components/date-time'
-
+import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
-
+import sharedMessages from '../../../lib/shared-messages'
 import style from './entity-title-section.styl'
 
 const EntityTitleSection = ({ entityName, entityId, description, creationDate, children }) => {
@@ -30,14 +30,18 @@ const EntityTitleSection = ({ entityName, entityId, description, creationDate, c
           <Col md={12} className={style.container}>
             <h1 className={style.title}>{entityName || entityId}</h1>
             <span className={style.id}>
-              <strong>ID:</strong> {entityId}
+              <strong>
+                <Message content={sharedMessages.id} />:
+              </strong>{' '}
+              {entityId}
             </span>
             {description && <span className={style.description}>{description}</span>}
             <div className={style.bottom}>
               <div className={style.children}>{children}</div>
               <div className={style.creationDate}>
                 <span>
-                  Created <DateTime.Relative value={creationDate} />
+                  <Message content={sharedMessages.created} />{' '}
+                  <DateTime.Relative value={creationDate} />
                 </span>
               </div>
             </div>
@@ -74,7 +78,10 @@ EntityTitleSection.Device = ({ deviceName, deviceId, description, children }) =>
           >
             <h1 className={style.title}>{deviceName || deviceId}</h1>
             <span className={style.id}>
-              <strong>ID:</strong> {deviceId}
+              <strong>
+                <Message content={sharedMessages.id} />:
+              </strong>{' '}
+              {deviceId}
             </span>
             {description && <span className={style.description}>{description}</span>}
           </div>
