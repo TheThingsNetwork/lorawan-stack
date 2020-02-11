@@ -46,6 +46,30 @@ class Devices {
     )
   }
 
+  _emitDefaults(paths, device) {
+    // Handle zero coordinates that are swallowed by the grpc-gateway for device location.
+    const hasLocation = Boolean(device.locations) && Boolean(device.locations.user)
+    const requestedLocation = paths.some(path => path.startsWith('location'))
+
+    if (hasLocation && requestedLocation) {
+      const { locations } = device
+
+      if (!('altitude' in locations.user)) {
+        locations.user.altitude = 0
+      }
+
+      if (!('longitude' in locations.user)) {
+        locations.user.longitude = 0
+      }
+
+      if (!('latitude' in locations.user)) {
+        locations.user.latitude = 0
+      }
+    }
+
+    return device
+  }
+
   async _setDevice(applicationId, deviceId, device, create = false, requestTreeOverwrite) {
     const ids = device.ids
     const devId = deviceId || ('device_id' in ids && ids.device_id)
@@ -315,7 +339,10 @@ class Devices {
       ignoreNotFound,
     )
 
-    return this._responseTransform(response)
+    const { field_mask } = Marshaler.selectorToFieldMask(selector)
+    const device = this._emitDefaults(field_mask.paths, Marshaler.unwrapDevice(response))
+
+    return this._proxy ? new Device(device, this._api) : device
   }
 
   async updateById(applicationId, deviceId, patch) {
@@ -325,7 +352,12 @@ class Devices {
       patch.supports_join = true
     }
 
-    return this._responseTransform(response)
+    const device = this._emitDefaults(
+      Marshaler.fieldMaskFromPatch(patch),
+      Marshaler.unwrapDevice(response),
+    )
+
+    return this._proxy ? new Device(device, this._api) : device
   }
 
   async create(applicationId, device, { otaa = false }) {
