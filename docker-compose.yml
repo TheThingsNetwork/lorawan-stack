@@ -36,7 +36,7 @@ services:
 
   stack:
     image: thethingsnetwork/lorawan-stack
-    entrypoint: ttn-lw-stack
+    entrypoint: ttn-lw-stack -c /config/ttn-lw-stack.yml
     command: start
     restart: unless-stopped
     depends_on:
@@ -45,14 +45,9 @@ services:
       - cockroach
       # If using PostgreSQL:
       # - postgres
-
-    # If using (self) signed certificates:
-    secrets:
-      - cert.pem
-      - key.pem
-
     volumes:
       - ./blob:/srv/ttn-lorawan/public/blob
+      - ./config/stack:/config:ro
       # If using Let's Encrypt:
       # - ./acme:/var/lib/acme
 
@@ -74,97 +69,10 @@ services:
       - "8887:8887"
       - "1700:1700/udp"
 
-    environment:
-      # If using CockroachDB:
-      - TTN_LW_IS_DATABASE_URI=postgres://root@cockroach:26257/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
-      # If using PostgreSQL:
-      # - TTN_LW_IS_DATABASE_URI=postgres://root@postgres:5432/${DEV_DATABASE_NAME:-ttn_lorawan}?sslmode=disable
-      - TTN_LW_REDIS_ADDRESS=redis:6379
-
-      # Let's Encrypt for "thethings.example.com":
-      # - TTN_LW_TLS_SOURCE=acme
-      # - TTN_LW_TLS_ACME_DIR=/var/lib/acme
-      # - TTN_LW_TLS_ACME_EMAIL=you@thethings.example.com
-      # - TTN_LW_TLS_ACME_HOSTS=thethings.example.com
-      # - TTN_LW_TLS_ACME_DEFAULT_HOST=thethings.example.com
-
-      # If using (self) signed certificates:
-      - TTN_LW_TLS_SOURCE=file
-      - TTN_LW_TLS_ROOT_CA=/run/secrets/cert.pem
-      - TTN_LW_TLS_CERTIFICATE=/run/secrets/cert.pem
-      - TTN_LW_TLS_KEY=/run/secrets/key.pem
-
-      # HTTP Server configuration:
-      - TTN_LW_HTTP_COOKIE_HASH_KEY # generate 64 bytes (openssl rand -hex 64)
-      - TTN_LW_HTTP_COOKIE_BLOCK_KEY # generate 32 bytes (openssl rand -hex 32)
-      - TTN_LW_HTTP_METRICS_PASSWORD # choose a password
-      - TTN_LW_HTTP_PPROF_PASSWORD # choose a password
-
-      # Email configuration for "thethings.example.com":
-      # - TTN_LW_IS_EMAIL_SENDER_NAME=The Things Stack
-      # - TTN_LW_IS_EMAIL_SENDER_ADDRESS=noreply@thethings.example.com
-      # - TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL=https://thethings.example.com/console
-      # - TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL=https://thethings.example.com/oauth
-
-      # If sending email with Sendgrid:
-      # - TTN_LW_IS_EMAIL_PROVIDER=sendgrid
-      # - TTN_LW_IS_EMAIL_SENDGRID_API_KEY=enter Sendgrid API key
-
-      # If sending email with SMTP:
-      # - TTN_LW_IS_EMAIL_PROVIDER=smtp
-      # - TTN_LW_IS_EMAIL_SMTP_ADDRESS=enter mail server address
-      # - TTN_LW_IS_EMAIL_SMTP_USERNAME=enter username
-      # - TTN_LW_IS_EMAIL_SMTP_PASSWORD=enter password
-
-      # If Application Server enabled, defaults for "thethings.example.com":
-      # - TTN_LW_AS_MQTT_PUBLIC_ADDRESS=thethings.example.com:1883
-      # - TTN_LW_AS_MQTT_PUBLIC_TLS_ADDRESS=thethings.example.com:8883
-
-      # If Application Server enabled, Application Server interoperability configuration:
-      # If interoperability configuration repository is a directory on OS FS:
-      # - TTN_LW_AS_INTEROP_DIRECTORY=/path/to/interop/repository
-      # If interoperability configuration repository is a URL:
-      # - TTN_LW_AS_INTEROP_URL=https://thethings.example.com
-      # If interoperability configuration repository is a blob:
-      # - TTN_LW_AS_INTEROP_BLOB_PATH=/path/to/interop/directory
-      # - TTN_LW_AS_INTEROP_BLOB_BUCKET=enter bucket name
-
-      # If Gateway Server enabled, defaults for "thethings.example.com":
-      # - TTN_LW_GS_MQTT_PUBLIC_ADDRESS=thethings.example.com:1882
-      # - TTN_LW_GS_MQTT_PUBLIC_TLS_ADDRESS=thethings.example.com:8882
-      # - TTN_LW_GS_MQTT_V2_PUBLIC_ADDRESS=thethings.example.com:1881
-      # - TTN_LW_GS_MQTT_V2_PUBLIC_TLS_ADDRESS=thethings.example.com:8881
-
-      # If Gateway Configuration Server enabled, defaults for "thethings.example.com":
-      # - TTN_LW_GCS_BASIC_STATION_DEFAULT_LNS_URI=wss://thethings.example.com:8887
-      # - TTN_LW_GCS_THE_THINGS_GATEWAY_DEFAULT_MQTT_SERVER=mqtts://thethings.example.com:8881
-
-      # If Network Server enabled, Network Server interoperability configuration:
-      # If interoperability configuration repository is a directory on OS FS:
-      # - TTN_LW_NS_INTEROP_DIRECTORY=/path/to/interop/repository
-      # If interoperability configuration repository is a URL:
-      # - TTN_LW_NS_INTEROP_URL=https://thethings.example.com
-      # If interoperability configuration repository is a blob:
-      # - TTN_LW_NS_INTEROP_BLOB_PATH=/path/to/interop/directory
-      # - TTN_LW_NS_INTEROP_BLOB_BUCKET=enter bucket name
-
-      # Web UI configuration for "thethings.example.com":
-      # - TTN_LW_IS_OAUTH_UI_CANONICAL_URL=https://thethings.example.com/oauth
-      # - TTN_LW_IS_OAUTH_UI_IS_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL=https://thethings.example.com/oauth/authorize
-      # - TTN_LW_CONSOLE_OAUTH_TOKEN_URL=https://thethings.example.com/oauth/token
-      # - TTN_LW_CONSOLE_UI_CANONICAL_URL=https://thethings.example.com/console
-      # - TTN_LW_CONSOLE_UI_IS_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_UI_GS_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_UI_NS_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_UI_AS_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_UI_JS_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_UI_EDTC_BASE_URL=https://thethings.example.com/api/v3
-      # - TTN_LW_CONSOLE_UI_QRG_BASE_URL=https://thethings.example.com/api/v3
-
-      # Console OAuth client and secret:
-      - TTN_LW_CONSOLE_OAUTH_CLIENT_ID=console
-      - TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET=console # generate a good one (openssl rand -hex 32)
+    # If using (self) signed certificates:
+    secrets:
+      - cert.pem
+      - key.pem
 
 # If using (self) signed certificates:
 secrets:
