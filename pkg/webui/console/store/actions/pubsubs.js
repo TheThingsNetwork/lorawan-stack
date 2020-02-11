@@ -33,3 +33,13 @@ export const [
   },
   { request: getPubsubsList, success: getPubsubsListSuccess, failure: getPubsubsListFailure },
 ] = createRequestActions(GET_PUBSUBS_LIST_BASE, appId => ({ appId }))
+
+export const UPDATE_PUBSUB_BASE = 'UPDATE_PUBSUB'
+export const [
+  { request: UPDATE_PUBSUB, success: UPDATE_PUBSUB_SUCCESS, failure: UPDATE_PUBSUB_FAILURE },
+  { request: updatePubsub, success: updatePubsubSuccess, failure: updatePubsubFailure },
+] = createRequestActions(UPDATE_PUBSUB_BASE, (appId, pubsubId, patch) => ({
+  appId,
+  pubsubId,
+  patch,
+}))

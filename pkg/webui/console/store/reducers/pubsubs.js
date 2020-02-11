@@ -12,7 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_PUBSUB, GET_PUBSUB_SUCCESS, GET_PUBSUBS_LIST_SUCCESS } from '../actions/pubsubs'
+import { merge } from 'lodash'
+
+import {
+  GET_PUBSUB,
+  GET_PUBSUB_SUCCESS,
+  GET_PUBSUBS_LIST_SUCCESS,
+  UPDATE_PUBSUB_SUCCESS,
+} from '../actions/pubsubs'
 import { getPubsubId } from '../../../lib/selectors/id'
 
 const defaultState = {
@@ -46,6 +53,16 @@ const pubsubs = function(state = defaultState, { type, payload }) {
           }, {}),
         },
         totalCount: payload.totalCount,
+      }
+    case UPDATE_PUBSUB_SUCCESS:
+      const pubsubId = getPubsubId(payload)
+
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [pubsubId]: merge({}, state.entities[pubsubId], payload),
+        },
       }
     default:
       return state
