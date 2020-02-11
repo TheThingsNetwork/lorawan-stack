@@ -17,11 +17,10 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
 
-import LocationForm from '../../../components/location-form'
+import LocationForm from '../../components/location-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
@@ -31,27 +30,10 @@ import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
 
-import {
-  latitude as latitudeRegexp,
-  longitude as longitudeRegexp,
-  int32 as int32Regexp,
-} from '../../lib/regexp'
 import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   setDeviceLocation: 'Set Device Location',
-})
-
-const validationSchema = Yup.object().shape({
-  latitude: Yup.string()
-    .required(sharedMessages.validateRequired)
-    .matches(latitudeRegexp, sharedMessages.validateLatLong),
-  longitude: Yup.string()
-    .required(sharedMessages.validateRequired)
-    .matches(longitudeRegexp, sharedMessages.validateLatLong),
-  altitude: Yup.string()
-    .matches(int32Regexp, sharedMessages.validateInt32)
-    .required(sharedMessages.validateRequired),
 })
 
 const getRegistryLocation = function(locations) {
@@ -84,7 +66,6 @@ const getRegistryLocation = function(locations) {
     />
   )
 })
-@bind
 export default class DeviceGeneralSettings extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
@@ -93,6 +74,7 @@ export default class DeviceGeneralSettings extends React.Component {
     updateDevice: PropTypes.func.isRequired,
   }
 
+  @bind
   async handleSubmit(values) {
     const { device, appId, devId, updateDevice } = this.props
 
@@ -121,6 +103,7 @@ export default class DeviceGeneralSettings extends React.Component {
     await updateDevice(appId, devId, patch)
   }
 
+  @bind
   async handleDelete() {
     const { device, devId, appId, updateDevice } = this.props
     const registryLocation = getRegistryLocation(device.locations)
@@ -145,7 +128,6 @@ export default class DeviceGeneralSettings extends React.Component {
             <LocationForm
               entityId={devId}
               formTitle={m.setDeviceLocation}
-              validationSchema={validationSchema}
               initialValues={registryLocation ? registryLocation.location : undefined}
               onSubmit={this.handleSubmit}
               onDelete={this.handleDelete}

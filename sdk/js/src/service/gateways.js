@@ -39,6 +39,27 @@ class Gateways {
     })
   }
 
+  _emitDefaults(paths, gateway) {
+    // Handle zero coordinates that are swallowed by the grpc-gateway for gateway antennas.
+    if (paths.includes('antennas') && Boolean(gateway.antennas)) {
+      const { antennas } = gateway
+
+      for (const antenna of antennas) {
+        if (!('altitude' in antenna.location)) {
+          antenna.location.altitude = 0
+        }
+        if (!('longitude' in antenna.location)) {
+          antenna.location.longitude = 0
+        }
+        if (!('latitude' in antenna.location)) {
+          antenna.location.latitude = 0
+        }
+      }
+    }
+
+    return gateway
+  }
+
   // Retrieval
 
   async getAll(params, selector) {
@@ -59,7 +80,7 @@ class Gateways {
       fieldMask,
     )
 
-    return Marshaler.unwrapGateway(response)
+    return this._emitDefaults(fieldMask.field_mask.paths, Marshaler.unwrapGateway(response))
   }
 
   async search(params, selector) {
@@ -84,7 +105,7 @@ class Gateways {
       },
     )
 
-    return Marshaler.unwrapGateway(response)
+    return this._emitDefaults(mask, Marshaler.unwrapGateway(response))
   }
 
   // Create

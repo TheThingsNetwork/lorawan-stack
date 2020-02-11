@@ -17,10 +17,9 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import * as Yup from 'yup'
 
 import PageTitle from '../../../components/page-title'
-import LocationForm from '../../../components/location-form'
+import LocationForm from '../../components/location-form'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
@@ -31,27 +30,10 @@ import { attachPromise } from '../../store/actions/lib'
 import { selectSelectedGateway, selectSelectedGatewayId } from '../../store/selectors/gateways'
 import { mayViewOrEditGatewayLocation } from '../../lib/feature-checks'
 
-import {
-  latitude as latitudeRegexp,
-  longitude as longitudeRegexp,
-  int32 as int32Regexp,
-} from '../../lib/regexp'
 import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   setGatewayLocation: 'Set gateway antenna location',
-})
-
-const validationSchema = Yup.object().shape({
-  latitude: Yup.string()
-    .required(sharedMessages.validateRequired)
-    .matches(latitudeRegexp, sharedMessages.validateLatLong),
-  longitude: Yup.string()
-    .required(sharedMessages.validateRequired)
-    .matches(longitudeRegexp, sharedMessages.validateLatLong),
-  altitude: Yup.string()
-    .matches(int32Regexp, sharedMessages.validateInt32)
-    .required(sharedMessages.validateRequired),
 })
 
 const getRegistryLocation = function(antennas) {
@@ -81,7 +63,6 @@ const getRegistryLocation = function(antennas) {
 @withFeatureRequirement(mayViewOrEditGatewayLocation, {
   redirect: ({ gtwId }) => `/gateways/${gtwId}`,
 })
-@bind
 export default class GatewayLocation extends React.Component {
   static propTypes = {
     gateway: PropTypes.gateway.isRequired,
@@ -89,6 +70,7 @@ export default class GatewayLocation extends React.Component {
     updateGateway: PropTypes.func.isRequired,
   }
 
+  @bind
   async handleSubmit(values) {
     const { gateway, gtwId, updateGateway } = this.props
 
@@ -118,6 +100,7 @@ export default class GatewayLocation extends React.Component {
     await updateGateway(gtwId, patch)
   }
 
+  @bind
   async handleDelete() {
     const { gateway, gtwId, updateGateway } = this.props
     const registryLocation = getRegistryLocation(gateway.antennas)
@@ -143,7 +126,6 @@ export default class GatewayLocation extends React.Component {
             <LocationForm
               entityId={gtwId}
               formTitle={m.setGatewayLocation}
-              validationSchema={validationSchema}
               initialValues={initialValues}
               onSubmit={this.handleSubmit}
               onDelete={this.handleDelete}

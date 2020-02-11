@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Display of error payloads in console event log
+- Zero coordinate handling in location form in the Console.
 
 ### Changed
 

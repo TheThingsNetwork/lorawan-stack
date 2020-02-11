@@ -15,18 +15,20 @@
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
+import * as Yup from 'yup'
 
-import Form from '../form'
-import Input from '../input'
-import Message from '../../lib/components/message'
-import SubmitBar from '../submit-bar'
-import SubmitButton from '../submit-button'
-import Notification from '../notification'
-import ModalButton from '../button/modal-button'
-import toast from '../toast'
+import Form from '../../../components/form'
+import Input from '../../../components/input'
+import Message from '../../../lib/components/message'
+import SubmitBar from '../../../components/submit-bar'
+import SubmitButton from '../../../components/submit-button'
+import Notification from '../../../components/notification'
+import ModalButton from '../../../components/button/modal-button'
+import toast from '../../../components/toast'
 
-import sharedMessages from '../../lib/shared-messages'
-import PropTypes from '../../lib/prop-types'
+import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '../../lib/regexp'
+import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '../../../lib/prop-types'
 
 const m = defineMessages({
   deleteWarning: 'Are you sure you want to delete this location entry?',
@@ -37,7 +39,29 @@ const m = defineMessages({
   deleteSuccess: 'The location has been removed successfully',
 })
 
-@bind
+const validationSchema = Yup.object().shape({
+  latitude: Yup.number()
+    .test('is-valid-latitude', sharedMessages.validateLatLong, value =>
+      latitudeRegexp.test(String(value)),
+    )
+    .required(sharedMessages.validateRequired),
+  longitude: Yup.number()
+    .test('is-valid-longitude', sharedMessages.validateLatLong, value =>
+      longitudeRegexp.test(String(value)),
+    )
+    .required(sharedMessages.validateRequired),
+  altitude: Yup.number()
+    .integer(sharedMessages.validateInt32)
+    .required(sharedMessages.validateRequired),
+})
+
+// We consider location of an entity set iff at least one coordinate is set,
+// i.e. longitude, altitude, latitude.
+const hasLocationSet = location =>
+  typeof location.altitude !== 'undefined' ||
+  typeof location.latitude !== 'undefined' ||
+  typeof location.longitude !== 'undefined'
+
 class LocationForm extends Component {
   static propTypes = {
     entityId: PropTypes.string.isRequired,
@@ -53,8 +77,6 @@ class LocationForm extends Component {
     onDelete: PropTypes.func.isRequired,
     /** The handler for the submit function of the form */
     onSubmit: PropTypes.func.isRequired,
-    /** The validation schema of the form */
-    validationSchema: PropTypes.shape({}).isRequired,
   }
 
   static defaultProps = {
@@ -75,13 +97,14 @@ class LocationForm extends Component {
     error: '',
   }
 
+  @bind
   async onSubmit(values, { resetForm, setSubmitting }) {
     const { onSubmit, entityId } = this.props
 
     this.setState({ error: '' })
 
     try {
-      await onSubmit(values)
+      await onSubmit(validationSchema.cast(values))
       resetForm()
       toast({
         title: entityId,
@@ -94,6 +117,7 @@ class LocationForm extends Component {
     }
   }
 
+  @bind
   async onDelete() {
     const { onDelete, entityId } = this.props
 
@@ -111,11 +135,10 @@ class LocationForm extends Component {
   }
 
   render() {
-    const { initialValues, formTitle, validationSchema } = this.props
-
+    const { initialValues, formTitle } = this.props
     const { error } = this.state
 
-    const entryExists = initialValues.latitude && initialValues.altitude && initialValues.longitude
+    const entryExists = hasLocationSet(initialValues)
 
     return (
       <React.Fragment>
