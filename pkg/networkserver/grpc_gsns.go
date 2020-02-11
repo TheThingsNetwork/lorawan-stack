@@ -201,7 +201,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 			continue
 		}
 
-		drIdx, err := searchDataRate(up.Settings.DataRate, dev.EndDevice, ns.FrequencyPlans)
+		drIdx, err := searchDataRate(up.Settings.DataRate, phy)
 		if err != nil {
 			logger.WithError(err).Debug("Failed to determine data rate index of uplink, skip")
 			continue
@@ -1169,7 +1169,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			}
 			up.DeviceChannelIndex = uint32(upChIdx)
 
-			upDRIdx, err := searchDataRate(up.Settings.DataRate, stored, ns.Component.FrequencyPlans)
+			upDRIdx, err := searchDataRate(up.Settings.DataRate, phy)
 			if err != nil {
 				return nil, nil, err
 			}
