@@ -19,16 +19,17 @@ import {
   selectSelectedApplicationId,
   selectApplicationLinkIndicator,
   selectApplicationLinkFetching,
+  selectApplicationDeviceCount,
 } from '../../store/selectors/applications'
 import {
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
 } from '../../store/selectors/collaborators'
 import { selectApiKeysTotalCount, selectApiKeysFetching } from '../../store/selectors/api-keys'
-import { selectDevicesTotalCount, selectDevicesFetching } from '../../store/selectors/devices'
 import { getCollaboratorsList } from '../../store/actions/collaborators'
 import { getApiKeysList } from '../../store/actions/api-keys'
 import { getApplicationLink } from '../../store/actions/link'
+import { getApplicationDeviceCount } from '../../store/actions/applications'
 
 import {
   checkFromState,
@@ -42,7 +43,7 @@ const mapStateToProps = (state, props) => {
   const appId = selectSelectedApplicationId(state)
   const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: appId })
   const apiKeysTotalCount = selectApiKeysTotalCount(state)
-  const devicesTotalCount = selectDevicesTotalCount(state)
+  const devicesTotalCount = selectApplicationDeviceCount(state)
   const mayViewApplicationApiKeys = checkFromState(mayViewOrEditApplicationApiKeys, state)
   const mayViewApplicationCollaborators = checkFromState(
     mayViewOrEditApplicationCollaborators,
@@ -55,8 +56,7 @@ const mapStateToProps = (state, props) => {
     selectCollaboratorsFetching(state)
   const apiKeysFetching =
     (mayViewApplicationApiKeys && apiKeysTotalCount === undefined) || selectApiKeysFetching(state)
-  const devicesFetching =
-    (mayViewDevices && devicesTotalCount === undefined) || selectDevicesFetching(state)
+  const devicesFetching = mayViewDevices && devicesTotalCount === undefined
 
   return {
     appId,
@@ -82,11 +82,13 @@ const mapDispatchToProps = dispatch => ({
     mayViewApplicationCollaborators,
     mayViewApplicationApiKeys,
     mayViewApplicationLink,
+    mayViewDevices,
     appId,
   ) {
     if (mayViewApplicationCollaborators) dispatch(getCollaboratorsList('application', appId))
     if (mayViewApplicationApiKeys) dispatch(getApiKeysList('application', appId))
     if (mayViewApplicationLink) dispatch(getApplicationLink(appId))
+    if (mayViewDevices) dispatch(getApplicationDeviceCount(appId))
   },
 })
 
@@ -99,6 +101,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
       stateProps.mayViewApplicationCollaborators,
       stateProps.mayViewApplicationApiKeys,
       stateProps.mayViewApplicationLink,
+      stateProps.mayViewDevices,
       stateProps.appId,
     ),
 })
