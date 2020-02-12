@@ -97,7 +97,7 @@ func Write(w io.Writer, format string, data interface{}) (err error) {
 func IsPipe(r io.Reader) bool {
 	if f, ok := r.(*os.File); ok {
 		if stat, err := f.Stat(); err == nil {
-			return (stat.Mode() & os.ModeCharDevice) == 0
+			return (stat.Mode()&os.ModeCharDevice) == 0 && stat.Size() > 0
 		}
 	}
 	return false
