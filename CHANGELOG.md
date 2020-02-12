@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updating `supports_class_c` field in the Device General Settings Page in the Console.
 - Updating MQTT pubsub configuration in the Console
 - Handling multiple consequent updates of MQTT pubsub/webhook integrations in the Console.
+- Displaying total device count in application overview section when using device search in the Console
 
 ### Security
 
