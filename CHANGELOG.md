@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handling multiple consequent updates of MQTT pubsub/webhook integrations in the Console.
 - Displaying total device count in application overview section when using device search in the Console
 - FQDN used for Backend Interfaces interoperability requests.
+- Exposing device sensitive fields to unrelated stack components in the Console.
 
 ### Security
 

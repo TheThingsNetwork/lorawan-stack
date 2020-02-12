@@ -130,18 +130,7 @@ class Devices {
       return acc
     }, [])
 
-    // Make sure to write at least the ids, in case of creation
-    const mergeBase = create
-      ? {
-          ns: [['ids']],
-          as: [['ids']],
-          js: [['ids']],
-        }
-      : {}
-
-    const requestTree = requestTreeOverwrite
-      ? requestTreeOverwrite
-      : splitSetPaths(paths, mergeBase)
+    const requestTree = requestTreeOverwrite ? requestTreeOverwrite : splitSetPaths(paths)
 
     if (create) {
       if (device.join_server_address !== this._stackConfig.jsHost) {
