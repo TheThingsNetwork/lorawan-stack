@@ -328,6 +328,7 @@ func makeJoinServerHTTPRequestFunc(scheme, dns, fqdn string, port uint32, rpcPat
 		port = defaultHTTPSPort
 	}
 	return func(joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, pld interface{}) (*http.Request, error) {
+		fqdn := fqdn // Create a new reference to fqdn to avoid mutating the variable in the outside scope.
 		if fqdn == "" {
 			fqdn = JoinServerFQDN(joinEUI, dns)
 		}
