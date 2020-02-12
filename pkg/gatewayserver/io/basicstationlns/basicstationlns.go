@@ -216,7 +216,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	}
 	ctx = metadata.NewIncomingContext(ctx, md)
 	// If a fallback frequency is defined in the server context, inject it into local the context.
-	if fallback, ok := frequencyplans.FallbackIDFromContext(ctx); ok {
+	if fallback, ok := frequencyplans.FallbackIDFromContext(s.ctx); ok {
 		ctx = frequencyplans.WithFallbackID(ctx, fallback)
 	}
 
