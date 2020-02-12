@@ -42,6 +42,20 @@ export const [
   { request: getApplication, success: getApplicationSuccess, failure: getApplicationFailure },
 ] = createRequestActions(GET_APP_BASE, id => ({ id }), (id, selector) => ({ selector }))
 
+export const GET_APP_DEV_COUNT_BASE = 'GET_APPLICATION_DEVICE_COUNT'
+export const [
+  {
+    request: GET_APP_DEV_COUNT,
+    success: GET_APP_DEV_COUNT_SUCCESS,
+    failure: GET_APP_DEV_COUNT_FAILURE,
+  },
+  {
+    request: getApplicationDeviceCount,
+    success: getApplicationDeviceCountSuccess,
+    failure: getApplicationDeviceCountFailure,
+  },
+] = createRequestActions(GET_APP_DEV_COUNT_BASE, id => ({ id }))
+
 export const UPDATE_APP_BASE = 'UPDATE_APPLICATION'
 export const [
   { request: UPDATE_APP, success: UPDATE_APP_SUCCESS, failure: UPDATE_APP_FAILURE },
