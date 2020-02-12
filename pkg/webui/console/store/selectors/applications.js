@@ -43,6 +43,8 @@ export const selectSelectedApplication = state =>
   selectApplicationById(state, selectSelectedApplicationId(state))
 export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)
 export const selectApplicationError = createErrorSelector(GET_APP_BASE)
+export const selectApplicationDeviceCount = state =>
+  selectApplicationStore(state).applicationDeviceCount
 
 // Applications
 const selectAppsIds = createPaginationIdsSelectorByEntity(ENTITY)

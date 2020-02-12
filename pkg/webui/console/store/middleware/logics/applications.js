@@ -82,6 +82,16 @@ const getApplicationsLogic = createRequestLogic({
   },
 })
 
+const getApplicationDeviceCountLogic = createRequestLogic({
+  type: applications.GET_APP_DEV_COUNT,
+  async process({ action }) {
+    const { id: appId } = action.payload
+    const data = await api.devices.list(appId, { limit: 1 })
+
+    return { applicationDeviceCount: data.totalCount }
+  },
+})
+
 const getApplicationsRightsLogic = createRequestLogic({
   type: applications.GET_APPS_RIGHTS_LIST,
   async process({ action }) {
@@ -136,6 +146,7 @@ const getPubsubFormatsLogic = createRequestLogic({
 
 export default [
   getApplicationLogic,
+  getApplicationDeviceCountLogic,
   updateApplicationLogic,
   deleteApplicationLogic,
   getApplicationsLogic,
