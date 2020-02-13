@@ -236,16 +236,19 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		logger.WithError(err).Warn("Failed to connect")
 		return err
 	}
-	defer func() {
-		conn.Disconnect(err)
-	}()
 
 	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
+		conn.Disconnect(err)
 		return err
 	}
 	defer ws.Close()
+
+	defer func() {
+		conn.Disconnect(err)
+		err = nil // Errors are sent over the websocket connection that is established by this point.
+	}()
 
 	fps := conn.FrequencyPlans()
 	bandID := conn.BandID()
@@ -254,6 +257,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		for {
 			select {
 			case <-conn.Context().Done():
+				ws.Close()
 				return
 			case down := <-conn.Down():
 				dlTime := time.Now()
@@ -301,135 +305,129 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	}
 
 	for {
-		select {
-		case <-conn.Context().Done():
-			return conn.Context().Err()
-		default:
-			_, data, err := ws.ReadMessage()
-			if err != nil {
-				logger.WithError(err).Debug("Failed to read message")
-				conn.Disconnect(err)
-				return nil
-			}
+		_, data, err := ws.ReadMessage()
+		if err != nil {
+			logger.WithError(err).Debug("Failed to read message")
+			return err
+		}
 
-			typ, err := messages.Type(data)
-			if err != nil {
-				logger.WithError(err).Debug("Failed to parse message type")
-				continue
+		typ, err := messages.Type(data)
+		if err != nil {
+			logger.WithError(err).Debug("Failed to parse message type")
+			continue
+		}
+		logger := logger.WithFields(log.Fields(
+			"upstream_type", typ,
+		))
+		receivedAt := time.Now()
+
+		switch typ {
+		case messages.TypeUpstreamVersion:
+			var version messages.Version
+			if err := json.Unmarshal(data, &version); err != nil {
+				logger.WithError(err).Debug("Failed to unmarshal version message")
+				return err
 			}
 			logger := logger.WithFields(log.Fields(
-				"upstream_type", typ,
+				"station", version.Station,
+				"firmware", version.Firmware,
+				"model", version.Model,
 			))
-			receivedAt := time.Now()
-
-			switch typ {
-			case messages.TypeUpstreamVersion:
-				var version messages.Version
-				if err := json.Unmarshal(data, &version); err != nil {
-					logger.WithError(err).Debug("Failed to unmarshal version message")
-					return err
-				}
-				logger := logger.WithFields(log.Fields(
-					"station", version.Station,
-					"firmware", version.Firmware,
-					"model", version.Model,
-				))
-				cfg, err := pfconfig.GetRouterConfig(bandID, fps, version.IsProduction(), time.Now())
-				if err != nil {
-					logger.WithError(err).Warn("Failed to generate router configuration")
-					return err
-				}
-				data, err = cfg.MarshalJSON()
-				if err != nil {
-					logger.WithError(err).Warn("Failed to marshal response message")
-					return err
-				}
-				if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
-					logger.WithError(err).Warn("Failed to send router configuration")
-					return err
-				}
-				stat := &ttnpb.GatewayStatus{
-					Time: receivedAt,
-					Versions: map[string]string{
-						"station":  version.Station,
-						"firmware": version.Firmware,
-						"package":  version.Package,
-					},
-					Advanced: &pbtypes.Struct{
-						Fields: map[string]*pbtypes.Value{
-							"model": {
-								Kind: &pbtypes.Value_StringValue{
-									StringValue: version.Model,
-								},
+			cfg, err := pfconfig.GetRouterConfig(bandID, fps, version.IsProduction(), time.Now())
+			if err != nil {
+				logger.WithError(err).Warn("Failed to generate router configuration")
+				return err
+			}
+			data, err = cfg.MarshalJSON()
+			if err != nil {
+				logger.WithError(err).Warn("Failed to marshal response message")
+				return err
+			}
+			if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
+				logger.WithError(err).Warn("Failed to send router configuration")
+				return err
+			}
+			stat := &ttnpb.GatewayStatus{
+				Time: receivedAt,
+				Versions: map[string]string{
+					"station":  version.Station,
+					"firmware": version.Firmware,
+					"package":  version.Package,
+				},
+				Advanced: &pbtypes.Struct{
+					Fields: map[string]*pbtypes.Value{
+						"model": {
+							Kind: &pbtypes.Value_StringValue{
+								StringValue: version.Model,
 							},
-							"features": {
-								Kind: &pbtypes.Value_StringValue{
-									StringValue: version.Features,
-								},
+						},
+						"features": {
+							Kind: &pbtypes.Value_StringValue{
+								StringValue: version.Features,
 							},
 						},
 					},
-				}
-				if err := conn.HandleStatus(stat); err != nil {
-					logger.WithError(err).Warn("Failed to send version response message")
-				}
-
-			case messages.TypeUpstreamJoinRequest:
-				var jreq messages.JoinRequest
-				if err := json.Unmarshal(data, &jreq); err != nil {
-					logger.WithError(err).Debug("Failed to unmarshal join-request message")
-					return nil
-				}
-				up, err := jreq.ToUplinkMessage(ids, bandID, receivedAt)
-				if err != nil {
-					logger.WithError(err).Debug("Failed to parse join-request message")
-					return nil
-				}
-				recordXTime(jreq.UpInfo.XTime, up.ReceivedAt)
-				if err := conn.HandleUp(up); err != nil {
-					logger.WithError(err).Warn("Failed to handle uplink message")
-				}
-				recordRTT(conn, receivedAt, jreq.RefTime)
-
-			case messages.TypeUpstreamUplinkDataFrame:
-				var updf messages.UplinkDataFrame
-				if err := json.Unmarshal(data, &updf); err != nil {
-					logger.WithError(err).Debug("Failed to unmarshal uplink data frame")
-					return nil
-				}
-				up, err := updf.ToUplinkMessage(ids, bandID, receivedAt)
-				if err != nil {
-					logger.WithError(err).Debug("Failed to parse uplink data frame")
-					return nil
-				}
-				recordXTime(updf.UpInfo.XTime, up.ReceivedAt)
-				if err := conn.HandleUp(up); err != nil {
-					logger.WithError(err).Warn("Failed to handle uplink message")
-				}
-				recordRTT(conn, receivedAt, updf.RefTime)
-
-			case messages.TypeUpstreamTxConfirmation:
-				var txConf messages.TxConfirmation
-				if err := json.Unmarshal(data, &txConf); err != nil {
-					logger.WithError(err).Debug("Failed to unmarshal Tx acknowledgement frame")
-					return nil
-				}
-				if cids, _, ok := s.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
-					txAck := messages.ToTxAcknowledgment(cids)
-					if err := conn.HandleTxAck(&txAck); err != nil {
-						logger.WithField("diid", txConf.Diid).Warn("Failed to handle Tx acknowledgement")
-					}
-				} else {
-					logger.WithField("diid", txConf.Diid).Debug("Tx acknowledgement either does not correspond to a downlink message or arrived too late")
-				}
-				recordRTT(conn, receivedAt, txConf.RefTime)
-
-			case messages.TypeUpstreamProprietaryDataFrame, messages.TypeUpstreamRemoteShell, messages.TypeUpstreamTimeSync:
-				logger.WithField("message_type", typ).Debug("Message type not implemented")
-
-			default:
-				logger.WithField("message_type", typ).Debug("Unknown message type")
+				},
 			}
+			if err := conn.HandleStatus(stat); err != nil {
+				logger.WithError(err).Warn("Failed to send version response message")
+			}
+
+		case messages.TypeUpstreamJoinRequest:
+			var jreq messages.JoinRequest
+			if err := json.Unmarshal(data, &jreq); err != nil {
+				logger.WithError(err).Debug("Failed to unmarshal join-request message")
+				return err
+			}
+			up, err := jreq.ToUplinkMessage(ids, bandID, receivedAt)
+			if err != nil {
+				logger.WithError(err).Debug("Failed to parse join-request message")
+				return err
+			}
+			recordXTime(jreq.UpInfo.XTime, up.ReceivedAt)
+			if err := conn.HandleUp(up); err != nil {
+				logger.WithError(err).Warn("Failed to handle uplink message")
+			}
+			recordRTT(conn, receivedAt, jreq.RefTime)
+
+		case messages.TypeUpstreamUplinkDataFrame:
+			var updf messages.UplinkDataFrame
+			if err := json.Unmarshal(data, &updf); err != nil {
+				logger.WithError(err).Debug("Failed to unmarshal uplink data frame")
+				return err
+			}
+			up, err := updf.ToUplinkMessage(ids, bandID, receivedAt)
+			if err != nil {
+				logger.WithError(err).Debug("Failed to parse uplink data frame")
+				return err
+			}
+			recordXTime(updf.UpInfo.XTime, up.ReceivedAt)
+			if err := conn.HandleUp(up); err != nil {
+				logger.WithError(err).Warn("Failed to handle uplink message")
+			}
+			recordRTT(conn, receivedAt, updf.RefTime)
+
+		case messages.TypeUpstreamTxConfirmation:
+			var txConf messages.TxConfirmation
+			if err := json.Unmarshal(data, &txConf); err != nil {
+				logger.WithError(err).Debug("Failed to unmarshal Tx acknowledgement frame")
+				return err
+			}
+			if cids, _, ok := s.tokens.Get(uint16(txConf.Diid), receivedAt); ok {
+				txAck := messages.ToTxAcknowledgment(cids)
+				if err := conn.HandleTxAck(&txAck); err != nil {
+					logger.WithField("diid", txConf.Diid).Warn("Failed to handle Tx acknowledgement")
+				}
+			} else {
+				logger.WithField("diid", txConf.Diid).Debug("Tx acknowledgement either does not correspond to a downlink message or arrived too late")
+			}
+			recordRTT(conn, receivedAt, txConf.RefTime)
+
+		case messages.TypeUpstreamProprietaryDataFrame, messages.TypeUpstreamRemoteShell, messages.TypeUpstreamTimeSync:
+			logger.WithField("message_type", typ).Debug("Message type not implemented")
+
+		default:
+			logger.WithField("message_type", typ).Debug("Unknown message type")
 		}
 	}
 }

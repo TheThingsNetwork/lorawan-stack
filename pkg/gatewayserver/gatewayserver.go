@@ -68,7 +68,7 @@ type GatewayServer struct {
 
 	upstreamHandlers map[string]upstream.Handler
 
-	connections sync.Map
+	connections sync.Map // string to connectionEntry
 }
 
 func (gs *GatewayServer) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
@@ -345,6 +345,13 @@ var (
 	)
 )
 
+var errNewConnection = errors.DefineAborted("new_connection", "new connection from same gateway")
+
+type connectionEntry struct {
+	*io.Connection
+	upstreamDone chan struct{}
+}
+
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
 func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
@@ -412,10 +419,23 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	if err != nil {
 		return nil, err
 	}
-	gs.connections.Store(uid, conn)
+	connEntry := connectionEntry{
+		Connection:   conn,
+		upstreamDone: make(chan struct{}),
+	}
+	for existing, exists := gs.connections.LoadOrStore(uid, connEntry); exists; existing, exists = gs.connections.LoadOrStore(uid, connEntry) {
+		existingConnEntry := existing.(connectionEntry)
+		logger.Warn("Disconnect existing connection")
+		existingConnEntry.Disconnect(errNewConnection)
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-existingConnEntry.upstreamDone:
+		}
+	}
 	registerGatewayConnect(ctx, ids)
 	logger.Info("Connected")
-	go gs.handleUpstream(conn)
+	go gs.handleUpstream(connEntry)
 
 	for name, handler := range gs.upstreamHandlers {
 		go func(name string, handler upstream.Handler) {
@@ -430,11 +450,11 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 
 // GetConnection returns the *io.Connection for the given gateway. If not found, this method returns nil, false.
 func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*io.Connection, bool) {
-	conn, loaded := gs.connections.Load(unique.ID(ctx, ids))
+	entry, loaded := gs.connections.Load(unique.ID(ctx, ids))
 	if !loaded {
 		return nil, false
 	}
-	return conn.(*io.Connection), true
+	return entry.(connectionEntry).Connection, true
 }
 
 var (
@@ -466,7 +486,7 @@ type upstreamItem struct {
 	host *upstreamHost
 }
 
-func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
+func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 	ctx := conn.Context()
 	logger := log.FromContext(ctx)
 	defer func() {
@@ -474,6 +494,7 @@ func (gs *GatewayServer) handleUpstream(conn *io.Connection) {
 		gs.connections.Delete(unique.ID(ctx, ids))
 		registerGatewayDisconnect(ctx, ids)
 		logger.Info("Disconnected")
+		close(conn.upstreamDone)
 	}()
 
 	handleFn := func(host *upstreamHost) {

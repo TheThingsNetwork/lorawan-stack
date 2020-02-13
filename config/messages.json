@@ -3734,6 +3734,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:new_connection": {
+    "translations": {
+      "en": "new connection from same gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:no_fallback_frequency_plan": {
     "translations": {
       "en": "gateway `{gateway_uid}` is not registered and no fallback frequency plan defined"
