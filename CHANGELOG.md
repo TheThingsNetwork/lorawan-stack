@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Display of error payloads in console event log
+- Display of error payloads in console event log.
 - Zero coordinate handling in location form in the Console.
 
 ### Changed
@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FQDN used for Backend Interfaces interoperability requests.
 - Exposing device sensitive fields to unrelated stack components in the Console.
 - CLI trying to read input while none available.
+- Reconnections of gateways whose previous connection was not cleaned up properly. New connections from the same gateway now actively disconnects existing connections.
 
 ### Security
 

@@ -125,6 +125,8 @@ func (c *connection) setup(ctx context.Context) error {
 			select {
 			case <-c.io.Context().Done():
 				logger.WithError(c.io.Context().Err()).Debug("Done sending downlink")
+				c.session.Close()
+				c.mqtt.Close()
 				return
 			case down := <-c.io.Down():
 				buf, err := c.format.FromDownlink(down, c.io.Gateway().GatewayIdentifiers)
@@ -165,12 +167,13 @@ func (c *connection) setup(ctx context.Context) error {
 			}
 			if err != nil {
 				if err != stdio.EOF {
-					logger.WithError(err).Error("Send failed, closing session")
+					logger.WithError(err).Error("Send failed, close session")
 				} else {
 					logger.Info("Disconnected")
 				}
-				c.session.Close()
 				c.io.Disconnect(err)
+				c.session.Close()
+				c.mqtt.Close()
 				return
 			}
 		}

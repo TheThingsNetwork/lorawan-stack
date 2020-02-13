@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
@@ -34,7 +33,7 @@ func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttn
 	if !ok {
 		return nil, errNotConnected.WithAttributes("gateway_uid", uid)
 	}
-	conn := val.(*io.Connection)
+	conn := val.(connectionEntry)
 
 	stats := &ttnpb.GatewayConnectionStats{}
 	ct := conn.ConnectTime()
