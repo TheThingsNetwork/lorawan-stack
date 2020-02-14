@@ -439,12 +439,13 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	go gs.handleUpstream(connEntry)
 
 	for name, handler := range gs.upstreamHandlers {
-		go func(name string, handler upstream.Handler) {
-			logger := log.FromContext(ctx).WithField("handler", name)
-			if err := handler.ConnectGateway(conn.Context(), ids, conn); err != nil {
-				logger.WithError(err).Warn("Failed to connect gateway on upstream")
-			}
-		}(name, handler)
+		handler := handler
+		gs.StartTask(conn.Context(), fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayID),
+			func(ctx context.Context) error {
+				return handler.ConnectGateway(ctx, ids, conn)
+			},
+			component.TaskRestartOnFailure, 0.1, component.TaskBackoffDial...,
+		)
 	}
 	return conn, nil
 }
