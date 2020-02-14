@@ -364,6 +364,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		"protocol", frontend.Protocol(),
 		"gateway_uid", uid,
 	))
+	ctx = log.NewContext(ctx, logger)
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:conn:%s", events.NewCorrelationID()))
 
 	var err error
