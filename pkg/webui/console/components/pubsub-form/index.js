@@ -79,17 +79,19 @@ export default class PubsubForm extends Component {
 
   async handleSubmit(values, { setSubmitting, resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
-    const pubsub = mapFormValuesToPubsub(values, appId)
+
+    const castedValues = validationSchema.cast(values)
+    const pubsub = mapFormValuesToPubsub(castedValues, appId)
 
     await this.setState({ error: '' })
 
     try {
       const result = await onSubmit(pubsub)
 
-      resetForm(values)
+      resetForm(castedValues)
       await onSubmitSuccess(result)
     } catch (error) {
-      resetForm(values)
+      resetForm(castedValues)
 
       await this.setState({ error })
       await onSubmitFailure(error)
