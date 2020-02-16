@@ -8637,6 +8637,16 @@
               "fullType": "ttn.lorawan.v3.DownlinkMessage",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "last_network_initiated_downlink_at",
+              "description": "Time when the last network-initiated downlink message was scheduled.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
             }
           ]
         },

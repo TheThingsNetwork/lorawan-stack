@@ -1510,6 +1510,18 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 			}
 
+		case "last_network_initiated_downlink_at":
+
+			if v, ok := interface{}(m.GetLastNetworkInitiatedDownlinkAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACStateValidationError{
+						field:  "last_network_initiated_downlink_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return MACStateValidationError{
 				field:  name,
