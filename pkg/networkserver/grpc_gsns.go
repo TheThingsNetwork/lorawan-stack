@@ -912,15 +912,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return err
 	}
 
-	downAt, ok := nextDataDownlinkAfter(ctx, stored, matched.phy, ns.defaultMACSettings, timeNow().UTC())
-	if !ok {
-		logger.Debug("No downlink to send or windows expired, avoid adding downlink task after data uplink")
-	} else {
-		downAt = downAt.Add(-scheduleWindow())
-		logger.WithField("start_at", downAt).Debug("Add downlink task after data uplink")
-		if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
-			logger.WithError(err).Error("Failed to add downlink task after data uplink")
-		}
+	if err := ns.updateDataDownlinkTask(ctx, stored, time.Time{}); err != nil {
+		logger.WithError(err).Error("Failed to update downlink task queue after data uplink")
 	}
 
 	if matched.NbTrans == 1 {
@@ -941,12 +934,16 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		registerForwardDataUplink(ctx, up)
 	}
 
-	if len(queuedApplicationUplinks) > 0 {
+	if n := len(queuedApplicationUplinks); n > 0 {
+		logger := logger.WithField("uplink_count", n)
+		logger.Debug("Enqueue application uplinks for sending to Application Server")
 		if err := ns.applicationUplinks.Add(ctx, queuedApplicationUplinks...); err != nil {
-			logger.WithError(err).Warn("Failed to queue application uplinks for sending to Application Server")
+			logger.WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
 		}
 	}
-	if len(queuedEvents) > 0 {
+	if n := len(queuedEvents); n > 0 {
+		logger := logger.WithField("event_count", n)
+		logger.Debug("Publish events")
 		for _, ev := range queuedEvents {
 			events.Publish(ev(ctx, stored.EndDeviceIdentifiers))
 		}
@@ -1185,11 +1182,12 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 
-	startAt := up.ReceivedAt.Add(phy.JoinAcceptDelay1 - scheduleWindow())
-	logger.WithField("start_at", startAt).Debug("Add downlink task for join-accept")
-	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
-		logger.WithError(err).Error("Failed to add downlink task for join-accept")
+	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - req.RxDelay.Duration()/2 - nsScheduleWindow())
+	logger.WithField("start_at", downAt).Debug("Add downlink task")
+	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
+		logger.WithError(err).Error("Failed to add downlink task after join-request")
 	}
+	logger.Debug("Enqueue join-accept for sending to Application Server")
 	if err := ns.applicationUplinks.Add(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: dev.EndDeviceIdentifiers.ApplicationIdentifiers,
@@ -1206,7 +1204,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			ReceivedAt:           respRecvAt,
 		}},
 	}); err != nil {
-		logger.WithError(err).Warn("Failed to queue join-accept for sending to Application Server")
+		logger.WithError(err).Warn("Failed to enqueue join-accept for sending to Application Server")
 	}
 	return nil
 }

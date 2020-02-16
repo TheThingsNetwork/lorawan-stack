@@ -324,7 +324,7 @@ func computePingOffset(beaconTime uint32, devAddr types.DevAddr, pingPeriod uint
 	return test.Must(crypto.ComputePingOffset(beaconTime, devAddr, pingPeriod)).(uint16)
 }
 
-func TestNextPingSlotAfter(t *testing.T) {
+func TestNextPingSlotAt(t *testing.T) {
 	const beaconTime = 10000 * beaconPeriod
 	beaconAt := gpstime.Parse(beaconTime)
 	devAddr := types.DevAddr{0x01, 0x34, 0x07, 0x29}
@@ -504,23 +504,24 @@ func TestNextPingSlotAfter(t *testing.T) {
 	}
 }
 
-func TestNextDataDownlinkAfter(t *testing.T) {
-	nextPingSlotAfter := func(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) time.Time {
-		pingSlotAfter, ok := nextPingSlotAfter(ctx, dev, earliestAt)
+func TestNextDataDownlinkAt(t *testing.T) {
+	nextPingSlotAt := func(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) time.Time {
+		pingSlotAt, ok := nextPingSlotAt(ctx, dev, earliestAt)
 		if !ok {
-			panic(fmt.Sprintf("failed to compute next ping slot after %v", earliestAt))
+			panic(fmt.Sprintf("failed to compute next ping slot starting from %v", earliestAt))
 		}
-		return pingSlotAfter
+		return pingSlotAt
 	}
 
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	type TestCase struct {
-		Name         string
-		Device       *ttnpb.EndDevice
-		EarliestAt   time.Time
-		ExpectedTime time.Time
-		ExpectedOk   bool
+		Name          string
+		Device        *ttnpb.EndDevice
+		EarliestAt    time.Time
+		ExpectedTime  time.Time
+		ExpectedClass ttnpb.Class
+		ExpectedOk    bool
 	}
 	for _, tc := range []TestCase{
 		{
@@ -553,8 +554,9 @@ func TestNextDataDownlinkAfter(t *testing.T) {
 					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				},
 			},
-			ExpectedTime: time.Unix(41+4, 0),
-			ExpectedOk:   true,
+			ExpectedTime:  time.Unix(41+4, 0).Add(-infrastructureDelay / 2),
+			ExpectedClass: ttnpb.CLASS_A,
+			ExpectedOk:    true,
 		},
 		{
 			Name:       "unicast/class A/Rx windows closed",
@@ -611,8 +613,9 @@ func TestNextDataDownlinkAfter(t *testing.T) {
 					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				},
 			},
-			ExpectedTime: gpstime.Parse(beaconPeriod + 4*time.Second),
-			ExpectedOk:   true,
+			ExpectedTime:  gpstime.Parse(beaconPeriod + 4*time.Second).Add(-infrastructureDelay / 2),
+			ExpectedClass: ttnpb.CLASS_A,
+			ExpectedOk:    true,
 		},
 		func() TestCase {
 			dev := &ttnpb.EndDevice{
@@ -642,11 +645,12 @@ func TestNextDataDownlinkAfter(t *testing.T) {
 			}
 			earliestAt := gpstime.Parse(beaconPeriod + time.Second)
 			return TestCase{
-				Name:         "unicast/class B/Rx windows closed",
-				Device:       dev,
-				EarliestAt:   earliestAt,
-				ExpectedTime: nextPingSlotAfter(ctx, dev, earliestAt),
-				ExpectedOk:   true,
+				Name:          "unicast/class B/Rx windows closed",
+				Device:        dev,
+				EarliestAt:    earliestAt,
+				ExpectedTime:  nextPingSlotAt(ctx, dev, earliestAt),
+				ExpectedClass: ttnpb.CLASS_B,
+				ExpectedOk:    true,
 			}
 		}(),
 		{
@@ -675,8 +679,9 @@ func TestNextDataDownlinkAfter(t *testing.T) {
 					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				},
 			},
-			ExpectedTime: time.Unix(41+4, 0),
-			ExpectedOk:   true,
+			ExpectedTime:  time.Unix(41+4, 0).Add(-infrastructureDelay / 2),
+			ExpectedClass: ttnpb.CLASS_A,
+			ExpectedOk:    true,
 		},
 		{
 			Name:       "unicast/class C/Rx windows closed",
@@ -703,16 +708,18 @@ func TestNextDataDownlinkAfter(t *testing.T) {
 					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				},
 			},
-			ExpectedTime: time.Unix(42, 0),
-			ExpectedOk:   true,
+			ExpectedTime:  time.Unix(42, 0),
+			ExpectedClass: ttnpb.CLASS_C,
+			ExpectedOk:    true,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx := log.NewContext(ctx, test.GetLogger(t))
-			ret, ok := nextDataDownlinkAfter(ctx, tc.Device, test.Must(band.GetByID(band.EU_863_870)).(band.Band), ttnpb.MACSettings{}, tc.EarliestAt)
+			ret, class, ok := nextDataDownlinkAt(ctx, tc.Device, test.Must(band.GetByID(band.EU_863_870)).(band.Band), ttnpb.MACSettings{}, tc.EarliestAt)
 			if a.So(ok, should.Equal, tc.ExpectedOk) {
+				a.So(class, should.Resemble, tc.ExpectedClass)
 				a.So(ret, should.Resemble, tc.ExpectedTime)
 			}
 		})

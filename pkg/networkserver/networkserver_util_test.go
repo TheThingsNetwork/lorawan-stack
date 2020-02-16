@@ -104,13 +104,7 @@ func NSScheduleWindow() time.Duration {
 	return nsScheduleWindow()
 }
 
-func GSScheduleWindow() time.Duration {
-	return gsScheduleWindow()
-}
-
-func ScheduleWindow() time.Duration {
-	return scheduleWindow()
-}
+const InfrastructureDelay = infrastructureDelay
 
 // CopyEndDevice returns a deep copy of ttnpb.EndDevice pb.
 func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
