@@ -397,7 +397,7 @@ func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band
 		}
 
 	default:
-		panic(fmt.Sprintf("Unmatched device class: %v", dev.MACState.DeviceClass))
+		panic(fmt.Sprintf("unmatched device class: %v", dev.MACState.DeviceClass))
 	}
 
 	var absTime time.Time

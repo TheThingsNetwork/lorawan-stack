@@ -1327,7 +1327,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					freq = dev.MACState.CurrentParameters.Rx2Frequency
 
 				default:
-					panic(fmt.Sprintf("unmatched class: '%s'", class))
+					panic(fmt.Sprintf("unmatched downlink class: '%s'", class))
 				}
 
 				genDown, genState, err := ns.generateDownlink(ctx, dev, phy, class, transmitAt,

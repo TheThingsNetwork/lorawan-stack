@@ -847,7 +847,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				macState, err := NewMACState(expected, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 				if !a.So(err, should.BeNil) {
-					panic(fmt.Sprintf("Failed to reset MAC state: %s", err))
+					panic(fmt.Sprintf("failed to reset MAC state: %s", err))
 				}
 				expected.MACState = macState
 				a.So(dev, should.Resemble, expected)
@@ -1034,7 +1034,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				macState, err := NewMACState(expected, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 				if !a.So(err, should.BeNil) {
-					panic(fmt.Sprintf("Failed to reset MAC state: %s", err))
+					panic(fmt.Sprintf("failed to reset MAC state: %s", err))
 				}
 				expected.MACState = macState
 				a.So(dev, should.Resemble, expected)
@@ -1220,7 +1220,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				}
 				macState, err := NewMACState(expected, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
 				if !a.So(err, should.BeNil) {
-					panic(fmt.Sprintf("Failed to reset MAC state: %s", err))
+					panic(fmt.Sprintf("failed to reset MAC state: %s", err))
 				}
 				expected.MACState = macState
 				a.So(dev, should.Resemble, expected)
