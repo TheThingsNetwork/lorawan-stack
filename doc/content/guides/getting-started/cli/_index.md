@@ -24,7 +24,6 @@ $ brew install TheThingsNetwork/lorawan-stack/ttn-lw-stack
 ```bash
 $ sudo snap install ttn-lw-stack
 $ sudo snap alias ttn-lw-stack.ttn-lw-cli ttn-lw-cli
-$ sudo snap connect ttn-lw-stack:personal-files      # for $HOME/.ttn-lw-cli.yml
 ```
 
 ### Binaries
@@ -38,6 +37,8 @@ The command-line needs to be configured to connect to your deployment on `thethi
 1. Environment: `export TTN_LW_CONFIG=/path/to/ttn-lw-cli.yml`
 2. Command-line flag: `-c /path/to/ttn-lw-cli.yml`
 3. Save as `.ttn-lw-cli.yml` in `$XDG_CONFIG_HOME`, your home directory, or the working directory.
+
+> NOTE: When using the snap packages, `~/.ttn-lw-cli.yml` will fail with permission errors. Choose a different path.
 
 ```yaml
 oauth-server-address: 'https://thethings.example.com/oauth'

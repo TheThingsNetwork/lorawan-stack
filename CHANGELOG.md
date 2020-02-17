@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Do not use `personal-files` plugin for snap package.
+
 ### Deprecated
 
 ### Removed
@@ -36,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Exposing device sensitive fields to unrelated stack components in the Console.
 - CLI trying to read input while none available.
 - Reconnections of gateways whose previous connection was not cleaned up properly. New connections from the same gateway now actively disconnects existing connections.
+- `ttn-lw-stack` and `ttn-lw-cli` file permission errors when installed using snap.
+  - You may need to run `sudo snap connect ttn-lw-stack:personal-files`
 
 ## [3.5.2] (2020-02-06)
 
@@ -57,8 +61,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Crashes on Gateway Server start when traffic flow started while The Things Stack was still starting.
 - Not detecting session change in Application Server when interop Join Server did not provide a `SessionKeyID`.
-- `ttn-lw-stack` and `ttn-lw-cli` file permission errors when installed using snap.
-  - You may need to run `sudo snap connect ttn-lw-stack:personal-files`
 
 ## [3.5.0] (2020-01-24)
 
