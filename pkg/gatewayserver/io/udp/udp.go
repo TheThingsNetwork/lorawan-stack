@@ -344,7 +344,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				break
 			}
 			downlinkPath := state.lastDownlinkPath.Load().(downlinkPath)
-			logger = logger.WithField("remote_addr", downlinkPath.addr.String())
+			logger := logger.WithField("remote_addr", downlinkPath.addr.String())
 			packet := encoding.Packet{
 				GatewayAddr:     &downlinkPath.addr,
 				ProtocolVersion: downlinkPath.version,
