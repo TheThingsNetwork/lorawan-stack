@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- End device events subscription release in the Console. 
+
 ### Security
 
 ## [3.5.3] (2020-02-14)
