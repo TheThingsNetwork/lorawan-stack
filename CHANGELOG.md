@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Join-request transmission parameters.
 - ADR in 72-channel regions.
 - Payload length limits used by Network Server being too low.
+- CLI ignores default config files that cannot be read.
 
 ### Security
 
