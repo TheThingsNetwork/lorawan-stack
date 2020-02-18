@@ -17,11 +17,16 @@ import TTN from 'ttn-lw'
 
 import token from '../lib/access-token'
 import getCookieValue from '../../lib/cookie'
-import { selectStackConfig, selectApplicationRootPath } from '../../lib/selectors/env'
+import {
+  selectStackConfig,
+  selectApplicationRootPath,
+  selectOAuthBaseUrlConfig,
+} from '../../lib/selectors/env'
 import toast from '../../components/toast'
 
 const stackConfig = selectStackConfig()
 const appRoot = selectApplicationRootPath()
+const oAuthBaseUrl = selectOAuthBaseUrlConfig()
 
 const stack = {
   is: stackConfig.is.enabled ? stackConfig.is.base_url : undefined,
@@ -75,6 +80,11 @@ export default {
     },
     logout() {
       return instance.post(`${appRoot}/api/auth/logout`)
+    },
+  },
+  oauth: {
+    logout() {
+      return instance.post(`${oAuthBaseUrl}/api/auth/logout`)
     },
   },
   clients: {
