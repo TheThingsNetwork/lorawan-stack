@@ -44,7 +44,8 @@ jobs:
         - '5432/tcp'
         env:
           POSTGRES_USER: root
-          POSTGRES_PASSWORD: ''
+          POSTGRES_PASSWORD: root
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       redis:
         image: redis
         ports:
@@ -52,11 +53,15 @@ jobs:
     steps:
     - name: Create ttn_lorawan_is_test DB
       uses: docker://postgres
+      env:
+        PGPASSWORD: root
       with:
         entrypoint: /usr/bin/createdb
         args: -h postgres -U root ttn_lorawan_is_test
     - name: Create ttn_lorawan_is_store_test DB
       uses: docker://postgres
+      env:
+        PGPASSWORD: root
       with:
         entrypoint: /usr/bin/createdb
         args: -h postgres -U root ttn_lorawan_is_store_test
@@ -71,6 +76,7 @@ jobs:
     - name: mage go:test
       env:
         SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
+        SQL_DB_AUTH: 'root:root'
         REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
         TEST_REDIS: '1'
         TEST_SLOWDOWN: '8'

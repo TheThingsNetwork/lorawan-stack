@@ -272,7 +272,11 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 		if dbName == "" {
 			dbName = "ttn_lorawan_is_test"
 		}
-		dbConnString = fmt.Sprintf("postgresql://root@%s/%s?sslmode=disable", dbAddress, dbName)
+		dbAuth := os.Getenv("SQL_DB_AUTH")
+		if dbAuth == "" {
+			dbAuth = "root"
+		}
+		dbConnString = fmt.Sprintf("postgresql://%s@%s/%s?sslmode=disable", dbAuth, dbAddress, dbName)
 		db, err := store.Open(ctx, dbConnString)
 		if err != nil {
 			panic(err)
