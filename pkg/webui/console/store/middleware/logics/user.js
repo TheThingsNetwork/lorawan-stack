@@ -15,6 +15,7 @@
 import * as user from '../../actions/user'
 import api from '../../../api'
 import * as accessToken from '../../../lib/access-token'
+import { isUnauthenticatedError } from '../../../../lib/errors/utils'
 import createRequestLogic from './lib'
 
 export default [
@@ -22,7 +23,19 @@ export default [
     type: user.LOGOUT,
     async process() {
       try {
+        // Logout of the Console first
         await api.console.logout()
+
+        try {
+          // Then logout of the OAuth Provider
+          await api.oauth.logout()
+        } catch (err) {
+          if (!isUnauthenticatedError(err)) {
+            // Unauthenticated errors indicate that the user is already logged
+            // out from the OAuth provider. We can hence ignore this error.
+            throw err
+          }
+        }
       } finally {
         accessToken.clear()
       }
