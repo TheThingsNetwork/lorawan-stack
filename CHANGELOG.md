@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - End device events subscription release in the Console. 
 - Blocking UDP packet handling while the gateway was still connecting. Traffic is now dropped while the connection is in progress, so that traffic from already connected gateways keep flowing.
+- Join-request transmission parameters.
 
 ### Security
 
