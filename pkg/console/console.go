@@ -46,9 +46,10 @@ type StackConfig struct {
 
 // FrontendConfig is the configuration for the Console frontend.
 type FrontendConfig struct {
-	Language    string `json:"language" name:"-"`
-	SupportLink string `json:"support_link" name:"support-link" description:"The URI that the support button will point to"`
-	StackConfig `json:"stack_config" name:",squash"`
+	Language     string `json:"language" name:"-"`
+	SupportLink  string `json:"support_link" name:"support-link" description:"The URI that the support button will point to"`
+	OAuthBaseURL string `json:"oauth_base_url" name:"oauth-base-url" description:"The base location of the oauth provider of the console"`
+	StackConfig  `json:"stack_config" name:",squash"`
 }
 
 // Config is the configuration for the Console.
