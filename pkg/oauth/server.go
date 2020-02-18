@@ -245,7 +245,6 @@ func (s *server) RegisterRoutes(server *web.Server) {
 
 	api := group.Group("/api", middleware.CSRF())
 	api.POST("/auth/login", s.Login)
-	api.POST("/auth/logout", s.Logout, s.requireLogin)
 	api.GET("/me", s.CurrentUser, s.requireLogin)
 
 	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
@@ -261,6 +260,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	group.GET("/*", webui.Template.Handler, middleware.CSRF())
 
 	// No CSRF here:
+	group.POST("/api/auth/logout", s.Logout, s.requireLogin)
 	group.GET("/code", webui.Template.Handler)
 	group.GET("/local-callback", s.redirectToLocal)
 	group.POST("/token", s.Token)
