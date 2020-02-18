@@ -3392,6 +3392,15 @@
       "file": "udp.go"
     }
   },
+  "error:pkg/gatewayserver/io/udp:connection_not_ready": {
+    "translations": {
+      "en": "connection is not ready"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "udp.go"
+    }
+  },
   "error:pkg/gatewayserver/io/udp:downlink_claim": {
     "translations": {
       "en": "failed to claim downlink"
