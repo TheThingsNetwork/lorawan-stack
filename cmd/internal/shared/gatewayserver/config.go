@@ -16,6 +16,7 @@ package shared
 
 import (
 	"fmt"
+	"time"
 
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -48,7 +49,8 @@ var DefaultGatewayServerConfig = gatewayserver.Config{
 		PublicTLSAddress: fmt.Sprintf("%s:8882", shared.DefaultPublicHost),
 	},
 	BasicStation: gatewayserver.BasicStationConfig{
-		Listen:    ":1887",
-		ListenTLS: ":8887",
+		Listen:         ":1887",
+		ListenTLS:      ":8887",
+		WSPingInterval: 30 * time.Second,
 	},
 }

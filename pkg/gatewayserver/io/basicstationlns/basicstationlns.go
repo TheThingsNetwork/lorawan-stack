@@ -63,13 +63,14 @@ type srv struct {
 	upgrader             *websocket.Upgrader
 	tokens               io.DownlinkTokens
 	useTrafficTLSAddress bool
+	wsPingInterval       time.Duration
 }
 
 func (*srv) Protocol() string            { return "basicstation" }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
-func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool) *echo.Echo {
+func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool, wsPingInterval time.Duration) *echo.Echo {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 
 	webServer := echo.New()
@@ -88,6 +89,7 @@ func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool) *echo
 		upgrader:             &websocket.Upgrader{},
 		webServer:            webServer,
 		useTrafficTLSAddress: useTrafficTLSAddress,
+		wsPingInterval:       wsPingInterval,
 	}
 
 	webServer.GET("/router-info", s.handleDiscover)
