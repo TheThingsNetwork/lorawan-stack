@@ -1343,9 +1343,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+					macState.CurrentParameters.Rx1Delay = ttnpb.RX_DELAY_3
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.CurrentParameters.Rx1Delay = macState.DesiredParameters.Rx1Delay
-					macState.CurrentParameters.Channels = macState.DesiredParameters.Channels
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 						Keys:    *makeSessionKeys(ttnpb.MAC_V1_1),
@@ -1565,8 +1564,6 @@ func TestHandleUplink(t *testing.T) {
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.CurrentParameters.Rx1Delay = macState.DesiredParameters.Rx1Delay
-					macState.CurrentParameters.Channels = macState.DesiredParameters.Channels
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 						Keys:    *makeSessionKeys(ttnpb.MAC_V1_0_2),
@@ -1759,8 +1756,6 @@ func TestHandleUplink(t *testing.T) {
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.CurrentParameters.Rx1Delay = macState.DesiredParameters.Rx1Delay
-					macState.CurrentParameters.Channels = macState.DesiredParameters.Channels
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 						Keys:    *makeSessionKeys(ttnpb.MAC_V1_1),
@@ -1986,8 +1981,6 @@ func TestHandleUplink(t *testing.T) {
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.CurrentParameters.Rx1Delay = macState.DesiredParameters.Rx1Delay
-					macState.CurrentParameters.Channels = macState.DesiredParameters.Channels
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 						Keys:    *makeSessionKeys(ttnpb.MAC_V1_0_2),
@@ -2216,8 +2209,6 @@ func TestHandleUplink(t *testing.T) {
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.CurrentParameters.Rx1Delay = macState.DesiredParameters.Rx1Delay
-					macState.CurrentParameters.Channels = macState.DesiredParameters.Channels
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 						Keys:    *makeSessionKeys(ttnpb.MAC_V1_1),
