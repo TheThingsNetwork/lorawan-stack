@@ -39,20 +39,24 @@ import style from './error.styl'
 
 const reload = () => location.reload()
 
-const FullViewErrorInner = function({ error, env }) {
+const FullViewErrorInner = function({ error, title, env, goBack }) {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
 
-  let errorTitleMessage = errorMessages.unknownErrorTitle
+  let errorTitleMessage
+  if (title) {
+    errorTitleMessage = title
+  } else if (statusCode && statusCodeMessages[statusCode]) {
+    errorTitleMessage = statusCodeMessages[statusCode]
+  } else {
+    errorTitleMessage = errorMessages.unknownErrorTitle
+  }
   let errorMessageMessage = errorMessages.contactAdministrator
   if (!isUnknown) {
     errorMessageMessage = error
   } else if (isNotFound) {
     errorMessageMessage = errorMessages.genericNotFound
-  }
-  if (statusCode) {
-    errorTitleMessage = statusCodeMessages[statusCode]
   }
 
   return (
@@ -67,7 +71,7 @@ const FullViewErrorInner = function({ error, env }) {
               content={errorTitleMessage}
             />
             <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
-            {isNotFoundError(error) ? (
+            {isNotFoundError(error) || goBack ? (
               <Button.AnchorLink
                 icon="keyboard_arrow_left"
                 message={sharedMessages.takeMeBack}
@@ -85,26 +89,34 @@ const FullViewErrorInner = function({ error, env }) {
 
 const FullViewErrorInnerWithEnv = withEnv(FullViewErrorInner)
 
-const FullViewError = function({ error }) {
+const FullViewError = function({ error, title, goBack }) {
   return (
     <div className={style.wrapper}>
       <Header className={style.header} anchored />
-      <FullViewErrorInnerWithEnv error={error} />
+      <FullViewErrorInnerWithEnv error={error} title={title} goBack={goBack} />
       <Footer />
     </div>
   )
 }
 
-FullViewErrorInner.propTypes = {
-  env: PropTypes.env,
-  error: PropTypes.error.isRequired,
-}
-
 FullViewError.propTypes = {
   error: PropTypes.error.isRequired,
+  goBack: PropTypes.bool,
+  title: PropTypes.message,
+}
+
+FullViewError.defaultProps = {
+  title: undefined,
+  goBack: false,
+}
+
+FullViewErrorInner.propTypes = {
+  ...FullViewError.propTypes,
+  env: PropTypes.env,
 }
 
 FullViewErrorInner.defaultProps = {
+  ...FullViewErrorInner.defaultProps,
   env: undefined,
 }
 
