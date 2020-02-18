@@ -16,15 +16,18 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
+import { defineMessages } from 'react-intl'
 
 import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import HeaderComponent from '../../../components/header'
 import NavigationBar from '../../../components/navigation/bar'
 import Dropdown from '../../../components/dropdown'
+import toast from '../../../components/toast'
 
 import { logout } from '../../store/actions/user'
 import { selectUser } from '../../store/selectors/user'
+import { attachPromise } from '../../store/actions/lib'
 import {
   checkFromState,
   mayViewApplications,
@@ -32,6 +35,11 @@ import {
   mayViewOrganizationsOfUser,
   mayManageUsers,
 } from '../../lib/feature-checks'
+
+const m = defineMessages({
+  logoutUnsuccessful:
+    'An error occured during the logout process. Please try again and verify that the logout was successful. This page will now refresh.',
+})
 
 @withRouter
 @connect(
@@ -48,9 +56,8 @@ import {
     }
     return { user }
   },
-  { handleLogout: logout },
+  { handleLogout: attachPromise(logout) },
 )
-@bind
 class Header extends Component {
   static propTypes = {
     /** A handler for when the user clicks the logout button */
@@ -80,11 +87,28 @@ class Header extends Component {
     mayViewOrganizations: false,
   }
 
+  @bind
+  async handleLogout() {
+    const { handleLogout } = this.props
+    try {
+      await handleLogout()
+    } catch (err) {
+      toast({
+        title: 'Logout unsuccessful',
+        type: toast.types.ERROR,
+        message: m.logoutUnsuccessful,
+        autoClose: false,
+      })
+      // Unsuccessful logout potentially results in an unsafe application state.
+      // It is best to refresh the page to force a proper reinitialization.
+      window.setTimeout(() => location.reload(), 4000)
+    }
+  }
+
   render() {
     const {
       user,
       handleSearchRequest,
-      handleLogout,
       searchable,
       mayViewApplications,
       mayViewGateways,
@@ -137,7 +161,7 @@ class Header extends Component {
             path="/admin/user-management"
           />
         )}
-        <Dropdown.Item title={sharedMessages.logout} icon="logout" action={handleLogout} />
+        <Dropdown.Item title={sharedMessages.logout} icon="logout" action={this.handleLogout} />
       </React.Fragment>
     )
 
@@ -167,7 +191,7 @@ class Header extends Component {
         navigationEntries={navigationEntries}
         searchable={searchable}
         onSearchRequest={handleSearchRequest}
-        onLogout={handleLogout}
+        onLogout={this.handleLogout}
       />
     )
   }
