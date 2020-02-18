@@ -44,4 +44,6 @@ export const selectLanguageConfig = () => selectApplicationConfig().language
 
 export const selectSupportLinkConfig = () => selectApplicationConfig().support_link
 
+export const selectOAuthBaseUrlConfig = () => selectApplicationConfig().oauth_base_url
+
 export const selectPageData = () => configSelector().PAGE_DATA
