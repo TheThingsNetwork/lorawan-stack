@@ -55,7 +55,7 @@ type Config struct {
 
 // DefaultConfig contains the default configuration.
 var DefaultConfig = Config{
-	PacketHandlers:      10,
+	PacketHandlers:      1 << 4,
 	PacketBuffer:        50,
 	DownlinkPathExpires: 15 * time.Second, // Expire downlink after missing typically 3 PULL_DATA messages.
 	ConnectionExpires:   1 * time.Minute,  // Expire connection after missing typically 2 status messages.
@@ -182,6 +182,8 @@ func (s *srv) handlePackets() {
 	}
 }
 
+var errConnectionNotReady = errors.DefineUnavailable("connection_not_ready", "connection is not ready")
+
 func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 	cs := &state{
 		ioWait:          make(chan struct{}),
@@ -220,7 +222,11 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 			return nil, err
 		}
 	} else {
-		<-cs.ioWait
+		select {
+		case <-cs.ioWait:
+		default:
+			return nil, errConnectionNotReady
+		}
 		if cs.ioErr != nil {
 			return nil, cs.ioErr
 		}
