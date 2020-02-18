@@ -255,7 +255,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	fps := conn.FrequencyPlans()
 	bandID := conn.BandID()
 
-	pingTicker := time.NewTicker(srv.wsPingInterval)
+	pingTicker := time.NewTicker(s.wsPingInterval)
 	defer pingTicker.Stop()
 
 	ws.SetPingHandler(func(data string) error {
