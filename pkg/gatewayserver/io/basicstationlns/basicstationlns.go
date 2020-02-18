@@ -255,12 +255,39 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	fps := conn.FrequencyPlans()
 	bandID := conn.BandID()
 
+	pingTicker := time.NewTicker(srv.wsPingInterval)
+	defer pingTicker.Stop()
+
+	ws.SetPingHandler(func(data string) error {
+		logger := logger
+		logger.Debug("Received ws ping from gateway, sending pong")
+		if err := ws.WriteMessage(websocket.PongMessage, nil); err != nil {
+			logger.WithError(err).Warn("Failed to send pong")
+			return err
+		}
+		return nil
+	})
+
+	// Not all gateways support pongs to the server's pings.
+	ws.SetPongHandler(func(data string) error {
+		logger := logger
+		logger.Debug("Received Pong from Gateway")
+		return nil
+	})
+
 	go func() {
 		for {
 			select {
 			case <-conn.Context().Done():
 				ws.Close()
 				return
+			case <-pingTicker.C:
+				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
+					logger.WithError(err).Warn("Failed to send ping message")
+					conn.Disconnect(err)
+					ws.Close()
+					return
+				}
 			case down := <-conn.Down():
 				dlTime := time.Now()
 				scheduledMsg := down.GetScheduled()
