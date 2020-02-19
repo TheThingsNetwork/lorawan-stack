@@ -90,48 +90,48 @@ func init() {
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 10,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: constPayloadSizer(19)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(19)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 9,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: constPayloadSizer(61)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(61)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 8,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: constPayloadSizer(133)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(133)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: constPayloadSizer(250)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(250)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 8,
 				Bandwidth:       500000,
-			}}}, DefaultMaxSize: constPayloadSizer(250)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(250)},
 			{}, {}, {}, // RFU
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 12,
 				Bandwidth:       500000,
-			}}}, DefaultMaxSize: constPayloadSizer(41)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(41)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 11,
 				Bandwidth:       500000,
-			}}}, DefaultMaxSize: constPayloadSizer(117)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(117)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 10,
 				Bandwidth:       500000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 9,
 				Bandwidth:       500000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 8,
 				Bandwidth:       500000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       500000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
+			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
 			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},
 		MaxADRDataRateIndex: 3,

@@ -56,34 +56,34 @@ func init() {
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 12,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: dwellTimePayloadSizer{59, 0}},
+			}}}, MaximumMACPayloadSize: makeDwellTimeMaximumMACPayloadSizeFunc(59, 0)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 11,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: dwellTimePayloadSizer{59, 0}},
+			}}}, MaximumMACPayloadSize: makeDwellTimeMaximumMACPayloadSizeFunc(59, 0)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 10,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: dwellTimePayloadSizer{59, 19}},
+			}}}, MaximumMACPayloadSize: makeDwellTimeMaximumMACPayloadSizeFunc(59, 19)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 9,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: dwellTimePayloadSizer{123, 61}},
+			}}}, MaximumMACPayloadSize: makeDwellTimeMaximumMACPayloadSizeFunc(123, 61)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 8,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: dwellTimePayloadSizer{230, 133}},
+			}}}, MaximumMACPayloadSize: makeDwellTimeMaximumMACPayloadSizeFunc(230, 133)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       125000,
-			}}}, DefaultMaxSize: dwellTimePayloadSizer{230, 250}},
+			}}}, MaximumMACPayloadSize: makeDwellTimeMaximumMACPayloadSizeFunc(230, 250)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
 				SpreadingFactor: 7,
 				Bandwidth:       250000,
-			}}}, DefaultMaxSize: dwellTimePayloadSizer{230, 250}},
+			}}}, MaximumMACPayloadSize: makeDwellTimeMaximumMACPayloadSizeFunc(230, 250)},
 			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_FSK{FSK: &ttnpb.FSKDataRate{
 				BitRate: 50000,
-			}}}, DefaultMaxSize: dwellTimePayloadSizer{230, 250}},
+			}}}, MaximumMACPayloadSize: makeDwellTimeMaximumMACPayloadSizeFunc(230, 250)},
 			{}, {}, {}, {}, {}, {}, {}, // RFU
 			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
 		},

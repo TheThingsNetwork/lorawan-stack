@@ -27,37 +27,27 @@ import (
 // eirpDelta is the delta between EIRP and ERP.
 const eirpDelta = 2.15
 
-// PayloadSizer abstracts the acceptable payload size depending on contextual parameters.
-type PayloadSizer interface {
-	PayloadSize(dwellTime bool) uint16
-}
+type MaxMACPayloadSizeFunc func(bool) uint16
 
-type constPayloadSizer uint16
-
-func (p constPayloadSizer) PayloadSize(_ bool) uint16 {
-	return uint16(p)
-}
-
-type dwellTimePayloadSizer struct {
-	NoDwellTime uint16
-	DwellTime   uint16
-}
-
-//revive:disable:flag-parameter
-
-func (p dwellTimePayloadSizer) PayloadSize(dwellTime bool) uint16 {
-	if dwellTime {
-		return p.DwellTime
+func makeConstMaxMACPayloadSizeFunc(v uint16) MaxMACPayloadSizeFunc {
+	return func(_ bool) uint16 {
+		return v
 	}
-	return p.NoDwellTime
 }
 
-//revive:enable:flag-parameter
+func makeDwellTimeMaxMACPayloadSizeFunc(noDwellTimeSize, dwellTimeSize uint16) MaxMACPayloadSizeFunc {
+	return func(dwellTime bool) uint16 {
+		if dwellTime {
+			return dwellTimeSize
+		}
+		return noDwellTimeSize
+	}
+}
 
 // DataRate indicates the properties of a band's data rate.
 type DataRate struct {
-	Rate           ttnpb.DataRate
-	DefaultMaxSize PayloadSizer
+	Rate              ttnpb.DataRate
+	MaxMACPayloadSize MaxMACPayloadSizeFunc
 }
 
 // Channel abstracts a band's channel properties.
