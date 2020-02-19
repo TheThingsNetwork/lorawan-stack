@@ -63,13 +63,14 @@ type srv struct {
 	upgrader             *websocket.Upgrader
 	tokens               io.DownlinkTokens
 	useTrafficTLSAddress bool
+	wsPingInterval       time.Duration
 }
 
 func (*srv) Protocol() string            { return "basicstation" }
 func (*srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates the Basic Station front end.
-func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool) *echo.Echo {
+func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool, wsPingInterval time.Duration) *echo.Echo {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/basicstation")
 
 	webServer := echo.New()
@@ -88,6 +89,7 @@ func New(ctx context.Context, server io.Server, useTrafficTLSAddress bool) *echo
 		upgrader:             &websocket.Upgrader{},
 		webServer:            webServer,
 		useTrafficTLSAddress: useTrafficTLSAddress,
+		wsPingInterval:       wsPingInterval,
 	}
 
 	webServer.GET("/router-info", s.handleDiscover)
@@ -253,12 +255,37 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	fps := conn.FrequencyPlans()
 	bandID := conn.BandID()
 
+	pingTicker := time.NewTicker(s.wsPingInterval)
+	defer pingTicker.Stop()
+
+	ws.SetPingHandler(func(data string) error {
+		logger.Debug("Received ping from gateway, send pong")
+		if err := ws.WriteMessage(websocket.PongMessage, nil); err != nil {
+			logger.WithError(err).Warn("Failed to send pong")
+			return err
+		}
+		return nil
+	})
+
+	// Not all gateways support pongs to the server's pings.
+	ws.SetPongHandler(func(data string) error {
+		logger.Debug("Received pong from gateway")
+		return nil
+	})
+
 	go func() {
 		for {
 			select {
 			case <-conn.Context().Done():
 				ws.Close()
 				return
+			case <-pingTicker.C:
+				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
+					logger.WithError(err).Warn("Failed to send ping message")
+					conn.Disconnect(err)
+					ws.Close()
+					return
+				}
 			case down := <-conn.Down():
 				dlTime := time.Now()
 				scheduledMsg := down.GetScheduled()
