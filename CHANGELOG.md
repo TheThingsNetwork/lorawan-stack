@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Do not use `personal-files` plugin for snap package.
 - Network Server will never attempt RX1 for devices with `Rx1Delay` of `1` second.
 - Improved efficiency of ADR MAC commands.
+- Gateway Configuration Server will use the default WebSocket TLS port if none is set.
 
 ### Deprecated
 
