@@ -434,7 +434,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		case <-existingConnEntry.upstreamDone:
 		}
 	}
-	registerGatewayConnect(ctx, ids)
+	registerGatewayConnect(ctx, ids, frontend.Protocol())
 	logger.Info("Connected")
 	go gs.handleUpstream(connEntry)
 
@@ -494,7 +494,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 	defer func() {
 		ids := conn.Gateway().GatewayIdentifiers
 		gs.connections.Delete(unique.ID(ctx, ids))
-		registerGatewayDisconnect(ctx, ids)
+		registerGatewayDisconnect(ctx, ids, conn.Frontend().Protocol())
 		logger.Info("Disconnected")
 		close(conn.upstreamDone)
 	}()
