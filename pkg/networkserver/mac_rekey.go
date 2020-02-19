@@ -34,13 +34,15 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	evs := []events.DefinitionDataClosure{
 		evtReceiveRekeyIndication.BindData(pld),
 	}
-	if !dev.SupportsJoin {
+	if !dev.SupportsJoin || dev.MACState.PendingJoinRequest == nil || dev.PendingSession == nil {
 		return evs, nil
 	}
 
-	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
 	dev.EndDeviceIdentifiers.DevAddr = &dev.PendingSession.DevAddr
+	dev.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
+	dev.MACState.PendingJoinRequest = nil
 	dev.Session = dev.PendingSession
+	dev.PendingMACState = nil
 	dev.PendingSession = nil
 
 	conf := &ttnpb.MACCommand_RekeyConf{

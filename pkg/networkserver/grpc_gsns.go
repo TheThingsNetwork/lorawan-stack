@@ -183,7 +183,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 
 	type device struct {
 		matchedDevice
-		band                       band.Band
 		gap                        uint32
 		pendingApplicationDownlink *ttnpb.ApplicationDownlink
 	}
@@ -243,7 +242,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 					NbTrans:       1,
 					Pending:       true,
 				},
-				band:                       phy,
 				gap:                        pld.FCnt,
 				pendingApplicationDownlink: pendingApplicationDownlink,
 			})
@@ -324,7 +322,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 					FCnt:          dev.Session.LastFCntUp,
 					NbTrans:       nbTrans,
 				},
-				band:                       phy,
 				pendingApplicationDownlink: pendingApplicationDownlink,
 			})
 			continue
@@ -362,7 +359,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 					FCntReset:     true,
 					NbTrans:       1,
 				},
-				band:                       phy,
 				gap:                        gap,
 				pendingApplicationDownlink: pendingApplicationDownlink,
 			})
@@ -397,7 +393,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 						FCntReset:     true,
 						NbTrans:       1,
 					},
-					band:                       phy,
 					gap:                        gap,
 					pendingApplicationDownlink: pendingApplicationDownlink,
 				})
@@ -429,7 +424,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 				FCnt:          fCnt,
 				NbTrans:       1,
 			},
-			band:                       phy,
 			gap:                        gap,
 			pendingApplicationDownlink: pendingApplicationDownlink,
 		})
@@ -452,8 +446,47 @@ matchLoop:
 		session := match.Device.Session
 		if match.Pending {
 			session = match.Device.PendingSession
-		}
 
+			match.Device.MACState.CurrentParameters.Rx1Delay = match.Device.MACState.PendingJoinRequest.RxDelay
+			match.Device.MACState.CurrentParameters.Rx1DataRateOffset = match.Device.MACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
+			match.Device.MACState.CurrentParameters.Rx2DataRateIndex = match.Device.MACState.PendingJoinRequest.DownlinkSettings.Rx2DR
+			if match.Device.MACState.PendingJoinRequest.DownlinkSettings.OptNeg && match.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+				// The version will be further negotiated via RekeyInd/RekeyConf
+				match.Device.MACState.LoRaWANVersion = ttnpb.MAC_V1_1
+			}
+			if match.Device.MACState.PendingJoinRequest.CFList != nil {
+				switch match.Device.MACState.PendingJoinRequest.CFList.Type {
+				case ttnpb.CFListType_FREQUENCIES:
+					for _, freq := range match.Device.MACState.PendingJoinRequest.CFList.Freq {
+						if freq == 0 {
+							break
+						}
+						match.Device.MACState.CurrentParameters.Channels = append(match.Device.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+							UplinkFrequency:   uint64(freq * 100),
+							DownlinkFrequency: uint64(freq * 100),
+							MaxDataRateIndex:  ttnpb.DataRateIndex(match.phy.MaxADRDataRateIndex),
+							EnableUplink:      true,
+						})
+					}
+
+				case ttnpb.CFListType_CHANNEL_MASKS:
+					if len(match.Device.MACState.CurrentParameters.Channels) != len(match.Device.MACState.PendingJoinRequest.CFList.ChMasks) {
+						logger.Debug("Device channel length does not equal length of join-request ChMasks, skip")
+						continue matchLoop
+					}
+					for i, m := range match.Device.MACState.PendingJoinRequest.CFList.ChMasks {
+						if m {
+							continue
+						}
+						if match.Device.MACState.CurrentParameters.Channels[i] == nil {
+							logger.WithField("channel_index", i).Debug("Device channel present in join-request ChMasks is not defined, skip")
+							continue matchLoop
+						}
+						match.Device.MACState.CurrentParameters.Channels[i].EnableUplink = m
+					}
+				}
+			}
+		}
 		if session.FNwkSIntKey == nil || len(session.FNwkSIntKey.Key) == 0 {
 			logger.Warn("Device missing FNwkSIntKey in registry, skip")
 			continue
@@ -464,9 +497,6 @@ matchLoop:
 			continue
 		}
 
-		if match.NbTrans > 1 {
-			match.Device.MACState.PendingRequests = nil
-		}
 		macBuf := pld.FOpts
 		if len(macBuf) == 0 && pld.FPort == 0 {
 			macBuf = pld.FRMPayload
@@ -488,10 +518,13 @@ matchLoop:
 			}
 		}
 
+		if match.NbTrans > 1 {
+			match.Device.MACState.PendingRequests = nil
+		}
 		var cmds []*ttnpb.MACCommand
 		for r := bytes.NewReader(macBuf); r.Len() > 0; {
 			cmd := &ttnpb.MACCommand{}
-			if err := lorawan.DefaultMACCommands.ReadUplink(match.band, r, cmd); err != nil {
+			if err := lorawan.DefaultMACCommands.ReadUplink(match.phy, r, cmd); err != nil {
 				logger.WithFields(log.Fields(
 					"bytes_left", r.Len(),
 					"mac_count", len(cmds),
@@ -645,13 +678,20 @@ matchLoop:
 
 		if match.Pending {
 			if match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-				match.Device.Session = match.Device.PendingSession
 				match.Device.EndDeviceIdentifiers.DevAddr = &pld.DevAddr
-			} else if match.Device.PendingSession != nil {
+				match.Device.MACState.PendingJoinRequest = nil
+				match.Device.Session = match.Device.PendingSession
+				match.Device.PendingSession = nil
+				match.Device.PendingMACState = nil
+			} else if match.Device.PendingSession != nil || match.Device.PendingMACState != nil || match.Device.MACState.PendingJoinRequest != nil {
 				logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device, skip")
 				continue matchLoop
 			}
 			match.SetPaths = append(match.SetPaths, "ids.dev_addr")
+		} else if match.Device.PendingSession != nil || match.Device.PendingMACState != nil {
+			// TODO: Notify AS of session recovery(https://github.com/TheThingsNetwork/lorawan-stack/issues/594)
+			match.Device.PendingMACState = nil
+			match.Device.PendingSession = nil
 		}
 
 		chIdx, err := searchUplinkChannel(up.Settings.Frequency, match.Device.MACState)
@@ -729,18 +769,12 @@ matchLoop:
 				}
 			}
 			match.QueuedApplicationUplinks = append(match.QueuedApplicationUplinks, asUp)
-		}
-		if !match.Pending && match.Device.PendingSession != nil {
-			// TODO: Notify AS of session recovery(https://github.com/TheThingsNetwork/lorawan-stack/issues/594)
+			match.Device.MACState.PendingApplicationDownlink = nil
 		}
 		if match.Pending || match.FCntReset {
 			match.Device.Session.StartedAt = up.ReceivedAt
 		}
-		match.Device.MACState.PendingApplicationDownlink = nil
-		match.Device.MACState.PendingJoinRequest = nil
 		match.Device.MACState.RxWindowsAvailable = true
-		match.Device.PendingMACState = nil
-		match.Device.PendingSession = nil
 		match.Device.Session.LastFCntUp = match.FCnt
 		match.SetPaths = append(match.SetPaths,
 			"mac_state",
@@ -1082,44 +1116,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		Request: *req,
 	}
 	macState.RxWindowsAvailable = true
-
-	macState.CurrentParameters.Rx1Delay = req.RxDelay
-	macState.CurrentParameters.Rx1DataRateOffset = req.DownlinkSettings.Rx1DROffset
-	macState.CurrentParameters.Rx2DataRateIndex = req.DownlinkSettings.Rx2DR
-	if req.DownlinkSettings.OptNeg && dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) > 0 {
-		// The version will be further negotiated via RekeyInd/RekeyConf
-		macState.LoRaWANVersion = ttnpb.MAC_V1_1
-	}
-	if req.CFList != nil {
-		switch req.CFList.Type {
-		case ttnpb.CFListType_FREQUENCIES:
-			for _, freq := range req.CFList.Freq {
-				if freq == 0 {
-					break
-				}
-				macState.CurrentParameters.Channels = append(macState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
-					UplinkFrequency:   uint64(freq * 100),
-					DownlinkFrequency: uint64(freq * 100),
-					MaxDataRateIndex:  ttnpb.DataRateIndex(phy.MaxADRDataRateIndex),
-					EnableUplink:      true,
-				})
-			}
-
-		case ttnpb.CFListType_CHANNEL_MASKS:
-			if len(macState.CurrentParameters.Channels) != len(req.CFList.ChMasks) {
-				return errCorruptedMACState
-			}
-			for i, m := range req.CFList.ChMasks {
-				if m {
-					continue
-				}
-				if macState.CurrentParameters.Channels[i] == nil {
-					return errCorruptedMACState
-				}
-				macState.CurrentParameters.Channels[i].EnableUplink = m
-			}
-		}
-	}
 
 	events.Publish(evtForwardJoinRequest(ctx, dev.EndDeviceIdentifiers, nil))
 	registerForwardJoinRequest(ctx, up)
