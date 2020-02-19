@@ -1342,7 +1342,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
 
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 					macState.CurrentParameters.Rx1Delay = ttnpb.RX_DELAY_3
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
 					macState.RxWindowsAvailable = true
@@ -1562,7 +1562,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
 
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
@@ -1754,7 +1754,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
 
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
@@ -1979,7 +1979,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
 
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
@@ -2207,7 +2207,7 @@ func TestHandleUplink(t *testing.T) {
 					}
 					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
 
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
 					macState.RxWindowsAvailable = true
 					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
@@ -2337,7 +2337,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 					macState.RecentUplinks = makeRecentUplinks()
 					return macState
 				}
@@ -2569,7 +2569,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 					macState.RecentUplinks = makeRecentUplinks()
 					return macState
 				}
@@ -2801,7 +2801,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 					macState.RecentUplinks = makeRecentUplinks()
 					return macState
 				}
@@ -3036,7 +3036,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 					macState.CurrentParameters.ADRNbTrans = 2
 					macState.DesiredParameters.ADRNbTrans = 2
 					macState.RecentUplinks = makeRecentUplinks()

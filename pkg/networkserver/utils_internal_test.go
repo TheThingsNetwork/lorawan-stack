@@ -69,7 +69,7 @@ func TestNewMACState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),
@@ -108,7 +108,7 @@ func TestNewMACState(t *testing.T) {
 				SupportsClassB: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				macState.DeviceClass = ttnpb.CLASS_B
 				return macState
@@ -130,7 +130,7 @@ func TestNewMACState(t *testing.T) {
 				SupportsClassC: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				macState.DeviceClass = ttnpb.CLASS_C
 				return macState
@@ -150,7 +150,7 @@ func TestNewMACState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),
@@ -189,7 +189,7 @@ func TestNewMACState(t *testing.T) {
 				SupportsClassB: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				macState.DeviceClass = ttnpb.CLASS_B
 				return macState
@@ -211,7 +211,7 @@ func TestNewMACState(t *testing.T) {
 				SupportsClassC: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				macState.DeviceClass = ttnpb.CLASS_C
 				return macState
@@ -219,7 +219,7 @@ func TestNewMACState(t *testing.T) {
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 		{
-			Name: "1.0.2/US915",
+			Name: "1.0.2/US915_FSB2",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.USFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_0_2,
@@ -231,14 +231,14 @@ func TestNewMACState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2)
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 		{
-			Name: "1.1/US915",
+			Name: "1.1/US915_FSB2",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanID:   test.USFrequencyPlanID,
 				LoRaWANVersion:    ttnpb.MAC_V1_1,
@@ -250,7 +250,7 @@ func TestNewMACState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
 				return macState
 			}(),

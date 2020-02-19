@@ -203,7 +203,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						FrequencyPlanID:      test.EUFrequencyPlanID,
 						LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 						LoRaWANVersion:       ttnpb.MAC_V1_1,
-						MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
+						MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
 						Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 33),
 						MACSettings: &ttnpb.MACSettings{
 							ResetsFCnt:        &pbtypes.BoolValue{Value: true},
@@ -221,7 +221,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				}
 				session := makeSession(ttnpb.MAC_V1_1, devAddr, 12)
 				session.StartedAt = dev.Device.Session.StartedAt
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
 					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
@@ -317,7 +317,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 						LoRaWANVersion:       ttnpb.MAC_V1_1,
 						MACState: func() *ttnpb.MACState {
-							macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1)
+							macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 							macState.PendingApplicationDownlink = makeApplicationDownlink()
 							return macState
 						}(),
@@ -338,7 +338,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				}
 				session := makeSession(ttnpb.MAC_V1_1, devAddr, 12)
 				session.StartedAt = dev.Device.Session.StartedAt
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
 					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
@@ -435,7 +435,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						FrequencyPlanID:      test.EUFrequencyPlanID,
 						LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 						LoRaWANVersion:       ttnpb.MAC_V1_1,
-						MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1),
+						MACState:             MakeDefaultUS915FSB2MACState(ttnpb.CLASS_B, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
 						Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 33),
 						MACSettings: &ttnpb.MACSettings{
 							ResetsFCnt: &pbtypes.BoolValue{Value: true},
@@ -452,7 +452,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				}
 				session := makeSession(ttnpb.MAC_V1_1, devAddr, 12)
 				session.StartedAt = dev.Device.Session.StartedAt
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 				macState.RxWindowsAvailable = true
 				expectedDev := &matchedDevice{
 					phy:                 test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
@@ -549,7 +549,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
 						LoRaWANVersion:       ttnpb.MAC_V1_1,
 						MACState: func() *ttnpb.MACState {
-							macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+							macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 							macState.PendingApplicationDownlink = makeApplicationDownlink()
 							macState.RecentDownlinks = []*ttnpb.DownlinkMessage{
 								{
@@ -576,7 +576,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					!a.So(dev.Device.Session, should.NotBeNil) {
 					return false
 				}
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1)
+				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 				macState.RxWindowsAvailable = true
 				macState.RecentDownlinks = []*ttnpb.DownlinkMessage{
 					{

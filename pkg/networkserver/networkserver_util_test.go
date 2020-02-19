@@ -176,33 +176,7 @@ func MakeLinkCheckAns(mds ...*ttnpb.RxMetadata) *ttnpb.MACCommand {
 	}).MACCommand()
 }
 
-func MakeEU868Channels(chs ...*ttnpb.MACParameters_Channel) []*ttnpb.MACParameters_Channel {
-	return append([]*ttnpb.MACParameters_Channel{
-		{
-			UplinkFrequency:   868100000,
-			DownlinkFrequency: 868100000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-			EnableUplink:      true,
-		},
-		{
-			UplinkFrequency:   868300000,
-			DownlinkFrequency: 868300000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-			EnableUplink:      true,
-		},
-		{
-			UplinkFrequency:   868500000,
-			DownlinkFrequency: 868500000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-			EnableUplink:      true,
-		},
-	}, chs...)
-}
-
-func MakeDefaultEU868CurrentMACParameters() ttnpb.MACParameters {
+func MakeDefaultEU868CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
 	return ttnpb.MACParameters{
 		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
 		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
@@ -216,74 +190,84 @@ func MakeDefaultEU868CurrentMACParameters() ttnpb.MACParameters {
 		Rx1Delay:                   ttnpb.RX_DELAY_1,
 		Rx2DataRateIndex:           ttnpb.DATA_RATE_0,
 		Rx2Frequency:               869525000,
-		Channels:                   MakeEU868Channels(),
+		Channels: []*ttnpb.MACParameters_Channel{
+			{
+				UplinkFrequency:   868100000,
+				DownlinkFrequency: 868100000,
+				MinDataRateIndex:  ttnpb.DATA_RATE_0,
+				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+				EnableUplink:      true,
+			},
+			{
+				UplinkFrequency:   868300000,
+				DownlinkFrequency: 868300000,
+				MinDataRateIndex:  ttnpb.DATA_RATE_0,
+				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+				EnableUplink:      true,
+			},
+			{
+				UplinkFrequency:   868500000,
+				DownlinkFrequency: 868500000,
+				MinDataRateIndex:  ttnpb.DATA_RATE_0,
+				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+				EnableUplink:      true,
+			},
+		},
 	}
 }
 
-func MakeDefaultEU868DesiredMACParameters() ttnpb.MACParameters {
-	return ttnpb.MACParameters{
-		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
-		ADRNbTrans:                 1,
-		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
-		MaxEIRP:                    16,
-		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
-		PingSlotFrequency:          869525000,
-		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
-		RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-		Rx1Delay:                   ttnpb.RX_DELAY_1,
-		Rx2DataRateIndex:           ttnpb.DATA_RATE_0,
-		Rx2Frequency:               869525000,
-		Channels: MakeEU868Channels(
-			&ttnpb.MACParameters_Channel{
-				UplinkFrequency:   867100000,
-				DownlinkFrequency: 867100000,
-				MinDataRateIndex:  ttnpb.DATA_RATE_0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				EnableUplink:      true,
-			},
-			&ttnpb.MACParameters_Channel{
-				UplinkFrequency:   867300000,
-				DownlinkFrequency: 867300000,
-				MinDataRateIndex:  ttnpb.DATA_RATE_0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				EnableUplink:      true,
-			},
-			&ttnpb.MACParameters_Channel{
-				UplinkFrequency:   867500000,
-				DownlinkFrequency: 867500000,
-				MinDataRateIndex:  ttnpb.DATA_RATE_0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				EnableUplink:      true,
-			},
-			&ttnpb.MACParameters_Channel{
-				UplinkFrequency:   867700000,
-				DownlinkFrequency: 867700000,
-				MinDataRateIndex:  ttnpb.DATA_RATE_0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				EnableUplink:      true,
-			},
-			&ttnpb.MACParameters_Channel{
-				UplinkFrequency:   867900000,
-				DownlinkFrequency: 867900000,
-				MinDataRateIndex:  ttnpb.DATA_RATE_0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				EnableUplink:      true,
-			},
-		),
-	}
+func MakeDefaultEU868DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
+	params := MakeDefaultEU868CurrentMACParameters(ver)
+	params.Channels = append(params.Channels,
+		&ttnpb.MACParameters_Channel{
+			UplinkFrequency:   867100000,
+			DownlinkFrequency: 867100000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			EnableUplink:      true,
+		},
+		&ttnpb.MACParameters_Channel{
+			UplinkFrequency:   867300000,
+			DownlinkFrequency: 867300000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			EnableUplink:      true,
+		},
+		&ttnpb.MACParameters_Channel{
+			UplinkFrequency:   867500000,
+			DownlinkFrequency: 867500000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			EnableUplink:      true,
+		},
+		&ttnpb.MACParameters_Channel{
+			UplinkFrequency:   867700000,
+			DownlinkFrequency: 867700000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			EnableUplink:      true,
+		},
+		&ttnpb.MACParameters_Channel{
+			UplinkFrequency:   867900000,
+			DownlinkFrequency: 867900000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			EnableUplink:      true,
+		},
+	)
+	return params
 }
 
-func MakeDefaultEU868MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MACState {
+func MakeDefaultEU868MACState(class ttnpb.Class, macVer ttnpb.MACVersion, phyVer ttnpb.PHYVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
 		DeviceClass:       class,
-		LoRaWANVersion:    ver,
-		CurrentParameters: MakeDefaultEU868CurrentMACParameters(),
-		DesiredParameters: MakeDefaultEU868DesiredMACParameters(),
+		LoRaWANVersion:    macVer,
+		CurrentParameters: MakeDefaultEU868CurrentMACParameters(phyVer),
+		DesiredParameters: MakeDefaultEU868DesiredMACParameters(phyVer),
 	}
 }
 
-func MakeUS915Channels() []*ttnpb.MACParameters_Channel {
+func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
 	var chs []*ttnpb.MACParameters_Channel
 	for i := 0; i < 64; i++ {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -304,58 +288,47 @@ func MakeUS915Channels() []*ttnpb.MACParameters_Channel {
 	for i := 0; i < 72; i++ {
 		chs[i].DownlinkFrequency = uint64(923300000 + 600000*(i%8))
 	}
-	return chs
+	return ttnpb.MACParameters{
+		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
+		ADRNbTrans:                 1,
+		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
+		MaxEIRP:                    30,
+		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
+		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+		RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
+		Rx1Delay:                   ttnpb.RX_DELAY_1,
+		Rx2DataRateIndex:           ttnpb.DATA_RATE_8,
+		Rx2Frequency:               923300000,
+		Channels:                   chs,
+	}
 }
 
-func MakeDefaultUS915FSB2MACState(class ttnpb.Class, ver ttnpb.MACVersion) *ttnpb.MACState {
+func MakeDefaultUS915FSB2DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
+	params := MakeDefaultUS915CurrentMACParameters(ver)
+	for _, ch := range params.Channels {
+		switch ch.UplinkFrequency {
+		case 903900000,
+			904100000,
+			904300000,
+			904500000,
+			904700000,
+			904900000,
+			905100000,
+			905300000:
+			continue
+		}
+		ch.EnableUplink = false
+	}
+	return params
+}
+
+func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVer ttnpb.MACVersion, phyVer ttnpb.PHYVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
-		DeviceClass:    class,
-		LoRaWANVersion: ver,
-		CurrentParameters: ttnpb.MACParameters{
-			ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-			ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
-			ADRNbTrans:                 1,
-			MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
-			MaxEIRP:                    30,
-			PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
-			RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
-			RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-			Rx1Delay:                   ttnpb.RX_DELAY_1,
-			Rx2DataRateIndex:           ttnpb.DATA_RATE_8,
-			Rx2Frequency:               923300000,
-			Channels:                   MakeUS915Channels(),
-		},
-		DesiredParameters: ttnpb.MACParameters{
-			ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-			ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
-			ADRNbTrans:                 1,
-			MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
-			MaxEIRP:                    30,
-			PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
-			RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
-			RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-			Rx1Delay:                   ttnpb.RX_DELAY_1,
-			Rx2DataRateIndex:           ttnpb.DATA_RATE_8,
-			Rx2Frequency:               923300000,
-			Channels: func() []*ttnpb.MACParameters_Channel {
-				ret := MakeUS915Channels()
-				for _, ch := range ret {
-					switch ch.UplinkFrequency {
-					case 903900000,
-						904100000,
-						904300000,
-						904500000,
-						904700000,
-						904900000,
-						905100000,
-						905300000:
-						continue
-					}
-					ch.EnableUplink = false
-				}
-				return ret
-			}(),
-		},
+		DeviceClass:       class,
+		LoRaWANVersion:    macVer,
+		CurrentParameters: MakeDefaultUS915CurrentMACParameters(phyVer),
+		DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(phyVer),
 	}
 }
 
