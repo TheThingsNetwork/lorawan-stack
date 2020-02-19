@@ -259,8 +259,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	defer pingTicker.Stop()
 
 	ws.SetPingHandler(func(data string) error {
-		logger := logger
-		logger.Debug("Received ws ping from gateway, sending pong")
+		logger.Debug("Received ping from gateway, send pong")
 		if err := ws.WriteMessage(websocket.PongMessage, nil); err != nil {
 			logger.WithError(err).Warn("Failed to send pong")
 			return err
@@ -270,8 +269,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	// Not all gateways support pongs to the server's pings.
 	ws.SetPongHandler(func(data string) error {
-		logger := logger
-		logger.Debug("Received Pong from Gateway")
+		logger.Debug("Received pong from gateway")
 		return nil
 	})
 

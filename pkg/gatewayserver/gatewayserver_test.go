@@ -61,7 +61,7 @@ var (
 	unregisteredGatewayEUI = types.EUI64{0xBB, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
 	timeout        = (1 << 5) * test.Delay
-	WSPingInterval = (1 << 3) * test.Delay
+	wsPingInterval = (1 << 3) * test.Delay
 )
 
 func TestGatewayServer(t *testing.T) {
@@ -104,7 +104,7 @@ func TestGatewayServer(t *testing.T) {
 		},
 		BasicStation: gatewayserver.BasicStationConfig{
 			Listen:         ":1887",
-			WSPingInterval: WSPingInterval,
+			WSPingInterval: wsPingInterval,
 		},
 	}
 	gs, err := gatewayserver.New(c, config)
