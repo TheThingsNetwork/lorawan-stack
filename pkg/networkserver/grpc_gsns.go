@@ -929,8 +929,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			if !deviceUseADR(stored, ns.defaultMACSettings) {
 				return stored, paths, nil
 			}
-
-			if err := adaptDataRate(stored, ns.FrequencyPlans, ns.defaultMACSettings); err != nil {
+			if err := adaptDataRate(stored, matched.phy, ns.defaultMACSettings); err != nil {
 				handleErr = true
 				return nil, nil, err
 			}

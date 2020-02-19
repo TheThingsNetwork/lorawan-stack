@@ -23,7 +23,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -233,13 +233,13 @@ func TestAdaptDataRate(t *testing.T) {
 	for _, tc := range []struct {
 		Name       string
 		Device     *ttnpb.EndDevice
+		PHY        band.Band
 		DeviceDiff func(*ttnpb.EndDevice)
 		Error      error
 	}{
 		{
 			Name: "adapted example from Semtech paper",
 			Device: &ttnpb.EndDevice{
-				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				MACState: &ttnpb.MACState{
 					CurrentParameters: ttnpb.MACParameters{
 						ADRDataRateIndex: 0,
@@ -294,6 +294,7 @@ func TestAdaptDataRate(t *testing.T) {
 					},
 				}),
 			},
+			PHY: test.Must(band.All[band.EU_863_870].Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
 			DeviceDiff: func(dev *ttnpb.EndDevice) {
 				dev.MACState.DesiredParameters.ADRDataRateIndex = 4
 				dev.MACState.DesiredParameters.ADRNbTrans = 1
@@ -306,7 +307,7 @@ func TestAdaptDataRate(t *testing.T) {
 
 			dev := CopyEndDevice(tc.Device)
 
-			err := adaptDataRate(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})
+			err := adaptDataRate(dev, tc.PHY, ttnpb.MACSettings{})
 			if err != nil && !a.So(err, should.Equal, tc.Error) ||
 				err == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
