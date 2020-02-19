@@ -186,18 +186,17 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 						(&ttnpb.MACCommand_LinkADRReq{
 							ChannelMask: []bool{
 								false, false, false, false, false, false, false, false,
-								false, false, false, false, false, false, true, false,
+								false, false, false, false, false, false, false, false,
 							},
-							ChannelMaskControl: 5,
+							ChannelMaskControl: 7,
 							NbTrans:            1,
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
 							ChannelMask: []bool{
 								false, false, false, false, false, false, false, false,
-								false, false, false, false, false, false, false, false,
+								true, true, true, true, true, true, true, true,
 							},
-							ChannelMaskControl: 4,
-							NbTrans:            1,
+							NbTrans: 1,
 						}).MACCommand(),
 					}
 					return macState
@@ -213,18 +212,17 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
-							false, false, false, false, false, false, true, false,
+							false, false, false, false, false, false, false, false,
 						},
-						ChannelMaskControl: 5,
+						ChannelMaskControl: 7,
 						NbTrans:            1,
 					}),
 					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
-							false, false, false, false, false, false, false, false,
+							true, true, true, true, true, true, true, true,
 						},
-						ChannelMaskControl: 4,
-						NbTrans:            1,
+						NbTrans: 1,
 					}),
 				},
 			},

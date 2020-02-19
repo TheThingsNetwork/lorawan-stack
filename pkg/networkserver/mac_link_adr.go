@@ -69,11 +69,15 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		}, errCorruptedMACState
 	}
 
+	currentChs := make([]bool, phy.MaxUplinkChannels)
+	for i, ch := range dev.MACState.CurrentParameters.Channels {
+		currentChs[i] = ch.GetEnableUplink()
+	}
 	desiredChs := make([]bool, phy.MaxUplinkChannels)
 	for i, ch := range dev.MACState.DesiredParameters.Channels {
 		desiredChs[i] = ch.GetEnableUplink()
 	}
-	desiredMasks, err := phy.GenerateChMasks(desiredChs)
+	desiredMasks, err := phy.GenerateChMasks(currentChs, desiredChs)
 	if err != nil {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
