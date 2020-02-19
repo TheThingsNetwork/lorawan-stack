@@ -33,6 +33,13 @@ func disableTxParamSetupReq(b Band) Band {
 	return b
 }
 
+func makeSetMaxTxPowerIndexFunc(idx uint8) func(Band) Band {
+	return func(b Band) Band {
+		b.MaxTxPowerIndex = idx
+		return b
+	}
+}
+
 // LoRaWAN 1.0.2rB -> 1.0.2rA downgrades
 
 func auDataRates1_0_2(b Band) Band {
