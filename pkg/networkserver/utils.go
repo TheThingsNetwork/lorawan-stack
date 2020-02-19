@@ -18,14 +18,24 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/gpstime"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
+
+// nsScheduleWindow returns minimum time.Duration between downlink being added to the queue and it being sent to GS for transmission.
+func nsScheduleWindow() time.Duration {
+	// TODO: Observe this value at runtime https://github.com/TheThingsNetwork/lorawan-stack/issues/1552.
+	return 200 * time.Millisecond
+}
 
 var timeNow func() time.Time = time.Now
 
@@ -54,6 +64,34 @@ func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 		return defaults.UseADR.Value
 	}
 	return true
+}
+
+// DefaultClassBTimeout is the default time-out for the device to respond to class B downlink messages.
+// When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
+const DefaultClassBTimeout = time.Minute
+
+func deviceClassBTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	if dev.MACSettings != nil && dev.MACSettings.ClassBTimeout != nil {
+		return *dev.MACSettings.ClassBTimeout
+	}
+	if defaults.ClassBTimeout != nil {
+		return *defaults.ClassBTimeout
+	}
+	return DefaultClassBTimeout
+}
+
+// DefaultClassCTimeout is the default time-out for the device to respond to class C downlink messages.
+// When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
+const DefaultClassCTimeout = 15 * time.Second
+
+func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+	if dev.MACSettings != nil && dev.MACSettings.ClassCTimeout != nil {
+		return *dev.MACSettings.ClassCTimeout
+	}
+	if defaults.ClassCTimeout != nil {
+		return *defaults.ClassCTimeout
+	}
+	return DefaultClassCTimeout
 }
 
 func getDeviceBandVersion(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*frequencyplans.FrequencyPlan, band.Band, error) {
@@ -119,6 +157,7 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 	case deviceNeedsADRParamSetupReq(dev, phy),
 		deviceNeedsBeaconFreqReq(dev),
 		deviceNeedsBeaconTimingReq(dev),
+		deviceNeedsDevStatusReq(dev, defaults, t),
 		deviceNeedsDLChannelReq(dev),
 		deviceNeedsDutyCycleReq(dev),
 		deviceNeedsLinkADRReq(dev),
@@ -130,16 +169,19 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 		deviceNeedsTxParamSetupReq(dev, phy):
 		return true
 	}
-	statusAt, ok := deviceNeedsDevStatusReqAt(dev, defaults)
-	return ok && t.After(statusAt)
+	return false
 }
 
 func lastUplink(ups ...*ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 	return ups[len(ups)-1]
 }
 
+func lastDownlink(downs ...*ttnpb.DownlinkMessage) *ttnpb.DownlinkMessage {
+	return downs[len(downs)-1]
+}
+
 func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
-	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.MACState.RecentUplinks) == 0 {
+	if dev.MACState == nil || len(dev.MACState.RecentUplinks) == 0 {
 		return false
 	}
 	if len(dev.MACState.QueuedResponses) > 0 {
@@ -162,85 +204,254 @@ func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time
 	return deviceNeedsMACRequestsAt(ctx, dev, t, phy, defaults)
 }
 
-func nextClassADataDownlinkSlot(dev *ttnpb.EndDevice) (time.Time, bool) {
+func classAWindows(up *ttnpb.UplinkMessage, rxDelay time.Duration) (rx1, rx2 time.Time) {
+	rx1 = up.ReceivedAt.Add(-infrastructureDelay/2 + rxDelay)
+	return rx1, rx1.Add(time.Second)
+}
+
+func nextClassADownlinkAt(dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
 	if dev.MACState == nil || !dev.MACState.RxWindowsAvailable || len(dev.MACState.RecentUplinks) == 0 {
 		return time.Time{}, false
 	}
-	rx1 := lastUplink(dev.MACState.RecentUplinks...).ReceivedAt.Add(dev.MACState.CurrentParameters.Rx1Delay.Duration())
-	rx2 := rx1.Add(time.Second)
+	rx1, rx2 := classAWindows(lastUplink(dev.MACState.RecentUplinks...), dev.MACState.CurrentParameters.Rx1Delay.Duration())
 	switch {
-	case rx2.Before(timeNow()):
-		return time.Time{}, false
-	case rx1.After(timeNow()):
+	case !earliestAt.After(rx1):
 		return rx1, true
-	default:
+	case !earliestAt.After(rx2):
 		return rx2, true
+	default:
+		return time.Time{}, false
 	}
 }
 
-func nextConfirmedClassCDownlinkAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Time {
-	if dev.GetMACState().GetLastConfirmedDownlinkAt() == nil {
-		return time.Time{}
+func nextUnconfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
+	if dev.MACState == nil {
+		log.FromContext(ctx).Warn("Insufficient data to compute next network-initiated downlink slot")
+		return time.Time{}, false
 	}
-	if dev.GetMACState().GetRxWindowsAvailable() {
-		return time.Time{}
+	if dev.MACState.LastNetworkInitiatedDownlinkAt == nil {
+		return earliestAt, true
 	}
 	if len(dev.MACState.RecentUplinks) > 0 {
-		if lastUplink(dev.MACState.RecentUplinks...).ReceivedAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
-			return time.Time{}
+		recvAt := lastUplink(dev.MACState.RecentUplinks...).ReceivedAt
+		if recvAt.After(*dev.MACState.LastNetworkInitiatedDownlinkAt) {
+			if earliestAt.After(recvAt) {
+				return earliestAt, true
+			}
+			return recvAt, true
 		}
 	}
-	return dev.MACState.LastConfirmedDownlinkAt.Add(deviceClassCTimeout(dev, defaults))
+	t := dev.MACState.LastNetworkInitiatedDownlinkAt.Add(networkInitiatedDownlinkInterval)
+	if earliestAt.After(t) {
+		return earliestAt, true
+	}
+	return t, true
 }
 
-// nextDataDownlinkAt returns the time.Time when the downlink should be scheduled on the Gateway Server
-// and whether or not there is a data downlink to schedule.
-func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings) (time.Time, bool) {
+func nextConfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, timeout time.Duration, earliestAt time.Time) (time.Time, bool) {
 	if dev.MACState == nil {
+		log.FromContext(ctx).Warn("Insufficient data to compute next confirmed network-initiated downlink slot")
 		return time.Time{}, false
 	}
-	if !dev.Multicast {
-		downAt, ok := nextClassADataDownlinkSlot(dev)
-		if ok && needsClassADataDownlinkAt(ctx, dev, downAt, phy, defaults) {
-			return downAt.Add(-gsScheduleWindow), true
-		}
-	}
-	switch dev.MACState.DeviceClass {
-	case ttnpb.CLASS_A, ttnpb.CLASS_B:
+	earliestAt, ok := nextUnconfirmedNetworkInitiatedDownlinkAt(ctx, dev, earliestAt)
+	if !ok {
 		return time.Time{}, false
-	case ttnpb.CLASS_C:
-		now := timeNow().UTC()
-		confirmedAt := nextConfirmedClassCDownlinkAt(dev, defaults)
-		if confirmedAt.Before(now) {
-			confirmedAt = now
-		}
-		if deviceNeedsMACRequestsAt(ctx, dev, confirmedAt, phy, defaults) {
-			return confirmedAt, true
-		}
-		var absTime time.Time
-		if len(dev.QueuedApplicationDownlinks) > 0 {
-			classBC := dev.QueuedApplicationDownlinks[0].ClassBC
-			if classBC == nil || classBC.AbsoluteTime == nil || classBC.AbsoluteTime.IsZero() {
-				return now, true
+	}
+	if dev.MACState.LastConfirmedDownlinkAt == nil {
+		return earliestAt, true
+	}
+	if len(dev.MACState.RecentUplinks) > 0 {
+		recvAt := lastUplink(dev.MACState.RecentUplinks...).ReceivedAt
+		if recvAt.After(*dev.MACState.LastConfirmedDownlinkAt) {
+			if earliestAt.After(recvAt) {
+				return earliestAt, true
 			}
-			absTime = classBC.AbsoluteTime.UTC()
+			return recvAt, true
+		}
+	}
+	t := dev.MACState.LastConfirmedDownlinkAt.Add(timeout)
+	if earliestAt.After(t) {
+		return earliestAt, true
+	}
+	return t, true
+}
+
+const (
+	tBeaconDelay   = 1*time.Microsecond + 500*time.Nanosecond
+	beaconPeriod   = 128 * time.Second
+	beaconReserved = 2*time.Second + 120*time.Millisecond
+	pingSlotCount  = 4096
+	pingSlotLen    = 30 * time.Millisecond
+)
+
+func beaconTimeBefore(t time.Time) time.Duration {
+	return gpstime.ToGPS(t) / beaconPeriod * beaconPeriod
+}
+
+// nextPingSlotAt returns the transmission time of next available class B ping slot, which will always be after earliestAt.
+func nextPingSlotAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
+	if dev.MACState == nil || dev.Session == nil || dev.Session.DevAddr.IsZero() || dev.MACState.PingSlotPeriodicity == nil {
+		log.FromContext(ctx).Warn("Insufficient data to compute next ping slot")
+		return time.Time{}, false
+	}
+
+	pingNb := uint16(1 << (7 - dev.MACState.PingSlotPeriodicity.Value))
+	pingPeriod := uint16(1 << (5 + dev.MACState.PingSlotPeriodicity.Value))
+
+	for beaconTime := beaconTimeBefore(earliestAt); beaconTime < math.MaxInt64; beaconTime += beaconPeriod {
+		pingOffset, err := crypto.ComputePingOffset(uint32(beaconTime/time.Second), dev.Session.DevAddr, pingPeriod)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Failed to compute ping offset")
+			return time.Time{}, false
 		}
 
-		statusAt, ok := deviceNeedsDevStatusReqAt(dev, defaults)
-		if !ok {
-			if absTime.IsZero() {
-				return time.Time{}, false
-			}
-			return absTime.Add(-gsScheduleWindow), true
+		t := gpstime.Parse(beaconTime + tBeaconDelay + beaconReserved + time.Duration(pingOffset)*pingSlotLen).UTC()
+		if !earliestAt.After(t) {
+			return t, true
 		}
-		// NOTE: statusAt is after confirmedAt, otherwise deviceNeedsMACRequestsAt call above would evaluate to true.
-		if statusAt.After(absTime) {
-			return absTime.Add(-gsScheduleWindow), true
+		sub := earliestAt.Sub(t)
+		if sub >= beaconPeriod {
+			panic(fmt.Errorf("difference between earliestAt and first ping slot must be below '%s', got '%s'", beaconPeriod, sub))
 		}
-		return statusAt, true
-	default:
-		panic(fmt.Sprintf("Unmatched device class: %v", dev.MACState.DeviceClass))
+		pingPeriodDuration := time.Duration(pingPeriod) * pingSlotLen
+		n := sub / pingPeriodDuration
+		if int64(n) >= int64(pingNb) {
+			continue
+		}
+		t = t.Add(n * pingPeriodDuration)
+		if !earliestAt.After(t) {
+			return t, true
+		}
+		if int64(n+1) == int64(pingNb) {
+			continue
+		}
+		return t.Add(pingPeriodDuration), true
 	}
+	return time.Time{}, false
+}
+
+func nextUnconfirmedClassBDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
+	earliestAt, ok := nextUnconfirmedNetworkInitiatedDownlinkAt(ctx, dev, earliestAt)
+	if !ok {
+		return time.Time{}, false
+	}
+	return nextPingSlotAt(ctx, dev, earliestAt)
+}
+
+func nextConfirmedClassBDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, earliestAt time.Time) (time.Time, bool) {
+	earliestAt, ok := nextConfirmedNetworkInitiatedDownlinkAt(ctx, dev, deviceClassBTimeout(dev, defaults), earliestAt)
+	if !ok {
+		return time.Time{}, false
+	}
+	return nextPingSlotAt(ctx, dev, earliestAt)
+}
+
+func nextUnconfirmedClassCDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
+	return nextUnconfirmedNetworkInitiatedDownlinkAt(ctx, dev, earliestAt)
+}
+
+func nextConfirmedClassCDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, earliestAt time.Time) (time.Time, bool) {
+	return nextConfirmedNetworkInitiatedDownlinkAt(ctx, dev, deviceClassCTimeout(dev, defaults), earliestAt)
+}
+
+// nextDataDownlinkAt returns the time.Time after earliestAt when a data downlink
+// should be transmitted to the device by the gateway and whether or not there is a data downlink to schedule.
+func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings, earliestAt time.Time) (time.Time, ttnpb.Class, bool) {
+	if dev.MACState == nil {
+		return time.Time{}, ttnpb.CLASS_A, false
+	}
+	if !dev.Multicast {
+		downAt, ok := nextClassADownlinkAt(dev, earliestAt)
+		if ok && needsClassADataDownlinkAt(ctx, dev, downAt, phy, defaults) {
+			return downAt, ttnpb.CLASS_A, true
+		}
+	}
+
+	class := dev.MACState.DeviceClass
+	if class == ttnpb.CLASS_A {
+		return time.Time{}, class, false
+	}
+
+	var earliestConfirmedAt time.Time
+	switch class {
+	case ttnpb.CLASS_B:
+		var ok bool
+		earliestAt, ok = nextUnconfirmedClassBDownlinkAt(ctx, dev, earliestAt)
+		if !ok {
+			return time.Time{}, class, false
+		}
+		earliestConfirmedAt, ok = nextConfirmedClassBDownlinkAt(ctx, dev, defaults, earliestAt)
+		if !ok {
+			return time.Time{}, class, false
+		}
+
+	case ttnpb.CLASS_C:
+		var ok bool
+		earliestAt, ok = nextUnconfirmedClassCDownlinkAt(ctx, dev, earliestAt)
+		if !ok {
+			return time.Time{}, class, false
+		}
+		earliestConfirmedAt, ok = nextConfirmedClassCDownlinkAt(ctx, dev, defaults, earliestAt)
+		if !ok {
+			return time.Time{}, class, false
+		}
+
+	default:
+		panic(fmt.Sprintf("unmatched device class: %v", dev.MACState.DeviceClass))
+	}
+
+	var absTime time.Time
+	for _, down := range dev.QueuedApplicationDownlinks {
+		if down.ClassBC == nil || down.ClassBC.AbsoluteTime == nil || down.ClassBC.AbsoluteTime.IsZero() {
+			if down.Confirmed || deviceNeedsMACRequestsAt(ctx, dev, earliestAt, phy, defaults) {
+				return earliestConfirmedAt, class, true
+			}
+			return earliestAt, class, true
+		}
+		t := *down.ClassBC.AbsoluteTime
+		if t.Before(earliestAt) || t.Before(earliestConfirmedAt) && (down.Confirmed || deviceNeedsMACRequestsAt(ctx, dev, t, phy, defaults)) {
+			// This downlink will never be scheduled, hence continue to next one.
+			continue
+		}
+		if t.After(earliestConfirmedAt) {
+			// NOTE: There may be MAC commands available to send earlier than t.
+			absTime = t.UTC()
+			break
+		}
+		// t is in (earliestAt;earliestConfirmedAt] range.
+		return t.UTC(), class, true
+	}
+	if deviceNeedsMACRequestsAt(ctx, dev, earliestConfirmedAt, phy, defaults) {
+		return earliestConfirmedAt, class, true
+	}
+
+	statusAt, ok := deviceNeedsDevStatusReqAt(dev, defaults)
+	if !ok {
+		if absTime.IsZero() {
+			return time.Time{}, class, false
+		}
+		return absTime, class, true
+	}
+
+	// NOTE: statusAt is after earliestConfirmedAt, otherwise deviceNeedsMACRequestsAt call above would evaluate to true.
+	if !absTime.IsZero() && statusAt.After(absTime) {
+		return absTime, class, true
+	}
+	if class != ttnpb.CLASS_B {
+		return statusAt, class, true
+	}
+
+	t, ok := nextConfirmedClassBDownlinkAt(ctx, dev, defaults, statusAt)
+	if !ok {
+		if absTime.IsZero() {
+			return time.Time{}, class, false
+		}
+		return absTime, class, true
+	}
+	if !absTime.IsZero() && absTime.Before(t) {
+		return absTime, class, true
+	}
+	return t, class, true
 }
 
 func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (*ttnpb.MACState, error) {

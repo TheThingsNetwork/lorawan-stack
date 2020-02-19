@@ -22,8 +22,8 @@ import (
 
 const (
 	needEcho           = "This assertion requires an *echo.Echo but got %T"
-	needMethodString   = "This assertions requires the method to be a string"
-	needPathString     = "This assertions requires the path to be a string"
+	needMethodString   = "This assertion requires the method to be a string"
+	needPathString     = "This assertion requires the path to be a string"
 	shouldHaveRoute    = "Should have a route %s %s"
 	shouldNotHaveRoute = "Should not have a route %s %s"
 )

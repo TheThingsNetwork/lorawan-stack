@@ -16,6 +16,7 @@ package assertions
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/kr/pretty"
@@ -25,6 +26,12 @@ import (
 const (
 	shouldHaveEmptyDiff    = "Expected: '%#v'\nActual:   '%#v'\nDiff:  '%s'\n(should resemble diff)!"
 	shouldNotHaveEmptyDiff = "Expected '%#v'\nto diff  '%#v'\n(but it did)!"
+
+	needPointer                        = "This assertion requires a pointer type (you provided %T)."
+	needSetFielderCompatible           = "This assertion requires a SetFielder-compatible comparison type (you provided %T)."
+	needStringCompatible               = "This assertion requires a string-compatible comparison type (you provided %T)."
+	needStringCompatibleOrArrayOrSlice = "This assertion requires a string-compatible comparison type or a either array or slice of such(you provided %T)."
+	setFieldsFailed                    = "SetFields failed with: %s"
 )
 
 func lastLine(s string) string {
@@ -53,6 +60,69 @@ func ShouldResemble(actual interface{}, expected ...interface{}) (message string
 		lines = append(lines, fmt.Sprintf("   %s", d))
 	}
 	return strings.Join(append(lines, lastLine(message)), "\n")
+}
+
+// ShouldResembleFields is same as ShouldResemble, but only compares the specified fields for 2 given SetFielders.
+func ShouldResembleFields(actual interface{}, expected ...interface{}) (message string) {
+	if len(expected) < 1 {
+		return fmt.Sprintf(needAtLeastValues, 1, len(expected))
+	}
+
+	at := reflect.TypeOf(actual)
+	if at.Kind() != reflect.Ptr {
+		return fmt.Sprintf(needPointer, actual)
+	}
+	av := reflect.New(at.Elem())
+	am := av.MethodByName("SetFields")
+	if !am.IsValid() {
+		return fmt.Sprintf(needSetFielderCompatible, actual)
+	}
+
+	et := reflect.TypeOf(expected[0])
+	if et.Kind() != reflect.Ptr {
+		return fmt.Sprintf(needPointer, expected[0])
+	}
+	ev := reflect.New(et.Elem())
+	em := ev.MethodByName("SetFields")
+	if !em.IsValid() {
+		return fmt.Sprintf(needSetFielderCompatible, expected[0])
+	}
+
+	if len(expected) == 1 {
+		return ShouldResemble(actual, expected...)
+	}
+
+	ps := reflect.MakeSlice(reflect.TypeOf([]string{}), 0, 0)
+	for _, p := range expected[1:] {
+		pv := reflect.ValueOf(p)
+		switch pv.Kind() {
+		case reflect.String:
+			ps = reflect.Append(ps, pv)
+		case reflect.Array:
+			if pv.Type().Elem().Kind() != reflect.String {
+				return fmt.Sprintf(needStringCompatible, p)
+			}
+			for i := 0; i < pv.Len(); i++ {
+				ps = reflect.Append(ps, pv.Index(i))
+			}
+		case reflect.Slice:
+			if pv.Type().Elem().Kind() != reflect.String {
+				return fmt.Sprintf(needStringCompatible, p)
+			}
+			ps = reflect.AppendSlice(ps, pv)
+		default:
+			return fmt.Sprintf(needStringCompatibleOrArrayOrSlice, p)
+		}
+	}
+
+	if ret := am.CallSlice([]reflect.Value{reflect.ValueOf(actual), ps})[0]; !ret.IsNil() {
+		return fmt.Sprintf(setFieldsFailed, ret.Interface().(error))
+	}
+
+	if ret := em.CallSlice([]reflect.Value{reflect.ValueOf(expected[0]), ps})[0]; !ret.IsNil() {
+		return fmt.Sprintf(setFieldsFailed, ret.Interface().(error))
+	}
+	return ShouldResemble(av.Interface(), ev.Interface())
 }
 
 // ShouldHaveEmptyDiff compares the pretty.Diff of values.

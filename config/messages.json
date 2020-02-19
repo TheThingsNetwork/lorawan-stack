@@ -2726,6 +2726,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/crypto:ping_period": {
+    "translations": {
+      "en": "ping period must be a power of 2 between 32 and 4096, got '{value}'"
+    },
+    "description": {
+      "package": "pkg/crypto",
+      "file": "ping_slot.go"
+    }
+  },
   "error:pkg/crypto:rejoin_request_0_2_size": {
     "translations": {
       "en": "invalid rejoin-request type 0 or 2 size of {size} bytes, expected 15 bytes"
@@ -7076,6 +7085,33 @@
   "event:ns.application.end_link": {
     "translations": {
       "en": "end application link"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.class.switch.a": {
+    "translations": {
+      "en": "switched to class A"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.class.switch.b": {
+    "translations": {
+      "en": "switched to class B"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.class.switch.c": {
+    "translations": {
+      "en": "switched to class C"
     },
     "description": {
       "package": "pkg/networkserver",

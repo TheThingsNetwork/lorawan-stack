@@ -13,7 +13,7 @@ LoRaWAN is a protocol for low-power wide area networks. It allows for large scal
   - [x] Supports LoRaWAN 1.0, 1.0.1, 1.0.2 and 1.0.3
   - [x] Supports LoRaWAN Regional Parameters 1.0, 1.0.2 rev B, 1.0.3 rev A, 1.1 rev A and B
   - [x] Supports Class A devices
-  - [ ] Supports Class B devices
+  - [x] Supports Class B devices
   - [x] Supports Class C devices
   - [x] Supports OTAA devices
   - [x] Supports ABP devices

@@ -341,6 +341,9 @@ message MACState {
   // Recent data downlink messages sorted by time.
   // The number of messages stored may depend on configuration.
   repeated DownlinkMessage recent_downlinks = 15;
+
+  // Time when the last network-initiated downlink message was scheduled.
+  google.protobuf.Timestamp last_network_initiated_downlink_at = 16 [(gogoproto.stdtime) = true];
 }
 
 // Power state of the device.

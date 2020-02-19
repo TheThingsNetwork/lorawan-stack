@@ -196,10 +196,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		ctx := dev.Context
 
 		logger := log.FromContext(ctx).WithFields(log.Fields(
-			"dev_addr", pld.DevAddr,
 			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-			"payload_length", len(macPayloadBytes),
-			"uplink_f_cnt", pld.FCnt,
+			"mac_payload_len", len(macPayloadBytes),
 		))
 		ctx = log.NewContext(ctx, logger)
 
@@ -516,6 +514,35 @@ matchLoop:
 		logger = logger.WithField("mac_count", len(cmds))
 		ctx = log.NewContext(ctx, logger)
 
+		if pld.ClassB {
+			switch {
+			case !match.Device.SupportsClassB:
+				logger.Debug("Ignore class B bit in uplink, since device does not support class B")
+
+			case match.Device.MACState.CurrentParameters.PingSlotFrequency == 0:
+				logger.Debug("Ignore class B bit in uplink, since ping slot frequency is not known")
+
+			case match.Device.MACState.CurrentParameters.PingSlotDataRateIndexValue == nil:
+				logger.Debug("Ignore class B bit in uplink, since ping slot data rate index is not known")
+
+			case match.Device.MACState.PingSlotPeriodicity == nil:
+				logger.Debug("Ignore class B bit in uplink, since ping slot periodicity is not known")
+
+			case match.Device.MACState.DeviceClass != ttnpb.CLASS_B:
+				logger.WithField("previous_class", match.Device.MACState.DeviceClass).Debug("Switch device class to class B")
+				match.QueuedEvents = append(match.QueuedEvents, evtClassBSwitch.BindData(match.Device.MACState.DeviceClass))
+				match.Device.MACState.DeviceClass = ttnpb.CLASS_B
+			}
+		} else if match.Device.MACState.DeviceClass == ttnpb.CLASS_B {
+			if match.Device.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && match.Device.SupportsClassC {
+				match.QueuedEvents = append(match.QueuedEvents, evtClassCSwitch.BindData(ttnpb.CLASS_B))
+				match.Device.MACState.DeviceClass = ttnpb.CLASS_C
+			} else {
+				match.QueuedEvents = append(match.QueuedEvents, evtClassASwitch.BindData(ttnpb.CLASS_B))
+				match.Device.MACState.DeviceClass = ttnpb.CLASS_A
+			}
+		}
+
 		match.Device.MACState.QueuedResponses = match.Device.MACState.QueuedResponses[:0]
 	macLoop:
 		for len(cmds) > 0 {
@@ -541,7 +568,6 @@ matchLoop:
 				pld := cmd.GetLinkADRAns()
 				dupCount := 0
 				if match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && match.Device.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-					logger.Debug("Count LinkADR duplicates")
 					for _, dup := range cmds {
 						if dup.CID != ttnpb.CID_LINK_ADR {
 							break
@@ -552,7 +578,6 @@ matchLoop:
 						}
 						dupCount++
 					}
-					logger.WithField("duplicate_count", dupCount).Debug("Counted LinkADR duplicates")
 				}
 				if err != nil {
 					break
@@ -634,6 +659,8 @@ matchLoop:
 			logger.WithError(err).Debug("Failed to determine channel index of uplink, skip")
 			continue
 		}
+		logger = logger.WithField("channel_index", chIdx)
+		ctx = log.NewContext(ctx, logger)
 		match.ChannelIndex = chIdx
 
 		var computedMIC [4]byte
@@ -767,6 +794,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"dev_addr", pld.DevAddr,
 		"f_opts_len", len(pld.FOpts),
 		"f_port", pld.FPort,
+		"frequency", up.Settings.Frequency,
 		"frm_payload_len", len(pld.FRMPayload),
 		"uplink_f_cnt", pld.FCnt,
 	))
@@ -884,15 +912,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return err
 	}
 
-	downAt, ok := nextDataDownlinkAt(ctx, stored, matched.phy, ns.defaultMACSettings)
-	if !ok {
-		logger.Debug("No downlink to send or windows expired, avoid adding downlink task after data uplink")
-	} else {
-		downAt = downAt.Add(-nsScheduleWindow)
-		logger.WithField("start_at", downAt).Debug("Add downlink task after data uplink")
-		if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
-			logger.WithError(err).Error("Failed to add downlink task after data uplink")
-		}
+	if err := ns.updateDataDownlinkTask(ctx, stored, time.Time{}); err != nil {
+		logger.WithError(err).Error("Failed to update downlink task queue after data uplink")
 	}
 
 	if matched.NbTrans == 1 {
@@ -913,12 +934,16 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		registerForwardDataUplink(ctx, up)
 	}
 
-	if len(queuedApplicationUplinks) > 0 {
+	if n := len(queuedApplicationUplinks); n > 0 {
+		logger := logger.WithField("uplink_count", n)
+		logger.Debug("Enqueue application uplinks for sending to Application Server")
 		if err := ns.applicationUplinks.Add(ctx, queuedApplicationUplinks...); err != nil {
-			logger.WithError(err).Warn("Failed to queue application uplinks for sending to Application Server")
+			logger.WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
 		}
 	}
-	if len(queuedEvents) > 0 {
+	if n := len(queuedEvents); n > 0 {
+		logger := logger.WithField("event_count", n)
+		logger.Debug("Publish events")
 		for _, ev := range queuedEvents {
 			events.Publish(ev(ctx, stored.EndDeviceIdentifiers))
 		}
@@ -1157,11 +1182,12 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 
-	startAt := up.ReceivedAt.Add(phy.JoinAcceptDelay1 - nsScheduleWindow - gsScheduleWindow)
-	logger.WithField("start_at", startAt).Debug("Add downlink task for join-accept")
-	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, startAt, true); err != nil {
-		logger.WithError(err).Error("Failed to add downlink task for join-accept")
+	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - req.RxDelay.Duration()/2 - nsScheduleWindow())
+	logger.WithField("start_at", downAt).Debug("Add downlink task")
+	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
+		logger.WithError(err).Error("Failed to add downlink task after join-request")
 	}
+	logger.Debug("Enqueue join-accept for sending to Application Server")
 	if err := ns.applicationUplinks.Add(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: dev.EndDeviceIdentifiers.ApplicationIdentifiers,
@@ -1178,7 +1204,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			ReceivedAt:           respRecvAt,
 		}},
 	}); err != nil {
-		logger.WithError(err).Warn("Failed to queue join-accept for sending to Application Server")
+		logger.WithError(err).Warn("Failed to enqueue join-accept for sending to Application Server")
 	}
 	return nil
 }
