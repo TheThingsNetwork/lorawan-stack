@@ -256,9 +256,10 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 			scheme = "wss"
 		}
 		address := host
-		if port != "" {
-			address = net.JoinHostPort(host, port)
+		if port == "" {
+			port = "8887"
 		}
+		address = net.JoinHostPort(host, port)
 		res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
 	}
 
