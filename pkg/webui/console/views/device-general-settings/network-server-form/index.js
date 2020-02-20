@@ -45,6 +45,7 @@ const lorawanVersions = [
   { value: '1.0.1', label: 'MAC V1.0.1' },
   { value: '1.0.2', label: 'MAC V1.0.2' },
   { value: '1.0.3', label: 'MAC V1.0.3' },
+  { value: '1.0.4', label: 'MAC V1.0.4' },
   { value: '1.1.0', label: 'MAC V1.1' },
 ]
 
