@@ -29,6 +29,18 @@ const instance = axios.create({
   headers: { 'X-CSRF-Token': csrf },
 })
 
+instance.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    if ('response' in error && error.response && 'data' in error.response) {
+      throw error.response.data
+    }
+    throw error
+  },
+)
+
 export default {
   users: {
     async register(userData) {
