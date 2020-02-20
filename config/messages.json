@@ -1187,6 +1187,15 @@
       "file": "contact_info.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:data_rate_index": {
+    "translations": {
+      "en": "Data rate index is invalid"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:end_device_eui_update": {
     "translations": {
       "en": "end device EUIs can not be updated"
@@ -3107,6 +3116,15 @@
   "error:pkg/frequencyplans:channel": {
     "translations": {
       "en": "invalid frequency plan channel `{index}`"
+    },
+    "description": {
+      "package": "pkg/frequencyplans",
+      "file": "frequencyplans.go"
+    }
+  },
+  "error:pkg/frequencyplans:data_rate_index": {
+    "translations": {
+      "en": "Data rate index is invalid"
     },
     "description": {
       "package": "pkg/frequencyplans",
@@ -5230,11 +5248,11 @@
   },
   "error:pkg/networkserver:application_downlink_too_long": {
     "translations": {
-      "en": "application downlink payload is too long"
+      "en": "application downlink payload length '{length}' exceeds maximum '{max}'"
     },
     "description": {
       "package": "pkg/networkserver",
-      "file": "downlink.go"
+      "file": "errors.go"
     }
   },
   "error:pkg/networkserver:channel_index": {
