@@ -96,6 +96,8 @@ func (v MACVersion) MarshalJSON() ([]byte, error) {
 		res = "1.0.2"
 	case ttnpb.MAC_V1_0_3:
 		res = "1.0.3"
+	case ttnpb.MAC_V1_0_4:
+		res = "1.0.4"
 	case ttnpb.MAC_V1_1:
 		res = "1.1"
 	default:
@@ -116,6 +118,8 @@ func (v *MACVersion) UnmarshalJSON(data []byte) error {
 		res = ttnpb.MAC_V1_0_2
 	case "1.0.3":
 		res = ttnpb.MAC_V1_0_3
+	case "1.0.4":
+		res = ttnpb.MAC_V1_0_4
 	case "1.1":
 		res = ttnpb.MAC_V1_1
 	default:
