@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Class B support.
 - WebSocket Ping-Pong support for Basic Station frontend in the Gateway Server.
+- LoRaWAN 1.0.4 support.
 
 ### Changed
 
