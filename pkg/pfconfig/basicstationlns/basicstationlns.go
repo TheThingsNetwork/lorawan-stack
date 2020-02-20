@@ -83,11 +83,11 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 	conf.JoinEUI = nil
 	conf.NetID = nil
 
-	band, err := band.GetByID(bandID)
+	phy, err := band.GetByID(bandID)
 	if err != nil {
 		return RouterConfig{}, errFrequencyPlan
 	}
-	s := strings.Split(band.ID, "_")
+	s := strings.Split(phy.ID, "_")
 	if len(s) < 2 {
 		return RouterConfig{}, errFrequencyPlan
 	}
@@ -135,7 +135,7 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 
 // getDataRatesFromBandID parses the available data rates from the band into DataRates.
 func getDataRatesFromBandID(id string) (DataRates, error) {
-	band, err := band.GetByID(id)
+	phy, err := band.GetByID(id)
 	if err != nil {
 		return DataRates{}, err
 	}
@@ -148,7 +148,7 @@ func getDataRatesFromBandID(id string) (DataRates, error) {
 		dr[2] = 0
 	}
 
-	for i, dr := range band.DataRates {
+	for i, dr := range phy.DataRates {
 		if loraDR := dr.Rate.GetLoRa(); loraDR != nil {
 			loraDR.GetSpreadingFactor()
 			drs[i][0] = int(loraDR.GetSpreadingFactor())

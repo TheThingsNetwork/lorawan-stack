@@ -17,6 +17,7 @@ package messages
 import (
 	"bytes"
 	"encoding/binary"
+	"math"
 
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -56,35 +57,36 @@ func getFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
 }
 
 func getDataRateFromIndex(bandID string, index int) (ttnpb.DataRate, bool, error) {
-	band, err := band.GetByID(bandID)
+	phy, err := band.GetByID(bandID)
 	if err != nil {
 		return ttnpb.DataRate{}, false, errDataRateIndex.WithCause(err)
 	}
-	if index >= len(band.DataRates) {
+	// All protobuf enums are int32-typed, so ensure it does not overflow.
+	if index < 0 || index > math.MaxInt32 {
+		return ttnpb.DataRate{}, false, errDataRateIndex
+	}
+	dr, ok := phy.DataRates[ttnpb.DataRateIndex(index)]
+	if !ok {
 		return ttnpb.DataRate{}, false, errDataRateIndex
 	}
 
-	dr := band.DataRates[index].Rate
-
-	if dr.GetLoRa() != nil {
-		return dr, true, nil
+	if dr.Rate.GetLoRa() != nil {
+		return dr.Rate, true, nil
 	}
-
-	return dr, false, nil
+	return dr.Rate, false, nil
 }
 
-func getDataRateIndexFromDataRate(bandID string, DR ttnpb.DataRate) (int, error) {
-	if (DR == ttnpb.DataRate{}) {
+func getDataRateIndexFromDataRate(bandID string, dr ttnpb.DataRate) (int, error) {
+	if (dr == ttnpb.DataRate{}) {
 		return 0, errDataRate
 	}
-	band, err := band.GetByID(bandID)
+	phy, err := band.GetByID(bandID)
 	if err != nil {
 		return 0, err
 	}
-	for i, dr := range band.DataRates {
-		if dr.Rate.Equal(DR) {
-			return i, nil
-		}
+	i, ok := phy.FindDataRate(dr)
+	if !ok {
+		return 0, errDataRate
 	}
-	return 0, errDataRate
+	return int(i), nil
 }

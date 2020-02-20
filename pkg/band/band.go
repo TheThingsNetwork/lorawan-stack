@@ -50,6 +50,25 @@ type DataRate struct {
 	MaxMACPayloadSize MaxMACPayloadSizeFunc
 }
 
+func makeLoRaDataRate(spreadingFactor uint8, bandwidth uint32, maximumMACPayloadSize MaxMACPayloadSizeFunc) DataRate {
+	return DataRate{
+		Rate: (&ttnpb.LoRaDataRate{
+			SpreadingFactor: uint32(spreadingFactor),
+			Bandwidth:       bandwidth,
+		}).DataRate(),
+		MaxMACPayloadSize: maximumMACPayloadSize,
+	}
+}
+
+func makeFSKDataRate(bitRate uint32, maximumMACPayloadSize MaxMACPayloadSizeFunc) DataRate {
+	return DataRate{
+		Rate: (&ttnpb.FSKDataRate{
+			BitRate: bitRate,
+		}).DataRate(),
+		MaxMACPayloadSize: maximumMACPayloadSize,
+	}
+}
+
 // Channel abstracts a band's channel properties.
 type Channel struct {
 	// Frequency indicates the frequency of the channel.
@@ -128,7 +147,7 @@ type Band struct {
 	// SubBands define the sub-bands, their duty-cycle limit and Tx power. The frequency ranges may not overlap.
 	SubBands []SubBandParameters
 
-	DataRates [16]DataRate
+	DataRates map[ttnpb.DataRateIndex]DataRate
 
 	FreqMultiplier   uint64
 	ImplementsCFList bool
@@ -278,6 +297,16 @@ func (b Band) FindSubBand(frequency uint64) (SubBandParameters, bool) {
 		}
 	}
 	return SubBandParameters{}, false
+}
+
+// FindDataRate returns the data rate index by data rate, if any.
+func (b Band) FindDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, bool) {
+	for i, bDR := range b.DataRates {
+		if bDR.Rate.Equal(dr) {
+			return i, true
+		}
+	}
+	return 0, false
 }
 
 func makeBeaconFrequencyFunc(frequencies [8]uint64) func(float64) uint64 {

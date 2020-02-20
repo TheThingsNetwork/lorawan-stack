@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 // SX1301Config contains the configuration for the SX1301 concentrator.
@@ -276,7 +277,7 @@ var defaultTxLUTConfigs = []TxLUTConfig{
 
 // BuildSX1301Config builds the SX1301 configuration for the given frequency plan.
 func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Config, error) {
-	band, err := band.GetByID(frequencyPlan.BandID)
+	phy, err := band.GetByID(frequencyPlan.BandID)
 	if err != nil {
 		return nil, err
 	}
@@ -339,26 +340,32 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 
 	conf.LoRaStandardChannel = &IFConfig{Enable: false}
 	if channel := frequencyPlan.LoRaStandardChannel; channel != nil {
-		if lora := band.DataRates[channel.DataRate].Rate.GetLoRa(); lora != nil {
-			conf.LoRaStandardChannel = &IFConfig{
-				Enable:       true,
-				Radio:        channel.Radio,
-				IFValue:      int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
-				Bandwidth:    lora.Bandwidth,
-				SpreadFactor: uint8(lora.SpreadingFactor),
+		dr, ok := phy.DataRates[ttnpb.DataRateIndex(channel.DataRate)]
+		if ok {
+			if lora := dr.Rate.GetLoRa(); lora != nil {
+				conf.LoRaStandardChannel = &IFConfig{
+					Enable:       true,
+					Radio:        channel.Radio,
+					IFValue:      int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+					Bandwidth:    lora.Bandwidth,
+					SpreadFactor: uint8(lora.SpreadingFactor),
+				}
 			}
 		}
 	}
 
 	conf.FSKChannel = &IFConfig{Enable: false}
 	if channel := frequencyPlan.FSKChannel; channel != nil {
-		if fsk := band.DataRates[channel.DataRate].Rate.GetFSK(); fsk != nil {
-			conf.FSKChannel = &IFConfig{
-				Enable:    true,
-				Radio:     channel.Radio,
-				IFValue:   int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
-				Bandwidth: 125000,
-				Datarate:  fsk.BitRate,
+		dr, ok := phy.DataRates[ttnpb.DataRateIndex(channel.DataRate)]
+		if ok {
+			if fsk := dr.Rate.GetFSK(); fsk != nil {
+				conf.FSKChannel = &IFConfig{
+					Enable:    true,
+					Radio:     channel.Radio,
+					IFValue:   int32(int64(channel.Frequency) - int64(conf.Radios[channel.Radio].Frequency)),
+					Bandwidth: 125000,
+					Datarate:  fsk.BitRate,
+				}
 			}
 		}
 	}

@@ -127,7 +127,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		if !ok {
 			return nil, errFrequencyPlan.WithAttributes("frequency_plan", lorawanMetadata.FrequencyPlan)
 		}
-		band, err := band.GetByID(bandID)
+		phy, err := band.GetByID(bandID)
 		if err != nil {
 			return nil, err
 		}
@@ -137,10 +137,10 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		if err != nil {
 			return nil, err
 		}
-		for bandDRIndex, bandDR := range band.DataRates {
+		for bandDRIndex, bandDR := range phy.DataRates {
 			if bandDR.Rate.Equal(loraDr.DataRate) {
 				found = true
-				drIndex = ttnpb.DataRateIndex(bandDRIndex)
+				drIndex = bandDRIndex
 				break
 			}
 		}

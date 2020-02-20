@@ -379,12 +379,12 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			"data_rate_index", rx.dataRateIndex,
 		))
 		logger.Debug("Attempt to schedule downlink in receive window")
-		dataRate := phy.DataRates[rx.dataRateIndex].Rate
-		if dataRate == (ttnpb.DataRate{}) {
+		dr, ok := phy.DataRates[rx.dataRateIndex]
+		if !ok {
 			return 0, errDataRate.WithAttributes("index", rx.dataRateIndex)
 		}
 		// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
-		maxPHYLength := phy.DataRates[rx.dataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()) + 5
+		maxPHYLength := dr.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()) + 5
 		if len(msg.RawPayload) > int(maxPHYLength) {
 			return 0, errTooLong.WithAttributes(
 				"payload_length", len(msg.RawPayload),
@@ -413,8 +413,8 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if int(ids.AntennaIndex) < len(c.gateway.Antennas) {
 			settings.Downlink.TxPower -= c.gateway.Antennas[ids.AntennaIndex].Gain
 		}
-		settings.DataRate = dataRate
-		if dr := dataRate.GetLoRa(); dr != nil {
+		settings.DataRate = dr.Rate
+		if lora := dr.Rate.GetLoRa(); lora != nil {
 			settings.CodingRate = phy.LoRaCodingRate
 			settings.Downlink.InvertPolarization = true
 		}

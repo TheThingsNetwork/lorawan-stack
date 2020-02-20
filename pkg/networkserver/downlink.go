@@ -871,7 +871,7 @@ loop:
 			break loop
 		}
 	}
-	dr, ok := phy.DataRates[uint8(maxUpDRIdx)]
+	dr, ok := phy.DataRates[maxUpDRIdx]
 	if !ok {
 		return 0, errDataRateNotFound
 	}
@@ -1016,7 +1016,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		maxDRIdx = req.Rx2DataRateIndex
 	}
 
-	maxDR, ok := phy.DataRates[uint8(maxDRIdx)]
+	maxDR, ok := phy.DataRates[maxDRIdx]
 	if !ok {
 		logger.WithField("data_rate_index", maxDRIdx).Error("Data rate not found")
 		return downlinkAttemptResult{
@@ -1053,11 +1053,11 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 
 	if attemptRx1 && attemptRx2 {
-		dr1, ok := phy.DataRates[uint8(req.Rx1DataRateIndex)]
+		dr1, ok := phy.DataRates[req.Rx1DataRateIndex]
 		if !ok {
 			logger.WithField("data_rate_index", req.Rx1DataRateIndex).Error("Rx1 data rate not found")
 		}
-		dr2, ok := phy.DataRates[uint8(req.Rx2DataRateIndex)]
+		dr2, ok := phy.DataRates[req.Rx2DataRateIndex]
 		if !ok {
 			logger.WithField("data_rate_index", req.Rx2DataRateIndex).Error("Rx2 data rate not found")
 		}
@@ -1356,7 +1356,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					panic(fmt.Sprintf("unmatched downlink class: '%s'", class))
 				}
 
-				dr, ok := phy.DataRates[uint8(drIdx)]
+				dr, ok := phy.DataRates[drIdx]
 				if !ok {
 					logger.WithField("data_rate_index", drIdx).Error("Rx2 data rate not found")
 					return dev, sets, nil

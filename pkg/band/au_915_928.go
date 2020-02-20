@@ -82,61 +82,21 @@ func init() {
 			},
 		},
 
-		DataRates: [16]DataRate{
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 12,
-				Bandwidth:       125000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(59)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 11,
-				Bandwidth:       125000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(59)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 10,
-				Bandwidth:       125000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(59)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 9,
-				Bandwidth:       125000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(123)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 8,
-				Bandwidth:       125000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 7,
-				Bandwidth:       125000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 8,
-				Bandwidth:       500000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
-			{}, // RFU
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 12,
-				Bandwidth:       500000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(41)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 11,
-				Bandwidth:       500000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(117)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 10,
-				Bandwidth:       500000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 9,
-				Bandwidth:       500000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 8,
-				Bandwidth:       500000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 7,
-				Bandwidth:       500000,
-			}}}, MaximumMACPayloadSize: makeConstMaximumMACPayloadSizeFunc(230)},
-			{}, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU for previous versions
+		DataRates: map[ttnpb.DataRateIndex]DataRate{
+			0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
+			4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+			5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+			6: makeLoRaDataRate(8, 500000, makeConstMaxMACPayloadSizeFunc(230)),
+
+			8:  makeLoRaDataRate(12, 500000, makeConstMaxMACPayloadSizeFunc(41)),
+			9:  makeLoRaDataRate(11, 500000, makeConstMaxMACPayloadSizeFunc(117)),
+			10: makeLoRaDataRate(10, 500000, makeConstMaxMACPayloadSizeFunc(230)),
+			11: makeLoRaDataRate(9, 500000, makeConstMaxMACPayloadSizeFunc(230)),
+			12: makeLoRaDataRate(8, 500000, makeConstMaxMACPayloadSizeFunc(230)),
+			13: makeLoRaDataRate(7, 500000, makeConstMaxMACPayloadSizeFunc(230)),
 		},
 		MaxADRDataRateIndex: 5,
 
