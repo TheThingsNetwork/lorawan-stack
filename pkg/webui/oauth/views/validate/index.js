@@ -23,7 +23,7 @@ import ErrorNotification from '@ttn-lw/components/error-notification'
 import Notification from '@ttn-lw/components/notification'
 import Link from '@ttn-lw/components/link'
 
-import Logo from '@ttn-lw/containers/logo'
+import Logo from '@console/containers/logo'
 
 import Message from '@ttn-lw/lib/components/message'
 
