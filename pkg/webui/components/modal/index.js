@@ -18,8 +18,6 @@ import classnames from 'classnames'
 
 import Button from '@ttn-lw/components/button'
 
-import Logo from '@ttn-lw/containers/logo'
-
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -38,7 +36,7 @@ class Modal extends React.PureComponent {
     danger: PropTypes.bool,
     formName: PropTypes.string,
     inline: PropTypes.bool,
-    logo: PropTypes.bool,
+    logo: PropTypes.node,
     message: PropTypes.message,
     method: PropTypes.string,
     name: PropTypes.string,
@@ -55,7 +53,7 @@ class Modal extends React.PureComponent {
     children: undefined,
     danger: false,
     formName: undefined,
-    logo: false,
+    logo: undefined,
     message: undefined,
     method: undefined,
     onComplete: () => null,
@@ -166,7 +164,7 @@ class Modal extends React.PureComponent {
                 </h1>
                 {subtitle && <Message component="span" content={subtitle} />}
               </div>
-              {logo && <Logo vertical className={style.logo} />}
+              {logo}
             </div>
           )}
           {title && <div className={style.line} />}
