@@ -48,14 +48,16 @@ The `ports` section exposes {{% tts %}}'s ports to the world. Port `80` and `443
 stack:
   image: 'thethingsnetwork/lorawan-stack:<the tag>'
   entrypoint: 'ttn-lw-stack'
-  command: 'start'
+  command: 'start all -c /config/ttn-lw-stack.yml'
   restart: 'unless-stopped'
   depends_on:
     - 'cockroach'
     - 'redis'
   volumes:
-    - './acme:/var/lib/acme'
     - './data/blob:/srv/ttn-lorawan/public/blob'
+    - './config/stack:/config:ro'
+    # If using Let's Encrypt
+    - './acme:/var/lib/acme'
   ports:
     - '80:1885'
     - '443:8885'
@@ -70,82 +72,136 @@ stack:
     - '1887:1887'
     - '8887:8887'
     - '1700:1700/udp'
-  env_file: '.env'
+
+  # If using (self) signed certificates
+  # secrets:
+  #   - cert.pem
+  #   - key.pem
+
+# If using (self) signed certificates
+# secrets:
+#   cert.pem:
+#     file: ./cert.pem
+#   key.pem:
+#     file: ./key.pem
 ```
 
-Next, we'll have a look at the configuration options for your private deployment. We'll set these options in the `.env` file that is referenced by the `env_file` option of the `stack` service in `docker-compose.yml`.
+Next, we'll have a look at the configuration options for your private deployment. We'll set these options in the `ttn-lw-stack.yml` file that is mounted as a volume on the `stack` service in `docker-compose.yml`.
 
-First we'll make sure that {{% tts %}} uses the correct databases.
+The first thing we should configure are the databases used by the stack. We will
+set these to the CockroachDB and Redis instances that were defined in the
+`docker-compose.yml` file above.
 
-```bash
-TTN_LW_IS_DATABASE_URI="postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable"
-TTN_LW_REDIS_ADDRESS="redis:6379"
+Next is TLS with Let's Encrypt. Since we're deploying {{% tts %}} on
+`thethings.example.com`, we configure it to only request certificates for that
+host, and also to use it as the default host.
+
+We also configure HTTP server keys for encrypting and verifying cookies, as well
+as passwords for endpoints that you may want to keep for internal use.
+
+{{% tts %}} sends emails to users, so we need to configure how these are sent.
+You can use Sendgrid or an SMTP server. If you skip setting up an email provider,
+{{% tts %}} will print emails to the stack logs.
+
+Finally, we also need to configure the URLs for the Web UI and the secret used
+by the console client.
+
+For more detailed configuration, refer to [the relevant documentation]({{< ref "/reference/configuration" >}})
+
+Below is an example `ttn-lw-stack.yml` file:
+
+```yaml
+# Example ttn-lw-stack configuration file
+
+# Redis configuration
+redis:
+  address: 'redis:6379'
+
+# Identity Server configuration
+is:
+  # If using CockroachDB
+  database-uri: 'postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable'
+
+  # If using PostgreSQL:
+  # database-uri: 'postgres://root@postgres:5432/ttn_lorawan?sslmode=disable'
+
+  # Email configuration for "thethings.example.com"
+  email:
+    sender-name: 'The Things Stack'
+    sender-address: 'noreply@thethings.example.com'
+    network:
+      name: 'The Things Stack'
+      console-url: 'https://thethings.example.com/console'
+      identity-server-url: 'https://thethings.example.com/oauth'
+
+  # Web UI configuration for "thethings.example.com":
+  oauth:
+    ui:
+      canonical-url: 'https://thethings.example.com/oauth'
+      is:
+        base-url: 'https://thethings.example.com/api/v3'
+
+# HTTP server configuration
+http:
+  cookie:
+    # generate 32 bytes (openssl rand -hex 32)
+    block-key: '0011223344556677001122334455667700112233445566770011223344556677'
+    # generate 64 bytes (openssl rand -hex 64)
+    hash-key: '00112233445566770011223344556677001122334455667700112233445566770011223344556677001122334455667700112233445566770011223344556677'
+  metrics:
+    password: 'metrics'               # choose a password
+  pprof:
+    password: 'pprof'                 # choose a password
+
+# Let's encrypt for "thethings.example.com"
+tls:
+  source: 'acme'
+  acme:
+    dir: '/var/lib/acme'
+    email: 'you@thethings.example.com'
+    hosts: ['thethings.example.com']
+    default-host: 'thethings.example.com'
+
+# If Gateway Server enabled, defaults for "thethings.example.com":
+gs:
+  mqtt:
+    public-address: 'thethings.example.com:1882'
+    public-tls-address: 'thethings.example.com:8882'
+  mqtt-v2:
+    public-address: 'thethings.example.com:1881'
+    public-tls-address: 'thethings.example.com:8881'
+
+# If Gateway Configuration Server enabled, defaults for "thethings.example.com":
+gcs:
+  basic-station:
+    default:
+      lns-uri: 'wss://thethings.example.com:8887'
+  the-things-gateway:
+    default:
+      mqtt-server: 'mqtts://thethings.example.com:8881'
+
+# Web UI configuration for "thethings.example.com":
+console:
+  ui:
+    canonical-url: 'https://thethings.example.com/console'
+    is:
+      base-url: 'https://thethings.example.com/api/v3'
+    gs:
+      base-url: 'https://thethings.example.com/api/v3'
+    ns:
+      base-url: 'https://thethings.example.com/api/v3'
+    as:
+      base-url: 'https://thethings.example.com/api/v3'
+    js:
+      base-url: 'https://thethings.example.com/api/v3'
+    qrg:
+      base-url: 'https://thethings.example.com/api/v3'
+    edtc:
+      base-url: 'https://thethings.example.com/api/v3'
+
+  oauth:
+    client-id: 'console'
+    client-secret: 'console'          # choose or generate a secret (*)
 ```
 
-Then we'll configure TLS with Let's Encrypt. Since we're deploying {{% tts %}} on `thethings.example.com`, we configure it to only request certificates for that host, and to also use it as the default host.
-
-```bash
-TTN_LW_TLS_SOURCE="acme"
-TTN_LW_TLS_ACME_DIR="/var/lib/acme"
-TTN_LW_TLS_ACME_EMAIL="your@email.com"
-TTN_LW_TLS_ACME_HOSTS="thethings.example.com"
-TTN_LW_TLS_ACME_DEFAULT_HOST="thethings.example.com"
-```
-
-Next, we'll configure the HTTP server with keys for encrypting and verifying cookies, and with passwords for endpoints that you may want to keep for internal use.
-
-```bash
-TTN_LW_HTTP_COOKIE_HASH_KEY=...  # generate 64 bytes (openssl rand -hex 64)
-TTN_LW_HTTP_COOKIE_BLOCK_KEY=... # generate 32 bytes (openssl rand -hex 32)
-TTN_LW_HTTP_METRICS_PASSWORD=... # choose a password
-TTN_LW_HTTP_PPROF_PASSWORD=...   # choose a password
-```
-
-{{% tts %}} sends emails to users, so we need to configure how those are sent. 
-
-```bash
-TTN_LW_IS_EMAIL_SENDER_NAME="{{% tts %}}"
-TTN_LW_IS_EMAIL_SENDER_ADDRESS="noreply@thethings.example.com"
-TTN_LW_IS_EMAIL_NETWORK_CONSOLE_URL="https://thethings.example.com/console"
-TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="https://thethings.example.com/oauth"
-```
-
-You can either use Sendgrid or an SMTP server. If you don't set up an email provider, {{% tts %}} will print emails to the server log.
-
-```bash
-TTN_LW_IS_EMAIL_PROVIDER="sendgrid"
-TTN_LW_IS_EMAIL_SENDGRID_API_KEY=... # enter Sendgrid API key
-```
-
-or
-
-```bash
-TTN_LW_IS_EMAIL_PROVIDER="smtp"
-TTN_LW_IS_EMAIL_SMTP_ADDRESS=...  # enter mail server address
-TTN_LW_IS_EMAIL_SMTP_USERNAME=... # enter username
-TTN_LW_IS_EMAIL_SMTP_PASSWORD=... # enter password
-```
-
-Finally, we need to configure the Web UI to use `thethings.example.com`.
-
-```bash
-TTN_LW_IS_OAUTH_UI_CANONICAL_URL="https://thethings.example.com/oauth"
-TTN_LW_IS_OAUTH_UI_IS_BASE_URL="https://thethings.example.com/api/v3"
-
-TTN_LW_CONSOLE_OAUTH_AUTHORIZE_URL="https://thethings.example.com/oauth/authorize"
-TTN_LW_CONSOLE_OAUTH_TOKEN_URL="https://thethings.example.com/oauth/token"
-
-TTN_LW_CONSOLE_UI_CANONICAL_URL="https://thethings.example.com/console"
-TTN_LW_CONSOLE_UI_IS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_GS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_NS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_AS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_JS_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_EDTC_BASE_URL="https://thethings.example.com/api/v3"
-TTN_LW_CONSOLE_UI_QRG_BASE_URL="https://thethings.example.com/api/v3"
-
-TTN_LW_CONSOLE_OAUTH_CLIENT_ID="console"
-TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET=... # choose or generate a secret
-```
-
-You will need the `TTN_LW_CONSOLE_OAUTH_CLIENT_SECRET` again in a later step.
+(*) You will need the `console.oauth.client-secret` again in a later step.
