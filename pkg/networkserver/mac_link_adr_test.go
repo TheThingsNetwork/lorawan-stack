@@ -176,28 +176,27 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3),
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
 				MACState: func() *ttnpb.MACState {
-					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3)
+					macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A)
 					macState.PendingRequests = []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
 							ChannelMask: []bool{
 								false, false, false, false, false, false, false, false,
-								false, false, false, false, false, false, true, false,
+								false, false, false, false, false, false, false, false,
 							},
-							ChannelMaskControl: 5,
+							ChannelMaskControl: 7,
 							NbTrans:            1,
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
 							ChannelMask: []bool{
 								false, false, false, false, false, false, false, false,
-								false, false, false, false, false, false, false, false,
+								true, true, true, true, true, true, true, true,
 							},
-							ChannelMaskControl: 4,
-							NbTrans:            1,
+							NbTrans: 1,
 						}).MACCommand(),
 					}
 					return macState
@@ -213,18 +212,17 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
-							false, false, false, false, false, false, true, false,
+							false, false, false, false, false, false, false, false,
 						},
-						ChannelMaskControl: 5,
+						ChannelMaskControl: 7,
 						NbTrans:            1,
 					}),
 					evtEnqueueLinkADRRequest.BindData(&ttnpb.MACCommand_LinkADRReq{
 						ChannelMask: []bool{
 							false, false, false, false, false, false, false, false,
-							false, false, false, false, false, false, false, false,
+							true, true, true, true, true, true, true, true,
 						},
-						ChannelMaskControl: 4,
-						NbTrans:            1,
+						NbTrans: 1,
 					}),
 				},
 			},
@@ -235,11 +233,11 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_0_3_REV_A)).(band.Band),
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3),
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3),
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A),
 			},
 			MaxDownlinkLength: 7,
 			MaxUplinkLength:   24,
@@ -254,11 +252,11 @@ func TestEnqueueLinkADRReq(t *testing.T) {
 			Band: test.Must(test.Must(band.GetByID(band.US_902_928)).(band.Band).Version(ttnpb.PHY_V1_1_REV_B)).(band.Band),
 			InputDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1),
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				FrequencyPlanID: test.USFrequencyPlanID,
-				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1),
+				MACState:        MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B),
 			},
 			MaxDownlinkLength: 42,
 			MaxUplinkLength:   1,

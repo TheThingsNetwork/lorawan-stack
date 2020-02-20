@@ -15,7 +15,7 @@
 package networkserver
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -155,7 +155,7 @@ func uplinkMetadata(ups ...*ttnpb.UplinkMessage) []*ttnpb.RxMetadata {
 	return mds
 }
 
-func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) error {
+func adaptDataRate(dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings) error {
 	ups := dev.RecentADRUplinks
 	if len(ups) == 0 {
 		return nil
@@ -164,11 +164,6 @@ func adaptDataRate(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttn
 	maxSNR, ok := maxSNRFromMetadata(uplinkMetadata(ups...)...)
 	if !ok {
 		return nil
-	}
-
-	_, phy, err := getDeviceBandVersion(dev, fps)
-	if err != nil {
-		return err
 	}
 
 	dev.MACState.DesiredParameters.ADRDataRateIndex = dev.MACState.CurrentParameters.ADRDataRateIndex

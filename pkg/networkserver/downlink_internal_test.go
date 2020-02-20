@@ -83,14 +83,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 	}
 
 	rxMetadata := MakeRxMetadataSlice()
-	eu868macParameters := MakeDefaultEU868CurrentMACParameters()
-	eu868macParameters.Rx1Delay = ttnpb.RX_DELAY_2 // Due to infrastructureDelay being 1 second, Network Server never schedules Rx1 for devices with RxDelay == 1.
-	eu868macParameters.Channels = append(eu868macParameters.Channels, &ttnpb.MACParameters_Channel{
-		UplinkFrequency:   430000000,
-		DownlinkFrequency: 431000000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_3,
-	})
+	makeEU868macParameters := func(ver ttnpb.PHYVersion) ttnpb.MACParameters {
+		params := MakeDefaultEU868CurrentMACParameters(ver)
+		params.Rx1Delay = ttnpb.RX_DELAY_2 // Due to infrastructureDelay being 1 second, Network Server never schedules Rx1 for devices with RxDelay == 1.
+		params.Channels = append(params.Channels, &ttnpb.MACParameters_Channel{
+			UplinkFrequency:   430000000,
+			DownlinkFrequency: 431000000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_3,
+		})
+		return params
+	}
 
 	assertGetRxMetadataGatewayPeers := func(ctx context.Context, getPeerCh <-chan test.ClusterGetPeerRequest, peer124, peer3 cluster.Peer) bool {
 		t := test.MustTFromContext(ctx)
@@ -519,8 +522,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -641,8 +644,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters:  *CopyMACParameters(&eu868macParameters),
-						DesiredParameters:  *CopyMACParameters(&eu868macParameters),
+						CurrentParameters:  makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters:  makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:        ttnpb.CLASS_A,
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
@@ -785,8 +788,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -923,8 +926,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters:  *CopyMACParameters(&eu868macParameters),
-						DesiredParameters:  *CopyMACParameters(&eu868macParameters),
+						CurrentParameters:  makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters:  makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:        ttnpb.CLASS_A,
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
@@ -1076,8 +1079,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1224,8 +1227,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_0_3_REV_A),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_0_3_REV_A),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_0_3,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1416,8 +1419,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_0_3_REV_A),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_0_3_REV_A),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_0_3,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1600,8 +1603,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedResponses: []*ttnpb.MACCommand{
@@ -1869,8 +1872,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedResponses: []*ttnpb.MACCommand{
@@ -2163,8 +2166,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedResponses: []*ttnpb.MACCommand{
@@ -2450,8 +2453,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedResponses: []*ttnpb.MACCommand{
@@ -2623,8 +2626,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					MACState: &ttnpb.MACState{
-						CurrentParameters:       *CopyMACParameters(&eu868macParameters),
-						DesiredParameters:       *CopyMACParameters(&eu868macParameters),
+						CurrentParameters:       makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters:       makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:             ttnpb.CLASS_A,
 						LoRaWANVersion:          ttnpb.MAC_V1_1,
 						LastConfirmedDownlinkAt: &downAt,
@@ -2770,8 +2773,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ClassBTimeout: DurationPtr(42 * time.Second),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_B,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
@@ -3072,8 +3075,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ClassCTimeout: DurationPtr(42 * time.Second),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedResponses: []*ttnpb.MACCommand{
@@ -3250,8 +3253,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ClassCTimeout: DurationPtr(42 * time.Second),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters:       *CopyMACParameters(&eu868macParameters),
-						DesiredParameters:       *CopyMACParameters(&eu868macParameters),
+						CurrentParameters:       makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters:       makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:             ttnpb.CLASS_C,
 						LastConfirmedDownlinkAt: &downAt,
 						LoRaWANVersion:          ttnpb.MAC_V1_1,
@@ -3403,8 +3406,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ClassCTimeout: DurationPtr(42 * time.Second),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedResponses: []*ttnpb.MACCommand{
@@ -3779,8 +3782,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusTimePeriodicity: DurationPtr(time.Hour),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -4054,8 +4057,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ClassCTimeout: DurationPtr(42 * time.Second),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -4466,8 +4469,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						ClassCTimeout: DurationPtr(42 * time.Second),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -4854,8 +4857,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -5028,8 +5031,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusTimePeriodicity:  DurationPtr(0),
 					},
 					MACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
@@ -5235,8 +5238,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					PendingMACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
@@ -5356,8 +5359,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					PendingMACState: &ttnpb.MACState{
-						CurrentParameters: *CopyMACParameters(&eu868macParameters),
-						DesiredParameters: *CopyMACParameters(&eu868macParameters),
+						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
+						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						PendingJoinRequest: &ttnpb.JoinRequest{

@@ -15,7 +15,6 @@
 package band
 
 import (
-	"math"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -23,164 +22,411 @@ import (
 )
 
 func TestParseChMask(t *testing.T) {
+	a := assertions.New(t)
+	a.So(parseChMask(0), should.Resemble, map[uint8]bool{})
+	a.So(parseChMask(42), should.Resemble, map[uint8]bool{})
+	a.So(parseChMask(0, false), should.Resemble, map[uint8]bool{
+		0: false,
+	})
+	a.So(parseChMask(253, false, true, true), should.Resemble, map[uint8]bool{
+		253: false,
+		254: true,
+		255: true,
+	})
+	a.So(func() { parseChMask(253, false, true, true, false) }, should.Panic)
+	a.So(parseChMask(42, true, true, true, false, false, true), should.Resemble, map[uint8]bool{
+		42: true,
+		43: true,
+		44: true,
+		45: false,
+		46: false,
+		47: true,
+	})
+
 	for _, tc := range []struct {
-		name string
-
-		parseChMask func(mask [16]bool, cntl uint8) (map[uint8]bool, error)
-
-		mask [16]bool
-		cntl uint8
-
-		enabledChannels  []uint8
-		disabledChannels []uint8
-		fails            bool
+		Name           string
+		ParseChMask    func(Mask [16]bool, ChMaskCntl uint8) (map[uint8]bool, error)
+		Mask           [16]bool
+		ChMaskCntl     uint8
+		Expected       map[uint8]bool
+		ErrorAssertion func(t *testing.T, err error) bool
 	}{
 		{
-			name: "16 channels/cntl=0",
-
-			parseChMask: parseChMask16,
-
-			mask: [16]bool{
+			Name:        "16 channels/ChMaskCntl=0",
+			ParseChMask: parseChMask16,
+			Mask: [16]bool{
 				true, false, false, true, false, false, false, false,
-				false, false, false, false, false, false, false, false,
+				true, false, true, false, false, false, false, false,
 			},
-			cntl: 0,
-
-			enabledChannels:  []uint8{0, 3},
-			disabledChannels: []uint8{1, 2, 4, 5, 11},
-		},
-		{
-			name: "16 channels/cntl=6",
-
-			parseChMask: parseChMask16,
-
-			mask: [16]bool{
+			Expected: parseChMask(0,
 				true, false, false, true, false, false, false, false,
-				false, false, false, false, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
-			cntl: 6,
-
-			enabledChannels: func() (chans []uint8) {
-				for i := uint8(0); i < 16; i++ {
-					chans = append(chans, i)
-				}
-				return
-			}(),
 		},
 		{
-			name:        "16 channels/cntl=3",
-			parseChMask: parseChMask16,
-			cntl:        3,
-			fails:       true,
+			Name:        "16 channels/ChMaskCntl=1",
+			ParseChMask: parseChMask16,
+			ChMaskCntl:  1,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 1))
+			},
 		},
 		{
-			name: "72 channels/cntl=1",
-
-			parseChMask: parseChMask72,
-
-			mask: [16]bool{
+			Name:        "16 channels/ChMaskCntl=2",
+			ParseChMask: parseChMask16,
+			ChMaskCntl:  2,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 2))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=3",
+			ParseChMask: parseChMask16,
+			ChMaskCntl:  3,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 3))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=4",
+			ParseChMask: parseChMask16,
+			ChMaskCntl:  4,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 4))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=5",
+			ParseChMask: parseChMask16,
+			ChMaskCntl:  5,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 5))
+			},
+		},
+		{
+			Name:        "16 channels/ChMaskCntl=6",
+			ParseChMask: parseChMask16,
+			Mask: [16]bool{
 				true, false, false, true, false, false, false, false,
-				false, false, false, false, false, false, false, false,
+				true, false, true, false, false, false, false, false,
 			},
-			cntl: 1,
-
-			enabledChannels:  []uint8{16, 19},
-			disabledChannels: []uint8{0, 3, 4, 5, 17, 18, 20, 32, 64},
+			ChMaskCntl: 6,
+			Expected: parseChMask(0,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
 		},
 		{
-			name: "72 channels/cntl=5",
-
-			parseChMask: parseChMask72,
-
-			mask: [16]bool{
+			Name:        "16 channels/ChMaskCntl=7",
+			ParseChMask: parseChMask16,
+			ChMaskCntl:  7,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 7))
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=0",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
 				true, false, false, true, false, false, false, false,
-				false, false, false, false, false, false, false, false,
+				true, false, true, false, false, false, false, false,
 			},
-			cntl: 5,
-
-			enabledChannels:  []uint8{0, 3, 7, 24, 25, 26, 30, 31, 64, 67},
-			disabledChannels: []uint8{8, 9, 10, 11, 32, 33, 55, 65, 66, 68, 70},
-		},
-		{
-			name: "72 channels/cntl=6",
-
-			parseChMask: parseChMask72,
-
-			mask: [16]bool{
+			Expected: parseChMask(0,
 				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=1",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 1,
+			Expected: parseChMask(16,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=2",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 2,
+			Expected: parseChMask(32,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=3",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 3,
+			Expected: parseChMask(48,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=4",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 4,
+			Expected: parseChMask(64,
+				true, false, false, true, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "72 channels/ChMaskCntl=5",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 5,
+			Expected: parseChMask(0,
+				true, true, true, true, true, true, true, true,
 				false, false, false, false, false, false, false, false,
-			},
-			cntl: 6,
-
-			enabledChannels:  []uint8{0, 3, 7, 8, 9, 10, 11, 24, 25, 26, 30, 32, 33, 55, 31, 64, 67},
-			disabledChannels: []uint8{65, 66, 68},
-		},
-		{
-			name: "72 channels/cntl=7",
-
-			parseChMask: parseChMask72,
-
-			mask: [16]bool{
-				true, false, false, true, true, false, false, false,
 				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
-			cntl: 7,
-
-			enabledChannels:  []uint8{64, 67, 68},
-			disabledChannels: []uint8{0, 3, 7, 8, 9, 10, 11, 24, 25, 26, 30, 32, 33, 55, 31, 65, 66, 69, 70},
 		},
 		{
-			name:        "72 channels/cntl=math.MaxUint8",
-			parseChMask: parseChMask72,
-			cntl:        math.MaxUint8,
-			fails:       true,
-		},
-		{
-			name: "96 channels/cntl=3",
-
-			parseChMask: parseChMask96,
-
-			mask: [16]bool{
-				true, false, false, true, true, false, false, false,
-				true, true, true, false, false, false, false, false,
+			Name:        "72 channels/ChMaskCntl=6",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
 			},
-			cntl: 3,
-
-			enabledChannels:  []uint8{48, 51, 52, 56, 57},
-			disabledChannels: []uint8{0, 16, 17, 49, 50, 55, 66},
+			ChMaskCntl: 6,
+			Expected: parseChMask(0,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, false, false, true, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
 		},
 		{
-			name:            "96 channels/cntl=6",
-			parseChMask:     parseChMask96,
-			cntl:            6,
-			enabledChannels: []uint8{0, 3, 16, 17, 55, 90},
+			Name:        "72 channels/ChMaskCntl=7",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 7,
+			Expected: parseChMask(0,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
 		},
 		{
-			name:        "96 channels/cntl=math.MaxUint8",
-			parseChMask: parseChMask96,
-			cntl:        math.MaxUint8,
-			fails:       true,
+			Name:        "72 channels/ChMaskCntl=8",
+			ParseChMask: parseChMask72,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 8,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 8))
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=0",
+			ParseChMask: parseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			Expected: parseChMask(0,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=1",
+			ParseChMask: parseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 1,
+			Expected: parseChMask(16,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=2",
+			ParseChMask: parseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 2,
+			Expected: parseChMask(32,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=3",
+			ParseChMask: parseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 3,
+			Expected: parseChMask(48,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=4",
+			ParseChMask: parseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 4,
+			Expected: parseChMask(64,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=5",
+			ParseChMask: parseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 5,
+			Expected: parseChMask(80,
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=6",
+			ParseChMask: parseChMask96,
+			Mask: [16]bool{
+				true, false, false, true, false, false, false, false,
+				true, false, true, false, false, false, false, false,
+			},
+			ChMaskCntl: 6,
+			Expected: parseChMask(0,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			),
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:        "96 channels/ChMaskCntl=7",
+			ParseChMask: parseChMask96,
+			ChMaskCntl:  7,
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", 7))
+			},
 		},
 	} {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			res, err := tc.parseChMask(tc.mask, tc.cntl)
-			if tc.fails {
-				if !a.So(err, should.NotBeNil) {
-					t.FailNow()
-				}
-				return
-			}
-			if !a.So(err, should.BeNil) {
-				t.FailNow()
-			}
-
-			for _, enabledChannel := range tc.enabledChannels {
-				a.So(res[enabledChannel], should.BeTrue)
-			}
-			for _, disabledChannel := range tc.disabledChannels {
-				a.So(res[disabledChannel], should.BeFalse)
+			var mask [16]bool
+			copy(mask[:], tc.Mask[:])
+			res, err := tc.ParseChMask(mask, tc.ChMaskCntl)
+			a.So(mask, should.Equal, tc.Mask)
+			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(res, should.Resemble, tc.Expected)
 			}
 		})
 	}
@@ -188,54 +434,150 @@ func TestParseChMask(t *testing.T) {
 
 func TestGenerateChMask(t *testing.T) {
 	for _, tc := range []struct {
-		Name     string
-		Generate func([]bool) ([]ChMaskCntlPair, error)
-		Mask     []bool
-		Expected []ChMaskCntlPair
-		Error    error
+		Name            string
+		Generate        func([]bool, []bool) ([]ChMaskCntlPair, error)
+		CurrentChannels []bool
+		DesiredChannels []bool
+		Expected        []ChMaskCntlPair
+		ErrorAssertion  func(t *testing.T, err error) bool
 	}{
+		// NOTE: generateChMask16 always generates singleton ChMaskCntlPair slice regardless of CurrentChannels.
 		{
-			Name:     "16 channels/2,4 on",
+			Name:     "16 channels/2,4",
 			Generate: generateChMask16,
-			Mask: []bool{
-				false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false,
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				false, true, false, true, false, false, false, false,
+				false, false, false, false, false, false, false, false,
 			},
 			Expected: []ChMaskCntlPair{
-				{0, [16]bool{false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false}},
+				{
+					Mask: [16]bool{
+						false, true, false, true, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
-			Name:     "16 channels/all on",
+			Name:     "16 channels/1-16",
 			Generate: generateChMask16,
-			Mask: []bool{
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+			CurrentChannels: []bool{
+				true, true, false, true, false, true, true, true,
+				true, true, true, false, true, true, false, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
 			},
 			Expected: []ChMaskCntlPair{
-				{6, [16]bool{}},
+				{
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
+
 		{
-			Name:     "72 channels/1-16 on, 42, 67, 69 on (Cntl5 off)",
+			Name:     "72 channels/no cntl5/current(1-72)/desired(1-72)",
 			Generate: makeGenerateChMask72(false),
-			Mask: []bool{
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/cntl5/current(1-72)/desired(1-72)",
+			Generate: makeGenerateChMask72(true),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/no cntl5/current:(1-16,42,67,69);desired:(1-16,42,67,69)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, true, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
 				false, false, true, false, true, false, false, false,
 			},
-			Expected: []ChMaskCntlPair{
-				{0, [16]bool{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true}},
-				{1, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-				{2, [16]bool{false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false}},
-				{3, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-				{4, [16]bool{false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false}},
-			},
-		},
-		{
-			Name:     "72 channels/1-16 on, 42, 67, 69 on (Cntl5 on)",
-			Generate: makeGenerateChMask72(true),
-			Mask: []bool{
+			DesiredChannels: []bool{
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
 				false, false, false, false, false, false, false, false,
@@ -247,102 +589,481 @@ func TestGenerateChMask(t *testing.T) {
 				false, false, true, false, true, false, false, false,
 			},
 			Expected: []ChMaskCntlPair{
-				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true}},
-				{2, [16]bool{false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false}},
-				{4, [16]bool{false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false}},
+				{
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
-			Name:     "72 channels/125Hz on, 66, 68 on",
-			Generate: makeGenerateChMask72(false),
-			Mask: []bool{
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				false, true, false, true, false, false, false, false,
+			Name:     "72 channels/cntl5/current:(1-16,42,67,69);desired:(1-16,42,67,69)",
+			Generate: makeGenerateChMask72(true),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, true, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false,
 			},
-			Expected: []ChMaskCntlPair{
-				{6, [16]bool{false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false}},
-			},
-		},
-		{
-			Name:     "72 channels/125Hz off, 67, 69 on",
-			Generate: makeGenerateChMask72(false),
-			Mask: []bool{
-				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, true, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
 				false, false, true, false, true, false, false, false,
 			},
 			Expected: []ChMaskCntlPair{
-				{7, [16]bool{false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false}},
+				{
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
-			Name:     "72 channels/FSB 1 on",
-			Generate: makeGenerateChMask72(true),
-			Mask: []bool{
+			Name:     "72 channels/no cntl5/current:(1-4,6-16,42,67,69);desired:(1-16,42,67,69)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				false, false, false, false, true, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, true, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, true, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
 				false, false, false, false, false, false, false, false,
+				false, false, true, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, true, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
-				true, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false,
 			},
 			Expected: []ChMaskCntlPair{
-				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true}},
+				{
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
-			Name:     "72 channels/FSB 1 on, ch 2 off",
-			Generate: makeGenerateChMask72(true),
-			Mask: []bool{
-				true, false, true, true, true, true, true, true,
+			Name:     "72 channels/cntl5/current:(1-4,6-16,42,67,69);desired:(1-16,42,67,69)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				false, false, false, false, true, false, false, false,
 				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
+				false, false, true, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, true, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, true, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, true, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
-				true, false, false, false, false, false, false, false,
+				false, false, true, false, true, false, false, false,
 			},
 			Expected: []ChMaskCntlPair{
-				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true}},
-				{0, [16]bool{true, false, true, true, true, true, true, true, false, false, false, false, false, false, false, false}},
+				{
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
-			Name:     "72 channels/FSB 3, 4 on",
-			Generate: makeGenerateChMask72(true),
-			Mask: []bool{
-				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
+			Name:     "72 channels/no cntl5/current(1-12,14-33,36-42,44-72)/desired(1-69)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
 				true, true, true, true, true, true, true, true,
 				true, true, true, true, true, true, true, true,
-				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false,
-				false, false, true, true, false, false, false, false,
+				true, false, false, true, true, true, true, true,
+				true, true, false, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, false, false, false,
 			},
 			Expected: []ChMaskCntlPair{
-				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false}},
+				{
+					Cntl: 6,
+					Mask: [16]bool{
+						true, true, true, true, true, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
-			Name:     "72 channels/FSB 3, 4 on, ch 67,68 off",
+			Name:     "72 channels/cntl5/current(1-12,14-33,36-42,44-72)/desired(1-69)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, true, true, true, true,
+				true, true, false, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, false, false, false,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 6,
+					Mask: [16]bool{
+						true, true, true, true, true, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/no cntl5/current(1-12,14-33,36-42,44-71)/desired(1-3,5-72)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, true, true, true, true,
+				true, true, false, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, false,
+			},
+			DesiredChannels: []bool{
+				true, true, true, false, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 6,
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Mask: [16]bool{
+						true, true, true, false, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/cntl5/current(1-12,14-33,36-42,44-71)/desired(1-3,5-72)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, true, true, true, true,
+				true, true, false, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, false,
+			},
+			DesiredChannels: []bool{
+				true, true, true, false, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 6,
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Mask: [16]bool{
+						true, true, true, false, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/no cntl5/current(1-12,14-33,36-42,44-63,65-72)/desired(1-3,5-72)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, true, true, true, true,
+				true, true, false, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, false,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, false, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 6,
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Mask: [16]bool{
+						true, true, true, false, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/cntl5/current(1-12,14-33,36-42,44-63,65-72)/desired(1-3,5-72)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, true, true, true, true,
+				true, true, false, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, false,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, false, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 6,
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Mask: [16]bool{
+						true, true, true, false, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/no cntl5/current(1-72)/desired(9-16,65-72)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 7,
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/cntl5/current(1-72)/desired(9-16,65-72)",
 			Generate: makeGenerateChMask72(true),
-			Mask: []bool{
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
 				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 5,
+					Mask: [16]bool{
+						false, true, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "72 channels/no cntl5/current(1-72)/desired(9-24)",
+			Generate: makeGenerateChMask72(false),
+			CurrentChannels: []bool{
 				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
 				false, false, false, false, false, false, false, false,
@@ -350,55 +1071,214 @@ func TestGenerateChMask(t *testing.T) {
 				false, false, false, false, false, false, false, false,
 			},
 			Expected: []ChMaskCntlPair{
-				{5, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false}},
-				{4, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
+				{
+					Cntl: 7,
+				},
+				{
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+				{
+					Cntl: 1,
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
-			Name:     "96 channels/1-16 on, 42, 67, 69, 80 on",
+			Name:     "72 channels/cntl5/current(1-72)/desired(9-24)",
+			Generate: makeGenerateChMask72(true),
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				false, false, false, false, false, false, false, false,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+				false, false, false, false, false, false, false, false,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 5,
+					Mask: [16]bool{
+						false, true, true, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+				{
+					Cntl: 4,
+					Mask: [16]bool{
+						false, false, false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+
+		{
+			Name:     "96 channels/current(1-96)/desired(1-96)",
 			Generate: generateChMask96,
-			Mask: []bool{
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false,
-				false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-				false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false,
-				true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
 			},
 			Expected: []ChMaskCntlPair{
-				{0, [16]bool{true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true}},
-				{1, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-				{2, [16]bool{false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false}},
-				{3, [16]bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-				{4, [16]bool{false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false}},
-				{5, [16]bool{true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
+				{
+					Mask: [16]bool{
+						true, true, true, true, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 		{
-			Name:     "96 channels/all on",
+			Name:     "96 channels/current(1-12,14-33,36-42,44-96)/desired(1-96)",
 			Generate: generateChMask96,
-			Mask: []bool{
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-				true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, true, true, true, true,
+				true, true, false, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			DesiredChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
 			},
 			Expected: []ChMaskCntlPair{
-				{6, [16]bool{}},
+				{
+					Cntl: 6,
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
+			},
+		},
+		{
+			Name:     "96 channels/current(1-12,14-33,36-42,44-95)/desired(1-3,5-96)",
+			Generate: generateChMask96,
+			CurrentChannels: []bool{
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, false, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, false, false, true, true, true, true, true,
+				true, true, false, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, false,
+			},
+			DesiredChannels: []bool{
+				true, true, true, false, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+				true, true, true, true, true, true, true, true,
+			},
+			Expected: []ChMaskCntlPair{
+				{
+					Cntl: 6,
+				},
+				{
+					Mask: [16]bool{
+						true, true, true, false, true, true, true, true,
+						true, true, true, true, true, true, true, true,
+					},
+				},
+			},
+			ErrorAssertion: func(t *testing.T, err error) bool {
+				return assertions.New(t).So(err, should.BeNil)
 			},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ret, err := tc.Generate(tc.Mask)
-			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
-				tc.Error == nil && !a.So(err, should.BeNil) {
-				t.FailNow()
+			current := append(tc.CurrentChannels[:0:0], tc.CurrentChannels...)
+			desired := append(tc.DesiredChannels[:0:0], tc.DesiredChannels...)
+			res, err := tc.Generate(current, desired)
+			a.So(current, should.Resemble, tc.CurrentChannels)
+			a.So(desired, should.Resemble, tc.DesiredChannels)
+			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
+				a.So(res, should.Resemble, tc.Expected)
 			}
-			a.So(ret, should.Resemble, tc.Expected)
 		})
 	}
 }

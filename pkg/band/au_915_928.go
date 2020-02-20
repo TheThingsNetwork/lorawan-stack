@@ -196,8 +196,9 @@ func init() {
 		regionalParameters1_0_2RevB: composeSwaps(
 			disableChMaskCntl51_0_2,
 			disableTxParamSetupReq,
+			makeSetMaxTxPowerIndexFunc(10),
 		),
-		regionalParameters1_0_3RevA: bandIdentity,
+		regionalParameters1_0_3RevA: makeSetMaxTxPowerIndexFunc(15),
 		regionalParameters1_1RevA:   bandIdentity,
 	}
 	All[AU_915_928] = au_915_928

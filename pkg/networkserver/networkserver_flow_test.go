@@ -324,7 +324,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 								DevNonce: [2]byte{0x00, 0x01},
 							},
 						},
-						MIC: []byte{3, 2, 1, 0},
+						MIC: []byte{0x03, 0x02, 0x01, 0x00},
 					},
 					RawPayload:         payload,
 					DevAddr:            req.DevAddr,
@@ -911,6 +911,808 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 	})
 }
 
+func handleClassAOTAAUS915FlowTest1_0_3(ctx context.Context, conn *grpc.ClientConn, conf Config, env TestEnvironment) {
+	t := test.MustTFromContext(ctx)
+	a := assertions.New(t)
+
+	appID := ttnpb.ApplicationIdentifiers{ApplicationID: "flow-test-app-id"}
+	devID := "flow-test-dev-id"
+
+	start := time.Now()
+
+	linkCtx, closeLink := context.WithCancel(ctx)
+	link, linkEndEvent, ok := AssertLinkApplication(linkCtx, conn, env.Cluster.GetPeer, env.Events, appID)
+	if !a.So(ok, should.BeTrue) || !a.So(link, should.NotBeNil) {
+		t.Error("AS link assertion failed")
+		closeLink()
+		return
+	}
+	defer func() {
+		closeLink()
+		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev.Data(), should.BeError) &&
+				a.So(errors.IsCanceled(ev.Data().(error)), should.BeTrue) &&
+				a.So(ev, should.ResembleEvent, linkEndEvent(ev.Data().(error)))
+		}), should.BeTrue) {
+			t.Error("AS link end event assertion failed")
+		}
+	}()
+
+	setDevice := ttnpb.EndDevice{
+		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			DeviceID:               devID,
+			ApplicationIdentifiers: appID,
+			JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		},
+		FrequencyPlanID:   test.USFrequencyPlanID,
+		LoRaWANPHYVersion: ttnpb.PHY_V1_0_3_REV_A,
+		LoRaWANVersion:    ttnpb.MAC_V1_0_3,
+		SupportsJoin:      true,
+	}
+
+	dev, ok := AssertSetDevice(ctx, conn, env.Cluster.GetPeer, env.Events, true, &ttnpb.SetEndDeviceRequest{
+		EndDevice: setDevice,
+		FieldMask: pbtypes.FieldMask{
+			Paths: []string{
+				"frequency_plan_id",
+				"lorawan_phy_version",
+				"lorawan_version",
+				"supports_join",
+			},
+		},
+	})
+	if !a.So(ok, should.BeTrue) || !a.So(dev, should.NotBeNil) {
+		t.Error("Failed to create device")
+		return
+	}
+	t.Log("Device created")
+	a.So(dev.CreatedAt, should.HappenAfter, start)
+	a.So(dev.UpdatedAt, should.Equal, dev.CreatedAt)
+	a.So([]time.Time{start, dev.CreatedAt, time.Now()}, should.BeChronological)
+	getDevice := CopyEndDevice(&setDevice)
+	getDevice.CreatedAt = dev.CreatedAt
+	getDevice.UpdatedAt = dev.UpdatedAt
+	a.So(dev, should.Resemble, getDevice)
+
+	scheduleDownlinkCh := make(chan NsGsScheduleDownlinkRequest)
+	gsPeer := NewGSPeer(ctx, &MockNsGsServer{
+		ScheduleDownlinkFunc: MakeNsGsScheduleDownlinkChFunc(scheduleDownlinkCh),
+	})
+
+	handleJoinCh := make(chan NsJsHandleJoinRequest)
+	jsPeer := NewJSPeer(ctx, &MockNsJsServer{
+		HandleJoinFunc: MakeNsJsHandleJoinChFunc(handleJoinCh),
+	})
+	gsns := ttnpb.NewGsNsClient(conn)
+
+	appSKey := types.AES128Key{0x42, 0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	fNwkSIntKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
+	var devAddr types.DevAddr
+	if !t.Run("join-request", func(t *testing.T) {
+		a := assertions.New(t)
+
+		ctx := test.ContextWithT(ctx, t)
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		payload := []byte{
+			/* MHDR */
+			0b000_000_00,
+			/* Join-request */
+			/** JoinEUI **/
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42,
+			/** DevEUI **/
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x42,
+			/** DevNonce **/
+			0x01, 0x00,
+			/* MIC */
+			0x03, 0x02, 0x01, 0x00,
+		}
+
+		makeUplink := func(rxMetadata *ttnpb.RxMetadata, correlationIDs ...string) *ttnpb.UplinkMessage {
+			var mds []*ttnpb.RxMetadata
+			if rxMetadata != nil {
+				mds = []*ttnpb.RxMetadata{rxMetadata}
+			}
+			return &ttnpb.UplinkMessage{
+				RawPayload: payload,
+				Settings: ttnpb.TxSettings{
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 10,
+						}},
+					},
+					Frequency: 903000000,
+					EnableCRC: true,
+					Timestamp: 42,
+				},
+				RxMetadata:     mds,
+				ReceivedAt:     time.Now(),
+				CorrelationIDs: correlationIDs,
+			}
+		}
+
+		handleUplinkErrCh := make(chan error)
+		go func() {
+			_, err := gsns.HandleUplink(ctx, makeUplink(
+				&ttnpb.RxMetadata{
+					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-1",
+					},
+					SNR:         -1,
+					UplinkToken: []byte("join-request-token-1"),
+				},
+				"GsNs-1", "GsNs-2",
+			))
+			t.Logf("HandleUplink returned %v", err)
+			handleUplinkErrCh <- err
+		}()
+
+		defer time.AfterFunc((1<<3)*test.Delay, func() {
+			_, err := gsns.HandleUplink(ctx, makeUplink(
+				&ttnpb.RxMetadata{
+					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-2",
+					},
+					SNR:         -2,
+					UplinkToken: []byte("join-request-token-2"),
+				},
+				"GsNs-1", "GsNs-3",
+			))
+			t.Logf("Duplicate HandleUplink returned %v", err)
+			handleUplinkErrCh <- err
+		}).Stop()
+
+		defer time.AfterFunc((1<<3)*test.Delay, func() {
+			_, err := gsns.HandleUplink(ctx, makeUplink(
+				nil,
+				"GsNs-4",
+			))
+			t.Logf("Duplicate HandleUplink returned %v", err)
+			handleUplinkErrCh <- err
+		}).Stop()
+
+		var reqCIDs []string
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
+			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				reqCIDs = events.CorrelationIDsFromContext(ctx)
+				return a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
+					a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+						DeviceID:               devID,
+						ApplicationIdentifiers: appID,
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					})
+			},
+			test.ClusterGetPeerResponse{Peer: jsPeer},
+		), should.BeTrue) {
+			t.Error("JS peer request assertion failed")
+			return
+		}
+
+		a.So(reqCIDs, should.HaveLength, 4)
+		a.So(reqCIDs, should.Contain, "GsNs-1")
+		a.So(reqCIDs, should.Contain, "GsNs-2")
+
+		if !a.So(AssertAuthNsJsHandleJoinRequest(ctx, env.Cluster.Auth, handleJoinCh, func(ctx context.Context, req *ttnpb.JoinRequest) bool {
+			devAddr = req.DevAddr
+			return a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCIDs) &&
+				a.So(req.DevAddr, should.NotBeEmpty) &&
+				a.So(req.DevAddr.NwkID(), should.Resemble, conf.NetID.ID()) &&
+				a.So(req.DevAddr.NetIDType(), should.Equal, conf.NetID.Type()) &&
+				a.So(len(req.CFList.GetChMasks()), should.Equal, 72) &&
+				a.So(req, should.Resemble, &ttnpb.JoinRequest{
+					Payload: &ttnpb.Message{
+						Payload: &ttnpb.Message_JoinRequestPayload{
+							JoinRequestPayload: &ttnpb.JoinRequestPayload{
+								JoinEUI:  types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+								DevEUI:   types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+								DevNonce: [2]byte{0x00, 0x01},
+							},
+						},
+						MIC: []byte{0x03, 0x02, 0x01, 0x00},
+					},
+					RawPayload:         payload,
+					DevAddr:            req.DevAddr,
+					SelectedMACVersion: ttnpb.MAC_V1_0_3,
+					NetID:              conf.NetID,
+					RxDelay:            ttnpb.RX_DELAY_6,
+					DownlinkSettings: ttnpb.DLSettings{
+						Rx2DR: ttnpb.DATA_RATE_8,
+					},
+					CFList: &ttnpb.CFList{
+						Type: ttnpb.CFListType_CHANNEL_MASKS,
+						ChMasks: []bool{
+							false, false, false, false, false, false, false, false,
+							true, true, true, true, true, true, true, true,
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, false, false,
+							false, false, false, false, false, false, false, false,
+						},
+					},
+					CorrelationIDs: req.CorrelationIDs,
+				})
+		},
+			&grpc.EmptyCallOption{},
+			NsJsHandleJoinResponse{
+				Response: &ttnpb.JoinResponse{
+					RawPayload: bytes.Repeat([]byte{0x42}, 33),
+					SessionKeys: ttnpb.SessionKeys{
+						SessionKeyID: []byte("session-key-id"),
+						AppSKey: &ttnpb.KeyEnvelope{
+							Key: &appSKey,
+						},
+						FNwkSIntKey: &ttnpb.KeyEnvelope{
+							Key: &fNwkSIntKey,
+						},
+					},
+					CorrelationIDs: []string{"NsJs-1", "NsJs-2"},
+				},
+			},
+		), should.BeTrue) {
+			t.Error("Join-request send assertion failed")
+			return
+		}
+
+		reqCIDs = append(reqCIDs, "NsJs-1", "NsJs-2")
+
+		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+				}, nil))
+		}), should.BeTrue) {
+			t.Error("Join-request forward event assertion failed")
+		}
+
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for duplicate HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle duplicate uplink: %s", err)
+				return
+			}
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for duplicate HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle duplicate uplink: %s", err)
+				return
+			}
+		}
+
+		if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+				}, 2))
+		}), should.BeTrue) {
+			t.Error("Metadata merge event assertion failed")
+		}
+
+		var asUp *ttnpb.ApplicationUp
+		var err error
+		if !a.So(test.WaitContext(ctx, func() {
+			asUp, err = link.Recv()
+		}), should.BeTrue) {
+			t.Error("Timed out while waiting for join-accept to be sent to AS")
+			return
+		}
+		if !a.So(err, should.BeNil) {
+			t.Errorf("Failed to receive AS uplink: %s", err)
+			return
+		}
+		a.So(asUp.CorrelationIDs, should.HaveSameElementsDeep, reqCIDs)
+		a.So([]time.Time{start, asUp.GetJoinAccept().GetReceivedAt(), time.Now()}, should.BeChronological)
+		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				DeviceID:               devID,
+				ApplicationIdentifiers: appID,
+				JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+				DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+				DevAddr:                &devAddr,
+			},
+			CorrelationIDs: asUp.CorrelationIDs,
+			Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
+				AppSKey: &ttnpb.KeyEnvelope{
+					Key: &appSKey,
+				},
+				SessionKeyID: []byte("session-key-id"),
+				ReceivedAt:   asUp.GetJoinAccept().GetReceivedAt(),
+			}},
+		})
+
+		if !a.So(test.WaitContext(ctx, func() {
+			err = link.Send(ttnpb.Empty)
+		}), should.BeTrue) {
+			t.Error("Timed out while waiting for NS to process AS response")
+			return
+		}
+		if !a.So(err, should.BeNil) {
+			t.Errorf("Failed to send AS uplink response: %s", err)
+			return
+		}
+
+		select {
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle uplink: %s", err)
+				return
+			}
+
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for HandleUplink to return")
+			return
+		}
+		close(handleUplinkErrCh)
+
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
+			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-1",
+					})
+			},
+			test.ClusterGetPeerResponse{Peer: gsPeer},
+		), should.BeTrue) {
+			return
+		}
+
+		if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
+			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-2",
+					})
+			},
+			test.ClusterGetPeerResponse{Peer: gsPeer},
+		), should.BeTrue) {
+			return
+		}
+
+		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, env.Cluster.Auth, scheduleDownlinkCh,
+			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
+				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
+					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
+					a.So(msg.CorrelationIDs, should.HaveLength, 5) &&
+					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+						RawPayload: bytes.Repeat([]byte{0x42}, 33),
+						Settings: &ttnpb.DownlinkMessage_Request{
+							Request: &ttnpb.TxRequest{
+								Class: ttnpb.CLASS_A,
+								DownlinkPaths: []*ttnpb.DownlinkPath{
+									{
+										Path: &ttnpb.DownlinkPath_UplinkToken{
+											UplinkToken: []byte("join-request-token-1"),
+										},
+									},
+									{
+										Path: &ttnpb.DownlinkPath_UplinkToken{
+											UplinkToken: []byte("join-request-token-2"),
+										},
+									},
+								},
+								Rx1Delay:         ttnpb.RX_DELAY_5,
+								Rx1DataRateIndex: ttnpb.DATA_RATE_10,
+								Rx1Frequency:     923300000,
+								Rx2DataRateIndex: ttnpb.DATA_RATE_8,
+								Rx2Frequency:     923300000,
+								Priority:         ttnpb.TxSchedulePriority_HIGHEST,
+								FrequencyPlanID:  test.USFrequencyPlanID,
+							},
+						},
+						CorrelationIDs: msg.CorrelationIDs,
+					})
+			},
+			&grpc.EmptyCallOption{},
+			NsGsScheduleDownlinkResponse{
+				Response: &ttnpb.ScheduleDownlinkResponse{},
+			},
+		), should.BeTrue)
+	}) {
+		t.Error("Join-accept schedule assertion failed")
+		return
+	}
+
+	t.Logf("Device successfully joined. DevAddr: %s", devAddr)
+
+	t.Run("uplink", func(t *testing.T) {
+		a := assertions.New(t)
+
+		ctx := test.ContextWithT(ctx, t)
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		uplinkFRMPayload := test.Must(crypto.EncryptUplink(appSKey, devAddr, 0, []byte("test"))).([]byte)
+
+		makeUplink := func(rxMetadata *ttnpb.RxMetadata, correlationIDs ...string) *ttnpb.UplinkMessage {
+			var mds []*ttnpb.RxMetadata
+			if rxMetadata != nil {
+				mds = []*ttnpb.RxMetadata{rxMetadata}
+			}
+			return &ttnpb.UplinkMessage{
+				RawPayload: MustAppendLegacyUplinkMIC(
+					fNwkSIntKey,
+					devAddr,
+					0,
+					append([]byte{
+						/* MHDR */
+						0b010_000_00,
+						/* MACPayload */
+						/** FHDR **/
+						/*** DevAddr ***/
+						devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+						/*** FCtrl ***/
+						0b1_0_0_0_0000,
+						/*** FCnt ***/
+						0x00, 0x00,
+						/** FPort **/
+						0x42,
+					},
+						uplinkFRMPayload...,
+					)...,
+				),
+				Settings: ttnpb.TxSettings{
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 9,
+						}},
+					},
+					EnableCRC: true,
+					Frequency: 904100000,
+					Timestamp: 42,
+				},
+				RxMetadata:     mds,
+				ReceivedAt:     time.Now(),
+				CorrelationIDs: correlationIDs,
+			}
+		}
+
+		mds := [...]*ttnpb.RxMetadata{
+			{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "test-gtw-2",
+				},
+				SNR:         -3.42,
+				UplinkToken: []byte("test-uplink-token-2"),
+			},
+			{
+				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayID: "test-gtw-3",
+				},
+				SNR:         -2.3,
+				UplinkToken: []byte("test-uplink-token-3"),
+			},
+		}
+
+		handleUplinkErrCh := make(chan error)
+		sendUplinks := func(ctx context.Context) bool {
+			t := test.MustTFromContext(ctx)
+			t.Helper()
+
+			go func() {
+				_, err := gsns.HandleUplink(ctx, makeUplink(
+					mds[0],
+					"GsNs-1", "GsNs-2",
+				))
+				t.Logf("HandleUplink returned %v", err)
+				handleUplinkErrCh <- err
+			}()
+
+			defer time.AfterFunc((1<<3)*test.Delay, func() {
+				_, err := gsns.HandleUplink(ctx, makeUplink(
+					mds[1],
+					"GsNs-1", "GsNs-3",
+				))
+				t.Logf("Duplicate HandleUplink returned %v", err)
+				handleUplinkErrCh <- err
+			}).Stop()
+
+			defer time.AfterFunc((1<<3)*test.Delay, func() {
+				_, err := gsns.HandleUplink(ctx, makeUplink(
+					nil,
+					"GsNs-1", "GsNs-4",
+				))
+				t.Logf("Duplicate HandleUplink returned %v", err)
+				handleUplinkErrCh <- err
+			}).Stop()
+
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for duplicate HandleUplink to return")
+				return false
+
+			case err := <-handleUplinkErrCh:
+				if !a.So(err, should.BeNil) {
+					t.Errorf("Failed to handle duplicate uplink: %s", err)
+					return false
+				}
+			}
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for duplicate HandleUplink to return")
+				return false
+
+			case err := <-handleUplinkErrCh:
+				if !a.So(err, should.BeNil) {
+					t.Errorf("Failed to handle duplicate uplink: %s", err)
+					return false
+				}
+			}
+			return true
+		}
+		if !a.So(sendUplinks(ctx), should.BeTrue) {
+			t.Error("Failed to send uplinks")
+		}
+
+		var reqCIDs []string
+		assertHandleUplink := func(ctx context.Context, evReq test.EventPubSubPublishRequest) bool {
+			t := test.MustTFromContext(ctx)
+			t.Helper()
+
+			reqCIDs = evReq.Event.CorrelationIDs()
+			if !a.So(evReq.Event, should.ResembleEvent, EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevAddr:                &devAddr,
+				}, 2)) {
+				t.Error("Metadata merge event assertion failed")
+				return false
+			}
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for events.Publish response of merge event to be processed")
+				return false
+
+			case evReq.Response <- struct{}{}:
+			}
+
+			if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+				return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+					ttnpb.EndDeviceIdentifiers{
+						DeviceID:               devID,
+						ApplicationIdentifiers: appID,
+						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+						DevAddr:                &devAddr,
+					}, nil))
+			}), should.BeTrue) {
+				t.Error("Uplink forward event assertion failed")
+				return false
+			}
+
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for HandleUplink to return")
+				return false
+
+			case err := <-handleUplinkErrCh:
+				if !a.So(err, should.BeNil) {
+					t.Errorf("Failed to handle uplink: %s", err)
+					return false
+				}
+			}
+			return true
+		}
+
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for an event or HandleUplink error")
+			return
+
+		case evReq := <-env.Events:
+			if !a.So(assertHandleUplink(ctx, evReq), should.BeTrue) {
+				t.Error("Failed to assert first HandleUplink")
+				return
+			}
+
+		case err := <-handleUplinkErrCh:
+			if err != nil {
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("HandleUplink failed with unexpected error: %v", err)
+					return
+				}
+				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
+
+				if !a.So(sendUplinks(ctx), should.BeTrue) {
+					t.Error("Failed to send uplinks")
+				}
+
+				select {
+				case <-ctx.Done():
+					t.Error("Timed out while waiting for an event")
+					return
+
+				case evReq := <-env.Events:
+					if !a.So(assertHandleUplink(ctx, evReq), should.BeTrue) {
+						t.Error("Failed to assert first HandleUplink")
+						return
+					}
+				}
+			}
+		}
+		close(handleUplinkErrCh)
+
+		a.So(reqCIDs, should.HaveLength, 4)
+		a.So(reqCIDs, should.Contain, "GsNs-1")
+		a.So(reqCIDs, should.Contain, "GsNs-2")
+
+		var asUp *ttnpb.ApplicationUp
+		var err error
+		if !a.So(test.WaitContext(ctx, func() {
+			asUp, err = link.Recv()
+		}), should.BeTrue) {
+			t.Error("Timed out while waiting for uplink to be sent to AS")
+			return
+		}
+		if !a.So(err, should.BeNil) {
+			t.Errorf("Failed to receive AS uplink: %s", err)
+			return
+		}
+
+		a.So(asUp.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, mds)
+		a.So([]time.Time{start, asUp.GetUplinkMessage().GetReceivedAt(), time.Now()}, should.BeChronological)
+		a.So(asUp, should.Resemble, &ttnpb.ApplicationUp{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				DeviceID:               devID,
+				ApplicationIdentifiers: appID,
+				JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+				DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+				DevAddr:                &devAddr,
+			},
+			CorrelationIDs: reqCIDs,
+			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
+				SessionKeyID: []byte("session-key-id"),
+				FPort:        0x42,
+				FRMPayload:   uplinkFRMPayload,
+				RxMetadata:   asUp.GetUplinkMessage().GetRxMetadata(),
+				Settings: ttnpb.TxSettings{
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 9,
+						}},
+					},
+					DataRateIndex: ttnpb.DATA_RATE_1,
+					EnableCRC:     true,
+					Frequency:     904100000,
+					Timestamp:     42,
+				},
+				ReceivedAt: asUp.GetUplinkMessage().GetReceivedAt(),
+			}},
+		})
+
+		if !a.So(test.WaitContext(ctx, func() {
+			err = link.Send(ttnpb.Empty)
+		}), should.BeTrue) {
+			t.Error("Timed out while waiting for NS to process AS response")
+			return
+		}
+		if !a.So(err, should.BeNil) {
+			t.Errorf("Failed to send AS uplink response: %s", err)
+			return
+		}
+
+		a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
+			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-3",
+					})
+			},
+			test.ClusterGetPeerResponse{Peer: gsPeer},
+		), should.BeTrue)
+
+		a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer,
+			func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+				return a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER) &&
+					a.So(ids, should.Resemble, ttnpb.GatewayIdentifiers{
+						GatewayID: "test-gtw-2",
+					})
+			},
+			test.ClusterGetPeerResponse{Peer: gsPeer},
+		), should.BeTrue)
+
+		a.So(AssertAuthNsGsScheduleDownlinkRequest(ctx, env.Cluster.Auth, scheduleDownlinkCh,
+			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
+				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
+					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
+					a.So(msg.CorrelationIDs, should.HaveLength, 5) &&
+					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
+						RawPayload: MustAppendLegacyDownlinkMIC(
+							fNwkSIntKey,
+							devAddr,
+							1,
+							append([]byte{
+								/* MHDR */
+								0b011_000_00,
+								/* MACPayload */
+								/** FHDR **/
+								/*** DevAddr ***/
+								devAddr[3], devAddr[2], devAddr[1], devAddr[0],
+								/*** FCtrl ***/
+								0b1_0_0_0_0000,
+								/*** FCnt ***/
+								0x01, 0x00,
+								/** FPort **/
+								0x0,
+							},
+								test.Must(crypto.EncryptDownlink(fNwkSIntKey, devAddr, 1, []byte{
+									/* DevStatusReq */
+									0x06,
+								})).([]byte)...,
+							)...,
+						),
+						Settings: &ttnpb.DownlinkMessage_Request{
+							Request: &ttnpb.TxRequest{
+								Class: ttnpb.CLASS_A,
+								DownlinkPaths: []*ttnpb.DownlinkPath{
+									{
+										Path: &ttnpb.DownlinkPath_UplinkToken{
+											UplinkToken: []byte("test-uplink-token-3"),
+										},
+									},
+									{
+										Path: &ttnpb.DownlinkPath_UplinkToken{
+											UplinkToken: []byte("test-uplink-token-2"),
+										},
+									},
+								},
+								Rx1Delay:         ttnpb.RX_DELAY_6,
+								Rx1DataRateIndex: ttnpb.DATA_RATE_11,
+								Rx1Frequency:     923900000,
+								Rx2DataRateIndex: ttnpb.DATA_RATE_8,
+								Rx2Frequency:     923300000,
+								Priority:         ttnpb.TxSchedulePriority_HIGHEST,
+								FrequencyPlanID:  test.USFrequencyPlanID,
+							},
+						},
+						CorrelationIDs: msg.CorrelationIDs,
+					})
+			},
+			&grpc.EmptyCallOption{},
+			NsGsScheduleDownlinkResponse{
+				Response: &ttnpb.ScheduleDownlinkResponse{},
+			},
+		), should.BeTrue)
+
+		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtEnqueueDevStatusRequest(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevAddr:                &devAddr,
+				}, nil))
+		}), should.BeTrue)
+	})
+}
+
 func TestFlow(t *testing.T) {
 	t.Parallel()
 
@@ -932,6 +1734,7 @@ func TestFlow(t *testing.T) {
 
 			for flow, handleFlowTest := range map[string]func(context.Context, *grpc.ClientConn, Config, TestEnvironment){
 				"Class A/OTAA/EU868/1.0.2": handleClassAOTAAEU868FlowTest1_0_2,
+				"Class A/OTAA/US915/1.0.3": handleClassAOTAAUS915FlowTest1_0_3,
 			} {
 				t.Run(flow, func(t *testing.T) {
 					uq, uqClose := tc.NewApplicationUplinkQueue(t)

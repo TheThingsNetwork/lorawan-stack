@@ -188,7 +188,7 @@ func init() {
 
 		regionalParameters1_0:       bandIdentity,
 		regionalParameters1_0_1:     bandIdentity,
-		regionalParameters1_0_2RevA: bandIdentity,
+		regionalParameters1_0_2RevA: makeSetMaxTxPowerIndexFunc(5),
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_0_3RevA: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,
