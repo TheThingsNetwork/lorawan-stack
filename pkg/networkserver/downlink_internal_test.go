@@ -1437,7 +1437,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
 							FCnt:           0x42,
 							FPort:          0x1,
-							FRMPayload:     bytes.Repeat([]byte("x"), 256),
+							FRMPayload:     bytes.Repeat([]byte("x"), 250),
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
 						},
@@ -1516,7 +1516,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[0],
-									Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong),
+									Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong.WithAttributes("length", 250, "max", uint16(51))),
 								},
 							},
 						},
@@ -2156,7 +2156,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				}
 
-				// NOTE: Maximum FRMPayload length in both Rx1(DR0) and RX2(DR1) is 51. There are 6 bytes of FOpts, hence maximum fitting application downlink length is 45.
+				// NOTE: Maximum MACPayload length in both Rx1(DR0) and RX2(DR1) is 59. There are 6 bytes of FOpts, hence maximum fitting application downlink length is 59-8-6 == 45.
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -6458,7 +6458,7 @@ func TestGenerateDownlink(t *testing.T) {
 				return
 			}
 
-			genDown, genState, err := ns.generateDownlink(ctx, dev, phy, dev.MACState.DeviceClass, time.Now(), math.MaxUint16, math.MaxUint16)
+			genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, dev.MACState.DeviceClass, time.Now(), math.MaxUint16, math.MaxUint16)
 			if tc.Error != nil {
 				a.So(err, should.EqualErrorOrDefinition, tc.Error)
 				a.So(genDown, should.BeNil)
