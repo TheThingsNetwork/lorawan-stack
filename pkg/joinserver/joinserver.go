@@ -152,6 +152,7 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_0_1,
 	ttnpb.MAC_V1_0_2,
 	ttnpb.MAC_V1_0_3,
+	ttnpb.MAC_V1_0_4,
 	ttnpb.MAC_V1_1,
 }
 
