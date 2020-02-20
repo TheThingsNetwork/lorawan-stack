@@ -24,9 +24,10 @@ To push downlink to the end of the queue:
 $ ttn-lw-cli end-devices downlink push app1 dev1 \
   --frm-payload 01020304 \
   --priority NORMAL
+  --f-port 42
 ```
 
-You can pass an `FPort` (default `1`) with `--f-port`, and confirmed downlink with `--confirmed`.
+You must pass an `FPort` with `--f-port`. Confirmed downlinks can be set using `--confirmed`.
 
 To replace the existing queue with a new item:
 
