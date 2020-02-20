@@ -27,8 +27,8 @@ const defaultState = {
   error: false,
 }
 
-const user = function(state = defaultState, action) {
-  switch (action.type) {
+const user = function(state = defaultState, { type, payload }) {
+  switch (type) {
     case GET_USER_ME:
       return {
         ...state,
@@ -40,7 +40,7 @@ const user = function(state = defaultState, action) {
       return {
         ...state,
         fetching: false,
-        user: action.user,
+        user: payload,
         error: false,
       }
     case GET_USER_ME_FAILURE:
@@ -48,7 +48,7 @@ const user = function(state = defaultState, action) {
         ...state,
         fetching: false,
         user: undefined,
-        error: action.error,
+        error: payload,
       }
     case LOGOUT:
       return {
@@ -67,7 +67,7 @@ const user = function(state = defaultState, action) {
       return {
         ...state,
         fetching: false,
-        error: action.error,
+        error: payload,
       }
     default:
       return state
