@@ -10,15 +10,13 @@ The streaming data integrations provide multiple formats for the delivery of app
 
 ## JSON
 
-[comment]: # (The JSON examples given bellow use the javascript tag instead of json since json does not support comments.)
-
-The JSON message format is described in the sections bellow.
+The JSON message format is described in the sections below.
 
 > Note: Empty fields are omitted from payloads. As such, if a certain field has a value of `""`, `0` or `false` it will not be present in the message.
 
-### JSON Join Messages
+### Join-accept Messages
 
-The JSON join messages use the following format:
+The JSON join-accept messages use the following format:
 
 ```javascript
 {
@@ -27,8 +25,8 @@ The JSON join messages use the following format:
     "application_ids" : {
       "application_id" : "app1"              // Application ID
     },
-    "dev_eui" : "0004A30B001C0530",          // Device EUI of the end device
-    "join_eui" : "800000000000000C",         // Join EUI of the end device (also known as application EUI in LoRaWAN versions bellow 1.1)
+    "dev_eui" : "0004A30B001C0530",          // DevEUI of the end device
+    "join_eui" : "800000000000000C",         // JoinEUI of the end device (also known as AppEUI in LoRaWAN versions below 1.1)
     "dev_addr" : "00BCB929"                  // Device address known by the Network Server
   },
   "correlation_ids" : [ "as:up:01..." ],     // Correlation identifiers of the message
@@ -53,7 +51,13 @@ The JSON join messages use the following format:
     "join_eui" : "800000000000000C",
     "dev_addr" : "01497ECC"
   },
-  "correlation_ids" : [ "as:up:01E191YN5F2HMBQCBCVRF731VY", "gs:conn:01E191S6ZEWB630NTR45K5QN4Q", "gs:uplink:01E191YMZ2S7ZRTEGATVE2S3HH", "ns:uplink:01E191YMZ2J64K6FEW5F0WE7TQ", "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E191YMZ2KK3TJYG5C4XZP8JK" ],
+  "correlation_ids" : [
+    "as:up:01E191YN5F2HMBQCBCVRF731VY",
+    "gs:conn:01E191S6ZEWB630NTR45K5QN4Q",
+    "gs:uplink:01E191YMZ2S7ZRTEGATVE2S3HH",
+    "ns:uplink:01E191YMZ2J64K6FEW5F0WE7TQ",
+    "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E191YMZ2KK3TJYG5C4XZP8JK"
+  ],
   "received_at" : "2020-02-17T07:49:09.935284891Z",
   "join_accept" : {
     "session_key_id" : "AXBSH1Pk6Z0G166RlH16CQ==",
@@ -64,7 +68,7 @@ The JSON join messages use the following format:
 
 </details>
 
-### JSON Uplink Messages
+### Uplink Messages
 
 The JSON uplink messages use the following format:
 
@@ -75,8 +79,8 @@ The JSON uplink messages use the following format:
     "application_ids" : {
       "application_id" : "app1"              // Application ID
     },
-    "dev_eui" : "0004A30B001C0530",          // Device EUI of the end device
-    "join_eui" : "800000000000000C",         // Join EUI of the end device (also known as application EUI in LoRaWAN versions bellow 1.1)
+    "dev_eui" : "0004A30B001C0530",          // DevEUI of the end device
+    "join_eui" : "800000000000000C",         // JoinEUI of the end device (also known as AppEUI in LoRaWAN versions below 1.1)
     "dev_addr" : "00BCB929"                  // Device address known by the Network Server
   },
   "correlation_ids" : [ "as:up:01...", ... ],// Correlation identifiers of the message
@@ -85,7 +89,11 @@ The JSON uplink messages use the following format:
     "session_key_id": "AXA50...",            // Join Server issued identifier for the session keys used by this uplink
     "f_cnt": 1,                              // Frame counter
     "f_port": 1,                             // Frame port
-    "frm_payload": "gkHe",                   // Frame payload
+    "frm_payload": "gkHe",                   // Frame payload (Base64)
+    "decoded_payload" : {                    // Decoded payload object, decoded by the device payload formatter
+      "temperature": 1.0,
+      "luminosity": 0.64
+    },
     "rx_metadata": [{                        // A list of metadata for each antenna of each gateway that received this message
       "gateway_ids": {
         "gateway_id": "gtw1",                // Gateway ID
@@ -130,12 +138,22 @@ The JSON uplink messages use the following format:
     "join_eui" : "800000000000000C",
     "dev_addr" : "00BCB929"
   },
-  "correlation_ids" : [ "as:up:01E0WZGT6Y7657CPFPE5WEYDSQ", "gs:conn:01E0WDEC6T5T4XXBAX7S1VMFKE", "gs:uplink:01E0WZGSZWT07NE5TS2APTV1Z9", "ns:uplink:01E0WZGSZXZXZS8RFAWZX0F2FY", "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E0WZGSZXGE1KS577PFBWRJEE" ],
+  "correlation_ids" : [
+    "as:up:01E0WZGT6Y7657CPFPE5WEYDSQ",
+    "gs:conn:01E0WDEC6T5T4XXBAX7S1VMFKE",
+    "gs:uplink:01E0WZGSZWT07NE5TS2APTV1Z9",
+    "ns:uplink:01E0WZGSZXZXZS8RFAWZX0F2FY",
+    "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E0WZGSZXGE1KS577PFBWRJEE"
+  ],
   "received_at" : "2020-02-12T15:15:46.014773143Z",
   "uplink_message" : {
     "session_key_id" : "AXA50tHUGUucuzS/bCGMNw==",
     "f_cnt" : 1,
     "frm_payload" : "gkHe",
+    "decoded_payload" : {
+      "temperature": 1.0,
+      "luminosity": 0.64
+    },
     "rx_metadata" : [ {
       "gateway_ids" : {
         "gateway_id" : "gtw1",
@@ -169,7 +187,7 @@ The JSON uplink messages use the following format:
 
 </details>
 
-### JSON Downlink Events Messages
+### Downlink Events Messages
 
 The JSON downlink `ack`, `nack`, `queued` and `sent` events messages use the following format:
 
@@ -180,8 +198,8 @@ The JSON downlink `ack`, `nack`, `queued` and `sent` events messages use the fol
     "application_ids" : {
       "application_id" : "app1"              // Application ID
     },
-    "dev_eui" : "0004A30B001C0530",          // Device EUI of the end device
-    "join_eui" : "800000000000000C",         // Join EUI of the end device (also known as application EUI in LoRaWAN versions bellow 1.1)
+    "dev_eui" : "0004A30B001C0530",          // DevEUI of the end device
+    "join_eui" : "800000000000000C",         // JoinEUI of the end device (also known as AppEUI in LoRaWAN versions below 1.1)
     "dev_addr" : "00BCB929"                  // Device address known by the Network Server
   },
   "correlation_ids" : [ "as:downlink:..." ], // Correlation identifiers of the message
@@ -190,7 +208,7 @@ The JSON downlink `ack`, `nack`, `queued` and `sent` events messages use the fol
     "session_key_id" : "AXBSH1Pk6Z0G166...", // Join Server issued identifier for the session keys
     "f_port" : 15,                           // Frame port
     "f_cnt" : 1,                             // Frame counter
-    "frm_payload" : "vu8=",                  // Frame payload
+    "frm_payload" : "vu8=",                  // Frame payload (Base64)
     "confirmed" : true,                      // If the downlink expects a confirmation from the device or not
     "priority" : "NORMAL",                   // Priority of the message in the downlink queue
     "correlation_ids" : [ "as:downlink..." ] // Correlation identifiers of the message
@@ -211,7 +229,14 @@ The JSON downlink `ack`, `nack`, `queued` and `sent` events messages use the fol
     "join_eui" : "800000000000000C",
     "dev_addr" : "00C30DFA"
   },
-  "correlation_ids" : [ "as:downlink:01E19B99501X84X6CV471TVSZ1", "as:up:01E19B9J8ED6HZW5CC41KPGHVD", "gs:conn:01E191S6ZEWB630NTR45K5QN4Q", "gs:uplink:01E19B9J17SRJWJ4GV3MCJHNWZ", "ns:uplink:01E19B9J1CG3QNWS5M8G3DBMPN", "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E19B9J17K85MJ1MXPHTW0410" ],
+  "correlation_ids" : [
+    "as:downlink:01E19B99501X84X6CV471TVSZ1",
+    "as:up:01E19B9J8ED6HZW5CC41KPGHVD",
+    "gs:conn:01E191S6ZEWB630NTR45K5QN4Q",
+    "gs:uplink:01E19B9J17SRJWJ4GV3MCJHNWZ",
+    "ns:uplink:01E19B9J1CG3QNWS5M8G3DBMPN",
+    "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E19B9J17K85MJ1MXPHTW0410"
+  ],
   "received_at" : "2020-02-17T10:32:24.590413417Z",
   "downlink_ack" : {
     "session_key_id" : "AXBSp8v2brG0jqkri+sIkw==",
@@ -241,7 +266,7 @@ The JSON downlink `failed` event provides both the downlink and the error detail
   "downlink_failed" : {
     "downlink" : {                           // Downlink that which triggered the failure
       "f_port" : 15,                         // Frame port
-      "frm_payload" : "YWFhYWFhY...",        // Frame payload
+      "frm_payload" : "YWFhYWFhY...",        // Frame payload (Base64)
       "confirmed" : true,                    // If the downlink expects a confirmation from the device or not
       "priority" : "NORMAL",                 // Priority of the message in the downlink queue
       "correlation_ids" : [ "as:downli..." ] // Correlation identifiers of the message
@@ -271,7 +296,7 @@ The JSON downlink `failed` event provides both the downlink and the error detail
   "downlink_failed" : {
     "downlink" : {
       "f_port" : 15,
-      "frm_payload" : "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh",
+      "frm_payload" : "vu8=",
       "confirmed" : true,
       "priority" : "NORMAL",
       "correlation_ids" : [ "as:downlink:01E19Z5W3BZBG7CXSJE9C0A3CE" ]
@@ -289,7 +314,7 @@ The JSON downlink `failed` event provides both the downlink and the error detail
 
 </details>
 
-### JSON Downlink Messages
+### Downlink Messages
 
 The JSON downlink messages use the following format:
 
@@ -303,7 +328,11 @@ The JSON downlink messages use the following format:
   },
   "downlinks": [{
     "f_port": 15,                            // Frame port
-    "frm_payload": "vu8=",                   // Frame payload
+    "frm_payload": "vu8=",                   // Frame payload (Base64)
+    "decoded_payload" : {                    // Decoded payload object, to be encoded by the device payload formatter
+      "temperature": 1.0,
+      "luminosity": 0.64
+    },
     "priority": "NORMAL",                    // Priority of the message in the downlink queue
     "confirmed": true,                       // If the downlink expects a confirmation from the device or not
     "correlation_ids" : [ "custom-id" ]      // Correlation identifiers of the message
@@ -326,6 +355,10 @@ The JSON downlink messages use the following format:
   "downlinks": [{
     "f_port": 15,
     "frm_payload": "vu8=",
+    "decoded_payload" : {
+      "temperature": 1.0,
+      "luminosity": 0.64
+    },
     "priority": "NORMAL",
     "confirmed": true,
     "correlation_ids" : [ "custom-id" ]
