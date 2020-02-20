@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
@@ -31,10 +32,17 @@ func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 		return nil, errNoPayload
 	}
 
+	evs := []events.DefinitionDataClosure{
+		evtReceivePingSlotInfoRequest.BindData(pld),
+	}
+	if dev.MACState.DeviceClass != ttnpb.CLASS_A {
+		log.FromContext(ctx).Debug("Ignore PingSlotInfoReq from device not in class A mode")
+		return evs, nil
+	}
+
 	dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{Value: pld.Period}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ttnpb.CID_PING_SLOT_INFO.MACCommand())
-	return []events.DefinitionDataClosure{
-		evtReceivePingSlotInfoRequest.BindData(pld),
+	return append(evs,
 		evtEnqueuePingSlotInfoAnswer.BindData(nil),
-	}, nil
+	), nil
 }
