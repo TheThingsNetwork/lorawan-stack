@@ -71,7 +71,6 @@ func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.Appli
 	return logger.WithFields(log.Fields(pairs...))
 }
 
-var errApplicationDownlinkTooLong = errors.DefineInvalidArgument("application_downlink_too_long", "application downlink payload is too long")
 var errNoDownlink = errors.Define("no_downlink", "no downlink to send")
 
 type generatedDownlink struct {
@@ -128,19 +127,19 @@ func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.
 	return ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, t, true)
 }
 
-// generateDownlink attempts to generate a downlink.
-// generateDownlink returns the generated downlink, application uplinks associated with the generation and error, if any.
-// generateDownlink may mutate the device in order to record the downlink generated.
-// maxDownLen and maxUpLen represent the maximum length of PHYPayload for the downlink and corresponding uplink respectively.
+// generateDataDownlink attempts to generate a downlink.
+// generateDataDownlink returns the generated downlink, application uplinks associated with the generation and error, if any.
+// generateDataDownlink may mutate the device in order to record the downlink generated.
+// maxDownLen and maxUpLen represent the maximum length of MACPayload for the downlink and corresponding uplink respectively.
 // If no downlink could be generated errNoDownlink is returned.
-// generateDownlink does not perform validation of dev.MACState.DesiredParameters,
+// generateDataDownlink does not perform validation of dev.MACState.DesiredParameters,
 // hence, it could potentially generate MAC command(s), which are not suported by the
 // regional parameters the device operates in.
 // For example, a sequence of 'NewChannel' MAC commands could be generated for a
 // device operating in a region where a fixed channel plan is defined in case
 // dev.MACState.CurrentParameters.Channels is not equal to dev.MACState.DesiredParameters.Channels.
-// Note, that generateDownlink assumes transmitAt is the earliest possible time a downlink can be transmitted to the device.
-func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, class ttnpb.Class, transmitAt time.Time, maxDownLen, maxUpLen uint16) (*generatedDownlink, generateDownlinkState, error) {
+// Note, that generateDataDownlink assumes transmitAt is the earliest possible time a downlink can be transmitted to the device.
+func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, class ttnpb.Class, transmitAt time.Time, maxDownLen, maxUpLen uint16) (*generatedDownlink, generateDownlinkState, error) {
 	if dev.MACState == nil {
 		return nil, generateDownlinkState{}, errUnknownMACState
 	}
@@ -151,16 +150,18 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
 		"mac_version", dev.MACState.LoRaWANVersion,
+		"max_downlink_length", maxDownLen,
 		"phy_version", dev.LoRaWANPHYVersion,
 		"transmit_at", transmitAt,
 	))
 	logger := log.FromContext(ctx)
 
-	// NOTE: len(MHDR) + len(FHDR) + len(MIC) = 1 + 7 + 4 = 12
-	if maxDownLen < 12 || maxUpLen < 12 {
-		panic("payload length limits too short to generate downlink")
+	// NOTE: len(FHDR) + len(FPort) = 7 + 1 = 8
+	if maxDownLen < 8 || maxUpLen < 8 {
+		log.FromContext(ctx).Error("Data rate MAC payload size limits too low for data downlink to be generated")
+		return nil, generateDownlinkState{}, errInvalidDataRate
 	}
-	maxDownLen, maxUpLen = maxDownLen-12, maxUpLen-12
+	maxDownLen, maxUpLen = maxDownLen-8, maxUpLen-8
 
 	var fPending bool
 	spec := lorawan.DefaultMACCommands
@@ -182,7 +183,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 				break
 			}
 			cmds = append(cmds, cmd)
-			maxDownLen -= desc.DownlinkLength
+			maxDownLen -= 1 + desc.DownlinkLength
 		}
 	}
 	dev.MACState.QueuedResponses = nil
@@ -271,7 +272,6 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 	logger = logger.WithFields(log.Fields(
 		"mac_count", len(cmds),
 		"mac_len", len(cmdBuf),
-		"max_down_len", maxDownLen,
 	))
 	ctx = log.NewContext(ctx, logger)
 
@@ -392,7 +392,7 @@ func (ns *NetworkServer) generateDownlink(ctx context.Context, dev *ttnpb.EndDev
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 								ApplicationDownlink: *down,
-								Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong),
+								Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong.WithAttributes("length", len(down.FRMPayload), "max", maxDownLen)),
 							},
 						},
 					})
@@ -856,7 +856,7 @@ func txRequestFromUplink(phy band.Band, macState *ttnpb.MACState, rx1, rx2 bool,
 }
 
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
-func maximumUplinkLength(fp *frequencyplans.FrequencyPlan, phy band.Band, ups ...*ttnpb.UplinkMessage) uint16 {
+func maximumUplinkLength(fp *frequencyplans.FrequencyPlan, phy band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
 	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
 	maxUpDRIdx := ttnpb.DATA_RATE_0
 loop:
@@ -871,7 +871,11 @@ loop:
 			break loop
 		}
 	}
-	return phy.DataRates[maxUpDRIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetUplinks())
+	dr, ok := phy.DataRates[maxUpDRIdx]
+	if !ok {
+		return 0, errDataRateNotFound
+	}
+	return dr.MaxMACPayloadSize(fp.DwellTime.GetUplinks()), nil
 }
 
 // downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
@@ -994,26 +998,36 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 
 	// transmitAt is the earliest time.Time when downlink will be transmitted to the device.
 	var transmitAt time.Time
-	var maxDR ttnpb.DataRateIndex
+	var maxDRIdx ttnpb.DataRateIndex
 	switch {
 	case attemptRx1 && attemptRx2:
 		transmitAt = rx1
-		maxDR = req.Rx1DataRateIndex
-		if req.Rx2DataRateIndex > maxDR {
-			maxDR = req.Rx2DataRateIndex
+		maxDRIdx = req.Rx1DataRateIndex
+		if req.Rx2DataRateIndex > maxDRIdx {
+			maxDRIdx = req.Rx2DataRateIndex
 		}
 
 	case attemptRx1:
 		transmitAt = rx1
-		maxDR = req.Rx1DataRateIndex
+		maxDRIdx = req.Rx1DataRateIndex
 
 	case attemptRx2:
 		transmitAt = rx2
-		maxDR = req.Rx2DataRateIndex
+		maxDRIdx = req.Rx2DataRateIndex
 	}
 
-	genDown, genState, err := ns.generateDownlink(ctx, dev, phy, ttnpb.CLASS_A, transmitAt,
-		phy.DataRates[maxDR].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+	maxDR, ok := phy.DataRates[maxDRIdx]
+	if !ok {
+		logger.WithField("data_rate_index", maxDRIdx).Error("Data rate not found")
+		return downlinkAttemptResult{
+			SetPaths: ttnpb.AddFields(sets,
+				"mac_state.queued_responses",
+				"mac_state.rx_windows_available",
+			),
+		}
+	}
+	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, ttnpb.CLASS_A, transmitAt,
+		maxDR.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()),
 		maxUpLength,
 	)
 	if genState.NeedsDownlinkQueueUpdate {
@@ -1039,8 +1053,16 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 
 	if attemptRx1 && attemptRx2 {
-		attemptRx1 = len(genDown.Payload) <= int(phy.DataRates[req.Rx1DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
-		attemptRx2 = len(genDown.Payload) <= int(phy.DataRates[req.Rx2DataRateIndex].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()))
+		dr1, ok := phy.DataRates[req.Rx1DataRateIndex]
+		if !ok {
+			logger.WithField("data_rate_index", req.Rx1DataRateIndex).Error("Rx1 data rate not found")
+		}
+		dr2, ok := phy.DataRates[req.Rx2DataRateIndex]
+		if !ok {
+			logger.WithField("data_rate_index", req.Rx2DataRateIndex).Error("Rx2 data rate not found")
+		}
+		attemptRx1 = len(genDown.Payload) <= int(dr1.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()))
+		attemptRx2 = len(genDown.Payload) <= int(dr2.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()))
 		if !attemptRx1 && !attemptRx2 {
 			logger.Error("Generated downlink payload size does not fit neither Rx1, nor Rx2, skip class A downlink slot")
 			dev.MACState.QueuedResponses = nil
@@ -1278,7 +1300,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 
 				var maxUpLength uint16 = math.MaxUint16
 				if dev.MACState.LoRaWANVersion == ttnpb.MAC_V1_1 {
-					maxUpLength = maximumUplinkLength(fp, phy, dev.MACState.RecentUplinks...)
+					maxUpLength, err = maximumUplinkLength(fp, phy, dev.MACState.RecentUplinks...)
+					if err != nil {
+						logger.WithError(err).Error("Failed to determine maximum uplink length")
+						return dev, nil, nil
+					}
 				}
 
 				var sets []string
@@ -1330,8 +1356,13 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					panic(fmt.Sprintf("unmatched downlink class: '%s'", class))
 				}
 
-				genDown, genState, err := ns.generateDownlink(ctx, dev, phy, class, transmitAt,
-					phy.DataRates[drIdx].DefaultMaxSize.PayloadSize(fp.DwellTime.GetDownlinks()),
+				dr, ok := phy.DataRates[drIdx]
+				if !ok {
+					logger.WithField("data_rate_index", drIdx).Error("Rx2 data rate not found")
+					return dev, sets, nil
+				}
+				genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, class, transmitAt,
+					dr.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()),
 					maxUpLength,
 				)
 				if genState.NeedsDownlinkQueueUpdate {

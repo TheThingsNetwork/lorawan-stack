@@ -27,37 +27,46 @@ import (
 // eirpDelta is the delta between EIRP and ERP.
 const eirpDelta = 2.15
 
-// PayloadSizer abstracts the acceptable payload size depending on contextual parameters.
-type PayloadSizer interface {
-	PayloadSize(dwellTime bool) uint16
-}
+type MaxMACPayloadSizeFunc func(bool) uint16
 
-type constPayloadSizer uint16
-
-func (p constPayloadSizer) PayloadSize(_ bool) uint16 {
-	return uint16(p)
-}
-
-type dwellTimePayloadSizer struct {
-	NoDwellTime uint16
-	DwellTime   uint16
-}
-
-//revive:disable:flag-parameter
-
-func (p dwellTimePayloadSizer) PayloadSize(dwellTime bool) uint16 {
-	if dwellTime {
-		return p.DwellTime
+func makeConstMaxMACPayloadSizeFunc(v uint16) MaxMACPayloadSizeFunc {
+	return func(_ bool) uint16 {
+		return v
 	}
-	return p.NoDwellTime
 }
 
-//revive:enable:flag-parameter
+func makeDwellTimeMaxMACPayloadSizeFunc(noDwellTimeSize, dwellTimeSize uint16) MaxMACPayloadSizeFunc {
+	return func(dwellTime bool) uint16 {
+		if dwellTime {
+			return dwellTimeSize
+		}
+		return noDwellTimeSize
+	}
+}
 
 // DataRate indicates the properties of a band's data rate.
 type DataRate struct {
-	Rate           ttnpb.DataRate
-	DefaultMaxSize PayloadSizer
+	Rate              ttnpb.DataRate
+	MaxMACPayloadSize MaxMACPayloadSizeFunc
+}
+
+func makeLoRaDataRate(spreadingFactor uint8, bandwidth uint32, maximumMACPayloadSize MaxMACPayloadSizeFunc) DataRate {
+	return DataRate{
+		Rate: (&ttnpb.LoRaDataRate{
+			SpreadingFactor: uint32(spreadingFactor),
+			Bandwidth:       bandwidth,
+		}).DataRate(),
+		MaxMACPayloadSize: maximumMACPayloadSize,
+	}
+}
+
+func makeFSKDataRate(bitRate uint32, maximumMACPayloadSize MaxMACPayloadSizeFunc) DataRate {
+	return DataRate{
+		Rate: (&ttnpb.FSKDataRate{
+			BitRate: bitRate,
+		}).DataRate(),
+		MaxMACPayloadSize: maximumMACPayloadSize,
+	}
 }
 
 // Channel abstracts a band's channel properties.
@@ -138,7 +147,7 @@ type Band struct {
 	// SubBands define the sub-bands, their duty-cycle limit and Tx power. The frequency ranges may not overlap.
 	SubBands []SubBandParameters
 
-	DataRates [16]DataRate
+	DataRates map[ttnpb.DataRateIndex]DataRate
 
 	FreqMultiplier   uint64
 	ImplementsCFList bool
@@ -288,6 +297,16 @@ func (b Band) FindSubBand(frequency uint64) (SubBandParameters, bool) {
 		}
 	}
 	return SubBandParameters{}, false
+}
+
+// FindDataRate returns the data rate index by data rate, if any.
+func (b Band) FindDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, bool) {
+	for i, bDR := range b.DataRates {
+		if bDR.Rate.Equal(dr) {
+			return i, true
+		}
+	}
+	return 0, false
 }
 
 func makeBeaconFrequencyFunc(frequencies [8]uint64) func(float64) uint64 {

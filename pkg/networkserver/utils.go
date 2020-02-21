@@ -115,12 +115,11 @@ func searchDataRate(dr ttnpb.DataRate, dev *ttnpb.EndDevice, fps *frequencyplans
 	if err != nil {
 		return 0, err
 	}
-	for i, bDR := range phy.DataRates {
-		if bDR.Rate.Equal(dr) {
-			return ttnpb.DataRateIndex(i), nil
-		}
+	idx, ok := phy.FindDataRate(dr)
+	if !ok {
+		return 0, errDataRateNotFound.WithAttributes("data_rate", dr)
 	}
-	return 0, errDataRateNotFound.WithAttributes("data_rate", dr)
+	return idx, nil
 }
 
 func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {

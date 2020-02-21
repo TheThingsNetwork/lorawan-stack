@@ -83,12 +83,16 @@ func (m *simulateMetadataParams) setDefaults() error {
 		}
 	}
 	if m.Bandwidth == 0 || m.SpreadingFactor == 0 {
-		drIdx := int(m.DataRateIndex)
-		if drIdx < int(phy.UplinkChannels[0].MinDataRate) || drIdx > int(phy.UplinkChannels[0].MaxDataRate) {
-			drIdx = int(phy.UplinkChannels[0].MaxDataRate)
+		drIdx := ttnpb.DataRateIndex(m.DataRateIndex)
+		if drIdx < phy.UplinkChannels[0].MinDataRate || drIdx > phy.UplinkChannels[0].MaxDataRate {
+			drIdx = phy.UplinkChannels[0].MaxDataRate
 		}
-		dr := phy.DataRates[drIdx].Rate.GetLoRa()
-		m.SpreadingFactor, m.Bandwidth = dr.SpreadingFactor, dr.Bandwidth
+		dr, ok := phy.DataRates[drIdx]
+		if !ok {
+			return errInvalidDataRateIndex
+		}
+		lora := dr.Rate.GetLoRa()
+		m.SpreadingFactor, m.Bandwidth = lora.SpreadingFactor, lora.Bandwidth
 	} else if m.DataRateIndex == 0 {
 		for i, dr := range phy.DataRates {
 			if dr.Rate.GetLoRa().SpreadingFactor == m.SpreadingFactor && dr.Rate.GetLoRa().Bandwidth == m.Bandwidth {

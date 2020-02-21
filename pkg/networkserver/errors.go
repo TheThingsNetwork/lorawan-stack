@@ -20,6 +20,7 @@ import (
 
 var (
 	errABPJoinRequest             = errors.DefineInvalidArgument("abp_join_request", "received a join-request from ABP device")
+	errApplicationDownlinkTooLong = errors.DefineInvalidArgument("application_downlink_too_long", "application downlink payload length '{length}' exceeds maximum '{max}'")
 	errClassAMulticast            = errors.DefineInvalidArgument("class_a_multicast", "multicast device in class A mode")
 	errClassBCForClassA           = errors.DefineInvalidArgument("class_b_c_for_class_a", "class B/C downlink queued for device in class A mode")
 	errComputeMIC                 = errors.DefineInvalidArgument("compute_mic", "failed to compute MIC")

@@ -769,3 +769,19 @@ func (v DataRateIndex) String() string {
 func (v RxDelay) String() string {
 	return strconv.Itoa(int(v))
 }
+
+func (v LoRaDataRate) DataRate() DataRate {
+	return DataRate{
+		Modulation: &DataRate_LoRa{
+			LoRa: &v,
+		},
+	}
+}
+
+func (v FSKDataRate) DataRate() DataRate {
+	return DataRate{
+		Modulation: &DataRate_FSK{
+			FSK: &v,
+		},
+	}
+}
