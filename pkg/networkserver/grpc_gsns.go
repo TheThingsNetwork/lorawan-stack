@@ -201,14 +201,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 			continue
 		}
 
-		drIdx, err := searchDataRate(up.Settings.DataRate, phy)
-		if err != nil {
-			logger.WithError(err).Debug("Failed to determine data rate index of uplink, skip")
-			continue
-		}
-		dr, ok := phy.DataRates[drIdx]
+		drIdx, dr, ok := phy.FindDataRate(up.Settings.DataRate)
 		if !ok {
-			logger.Debug("Data rate not found, skip")
+			logger.WithError(err).Debug("Data rate not found in PHY, skip")
 			continue
 		}
 
@@ -1163,17 +1158,17 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			stored.PendingMACState = macState
 			paths = append(paths, "pending_mac_state")
 
-			upChIdx, err := searchUplinkChannel(up.Settings.Frequency, macState)
+			chIdx, err := searchUplinkChannel(up.Settings.Frequency, macState)
 			if err != nil {
 				return nil, nil, err
 			}
-			up.DeviceChannelIndex = uint32(upChIdx)
+			up.DeviceChannelIndex = uint32(chIdx)
 
-			upDRIdx, err := searchDataRate(up.Settings.DataRate, phy)
-			if err != nil {
-				return nil, nil, err
+			drIdx, _, ok := phy.FindDataRate(up.Settings.DataRate)
+			if !ok {
+				return nil, nil, errDataRateNotFound
 			}
-			up.Settings.DataRateIndex = upDRIdx
+			up.Settings.DataRateIndex = drIdx
 
 			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
 			paths = append(paths, "recent_uplinks")
