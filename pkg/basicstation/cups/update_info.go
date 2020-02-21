@@ -248,17 +248,12 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		}
 	}
 	if gtw.GatewayServerAddress != req.LNSURI {
-		scheme, host, port, err := parseAddress(gtw.GatewayServerAddress)
+		scheme, host, port, err := parseAddress("wss", gtw.GatewayServerAddress)
 		if err != nil {
 			return err
 		}
-		if scheme == "" {
-			scheme = "wss"
-		}
 		address := host
-		if port != "" {
-			address = net.JoinHostPort(host, port)
-		}
+		address = net.JoinHostPort(host, port)
 		res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
 	}
 
