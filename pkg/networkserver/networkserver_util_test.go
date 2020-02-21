@@ -49,11 +49,14 @@ var (
 
 	ErrABPJoinRequest            = errABPJoinRequest
 	ErrDecodePayload             = errDecodePayload
+	ErrDeviceNotFound            = errDeviceNotFound
+	ErrOutdatedData              = errOutdatedData
 	ErrUnsupportedLoRaWANVersion = errUnsupportedLoRaWANVersion
 
 	EvtBeginApplicationLink    = evtBeginApplicationLink
 	EvtCreateEndDevice         = evtCreateEndDevice
 	EvtDeleteEndDevice         = evtDeleteEndDevice
+	EvtDropDataUplink          = evtDropDataUplink
 	EvtDropJoinRequest         = evtDropJoinRequest
 	EvtEndApplicationLink      = evtEndApplicationLink
 	EvtEnqueueDevStatusRequest = evtEnqueueDevStatusRequest
