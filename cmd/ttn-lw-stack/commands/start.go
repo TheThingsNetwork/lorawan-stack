@@ -35,6 +35,7 @@ import (
 	events_grpc "go.thethings.network/lorawan-stack/pkg/events/grpc"
 	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver"
+	gsredis "go.thethings.network/lorawan-stack/pkg/gatewayserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
 	jsredis "go.thethings.network/lorawan-stack/pkg/joinserver/redis"
@@ -142,6 +143,9 @@ var startCommand = &cobra.Command{
 
 		if start.GatewayServer || startDefault {
 			logger.Info("Setting up Gateway Server")
+			config.GS.Stats = &gsredis.GatewayConnectionStatsRegistry{
+				Redis: redis.New(config.Cache.Redis.WithNamespace("gs", "connection", "stats")),
+			}
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {
 				return shared.ErrInitializeGatewayServer.WithCause(err)
