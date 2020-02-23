@@ -41,6 +41,9 @@ type BasicStationConfig struct {
 type Config struct {
 	RequireRegisteredGateways bool `name:"require-registered-gateways" description:"Require the gateways to be registered in the Identity Server"`
 
+	Stats                             GatewayConnectionStatsRegistry `name:"-"`
+	UpdateConnectionStatsDebounceTime time.Duration                  `name:"update-connection-stats-debounce-time" description:"Time before repeated refresh of the gateway connection stats"`
+
 	Forward map[string][]string `name:"forward" description:"Forward the DevAddr prefixes to the specified hosts"`
 
 	MQTT         config.MQTT        `name:"mqtt"`
