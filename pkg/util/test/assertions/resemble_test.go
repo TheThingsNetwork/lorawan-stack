@@ -16,7 +16,6 @@ package assertions_test
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -124,11 +123,10 @@ func (dst *testSetFielder) SetFields(src *testSetFielder, paths ...string) error
 
 func TestShouldResembleFields(t *testing.T) {
 	for _, tc := range []struct {
-		A                interface{}
-		B                interface{}
-		Paths            []interface{}
-		Assertion        func(interface{}, ...interface{}) string
-		InverseAssertion func(interface{}, ...interface{}) string
+		A         interface{}
+		B         interface{}
+		Paths     []interface{}
+		Assertion func(interface{}, ...interface{}) string
 	}{
 		{
 			A:         &testSetFielder{},
@@ -140,7 +138,7 @@ func TestShouldResembleFields(t *testing.T) {
 				A: 42,
 			},
 			B:         &testSetFielder{},
-			Assertion: should.NotBeEmpty,
+			Assertion: should.BeEmpty,
 		},
 		{
 			A: &testSetFielder{
@@ -235,11 +233,6 @@ func TestShouldResembleFields(t *testing.T) {
 		t.Run(fmt.Sprintf("%+v/%+v/%+v", tc.A, tc.B, tc.Paths), func(t *testing.T) {
 			a := assertions.New(t)
 			a.So(ShouldResembleFields(tc.A, append([]interface{}{tc.B}, tc.Paths...)...), tc.Assertion)
-			if reflect.DeepEqual(tc.A, tc.B) {
-				a.So(ShouldResembleFields(tc.A, tc.B), should.BeEmpty)
-			} else {
-				a.So(ShouldResembleFields(tc.A, tc.B), should.NotBeEmpty)
-			}
 		})
 	}
 }
