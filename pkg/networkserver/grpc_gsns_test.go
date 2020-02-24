@@ -147,18 +147,19 @@ func TestHandleUplink(t *testing.T) {
 		"supports_class_b",
 		"supports_class_c",
 		"supports_join",
+		"queued_application_downlinks",
 	}
 
-	joinSetByEUIGetPaths := [...]string{
+	joinSetByIDGetPaths := [...]string{
 		"frequency_plan_id",
 		"lorawan_phy_version",
 		"queued_application_downlinks",
 		"recent_uplinks",
+		"session.queued_application_downlinks",
 	}
 
-	joinSetByEUISetPaths := [...]string{
+	joinSetByIDSetPaths := [...]string{
 		"pending_mac_state",
-		"queued_application_downlinks",
 		"recent_uplinks",
 	}
 
@@ -277,6 +278,16 @@ func TestHandleUplink(t *testing.T) {
 		return msg
 	}
 
+	makeJoinRequestWithSettings := func(decodePayload bool) *ttnpb.UplinkMessage {
+		msg := makeJoinRequest(decodePayload)
+		if !decodePayload {
+			return msg
+		}
+		msg.Settings.DataRateIndex = ttnpb.DATA_RATE_1
+		msg.DeviceChannelIndex = 2
+		return msg
+	}
+
 	makeRejoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
 		msg := &ttnpb.UplinkMessage{
 			CorrelationIDs: correlationIDs[:],
@@ -367,7 +378,7 @@ func TestHandleUplink(t *testing.T) {
 		}
 	}
 
-	makeLegacyDataUplink := func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
+	makeDataUplink1_0 := func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
 		msg := &ttnpb.UplinkMessage{
 			CorrelationIDs: correlationIDs[:],
 			RawPayload: MustAppendLegacyUplinkMIC(
@@ -404,13 +415,7 @@ func TestHandleUplink(t *testing.T) {
 		return msg
 	}
 
-	bindMakeLegacyDataUplinkFCnt := func(fCnt uint8) func(bool) *ttnpb.UplinkMessage {
-		return func(decoded bool) *ttnpb.UplinkMessage {
-			return makeLegacyDataUplink(fCnt, decoded)
-		}
-	}
-
-	makeDataUplink := func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
+	makeDataUplink1_1 := func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
 		sets := makeDataUplinkSettings()
 		mds := MakeRxMetadataSlice()
 		fOpts := MustEncryptUplink(nwkSEncKey, devAddr, uint32(fCnt), 0x02)
@@ -457,11 +462,26 @@ func TestHandleUplink(t *testing.T) {
 		return msg
 	}
 
-	bindMakeDataUplinkFCnt := func(fCnt uint8) func(bool) *ttnpb.UplinkMessage {
-		return func(decoded bool) *ttnpb.UplinkMessage {
-			return makeDataUplink(fCnt, decoded)
+	wrapMakeDataUplinkWithSettings := func(f func(uint8, bool) *ttnpb.UplinkMessage) func(uint8, bool) *ttnpb.UplinkMessage {
+		return func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
+			msg := f(fCnt, decodePayload)
+			if !decodePayload {
+				return msg
+			}
+			msg.DeviceChannelIndex = 1
+			msg.Settings.DataRateIndex = ttnpb.DATA_RATE_2
+			return msg
 		}
 	}
+
+	bindMakeDataUplinkFCnt := func(f func(uint8, bool) *ttnpb.UplinkMessage, fCnt uint8) func(bool) *ttnpb.UplinkMessage {
+		return func(decodePayload bool) *ttnpb.UplinkMessage {
+			return f(fCnt, decodePayload)
+		}
+	}
+
+	makeDataUplinkWithSettings1_0 := wrapMakeDataUplinkWithSettings(makeDataUplink1_0)
+	makeDataUplinkWithSettings1_1 := wrapMakeDataUplinkWithSettings(makeDataUplink1_1)
 
 	makeApplicationDownlink := func() *ttnpb.ApplicationDownlink {
 		return &ttnpb.ApplicationDownlink{
@@ -1218,7 +1238,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink(33, true),
+						makeDataUplink1_1(33, true),
 					},
 					SupportsJoin: true,
 					CreatedAt:    start,
@@ -1306,7 +1326,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now = clock.Add(time.Nanosecond)
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequest, start, duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
@@ -1326,12 +1346,12 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
+					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
 					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeDataUplink(33, true),
+							makeDataUplink1_1(33, true),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 							makeApplicationDownlink(),
@@ -1340,7 +1360,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
+					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 					macState.CurrentParameters.Rx1Delay = ttnpb.RX_DELAY_3
@@ -1357,12 +1377,10 @@ func TestHandleUplink(t *testing.T) {
 						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
 						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
 						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequest(true)
+						expectedUp := makeJoinRequestWithSettings(true)
 						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.DeviceChannelIndex = 2
 						expectedUp.ReceivedAt = recentUp.ReceivedAt
 						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
 					setCtx = context.WithValue(req.Context, struct{}{}, "set")
@@ -1412,15 +1430,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeJoinRequest(decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 2
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_1
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
 
 				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.BeNil)
@@ -1454,7 +1464,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(33, true),
+						makeDataUplink1_0(33, true),
 					},
 					SupportsJoin: true,
 					CreatedAt:    start,
@@ -1526,7 +1536,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequest, start, duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
@@ -1546,12 +1556,12 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
+					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
 					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeLegacyDataUplink(33, true),
+							makeDataUplink1_0(33, true),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 							makeApplicationDownlink(),
@@ -1560,7 +1570,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
+					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
@@ -1576,12 +1586,10 @@ func TestHandleUplink(t *testing.T) {
 						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
 						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
 						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequest(true)
+						expectedUp := makeJoinRequestWithSettings(true)
 						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.DeviceChannelIndex = 2
 						expectedUp.ReceivedAt = recentUp.ReceivedAt
 						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
 					setCtx = context.WithValue(req.Context, struct{}{}, "set")
@@ -1598,15 +1606,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeJoinRequest(decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 2
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_1
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
 
 				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.EqualErrorOrDefinition, errTest)
@@ -1639,7 +1639,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink(33, true),
+						makeDataUplink1_1(33, true),
 					},
 					SupportsJoin: true,
 					CreatedAt:    start,
@@ -1718,7 +1718,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequest, start, duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
@@ -1738,12 +1738,12 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
+					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
 					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeDataUplink(33, true),
+							makeDataUplink1_1(33, true),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 							makeApplicationDownlink(),
@@ -1752,7 +1752,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
+					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
@@ -1768,12 +1768,10 @@ func TestHandleUplink(t *testing.T) {
 						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
 						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
 						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequest(true)
+						expectedUp := makeJoinRequestWithSettings(true)
 						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.DeviceChannelIndex = 2
 						expectedUp.ReceivedAt = recentUp.ReceivedAt
 						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
 					setCtx = context.WithValue(req.Context, struct{}{}, "set")
@@ -1823,15 +1821,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeJoinRequest(decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 2
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_1
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
 
 				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.BeNil)
@@ -1867,7 +1857,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(33, true),
+						makeDataUplink1_0(33, true),
 					},
 					SupportsJoin: true,
 					CreatedAt:    start,
@@ -1943,7 +1933,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequest, start, duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
@@ -1963,12 +1953,12 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
+					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
 					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeLegacyDataUplink(33, true),
+							makeDataUplink1_0(33, true),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 							makeApplicationDownlink(),
@@ -1977,7 +1967,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
+					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
@@ -1993,12 +1983,10 @@ func TestHandleUplink(t *testing.T) {
 						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
 						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
 						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequest(true)
+						expectedUp := makeJoinRequestWithSettings(true)
 						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.DeviceChannelIndex = 2
 						expectedUp.ReceivedAt = recentUp.ReceivedAt
 						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
 					setCtx = context.WithValue(req.Context, struct{}{}, "set")
@@ -2048,15 +2036,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeJoinRequest(decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 2
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_1
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
 
 				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.BeNil)
@@ -2092,7 +2072,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink(33, true),
+						makeDataUplink1_1(33, true),
 					},
 					SupportsJoin: true,
 					CreatedAt:    start,
@@ -2171,7 +2151,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequest, start, duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
@@ -2191,12 +2171,12 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByEUIGetPaths[:])
+					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
 					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
 						FrequencyPlanID:   test.EUFrequencyPlanID,
 						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeDataUplink(33, true),
+							makeDataUplink1_1(33, true),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 							makeApplicationDownlink(),
@@ -2205,7 +2185,7 @@ func TestHandleUplink(t *testing.T) {
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return false
 					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByEUISetPaths[:])
+					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
 
 					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
 					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
@@ -2221,12 +2201,10 @@ func TestHandleUplink(t *testing.T) {
 						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
 						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
 						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequest(true)
+						expectedUp := makeJoinRequestWithSettings(true)
 						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.DeviceChannelIndex = 2
 						expectedUp.ReceivedAt = recentUp.ReceivedAt
 						expectedUp.RxMetadata = recentUp.RxMetadata
-						expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_1
 						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
 					}
 					setCtx = context.WithValue(req.Context, struct{}{}, "set")
@@ -2276,15 +2254,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeJoinRequest(decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 2
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_1
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
 
 				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.BeNil)
@@ -2325,14 +2295,14 @@ func TestHandleUplink(t *testing.T) {
 				clock := MockClock(start)
 				defer SetTimeNow(clock.Now)()
 
-				msg := makeLegacyDataUplink(34, false)
+				msg := makeDataUplink1_0(34, false)
 
 				handleUplinkErrCh := handle(ctx, msg)
 
 				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
 					return []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(31, true),
-						makeLegacyDataUplink(32, true),
+						makeDataUplink1_0(31, true),
+						makeDataUplink1_0(32, true),
 					}
 				}
 
@@ -2377,8 +2347,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
-					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
-					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
+					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeDataUplink1_0(42, true))
+					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeDataUplink1_0(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
 					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
@@ -2386,7 +2356,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now := clock.Add(time.Nanosecond)
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				now = clock.Add(time.Nanosecond)
@@ -2425,12 +2395,10 @@ func TestHandleUplink(t *testing.T) {
 					}
 					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-					expectedUp := makeLegacyDataUplink(34, true)
+					expectedUp := makeDataUplinkWithSettings1_0(34, true)
 					expectedUp.CorrelationIDs = upCorrelationIDs
-					expectedUp.DeviceChannelIndex = 1
 					expectedUp.ReceivedAt = start
 					expectedUp.RxMetadata = recentUp.RxMetadata
-					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
 					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
 
 					macState := makeMACState()
@@ -2528,15 +2496,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeLegacyDataUplink(34, decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 1
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplinkWithSettings1_0, 34), start, duplicateCount)
 
 				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.BeNil)
@@ -2557,14 +2517,14 @@ func TestHandleUplink(t *testing.T) {
 				clock := MockClock(start)
 				defer SetTimeNow(clock.Now)()
 
-				msg := makeDataUplink(34, false)
+				msg := makeDataUplink1_1(34, false)
 
 				handleUplinkErrCh := handle(ctx, msg)
 
 				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
 					return []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(31, true),
-						makeLegacyDataUplink(32, true),
+						makeDataUplink1_0(31, true),
+						makeDataUplink1_0(32, true),
 					}
 				}
 
@@ -2609,8 +2569,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Func(context.WithValue(req.Context, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
-					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
-					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
+					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeDataUplink1_0(42, true))
+					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeDataUplink1_0(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
 					a.So(req.Func(context.WithValue(req.Context, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
@@ -2618,7 +2578,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now := clock.Add(time.Nanosecond)
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_1, 34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				now = clock.Add(time.Nanosecond)
@@ -2657,12 +2617,10 @@ func TestHandleUplink(t *testing.T) {
 					}
 					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-					expectedUp := makeDataUplink(34, true)
+					expectedUp := makeDataUplinkWithSettings1_1(34, true)
 					expectedUp.CorrelationIDs = upCorrelationIDs
-					expectedUp.DeviceChannelIndex = 1
 					expectedUp.ReceivedAt = start
 					expectedUp.RxMetadata = recentUp.RxMetadata
-					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
 					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
 
 					macState := makeMACState()
@@ -2760,15 +2718,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeDataUplink(34, decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 1
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplinkWithSettings1_1, 34), start, duplicateCount)
 
 				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.BeNil)
@@ -2789,14 +2739,14 @@ func TestHandleUplink(t *testing.T) {
 				clock := MockClock(start)
 				defer SetTimeNow(clock.Now)()
 
-				msg := makeLegacyDataUplink(34, false)
+				msg := makeDataUplink1_0(34, false)
 
 				handleUplinkErrCh := handle(ctx, msg)
 
 				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
 					return []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(31, true),
-						makeLegacyDataUplink(32, true),
+						makeDataUplink1_0(31, true),
+						makeDataUplink1_0(32, true),
 					}
 				}
 
@@ -2841,8 +2791,8 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
-					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeLegacyDataUplink(42, true))
-					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
+					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeDataUplink1_0(42, true))
+					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeDataUplink1_0(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
 					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
@@ -2850,7 +2800,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now := clock.Add(time.Nanosecond)
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				now = clock.Add(time.Nanosecond)
@@ -2891,12 +2841,10 @@ func TestHandleUplink(t *testing.T) {
 					}
 					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-					expectedUp := makeLegacyDataUplink(34, true)
+					expectedUp := makeDataUplinkWithSettings1_0(34, true)
 					expectedUp.CorrelationIDs = upCorrelationIDs
-					expectedUp.DeviceChannelIndex = 1
 					expectedUp.ReceivedAt = start
 					expectedUp.RxMetadata = recentUp.RxMetadata
-					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
 					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(makeRecentUplinks(), expectedUp))
 
 					macState := makeMACState()
@@ -2994,15 +2942,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeLegacyDataUplink(34, decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 1
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplinkWithSettings1_0, 34), start, duplicateCount)
 
 				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.BeNil)
@@ -3023,14 +2963,14 @@ func TestHandleUplink(t *testing.T) {
 				clock := MockClock(start)
 				defer SetTimeNow(clock.Now)()
 
-				msg := makeLegacyDataUplink(34, false)
+				msg := makeDataUplink1_0(34, false)
 
 				handleUplinkErrCh := handle(ctx, msg)
 
 				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
 					return []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(31, true),
-						makeLegacyDataUplink(32, true),
+						makeDataUplink1_0(31, true),
+						makeDataUplink1_0(32, true),
 					}
 				}
 
@@ -3074,7 +3014,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now := clock.Add(time.Nanosecond)
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				now = clock.Add(time.Nanosecond)
@@ -3110,7 +3050,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeLegacyDataUplinkFCnt(34), now.Add(-2*time.Nanosecond), duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-2*time.Nanosecond), duplicateCount)
 
 				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.HaveSameErrorDefinitionAs, ErrOutdatedData.WithCause(ErrDeviceNotFound))
@@ -3128,15 +3068,15 @@ func TestHandleUplink(t *testing.T) {
 				clock := MockClock(start)
 				defer SetTimeNow(clock.Now)()
 
-				msg := makeLegacyDataUplink(34, false)
+				msg := makeDataUplink1_0(34, false)
 
 				handleUplinkErrCh := handle(ctx, msg)
 
 				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
 					return []*ttnpb.UplinkMessage{
-						makeLegacyDataUplink(31, true),
-						makeLegacyDataUplink(32, true),
-						makeLegacyDataUplink(34, true),
+						makeDataUplink1_0(31, true),
+						makeDataUplink1_0(32, true),
+						makeDataUplink1_0(34, true),
 					}
 				}
 
@@ -3183,7 +3123,7 @@ func TestHandleUplink(t *testing.T) {
 					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
 					fCntTooHighDevice := CopyEndDevice(rangeDevice)
 					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
-					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeLegacyDataUplink(42, true))
+					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeDataUplink1_0(42, true))
 					fCntTooHighDevice.Session.LastFCntUp = 42
 					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
 					req.Response <- nil
@@ -3191,7 +3131,7 @@ func TestHandleUplink(t *testing.T) {
 
 				now := clock.Add(time.Nanosecond)
 
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeLegacyDataUplinkFCnt(34), now.Add(-time.Nanosecond), duplicateCount)
+				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-time.Nanosecond), duplicateCount)
 				mds = append(mds, msg.RxMetadata...)
 
 				now = clock.Add(time.Nanosecond)
@@ -3230,12 +3170,10 @@ func TestHandleUplink(t *testing.T) {
 					}
 					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
 					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-					expectedUp := makeLegacyDataUplink(34, true)
+					expectedUp := makeDataUplinkWithSettings1_0(34, true)
 					expectedUp.CorrelationIDs = upCorrelationIDs
-					expectedUp.DeviceChannelIndex = 1
 					expectedUp.ReceivedAt = start
 					expectedUp.RxMetadata = recentUp.RxMetadata
-					expectedUp.Settings.DataRateIndex = ttnpb.DATA_RATE_2
 					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
 
 					macState := makeMACState()
@@ -3293,15 +3231,7 @@ func TestHandleUplink(t *testing.T) {
 					return false
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, func(decoded bool) *ttnpb.UplinkMessage {
-					msg := makeLegacyDataUplink(34, decoded)
-					if !decoded {
-						return msg
-					}
-					msg.DeviceChannelIndex = 1
-					msg.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-					return msg
-				}, start, duplicateCount)
+				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplinkWithSettings1_0, 34), start, duplicateCount)
 
 				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
 					return a.So(err, should.BeNil)

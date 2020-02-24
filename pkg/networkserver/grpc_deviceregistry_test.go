@@ -145,6 +145,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_DEVICES_READ,
 								ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+								ttnpb.RIGHT_APPLICATION_LINK,
 							},
 						},
 					},
@@ -157,6 +158,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a.So(gets, should.HaveSameElementsDeep, []string{
 					"frequency_plan_id",
 					"session",
+					"queued_application_downlinks",
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -566,6 +568,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.last_conf_f_cnt_down",
 					"session.last_f_cnt_up",
 					"session.last_n_f_cnt_down",
+					"session.queued_application_downlinks",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
@@ -649,6 +652,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.last_conf_f_cnt_down",
 					"session.last_f_cnt_up",
 					"session.last_n_f_cnt_down",
+					"session.queued_application_downlinks",
 					"supports_class_b",
 					"supports_class_c",
 					"supports_join",
@@ -773,6 +777,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.last_conf_f_cnt_down",
 					"session.last_f_cnt_up",
 					"session.last_n_f_cnt_down",
+					"session.queued_application_downlinks",
 					"session.started_at",
 					"supports_join",
 				})
@@ -963,6 +968,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.last_conf_f_cnt_down",
 					"session.last_f_cnt_up",
 					"session.last_n_f_cnt_down",
+					"session.queued_application_downlinks",
 					"session.started_at",
 					"supports_join",
 				})
@@ -1143,6 +1149,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.last_conf_f_cnt_down",
 					"session.last_f_cnt_up",
 					"session.last_n_f_cnt_down",
+					"session.queued_application_downlinks",
 					"session.started_at",
 					"supports_join",
 				})
@@ -1327,6 +1334,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.last_conf_f_cnt_down",
 					"session.last_f_cnt_up",
 					"session.last_n_f_cnt_down",
+					"session.queued_application_downlinks",
 				})
 
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
@@ -1399,6 +1407,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.last_conf_f_cnt_down",
 					"session.last_f_cnt_up",
 					"session.last_n_f_cnt_down",
+					"session.queued_application_downlinks",
 				})
 
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
