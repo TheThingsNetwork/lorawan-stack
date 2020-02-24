@@ -895,7 +895,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			}
 
 			if !stored.CreatedAt.Equal(matched.Device.CreatedAt) || !stored.UpdatedAt.Equal(matched.Device.UpdatedAt) {
-				matched, err = ns.matchAndHandleDataUplink(up, true, contextualEndDevice{
+				rematched, err := ns.matchAndHandleDataUplink(up, true, contextualEndDevice{
 					Context:   ctx,
 					EndDevice: stored,
 				})
@@ -903,6 +903,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					handleErr = true
 					return nil, nil, errOutdatedData.WithCause(err)
 				}
+				matched = rematched
 			}
 			queuedEvents = append(queuedEvents, matched.QueuedEvents...)
 			queuedApplicationUplinks = append(queuedApplicationUplinks, matched.QueuedApplicationUplinks...)
