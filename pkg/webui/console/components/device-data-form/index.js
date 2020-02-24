@@ -309,6 +309,41 @@ class DeviceDataForm extends Component {
           component={Checkbox}
           disabled={external_js}
         />
+        <Form.Field
+          title={m.homeNetID}
+          description={m.homeNetIDDescription}
+          placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
+          name="net_id"
+          type="byte"
+          min={3}
+          max={3}
+          component={Input}
+          disabled={external_js}
+        />
+        <Form.Field
+          title={m.asServerID}
+          name="application_server_id"
+          description={m.asServerIDDescription}
+          placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
+          component={Input}
+          disabled={external_js}
+        />
+        <Form.Field
+          title={m.asServerKekLabel}
+          name="application_server_kek_label"
+          description={m.asServerKekLabelDescription}
+          placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
+          component={Input}
+          disabled={external_js}
+        />
+        <Form.Field
+          title={m.nsServerKekLabel}
+          name="network_server_kek_label"
+          description={m.nsServerKekLabelDescription}
+          placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
+          component={Input}
+          disabled={external_js}
+        />
       </React.Fragment>
     )
   }
