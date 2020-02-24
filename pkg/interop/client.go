@@ -136,7 +136,7 @@ func newHTTPRequest(url string, pld interface{}, headers map[string]string) (*ht
 	return req, nil
 }
 
-// JoinServerFQDN constructs Join Server FQDN using specified eui under domain
+// JoinServerFQDN constructs Join Server FQDN using specified EUI under domain
 // according to LoRaWAN Backend Interfaces specification.
 // If domain is empty, LoRaAllianceJoinEUIDomain is used.
 func JoinServerFQDN(eui types.EUI64, domain string) string {
