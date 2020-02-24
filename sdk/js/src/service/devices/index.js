@@ -234,8 +234,7 @@ class Devices {
       throw errors[0].error
     }
 
-    const result = mergeDevice(setParts)
-    return result
+    return mergeDevice(setParts)
   }
 
   async _getDevice(applicationId, deviceId, paths, ignoreNotFound) {
