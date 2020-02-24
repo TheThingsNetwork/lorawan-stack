@@ -50,6 +50,8 @@ message Session {
   uint32 last_conf_f_cnt_down = 7;
   // Time when the session started. Network Server only.
   google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  // Queued Application downlink messages. Stored in Application Server and Network Server.
+  repeated ApplicationDownlink queued_application_downlinks = 9;
 }
 
 // MACParameters represent the parameters of the device's MAC layer (active or desired).
@@ -510,6 +512,7 @@ message EndDevice {
   repeated DownlinkMessage recent_downlinks = 39;
   // Queued Application downlink messages. Stored in Application Server,
   // which sets them on the Network Server.
+  // This field is deprecated and is always set equal to session.queued_application_downlinks.
   repeated ApplicationDownlink queued_application_downlinks = 40;
 
   // The payload formatters for this end device. Stored in Application Server.
