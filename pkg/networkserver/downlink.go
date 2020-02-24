@@ -203,7 +203,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				enqueueNewChannelReq,
 				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) macCommandEnqueueState {
 					// NOTE: LinkADRReq must be enqueued after NewChannelReq.
-					st, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, phy)
+					st, err := enqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, phy)
 					if err != nil {
 						logger.WithError(err).Error("Failed to enqueue LinkADRReq")
 						return macCommandEnqueueState{
@@ -468,7 +468,6 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	} else {
 		pld.FHDR.FOpts = cmdBuf
 	}
-
 	if pld.FPort == 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
@@ -481,7 +480,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			},
 		})
 	}
-	pld.FHDR.FCtrl.FPending = fPending || len(dev.QueuedApplicationDownlinks) > 0
+	if class != ttnpb.CLASS_C {
+		pld.FHDR.FCtrl.FPending = fPending || len(dev.QueuedApplicationDownlinks) > 0
+	}
 
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
 	ctx = log.NewContext(ctx, logger)

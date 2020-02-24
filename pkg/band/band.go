@@ -299,14 +299,14 @@ func (b Band) FindSubBand(frequency uint64) (SubBandParameters, bool) {
 	return SubBandParameters{}, false
 }
 
-// FindDataRate returns the data rate index by data rate, if any.
-func (b Band) FindDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, bool) {
+// FindDataRate returns the data rate with index by API data rate, if any.
+func (b Band) FindDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, DataRate, bool) {
 	for i, bDR := range b.DataRates {
 		if bDR.Rate.Equal(dr) {
-			return i, true
+			return i, bDR, true
 		}
 	}
-	return 0, false
+	return 0, DataRate{}, false
 }
 
 func makeBeaconFrequencyFunc(frequencies [8]uint64) func(float64) uint64 {

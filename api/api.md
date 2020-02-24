@@ -4370,6 +4370,7 @@ Transmission settings for downlink.
 | `MAC_V1_0_2` | 3 |  |
 | `MAC_V1_1` | 4 |  |
 | `MAC_V1_0_3` | 5 |  |
+| `MAC_V1_0_4` | 6 |  |
 
 ### <a name="ttn.lorawan.v3.MType">Enum `MType`</a>
 

@@ -53,7 +53,7 @@ func deviceNeedsLinkADRReq(dev *ttnpb.EndDevice) bool {
 	return false
 }
 
-func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, phy band.Band) (macCommandEnqueueState, error) {
+func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, phy band.Band) (macCommandEnqueueState, error) {
 	if !deviceNeedsLinkADRReq(dev) {
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
@@ -92,6 +92,15 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		}, errCorruptedMACState
 	}
 
+	drIdx := dev.MACState.DesiredParameters.ADRDataRateIndex
+	if dev.MACState.LoRaWANVersion.HasNoChangeDataRateIndex() && (!deviceUseADR(dev, defaults) || dev.MACState.CurrentParameters.ADRDataRateIndex == dev.MACState.DesiredParameters.ADRDataRateIndex) {
+		drIdx = ttnpb.DATA_RATE_15
+	}
+	txPowerIdx := dev.MACState.DesiredParameters.ADRTxPowerIndex
+	if dev.MACState.LoRaWANVersion.HasNoChangeTXPowerIndex() && (!deviceUseADR(dev, defaults) || dev.MACState.CurrentParameters.ADRTxPowerIndex == dev.MACState.DesiredParameters.ADRTxPowerIndex) {
+		txPowerIdx = 15
+	}
+
 	var st macCommandEnqueueState
 	dev.MACState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, []events.DefinitionDataClosure, bool) {
 		if int(nDown) < len(desiredMasks) {
@@ -109,9 +118,9 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		cmds := make([]*ttnpb.MACCommand, 0, len(desiredMasks))
 		for i, m := range desiredMasks {
 			req := &ttnpb.MACCommand_LinkADRReq{
-				DataRateIndex:      dev.MACState.DesiredParameters.ADRDataRateIndex,
+				DataRateIndex:      drIdx,
 				NbTrans:            dev.MACState.DesiredParameters.ADRNbTrans,
-				TxPowerIndex:       dev.MACState.DesiredParameters.ADRTxPowerIndex,
+				TxPowerIndex:       txPowerIdx,
 				ChannelMaskControl: uint32(m.Cntl),
 				ChannelMask:        desiredMasks[i].Mask[:],
 			}

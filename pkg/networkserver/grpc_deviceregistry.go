@@ -501,6 +501,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if !ttnpb.HasAnyField([]string{"session"}, sets...) || req.EndDevice.Session == nil {
 				return &req.EndDevice, sets, nil
 			}
+		} else if req.EndDevice.LoRaWANVersion.RequireDevEUIForABP() && req.EndDevice.DevEUI == nil {
+			return nil, nil, errNoDevEUI
 		}
 
 		if err := ttnpb.RequireFields(sets,

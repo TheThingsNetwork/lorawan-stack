@@ -87,13 +87,13 @@ func resetsFCnt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 }
 
 // transmissionNumber returns the number of the transmission up would represent if appended to ups
-// and the time of the last transmission of macPayload in ups, if such is found.
-func transmissionNumber(macPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32, time.Time) {
+// and the time of the last transmission of phyPayload in ups, if such is found.
+func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32, time.Time) {
 	nb := uint32(1)
 	var lastTrans time.Time
 	for i := len(ups) - 1; i >= 0; i-- {
 		up := ups[i]
-		if len(up.RawPayload) < 4 || !bytes.Equal(macPayload, up.RawPayload[:len(up.RawPayload)-4]) {
+		if !bytes.Equal(phyPayload, up.RawPayload) {
 			break
 		}
 		nb++
@@ -177,8 +177,6 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 	if len(up.RawPayload) < 4 {
 		return nil, errRawPayloadTooShort
 	}
-	macPayloadBytes := up.RawPayload[:len(up.RawPayload)-4]
-
 	pld := up.Payload.GetMACPayload()
 
 	type device struct {
@@ -194,10 +192,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 
 		ctx := dev.Context
 
-		logger := log.FromContext(ctx).WithFields(log.Fields(
-			"device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers),
-			"mac_payload_len", len(macPayloadBytes),
-		))
+		logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 		ctx = log.NewContext(ctx, logger)
 
 		_, phy, err := getDeviceBandVersion(dev.EndDevice, ns.FrequencyPlans)
@@ -206,15 +201,27 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 			continue
 		}
 
-		drIdx, err := searchDataRate(up.Settings.DataRate, dev.EndDevice, ns.FrequencyPlans)
-		if err != nil {
-			logger.WithError(err).Debug("Failed to determine data rate index of uplink, skip")
+		drIdx, dr, ok := phy.FindDataRate(up.Settings.DataRate)
+		if !ok {
+			logger.WithError(err).Debug("Data rate not found in PHY, skip")
 			continue
 		}
 
 		pendingApplicationDownlink := dev.GetMACState().GetPendingApplicationDownlink()
 
-		if !pld.Ack && dev.PendingSession != nil && dev.PendingMACState != nil && dev.PendingSession.DevAddr == pld.DevAddr {
+		uplinkDwellTime := func(macState *ttnpb.MACState) bool {
+			if macState.CurrentParameters.UplinkDwellTime != nil {
+				return macState.CurrentParameters.UplinkDwellTime.Value
+			}
+			// Assume no dwell time if current value unknown.
+			return false
+		}
+
+		if !pld.Ack &&
+			dev.PendingSession != nil &&
+			dev.PendingMACState != nil &&
+			dev.PendingSession.DevAddr == pld.DevAddr &&
+			(!dev.PendingMACState.LoRaWANVersion.IgnoreUplinksExceedingLengthLimit() || len(up.RawPayload)-5 <= int(dr.MaxMACPayloadSize(uplinkDwellTime(dev.PendingMACState)))) {
 			logger := logger.WithFields(log.Fields(
 				"mac_version", dev.PendingMACState.LoRaWANVersion,
 				"pending_session", true,
@@ -247,10 +254,14 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 			})
 		}
 
-		if dev.Session == nil || dev.MACState == nil || dev.Session.DevAddr != pld.DevAddr {
+		switch {
+		case dev.Session == nil,
+			dev.MACState == nil,
+			dev.Session.DevAddr != pld.DevAddr,
+			dev.MACState.LoRaWANVersion.IgnoreUplinksExceedingLengthLimit() && len(up.RawPayload)-5 > int(dr.MaxMACPayloadSize(uplinkDwellTime(dev.MACState))):
 			continue
-		}
-		if pld.Ack && len(dev.MACState.RecentDownlinks) == 0 {
+
+		case pld.Ack && len(dev.MACState.RecentDownlinks) == 0:
 			logger.Debug("Uplink contains ACK, but no downlink was sent to device, skip")
 			continue
 		}
@@ -282,7 +293,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		ctx = log.NewContext(ctx, logger)
 
 		if fCnt == dev.Session.LastFCntUp && len(dev.MACState.RecentUplinks) > 0 {
-			nbTrans, lastAt := transmissionNumber(macPayloadBytes, dev.MACState.RecentUplinks...)
+			nbTrans, lastAt := transmissionNumber(up.RawPayload, dev.MACState.RecentUplinks...)
 			logger = logger.WithFields(log.Fields(
 				"f_cnt_gap", 0,
 				"f_cnt_reset", false,
@@ -709,7 +720,7 @@ matchLoop:
 				fNwkSIntKey,
 				pld.DevAddr,
 				match.FCnt,
-				macPayloadBytes,
+				up.RawPayload[:len(up.RawPayload)-4],
 			)
 		} else {
 			if match.Device.Session.SNwkSIntKey == nil || len(match.Device.Session.SNwkSIntKey.Key) == 0 {
@@ -736,7 +747,7 @@ matchLoop:
 				chIdx,
 				pld.DevAddr,
 				match.FCnt,
-				macPayloadBytes,
+				up.RawPayload[:len(up.RawPayload)-4],
 			)
 		}
 		if err != nil {
@@ -829,7 +840,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"f_opts_len", len(pld.FOpts),
 		"f_port", pld.FPort,
 		"frequency", up.Settings.Frequency,
-		"frm_payload_len", len(pld.FRMPayload),
 		"uplink_f_cnt", pld.FCnt,
 	))
 	ctx = log.NewContext(ctx, logger)
@@ -1149,17 +1159,17 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			stored.PendingMACState = macState
 			paths = append(paths, "pending_mac_state")
 
-			upChIdx, err := searchUplinkChannel(up.Settings.Frequency, macState)
+			chIdx, err := searchUplinkChannel(up.Settings.Frequency, macState)
 			if err != nil {
 				return nil, nil, err
 			}
-			up.DeviceChannelIndex = uint32(upChIdx)
+			up.DeviceChannelIndex = uint32(chIdx)
 
-			upDRIdx, err := searchDataRate(up.Settings.DataRate, stored, ns.Component.FrequencyPlans)
-			if err != nil {
-				return nil, nil, err
+			drIdx, _, ok := phy.FindDataRate(up.Settings.DataRate)
+			if !ok {
+				return nil, nil, errDataRateNotFound
 			}
-			up.Settings.DataRateIndex = upDRIdx
+			up.Settings.DataRateIndex = drIdx
 
 			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
 			paths = append(paths, "recent_uplinks")
@@ -1241,6 +1251,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"m_type", up.Payload.MType,
 		"major", up.Payload.Major,
+		"phy_payload_len", len(up.RawPayload),
 		"received_at", up.ReceivedAt,
 	))
 	ctx = log.NewContext(ctx, logger)

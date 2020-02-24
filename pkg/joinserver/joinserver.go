@@ -152,6 +152,7 @@ var supportedMACVersions = [...]ttnpb.MACVersion{
 	ttnpb.MAC_V1_0_1,
 	ttnpb.MAC_V1_0_2,
 	ttnpb.MAC_V1_0_3,
+	ttnpb.MAC_V1_0_4,
 	ttnpb.MAC_V1_1,
 }
 
@@ -307,7 +308,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			paths := make([]string, 0, 3)
 
 			dn := uint32(binary.BigEndian.Uint16(pld.DevNonce[:]))
-			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			if req.SelectedMACVersion.IncrementDevNonce() {
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
 						return nil, nil, errDevNonceTooSmall
@@ -383,7 +384,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			}
 
 			var networkCryptoService cryptoservices.Network
-			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
+			if req.SelectedMACVersion.UseNwkKey() && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
 				// LoRaWAN 1.1 and higher use a NwkKey.
 				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {
@@ -401,7 +402,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					return nil, nil, err
 				}
 				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-				if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+				if !req.SelectedMACVersion.UseNwkKey() {
 					// LoRaWAN 1.0.x use the AppKey for network security operations.
 					networkCryptoService = cryptoservices.NewMemory(nil, &appKey)
 				}
@@ -463,7 +464,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			if err != nil {
 				return nil, nil, errWrapKey.WithCause(err)
 			}
-			if req.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			if req.SelectedMACVersion.UseNwkKey() {
 				sessionKeys.SNwkSIntKey, err = js.wrapKeyIfKEKExists(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel)
 				if err != nil {
 					return nil, nil, errWrapKey.WithCause(err)

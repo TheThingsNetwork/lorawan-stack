@@ -674,6 +674,8 @@ func (v MACVersion) String() string {
 		return "1.0.2"
 	case MAC_V1_0_3:
 		return "1.0.3"
+	case MAC_V1_0_4:
+		return "1.0.4"
 	case MAC_V1_1:
 		return "1.1.0"
 	}
@@ -706,7 +708,44 @@ func (v MACVersion) EncryptFOpts() bool {
 // HasMaxFCntGap reports whether v defines a MaxFCntGap.
 // HasMaxFCntGap panics, if v.Validate() returns non-nil error.
 func (v MACVersion) HasMaxFCntGap() bool {
-	return v.Compare(MAC_V1_1) < 0
+	return v.Compare(MAC_V1_0_4) < 0
+}
+
+// HasNoChangeTXPowerIndex reports whether v defines a no-change TxPowerIndex value.
+// HasNoChangeTXPowerIndex panics, if v.Validate() returns non-nil error.
+func (v MACVersion) HasNoChangeTXPowerIndex() bool {
+	return v.Compare(MAC_V1_0_4) >= 0
+}
+
+// HasNoChangeDataRateIndex reports whether v defines a no-change DataRateIndex value.
+// HasNoChangeDataRateIndex panics, if v.Validate() returns non-nil error.
+func (v MACVersion) HasNoChangeDataRateIndex() bool {
+	return v.Compare(MAC_V1_0_4) >= 0
+}
+
+// IgnoreUplinksExceedingLengthLimit reports whether v requires Network Server to
+// silently drop uplinks exceeding selected data rate payload length limits.
+// IgnoreUplinksExceedingLengthLimit panics, if v.Validate() returns non-nil error.
+func (v MACVersion) IgnoreUplinksExceedingLengthLimit() bool {
+	return v.Compare(MAC_V1_0_4) >= 0 && v.Compare(MAC_V1_1) < 0
+}
+
+// IncrementDevNonce reports whether v defines DevNonce as an incrementing counter.
+// IncrementDevNonce panics, if v.Validate() returns non-nil error.
+func (v MACVersion) IncrementDevNonce() bool {
+	return v.Compare(MAC_V1_0_4) >= 0
+}
+
+// UseNwkKey reports whether v uses a root NwkKey.
+// UseNwkKey panics, if v.Validate() returns non-nil error.
+func (v MACVersion) UseNwkKey() bool {
+	return v.Compare(MAC_V1_1) >= 0
+}
+
+// RequireDevEUIForABP reports whether v requires ABP devices to have a DevEUI associated.
+// RequireDevEUIForABP panics, if v.Validate() returns non-nil error.
+func (v MACVersion) RequireDevEUIForABP() bool {
+	return v.Compare(MAC_V1_0_4) >= 0 && v.Compare(MAC_V1_1) < 0
 }
 
 // Validate reports whether v represents a valid PHYVersion.

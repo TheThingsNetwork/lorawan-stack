@@ -110,18 +110,6 @@ func getDeviceBandVersion(dev *ttnpb.EndDevice, fps *frequencyplans.Store) (*fre
 	return fp, b, nil
 }
 
-func searchDataRate(dr ttnpb.DataRate, dev *ttnpb.EndDevice, fps *frequencyplans.Store) (ttnpb.DataRateIndex, error) {
-	_, phy, err := getDeviceBandVersion(dev, fps)
-	if err != nil {
-		return 0, err
-	}
-	idx, ok := phy.FindDataRate(dr)
-	if !ok {
-		return 0, errDataRateNotFound.WithAttributes("data_rate", dr)
-	}
-	return idx, nil
-}
-
 func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
 	for i, ch := range macState.CurrentParameters.Channels {
 		if ch.UplinkFrequency == freq {
