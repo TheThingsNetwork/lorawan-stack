@@ -1121,6 +1121,18 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	macState.RxWindowsAvailable = true
 
+	chIdx, err := searchUplinkChannel(up.Settings.Frequency, macState)
+	if err != nil {
+		return err
+	}
+	up.DeviceChannelIndex = uint32(chIdx)
+
+	drIdx, _, ok := phy.FindDataRate(up.Settings.DataRate)
+	if !ok {
+		return errDataRateNotFound
+	}
+	up.Settings.DataRateIndex = drIdx
+
 	events.Publish(evtForwardJoinRequest(ctx, dev.EndDeviceIdentifiers, nil))
 	registerForwardJoinRequest(ctx, up)
 
@@ -1139,40 +1151,21 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
-			"queued_application_downlinks",
 			"recent_uplinks",
+			"session.queued_application_downlinks",
 		},
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during join-request handling, drop")
 				return nil, nil, errOutdatedData
 			}
-
-			var paths []string
-
+			invalidatedQueue = stored.GetSession().GetQueuedApplicationDownlinks()
 			stored.PendingMACState = macState
-			paths = append(paths, "pending_mac_state")
-
-			chIdx, err := searchUplinkChannel(up.Settings.Frequency, macState)
-			if err != nil {
-				return nil, nil, err
-			}
-			up.DeviceChannelIndex = uint32(chIdx)
-
-			drIdx, _, ok := phy.FindDataRate(up.Settings.DataRate)
-			if !ok {
-				return nil, nil, errDataRateNotFound
-			}
-			up.Settings.DataRateIndex = drIdx
-
 			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
-			paths = append(paths, "recent_uplinks")
-
-			invalidatedQueue = stored.QueuedApplicationDownlinks
-			stored.QueuedApplicationDownlinks = nil
-			paths = append(paths, "queued_application_downlinks")
-
-			return stored, paths, nil
+			return stored, []string{
+				"pending_mac_state",
+				"recent_uplinks",
+			}, nil
 		})
 	if err != nil {
 		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)

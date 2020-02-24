@@ -20,7 +20,7 @@ import (
 
 var (
 	errABPJoinRequest             = errors.DefineInvalidArgument("abp_join_request", "received a join-request from ABP device")
-	errApplicationDownlinkTooLong = errors.DefineInvalidArgument("application_downlink_too_long", "application downlink payload length '{length}' exceeds maximum '{max}'")
+	errApplicationDownlinkTooLong = errors.DefineInvalidArgument("application_downlink_too_long", "application downlink payload length `{length}` exceeds maximum '{max}'")
 	errClassAMulticast            = errors.DefineInvalidArgument("class_a_multicast", "multicast device in class A mode")
 	errClassBCForClassA           = errors.DefineInvalidArgument("class_b_c_for_class_a", "class B/C downlink queued for device in class A mode")
 	errComputeMIC                 = errors.DefineInvalidArgument("compute_mic", "failed to compute MIC")
@@ -35,7 +35,7 @@ var (
 	errEncodePayload              = errors.Define("encode_payload", "failed to encode payload")
 	errEncryptMAC                 = errors.DefineInternal("encrypt_mac", "failed to encrypt MAC commands")
 	errExpiredDownlink            = errors.DefineFailedPrecondition("downlink_expired", "queued downlink is expired")
-	errFCntTooLow                 = errors.DefineInvalidArgument("f_cnt_too_low", "FCnt is too low")
+	errFCntTooLow                 = errors.DefineInvalidArgument("f_cnt_too_low", "FCnt `{f_cnt}` is lower than minimum of `{min_f_cnt}`")
 	errInvalidAbsoluteTime        = errors.DefineInvalidArgument("absolute_time", "invalid absolute time set in application downlink")
 	errInvalidChannelIndex        = errors.DefineInvalidArgument("channel_index", "invalid channel index")
 	errInvalidConfiguration       = errors.DefineInvalidArgument("configuration", "invalid configuration")
@@ -58,6 +58,6 @@ var (
 	errUnknownNwkSEncKey          = errors.DefineNotFound("unknown_nwk_s_enc_key", "NwkSEncKey is unknown")
 	errUnknownSession             = errors.DefineNotFound("unknown_session", "unknown session")
 	errUnknownSNwkSIntKey         = errors.DefineNotFound("unknown_s_nwk_s_int_key", "SNwkSIntKey is unknown")
-	errUnsupportedLoRaWANVersion  = errors.DefineInvalidArgument("unsupported_lorawan_version", "unsupported LoRaWAN version: {version}", "version")
+	errUnsupportedLoRaWANVersion  = errors.DefineInvalidArgument("unsupported_lorawan_version", "unsupported LoRaWAN version: `{version}`", "version")
 	errUplinkChannelNotFound      = errors.DefineNotFound("uplink_channel_not_found", "uplink channel not found")
 )

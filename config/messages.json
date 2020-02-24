@@ -5257,7 +5257,7 @@
   },
   "error:pkg/networkserver:application_downlink_too_long": {
     "translations": {
-      "en": "application downlink payload length '{length}' exceeds maximum '{max}'"
+      "en": "application downlink payload length `{length}` exceeds maximum '{max}'"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -5428,7 +5428,7 @@
   },
   "error:pkg/networkserver:f_cnt_too_low": {
     "translations": {
-      "en": "FCnt is too low"
+      "en": "FCnt `{f_cnt}` is lower than minimum of `{min_f_cnt}`"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -5608,7 +5608,7 @@
   },
   "error:pkg/networkserver:unsupported_lorawan_version": {
     "translations": {
-      "en": "unsupported LoRaWAN version: {version}"
+      "en": "unsupported LoRaWAN version: `{version}`"
     },
     "description": {
       "package": "pkg/networkserver",

@@ -307,9 +307,9 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	ctx = log.NewContext(ctx, logger)
 
 	if len(cmdBuf) <= fOptsCapacity {
-		appDowns := dev.QueuedApplicationDownlinks[:0:0]
+		appDowns := dev.Session.QueuedApplicationDownlinks[:0:0]
 	outer:
-		for i, down := range dev.QueuedApplicationDownlinks {
+		for i, down := range dev.Session.QueuedApplicationDownlinks {
 			logger := loggerWithApplicationDownlinkFields(logger, down)
 
 			switch {
@@ -333,7 +333,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 
 			case down.FCnt <= dev.Session.LastNFCntDown && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0:
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
-				invalid, rest := partitionDownlinksBySessionKeyIDEquality(dev.Session.SessionKeyID, dev.QueuedApplicationDownlinks[i:]...)
+				invalid, rest := partitionDownlinksBySessionKeyIDEquality(dev.Session.SessionKeyID, dev.Session.QueuedApplicationDownlinks[i:]...)
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
 					CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
@@ -376,14 +376,14 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				// TODO: Check if following downlinks must be dropped (https://github.com/TheThingsNetwork/lorawan-stack/issues/1653).
 
 			case down.ClassBC != nil && class == ttnpb.CLASS_A:
-				appDowns = append(appDowns, dev.QueuedApplicationDownlinks[i:]...)
+				appDowns = append(appDowns, dev.Session.QueuedApplicationDownlinks[i:]...)
 				logger.Debug("Skip class B/C downlink for class A downlink slot")
 				break outer
 
 			case len(down.FRMPayload) > int(maxDownLen):
 				if len(down.FRMPayload) <= int(maxDownLen)+len(cmdBuf) {
 					logger.Debug("Skip application downlink with payload length exceeding band regulations due to FOpts field being non-empty")
-					appDowns = append(appDowns, dev.QueuedApplicationDownlinks[i:]...)
+					appDowns = append(appDowns, dev.Session.QueuedApplicationDownlinks[i:]...)
 				} else {
 					logger.Debug("Drop application downlink with payload length exceeding band regulations")
 					genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
@@ -400,17 +400,17 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				}
 
 			default:
-				appDowns = append(appDowns, dev.QueuedApplicationDownlinks[i+1:]...)
+				appDowns = append(appDowns, dev.Session.QueuedApplicationDownlinks[i+1:]...)
 				genState.ApplicationDownlink = down
 				break outer
 			}
 		}
 		if genState.ApplicationDownlink != nil {
-			genState.NeedsDownlinkQueueUpdate = len(appDowns) != len(dev.QueuedApplicationDownlinks)-1
+			genState.NeedsDownlinkQueueUpdate = len(appDowns) != len(dev.Session.QueuedApplicationDownlinks)-1
 		} else {
-			genState.NeedsDownlinkQueueUpdate = len(appDowns) != len(dev.QueuedApplicationDownlinks)
+			genState.NeedsDownlinkQueueUpdate = len(appDowns) != len(dev.Session.QueuedApplicationDownlinks)
 		}
-		dev.QueuedApplicationDownlinks = appDowns
+		dev.Session.QueuedApplicationDownlinks = appDowns
 	}
 
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
@@ -474,14 +474,14 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			CorrelationIDs:       events.CorrelationIDsFromContext(ctx),
 			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
-					Downlinks:    dev.QueuedApplicationDownlinks,
+					Downlinks:    dev.Session.QueuedApplicationDownlinks,
 					LastFCntDown: pld.FHDR.FCnt,
 				},
 			},
 		})
 	}
 	if class != ttnpb.CLASS_C {
-		pld.FHDR.FCtrl.FPending = fPending || len(dev.QueuedApplicationDownlinks) > 0
+		pld.FHDR.FCtrl.FPending = fPending || len(dev.Session.QueuedApplicationDownlinks) > 0
 	}
 
 	logger = logger.WithField("f_pending", pld.FHDR.FCtrl.FPending)
@@ -1033,7 +1033,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	)
 	if genState.NeedsDownlinkQueueUpdate {
 		sets = ttnpb.AddFields(sets,
-			"queued_application_downlinks",
+			"session.queued_application_downlinks",
 		)
 	}
 	if err != nil {
@@ -1045,7 +1045,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			logger.WithError(err).Warn("Failed to generate class A downlink, skip class A downlink slot")
 		}
 		if genState.ApplicationDownlink != nil {
-			dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+			dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 		}
 		return downlinkAttemptResult{
 			SetPaths:              sets,
@@ -1082,7 +1082,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		if err != nil {
 			logger.WithError(err).Warn("Failed to generate Tx request from uplink, skip class A downlink slot")
 			if genState.ApplicationDownlink != nil {
-				dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+				dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 			}
 			dev.MACState.QueuedResponses = nil
 			dev.MACState.RxWindowsAvailable = false
@@ -1116,7 +1116,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		}
 		logger.Warn("All Gateway Servers failed to schedule downlink, skip class A downlink slot")
 		if genState.ApplicationDownlink != nil {
-			dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+			dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 		}
 		dev.MACState.QueuedResponses = nil
 		dev.MACState.RxWindowsAvailable = false
@@ -1129,7 +1129,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		}
 	}
 	if genState.ApplicationDownlink != nil {
-		sets = ttnpb.AddFields(sets, "queued_application_downlinks")
+		sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
 	}
 	recordDataDownlink(dev, genDown, genState, down, ns.defaultMACSettings)
 	return downlinkAttemptResult{
@@ -1175,7 +1175,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				"mac_state",
 				"multicast",
 				"pending_mac_state",
-				"queued_application_downlinks",
 				"recent_downlinks",
 				"recent_uplinks",
 				"session",
@@ -1367,15 +1366,13 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					maxUpLength,
 				)
 				if genState.NeedsDownlinkQueueUpdate {
-					sets = []string{
-						"queued_application_downlinks",
-					}
+					sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
 				}
 				if err != nil {
 					logger.WithError(err).Warn("Failed to generate class B/C downlink, skip class B/C downlink slot")
 					queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, false)
-					if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "queued_application_downlinks") {
-						dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+					if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "session.queued_application_downlinks") {
+						dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 					}
 					return dev, sets, nil
 				}
@@ -1402,8 +1399,8 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					if len(paths) == 0 {
 						logger.Warn("No downlink path available, skip class B/C downlink slot")
 						queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, false)
-						if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "queued_application_downlinks") {
-							dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+						if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "session.queued_application_downlinks") {
+							dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 						}
 						return dev, sets, nil
 					}
@@ -1461,7 +1458,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 									},
 								})
 								if !genState.NeedsDownlinkQueueUpdate {
-									sets = ttnpb.AddFields(sets, "queued_application_downlinks")
+									sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
 								}
 								return dev, sets, nil
 							}
@@ -1481,7 +1478,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 									},
 								})
 								if !genState.NeedsDownlinkQueueUpdate {
-									sets = ttnpb.AddFields(sets, "queued_application_downlinks")
+									sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
 								}
 								return dev, sets, nil
 							}
@@ -1489,7 +1486,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					}
 					logger.Warn("All Gateway Servers failed to schedule downlink, skip class B/C downlink slot")
 					if genState.NeedsDownlinkQueueUpdate {
-						dev.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.QueuedApplicationDownlinks...)
+						dev.Session.QueuedApplicationDownlinks = append([]*ttnpb.ApplicationDownlink{genState.ApplicationDownlink}, dev.Session.QueuedApplicationDownlinks...)
 					}
 					return dev, sets, nil
 				}
@@ -1498,7 +1495,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				queuedEvents = append(queuedEvents, genState.Events...)
 				queuedApplicationUplinks = genState.appendApplicationUplinks(queuedApplicationUplinks, true)
 				if genState.ApplicationDownlink != nil {
-					sets = ttnpb.AddFields(sets, "queued_application_downlinks")
+					sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
 				}
 				return dev, ttnpb.AddFields(sets,
 					"mac_state.last_confirmed_downlink_at",
