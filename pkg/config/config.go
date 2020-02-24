@@ -259,9 +259,9 @@ func (m *Manager) inCLIFlags(path string) bool {
 func (m *Manager) ReadInConfig() error {
 	files := m.viper.GetStringSlice(m.configFlag)
 	for _, file := range files {
-		// ignore default config files that do not exist
+		// ignore default config files that are missing or do not have read permissions
 		if m.isDefault(file) && !m.inCLIFlags(file) {
-			if _, err := os.Stat(file); os.IsNotExist(err) {
+			if _, err := os.Stat(file); os.IsNotExist(err) || os.IsPermission(err) {
 				continue
 			}
 		}
