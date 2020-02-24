@@ -21,7 +21,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -154,32 +153,36 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_delay") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.adr_ack_delay_exponent") {
-		gets = ttnpb.AddFields(gets, "mac_state.current_parameters.adr_ack_delay_exponent")
-	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_limit") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.adr_ack_limit_exponent") {
-		gets = ttnpb.AddFields(gets, "mac_state.current_parameters.adr_ack_limit_exponent")
-	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.ping_slot_data_rate_index") && !ttnpb.HasAnyField(gets, "mac_state.current_parameters.ping_slot_data_rate_index_value") {
-		gets = ttnpb.AddFields(gets, "mac_state.current_parameters.ping_slot_data_rate_index_value")
-	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_delay") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.adr_ack_delay_exponent") {
-		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.adr_ack_delay_exponent")
-	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_limit") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.adr_ack_limit_exponent") {
-		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.adr_ack_limit_exponent")
-	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.ping_slot_data_rate_index") && !ttnpb.HasAnyField(gets, "mac_state.desired_parameters.ping_slot_data_rate_index_value") {
-		gets = ttnpb.AddFields(gets, "mac_state.desired_parameters.ping_slot_data_rate_index_value")
-	}
-
 	dev, ctx, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to get device from registry")
 		return nil, err
 	}
 
-	if dev.GetMACState().GetQueuedJoinAccept() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+	if dev.PendingSession != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_session.keys.f_nwk_s_int_key.key",
+		"pending_session.keys.nwk_s_enc_key.key",
+		"pending_session.keys.s_nwk_s_int_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, ns.KeyVault, dev.PendingSession.SessionKeys, "pending_session.keys", req.FieldMask.Paths...)
+		if err != nil {
+			return nil, err
+		}
+		dev.PendingSession.SessionKeys = sk
+	}
+	if dev.Session != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"session.keys.f_nwk_s_int_key.key",
+		"session.keys.nwk_s_enc_key.key",
+		"session.keys.s_nwk_s_int_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, ns.KeyVault, dev.Session.SessionKeys, "session.keys", req.FieldMask.Paths...)
+		if err != nil {
+			return nil, err
+		}
+		dev.Session.SessionKeys = sk
+	}
+
+	if dev.MACState.GetQueuedJoinAccept() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
 		"mac_state.queued_join_accept.keys.app_s_key.key",
 		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
 		"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
@@ -200,49 +203,6 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 			}
 		}
 		dev.MACState.QueuedJoinAccept.Keys = sk
-	}
-	if dev.GetPendingSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
-		"pending_session.keys.f_nwk_s_int_key.key",
-		"pending_session.keys.nwk_s_enc_key.key",
-		"pending_session.keys.s_nwk_s_int_key.key",
-	) {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, ns.KeyVault, dev.PendingSession.SessionKeys, "pending_session.keys", req.FieldMask.Paths...)
-		if err != nil {
-			return nil, err
-		}
-		dev.PendingSession.SessionKeys = sk
-	}
-	if dev.GetSession() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
-		"session.keys.f_nwk_s_int_key.key",
-		"session.keys.nwk_s_enc_key.key",
-		"session.keys.s_nwk_s_int_key.key",
-	) {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, ns.KeyVault, dev.Session.SessionKeys, "session.keys", req.FieldMask.Paths...)
-		if err != nil {
-			return nil, err
-		}
-		dev.Session.SessionKeys = sk
-	}
-
-	if dev.MACState != nil {
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_delay") && dev.MACState.CurrentParameters.ADRAckDelayExponent != nil {
-			dev.MACState.CurrentParameters.ADRAckDelay = lorawan.ADRAckDelayExponentToUint32(dev.MACState.CurrentParameters.ADRAckDelayExponent.Value)
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.adr_ack_limit") && dev.MACState.CurrentParameters.ADRAckLimitExponent != nil {
-			dev.MACState.CurrentParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(dev.MACState.CurrentParameters.ADRAckLimitExponent.Value)
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.current_parameters.ping_slot_data_rate_index") && dev.MACState.CurrentParameters.PingSlotDataRateIndexValue != nil {
-			dev.MACState.CurrentParameters.PingSlotDataRateIndex = dev.MACState.CurrentParameters.PingSlotDataRateIndexValue.Value
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_delay") && dev.MACState.DesiredParameters.ADRAckDelayExponent != nil {
-			dev.MACState.DesiredParameters.ADRAckDelay = lorawan.ADRAckDelayExponentToUint32(dev.MACState.DesiredParameters.ADRAckDelayExponent.Value)
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.adr_ack_limit") && dev.MACState.DesiredParameters.ADRAckLimitExponent != nil {
-			dev.MACState.DesiredParameters.ADRAckLimit = lorawan.ADRAckLimitExponentToUint32(dev.MACState.DesiredParameters.ADRAckLimitExponent.Value)
-		}
-		if ttnpb.HasAnyField(req.FieldMask.Paths, "mac_state.desired_parameters.ping_slot_data_rate_index") && dev.MACState.DesiredParameters.PingSlotDataRateIndexValue != nil {
-			dev.MACState.DesiredParameters.PingSlotDataRateIndex = dev.MACState.DesiredParameters.PingSlotDataRateIndexValue.Value
-		}
 	}
 	return ttnpb.FilterGetEndDevice(dev, req.FieldMask.Paths...)
 }
