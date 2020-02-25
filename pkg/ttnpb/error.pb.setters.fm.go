@@ -5,7 +5,7 @@ package ttnpb
 import fmt "fmt"
 
 func (dst *ErrorDetails) SetFields(src *ErrorDetails, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "namespace":
 			if len(subs) > 0 {

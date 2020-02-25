@@ -8,7 +8,7 @@ import (
 )
 
 func (dst *Event) SetFields(src *Event, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "name":
 			if len(subs) > 0 {
@@ -110,7 +110,7 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 }
 
 func (dst *StreamEventsRequest) SetFields(src *StreamEventsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "identifiers":
 			if len(subs) > 0 {

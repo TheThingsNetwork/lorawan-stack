@@ -8,7 +8,7 @@ import (
 )
 
 func (dst *OAuthClientAuthorizationIdentifiers) SetFields(src *OAuthClientAuthorizationIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -55,7 +55,7 @@ func (dst *OAuthClientAuthorizationIdentifiers) SetFields(src *OAuthClientAuthor
 }
 
 func (dst *OAuthClientAuthorization) SetFields(src *OAuthClientAuthorization, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -131,7 +131,7 @@ func (dst *OAuthClientAuthorization) SetFields(src *OAuthClientAuthorization, pa
 }
 
 func (dst *OAuthClientAuthorizations) SetFields(src *OAuthClientAuthorizations, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "authorizations":
 			if len(subs) > 0 {
@@ -151,7 +151,7 @@ func (dst *OAuthClientAuthorizations) SetFields(src *OAuthClientAuthorizations, 
 }
 
 func (dst *ListOAuthClientAuthorizationsRequest) SetFields(src *ListOAuthClientAuthorizationsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -210,7 +210,7 @@ func (dst *ListOAuthClientAuthorizationsRequest) SetFields(src *ListOAuthClientA
 }
 
 func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -316,7 +316,7 @@ func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths 
 }
 
 func (dst *OAuthAccessTokenIdentifiers) SetFields(src *OAuthAccessTokenIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -373,7 +373,7 @@ func (dst *OAuthAccessTokenIdentifiers) SetFields(src *OAuthAccessTokenIdentifie
 }
 
 func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -479,7 +479,7 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 }
 
 func (dst *OAuthAccessTokens) SetFields(src *OAuthAccessTokens, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "tokens":
 			if len(subs) > 0 {
@@ -499,7 +499,7 @@ func (dst *OAuthAccessTokens) SetFields(src *OAuthAccessTokens, paths ...string)
 }
 
 func (dst *ListOAuthAccessTokensRequest) SetFields(src *ListOAuthAccessTokensRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {

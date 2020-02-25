@@ -5,7 +5,7 @@ package ttnpb
 import fmt "fmt"
 
 func (dst *Picture) SetFields(src *Picture, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "embedded":
 			if len(subs) > 0 {
@@ -50,7 +50,7 @@ func (dst *Picture) SetFields(src *Picture, paths ...string) error {
 }
 
 func (dst *Picture_Embedded) SetFields(src *Picture_Embedded, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "mime_type":
 			if len(subs) > 0 {

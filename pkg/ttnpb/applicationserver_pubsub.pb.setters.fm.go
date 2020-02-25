@@ -10,7 +10,7 @@ import (
 )
 
 func (dst *ApplicationPubSubIdentifiers) SetFields(src *ApplicationPubSubIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -49,7 +49,7 @@ func (dst *ApplicationPubSubIdentifiers) SetFields(src *ApplicationPubSubIdentif
 }
 
 func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -455,7 +455,7 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 }
 
 func (dst *ApplicationPubSubs) SetFields(src *ApplicationPubSubs, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "pubsubs":
 			if len(subs) > 0 {
@@ -475,7 +475,7 @@ func (dst *ApplicationPubSubs) SetFields(src *ApplicationPubSubs, paths ...strin
 }
 
 func (dst *ApplicationPubSubFormats) SetFields(src *ApplicationPubSubFormats, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "formats":
 			if len(subs) > 0 {
@@ -495,7 +495,7 @@ func (dst *ApplicationPubSubFormats) SetFields(src *ApplicationPubSubFormats, pa
 }
 
 func (dst *GetApplicationPubSubRequest) SetFields(src *GetApplicationPubSubRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -534,7 +534,7 @@ func (dst *GetApplicationPubSubRequest) SetFields(src *GetApplicationPubSubReque
 }
 
 func (dst *ListApplicationPubSubsRequest) SetFields(src *ListApplicationPubSubsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -573,7 +573,7 @@ func (dst *ListApplicationPubSubsRequest) SetFields(src *ListApplicationPubSubsR
 }
 
 func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "pubsub":
 			if len(subs) > 0 {
@@ -612,7 +612,7 @@ func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubReque
 }
 
 func (dst *ApplicationPubSub_NATSProvider) SetFields(src *ApplicationPubSub_NATSProvider, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "server_url":
 			if len(subs) > 0 {
@@ -633,7 +633,7 @@ func (dst *ApplicationPubSub_NATSProvider) SetFields(src *ApplicationPubSub_NATS
 }
 
 func (dst *ApplicationPubSub_MQTTProvider) SetFields(src *ApplicationPubSub_MQTTProvider, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "server_url":
 			if len(subs) > 0 {
@@ -741,7 +741,7 @@ func (dst *ApplicationPubSub_MQTTProvider) SetFields(src *ApplicationPubSub_MQTT
 }
 
 func (dst *ApplicationPubSub_Message) SetFields(src *ApplicationPubSub_Message, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "topic":
 			if len(subs) > 0 {

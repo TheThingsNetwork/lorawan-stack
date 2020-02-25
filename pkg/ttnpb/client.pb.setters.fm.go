@@ -10,7 +10,7 @@ import (
 )
 
 func (dst *Client) SetFields(src *Client, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -164,7 +164,7 @@ func (dst *Client) SetFields(src *Client, paths ...string) error {
 }
 
 func (dst *Clients) SetFields(src *Clients, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "clients":
 			if len(subs) > 0 {
@@ -184,7 +184,7 @@ func (dst *Clients) SetFields(src *Clients, paths ...string) error {
 }
 
 func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "client_ids":
 			if len(subs) > 0 {
@@ -223,7 +223,7 @@ func (dst *GetClientRequest) SetFields(src *GetClientRequest, paths ...string) e
 }
 
 func (dst *ListClientsRequest) SetFields(src *ListClientsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
@@ -299,7 +299,7 @@ func (dst *ListClientsRequest) SetFields(src *ListClientsRequest, paths ...strin
 }
 
 func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "client":
 			if len(subs) > 0 {
@@ -346,7 +346,7 @@ func (dst *CreateClientRequest) SetFields(src *CreateClientRequest, paths ...str
 }
 
 func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "client":
 			if len(subs) > 0 {
@@ -385,7 +385,7 @@ func (dst *UpdateClientRequest) SetFields(src *UpdateClientRequest, paths ...str
 }
 
 func (dst *ListClientCollaboratorsRequest) SetFields(src *ListClientCollaboratorsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "client_ids":
 			if len(subs) > 0 {
@@ -434,7 +434,7 @@ func (dst *ListClientCollaboratorsRequest) SetFields(src *ListClientCollaborator
 }
 
 func (dst *GetClientCollaboratorRequest) SetFields(src *GetClientCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "client_ids":
 			if len(subs) > 0 {
@@ -481,7 +481,7 @@ func (dst *GetClientCollaboratorRequest) SetFields(src *GetClientCollaboratorReq
 }
 
 func (dst *SetClientCollaboratorRequest) SetFields(src *SetClientCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "client_ids":
 			if len(subs) > 0 {

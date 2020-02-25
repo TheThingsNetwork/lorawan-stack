@@ -9,7 +9,7 @@ import (
 )
 
 func (dst *QRCodeFormat) SetFields(src *QRCodeFormat, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "name":
 			if len(subs) > 0 {
@@ -50,7 +50,7 @@ func (dst *QRCodeFormat) SetFields(src *QRCodeFormat, paths ...string) error {
 }
 
 func (dst *QRCodeFormats) SetFields(src *QRCodeFormats, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "formats":
 			if len(subs) > 0 {
@@ -70,7 +70,7 @@ func (dst *QRCodeFormats) SetFields(src *QRCodeFormats, paths ...string) error {
 }
 
 func (dst *GetQRCodeFormatRequest) SetFields(src *GetQRCodeFormatRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "format_id":
 			if len(subs) > 0 {
@@ -91,7 +91,7 @@ func (dst *GetQRCodeFormatRequest) SetFields(src *GetQRCodeFormatRequest, paths 
 }
 
 func (dst *GenerateEndDeviceQRCodeRequest) SetFields(src *GenerateEndDeviceQRCodeRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "format_id":
 			if len(subs) > 0 {
@@ -155,7 +155,7 @@ func (dst *GenerateEndDeviceQRCodeRequest) SetFields(src *GenerateEndDeviceQRCod
 }
 
 func (dst *GenerateQRCodeResponse) SetFields(src *GenerateQRCodeResponse, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "text":
 			if len(subs) > 0 {
@@ -201,7 +201,7 @@ func (dst *GenerateQRCodeResponse) SetFields(src *GenerateQRCodeResponse, paths 
 }
 
 func (dst *GenerateEndDeviceQRCodeRequest_Image) SetFields(src *GenerateEndDeviceQRCodeRequest_Image, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "image_size":
 			if len(subs) > 0 {

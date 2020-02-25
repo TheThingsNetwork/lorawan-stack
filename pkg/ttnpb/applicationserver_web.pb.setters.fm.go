@@ -10,7 +10,7 @@ import (
 )
 
 func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -49,7 +49,7 @@ func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdent
 }
 
 func (dst *ApplicationWebhookTemplateIdentifiers) SetFields(src *ApplicationWebhookTemplateIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "template_id":
 			if len(subs) > 0 {
@@ -70,7 +70,7 @@ func (dst *ApplicationWebhookTemplateIdentifiers) SetFields(src *ApplicationWebh
 }
 
 func (dst *ApplicationWebhookTemplateField) SetFields(src *ApplicationWebhookTemplateField, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "id":
 			if len(subs) > 0 {
@@ -131,7 +131,7 @@ func (dst *ApplicationWebhookTemplateField) SetFields(src *ApplicationWebhookTem
 }
 
 func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -458,7 +458,7 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 }
 
 func (dst *ApplicationWebhookTemplates) SetFields(src *ApplicationWebhookTemplates, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "templates":
 			if len(subs) > 0 {
@@ -478,7 +478,7 @@ func (dst *ApplicationWebhookTemplates) SetFields(src *ApplicationWebhookTemplat
 }
 
 func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -800,7 +800,7 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 }
 
 func (dst *ApplicationWebhooks) SetFields(src *ApplicationWebhooks, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "webhooks":
 			if len(subs) > 0 {
@@ -820,7 +820,7 @@ func (dst *ApplicationWebhooks) SetFields(src *ApplicationWebhooks, paths ...str
 }
 
 func (dst *ApplicationWebhookFormats) SetFields(src *ApplicationWebhookFormats, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "formats":
 			if len(subs) > 0 {
@@ -840,7 +840,7 @@ func (dst *ApplicationWebhookFormats) SetFields(src *ApplicationWebhookFormats, 
 }
 
 func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -879,7 +879,7 @@ func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookReq
 }
 
 func (dst *ListApplicationWebhooksRequest) SetFields(src *ListApplicationWebhooksRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -918,7 +918,7 @@ func (dst *ListApplicationWebhooksRequest) SetFields(src *ListApplicationWebhook
 }
 
 func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "webhook":
 			if len(subs) > 0 {
@@ -957,7 +957,7 @@ func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookReq
 }
 
 func (dst *GetApplicationWebhookTemplateRequest) SetFields(src *GetApplicationWebhookTemplateRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -996,7 +996,7 @@ func (dst *GetApplicationWebhookTemplateRequest) SetFields(src *GetApplicationWe
 }
 
 func (dst *ListApplicationWebhookTemplatesRequest) SetFields(src *ListApplicationWebhookTemplatesRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "field_mask":
 			if len(subs) > 0 {
@@ -1017,7 +1017,7 @@ func (dst *ListApplicationWebhookTemplatesRequest) SetFields(src *ListApplicatio
 }
 
 func (dst *ApplicationWebhookTemplate_Message) SetFields(src *ApplicationWebhookTemplate_Message, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "path":
 			if len(subs) > 0 {
@@ -1038,7 +1038,7 @@ func (dst *ApplicationWebhookTemplate_Message) SetFields(src *ApplicationWebhook
 }
 
 func (dst *ApplicationWebhook_Message) SetFields(src *ApplicationWebhook_Message, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "path":
 			if len(subs) > 0 {

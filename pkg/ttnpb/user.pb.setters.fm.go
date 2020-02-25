@@ -10,7 +10,7 @@ import (
 )
 
 func (dst *User) SetFields(src *User, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -218,7 +218,7 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 }
 
 func (dst *Users) SetFields(src *Users, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "users":
 			if len(subs) > 0 {
@@ -238,7 +238,7 @@ func (dst *Users) SetFields(src *Users, paths ...string) error {
 }
 
 func (dst *GetUserRequest) SetFields(src *GetUserRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -277,7 +277,7 @@ func (dst *GetUserRequest) SetFields(src *GetUserRequest, paths ...string) error
 }
 
 func (dst *ListUsersRequest) SetFields(src *ListUsersRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "field_mask":
 			if len(subs) > 0 {
@@ -328,7 +328,7 @@ func (dst *ListUsersRequest) SetFields(src *ListUsersRequest, paths ...string) e
 }
 
 func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user":
 			if len(subs) > 0 {
@@ -367,7 +367,7 @@ func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string)
 }
 
 func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user":
 			if len(subs) > 0 {
@@ -406,7 +406,7 @@ func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string)
 }
 
 func (dst *CreateTemporaryPasswordRequest) SetFields(src *CreateTemporaryPasswordRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -435,7 +435,7 @@ func (dst *CreateTemporaryPasswordRequest) SetFields(src *CreateTemporaryPasswor
 }
 
 func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -494,7 +494,7 @@ func (dst *UpdateUserPasswordRequest) SetFields(src *UpdateUserPasswordRequest, 
 }
 
 func (dst *ListUserAPIKeysRequest) SetFields(src *ListUserAPIKeysRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -543,7 +543,7 @@ func (dst *ListUserAPIKeysRequest) SetFields(src *ListUserAPIKeysRequest, paths 
 }
 
 func (dst *GetUserAPIKeyRequest) SetFields(src *GetUserAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -582,7 +582,7 @@ func (dst *GetUserAPIKeyRequest) SetFields(src *GetUserAPIKeyRequest, paths ...s
 }
 
 func (dst *CreateUserAPIKeyRequest) SetFields(src *CreateUserAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -630,7 +630,7 @@ func (dst *CreateUserAPIKeyRequest) SetFields(src *CreateUserAPIKeyRequest, path
 }
 
 func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -677,7 +677,7 @@ func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, path
 }
 
 func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "email":
 			if len(subs) > 0 {
@@ -772,7 +772,7 @@ func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
 }
 
 func (dst *ListInvitationsRequest) SetFields(src *ListInvitationsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "limit":
 			if len(subs) > 0 {
@@ -803,7 +803,7 @@ func (dst *ListInvitationsRequest) SetFields(src *ListInvitationsRequest, paths 
 }
 
 func (dst *Invitations) SetFields(src *Invitations, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "invitations":
 			if len(subs) > 0 {
@@ -823,7 +823,7 @@ func (dst *Invitations) SetFields(src *Invitations, paths ...string) error {
 }
 
 func (dst *SendInvitationRequest) SetFields(src *SendInvitationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "email":
 			if len(subs) > 0 {
@@ -844,7 +844,7 @@ func (dst *SendInvitationRequest) SetFields(src *SendInvitationRequest, paths ..
 }
 
 func (dst *DeleteInvitationRequest) SetFields(src *DeleteInvitationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "email":
 			if len(subs) > 0 {
@@ -865,7 +865,7 @@ func (dst *DeleteInvitationRequest) SetFields(src *DeleteInvitationRequest, path
 }
 
 func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -904,7 +904,7 @@ func (dst *UserSessionIdentifiers) SetFields(src *UserSessionIdentifiers, paths 
 }
 
 func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
@@ -972,7 +972,7 @@ func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 }
 
 func (dst *UserSessions) SetFields(src *UserSessions, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "sessions":
 			if len(subs) > 0 {
@@ -992,7 +992,7 @@ func (dst *UserSessions) SetFields(src *UserSessions, paths ...string) error {
 }
 
 func (dst *ListUserSessionsRequest) SetFields(src *ListUserSessionsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_ids":
 			if len(subs) > 0 {
