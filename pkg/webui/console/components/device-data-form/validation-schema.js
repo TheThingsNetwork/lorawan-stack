@@ -108,6 +108,18 @@ const validationSchema = Yup.object({
                 : Yup.object().strip(), // Avoid generating when key is unexposed
           ),
         }),
+      net_id: Yup.nullableString()
+        .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
+        .default(''),
+      application_server_id: Yup.string()
+        .max(100, sharedMessages.validateTooLong)
+        .default(''),
+      application_server_kek_label: Yup.string()
+        .max(2048, sharedMessages.validateTooLong)
+        .default(''),
+      network_server_kek_label: Yup.string()
+        .max(2048, sharedMessages.validateTooLong)
+        .default(''),
       otherwise: schema =>
         schema.shape({
           nwk_key: Yup.object().strip(),
