@@ -26,7 +26,6 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/getsentry/raven-go"
 	"github.com/heptiolabs/healthcheck"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
@@ -36,9 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/interop"
 	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
 	"go.thethings.network/lorawan-stack/pkg/rpcserver"
-	"go.thethings.network/lorawan-stack/pkg/version"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"golang.org/x/crypto/acme/autocert"
 	"google.golang.org/grpc"
@@ -61,7 +58,6 @@ type Component struct {
 	acme *autocert.Manager
 
 	logger log.Stack
-	sentry *raven.Client
 
 	cluster    cluster.Cluster
 	clusterNew func(ctx context.Context, config *config.Cluster, options ...cluster.Option) (cluster.Cluster, error)
@@ -143,13 +139,6 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		tcpListeners: make(map[string]*listener),
 
 		KeyVault: keyVault,
-	}
-
-	if config.Sentry.DSN != "" {
-		c.sentry, _ = raven.New(config.Sentry.DSN)
-		c.sentry.SetIncludePaths([]string{"go.thethings.network/lorawan-stack"})
-		c.sentry.SetRelease(version.String())
-		c.logger.Use(sentry.New(c.sentry))
 	}
 
 	for _, opt := range opts {

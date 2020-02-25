@@ -20,9 +20,11 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/golang/gddo/httputil"
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	sentryerrors "go.thethings.network/lorawan-stack/pkg/errors/sentry"
 	_ "go.thethings.network/lorawan-stack/pkg/ttnpb" // imported for side-effect of correct TTN error rendering.
 )
 
@@ -88,10 +90,22 @@ func ErrorMiddleware(extraRenderers map[string]ErrorRenderer) echo.MiddlewareFun
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			err := next(c)
-			if err == nil || c.Response().Committed {
-				return err
+			if err == nil {
+				return nil
 			}
 			statusCode, err := ProcessError(err)
+			if c.Response().Committed {
+				statusCode = c.Response().Status
+			}
+			if statusCode >= 500 {
+				errEvent := sentryerrors.NewEvent(err)
+				errEvent.Transaction = c.Path()
+				errEvent.Request = errEvent.Request.FromHTTPRequest(c.Request())
+				sentry.CaptureEvent(errEvent)
+			}
+			if c.Response().Committed {
+				return err
+			}
 			renderer := httputil.NegotiateContentType(c.Request(), offers, "application/json")
 			if renderer != "" {
 				return renderers[renderer].RenderError(c, statusCode, err)

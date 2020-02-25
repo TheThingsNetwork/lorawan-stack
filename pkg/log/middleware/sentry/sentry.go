@@ -16,64 +16,63 @@
 package sentry
 
 import (
-	"errors"
-	"fmt"
-
-	raven "github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
+	sentryerrors "go.thethings.network/lorawan-stack/pkg/errors/sentry"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
 
 // Sentry is a log.Handler that sends errors to Sentry.
-type Sentry struct {
-	*raven.Client
-}
+type Sentry struct{}
 
 // New creates a new Sentry log middleware.
-func New(client *raven.Client) log.Middleware {
-	if client == nil {
-		client = raven.DefaultClient
-	}
-	return &Sentry{Client: client}
+func New() log.Middleware {
+	return &Sentry{}
 }
 
 // Wrap an existing log handler with Sentry.
 func (s *Sentry) Wrap(next log.Handler) log.Handler {
 	return log.HandlerFunc(func(entry log.Entry) (err error) {
-		switch entry.Level() {
-		case log.ErrorLevel:
-			s.forward(entry, false)
-		case log.FatalLevel:
-			s.forward(entry, true)
+		if entry.Level() == log.ErrorLevel {
+			s.forward(entry)
 		}
 		err = next.HandleLog(entry)
 		return
 	})
 }
 
-func (s *Sentry) forward(e log.Entry, wait bool) {
+func (s *Sentry) forward(e log.Entry) *sentry.EventID {
 	fields := e.Fields().Fields()
 	var err error
-	if fieldsErr, ok := fields["error"]; ok {
-		if fieldsErr, ok := fieldsErr.(error); ok {
-			err = fieldsErr
+	if namespaceField, ok := fields["namespace"]; ok {
+		switch namespaceField {
+		case "grpc", "web": // gRPC and web have their own Sentry integration.
+			return nil
 		}
 	}
-	details := make(map[string]string)
-	if err == nil {
-		err = errors.New(e.Message())
-	} else {
-		details["log_message"] = e.Message()
-	}
-	for k, v := range fields {
-		if k != "error" {
-			details[k] = fmt.Sprint(v)
+	if errField, ok := fields["error"]; ok {
+		if errField, ok := errField.(error); ok {
+			err = errField
 		}
 	}
-	details["log_level"] = e.Level().String()
-	trace := raven.NewStacktrace(6, 3, []string{"github.com/TheThings", "go.thethings"})
-	if wait {
-		s.Client.CaptureMessageAndWait(err.Error(), details, trace)
+	evt := sentryerrors.NewEvent(err)
+
+	evt.Message = e.Message()
+
+	// Add log fields.
+	if fld, ok := err.(log.Fielder); ok {
+		errFields := fld.Fields()
+		for k, v := range fields {
+			// Filter out error fields.
+			if _, isErrField := errFields[k]; isErrField {
+				continue
+			}
+			evt.Extra[k] = v
+		}
 	} else {
-		s.Client.CaptureMessage(err.Error(), details, trace) // non-blocking
+		for k, v := range fields {
+			evt.Extra[k] = v
+		}
 	}
+
+	return sentry.CaptureEvent(evt)
 }

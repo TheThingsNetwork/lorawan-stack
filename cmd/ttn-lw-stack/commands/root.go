@@ -19,6 +19,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/cmd/internal/commands"
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
@@ -26,6 +27,8 @@ import (
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	logsentry "go.thethings.network/lorawan-stack/pkg/log/middleware/sentry"
+	pkgversion "go.thethings.network/lorawan-stack/pkg/version"
 )
 
 var errMissingFlag = errors.DefineInvalidArgument("missing_flag", "missing CLI flag `{flag}`")
@@ -62,6 +65,21 @@ var (
 				log.WithLevel(config.Base.Log.Level),
 				log.WithHandler(log.NewCLI(os.Stdout)),
 			)
+
+			if config.Sentry.DSN != "" {
+				opts := sentry.ClientOptions{
+					Dsn:     config.Sentry.DSN,
+					Release: pkgversion.String(),
+				}
+				if hostname, err := os.Hostname(); err == nil {
+					opts.ServerName = hostname
+				}
+				err = sentry.Init(opts)
+				if err != nil {
+					return err
+				}
+				logger.Use(logsentry.New())
+			}
 
 			ctx = log.NewContext(ctx, logger)
 
