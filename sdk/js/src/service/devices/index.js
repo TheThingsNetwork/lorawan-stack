@@ -219,15 +219,22 @@ class Devices {
     if (errors.length !== 0) {
       // Roll back successfully created registry entries
       if (create) {
-        this._deleteDevice(appId, devId, setParts.map(e => e.hasAttempted && !e.hasErrored))
+        const rollbackComponents = setParts.reduce((components, part) => {
+          if (part.hasAttempted && !part.hasErrored) {
+            components.push(part.component)
+          }
+
+          return components
+        }, [])
+
+        this._deleteDevice(appId, devId, rollbackComponents)
       }
 
       // Throw the first error
       throw errors[0].error
     }
 
-    const result = mergeDevice(setParts)
-    return result
+    return mergeDevice(setParts)
   }
 
   async _getDevice(applicationId, deviceId, paths, ignoreNotFound) {
