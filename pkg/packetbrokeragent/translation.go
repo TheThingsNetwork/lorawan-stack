@@ -18,6 +18,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/json"
+	"math"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -65,10 +66,15 @@ func fromPBDataRate(region packetbroker.Region, index int) (ttnpb.DataRate, bool
 	if err != nil {
 		return ttnpb.DataRate{}, false
 	}
-	if index >= len(phy.DataRates) {
+	if index < 0 || index > math.MaxInt32 {
+		// All protobuf enums are int32-typed, so ensure it does not overflow.
 		return ttnpb.DataRate{}, false
 	}
-	return phy.DataRates[index].Rate, true
+	dr, ok := phy.DataRates[ttnpb.DataRateIndex(index)]
+	if !ok {
+		return ttnpb.DataRate{}, false
+	}
+	return dr.Rate, true
 }
 
 func toPBDataRateIndex(region packetbroker.Region, dr ttnpb.DataRate) (uint32, bool) {
