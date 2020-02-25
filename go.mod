@@ -47,14 +47,13 @@ require (
 	github.com/aws/aws-sdk-go v1.27.4
 	github.com/bep/tmc v0.5.1 // indirect
 	github.com/blang/semver v3.6.1+incompatible
-	github.com/certifi/gocertifi v0.0.0-20200104152315-a6d78f326758 // indirect
 	github.com/chrj/smtpd v0.1.2
 	github.com/client9/misspell v0.3.4
 	github.com/disintegration/imaging v1.6.2
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/envoyproxy/protoc-gen-validate v0.2.0-java
 	github.com/fsnotify/fsnotify v1.4.7
-	github.com/getsentry/raven-go v0.2.0
+	github.com/getsentry/sentry-go v0.5.1
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/gobuffalo/envy v1.8.1 // indirect
 	github.com/gobwas/glob v0.2.3
@@ -62,7 +61,6 @@ require (
 	github.com/gohugoio/hugo v0.62.2
 	github.com/golang/gddo v0.0.0-20191216155521-fbfc0f5e7810
 	github.com/golang/protobuf v1.3.3
-	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/google/rpmpack v0.0.0-20191226140753-aa36bfddb3a0 // indirect
 	github.com/google/wire v0.4.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190328170749-bb2674552d8f // indirect
@@ -88,8 +86,7 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/kamilsk/retry/v4 v4.4.1 // indirect
 	github.com/kr/pretty v0.2.0
-	// Do not upgrade Echo beyond v4.1.2 - see https://github.com/TheThingsNetwork/lorawan-stack/issues/977 .
-	github.com/labstack/echo/v4 v4.1.2
+	github.com/labstack/echo/v4 v4.1.11
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.3.0
 	github.com/magefile/mage v1.9.0
@@ -141,7 +138,6 @@ require (
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20200108215221-bd8f9a0ef82f
 	google.golang.org/grpc v1.26.0
-	// Do not upgrade go-sqlmock beyond v1.3.0 until https://github.com/heptiolabs/healthcheck/issues/23 is resolved
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
