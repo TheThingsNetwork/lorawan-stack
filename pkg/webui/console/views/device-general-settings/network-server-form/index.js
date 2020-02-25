@@ -60,7 +60,7 @@ const lorawanPhyVersions = [
 ]
 
 const NetworkServerForm = React.memo(props => {
-  const { device, onSubmit, onSubmitSuccess } = props
+  const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
 
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
@@ -91,10 +91,11 @@ const NetworkServerForm = React.memo(props => {
       _activation_mode,
       _external_js: hasExternalJs(device),
       _joined: isDeviceOTAA(device) && isDeviceJoined(device),
+      _generate_keys: mayReadKeys && mayEditKeys,
     }
 
     return validationSchema.cast(values)
-  }, [device])
+  }, [device, mayEditKeys, mayReadKeys])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
@@ -106,6 +107,7 @@ const NetworkServerForm = React.memo(props => {
         '_activation_mode',
         '_external_js',
         '_joined',
+        '_generate_keys',
       ])
 
       if (isABP) {
@@ -186,6 +188,10 @@ const NetworkServerForm = React.memo(props => {
     [initialValues],
   )
 
+  // We dont want to let the users edit `session` without read/write rights. This is unlikely to happen
+  // and such scenario is specific for some API keys, not for users.
+  const showKeys = mayReadKeys && mayEditKeys
+
   return (
     <Form
       validationSchema={validationSchema}
@@ -228,46 +234,52 @@ const NetworkServerForm = React.memo(props => {
       </Form.Field>
       {(isABP || isMulticast || isJoinedOTAA) && (
         <>
-          <DevAddrInput
-            title={sharedMessages.devAddr}
-            name="session.dev_addr"
-            placeholder={m.leaveBlankPlaceholder}
-            description={m.deviceAddrDescription}
-            required
-          />
-          <Form.Field
-            title={lorawanVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
-            name="session.keys.f_nwk_s_int_key.key"
-            type="byte"
-            min={16}
-            max={16}
-            placeholder={m.leaveBlankPlaceholder}
-            description={lorawanVersion >= 110 ? m.fNwkSIntKeyDescription : m.nwkSKeyDescription}
-            component={Input}
-          />
-          {lorawanVersion >= 110 && (
-            <Form.Field
-              title={sharedMessages.sNwkSIKey}
-              name="session.keys.s_nwk_s_int_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              placeholder={m.leaveBlankPlaceholder}
-              description={m.sNwkSIKeyDescription}
-              component={Input}
-            />
-          )}
-          {lorawanVersion >= 110 && (
-            <Form.Field
-              title={sharedMessages.nwkSEncKey}
-              name="session.keys.nwk_s_enc_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              placeholder={m.leaveBlankPlaceholder}
-              description={m.nwkSEncKeyDescription}
-              component={Input}
-            />
+          {showKeys && (
+            <>
+              <DevAddrInput
+                title={sharedMessages.devAddr}
+                name="session.dev_addr"
+                placeholder={m.leaveBlankPlaceholder}
+                description={m.deviceAddrDescription}
+                required
+              />
+              <Form.Field
+                title={lorawanVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
+                name="session.keys.f_nwk_s_int_key.key"
+                type="byte"
+                min={16}
+                max={16}
+                placeholder={m.leaveBlankPlaceholder}
+                description={
+                  lorawanVersion >= 110 ? m.fNwkSIntKeyDescription : m.nwkSKeyDescription
+                }
+                component={Input}
+              />
+              {lorawanVersion >= 110 && (
+                <Form.Field
+                  title={sharedMessages.sNwkSIKey}
+                  name="session.keys.s_nwk_s_int_key.key"
+                  type="byte"
+                  min={16}
+                  max={16}
+                  placeholder={m.leaveBlankPlaceholder}
+                  description={m.sNwkSIKeyDescription}
+                  component={Input}
+                />
+              )}
+              {lorawanVersion >= 110 && (
+                <Form.Field
+                  title={sharedMessages.nwkSEncKey}
+                  name="session.keys.nwk_s_enc_key.key"
+                  type="byte"
+                  min={16}
+                  max={16}
+                  placeholder={m.leaveBlankPlaceholder}
+                  description={m.nwkSEncKeyDescription}
+                  component={Input}
+                />
+              )}
+            </>
           )}
           {!isMulticast && !isJoinedOTAA && (
             <Form.Field
@@ -289,6 +301,8 @@ const NetworkServerForm = React.memo(props => {
 
 NetworkServerForm.propTypes = {
   device: PropTypes.device.isRequired,
+  mayEditKeys: PropTypes.bool.isRequired,
+  mayReadKeys: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
 }
