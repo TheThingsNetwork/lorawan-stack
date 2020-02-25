@@ -40,40 +40,15 @@ func init() {
 			},
 		},
 
-		DataRates: [16]DataRate{
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 12,
-				Bandwidth:       812000,
-			}}}, DefaultMaxSize: constPayloadSizer(59)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 11,
-				Bandwidth:       812000,
-			}}}, DefaultMaxSize: constPayloadSizer(123)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 10,
-				Bandwidth:       812000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 9,
-				Bandwidth:       812000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 8,
-				Bandwidth:       812000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 7,
-				Bandwidth:       812000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 6,
-				Bandwidth:       812000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
-			{Rate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-				SpreadingFactor: 5,
-				Bandwidth:       812000,
-			}}}, DefaultMaxSize: constPayloadSizer(230)},
-			{}, {}, {}, {}, {}, {}, {}, {}, // RFU
+		DataRates: map[ttnpb.DataRateIndex]DataRate{
+			0: makeLoRaDataRate(12, 812000, makeConstMaxMACPayloadSizeFunc(59)),
+			1: makeLoRaDataRate(11, 812000, makeConstMaxMACPayloadSizeFunc(123)),
+			2: makeLoRaDataRate(10, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+			3: makeLoRaDataRate(9, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+			4: makeLoRaDataRate(8, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+			5: makeLoRaDataRate(7, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+			6: makeLoRaDataRate(6, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+			7: makeLoRaDataRate(5, 812000, makeConstMaxMACPayloadSizeFunc(230)),
 		},
 		MaxADRDataRateIndex: 5,
 
