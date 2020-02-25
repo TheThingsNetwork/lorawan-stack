@@ -29,8 +29,8 @@ const validationSchema = Yup.object()
       .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
       .default(''),
     root_keys: Yup.object().when(
-      ['_external_js', '_lorawan_version'],
-      (externalJs, version, schema) => {
+      ['_external_js', '_lorawan_version', '_generate_keys'],
+      (externalJs, version, generateKeys, schema) => {
         const strippedSchema = Yup.object().strip()
         const keySchema = Yup.lazy(() => {
           return !externalJs
@@ -42,6 +42,10 @@ const validationSchema = Yup.object()
               })
             : Yup.object().strip()
         })
+
+        if (!generateKeys) {
+          return schema.strip()
+        }
 
         if (externalJs) {
           return schema.shape({

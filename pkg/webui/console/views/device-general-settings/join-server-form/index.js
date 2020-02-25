@@ -38,11 +38,11 @@ const isAppKeyHidden = ({ root_keys }) =>
   Boolean(root_keys) && Boolean(root_keys.app_key) && !Boolean(root_keys.app_key.key)
 
 const JoinServerForm = React.memo(props => {
-  const { device, onSubmit, onSubmitSuccess } = props
+  const { device, onSubmit, onSubmitSuccess, mayReadKeys, mayEditKeys } = props
 
   // Fallback to 1.1.0 in case NS is not available and lorawan version is not set present.
   const isNewLorawanVersion = parseLorawanMacVersion(device.lorawan_version || '1.1.0') >= 110
-  const externalJs = hasExternalJs(device)
+  const externalJs = hasExternalJs(device) && mayReadKeys
 
   const formRef = React.useRef(null)
   const [error, setError] = React.useState('')
@@ -54,10 +54,11 @@ const JoinServerForm = React.memo(props => {
       ...device,
       _external_js: hasExternalJs(device),
       _lorawan_version: device.lorawan_version,
+      _generate_keys: mayReadKeys && mayEditKeys,
     }
 
     return validationSchema.cast(values)
-  }, [device])
+  }, [device, mayEditKeys, mayReadKeys])
 
   // Setup and memoize callbacks for changes to `resets_join_nonces` for displaying the field warning.
   const handleResetsJoinNoncesChange = React.useCallback(
@@ -70,7 +71,11 @@ const JoinServerForm = React.memo(props => {
   const onFormSubmit = React.useCallback(
     async (values, { setSubmitting, resetForm }) => {
       const castedValues = validationSchema.cast(values)
-      const updatedValues = diff(initialValues, castedValues, ['_external_js', '_lorawan_version'])
+      const updatedValues = diff(initialValues, castedValues, [
+        '_external_js',
+        '_lorawan_version',
+        '_generate_keys',
+      ])
 
       setError('')
       try {
@@ -102,6 +107,11 @@ const JoinServerForm = React.memo(props => {
     nwkKeyPlaceholder = m.unexposed
   }
 
+  // We dont want to let the users edit `root_keys` without read/write rights. Without the write right
+  // the stack will reject this operation and without the read right we cannot determine whether the
+  // keys are provisioned by external or cluster JS.
+  const showKeys = mayReadKeys && mayEditKeys
+
   return (
     <Form
       validationSchema={validationSchema}
@@ -111,29 +121,33 @@ const JoinServerForm = React.memo(props => {
       error={error}
       enableReinitialize
     >
-      <Form.Field
-        title={sharedMessages.appKey}
-        name="root_keys.app_key.key"
-        type="byte"
-        min={16}
-        max={16}
-        placeholder={appKeyPlaceholder}
-        description={isNewLorawanVersion ? m.appKeyNewDescription : m.appKeyDescription}
-        component={Input}
-        disabled={externalJs || appKeyHidden}
-      />
-      {isNewLorawanVersion && (
-        <Form.Field
-          title={sharedMessages.nwkKey}
-          name="root_keys.nwk_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={nwkKeyPlaceholder}
-          description={m.nwkKeyDescription}
-          component={Input}
-          disabled={externalJs || nwkKeyHidden}
-        />
+      {showKeys && (
+        <>
+          <Form.Field
+            title={sharedMessages.appKey}
+            name="root_keys.app_key.key"
+            type="byte"
+            min={16}
+            max={16}
+            placeholder={appKeyPlaceholder}
+            description={isNewLorawanVersion ? m.appKeyNewDescription : m.appKeyDescription}
+            component={Input}
+            disabled={appKeyHidden}
+          />
+          {isNewLorawanVersion && (
+            <Form.Field
+              title={sharedMessages.nwkKey}
+              name="root_keys.nwk_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              placeholder={nwkKeyPlaceholder}
+              description={m.nwkKeyDescription}
+              component={Input}
+              disabled={nwkKeyHidden}
+            />
+          )}
+        </>
       )}
       {isNewLorawanVersion && (
         <Form.Field
@@ -142,7 +156,6 @@ const JoinServerForm = React.memo(props => {
           warning={resetsJoinNonces ? m.resetWarning : undefined}
           name="resets_join_nonces"
           component={Checkbox}
-          disabled={externalJs}
         />
       )}
       <Form.Field
@@ -153,28 +166,24 @@ const JoinServerForm = React.memo(props => {
         min={3}
         max={3}
         component={Input}
-        disabled={externalJs}
       />
       <Form.Field
         title={m.asServerID}
         name="application_server_id"
         description={m.asServerIDDescription}
         component={Input}
-        disabled={externalJs}
       />
       <Form.Field
         title={m.asServerKekLabel}
         name="application_server_kek_label"
         description={m.asServerKekLabelDescription}
         component={Input}
-        disabled={externalJs}
       />
       <Form.Field
         title={m.nsServerKekLabel}
         name="network_server_kek_label"
         description={m.nsServerKekLabelDescription}
         component={Input}
-        disabled={externalJs}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
@@ -185,6 +194,8 @@ const JoinServerForm = React.memo(props => {
 
 JoinServerForm.propTypes = {
   device: PropTypes.device.isRequired,
+  mayEditKeys: PropTypes.bool.isRequired,
+  mayReadKeys: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
 }
