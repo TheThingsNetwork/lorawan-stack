@@ -32,7 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ADR in 72-channel regions.
 - Payload length limits used by Network Server being too low.
 - CLI ignores default config files that cannot be read.
-- Fix device creation rollback potentially deleting existing device with same ID.
+- Device creation rollback potentially deleting existing device with same ID.
+- Returned values not representing the effective state of the devices in Network Server when deprecated field paths are used.
 
 ### Security
 
