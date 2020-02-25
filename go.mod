@@ -3,7 +3,7 @@ module go.thethings.network/lorawan-stack
 go 1.13
 
 // Use our fork of grpc-gateway.
-replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.12.2-gogo
+replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.13.0-gogo
 
 // Use our fork of otto.
 replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
@@ -51,7 +51,7 @@ require (
 	github.com/client9/misspell v0.3.4
 	github.com/disintegration/imaging v1.6.2
 	github.com/eclipse/paho.mqtt.golang v1.2.0
-	github.com/envoyproxy/protoc-gen-validate v0.2.0-java
+	github.com/envoyproxy/protoc-gen-validate v0.3.0-java
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/getsentry/sentry-go v0.5.1
 	github.com/go-redis/redis v6.15.6+incompatible
@@ -129,15 +129,15 @@ require (
 	gocloud.dev/pubsub/natspubsub v0.18.0
 	golang.org/x/crypto v0.0.0-20200109152110-61a87790db17
 	golang.org/x/image v0.0.0-20191214001246-9130b4cfad52 // indirect
-	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
+	golang.org/x/net v0.0.0-20200222125558-5a598a2470a0
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
-	golang.org/x/sys v0.0.0-20200107162124-548cf772de50 // indirect
+	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
 	golang.org/x/tools v0.0.0-20200110042803-e2f26524b78c
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 	google.golang.org/api v0.15.0
-	google.golang.org/genproto v0.0.0-20200108215221-bd8f9a0ef82f
-	google.golang.org/grpc v1.26.0
+	google.golang.org/genproto v0.0.0-20200225123651-fc8f55426688
+	google.golang.org/grpc v1.27.1
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
