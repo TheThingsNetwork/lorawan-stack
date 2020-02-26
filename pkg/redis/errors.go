@@ -27,12 +27,15 @@ var (
 
 // ConvertError converts Redis error into errors.Error.
 func ConvertError(err error) error {
+	ttnErr, ok := errors.From(err)
+	if ok {
+		return ttnErr
+	}
 	switch err {
 	case nil:
 		return nil
 	case redis.Nil:
 		return errNotFound
-	default:
-		return errStore.WithCause(err)
 	}
+	return errStore.WithCause(err)
 }
