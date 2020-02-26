@@ -15,8 +15,6 @@
 package sentry
 
 import (
-	"fmt"
-
 	"github.com/getsentry/sentry-go"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
@@ -43,9 +41,7 @@ func NewEvent(err error) *sentry.Event {
 
 	// Error Attributes.
 	for k, v := range errors.Attributes(errStack...) {
-		if val := fmt.Sprint(v); len(val) < 64 {
-			evt.Extra["error.attributes."+k] = val
-		}
+		evt.Extra["error.attributes."+k] = v
 	}
 
 	// Error Stack.
