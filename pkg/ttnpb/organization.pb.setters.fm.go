@@ -10,7 +10,7 @@ import (
 )
 
 func (dst *Organization) SetFields(src *Organization, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -97,7 +97,7 @@ func (dst *Organization) SetFields(src *Organization, paths ...string) error {
 }
 
 func (dst *Organizations) SetFields(src *Organizations, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organizations":
 			if len(subs) > 0 {
@@ -117,7 +117,7 @@ func (dst *Organizations) SetFields(src *Organizations, paths ...string) error {
 }
 
 func (dst *GetOrganizationRequest) SetFields(src *GetOrganizationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
@@ -156,7 +156,7 @@ func (dst *GetOrganizationRequest) SetFields(src *GetOrganizationRequest, paths 
 }
 
 func (dst *ListOrganizationsRequest) SetFields(src *ListOrganizationsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
@@ -232,7 +232,7 @@ func (dst *ListOrganizationsRequest) SetFields(src *ListOrganizationsRequest, pa
 }
 
 func (dst *CreateOrganizationRequest) SetFields(src *CreateOrganizationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization":
 			if len(subs) > 0 {
@@ -279,7 +279,7 @@ func (dst *CreateOrganizationRequest) SetFields(src *CreateOrganizationRequest, 
 }
 
 func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization":
 			if len(subs) > 0 {
@@ -318,7 +318,7 @@ func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, 
 }
 
 func (dst *ListOrganizationAPIKeysRequest) SetFields(src *ListOrganizationAPIKeysRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
@@ -367,7 +367,7 @@ func (dst *ListOrganizationAPIKeysRequest) SetFields(src *ListOrganizationAPIKey
 }
 
 func (dst *GetOrganizationAPIKeyRequest) SetFields(src *GetOrganizationAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
@@ -406,7 +406,7 @@ func (dst *GetOrganizationAPIKeyRequest) SetFields(src *GetOrganizationAPIKeyReq
 }
 
 func (dst *CreateOrganizationAPIKeyRequest) SetFields(src *CreateOrganizationAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
@@ -454,7 +454,7 @@ func (dst *CreateOrganizationAPIKeyRequest) SetFields(src *CreateOrganizationAPI
 }
 
 func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
@@ -501,7 +501,7 @@ func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPI
 }
 
 func (dst *ListOrganizationCollaboratorsRequest) SetFields(src *ListOrganizationCollaboratorsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
@@ -550,7 +550,7 @@ func (dst *ListOrganizationCollaboratorsRequest) SetFields(src *ListOrganization
 }
 
 func (dst *GetOrganizationCollaboratorRequest) SetFields(src *GetOrganizationCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {
@@ -597,7 +597,7 @@ func (dst *GetOrganizationCollaboratorRequest) SetFields(src *GetOrganizationCol
 }
 
 func (dst *SetOrganizationCollaboratorRequest) SetFields(src *SetOrganizationCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_ids":
 			if len(subs) > 0 {

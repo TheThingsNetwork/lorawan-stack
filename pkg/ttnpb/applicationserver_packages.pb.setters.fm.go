@@ -10,7 +10,7 @@ import (
 )
 
 func (dst *ApplicationPackage) SetFields(src *ApplicationPackage, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "name":
 			if len(subs) > 0 {
@@ -41,7 +41,7 @@ func (dst *ApplicationPackage) SetFields(src *ApplicationPackage, paths ...strin
 }
 
 func (dst *ApplicationPackages) SetFields(src *ApplicationPackages, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "packages":
 			if len(subs) > 0 {
@@ -61,7 +61,7 @@ func (dst *ApplicationPackages) SetFields(src *ApplicationPackages, paths ...str
 }
 
 func (dst *ApplicationPackageAssociationIdentifiers) SetFields(src *ApplicationPackageAssociationIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "end_device_ids":
 			if len(subs) > 0 {
@@ -100,7 +100,7 @@ func (dst *ApplicationPackageAssociationIdentifiers) SetFields(src *ApplicationP
 }
 
 func (dst *ApplicationPackageAssociation) SetFields(src *ApplicationPackageAssociation, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -168,7 +168,7 @@ func (dst *ApplicationPackageAssociation) SetFields(src *ApplicationPackageAssoc
 }
 
 func (dst *ApplicationPackageAssociations) SetFields(src *ApplicationPackageAssociations, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "associations":
 			if len(subs) > 0 {
@@ -188,7 +188,7 @@ func (dst *ApplicationPackageAssociations) SetFields(src *ApplicationPackageAsso
 }
 
 func (dst *GetApplicationPackageAssociationRequest) SetFields(src *GetApplicationPackageAssociationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -227,7 +227,7 @@ func (dst *GetApplicationPackageAssociationRequest) SetFields(src *GetApplicatio
 }
 
 func (dst *ListApplicationPackageAssociationRequest) SetFields(src *ListApplicationPackageAssociationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -286,7 +286,7 @@ func (dst *ListApplicationPackageAssociationRequest) SetFields(src *ListApplicat
 }
 
 func (dst *SetApplicationPackageAssociationRequest) SetFields(src *SetApplicationPackageAssociationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "association":
 			if len(subs) > 0 {

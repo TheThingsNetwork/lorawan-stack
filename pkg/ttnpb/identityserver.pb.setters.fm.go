@@ -5,7 +5,7 @@ package ttnpb
 import fmt "fmt"
 
 func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "universal_rights":
 			if len(subs) > 0 {
@@ -138,7 +138,7 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 }
 
 func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKeyAccess, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "api_key":
 			if len(subs) > 0 {

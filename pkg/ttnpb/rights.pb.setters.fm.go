@@ -5,7 +5,7 @@ package ttnpb
 import fmt "fmt"
 
 func (dst *Rights) SetFields(src *Rights, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "rights":
 			if len(subs) > 0 {
@@ -25,7 +25,7 @@ func (dst *Rights) SetFields(src *Rights, paths ...string) error {
 }
 
 func (dst *APIKey) SetFields(src *APIKey, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "id":
 			if len(subs) > 0 {
@@ -75,7 +75,7 @@ func (dst *APIKey) SetFields(src *APIKey, paths ...string) error {
 }
 
 func (dst *APIKeys) SetFields(src *APIKeys, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "api_keys":
 			if len(subs) > 0 {
@@ -95,7 +95,7 @@ func (dst *APIKeys) SetFields(src *APIKeys, paths ...string) error {
 }
 
 func (dst *Collaborator) SetFields(src *Collaborator, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -133,7 +133,7 @@ func (dst *Collaborator) SetFields(src *Collaborator, paths ...string) error {
 }
 
 func (dst *GetCollaboratorResponse) SetFields(src *GetCollaboratorResponse, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -171,7 +171,7 @@ func (dst *GetCollaboratorResponse) SetFields(src *GetCollaboratorResponse, path
 }
 
 func (dst *Collaborators) SetFields(src *Collaborators, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "collaborators":
 			if len(subs) > 0 {

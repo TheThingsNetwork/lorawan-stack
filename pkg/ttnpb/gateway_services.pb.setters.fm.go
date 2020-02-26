@@ -9,7 +9,7 @@ import (
 )
 
 func (dst *PullGatewayConfigurationRequest) SetFields(src *PullGatewayConfigurationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "gateway_ids":
 			if len(subs) > 0 {

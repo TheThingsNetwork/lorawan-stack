@@ -5,7 +5,7 @@ package ttnpb
 import fmt "fmt"
 
 func (dst *MQTTConnectionInfo) SetFields(src *MQTTConnectionInfo, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "public_address":
 			if len(subs) > 0 {

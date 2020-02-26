@@ -5,7 +5,7 @@ package ttnpb
 import fmt "fmt"
 
 func (dst *ListFrequencyPlansRequest) SetFields(src *ListFrequencyPlansRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "base_frequency":
 			if len(subs) > 0 {
@@ -26,7 +26,7 @@ func (dst *ListFrequencyPlansRequest) SetFields(src *ListFrequencyPlansRequest, 
 }
 
 func (dst *FrequencyPlanDescription) SetFields(src *FrequencyPlanDescription, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "id":
 			if len(subs) > 0 {
@@ -77,7 +77,7 @@ func (dst *FrequencyPlanDescription) SetFields(src *FrequencyPlanDescription, pa
 }
 
 func (dst *ListFrequencyPlansResponse) SetFields(src *ListFrequencyPlansResponse, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "frequency_plans":
 			if len(subs) > 0 {

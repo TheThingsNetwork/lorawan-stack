@@ -10,7 +10,7 @@ import (
 )
 
 func (dst *Application) SetFields(src *Application, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "ids":
 			if len(subs) > 0 {
@@ -97,7 +97,7 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 }
 
 func (dst *Applications) SetFields(src *Applications, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "applications":
 			if len(subs) > 0 {
@@ -117,7 +117,7 @@ func (dst *Applications) SetFields(src *Applications, paths ...string) error {
 }
 
 func (dst *GetApplicationRequest) SetFields(src *GetApplicationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -156,7 +156,7 @@ func (dst *GetApplicationRequest) SetFields(src *GetApplicationRequest, paths ..
 }
 
 func (dst *ListApplicationsRequest) SetFields(src *ListApplicationsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "collaborator":
 			if len(subs) > 0 {
@@ -232,7 +232,7 @@ func (dst *ListApplicationsRequest) SetFields(src *ListApplicationsRequest, path
 }
 
 func (dst *CreateApplicationRequest) SetFields(src *CreateApplicationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application":
 			if len(subs) > 0 {
@@ -279,7 +279,7 @@ func (dst *CreateApplicationRequest) SetFields(src *CreateApplicationRequest, pa
 }
 
 func (dst *UpdateApplicationRequest) SetFields(src *UpdateApplicationRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application":
 			if len(subs) > 0 {
@@ -318,7 +318,7 @@ func (dst *UpdateApplicationRequest) SetFields(src *UpdateApplicationRequest, pa
 }
 
 func (dst *ListApplicationAPIKeysRequest) SetFields(src *ListApplicationAPIKeysRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -367,7 +367,7 @@ func (dst *ListApplicationAPIKeysRequest) SetFields(src *ListApplicationAPIKeysR
 }
 
 func (dst *GetApplicationAPIKeyRequest) SetFields(src *GetApplicationAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -406,7 +406,7 @@ func (dst *GetApplicationAPIKeyRequest) SetFields(src *GetApplicationAPIKeyReque
 }
 
 func (dst *CreateApplicationAPIKeyRequest) SetFields(src *CreateApplicationAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -454,7 +454,7 @@ func (dst *CreateApplicationAPIKeyRequest) SetFields(src *CreateApplicationAPIKe
 }
 
 func (dst *UpdateApplicationAPIKeyRequest) SetFields(src *UpdateApplicationAPIKeyRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -501,7 +501,7 @@ func (dst *UpdateApplicationAPIKeyRequest) SetFields(src *UpdateApplicationAPIKe
 }
 
 func (dst *ListApplicationCollaboratorsRequest) SetFields(src *ListApplicationCollaboratorsRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -550,7 +550,7 @@ func (dst *ListApplicationCollaboratorsRequest) SetFields(src *ListApplicationCo
 }
 
 func (dst *GetApplicationCollaboratorRequest) SetFields(src *GetApplicationCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {
@@ -597,7 +597,7 @@ func (dst *GetApplicationCollaboratorRequest) SetFields(src *GetApplicationColla
 }
 
 func (dst *SetApplicationCollaboratorRequest) SetFields(src *SetApplicationCollaboratorRequest, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_ids":
 			if len(subs) > 0 {

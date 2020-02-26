@@ -8,7 +8,7 @@ import (
 )
 
 func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "uplink_messages":
 			if len(subs) > 0 {
@@ -78,7 +78,7 @@ func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) error {
 }
 
 func (dst *GatewayDown) SetFields(src *GatewayDown, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "downlink_message":
 			if len(subs) > 0 {
@@ -114,7 +114,7 @@ func (dst *GatewayDown) SetFields(src *GatewayDown, paths ...string) error {
 }
 
 func (dst *ScheduleDownlinkResponse) SetFields(src *ScheduleDownlinkResponse, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "delay":
 			if len(subs) > 0 {
@@ -135,7 +135,7 @@ func (dst *ScheduleDownlinkResponse) SetFields(src *ScheduleDownlinkResponse, pa
 }
 
 func (dst *ScheduleDownlinkErrorDetails) SetFields(src *ScheduleDownlinkErrorDetails, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "path_errors":
 			if len(subs) > 0 {

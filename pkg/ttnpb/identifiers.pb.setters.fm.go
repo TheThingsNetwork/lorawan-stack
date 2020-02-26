@@ -5,7 +5,7 @@ package ttnpb
 import fmt "fmt"
 
 func (dst *ApplicationIdentifiers) SetFields(src *ApplicationIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "application_id":
 			if len(subs) > 0 {
@@ -26,7 +26,7 @@ func (dst *ApplicationIdentifiers) SetFields(src *ApplicationIdentifiers, paths 
 }
 
 func (dst *ClientIdentifiers) SetFields(src *ClientIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "client_id":
 			if len(subs) > 0 {
@@ -47,7 +47,7 @@ func (dst *ClientIdentifiers) SetFields(src *ClientIdentifiers, paths ...string)
 }
 
 func (dst *EndDeviceIdentifiers) SetFields(src *EndDeviceIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "device_id":
 			if len(subs) > 0 {
@@ -113,7 +113,7 @@ func (dst *EndDeviceIdentifiers) SetFields(src *EndDeviceIdentifiers, paths ...s
 }
 
 func (dst *GatewayIdentifiers) SetFields(src *GatewayIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "gateway_id":
 			if len(subs) > 0 {
@@ -143,7 +143,7 @@ func (dst *GatewayIdentifiers) SetFields(src *GatewayIdentifiers, paths ...strin
 }
 
 func (dst *OrganizationIdentifiers) SetFields(src *OrganizationIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "organization_id":
 			if len(subs) > 0 {
@@ -164,7 +164,7 @@ func (dst *OrganizationIdentifiers) SetFields(src *OrganizationIdentifiers, path
 }
 
 func (dst *UserIdentifiers) SetFields(src *UserIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "user_id":
 			if len(subs) > 0 {
@@ -195,7 +195,7 @@ func (dst *UserIdentifiers) SetFields(src *UserIdentifiers, paths ...string) err
 }
 
 func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 
 		case "ids":
@@ -293,7 +293,7 @@ func (dst *OrganizationOrUserIdentifiers) SetFields(src *OrganizationOrUserIdent
 }
 
 func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 
 		case "ids":
@@ -523,7 +523,7 @@ func (dst *EntityIdentifiers) SetFields(src *EntityIdentifiers, paths ...string)
 }
 
 func (dst *CombinedIdentifiers) SetFields(src *CombinedIdentifiers, paths ...string) error {
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "entity_identifiers":
 			if len(subs) > 0 {

@@ -14,7 +14,6 @@
 
 syntax = "proto3";
 
-import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "lorawan-stack/api/gateway.proto";
