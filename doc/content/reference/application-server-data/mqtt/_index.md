@@ -139,7 +139,7 @@ For example, to send an unconfirmed downlink message to the device `dev1` in app
   "downlinks": [{
     "f_port": 15,
     "frm_payload": "vu8=",
-    "priority": "NORMAL",
+    "priority": "NORMAL"
   }]
 }
 ```
