@@ -21,10 +21,8 @@ import Input from '../../../components/input'
 import Checkbox from '../../../components/checkbox'
 import Radio from '../../../components/radio-button'
 import Select from '../../../components/select'
-import toast from '../../../components/toast'
 import Message from '../../../lib/components/message'
 import SubmitBar from '../../../components/submit-bar'
-import ModalButton from '../../../components/button/modal-button'
 import { NsFrequencyPlansSelect } from '../../containers/freq-plans-select'
 import DevAddrInput from '../../containers/dev-addr-input'
 import JoinEUIPrefixesInput from '../../containers/join-eui-prefixes-input'
@@ -32,32 +30,17 @@ import JoinEUIPrefixesInput from '../../containers/join-eui-prefixes-input'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import errorMessages from '../../../lib/errors/error-messages'
-import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
 import m from './messages'
 import validationSchema from './validation-schema'
 
 class DeviceDataForm extends Component {
-  constructor(props) {
-    super(props)
-
-    const {
-      initialValues: { supports_join, update, root_keys = {} },
-    } = this.props
-
-    const external_js = !Boolean(Object.keys(root_keys).length)
-    let otaa = true
-    if (update) {
-      otaa = Boolean(supports_join)
-    }
-
-    this.state = {
-      otaa,
-      resets_join_nonces: false,
-      resets_f_cnt: false,
-      external_js,
-    }
-    this.formRef = React.createRef()
+  formRef = React.createRef()
+  state = {
+    otaa: true,
+    resets_join_nonces: false,
+    resets_f_cnt: false,
+    external_js: true,
   }
 
   @bind
@@ -88,7 +71,6 @@ class DeviceDataForm extends Component {
       resets_join_nonces: external_js ? false : resets_join_nonces,
     }))
 
-    const { initialValues } = this.props
     const jsConfig = selectJsConfig()
     const { setValues, state } = this.formRef.current
 
@@ -106,7 +88,7 @@ class DeviceDataForm extends Component {
         external_js,
       })
     } else {
-      let { join_server_address } = initialValues
+      let join_server_address = state.join_server_address
 
       // Reset `join_server_address` if is present after disabling external JS provisioning.
       if (jsConfig.enabled && !Boolean(join_server_address)) {
@@ -122,46 +104,18 @@ class DeviceDataForm extends Component {
   }
 
   @bind
-  async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { onSubmit, onSubmitSuccess, initialValues, update } = this.props
-    const deviceId = getDeviceId(initialValues)
+  async handleSubmit(values, { setSubmitting }) {
+    const { onSubmit, onSubmitSuccess } = this.props
     const { external_js, ...castedValues } = validationSchema.cast(values)
     await this.setState({ error: '' })
 
     try {
       const device = await onSubmit(castedValues)
-      if (update) {
-        resetForm(values)
-        toast({
-          title: deviceId,
-          message: m.updateSuccess,
-          type: toast.types.SUCCESS,
-        })
-      }
       await onSubmitSuccess(device)
     } catch (error) {
       setSubmitting(false)
       const err = error instanceof Error ? errorMessages.genericError : error
       await this.setState({ error: err })
-    }
-  }
-
-  @bind
-  async handleDelete() {
-    const { onDelete, onDeleteSuccess, initialValues } = this.props
-    const deviceId = getDeviceId(initialValues)
-
-    try {
-      await onDelete()
-      toast({
-        title: deviceId,
-        message: m.deleteSuccess,
-        type: toast.types.SUCCESS,
-      })
-      onDeleteSuccess()
-    } catch (error) {
-      const err = error instanceof Error ? errorMessages.genericError : error
-      this.setState({ error: err })
     }
   }
 
@@ -229,20 +183,6 @@ class DeviceDataForm extends Component {
 
   get OTAASection() {
     const { resets_join_nonces, external_js } = this.state
-    const {
-      update,
-      initialValues: { root_keys },
-    } = this.props
-
-    const rootKeysNotExposed =
-      root_keys && root_keys.root_key_id && !root_keys.nwk_key && !root_keys.app_key
-
-    let rootKeyPlaceholder = m.leaveBlankPlaceholder
-    if (external_js) {
-      rootKeyPlaceholder = sharedMessages.provisionedOnExternalJoinServer
-    } else if (rootKeysNotExposed) {
-      rootKeyPlaceholder = m.unexposed
-    }
 
     return (
       <React.Fragment>
@@ -251,8 +191,7 @@ class DeviceDataForm extends Component {
           name="ids.join_eui"
           description={m.joinEUIDescription}
           required
-          disabled={update}
-          showPrefixes={!update}
+          showPrefixes
         />
         <Form.Field
           title={sharedMessages.devEUI}
@@ -262,7 +201,6 @@ class DeviceDataForm extends Component {
           max={8}
           description={m.deviceEUIDescription}
           required
-          disabled={update}
           component={Input}
         />
         <Form.Field
@@ -285,10 +223,10 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={rootKeyPlaceholder}
+          placeholder={m.leaveBlankPlaceholder}
           description={m.appKeyDescription}
           component={Input}
-          disabled={external_js || rootKeysNotExposed}
+          disabled={external_js}
         />
         <Form.Field
           title={sharedMessages.nwkKey}
@@ -296,10 +234,10 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={rootKeyPlaceholder}
+          placeholder={m.leaveBlankPlaceholder}
           description={m.nwkKeyDescription}
           component={Input}
-          disabled={external_js || rootKeysNotExposed}
+          disabled={external_js}
         />
         <Form.Field
           title={m.resetsJoinNonces}
@@ -350,15 +288,6 @@ class DeviceDataForm extends Component {
 
   render() {
     const { otaa, error, external_js } = this.state
-    const { initialValues, update } = this.props
-
-    let deviceId
-    let deviceName
-
-    if (initialValues) {
-      deviceId = getDeviceId(initialValues)
-      deviceName = initialValues.name
-    }
 
     const emptyValues = {
       ids: {
@@ -396,11 +325,10 @@ class DeviceDataForm extends Component {
     const joinServerAddress = jsConfig.enabled ? new URL(jsConfig.base_url).hostname : ''
 
     const formValues = {
+      ...emptyValues,
       network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
       application_server_address: asConfig.enabled ? new URL(asConfig.base_url).hostname : '',
       join_server_address: external_js ? undefined : joinServerAddress,
-      ...emptyValues,
-      ...initialValues,
       activation_mode: otaa ? 'otaa' : 'abp',
       external_js,
     }
@@ -421,7 +349,6 @@ class DeviceDataForm extends Component {
           placeholder={m.deviceIdPlaceholder}
           autoFocus
           required
-          disabled={update}
           component={Input}
         />
         <Form.Field
@@ -483,91 +410,26 @@ class DeviceDataForm extends Component {
           component={Input}
         />
         <Message component="h4" content={m.activationSettings} />
-        <Form.Field
-          title={m.activationMode}
-          disabled={update}
-          name="activation_mode"
-          component={Radio.Group}
-        >
+        <Form.Field title={m.activationMode} name="activation_mode" component={Radio.Group}>
           <Radio label={m.otaa} value="otaa" onChange={this.handleOTAASelect} />
           <Radio label={m.abp} value="abp" onChange={this.handleABPSelect} />
         </Form.Field>
         {otaa ? this.OTAASection : this.ABPSection}
         <SubmitBar>
-          <Form.Submit
-            component={SubmitButton}
-            message={update ? sharedMessages.saveChanges : m.createDevice}
-          />
-          {update && (
-            <ModalButton
-              type="button"
-              icon="delete"
-              message={m.deleteDevice}
-              modalData={{
-                message: { values: { deviceId: deviceName || deviceId }, ...m.deleteWarning },
-              }}
-              onApprove={this.handleDelete}
-              danger
-              naked
-            />
-          )}
+          <Form.Submit component={SubmitButton} message={m.createDevice} />
         </SubmitBar>
       </Form>
     )
   }
 }
 
-const keyPropType = PropTypes.shape({
-  key: PropTypes.string,
-})
-
-const initialValuesPropType = PropTypes.shape({
-  ids: PropTypes.shape({
-    device_id: PropTypes.string,
-    join_eui: PropTypes.string,
-    dev_eui: PropTypes.string,
-  }),
-  name: PropTypes.string,
-  activation_mode: PropTypes.string,
-  lorawan_version: PropTypes.string,
-  lorawan_phy_version: PropTypes.string,
-  frequency_plan_id: PropTypes.string,
-  supports_class_c: PropTypes.bool,
-  resets_join_nonces: PropTypes.bool,
-  root_keys: PropTypes.shape({
-    nwk_key: keyPropType,
-    app_key: keyPropType,
-    root_key_id: PropTypes.string,
-  }),
-  session: PropTypes.shape({
-    dev_addr: PropTypes.string,
-    keys: PropTypes.shape({
-      f_nwk_s_int_key: keyPropType,
-      s_nwk_s_int_key: keyPropType,
-      nwk_s_enc_key: keyPropType,
-      app_s_key: keyPropType,
-    }),
-  }),
-  mac_settings: PropTypes.shape({
-    resets_f_cnt: PropTypes.bool,
-  }),
-})
-
 DeviceDataForm.propTypes = {
-  initialValues: initialValuesPropType,
-  onDelete: PropTypes.func,
-  onDeleteSuccess: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func,
-  update: PropTypes.bool,
 }
 
 DeviceDataForm.defaultProps = {
-  onDelete: () => null,
-  onDeleteSuccess: () => null,
   onSubmitSuccess: () => null,
-  initialValues: {},
-  update: false,
 }
 
 export default DeviceDataForm
