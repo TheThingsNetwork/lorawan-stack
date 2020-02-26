@@ -20,7 +20,10 @@ import (
 )
 
 var (
+	errDecode              = errors.Define("decode", "failed to decode value")
+	errEncode              = errors.Define("encode", "failed to encode value")
 	errInvalidKeyValueType = errors.DefineInvalidArgument("value_type", "invalid value type for key `{key}`")
+	errNoArguments         = errors.DefineInvalidArgument("no_arguments", "no arguments")
 	errNotFound            = errors.DefineNotFound("not_found", "entity not found")
 	errStore               = errors.Define("store", "store error")
 	errTransactionFailed   = errors.DefineAborted("transaction_failed", "transaction failed")

@@ -48,7 +48,7 @@ type WatchCmdable interface {
 func MarshalProto(pb proto.Message) (string, error) {
 	b, err := proto.Marshal(pb)
 	if err != nil {
-		return "", err
+		return "", errEncode.WithCause(err)
 	}
 	return encoding.EncodeToString(b), nil
 }
@@ -57,9 +57,12 @@ func MarshalProto(pb proto.Message) (string, error) {
 func UnmarshalProto(s string, pb proto.Message) error {
 	b, err := encoding.DecodeString(s)
 	if err != nil {
-		return err
+		return errDecode.WithCause(err)
 	}
-	return proto.Unmarshal(b, pb)
+	if err = proto.Unmarshal(b, pb); err != nil {
+		return errDecode.WithCause(err)
+	}
+	return nil
 }
 
 // Key constructs the full key for entity identified by ks by joining ks using the default separator.
@@ -189,12 +192,12 @@ func FindProto(r WatchCmdable, k string, keyCmd func(string) (string, error)) *P
 	return &ProtoCmd{result: result}
 }
 
-type findProtosCmd struct {
+type stringSliceCmd struct {
 	result func() ([]string, error)
 }
 
 // ProtosCmd is a command, which can unmarshal its result into multiple protocol buffers.
-type ProtosCmd findProtosCmd
+type ProtosCmd stringSliceCmd
 
 // Range ranges over command result and unmarshals it into a protocol buffer.
 // f must return a new empty proto.Message of the type expected to be present in the command.
@@ -227,7 +230,7 @@ func (cmd ProtosCmd) Range(f func() (proto.Message, func() (bool, error))) error
 }
 
 // ProtosWithKeysCmd is a command, which can unmarshal its result into multiple protocol buffers given a key.
-type ProtosWithKeysCmd findProtosCmd
+type ProtosWithKeysCmd stringSliceCmd
 
 // Range ranges over command result and unmarshals it into a protocol buffer.
 // f must return a new empty proto.Message of the type expected to be present in the command given the key.
@@ -280,7 +283,7 @@ func FindProtosWithOffsetAndCount(offset, count int64) FindProtosOption {
 	}
 }
 
-func findProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) findProtosCmd {
+func findProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) stringSliceCmd {
 	s := &redis.Sort{
 		Get: []string{keyCmd("*")},
 		By:  "nosort", // see https://redis.io/commands/sort#skip-sorting-the-elements
@@ -288,7 +291,7 @@ func findProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...F
 	for _, opt := range opts {
 		opt(redisSort{s})
 	}
-	return findProtosCmd{
+	return stringSliceCmd{
 		result: r.Sort(k, s).Result,
 	}
 }
@@ -301,6 +304,13 @@ func FindProtos(r redis.Cmdable, k string, keyCmd func(string) string, opts ...F
 // FindProtosWithKeys gets protos stored under keys in k including the keys.
 func FindProtosWithKeys(r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) ProtosWithKeysCmd {
 	return ProtosWithKeysCmd(findProtos(r, k, keyCmd, append([]FindProtosOption{func(s redisSort) { s.Get = append([]string{"#"}, s.Get...) }}, opts...)...))
+}
+
+// ListProtos gets list of protos stored under key k.
+func ListProtos(ctx context.Context, r redis.Cmdable, k string) ProtosCmd {
+	return ProtosCmd{
+		result: r.LRange(k, 0, -1).Result,
+	}
 }
 
 const (
@@ -324,6 +334,7 @@ func WaitingTaskKey(k string) string {
 	return Key(k, "waiting")
 }
 
+// IsConsumerGroupExistsErr returns true if error represents the redis BUSYGROUP error.
 func IsConsumerGroupExistsErr(err error) bool {
 	return err != nil && err.Error() == "BUSYGROUP Consumer Group name already exists"
 }
@@ -643,4 +654,59 @@ func (q *TaskQueue) Pop(ctx context.Context, f func(string, time.Time) error) er
 	return PopTask(q.Redis, q.Group, q.ID, timeout, func(_ string, payload string, startAt time.Time) error {
 		return f(payload, startAt)
 	}, q.Key)
+}
+
+// Scripter is redis.scripter.
+type Scripter interface {
+	Eval(script string, keys []string, args ...interface{}) *redis.Cmd
+	EvalSha(sha1 string, keys []string, args ...interface{}) *redis.Cmd
+	ScriptExists(hashes ...string) *redis.BoolSliceCmd
+	ScriptLoad(script string) *redis.StringCmd
+}
+
+var deduplicationScript = redis.NewScript(`local exp = ARGV[1]
+local ok = redis.call('set', KEYS[1], '', 'px', exp, 'nx')
+if #ARGV > 1 then
+	table.remove(ARGV, 1)
+	redis.call('rpush', KEYS[2], unpack(ARGV))
+	if ok then
+		redis.call('pexpire', KEYS[2], exp)
+	end
+end
+if ok then
+	return 1
+else
+	return 0
+end`)
+
+// DeduplicationLockKey returns the key deduplication lock for k is stored under.
+func DeduplicationLockKey(k string) string {
+	return Key(k, "lock")
+}
+
+// DeduplicationLockKey returns the key deduplication list for k is stored under.
+func DeduplicationListKey(k string) string {
+	return Key(k, "list")
+}
+
+// DeduplicateProtos deduplicates protos using key k. It stores a lock at DeduplicationLockKey(k) and the list of collected protos at DeduplicationListKey(k).
+func DeduplicateProtos(ctx context.Context, r Scripter, k string, window time.Duration, msgs ...proto.Message) (bool, error) {
+	args := make([]interface{}, 0, 1+len(msgs))
+	args = append(args, window.Milliseconds())
+	for _, msg := range msgs {
+		s, err := MarshalProto(msg)
+		if err != nil {
+			return false, err
+		}
+		args = append(args, s)
+	}
+	v, err := deduplicationScript.Run(r, []string{DeduplicationLockKey(k), DeduplicationListKey(k)}, args...).Result()
+	if err != nil {
+		return false, ConvertError(err)
+	}
+	res, ok := v.(int64)
+	if !ok {
+		return false, errStore
+	}
+	return res == 1, nil
 }
