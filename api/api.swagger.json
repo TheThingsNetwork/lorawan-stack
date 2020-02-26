@@ -9875,7 +9875,7 @@
           "items": {
             "$ref": "#/definitions/v3ApplicationDownlink"
           },
-          "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server."
+          "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks."
         },
         "formatters": {
           "$ref": "#/definitions/v3MessagePayloadFormatters",
@@ -12035,6 +12035,13 @@
           "type": "string",
           "format": "date-time",
           "description": "Time when the session started. Network Server only."
+        },
+        "queued_application_downlinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3ApplicationDownlink"
+          },
+          "description": "Queued Application downlink messages. Stored in Application Server and Network Server."
         }
       }
     },

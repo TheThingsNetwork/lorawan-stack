@@ -91,6 +91,15 @@ func (dst *Session) SetFields(src *Session, paths ...string) error {
 				var zero time.Time
 				dst.StartedAt = zero
 			}
+		case "queued_application_downlinks":
+			if len(subs) > 0 {
+				return fmt.Errorf("'queued_application_downlinks' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.QueuedApplicationDownlinks = src.QueuedApplicationDownlinks
+			} else {
+				dst.QueuedApplicationDownlinks = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

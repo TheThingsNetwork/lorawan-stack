@@ -6706,7 +6706,7 @@
             },
             {
               "name": "queued_application_downlinks",
-              "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.",
+              "description": "Queued Application downlink messages. Stored in Application Server,\nwhich sets them on the Network Server.\nThis field is deprecated and is always set equal to session.queued_application_downlinks.",
               "label": "repeated",
               "type": "ApplicationDownlink",
               "longType": "ApplicationDownlink",
@@ -8803,6 +8803,16 @@
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "queued_application_downlinks",
+              "description": "Queued Application downlink messages. Stored in Application Server and Network Server.",
+              "label": "repeated",
+              "type": "ApplicationDownlink",
+              "longType": "ApplicationDownlink",
+              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
               "ismap": false,
               "defaultValue": ""
             }
