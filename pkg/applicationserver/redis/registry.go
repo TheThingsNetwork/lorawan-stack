@@ -196,7 +196,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 					}
 					i, err := tx.Exists(ek).Result()
 					if err != nil {
-						return ttnredis.ConvertError(err)
+						return err
 					}
 					if i != 0 {
 						return errDuplicateIdentifiers
@@ -221,7 +221,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		return nil
 	}, uk)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
 }
@@ -265,7 +265,7 @@ func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context
 
 	uids, err := r.Redis.SMembers(r.allKey(ctx)).Result()
 	if err != nil {
-		return err
+		return ttnredis.ConvertError(err)
 	}
 	for _, uid := range uids {
 		ctx, err := unique.WithContext(ctx, uid)
@@ -380,7 +380,7 @@ func (r *LinkRegistry) Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 		return nil
 	}, uk)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
 }

@@ -17,6 +17,8 @@ package networkserver
 import (
 	"context"
 
+	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 )
@@ -27,4 +29,15 @@ type DeviceRegistry interface {
 	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
 	RangeByAddr(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) error
 	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+}
+
+func logRegistryRPCError(ctx context.Context, err error, msg string) {
+	logger := log.FromContext(ctx).WithError(err)
+	var printLog func(string)
+	if errors.IsNotFound(err) || errors.IsInvalidArgument(err) {
+		printLog = logger.Debug
+	} else {
+		printLog = logger.Error
+	}
+	printLog(msg)
 }

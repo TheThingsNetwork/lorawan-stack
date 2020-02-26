@@ -214,7 +214,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids ttnpb.ApplicationWebhookId
 		return nil
 	}, ik)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
 }
