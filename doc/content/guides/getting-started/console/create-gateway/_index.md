@@ -22,7 +22,7 @@ You can now connect your gateway to {{% tts %}}.
 
 ### Create Gateway API Key
 
-Some gateways require an API Key with Link Gateway Rights to be able to connect to {{% tts %}}.
+Some gateways require an API Key with Link Gateway Rights to be able to connect to {{% tts %}}. 
 
 In order to do this, navigate the **API Keys** menu of your gateway and select **Add API Key**. Enter a name for your key, select the **Link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink** right and then press **Create API Key**.
 
