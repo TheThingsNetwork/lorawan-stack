@@ -45,7 +45,8 @@ func NewEvent(err error) *sentry.Event {
 	}
 
 	// Error Stack.
-	for _, err := range errStack {
+	for i := len(errStack) - 1; i >= 0; i-- {
+		err := errStack[i]
 		exception := sentry.Exception{
 			Value: err.Error(),
 		}
