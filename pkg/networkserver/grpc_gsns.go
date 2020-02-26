@@ -895,12 +895,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		matched.QueuedEvents = append(matched.QueuedEvents, evs...)
 	}
 
-	var handleErr bool
 	stored, ctx, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during uplink handling, drop")
-				handleErr = true
 				return nil, nil, errOutdatedData
 			}
 
@@ -910,7 +908,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					EndDevice: stored,
 				})
 				if err != nil {
-					handleErr = true
 					return nil, nil, errOutdatedData.WithCause(err)
 				}
 				matched = rematched
@@ -941,13 +938,12 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				return stored, paths, nil
 			}
 			if err := adaptDataRate(stored, matched.phy, ns.defaultMACSettings); err != nil {
-				handleErr = true
 				return nil, nil, err
 			}
 			return stored, paths, nil
 		})
-	if err != nil && !handleErr {
-		logger.WithError(err).Warn("Failed to update device in registry")
+	if err != nil && !errors.IsNotFound(err) && !errors.IsInvalidArgument(err) {
+		logger.WithError(err).Error("Failed to update device in registry")
 		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
 	}
 	if err != nil {
@@ -1052,7 +1048,9 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	)
 	if err != nil {
 		registerDropJoinRequest(ctx, up, err)
-		logger.WithError(err).Debug("Failed to load device from registry")
+		if !errors.IsNotFound(err) && !errors.IsInvalidArgument(err) {
+			logger.WithError(err).Error("Failed to load device from registry")
+		}
 		return err
 	}
 
