@@ -26,6 +26,7 @@ func NewEvent(err error) *sentry.Event {
 		return evt
 	}
 
+	evt.Level = sentry.LevelError
 	evt.Message = err.Error()
 
 	// Error Tags.
