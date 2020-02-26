@@ -261,7 +261,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 				}
 				i, err := tx.Exists(ek).Result()
 				if err != nil {
-					return ttnredis.ConvertError(err)
+					return err
 				}
 				if i != 0 {
 					return errDuplicateIdentifiers
@@ -276,7 +276,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 				}
 				i, err := tx.Exists(pk).Result()
 				if err != nil {
-					return ttnredis.ConvertError(err)
+					return err
 				}
 				if i != 0 {
 					return errAlreadyProvisioned
@@ -297,7 +297,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 	}
 	_, err = tx.Pipelined(pipelined)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return &ttnpb.ContextualEndDevice{
 		Context:   ctx,
@@ -319,16 +319,16 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 	err := r.Redis.Watch(func(tx *redis.Tx) error {
 		uid, err := tx.Get(ek).Result()
 		if err != nil {
-			return ttnredis.ConvertError(err)
+			return err
 		}
 		if err := tx.Watch(r.uidKey(uid)).Err(); err != nil {
-			return ttnredis.ConvertError(err)
+			return err
 		}
 		pb, err = r.set(ctx, tx, uid, gets, f)
 		return err
 	}, ek)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
 }
@@ -362,7 +362,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		return err
 	}, r.uidKey(uid))
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pb.EndDevice, nil
 }
@@ -497,7 +497,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 		return nil
 	}, ik)
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
 }
