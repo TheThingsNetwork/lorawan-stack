@@ -37,7 +37,14 @@ func disableTxParamSetupReq(b Band) Band {
 
 func makeSetMaxTxPowerIndexFunc(idx uint8) func(Band) Band {
 	return func(b Band) Band {
-		b.MaxTxPowerIndex = idx
+		b.TxOffset = b.TxOffset[:idx+1]
+		return b
+	}
+}
+
+func makeAddTxPowerFunc(offset float32) func(Band) Band {
+	return func(b Band) Band {
+		b.TxOffset = append(b.TxOffset, offset)
 		return b
 	}
 }

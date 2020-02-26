@@ -203,7 +203,7 @@ func adaptDataRate(dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettin
 	}
 
 	// If we still have margin left, we decrease the Tx power (increase the index).
-	for int(dev.MACState.DesiredParameters.ADRTxPowerIndex) < int(phy.MaxTxPowerIndex) {
+	for dev.MACState.DesiredParameters.ADRTxPowerIndex < uint32(phy.MaxTxPowerIndex()) {
 		newMargin := margin - (phy.TxOffset[dev.MACState.DesiredParameters.ADRTxPowerIndex] - phy.TxOffset[dev.MACState.DesiredParameters.ADRTxPowerIndex+1])
 		if newMargin < 0 {
 			break

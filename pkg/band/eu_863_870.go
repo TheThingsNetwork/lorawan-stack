@@ -125,12 +125,16 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 16,
-		TxOffset: [16]float32{
-			0, -2, -4, -6, -8, -10, -12, -14,
-			0, 0, 0, 0, 0, 0, 0, // RFU
-			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
+		TxOffset: []float32{
+			0,
+			-2,
+			-4,
+			-6,
+			-8,
+			-10,
+			-12,
+			-14,
 		},
-		MaxTxPowerIndex: 7,
 
 		Rx1Channel: channelIndexIdentity,
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
@@ -161,9 +165,11 @@ func init() {
 		},
 		PingSlotFrequency: uint64Ptr(euBeaconFrequency),
 
-		regionalParameters1_0:       bandIdentity,
-		regionalParameters1_0_1:     bandIdentity,
-		regionalParameters1_0_2RevA: makeSetMaxTxPowerIndexFunc(5),
+		regionalParameters1_0:   bandIdentity,
+		regionalParameters1_0_1: bandIdentity,
+		regionalParameters1_0_2RevA: composeSwaps(
+			makeSetMaxTxPowerIndexFunc(5),
+		),
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_0_3RevA: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,

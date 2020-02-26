@@ -171,10 +171,8 @@ type Band struct {
 	MinAckTimeout time.Duration
 	MaxAckTimeout time.Duration
 
-	// TxOffset in dB: A Tx's power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset.
-	TxOffset [16]float32
-	// MaxTxPowerIndex represents the maximum non-RFU TxPowerIndex, which can be used according to the band's spec.
-	MaxTxPowerIndex uint8
+	// TxOffset in dB: Tx power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset.
+	TxOffset []float32
 	// MaxADRDataRateIndex represents the maximum non-RFU DataRateIndex suitable for ADR, which can be used according to the band's spec.
 	MaxADRDataRateIndex uint8
 
@@ -211,6 +209,14 @@ type Band struct {
 	regionalParameters1_0_2RevB versionSwap
 	regionalParameters1_0_3RevA versionSwap
 	regionalParameters1_1RevA   versionSwap
+}
+
+func (b Band) MaxTxPowerIndex() uint8 {
+	n := len(b.TxOffset)
+	if n > math.MaxUint8 {
+		panic("length of TxOffset overflows uint8")
+	}
+	return uint8(n) - 1
 }
 
 // SubBandParameters contains the sub-band frequency range, duty cycle and Tx power.

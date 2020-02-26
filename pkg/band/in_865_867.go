@@ -75,14 +75,19 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 30,
-		TxOffset: func() [16]float32 {
-			offset := [16]float32{}
-			for i := 0; i < 11; i++ {
-				offset[i] = float32(0 - 2*i)
-			}
-			return offset
-		}(),
-		MaxTxPowerIndex: 10,
+		TxOffset: []float32{
+			0,
+			-2,
+			-4,
+			-6,
+			-8,
+			-10,
+			-12,
+			-14,
+			-16,
+			-18,
+			-20,
+		},
 
 		Rx1Channel: channelIndexIdentity,
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {

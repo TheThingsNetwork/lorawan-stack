@@ -111,14 +111,23 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 30,
-		TxOffset: func() [16]float32 {
-			offset := [16]float32{}
-			for i := 0; i < 15; i++ {
-				offset[i] = float32(0 - 2*i)
-			}
-			return offset
-		}(),
-		MaxTxPowerIndex: 14,
+		TxOffset: []float32{
+			0,
+			-2,
+			-4,
+			-6,
+			-8,
+			-10,
+			-12,
+			-14,
+			-16,
+			-18,
+			-20,
+			-22,
+			-24,
+			-26,
+			-28,
+		},
 
 		LoRaCodingRate: "4/5",
 
@@ -158,8 +167,10 @@ func init() {
 			disableTxParamSetupReq,
 			makeSetMaxTxPowerIndexFunc(10),
 		),
-		regionalParameters1_0_3RevA: makeSetMaxTxPowerIndexFunc(15),
-		regionalParameters1_1RevA:   bandIdentity,
+		regionalParameters1_0_3RevA: composeSwaps(
+			makeAddTxPowerFunc(-30),
+		),
+		regionalParameters1_1RevA: bandIdentity,
 	}
 	All[AU_915_928] = au_915_928
 }

@@ -91,12 +91,14 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 12.15,
-		TxOffset: [16]float32{
-			0, -2, -4, -6, -8, -10,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, // RFU
-			0, // Used by LinkADRReq starting from LoRaWAN Regional Parameters 1.1, RFU before
+		TxOffset: []float32{
+			0,
+			-2,
+			-4,
+			-6,
+			-8,
+			-10,
 		},
-		MaxTxPowerIndex: 5,
 
 		Rx1Channel: channelIndexIdentity,
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {

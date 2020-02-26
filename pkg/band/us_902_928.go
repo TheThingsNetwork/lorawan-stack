@@ -113,14 +113,23 @@ func init() {
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
 		DefaultMaxEIRP: 30,
-		TxOffset: func() [16]float32 {
-			offset := [16]float32{}
-			for i := 0; i < 15; i++ {
-				offset[i] = float32(0 - 2*i)
-			}
-			return offset
-		}(),
-		MaxTxPowerIndex: 14,
+		TxOffset: []float32{
+			0,
+			-2,
+			-4,
+			-6,
+			-8,
+			-10,
+			-12,
+			-14,
+			-16,
+			-18,
+			-20,
+			-22,
+			-24,
+			-26,
+			-28,
+		},
 
 		Rx1Channel: channelIndexModulo(8),
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
@@ -158,8 +167,10 @@ func init() {
 			disableChMaskCntl51_0_2,
 			makeSetMaxTxPowerIndexFunc(10),
 		),
-		regionalParameters1_0_3RevA: makeSetMaxTxPowerIndexFunc(15),
-		regionalParameters1_1RevA:   bandIdentity,
+		regionalParameters1_0_3RevA: composeSwaps(
+			makeAddTxPowerFunc(-30),
+		),
+		regionalParameters1_1RevA: bandIdentity,
 	}
 	All[US_902_928] = us_902_928
 }
