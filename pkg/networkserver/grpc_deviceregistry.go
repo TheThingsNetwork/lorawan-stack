@@ -175,6 +175,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 
 	dev, ctx, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
 	if err != nil {
+		logRegistryRPCError(ctx, err, "Failed to get device from registry")
 		return nil, err
 	}
 
@@ -561,6 +562,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return &req.EndDevice, sets, nil
 	})
 	if err != nil {
+		logRegistryRPCError(ctx, err, "Failed to set device in registry")
 		return nil, err
 	}
 	if evt != nil {
@@ -590,6 +592,7 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 		return nil, nil, nil
 	})
 	if err != nil {
+		logRegistryRPCError(ctx, err, "Failed to delete device from registry")
 		return nil, err
 	}
 	if evt != nil {

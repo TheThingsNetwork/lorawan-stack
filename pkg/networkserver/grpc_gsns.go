@@ -855,7 +855,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			})
 			return true
 		}); err != nil {
-		logger.WithError(err).Warn("Failed to find devices in registry by DevAddr")
+		logRegistryRPCError(ctx, err, "Failed to find devices in registry by DevAddr")
 		return err
 	}
 
@@ -942,11 +942,9 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			}
 			return stored, paths, nil
 		})
-	if err != nil && !errors.IsNotFound(err) && !errors.IsInvalidArgument(err) {
-		logger.WithError(err).Error("Failed to update device in registry")
-		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
-	}
 	if err != nil {
+		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
+		logRegistryRPCError(ctx, err, "Failed to find devices in registry by DevAddr")
 		events.Publish(evtDropDataUplink(ctx, matched.Device.EndDeviceIdentifiers, err))
 		registerDropDataUplink(ctx, up, err)
 		return err
@@ -1047,10 +1045,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		},
 	)
 	if err != nil {
+		logRegistryRPCError(ctx, err, "Failed to find devices in registry by DevAddr")
 		registerDropJoinRequest(ctx, up, err)
-		if !errors.IsNotFound(err) && !errors.IsInvalidArgument(err) {
-			logger.WithError(err).Error("Failed to load device from registry")
-		}
 		return err
 	}
 
@@ -1179,8 +1175,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			return stored, paths, nil
 		})
 	if err != nil {
-		logger.WithError(err).Warn("Failed to update device in registry")
 		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
+		logRegistryRPCError(ctx, err, "Failed to find devices in registry by DevAddr")
 	}
 	if err != nil {
 		return err
