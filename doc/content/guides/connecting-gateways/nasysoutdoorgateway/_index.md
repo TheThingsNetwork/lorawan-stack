@@ -13,7 +13,7 @@ NASys LoRaWAN Outdoor Gateway is an 8 Channel LoRaWAN gateway, whose technical s
 
 ## Registration
 
-Create a gateway by following the instructions for the [Console]({{< ref "/guides/getting-started/console#create-gateway" >}}) or the [CLI]({{< ref "/guides/getting-started/cli#create-gateway" >}}). Typically, the **EUI** field for your gateway should exist on the sticker at the bottom. Make note of the Gateway ID you choose, because it will be needed later.
+Create a gateway by following the instructions for the [Console]({{< ref "/guides/getting-started/console/create-gateway" >}}) or the [CLI]({{< ref "/guides/getting-started/cli#create-gateway" >}}). Typically, the **EUI** field for your gateway should exist on the sticker at the bottom. Make note of the Gateway ID you choose, because it will be needed later.
 
 ## Configuration using a Terminal
 
