@@ -84,6 +84,23 @@ func (m *Session) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "queued_application_downlinks":
+
+			for idx, item := range m.GetQueuedApplicationDownlinks() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return SessionValidationError{
+							field:  fmt.Sprintf("queued_application_downlinks[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return SessionValidationError{
 				field:  name,
