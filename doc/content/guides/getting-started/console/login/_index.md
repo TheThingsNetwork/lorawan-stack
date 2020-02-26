@@ -8,7 +8,7 @@ Learn how to login into the Console.
 
 <!--more-->
 
-## Login
+## Step by step
 
 The Console needs to be logged on in order to create gateways, applications, devices and API keys. With {{% tts %}} running, open `https://thethings.example.com` (replace with the URL of your deployment) in your browser.
 

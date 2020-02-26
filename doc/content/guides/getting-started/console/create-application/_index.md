@@ -8,7 +8,7 @@ Learn how to register an application using the Console.
 
 <!--more-->
 
-## Create Application
+## Step by step
 
 Go to **Applications** in the top menu, and click **+ Add Application** to reach the application registration page. Fill the application ID. The other fields are optional. Click **Create Application** to create the application.
 

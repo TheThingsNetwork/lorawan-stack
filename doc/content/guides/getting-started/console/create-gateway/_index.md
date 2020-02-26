@@ -8,7 +8,7 @@ Learn how to register a gateway using the Console.
 
 <!--more-->
 
-## Create Gateway
+## Step by step
 
 Go to **Gateways** in the top menu, and click **+ Add Gateway** to reach the gateway registration page. Fill the gateway ID, gateway EUI (if your gateway has an EUI) and frequency plan. The other fields are optional. Click **Create Gateway** to create the gateway.
 

@@ -8,7 +8,7 @@ Learn how to register an end device using the Console.
 
 <!--more-->
 
-## Create End Device
+## Step by step
 
 Go to **Devices** in the left menu and click on **+ Add Device** to reach the end device registration page. Fill the device ID, the LoRaWAN MAC and PHY versions and the frequency plan used by the device.
 
