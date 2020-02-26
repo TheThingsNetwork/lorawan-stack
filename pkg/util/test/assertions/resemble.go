@@ -68,30 +68,6 @@ func ShouldResembleFields(actual interface{}, expected ...interface{}) (message 
 		return fmt.Sprintf(needAtLeastValues, 1, len(expected))
 	}
 
-	at := reflect.TypeOf(actual)
-	if at.Kind() != reflect.Ptr {
-		return fmt.Sprintf(needPointer, actual)
-	}
-	av := reflect.New(at.Elem())
-	am := av.MethodByName("SetFields")
-	if !am.IsValid() {
-		return fmt.Sprintf(needSetFielderCompatible, actual)
-	}
-
-	et := reflect.TypeOf(expected[0])
-	if et.Kind() != reflect.Ptr {
-		return fmt.Sprintf(needPointer, expected[0])
-	}
-	ev := reflect.New(et.Elem())
-	em := ev.MethodByName("SetFields")
-	if !em.IsValid() {
-		return fmt.Sprintf(needSetFielderCompatible, expected[0])
-	}
-
-	if len(expected) == 1 {
-		return ShouldResemble(actual, expected...)
-	}
-
 	ps := reflect.MakeSlice(reflect.TypeOf([]string{}), 0, 0)
 	for _, p := range expected[1:] {
 		pv := reflect.ValueOf(p)
@@ -114,15 +90,34 @@ func ShouldResembleFields(actual interface{}, expected ...interface{}) (message 
 			return fmt.Sprintf(needStringCompatibleOrArrayOrSlice, p)
 		}
 	}
-
-	if ret := am.CallSlice([]reflect.Value{reflect.ValueOf(actual), ps})[0]; !ret.IsNil() {
-		return fmt.Sprintf(setFieldsFailed, ret.Interface().(error))
+	selectFields := func(v interface{}) (interface{}, string) {
+		t := reflect.TypeOf(v)
+		if t.Kind() != reflect.Ptr {
+			return nil, fmt.Sprintf(needPointer, v)
+		}
+		sv := reflect.New(t.Elem())
+		if v == nil {
+			return sv.Interface(), ""
+		}
+		m := sv.MethodByName("SetFields")
+		if !m.IsValid() {
+			return nil, fmt.Sprintf(needSetFielderCompatible, v)
+		}
+		if ret := m.CallSlice([]reflect.Value{reflect.ValueOf(v), ps})[0]; !ret.IsNil() {
+			return nil, fmt.Sprintf(setFieldsFailed, ret.Interface().(error))
+		}
+		return sv.Interface(), ""
 	}
 
-	if ret := em.CallSlice([]reflect.Value{reflect.ValueOf(expected[0]), ps})[0]; !ret.IsNil() {
-		return fmt.Sprintf(setFieldsFailed, ret.Interface().(error))
+	actualCmp, errStr := selectFields(actual)
+	if errStr != "" {
+		return errStr
 	}
-	return ShouldResemble(av.Interface(), ev.Interface())
+	expectedCmp, errStr := selectFields(expected[0])
+	if errStr != "" {
+		return errStr
+	}
+	return ShouldResemble(actualCmp, expectedCmp)
 }
 
 // ShouldHaveEmptyDiff compares the pretty.Diff of values.
