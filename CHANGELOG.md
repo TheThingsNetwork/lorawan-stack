@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI ignores default config files that cannot be read.
 - Device creation rollback potentially deleting existing device with same ID.
 - Returned values not representing the effective state of the devices in Network Server when deprecated field paths are used.
+- Downlink queue operations in Network Server for LoRaWAN 1.1 devices.
 
 ### Security
 
