@@ -43,7 +43,7 @@ import {
   mayReadApplicationDeviceKeys,
 } from '../../lib/feature-checks'
 
-import { hasExternalJs, isDeviceOTAA, isDeviceJoined } from './utils'
+import { isDeviceOTAA, isDeviceJoined } from './utils'
 import m from './messages'
 
 import IdentityServerForm from './identity-server-form'
@@ -221,14 +221,12 @@ export default class DeviceGeneralSettings extends React.Component {
     // 2. Disable the section if the device is ABP/Multicast, since JS does not store ABP/Multicast
     // devices.
     // 3. Disable the seciton if `join_server_address` is not equal to the cluster JS address.
-    // 4. Disable the seciton if an external JS is used.
     const sameJsAddress = getComponentBaseUrl(jsConfig) === device.join_server_address
-    const externalJs = hasExternalJs(device) && mayReadKeys
-    const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress || externalJs
+    const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress
     let jsDescription = m.jsDescription
     if (!jsEnabled) {
       jsDescription = m.jsDescriptionMissing
-    } else if (!sameJsAddress || externalJs) {
+    } else if (!sameJsAddress) {
       jsDescription = m.notInCluster
     } else if (nsEnabled && !isOTAA) {
       jsDescription = m.jsDescriptionOTAA
