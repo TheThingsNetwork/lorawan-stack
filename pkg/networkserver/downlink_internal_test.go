@@ -44,6 +44,66 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestAppendRecentDownlink(t *testing.T) {
+	downs := [...]*ttnpb.DownlinkMessage{
+		{
+			RawPayload: []byte("test1"),
+		},
+		{
+			RawPayload: []byte("test2"),
+		},
+		{
+			RawPayload: []byte("test3"),
+		},
+	}
+	for _, tc := range []struct {
+		Recent   []*ttnpb.DownlinkMessage
+		Down     *ttnpb.DownlinkMessage
+		Window   int
+		Expected []*ttnpb.DownlinkMessage
+	}{
+		{
+			Down:     downs[0],
+			Window:   1,
+			Expected: downs[:1],
+		},
+		{
+			Recent:   downs[:1],
+			Down:     downs[1],
+			Window:   1,
+			Expected: downs[1:2],
+		},
+		{
+			Recent:   downs[:2],
+			Down:     downs[2],
+			Window:   1,
+			Expected: downs[2:3],
+		},
+		{
+			Recent:   downs[:1],
+			Down:     downs[1],
+			Window:   2,
+			Expected: downs[:2],
+		},
+		{
+			Recent:   downs[:2],
+			Down:     downs[2],
+			Window:   2,
+			Expected: downs[1:3],
+		},
+	} {
+		t.Run(fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window), func(t *testing.T) {
+			a := assertions.New(t)
+			recent := CopyDownlinkMessages(tc.Recent...)
+			down := CopyDownlinkMessage(tc.Down)
+			ret := appendRecentDownlink(recent, down, tc.Window)
+			a.So(recent, should.Resemble, tc.Recent)
+			a.So(down, should.Resemble, tc.Down)
+			a.So(ret, should.Resemble, tc.Expected)
+		})
+	}
+}
+
 func TestProcessDownlinkTask(t *testing.T) {
 	getPaths := []string{
 		"frequency_plan_id",

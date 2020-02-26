@@ -16,6 +16,7 @@ package networkserver
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -29,6 +30,66 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
+
+func TestAppendRecentUplink(t *testing.T) {
+	ups := [...]*ttnpb.UplinkMessage{
+		{
+			RawPayload: []byte("test1"),
+		},
+		{
+			RawPayload: []byte("test2"),
+		},
+		{
+			RawPayload: []byte("test3"),
+		},
+	}
+	for _, tc := range []struct {
+		Recent   []*ttnpb.UplinkMessage
+		Up       *ttnpb.UplinkMessage
+		Window   int
+		Expected []*ttnpb.UplinkMessage
+	}{
+		{
+			Up:       ups[0],
+			Window:   1,
+			Expected: ups[:1],
+		},
+		{
+			Recent:   ups[:1],
+			Up:       ups[1],
+			Window:   1,
+			Expected: ups[1:2],
+		},
+		{
+			Recent:   ups[:2],
+			Up:       ups[2],
+			Window:   1,
+			Expected: ups[2:3],
+		},
+		{
+			Recent:   ups[:1],
+			Up:       ups[1],
+			Window:   2,
+			Expected: ups[:2],
+		},
+		{
+			Recent:   ups[:2],
+			Up:       ups[2],
+			Window:   2,
+			Expected: ups[1:3],
+		},
+	} {
+		t.Run(fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window), func(t *testing.T) {
+			a := assertions.New(t)
+			recent := CopyUplinkMessages(tc.Recent...)
+			up := CopyUplinkMessage(tc.Up)
+			ret := appendRecentUplink(recent, up, tc.Window)
+			a.So(recent, should.Resemble, tc.Recent)
+			a.So(up, should.Resemble, tc.Up)
+			a.So(ret, should.Resemble, tc.Expected)
+		})
+	}
+}
 
 func TestMatchAndHandleUplink(t *testing.T) {
 	netID := test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)

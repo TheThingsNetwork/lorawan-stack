@@ -129,6 +129,16 @@ func CopyUplinkMessages(pbs ...*ttnpb.UplinkMessage) []*ttnpb.UplinkMessage {
 	return deepcopy.Copy(pbs).([]*ttnpb.UplinkMessage)
 }
 
+// CopyDownlinkMessage returns a deep copy of ttnpb.DownlinkMessage pb.
+func CopyDownlinkMessage(pb *ttnpb.DownlinkMessage) *ttnpb.DownlinkMessage {
+	return deepcopy.Copy(pb).(*ttnpb.DownlinkMessage)
+}
+
+// CopyDownlinkMessages returns a deep copy of ...*ttnpb.DownlinkMessage pbs.
+func CopyDownlinkMessages(pbs ...*ttnpb.DownlinkMessage) []*ttnpb.DownlinkMessage {
+	return deepcopy.Copy(pbs).([]*ttnpb.DownlinkMessage)
+}
+
 // CopyMACParameters returns a deep copy of ttnpb.MACParameters pb.
 func CopyMACParameters(pb *ttnpb.MACParameters) *ttnpb.MACParameters {
 	return deepcopy.Copy(pb).(*ttnpb.MACParameters)
