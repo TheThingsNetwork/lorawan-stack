@@ -18,8 +18,10 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"os"
 	"path/filepath"
 	"regexp"
+	"runtime/debug"
 	"runtime/trace"
 	"strings"
 	"time"
@@ -163,19 +165,21 @@ func Initialize(db *gorm.DB) error {
 	return nil
 }
 
+// ErrTransactionRecovered is returned when a panic is caught from a SQL transaction.
+var ErrTransactionRecovered = errors.DefineInternal("transaction_recovered", "Internal Server Error")
+
 // Transact executes f in a db transaction.
 func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err error) {
 	defer trace.StartRegion(ctx, "database transaction").End()
 	tx := db.Begin()
 	defer func() {
 		if p := recover(); p != nil {
-			switch p := p.(type) {
-			case error:
-				err = p
-			case string:
-				err = errors.New(p)
-			default:
-				panic(p)
+			fmt.Fprintln(os.Stderr, p)
+			os.Stderr.Write(debug.Stack())
+			if pErr, ok := p.(error); ok {
+				err = ErrTransactionRecovered.WithCause(pErr)
+			} else {
+				err = ErrTransactionRecovered.WithAttributes("panic", p)
 			}
 		}
 		if err != nil {

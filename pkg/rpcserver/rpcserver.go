@@ -123,7 +123,12 @@ func New(ctx context.Context, opts ...Option) *Server {
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) (err error) {
 			fmt.Fprintln(os.Stderr, p)
 			os.Stderr.Write(debug.Stack())
-			return ErrRPCRecovered.WithAttributes("panic", p)
+			if pErr, ok := p.(error); ok {
+				err = ErrRPCRecovered.WithCause(pErr)
+			} else {
+				err = ErrRPCRecovered.WithAttributes("panic", p)
+			}
+			return err
 		}),
 	}
 

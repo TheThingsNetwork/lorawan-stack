@@ -4076,6 +4076,15 @@
       "file": "store.go"
     }
   },
+  "error:pkg/identityserver/store:transaction_recovered": {
+    "translations": {
+      "en": "Internal Server Error"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
   "error:pkg/identityserver/store:user_not_found": {
     "translations": {
       "en": "user `{user_id}` not found"
