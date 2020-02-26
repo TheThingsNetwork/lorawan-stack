@@ -19,7 +19,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/hex"
-	"fmt"
 	"os"
 	"strings"
 
@@ -171,26 +170,23 @@ type cluster struct {
 	keys [][]byte
 }
 
-var errPeerConnection = errors.Define(
-	"peer_connection",
-	"connection to peer `{name}` on `{address}` failed",
-)
-
-var errPeerEmptyTarget = errors.Define(
-	"peer_empty_target",
-	"peer target address is empty",
+var (
+	errPeerConnection    = errors.DefineUnavailable("peer_connection", "connection to peer `{name}` on `{address}` failed")
+	errPeerEmptyTarget   = errors.DefineInvalidArgument("peer_empty_target", "peer target address is empty")
+	errInvalidClusterKey = errors.DefineInvalidArgument("cluster_key", "invalid cluster key")
+	errInvalidKeyLength  = errors.DefineInvalidArgument("key_length", "invalid key length %d, must be 16, 24 or 32 bytes")
 )
 
 func (c *cluster) loadKeys(ctx context.Context, keys ...string) error {
-	for i, key := range keys {
+	for _, key := range keys {
 		decodedKey, err := hex.DecodeString(key)
 		if err != nil {
-			return fmt.Errorf("Could not decode cluster key: %s", err)
+			return errInvalidClusterKey.WithCause(err)
 		}
 		switch len(decodedKey) {
 		case 16, 24, 32:
 		default:
-			return fmt.Errorf("Invalid length for cluster key number %d: must be 16, 24 or 32 bytes", i)
+			return errInvalidClusterKey.WithCause(errInvalidKeyLength)
 		}
 		c.keys = append(c.keys, decodedKey)
 	}
@@ -245,9 +241,10 @@ func (c *cluster) Join() (err error) {
 		}
 		logger.Debug("Connecting to peer...")
 		peer.conn, peer.connErr = grpc.DialContext(peer.ctx, peer.target, options...)
-		if err != nil {
+		if peer.connErr != nil {
 			return errPeerConnection.WithCause(peer.connErr).WithAttributes("name", peer.name, "address", peer.target)
 		}
+		logger.Debug("Connected to peer")
 	}
 	return nil
 }
