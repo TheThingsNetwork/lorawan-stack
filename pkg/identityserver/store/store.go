@@ -267,34 +267,37 @@ type logger struct {
 
 // Print implements the gorm.logger interface.
 func (l logger) Print(v ...interface{}) {
-	if len(v) <= 2 {
+	if len(v) < 3 {
 		l.Error(fmt.Sprint(v...))
 		return
 	}
-	path := filepath.Base(v[1].(string))
-	logger := l.WithField("source", path)
+	logger := l.Interface
+	if source, ok := v[1].(string); ok {
+		logger = logger.WithField("source", filepath.Base(source))
+	} else {
+		l.Error(fmt.Sprint(v...))
+		return
+	}
 	switch v[0] {
-	case "log": // log, typically errors.
-		if len(v) < 3 {
-			return
-		}
+	case "log", "error":
 		if err, ok := v[2].(error); ok {
 			err = convertError(err)
 			if errors.IsAlreadyExists(err) {
 				return // no problem.
 			}
-			logger.WithError(err).Warn("Database error")
-		} else {
-			logger.Warn(fmt.Sprint(v[2:]...))
+			logger.WithError(err).Error("Database error")
+			return
 		}
-	case "sql": // slog, sql debug.
+		logger.Error(fmt.Sprint(v[2:]...))
+		return
+	case "sql":
 		if len(v) != 6 {
 			return
 		}
 		duration, _ := v[2].(time.Duration)
-		query := v[3].(string)
-		values := v[4].([]interface{})
-		rows := v[5].(int64)
+		query, _ := v[3].(string)
+		values, _ := v[4].([]interface{})
+		rows, _ := v[5].(int64)
 		logger.WithFields(log.Fields(
 			"duration", duration,
 			"query", query,
