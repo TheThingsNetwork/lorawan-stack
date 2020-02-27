@@ -23,7 +23,6 @@ import PageTitle from '../../../components/page-title'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import PubsubForm from '../../components/pubsub-form'
 import toast from '../../../components/toast'
-import diff from '../../../lib/diff'
 import sharedMessages from '../../../lib/shared-messages'
 
 import api from '../../api'
@@ -59,11 +58,9 @@ export default class ApplicationPubsubEdit extends Component {
 
   @bind
   async handleSubmit(pubsub) {
-    const { pubsub: originalPubsub, updatePubsub } = this.props
+    const { updatePubsub } = this.props
 
-    const patch = diff(originalPubsub, pubsub, ['ids'])
-
-    await updatePubsub(patch)
+    await updatePubsub(pubsub)
   }
 
   @bind

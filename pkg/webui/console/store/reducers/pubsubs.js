@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { merge } from 'lodash'
+import { mergeWith } from 'lodash'
 
 import {
   GET_PUBSUB,
@@ -61,7 +61,25 @@ const pubsubs = function(state = defaultState, { type, payload }) {
         ...state,
         entities: {
           ...state.entities,
-          [pubsubId]: merge({}, state.entities[pubsubId], payload),
+          [pubsubId]: mergeWith(
+            {},
+            state.entities[pubsubId],
+            payload,
+            (_, __, key, object, source) => {
+              // Handle switching between nats and pubsub. We do not want keep both entries, since
+              // there can be only one provider of a pubsub integration.
+
+              // If the payload has the `mqtt` field, then remove the `nats` field from the stored object.
+              if (source === payload && key === 'mqtt' && object.nats) {
+                delete object.nats
+              }
+
+              // If the payload has the `nats` field, then remove the `mqtt` field from the stored object.
+              if (source === payload && key === 'nats' && object.mqtt) {
+                delete object.mqtt
+              }
+            },
+          ),
         },
       }
     default:
