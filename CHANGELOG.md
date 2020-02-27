@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New `list` and `request-validation` subcommands for the CLI's `contact-info` commands.
+- Device Claim Authentication Code page in the Console.
 
 ### Changed
 
