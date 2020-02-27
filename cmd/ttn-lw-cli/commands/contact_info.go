@@ -27,6 +27,33 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
+func listContactInfo(entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.ContactInfo, error) {
+	is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+	if err != nil {
+		return nil, err
+	}
+	fieldMask := types.FieldMask{Paths: []string{"contact_info"}}
+	var res interface{}
+	switch id := entityID.Identifiers().(type) {
+	case *ttnpb.ApplicationIdentifiers:
+		res, err = ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{ApplicationIdentifiers: *id, FieldMask: fieldMask})
+	case *ttnpb.ClientIdentifiers:
+		res, err = ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{ClientIdentifiers: *id, FieldMask: fieldMask})
+	case *ttnpb.GatewayIdentifiers:
+		res, err = ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{GatewayIdentifiers: *id, FieldMask: fieldMask})
+	case *ttnpb.OrganizationIdentifiers:
+		res, err = ttnpb.NewOrganizationRegistryClient(is).Get(ctx, &ttnpb.GetOrganizationRequest{OrganizationIdentifiers: *id, FieldMask: fieldMask})
+	case *ttnpb.UserIdentifiers:
+		res, err = ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{UserIdentifiers: *id, FieldMask: fieldMask})
+	default:
+		panic(fmt.Errorf("no contact info in %T", id))
+	}
+	if err != nil {
+		return nil, err
+	}
+	return res.(interface{ GetContactInfo() []*ttnpb.ContactInfo }).GetContactInfo(), nil
+}
+
 func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error)) ([]*ttnpb.ContactInfo, error) {
 	is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 	if err != nil {
@@ -117,6 +144,21 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 	cmd := &cobra.Command{
 		Use:   "contact-info",
 		Short: fmt.Sprintf("Manage %s contact info", entity),
+	}
+	list := &cobra.Command{
+		Use:     fmt.Sprintf("list [%s-id]", entity),
+		Aliases: []string{"ls", "get"},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id, err := getID(cmd, args)
+			if err != nil {
+				return err
+			}
+			contactInfo, err := listContactInfo(id)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, contactInfo)
+		},
 	}
 	add := &cobra.Command{
 		Use: fmt.Sprintf("add [%s-id]", entity),
@@ -212,6 +254,8 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 	}
 	add.Flags().AddFlagSet(contactInfoFlags)
 	cmd.AddCommand(add)
+	list.Flags().AddFlagSet(contactInfoFlags)
+	cmd.AddCommand(list)
 	remove.Flags().AddFlagSet(contactInfoFlags)
 	cmd.AddCommand(remove)
 	validate.Flags().String("reference", "", "Reference of the requested validation")
