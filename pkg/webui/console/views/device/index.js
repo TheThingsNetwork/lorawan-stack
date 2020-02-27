@@ -31,6 +31,7 @@ import DeviceData from '../device-data'
 import DeviceGeneralSettings from '../device-general-settings'
 import DeviceLocation from '../device-location'
 import DevicePayloadFormatters from '../device-payload-formatters'
+import DeviceClaimAuthenticationCode from '../device-claim-authentication-code'
 
 import { getDevice, stopDeviceEventsStream } from '../../store/actions/devices'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
@@ -91,6 +92,7 @@ import style from './device.styl'
         'application_server_id',
         'application_server_kek_label',
         'network_server_kek_label',
+        'claim_authentication_code',
       ],
       { ignoreNotFound: true },
     ),
@@ -114,9 +116,11 @@ export default class Device extends React.Component {
     match: PropTypes.match.isRequired,
     stopStream: PropTypes.func.isRequired,
   }
+
   static defaultProps = {
     env: undefined,
   }
+
   componentWillUnmount() {
     const { device, stopStream } = this.props
 
@@ -152,6 +156,12 @@ export default class Device extends React.Component {
         exact: false,
       },
       {
+        title: sharedMessages.claiming,
+        name: 'claim-auth-code',
+        link: `${basePath}/claim-auth-code`,
+        disabled: !hasJs,
+      },
+      {
         title: sharedMessages.generalSettings,
         name: 'general-settings',
         link: `${basePath}/general-settings`,
@@ -171,6 +181,9 @@ export default class Device extends React.Component {
           <Route exact path={`${basePath}/location`} component={DeviceLocation} />
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
+          <Require condition={hasJs}>
+            <Route path={`${basePath}/claim-auth-code`} component={DeviceClaimAuthenticationCode} />
+          </Require>
           <NotFoundRoute />
         </Switch>
       </React.Fragment>
