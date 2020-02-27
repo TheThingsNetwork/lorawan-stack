@@ -101,6 +101,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		},
 	}
 	validV3Settings := ttnpb.TxSettings{
+		Timestamp: 1000,
 		DataRate: ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_LoRa{
 				LoRa: &ttnpb.LoRaDataRate{

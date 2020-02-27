@@ -120,6 +120,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 
 	settings := ttnpb.TxSettings{
 		Frequency: gwMetadata.Frequency,
+		Timestamp: gwMetadata.Timestamp,
 	}
 	switch lorawanMetadata.Modulation {
 	case ttnpbv2.Modulation_LORA:
