@@ -4193,6 +4193,15 @@
       "file": "organization_registry.go"
     }
   },
+  "error:pkg/identityserver:no_contact_info": {
+    "translations": {
+      "en": "no contact info for this entity type"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "contact_info_registry.go"
+    }
+  },
   "error:pkg/identityserver:no_invite_rights": {
     "translations": {
       "en": "no rights for inviting users"
