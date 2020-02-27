@@ -15,12 +15,17 @@
 package oauthclient
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"net/http"
 	"time"
 
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"golang.org/x/oauth2"
 )
+
+var errRefresh = errors.DefinePermissionDenied("refresh", "token refresh refused")
 
 func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
 	value, err := oc.getAuthCookie(c)
@@ -31,12 +36,19 @@ func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
 	token := &oauth2.Token{
 		AccessToken:  value.AccessToken,
 		RefreshToken: value.RefreshToken,
-		Expiry:       value.Expiry,
+		Expiry:       time.Now(),
 	}
 
 	freshToken, err := oc.oauth(c).TokenSource(c.Request().Context(), token).Token()
 	if err != nil {
-		return nil, err
+		var retrieveError *oauth2.RetrieveError
+		if stderrors.As(err, &retrieveError) {
+			var ttnErr errors.Error
+			if decErr := json.Unmarshal(retrieveError.Body, &ttnErr); decErr == nil {
+				return nil, errRefresh.WithCause(ttnErr)
+			}
+		}
+		return nil, errRefresh.WithCause(err)
 	}
 
 	if freshToken.AccessToken != token.AccessToken {
