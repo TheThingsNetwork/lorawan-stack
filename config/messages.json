@@ -6425,6 +6425,33 @@
       "file": "recover.go"
     }
   },
+  "error:pkg/web/oauthclient:exchange": {
+    "translations": {
+      "en": "token exchange refused"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:invalid_state": {
+    "translations": {
+      "en": "invalid state parameter"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:no_code": {
+    "translations": {
+      "en": "no code parameter present in request"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
   "error:pkg/web/oauthclient:no_oauth_config": {
     "translations": {
       "en": "no OAuth configuration found for the OAuth client"
@@ -6434,36 +6461,27 @@
       "file": "oauthclient.go"
     }
   },
-  "error:pkg/web/oauthclient:oauth_callback_error": {
-    "translations": {
-      "en": "an error occurred: {error}"
-    },
-    "description": {
-      "package": "pkg/web/oauthclient",
-      "file": "callback.go"
-    }
-  },
-  "error:pkg/web/oauthclient:oauth_callback_invalid_state": {
-    "translations": {
-      "en": "invalid state parameter"
-    },
-    "description": {
-      "package": "pkg/web/oauthclient",
-      "file": "callback.go"
-    }
-  },
-  "error:pkg/web/oauthclient:oauth_callback_no_code": {
-    "translations": {
-      "en": "no code parameter present in request"
-    },
-    "description": {
-      "package": "pkg/web/oauthclient",
-      "file": "callback.go"
-    }
-  },
-  "error:pkg/web/oauthclient:oauth_callback_no_state": {
+  "error:pkg/web/oauthclient:no_state": {
     "translations": {
       "en": "no state parameter present in request"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:refresh": {
+    "translations": {
+      "en": "token refresh refused"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "token.go"
+    }
+  },
+  "error:pkg/web/oauthclient:refused": {
+    "translations": {
+      "en": "refused by OAuth server"
     },
     "description": {
       "package": "pkg/web/oauthclient",

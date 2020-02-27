@@ -15,22 +15,28 @@
 package oauthclient
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"golang.org/x/oauth2"
 )
 
-var errCallback = errors.DefinePermissionDenied("oauth_callback_error", "an error occurred: {error}")
-var errNoStateParam = errors.DefinePermissionDenied("oauth_callback_no_state", "no state parameter present in request")
-var errNoCode = errors.DefinePermissionDenied("oauth_callback_no_code", "no code parameter present in request")
-var errInvalidState = errors.DefinePermissionDenied("oauth_callback_invalid_state", "invalid state parameter")
+var (
+	errRefused      = errors.DefinePermissionDenied("refused", "refused by OAuth server", "reason")
+	errNoStateParam = errors.DefinePermissionDenied("no_state", "no state parameter present in request")
+	errNoCodeParam  = errors.DefinePermissionDenied("no_code", "no code parameter present in request")
+	errInvalidState = errors.DefinePermissionDenied("invalid_state", "invalid state parameter")
+	errExchange     = errors.DefinePermissionDenied("exchange", "token exchange refused")
+)
 
 // HandleCallback is a handler that takes the auth code and exchanges it for the
 // access token.
 func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 	if e := c.QueryParam("error"); e != "" {
-		return errCallback.WithAttributes("error", c.QueryParam("error_description"))
+		return errRefused.WithAttributes("reason", c.QueryParam("error_description"))
 	}
 
 	state := c.QueryParam("state")
@@ -40,7 +46,7 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 
 	code := c.QueryParam("code")
 	if code == "" {
-		return errNoCode
+		return errNoCodeParam
 	}
 
 	stateCookie, err := oc.getStateCookie(c)
@@ -55,7 +61,14 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 	// Exchange token.
 	token, err := oc.oauth(c).Exchange(c.Request().Context(), code)
 	if err != nil {
-		return err
+		var retrieveError *oauth2.RetrieveError
+		if stderrors.As(err, &retrieveError) {
+			var ttnErr errors.Error
+			if decErr := json.Unmarshal(retrieveError.Body, &ttnErr); decErr == nil {
+				return errExchange.WithCause(ttnErr)
+			}
+		}
+		return errExchange.WithCause(err)
 	}
 
 	oc.removeStateCookie(c)
