@@ -217,6 +217,25 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 			return io.Write(os.Stdout, config.OutputFormat, updatedInfo)
 		},
 	}
+	requestValidation := &cobra.Command{
+		Use:   fmt.Sprintf("request-validation [%s-id]", entity),
+		Short: "Request validation for entity contact info",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id, err := getID(cmd, args)
+			if err != nil {
+				return err
+			}
+			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
+			if err != nil {
+				return err
+			}
+			res, err := ttnpb.NewContactInfoRegistryClient(is).RequestValidation(ctx, id)
+			if err != nil {
+				return err
+			}
+			return io.Write(os.Stdout, config.OutputFormat, res)
+		},
+	}
 	validate := &cobra.Command{
 		Use:   "validate [reference] [token]",
 		Short: "Validate contact info",
@@ -258,6 +277,8 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 	cmd.AddCommand(list)
 	remove.Flags().AddFlagSet(contactInfoFlags)
 	cmd.AddCommand(remove)
+	requestValidation.Flags().AddFlagSet(contactInfoFlags)
+	cmd.AddCommand(requestValidation)
 	validate.Flags().String("reference", "", "Reference of the requested validation")
 	validate.Flags().String("token", "", "Token that you received")
 	cmd.AddCommand(validate)
