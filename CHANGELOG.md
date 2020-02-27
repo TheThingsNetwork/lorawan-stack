@@ -9,16 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Class B support.
-- WebSocket Ping-Pong support for Basic Station frontend in the Gateway Server.
-- LoRaWAN 1.0.4 support.
-
 ### Changed
-
-- Do not use `personal-files` plugin for snap package.
-- Network Server will never attempt RX1 for devices with `Rx1Delay` of `1` second.
-- Improved efficiency of ADR MAC commands.
-- Gateway Configuration Server will use the default WebSocket TLS port if none is set.
 
 ### Deprecated
 
@@ -26,7 +17,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- End device events subscription release in the Console. 
+### Security
+
+## [3.6.0] (2020-02-27)
+
+### Added
+
+- Class B support.
+- WebSocket Ping-Pong support for Basic Station frontend in the Gateway Server.
+- LoRaWAN 1.0.4 support.
+
+### Changed
+
+- Do not use `personal-files` plugin for Snap package.
+- Network Server will never attempt RX1 for devices with `Rx1Delay` of 1 second.
+- Improved efficiency of ADR MAC commands.
+- Gateway Configuration Server will use the default WebSocket TLS port if none is set.
+
+### Fixed
+
+- End device events subscription release in the Console.
 - Blocking UDP packet handling while the gateway was still connecting. Traffic is now dropped while the connection is in progress, so that traffic from already connected gateways keep flowing.
 - Join-request transmission parameters.
 - ADR in 72-channel regions.
@@ -35,8 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Device creation rollback potentially deleting existing device with same ID.
 - Returned values not representing the effective state of the devices in Network Server when deprecated field paths are used.
 - Downlink queue operations in Network Server for LoRaWAN 1.1 devices.
-
-### Security
 
 ## [3.5.3] (2020-02-14)
 
@@ -626,7 +634,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.3...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...HEAD
+[3.6.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.3...v3.6.0
 [3.5.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.2...v3.5.3
 [3.5.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.1...v3.5.2
 [3.5.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.0...v3.5.1
