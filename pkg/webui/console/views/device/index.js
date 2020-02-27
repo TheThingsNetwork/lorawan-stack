@@ -25,6 +25,7 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
 import withEnv from '../../../lib/components/env'
 import NotFoundRoute from '../../../lib/components/not-found-route'
+import Require from '../../lib/components/require'
 
 import DeviceOverview from '../device-overview'
 import DeviceData from '../device-data'
@@ -40,8 +41,11 @@ import {
   selectDeviceFetching,
   selectDeviceError,
 } from '../../store/selectors/devices'
+import { selectJsConfig } from '../../../lib/selectors/env'
 
 import PropTypes from '../../../lib/prop-types'
+import getHostnameFromUrl from '../../../lib/host-from-url'
+
 import style from './device.styl'
 
 @connect(
@@ -134,9 +138,15 @@ export default class Device extends React.Component {
         params: { appId },
       },
       devId,
-      device: { name, description },
+      device: { name, description, join_server_address, supports_join },
       env: { siteName },
     } = this.props
+
+    const jsConfig = selectJsConfig()
+    const hasJs =
+      jsConfig.enabled &&
+      join_server_address === getHostnameFromUrl(jsConfig.base_url) &&
+      supports_join
 
     const basePath = `/applications/${appId}/devices/${devId}`
 
