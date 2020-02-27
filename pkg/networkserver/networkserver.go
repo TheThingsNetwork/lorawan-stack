@@ -201,7 +201,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		applicationUplinks:   conf.ApplicationUplinks,
 		deduplicationDone:    makeWindowEndAfterFunc(conf.DeduplicationWindow),
 		collectionDone:       makeWindowEndAfterFunc(conf.DeduplicationWindow + conf.CooldownWindow),
-		devices:              conf.Devices,
+		devices:              wrapDeviceRegistryWithDeprecatedFields(conf.Devices, deprecatedDeviceFields...),
 		downlinkTasks:        conf.DownlinkTasks,
 		metadataAccumulators: &sync.Map{},
 		metadataAccumulatorPool: &sync.Pool{
