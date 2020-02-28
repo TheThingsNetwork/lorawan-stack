@@ -58,5 +58,6 @@ const (
 	temporaryPasswordExpiresAtField     = "temporary_password_expires_at"
 	temporaryPasswordField              = "temporary_password"
 	updateChannelField                  = "update_channel"
+	updateLocationFromStatusField       = "update_location_from_status"
 	versionIDsField                     = "version_ids"
 )
