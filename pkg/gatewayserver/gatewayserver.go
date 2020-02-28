@@ -548,9 +548,9 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 						break
 					}
 					if err := handler.HandleStatus(ctx, conn.Gateway().GatewayIdentifiers, msg); err != nil {
-						registerForwardStatus(ctx, conn.Gateway(), msg, item.host.name)
-					} else {
 						registerDropStatus(ctx, conn.Gateway(), msg, item.host.name, err)
+					} else {
+						registerForwardStatus(ctx, conn.Gateway(), msg, item.host.name)
 					}
 				}
 			}

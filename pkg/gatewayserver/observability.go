@@ -210,6 +210,9 @@ type messageMetrics struct {
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.gatewaysConnected.Describe(ch)
 	m.statusReceived.Describe(ch)
+	m.statusForwarded.Describe(ch)
+	m.statusDropped.Describe(ch)
+	m.statusFailed.Describe(ch)
 	m.uplinkReceived.Describe(ch)
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
@@ -222,6 +225,9 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.gatewaysConnected.Collect(ch)
 	m.statusReceived.Collect(ch)
+	m.statusForwarded.Collect(ch)
+	m.statusDropped.Collect(ch)
+	m.statusFailed.Collect(ch)
 	m.uplinkReceived.Collect(ch)
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
