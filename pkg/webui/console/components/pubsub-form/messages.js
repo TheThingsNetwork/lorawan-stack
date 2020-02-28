@@ -42,4 +42,5 @@ export default defineMessages({
   tlsClientKey: 'Client private key',
   selectPemFile: 'Select .pem file…',
   pemFileProvided: '.pem file has been provided',
+  useCredentials: 'Use Credentials',
 })
