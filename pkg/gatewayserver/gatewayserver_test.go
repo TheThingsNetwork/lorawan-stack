@@ -90,7 +90,8 @@ func TestGatewayServer(t *testing.T) {
 	defer statsFlush()
 	defer statsRedisClient.Close()
 	config := &gatewayserver.Config{
-		RequireRegisteredGateways: false,
+		RequireRegisteredGateways:         false,
+		UpdateGatewayLocationDebounceTime: 0,
 		MQTT: config.MQTT{
 			Listen: ":1882",
 		},
@@ -136,7 +137,7 @@ func TestGatewayServer(t *testing.T) {
 		is.add(ctx, ttnpb.GatewayIdentifiers{
 			GatewayID: registeredGatewayID,
 			EUI:       &registeredGatewayEUI,
-		}, registeredGatewayKey, publicLocation)
+		}, registeredGatewayKey, publicLocation, true)
 
 		for _, ptc := range []struct {
 			Protocol               string
@@ -648,6 +649,120 @@ func TestGatewayServer(t *testing.T) {
 					}
 				})
 
+				if ptc.SupportsStatus {
+					t.Run("UpdateLocation", func(t *testing.T) {
+						for _, tc := range []struct {
+							Name           string
+							UpdateLocation bool
+							Up             *ttnpb.GatewayUp
+							ExpectLocation ttnpb.Location
+						}{
+							{
+								Name:           "NoUpdate",
+								UpdateLocation: false,
+								Up: &ttnpb.GatewayUp{
+									GatewayStatus: &ttnpb.GatewayStatus{
+										Time: time.Unix(424242, 0),
+										AntennaLocations: []*ttnpb.Location{
+											{
+												Source:    ttnpb.SOURCE_GPS,
+												Altitude:  10,
+												Latitude:  12,
+												Longitude: 14,
+											},
+										},
+									},
+								},
+								ExpectLocation: ttnpb.Location{
+									Source: ttnpb.SOURCE_REGISTRY,
+								},
+							},
+							{
+								Name:           "NoLocation",
+								UpdateLocation: true,
+								Up: &ttnpb.GatewayUp{
+									GatewayStatus: &ttnpb.GatewayStatus{
+										Time: time.Unix(424242, 0),
+									},
+								},
+								ExpectLocation: ttnpb.Location{
+									Source: ttnpb.SOURCE_REGISTRY,
+								},
+							},
+							{
+								Name:           "Update",
+								UpdateLocation: true,
+								Up: &ttnpb.GatewayUp{
+									GatewayStatus: &ttnpb.GatewayStatus{
+										Time: time.Unix(42424242, 0),
+										AntennaLocations: []*ttnpb.Location{
+											{
+												Source:    ttnpb.SOURCE_GPS,
+												Altitude:  10,
+												Latitude:  12,
+												Longitude: 14,
+											},
+										},
+									},
+								},
+								ExpectLocation: ttnpb.Location{
+									Source:    ttnpb.SOURCE_GPS,
+									Altitude:  10,
+									Latitude:  12,
+									Longitude: 14,
+								},
+							},
+						} {
+							t.Run(tc.Name, func(t *testing.T) {
+								a := assertions.New(t)
+
+								gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
+									GatewayIdentifiers: ids,
+								})
+								a.So(err, should.BeNil)
+								gtw.Antennas[0].Location = ttnpb.Location{
+									Source: ttnpb.SOURCE_REGISTRY,
+								}
+								gtw.UpdateLocationFromStatus = tc.UpdateLocation
+								gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
+									GatewayIdentifiers: ids,
+								})
+								a.So(err, should.BeNil)
+								a.So(gtw.UpdateLocationFromStatus, should.Equal, tc.UpdateLocation)
+
+								ctx, cancel := context.WithCancel(ctx)
+								upCh := make(chan *ttnpb.GatewayUp)
+								downCh := make(chan *ttnpb.GatewayDown)
+
+								wg := &sync.WaitGroup{}
+								wg.Add(1)
+								go func() {
+									defer wg.Done()
+									err := ptc.Link(ctx, t, ids, registeredGatewayKey, upCh, downCh)
+									if !errors.IsCanceled(err) {
+										t.Fatalf("Expected context canceled, but have %v", err)
+									}
+								}()
+
+								select {
+								case upCh <- tc.Up:
+								case <-time.After(timeout):
+									t.Fatalf("Failed to send message to upstream channel")
+								}
+
+								time.Sleep(timeout)
+								gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
+									GatewayIdentifiers: ids,
+								})
+								a.So(err, should.BeNil)
+								a.So(gtw.Antennas[0].Location, should.Resemble, tc.ExpectLocation)
+
+								cancel()
+								wg.Wait()
+							})
+						}
+					})
+				}
 				wg := &sync.WaitGroup{}
 				wg.Add(1)
 				go func() {
@@ -659,9 +774,10 @@ func TestGatewayServer(t *testing.T) {
 				}()
 
 				// Expected location for RxMetadata
-				location := &ttnpb.Location{
-					Source: ttnpb.SOURCE_REGISTRY,
-				}
+				gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
+					GatewayIdentifiers: ids,
+				})
+				location := &gtw.Antennas[0].Location
 				if !publicLocation {
 					location = nil
 				}

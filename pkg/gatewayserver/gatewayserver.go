@@ -399,6 +399,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 				"location_public",
 				"schedule_anytime_delay",
 				"schedule_downlink_late",
+				"update_location_from_status",
 			},
 		},
 	}, callOpt)
@@ -412,13 +413,14 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		}
 		logger.Warn("Connect unregistered gateway")
 		gtw = &ttnpb.Gateway{
-			GatewayIdentifiers:     ids,
-			FrequencyPlanID:        fpID,
-			FrequencyPlanIDs:       []string{fpID},
-			EnforceDutyCycle:       true,
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
-			Antennas:               []ttnpb.GatewayAntenna{},
-			LocationPublic:         false,
+			GatewayIdentifiers:       ids,
+			FrequencyPlanID:          fpID,
+			FrequencyPlanIDs:         []string{fpID},
+			EnforceDutyCycle:         true,
+			DownlinkPathConstraint:   ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			Antennas:                 []ttnpb.GatewayAntenna{},
+			LocationPublic:           false,
+			UpdateLocationFromStatus: false,
 		}
 	} else if err != nil {
 		return nil, err
@@ -446,6 +448,10 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	logger.Info("Connected")
 	go gs.handleUpstream(connEntry)
 	go gs.updateConnStats(connEntry)
+
+	if gtw.UpdateLocationFromStatus {
+		go gs.handleLocationUpdates(connEntry)
+	}
 
 	for name, handler := range gs.upstreamHandlers {
 		handler := handler
@@ -663,7 +669,6 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 			logger.WithError(err).Error("Failed to delete connection stats")
 		}
 	}()
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -675,6 +680,62 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 			}
 
 			timeout := time.After(gs.updateConnectionStatsDebounceTime)
+			select {
+			case <-ctx.Done():
+				return
+			case <-timeout:
+			}
+		}
+	}
+}
+
+func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
+	ctx := conn.Context()
+
+	var err error
+	var callOpt grpc.CallOption
+	callOpt, err = rpcmetadata.WithForwardedAuth(ctx, gs.AllowInsecureForCredentials())
+	if errors.IsUnauthenticated(err) {
+		callOpt = gs.WithClusterAuth()
+	} else if err != nil {
+		return
+	}
+	registry, err := gs.getRegistry(ctx, &conn.Gateway().GatewayIdentifiers)
+	if err != nil {
+		return
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-conn.LocationChanged():
+			status, _, ok := conn.StatusStats()
+			locations := status.AntennaLocations
+			antennas := conn.Gateway().Antennas
+			if ok && len(locations) > 0 && len(antennas) > 0 {
+				// TODO: Handle multiple antenna locations (https://github.com/TheThingsNetwork/lorawan-stack/issues/2006).
+				locations[0].Source = ttnpb.SOURCE_GPS
+				antennas[0].Location = *locations[0]
+
+				_, err := registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
+					Gateway: ttnpb.Gateway{
+						GatewayIdentifiers: conn.Gateway().GatewayIdentifiers,
+						Antennas:           conn.Gateway().Antennas,
+					},
+					FieldMask: pbtypes.FieldMask{
+						Paths: []string{
+							"antennas",
+						},
+					},
+				}, callOpt)
+
+				if err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Failed to update antenna location")
+				}
+			}
+
+			timeout := time.After(gs.config.UpdateGatewayLocationDebounceTime)
 			select {
 			case <-ctx.Done():
 				return

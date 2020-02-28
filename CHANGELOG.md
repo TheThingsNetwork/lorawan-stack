@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New `list` and `request-validation` subcommands for the CLI's `contact-info` commands.
 - Device Claim Authentication Code page in the Console.
+- Update gateway antenna location from incoming status message (see `update_location_from_status` gateway field and `--gs.update-gateway-location-debounce-time` option).
+  - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 
 ### Changed
 
