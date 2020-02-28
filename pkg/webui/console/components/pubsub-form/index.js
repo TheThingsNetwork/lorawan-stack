@@ -30,7 +30,12 @@ import PubsubFormatSelector from '../../containers/pubsub-formats-select'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
 
-import { mapPubsubToFormValues, mapFormValuesToPubsub, blankValues } from './mapping'
+import {
+  mapPubsubToFormValues,
+  mapFormValuesToPubsub,
+  blankValues,
+  mapNatsServerUrlToFormValue,
+} from './mapping'
 import m from './messages'
 import { qosOptions } from './qos-options'
 import validationSchema from './validation-schema'
@@ -69,11 +74,22 @@ export default class PubsubForm extends Component {
 
     const initialIsMqtt = update && 'mqtt' in initialPubsubValue
     const initialMqttSecure = initialIsMqtt ? initialPubsubValue.mqtt.use_tls : false
+    const initialUseCredentialsMqtt = initialIsMqtt
+      ? Boolean(initialPubsubValue.mqtt.username || initialPubsubValue.mqtt.password)
+      : true
+
+    const initialIsNats = update && 'nats' in initialPubsubValue
+    const { password, username } = initialIsNats
+      ? mapNatsServerUrlToFormValue(initialPubsubValue.nats.server_url)
+      : { password: undefined, username: undefined }
+    const initialUseCredentialsNats = initialIsNats ? Boolean(password || username) : true
 
     this.state = {
       error: '',
       isMqtt: initialIsMqtt,
       mqttSecure: initialMqttSecure,
+      mqttUseCredentials: initialUseCredentialsMqtt,
+      natsUseCredentials: initialUseCredentialsNats,
     }
   }
 
@@ -114,6 +130,10 @@ export default class PubsubForm extends Component {
     this.setState({ isMqtt: false })
   }
 
+  handleUseCredentialsChangeNats(event) {
+    this.setState({ natsUseCredentials: event.target.checked })
+  }
+
   handleMqttSelect() {
     this.setState({ isMqtt: true })
   }
@@ -122,23 +142,37 @@ export default class PubsubForm extends Component {
     this.setState({ mqttSecure: event.target.checked })
   }
 
+  handleUseCredentialsChangeMqtt(event) {
+    this.setState({ mqttUseCredentials: event.target.checked })
+  }
+
   get natsSection() {
+    const { natsUseCredentials } = this.state
     return (
       <React.Fragment>
         <Message component="h4" content={m.natsConfig} />
+        <Form.Field name="nats.secure" title={sharedMessages.secure} component={Checkbox} />
+        <Form.Field
+          name="nats.use_credentials"
+          title={m.useCredentials}
+          component={Checkbox}
+          onChange={this.handleUseCredentialsChangeNats}
+        />
         <Form.Field
           name="nats.username"
           title={sharedMessages.username}
           placeholder={m.usernamePlaceholder}
           component={Input}
-          required
+          required={natsUseCredentials}
+          disabled={!natsUseCredentials}
         />
         <Form.Field
           name="nats.password"
           title={sharedMessages.password}
           placeholder={m.passwordPlaceholder}
           component={Input}
-          required
+          required={natsUseCredentials}
+          disabled={!natsUseCredentials}
         />
         <Form.Field
           name="nats.address"
@@ -154,59 +188,16 @@ export default class PubsubForm extends Component {
           component={Input}
           required
         />
-        <Form.Field name="nats.secure" title={sharedMessages.secure} component={Checkbox} />
       </React.Fragment>
     )
   }
 
   get mqttSection() {
-    const { mqttSecure } = this.state
+    const { mqttSecure, mqttUseCredentials } = this.state
 
     return (
       <React.Fragment>
         <Message component="h4" content={m.mqttConfig} />
-        <Form.Field
-          name="mqtt.server_url"
-          title={m.serverUrl}
-          placeholder={m.mqttServerUrlPlaceholder}
-          component={Input}
-          required
-        />
-        <Form.Field
-          name="mqtt.client_id"
-          title={m.clientId}
-          placeholder={m.mqttClientIdPlaceholder}
-          component={Input}
-          required
-        />
-        <Form.Field
-          name="mqtt.username"
-          title={sharedMessages.username}
-          placeholder={m.usernamePlaceholder}
-          component={Input}
-          required
-        />
-        <Form.Field
-          name="mqtt.password"
-          title={sharedMessages.password}
-          placeholder={m.passwordPlaceholder}
-          component={Input}
-          required
-        />
-        <Form.Field
-          title={m.subscribeQos}
-          name="mqtt.subscribe_qos"
-          component={Select}
-          required
-          options={qosOptions}
-        />
-        <Form.Field
-          title={m.publishQos}
-          name="mqtt.publish_qos"
-          component={Select}
-          required
-          options={qosOptions}
-        />
         <Form.Field
           name="mqtt.use_tls"
           title={sharedMessages.secure}
@@ -244,6 +235,55 @@ export default class PubsubForm extends Component {
             />
           </React.Fragment>
         )}
+        <Form.Field
+          name="mqtt.server_url"
+          title={m.serverUrl}
+          placeholder={m.mqttServerUrlPlaceholder}
+          component={Input}
+          required
+        />
+        <Form.Field
+          name="mqtt.client_id"
+          title={m.clientId}
+          placeholder={m.mqttClientIdPlaceholder}
+          component={Input}
+          required
+        />
+        <Form.Field
+          name="mqtt.use_credentials"
+          title={m.useCredentials}
+          component={Checkbox}
+          onChange={this.handleUseCredentialsChangeMqtt}
+        />
+        <Form.Field
+          name="mqtt.username"
+          title={sharedMessages.username}
+          placeholder={m.usernamePlaceholder}
+          component={Input}
+          required={mqttUseCredentials}
+          disabled={!mqttUseCredentials}
+        />
+        <Form.Field
+          name="mqtt.password"
+          title={sharedMessages.password}
+          placeholder={m.passwordPlaceholder}
+          component={Input}
+          disabled={!mqttUseCredentials}
+        />
+        <Form.Field
+          title={m.subscribeQos}
+          name="mqtt.subscribe_qos"
+          component={Select}
+          required
+          options={qosOptions}
+        />
+        <Form.Field
+          title={m.publishQos}
+          name="mqtt.publish_qos"
+          component={Select}
+          required
+          options={qosOptions}
+        />
       </React.Fragment>
     )
   }
