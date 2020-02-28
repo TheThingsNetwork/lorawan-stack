@@ -235,6 +235,7 @@ export default defineMessages({
   validateInt32: 'Invalid numeric format',
   validateLatLong: 'Invalid value format (valid format e.g. 52.15249000)',
   validateMqttUrl: 'Invalid MQTT URL format',
+  validateMqttPassword: 'Password should be empty or at least 2 characters',
   validatePasswordMatch: 'Passwords should match',
   validateRequired: 'This field is required',
   validateRights: 'At least one right should be selected',
