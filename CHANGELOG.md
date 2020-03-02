@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New `list` and `request-validation` subcommands for the CLI's `contact-info` commands.
+
 ### Changed
 
 - Network and Application Servers now maintain application downlink queue per-session.

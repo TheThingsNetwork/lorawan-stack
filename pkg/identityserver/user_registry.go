@@ -334,6 +334,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				return nil, errUpdateUserAdminField.WithAttributes("field", path)
 			}
 		}
+		req.PrimaryEmailAddressValidatedAt = nil
 		cleanContactInfo(req.User.ContactInfo)
 	}
 
@@ -377,7 +378,6 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				if err != nil {
 					return err
 				}
-				contactInfo = usr.ContactInfo
 			}
 			if updatingPrimaryEmailAddress {
 				if !updatingContactInfo {
@@ -386,14 +386,13 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 						return err
 					}
 				}
-				req.PrimaryEmailAddressValidatedAt = nil
 				if !ttnpb.HasAnyField(req.FieldMask.Paths, "primary_email_address_validated_at") {
-					req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address_validated_at")
-				}
-				for _, contactInfo := range contactInfo {
-					if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
-						req.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
-						break
+					for _, contactInfo := range contactInfo {
+						if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
+							req.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
+							req.FieldMask.Paths = append(req.FieldMask.Paths, "primary_email_address_validated_at")
+							break
+						}
 					}
 				}
 			}
