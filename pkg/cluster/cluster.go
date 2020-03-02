@@ -19,7 +19,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/hex"
-	"fmt"
 	"os"
 	"strings"
 
@@ -117,28 +116,18 @@ func New(ctx context.Context, config *config.Cluster, options ...Option) (Cluste
 	if CustomNew != nil {
 		return CustomNew(ctx, config, options...)
 	}
+	return defaultNew(ctx, config, options...)
+}
 
+func defaultNew(ctx context.Context, config *config.Cluster, options ...Option) (Cluster, error) {
 	c := &cluster{
 		ctx:   ctx,
 		tls:   config.TLS,
 		peers: make(map[string]*peer),
 	}
 
-	for i, key := range config.Keys {
-		decodedKey, err := hex.DecodeString(key)
-		if err != nil {
-			return nil, fmt.Errorf("Could not decode cluster key: %s", err)
-		}
-		switch len(decodedKey) {
-		case 16, 24, 32:
-		default:
-			return nil, fmt.Errorf("Invalid length for cluster key number %d: must be 16, 24 or 32 bytes", i)
-		}
-		c.keys = append(c.keys, decodedKey)
-	}
-	if c.keys == nil {
-		c.keys = [][]byte{random.Bytes(32)}
-		log.FromContext(ctx).WithField("key", hex.EncodeToString(c.keys[0])).Warn("No cluster key configured, generated a random one")
+	if err := c.loadKeys(ctx, config.Keys...); err != nil {
+		return nil, err
 	}
 
 	c.self = &peer{
@@ -150,42 +139,22 @@ func New(ctx context.Context, config *config.Cluster, options ...Option) (Cluste
 	}
 	c.peers[c.self.name] = c.self
 
-	tryAddPeer := func(name string, target string, roles ...ttnpb.ClusterRole) {
-		if target == "" {
-			return
-		}
-		var filteredRoles []ttnpb.ClusterRole
-		for _, role := range roles {
-			if !c.self.HasRole(role) {
-				filteredRoles = append(filteredRoles, role)
-			}
-		}
-		if len(filteredRoles) == 0 {
-			return
-		}
-		c.peers[name] = &peer{
-			name:   name,
-			target: target,
-			roles:  filteredRoles,
-		}
+	for _, option := range options {
+		option.apply(c)
 	}
 
-	tryAddPeer("is", config.IdentityServer, ttnpb.ClusterRole_ACCESS, ttnpb.ClusterRole_ENTITY_REGISTRY)
-	tryAddPeer("gs", config.GatewayServer, ttnpb.ClusterRole_GATEWAY_SERVER)
-	tryAddPeer("ns", config.NetworkServer, ttnpb.ClusterRole_NETWORK_SERVER)
-	tryAddPeer("as", config.ApplicationServer, ttnpb.ClusterRole_APPLICATION_SERVER)
-	tryAddPeer("js", config.JoinServer, ttnpb.ClusterRole_JOIN_SERVER)
-	tryAddPeer("cs", config.CryptoServer, ttnpb.ClusterRole_CRYPTO_SERVER)
+	c.addPeer("is", config.IdentityServer, ttnpb.ClusterRole_ACCESS, ttnpb.ClusterRole_ENTITY_REGISTRY)
+	c.addPeer("gs", config.GatewayServer, ttnpb.ClusterRole_GATEWAY_SERVER)
+	c.addPeer("ns", config.NetworkServer, ttnpb.ClusterRole_NETWORK_SERVER)
+	c.addPeer("as", config.ApplicationServer, ttnpb.ClusterRole_APPLICATION_SERVER)
+	c.addPeer("js", config.JoinServer, ttnpb.ClusterRole_JOIN_SERVER)
+	c.addPeer("cs", config.CryptoServer, ttnpb.ClusterRole_CRYPTO_SERVER)
 
 	for _, join := range config.Join {
 		c.peers[join] = &peer{
 			name:   join,
 			target: join,
 		}
-	}
-
-	for _, option := range options {
-		option.apply(c)
 	}
 
 	return c, nil
@@ -201,15 +170,52 @@ type cluster struct {
 	keys [][]byte
 }
 
-var errPeerConnection = errors.Define(
-	"peer_connection",
-	"connection to peer `{name}` on `{address}` failed",
+var (
+	errPeerConnection    = errors.DefineUnavailable("peer_connection", "connection to peer `{name}` on `{address}` failed")
+	errPeerEmptyTarget   = errors.DefineInvalidArgument("peer_empty_target", "peer target address is empty")
+	errInvalidClusterKey = errors.DefineInvalidArgument("cluster_key", "invalid cluster key")
+	errInvalidKeyLength  = errors.DefineInvalidArgument("key_length", "invalid key length %d, must be 16, 24 or 32 bytes")
 )
 
-var errPeerEmptyTarget = errors.Define(
-	"peer_empty_target",
-	"peer target address is empty",
-)
+func (c *cluster) loadKeys(ctx context.Context, keys ...string) error {
+	for _, key := range keys {
+		decodedKey, err := hex.DecodeString(key)
+		if err != nil {
+			return errInvalidClusterKey.WithCause(err)
+		}
+		switch len(decodedKey) {
+		case 16, 24, 32:
+		default:
+			return errInvalidClusterKey.WithCause(errInvalidKeyLength)
+		}
+		c.keys = append(c.keys, decodedKey)
+	}
+	if c.keys == nil {
+		c.keys = [][]byte{random.Bytes(32)}
+		log.FromContext(ctx).WithField("key", hex.EncodeToString(c.keys[0])).Warn("No cluster key configured, generated a random one")
+	}
+	return nil
+}
+
+func (c *cluster) addPeer(name string, target string, roles ...ttnpb.ClusterRole) {
+	if target == "" {
+		return
+	}
+	var filteredRoles []ttnpb.ClusterRole
+	for _, role := range roles {
+		if !c.self.HasRole(role) {
+			filteredRoles = append(filteredRoles, role)
+		}
+	}
+	if len(filteredRoles) == 0 {
+		return
+	}
+	c.peers[name] = &peer{
+		name:   name,
+		target: target,
+		roles:  filteredRoles,
+	}
+}
 
 func (c *cluster) Join() (err error) {
 	options := rpcclient.DefaultDialOptions(c.ctx)
@@ -235,9 +241,10 @@ func (c *cluster) Join() (err error) {
 		}
 		logger.Debug("Connecting to peer...")
 		peer.conn, peer.connErr = grpc.DialContext(peer.ctx, peer.target, options...)
-		if err != nil {
+		if peer.connErr != nil {
 			return errPeerConnection.WithCause(peer.connErr).WithAttributes("name", peer.name, "address", peer.target)
 		}
+		logger.Debug("Connected to peer")
 	}
 	return nil
 }

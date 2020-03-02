@@ -2519,6 +2519,24 @@
       "file": "bucket.go"
     }
   },
+  "error:pkg/cluster:cluster_key": {
+    "translations": {
+      "en": "invalid cluster key"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
+  "error:pkg/cluster:key_length": {
+    "translations": {
+      "en": "invalid key length %d, must be 16, 24 or 32 bytes"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
   "error:pkg/cluster:peer_connection": {
     "translations": {
       "en": "connection to peer `{name}` on `{address}` failed"
