@@ -5957,6 +5957,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/redis:transaction_failed": {
+    "translations": {
+      "en": "transaction failed"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/redis:value_type": {
     "translations": {
       "en": "invalid value type for key `{key}`"
