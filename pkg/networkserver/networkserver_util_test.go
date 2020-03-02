@@ -103,27 +103,6 @@ func TimeNow() time.Time {
 	return timeNow()
 }
 
-type MockClock time.Time
-
-// Set sets clock to time t and returns old clock time.
-func (m *MockClock) Set(t time.Time) time.Time {
-	old := time.Time(*m)
-	*m = MockClock(t)
-	return old
-}
-
-// Add adds d to clock and returns current clock time.
-func (m *MockClock) Add(d time.Duration) time.Time {
-	t := time.Time(*m).Add(d)
-	*m = MockClock(t)
-	return t
-}
-
-// Now returns current clock time.
-func (m *MockClock) Now() time.Time {
-	return time.Time(*m)
-}
-
 func NSScheduleWindow() time.Duration {
 	return nsScheduleWindow()
 }
