@@ -25,12 +25,14 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
 import withEnv from '../../../lib/components/env'
 import NotFoundRoute from '../../../lib/components/not-found-route'
+import Require from '../../lib/components/require'
 
 import DeviceOverview from '../device-overview'
 import DeviceData from '../device-data'
 import DeviceGeneralSettings from '../device-general-settings'
 import DeviceLocation from '../device-location'
 import DevicePayloadFormatters from '../device-payload-formatters'
+import DeviceClaimAuthenticationCode from '../device-claim-authentication-code'
 
 import { getDevice, stopDeviceEventsStream } from '../../store/actions/devices'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
@@ -39,8 +41,11 @@ import {
   selectDeviceFetching,
   selectDeviceError,
 } from '../../store/selectors/devices'
+import { selectJsConfig } from '../../../lib/selectors/env'
 
 import PropTypes from '../../../lib/prop-types'
+import getHostnameFromUrl from '../../../lib/host-from-url'
+
 import style from './device.styl'
 
 @connect(
@@ -91,6 +96,7 @@ import style from './device.styl'
         'application_server_id',
         'application_server_kek_label',
         'network_server_kek_label',
+        'claim_authentication_code',
       ],
       { ignoreNotFound: true },
     ),
@@ -114,9 +120,11 @@ export default class Device extends React.Component {
     match: PropTypes.match.isRequired,
     stopStream: PropTypes.func.isRequired,
   }
+
   static defaultProps = {
     env: undefined,
   }
+
   componentWillUnmount() {
     const { device, stopStream } = this.props
 
@@ -130,9 +138,15 @@ export default class Device extends React.Component {
         params: { appId },
       },
       devId,
-      device: { name, description },
+      device: { name, description, join_server_address, supports_join },
       env: { siteName },
     } = this.props
+
+    const jsConfig = selectJsConfig()
+    const hasJs =
+      jsConfig.enabled &&
+      join_server_address === getHostnameFromUrl(jsConfig.base_url) &&
+      supports_join
 
     const basePath = `/applications/${appId}/devices/${devId}`
 
@@ -150,6 +164,12 @@ export default class Device extends React.Component {
         name: 'develop',
         link: payloadFormattersLink,
         exact: false,
+      },
+      {
+        title: sharedMessages.claiming,
+        name: 'claim-auth-code',
+        link: `${basePath}/claim-auth-code`,
+        disabled: !hasJs,
       },
       {
         title: sharedMessages.generalSettings,
@@ -171,6 +191,9 @@ export default class Device extends React.Component {
           <Route exact path={`${basePath}/location`} component={DeviceLocation} />
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
+          <Require condition={hasJs}>
+            <Route path={`${basePath}/claim-auth-code`} component={DeviceClaimAuthenticationCode} />
+          </Require>
           <NotFoundRoute />
         </Switch>
       </React.Fragment>

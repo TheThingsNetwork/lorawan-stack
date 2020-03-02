@@ -67,6 +67,10 @@ class Devices {
       }
     }
 
+    if (paths.includes('claim_authentication_code') && !Boolean(device.claim_authentication_code)) {
+      device.claim_authentication_code = null
+    }
+
     return device
   }
 
