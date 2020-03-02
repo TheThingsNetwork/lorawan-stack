@@ -16,9 +16,7 @@ package redis
 
 import (
 	"context"
-	"hash"
 	"hash/fnv"
-	"sync"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
@@ -28,32 +26,20 @@ import (
 
 // UplinkDeduplicator is an implementation of networkserver.UplinkDeduplicator.
 type UplinkDeduplicator struct {
-	Redis    *ttnredis.Client
-	hashPool *sync.Pool
+	Redis *ttnredis.Client
 }
 
 // NewUplinkDeduplicator returns a new uplink deduplicator.
 func NewUplinkDeduplicator(cl *ttnredis.Client) *UplinkDeduplicator {
 	return &UplinkDeduplicator{
 		Redis: cl,
-		hashPool: &sync.Pool{
-			New: func() interface{} {
-				return fnv.New64a()
-			},
-		},
 	}
 }
 
 func (d *UplinkDeduplicator) uplinkHash(ctx context.Context, up *ttnpb.UplinkMessage) string {
-	h := d.hashPool.Get().(hash.Hash64)
+	h := fnv.New64a()
 	_, _ = h.Write(up.RawPayload)
-
-	s := string(h.Sum(nil))
-
-	h.Reset()
-	d.hashPool.Put(h)
-
-	return s
+	return string(h.Sum(nil))
 }
 
 // DeduplicateUplink deduplicates up for window. Since highest precision allowed by Redis is millisecondsm, window is truncated to milliseconds.

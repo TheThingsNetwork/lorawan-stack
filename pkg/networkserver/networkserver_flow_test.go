@@ -23,6 +23,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
@@ -604,153 +605,95 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 			},
 		}
 
-		handleUplinkErrCh := make(chan error)
-		sendUplinks := func(ctx context.Context) bool {
-			t := test.MustTFromContext(ctx)
-			t.Helper()
+		handleUplinkErrCh := make(chan error, 3)
 
-			go func() {
-				_, err := gsns.HandleUplink(ctx, makeUplink(
-					mds[0],
-					"GsNs-1", "GsNs-2",
-				))
-				t.Logf("HandleUplink returned %v", err)
-				handleUplinkErrCh <- err
-			}()
-
-			defer time.AfterFunc((1<<3)*test.Delay, func() {
-				_, err := gsns.HandleUplink(ctx, makeUplink(
-					mds[1],
-					"GsNs-1", "GsNs-3",
-				))
-				t.Logf("Duplicate HandleUplink returned %v", err)
-				handleUplinkErrCh <- err
-			}).Stop()
-
-			defer time.AfterFunc((1<<3)*test.Delay, func() {
-				_, err := gsns.HandleUplink(ctx, makeUplink(
-					nil,
-					"GsNs-1", "GsNs-4",
-				))
-				t.Logf("Duplicate HandleUplink returned %v", err)
-				handleUplinkErrCh <- err
-			}).Stop()
-
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for duplicate HandleUplink to return")
-				return false
-
-			case err := <-handleUplinkErrCh:
-				if !a.So(err, should.BeNil) {
-					t.Errorf("Failed to handle duplicate uplink: %s", err)
-					return false
-				}
-			}
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for duplicate HandleUplink to return")
-				return false
-
-			case err := <-handleUplinkErrCh:
-				if !a.So(err, should.BeNil) {
-					t.Errorf("Failed to handle duplicate uplink: %s", err)
-					return false
-				}
-			}
-			return true
+		sendUplink := func(up *ttnpb.UplinkMessage) {
+			_, err := gsns.HandleUplink(ctx, up)
+			t.Logf("HandleUplink returned %v", err)
+			handleUplinkErrCh <- err
 		}
-		if !a.So(sendUplinks(ctx), should.BeTrue) {
-			t.Error("Failed to send uplinks")
+		sendFirstUplink := func() {
+			sendUplink(makeUplink(
+				mds[0],
+				"GsNs-1", "GsNs-2",
+			))
+		}
+		go sendFirstUplink()
+		for i := 0; i < 3; i++ {
+			select {
+			case <-time.After(conf.DeduplicationWindow / 5):
+			case err := <-handleUplinkErrCh:
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("HandleUplink failed with unexpected error: %v", err)
+					return
+				}
+				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
+				go sendFirstUplink()
+			}
+		}
+		go sendUplink(makeUplink(
+			mds[1],
+			"GsNs-1", "GsNs-3",
+		))
+		go sendUplink(makeUplink(
+			nil,
+			"GsNs-1", "GsNs-4",
+		))
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for duplicate HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle duplicate uplink: %s", err)
+				return
+			}
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for duplicate HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle duplicate uplink: %s", err)
+				return
+			}
 		}
 
 		var reqCIDs []string
-		assertHandleUplink := func(ctx context.Context, evReq test.EventPubSubPublishRequest) bool {
-			t := test.MustTFromContext(ctx)
-			t.Helper()
-
-			reqCIDs = evReq.Event.CorrelationIDs()
-			if !a.So(evReq.Event, should.ResembleEvent, EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			reqCIDs = ev.CorrelationIDs()
+			return a.So(ev, should.ResembleEvent, EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
 				ttnpb.EndDeviceIdentifiers{
 					DeviceID:               devID,
 					ApplicationIdentifiers: appID,
 					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					DevAddr:                &devAddr,
-				}, 2)) {
-				t.Error("Metadata merge event assertion failed")
-				return false
-			}
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for events.Publish response of merge event to be processed")
-				return false
-
-			case evReq.Response <- struct{}{}:
-			}
-
-			if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-				return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
-					ttnpb.EndDeviceIdentifiers{
-						DeviceID:               devID,
-						ApplicationIdentifiers: appID,
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevAddr:                &devAddr,
-					}, nil))
-			}), should.BeTrue) {
-				t.Error("Uplink forward event assertion failed")
-				return false
-			}
-
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for HandleUplink to return")
-				return false
-
-			case err := <-handleUplinkErrCh:
-				if !a.So(err, should.BeNil) {
-					t.Errorf("Failed to handle uplink: %s", err)
-					return false
-				}
-			}
-			return true
-		}
+				}, 2))
+		}), should.BeTrue)
+		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevAddr:                &devAddr,
+				}, nil))
+		}), should.BeTrue)
 
 		select {
 		case <-ctx.Done():
-			t.Error("Timed out while waiting for an event or HandleUplink error")
+			t.Error("Timed out while waiting for HandleUplink to return")
 			return
 
-		case evReq := <-env.Events:
-			if !a.So(assertHandleUplink(ctx, evReq), should.BeTrue) {
-				t.Error("Failed to assert first HandleUplink")
-				return
-			}
-
 		case err := <-handleUplinkErrCh:
-			if err != nil {
-				if !a.So(errors.IsNotFound(err), should.BeTrue) {
-					t.Errorf("HandleUplink failed with unexpected error: %v", err)
-					return
-				}
-				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
-
-				if !a.So(sendUplinks(ctx), should.BeTrue) {
-					t.Error("Failed to send uplinks")
-				}
-
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for an event")
-					return
-
-				case evReq := <-env.Events:
-					if !a.So(assertHandleUplink(ctx, evReq), should.BeTrue) {
-						t.Error("Failed to assert first HandleUplink")
-						return
-					}
-				}
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle uplink: %s", err)
+				return
 			}
 		}
 		close(handleUplinkErrCh)
@@ -1406,153 +1349,95 @@ func handleClassAOTAAUS915FlowTest1_0_3(ctx context.Context, conn *grpc.ClientCo
 			},
 		}
 
-		handleUplinkErrCh := make(chan error)
-		sendUplinks := func(ctx context.Context) bool {
-			t := test.MustTFromContext(ctx)
-			t.Helper()
+		handleUplinkErrCh := make(chan error, 3)
 
-			go func() {
-				_, err := gsns.HandleUplink(ctx, makeUplink(
-					mds[0],
-					"GsNs-1", "GsNs-2",
-				))
-				t.Logf("HandleUplink returned %v", err)
-				handleUplinkErrCh <- err
-			}()
-
-			defer time.AfterFunc((1<<3)*test.Delay, func() {
-				_, err := gsns.HandleUplink(ctx, makeUplink(
-					mds[1],
-					"GsNs-1", "GsNs-3",
-				))
-				t.Logf("Duplicate HandleUplink returned %v", err)
-				handleUplinkErrCh <- err
-			}).Stop()
-
-			defer time.AfterFunc((1<<3)*test.Delay, func() {
-				_, err := gsns.HandleUplink(ctx, makeUplink(
-					nil,
-					"GsNs-1", "GsNs-4",
-				))
-				t.Logf("Duplicate HandleUplink returned %v", err)
-				handleUplinkErrCh <- err
-			}).Stop()
-
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for duplicate HandleUplink to return")
-				return false
-
-			case err := <-handleUplinkErrCh:
-				if !a.So(err, should.BeNil) {
-					t.Errorf("Failed to handle duplicate uplink: %s", err)
-					return false
-				}
-			}
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for duplicate HandleUplink to return")
-				return false
-
-			case err := <-handleUplinkErrCh:
-				if !a.So(err, should.BeNil) {
-					t.Errorf("Failed to handle duplicate uplink: %s", err)
-					return false
-				}
-			}
-			return true
+		sendUplink := func(up *ttnpb.UplinkMessage) {
+			_, err := gsns.HandleUplink(ctx, up)
+			t.Logf("HandleUplink returned %v", err)
+			handleUplinkErrCh <- err
 		}
-		if !a.So(sendUplinks(ctx), should.BeTrue) {
-			t.Error("Failed to send uplinks")
+		sendFirstUplink := func() {
+			sendUplink(makeUplink(
+				mds[0],
+				"GsNs-1", "GsNs-2",
+			))
+		}
+		go sendFirstUplink()
+		for i := 0; i < 3; i++ {
+			select {
+			case <-time.After(conf.DeduplicationWindow / 5):
+			case err := <-handleUplinkErrCh:
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("HandleUplink failed with unexpected error: %v", err)
+					return
+				}
+				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
+				go sendFirstUplink()
+			}
+		}
+		go sendUplink(makeUplink(
+			mds[1],
+			"GsNs-1", "GsNs-3",
+		))
+		go sendUplink(makeUplink(
+			nil,
+			"GsNs-1", "GsNs-4",
+		))
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for duplicate HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle duplicate uplink: %s", err)
+				return
+			}
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for duplicate HandleUplink to return")
+			return
+
+		case err := <-handleUplinkErrCh:
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle duplicate uplink: %s", err)
+				return
+			}
 		}
 
 		var reqCIDs []string
-		assertHandleUplink := func(ctx context.Context, evReq test.EventPubSubPublishRequest) bool {
-			t := test.MustTFromContext(ctx)
-			t.Helper()
-
-			reqCIDs = evReq.Event.CorrelationIDs()
-			if !a.So(evReq.Event, should.ResembleEvent, EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			reqCIDs = ev.CorrelationIDs()
+			return a.So(ev, should.ResembleEvent, EvtMergeMetadata(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
 				ttnpb.EndDeviceIdentifiers{
 					DeviceID:               devID,
 					ApplicationIdentifiers: appID,
 					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					DevAddr:                &devAddr,
-				}, 2)) {
-				t.Error("Metadata merge event assertion failed")
-				return false
-			}
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for events.Publish response of merge event to be processed")
-				return false
-
-			case evReq.Response <- struct{}{}:
-			}
-
-			if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-				return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
-					ttnpb.EndDeviceIdentifiers{
-						DeviceID:               devID,
-						ApplicationIdentifiers: appID,
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevAddr:                &devAddr,
-					}, nil))
-			}), should.BeTrue) {
-				t.Error("Uplink forward event assertion failed")
-				return false
-			}
-
-			select {
-			case <-ctx.Done():
-				t.Error("Timed out while waiting for HandleUplink to return")
-				return false
-
-			case err := <-handleUplinkErrCh:
-				if !a.So(err, should.BeNil) {
-					t.Errorf("Failed to handle uplink: %s", err)
-					return false
-				}
-			}
-			return true
-		}
+				}, 2))
+		}), should.BeTrue)
+		a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(events.ContextWithCorrelationID(test.Context(), reqCIDs...),
+				ttnpb.EndDeviceIdentifiers{
+					DeviceID:               devID,
+					ApplicationIdentifiers: appID,
+					JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevAddr:                &devAddr,
+				}, nil))
+		}), should.BeTrue)
 
 		select {
 		case <-ctx.Done():
-			t.Error("Timed out while waiting for an event or HandleUplink error")
+			t.Error("Timed out while waiting for HandleUplink to return")
 			return
 
-		case evReq := <-env.Events:
-			if !a.So(assertHandleUplink(ctx, evReq), should.BeTrue) {
-				t.Error("Failed to assert first HandleUplink")
-				return
-			}
-
 		case err := <-handleUplinkErrCh:
-			if err != nil {
-				if !a.So(errors.IsNotFound(err), should.BeTrue) {
-					t.Errorf("HandleUplink failed with unexpected error: %v", err)
-					return
-				}
-				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
-
-				if !a.So(sendUplinks(ctx), should.BeTrue) {
-					t.Error("Failed to send uplinks")
-				}
-
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for an event")
-					return
-
-				case evReq := <-env.Events:
-					if !a.So(assertHandleUplink(ctx, evReq), should.BeTrue) {
-						t.Error("Failed to assert first HandleUplink")
-						return
-					}
-				}
+			if !a.So(err, should.BeNil) {
+				t.Errorf("Failed to handle uplink: %s", err)
+				return
 			}
 		}
 		close(handleUplinkErrCh)
@@ -1721,12 +1606,14 @@ func TestFlow(t *testing.T) {
 		NewDeviceRegistry         func(t testing.TB) (dr DeviceRegistry, closeFn func() error)
 		NewApplicationUplinkQueue func(t testing.TB) (uq ApplicationUplinkQueue, closeFn func() error)
 		NewDownlinkTaskQueue      func(t testing.TB) (tq DownlinkTaskQueue, closeFn func() error)
+		NewUplinkDeduplicator     func(t testing.TB) (ud UplinkDeduplicator, closeFn func() error)
 	}{
 		{
 			Name:                      "Redis application uplink queue/Redis registry/Redis downlink task queue",
 			NewApplicationUplinkQueue: NewRedisApplicationUplinkQueue,
 			NewDeviceRegistry:         NewRedisDeviceRegistry,
 			NewDownlinkTaskQueue:      NewRedisDownlinkTaskQueue,
+			NewUplinkDeduplicator:     NewRedisUplinkDeduplicator,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -1745,7 +1632,6 @@ func TestFlow(t *testing.T) {
 							}
 						}()
 					}
-
 					dr, drClose := tc.NewDeviceRegistry(t)
 					if drClose != nil {
 						defer func() {
@@ -1754,11 +1640,18 @@ func TestFlow(t *testing.T) {
 							}
 						}()
 					}
-
 					tq, tqClose := tc.NewDownlinkTaskQueue(t)
 					if tqClose != nil {
 						defer func() {
 							if err := tqClose(); err != nil {
+								t.Errorf("Failed to close downlink task queue: %s", err)
+							}
+						}()
+					}
+					ud, udClose := tc.NewUplinkDeduplicator(t)
+					if udClose != nil {
+						defer func() {
+							if err := udClose(); err != nil {
 								t.Errorf("Failed to close downlink task queue: %s", err)
 							}
 						}()
@@ -1769,6 +1662,7 @@ func TestFlow(t *testing.T) {
 						ApplicationUplinks: uq,
 						Devices:            dr,
 						DownlinkTasks:      tq,
+						UplinkDeduplicator: ud,
 						DownlinkPriorities: DownlinkPriorityConfig{
 							JoinAccept:             "highest",
 							MACCommands:            "highest",
@@ -1777,11 +1671,11 @@ func TestFlow(t *testing.T) {
 						DefaultMACSettings: MACSettingConfig{
 							DesiredRx1Delay: func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_6),
 						},
-						DeduplicationWindow: (1 << 5) * test.Delay,
-						CooldownWindow:      (1 << 6) * test.Delay,
+						DeduplicationWindow: (1 << 7) * test.Delay,
+						CooldownWindow:      (1 << 9) * test.Delay,
 					}
 
-					ns, ctx, env, stop := StartTest(t, conf, (1<<15)*test.Delay, false)
+					ns, ctx, env, stop := StartTest(t, component.Config{}, conf, (1<<14)*test.Delay)
 					defer stop()
 
 					handleFlowTest(ctx, ns.LoopbackConn(), conf, env)
