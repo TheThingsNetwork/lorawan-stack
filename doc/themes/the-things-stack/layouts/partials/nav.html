@@ -3,6 +3,7 @@
     <div class="navbar-brand">
       <a class="navbar-item" href="{{ relURL "/" }}">
         <img src="{{ "img/TTS-logo.svg" | relURL }}">
+        <p class="navbar-item is-size-7">{{- .Site.Params.version -}}</p>
       </a>
       {{- $currentPage := . -}}
       {{- range .Site.Menus.brand }}
