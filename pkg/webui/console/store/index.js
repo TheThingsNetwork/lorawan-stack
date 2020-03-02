@@ -23,9 +23,9 @@ import sensitiveFields from '@ttn-lw/constants/sensitive-data'
 import omitDeep from '@ttn-lw/lib/omit'
 import env from '@ttn-lw/lib/env'
 import dev from '@ttn-lw/lib/dev'
+import requestPromiseMiddleware from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 
 import createRootReducer from './reducers'
-import requestPromiseMiddleware from './middleware/request-promise-middleware'
 import logics from './middleware/logics'
 
 const composeEnhancers = (dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose

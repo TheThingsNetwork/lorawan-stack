@@ -23,13 +23,13 @@ import sensitiveFields from '@ttn-lw/constants/sensitive-data'
 import omitDeep from '@ttn-lw/lib/omit'
 import dev from '@ttn-lw/lib/dev'
 import env from '@ttn-lw/lib/env'
+import requestPromiseMiddleware from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 
 import createRootReducer from './reducers'
 import logic from './middleware'
 
 const composeEnhancers = (dev && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose
-
-let middlewares = [createLogicMiddleware(logic)]
+let middlewares = [requestPromiseMiddleware, createLogicMiddleware(logic)]
 
 if (env.sentryDsn) {
   middlewares = [
@@ -43,7 +43,6 @@ if (env.sentryDsn) {
 
 export default function(history) {
   const middleware = applyMiddleware(...middlewares, routerMiddleware(history))
-
   const store = createStore(createRootReducer(history), composeEnhancers(middleware))
   if (dev && module.hot) {
     module.hot.accept('./reducers', () => {
