@@ -47,7 +47,11 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
-	if ttnpb.HasAnyField(req.FieldMask.Paths, "queued_application_downlinks") {
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_session.queued_application_downlinks",
+		"queued_application_downlinks",
+		"session.queued_application_downlinks",
+	) {
 		if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_LINK); err != nil {
 			return nil, err
 		}
@@ -352,12 +356,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"mac_settings",
 			"mac_state",
 			"multicast",
-			"queued_application_downlinks",
 			"recent_uplinks",
 			"session.dev_addr",
 			"session.last_conf_f_cnt_down",
 			"session.last_f_cnt_up",
 			"session.last_n_f_cnt_down",
+			"session.queued_application_downlinks",
 		)
 		needsDownlinkCheck = true
 	}

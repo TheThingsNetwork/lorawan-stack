@@ -168,7 +168,7 @@ func lastDownlink(downs ...*ttnpb.DownlinkMessage) *ttnpb.DownlinkMessage {
 }
 
 func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {
-	if dev.MACState == nil || len(dev.MACState.RecentUplinks) == 0 {
+	if dev.Session == nil || dev.MACState == nil || len(dev.MACState.RecentUplinks) == 0 {
 		return false
 	}
 	if len(dev.MACState.QueuedResponses) > 0 {
@@ -183,7 +183,7 @@ func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time
 	case ttnpb.MType_CONFIRMED_UP:
 		return true
 	}
-	for _, down := range dev.QueuedApplicationDownlinks {
+	for _, down := range dev.Session.QueuedApplicationDownlinks {
 		if down.GetClassBC() == nil {
 			return true
 		}
@@ -277,7 +277,7 @@ func beaconTimeBefore(t time.Time) time.Duration {
 
 // nextPingSlotAt returns the transmission time of next available class B ping slot, which will always be after earliestAt.
 func nextPingSlotAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
-	if dev.MACState == nil || dev.Session == nil || dev.Session.DevAddr.IsZero() || dev.MACState.PingSlotPeriodicity == nil {
+	if dev.Session == nil || dev.Session.DevAddr.IsZero() || dev.MACState == nil || dev.MACState.PingSlotPeriodicity == nil {
 		log.FromContext(ctx).Warn("Insufficient data to compute next ping slot")
 		return time.Time{}, false
 	}
@@ -344,7 +344,7 @@ func nextConfirmedClassCDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, de
 // nextDataDownlinkAt returns the time.Time after earliestAt when a data downlink
 // should be transmitted to the device by the gateway and whether or not there is a data downlink to schedule.
 func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettings, earliestAt time.Time) (time.Time, ttnpb.Class, bool) {
-	if dev.MACState == nil {
+	if dev.Session == nil || dev.MACState == nil {
 		return time.Time{}, ttnpb.CLASS_A, false
 	}
 	if !dev.Multicast {
@@ -388,7 +388,7 @@ func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band
 	}
 
 	var absTime time.Time
-	for _, down := range dev.QueuedApplicationDownlinks {
+	for _, down := range dev.Session.QueuedApplicationDownlinks {
 		if down.ClassBC == nil || down.ClassBC.AbsoluteTime == nil || down.ClassBC.AbsoluteTime.IsZero() {
 			if down.Confirmed || deviceNeedsMACRequestsAt(ctx, dev, earliestAt, phy, defaults) {
 				return earliestConfirmedAt, class, true

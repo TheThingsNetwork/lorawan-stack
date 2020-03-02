@@ -398,7 +398,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 
 		{
-			Name: "Valid request/replace/no MAC state",
+			Name: "Valid request/replace/active session/MAC state",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -443,12 +443,12 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
 				})
 				if !a.So(err, should.BeError) {
@@ -480,7 +480,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 
 		{
-			Name: "Valid request/replace/Class A",
+			Name: "Valid request/replace/Class A/active session",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -514,7 +514,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
+
+				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -529,26 +530,31 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
-					},
-				})
+				}
+
+				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
+
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
+					{SessionKeyID: []byte("testSession"), FCnt: 0},
+					{SessionKeyID: []byte("testSession"), FCnt: 42},
+				}
+
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"queued_application_downlinks",
+					"pending_session.queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
-				a.So(dev, should.ResembleFields, &ttnpb.EndDevice{
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 0},
-						{SessionKeyID: []byte("testSession"), FCnt: 42},
-					},
-				}, sets)
+				a.So(dev, should.ResembleFields, setDevice, sets)
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
@@ -565,7 +571,115 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 
 		{
-			Name: "Valid request/replace/Class C",
+			Name: "Valid request/replace/Class A/both sessions",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+				err := errors.New("AddFunc must not be called")
+				test.MustTFromContext(ctx).Error(err)
+				return err
+			},
+			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
+					"mac_state",
+					"multicast",
+					"pending_mac_state",
+					"pending_session",
+					"queued_application_downlinks",
+					"recent_uplinks",
+					"session",
+				})
+
+				getDevice := &ttnpb.EndDevice{
+					FrequencyPlanID:   test.EUFrequencyPlanID,
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					MACState: &ttnpb.MACState{
+						DeviceClass:    ttnpb.CLASS_A,
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
+					Session: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: []byte("testSession"),
+						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
+					},
+					PendingMACState: &ttnpb.MACState{
+						DeviceClass:    ttnpb.CLASS_A,
+						LoRaWANVersion: ttnpb.MAC_V1_1,
+					},
+					PendingSession: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: []byte("testPendingSession"),
+						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+						},
+					},
+				}
+
+				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				if !a.So(err, should.BeNil) {
+					return nil, ctx, err
+				}
+
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
+					{SessionKeyID: []byte("testSession"), FCnt: 0},
+					{SessionKeyID: []byte("testSession"), FCnt: 42},
+				}
+				setDevice.PendingSession.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 2},
+				}
+
+				a.So(sets, should.HaveSameElementsDeep, []string{
+					"pending_session.queued_application_downlinks",
+					"session.queued_application_downlinks",
+				})
+				a.So(dev, should.ResembleFields, setDevice, sets)
+				return dev, ctx, nil
+			},
+			Request: &ttnpb.DownlinkQueueRequest{
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DeviceID:               "test-dev-id",
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+				},
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{SessionKeyID: []byte("testSession"), FCnt: 0},
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 2},
+					{SessionKeyID: []byte("testSession"), FCnt: 42},
+				},
+			},
+			SetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/replace/Class C/active session",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -604,7 +718,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
+
+				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -619,26 +734,31 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
-					},
-				})
+				}
+
+				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
+
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{
+					{SessionKeyID: []byte("testSession"), FCnt: 0},
+					{SessionKeyID: []byte("testSession"), FCnt: 42},
+				}
+
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"queued_application_downlinks",
+					"pending_session.queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
-				a.So(dev, should.ResembleFields, &ttnpb.EndDevice{
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 0},
-						{SessionKeyID: []byte("testSession"), FCnt: 42},
-					},
-				}, sets)
+				a.So(dev, should.ResembleFields, setDevice, sets)
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
@@ -656,7 +776,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		},
 
 		{
-			Name: "Valid request/delete/no MAC state",
+			Name: "Valid request/delete/no active MAC state",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -685,7 +805,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 					"session",
 				})
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
+
+				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -696,19 +817,38 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
+					PendingSession: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: []byte("testPendingSession"),
+						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+						},
 					},
-				})
-				a.So(err, should.BeNil)
+				}
+
+				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+				if !a.So(err, should.BeNil) {
+					return nil, ctx, err
+				}
+
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = nil
+				setDevice.PendingSession.QueuedApplicationDownlinks = nil
+
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"queued_application_downlinks",
+					"pending_session.queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
-				a.So(dev, should.ResembleFields, &ttnpb.EndDevice{}, sets)
+				a.So(dev, should.ResembleFields, setDevice, sets)
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
@@ -750,7 +890,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 					"session",
 				})
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
+
+				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -765,21 +906,38 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
+					PendingSession: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: []byte("testPendingSession"),
+						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+						},
 					},
-				})
+				}
+
+				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
+
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = nil
+				setDevice.PendingSession.QueuedApplicationDownlinks = nil
+
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"queued_application_downlinks",
+					"pending_session.queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
-				a.So(dev, should.ResembleFields, &ttnpb.EndDevice{}, sets)
+				a.So(dev, should.ResembleFields, setDevice, sets)
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
@@ -821,7 +979,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					"queued_application_downlinks",
 					"session",
 				})
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
+
+				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -836,21 +995,38 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
+					PendingSession: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: []byte("testPendingSession"),
+						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+						},
 					},
-				})
+				}
+
+				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
+
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = nil
+				setDevice.PendingSession.QueuedApplicationDownlinks = nil
+
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"queued_application_downlinks",
+					"pending_session.queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
-				a.So(dev, should.ResembleFields, &ttnpb.EndDevice{}, sets)
+				a.So(dev, should.ResembleFields, setDevice, sets)
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
@@ -885,6 +1061,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					},
 					DeduplicationWindow: 42,
 					CooldownWindow:      42,
+					DefaultMACSettings: MACSettingConfig{
+						StatusTimePeriodicity:  DurationPtr(0),
+						StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
+					},
 				})).(*NetworkServer)
 			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
@@ -1078,12 +1258,12 @@ func TestDownlinkQueuePush(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
 				})
 				if !a.So(err, should.BeError) {
@@ -1115,7 +1295,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		},
 
 		{
-			Name: "Valid request/push/Class A",
+			Name: "Valid request/push/Class A/active session",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -1149,7 +1329,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
+
+				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1164,30 +1345,31 @@ func TestDownlinkQueuePush(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
-					},
-				})
+				}
+
+				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
+
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = append(setDevice.Session.QueuedApplicationDownlinks,
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FCnt: 6},
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FCnt: 42},
+				)
+
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"queued_application_downlinks",
+					"pending_session.queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
-				a.So(dev, should.ResembleFields, &ttnpb.EndDevice{
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
-						{SessionKeyID: []byte("testSession"), FCnt: 6},
-						{SessionKeyID: []byte("testSession"), FCnt: 42},
-					},
-				}, sets)
+				a.So(dev, should.ResembleFields, setDevice, sets)
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
@@ -1204,7 +1386,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 		},
 
 		{
-			Name: "Valid request/push/Class A",
+			Name: "Valid request/push/Class A/both sessions",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -1238,7 +1420,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				})
-				dev, sets, err := f(ctx, &ttnpb.EndDevice{
+
+				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanID:   test.EUFrequencyPlanID,
 					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1253,35 +1436,43 @@ func TestDownlinkQueuePush(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
+					},
+					PendingMACState: &ttnpb.MACState{
+						DeviceClass:    ttnpb.CLASS_A,
+						LoRaWANVersion: ttnpb.MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testPendingSession"),
 						},
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
-					},
-				})
+				}
+
+				dev, sets, err := f(ctx, CopyEndDevice(getDevice))
 				if !a.So(err, should.BeNil) {
 					return nil, ctx, err
 				}
+
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = append(setDevice.Session.QueuedApplicationDownlinks,
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FCnt: 6},
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testSession"), FCnt: 42},
+				)
+				setDevice.PendingSession.QueuedApplicationDownlinks = append(setDevice.PendingSession.QueuedApplicationDownlinks,
+					&ttnpb.ApplicationDownlink{SessionKeyID: []byte("testPendingSession"), FCnt: 2},
+				)
+
 				a.So(sets, should.HaveSameElementsDeep, []string{
-					"queued_application_downlinks",
+					"pending_session.queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
-				a.So(dev, should.ResembleFields, &ttnpb.EndDevice{
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
-						{SessionKeyID: []byte("testSession"), FCnt: 6},
-						{SessionKeyID: []byte("testSession"), FCnt: 42},
-					},
-				}, sets)
+				a.So(dev, should.ResembleFields, setDevice, sets)
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
@@ -1291,6 +1482,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyID: []byte("testSession"), FCnt: 6},
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 2},
 					{SessionKeyID: []byte("testSession"), FCnt: 42},
 				},
 			},
@@ -1342,12 +1534,12 @@ func TestDownlinkQueuePush(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 1},
-						{SessionKeyID: []byte("testSession"), FCnt: 2},
-						{SessionKeyID: []byte("testSession"), FCnt: 3},
-						{SessionKeyID: []byte("testSession"), FCnt: 5},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 1},
+							{SessionKeyID: []byte("testSession"), FCnt: 2},
+							{SessionKeyID: []byte("testSession"), FCnt: 3},
+							{SessionKeyID: []byte("testSession"), FCnt: 5},
+						},
 					},
 				})
 				if !a.So(err, should.BeError) {
@@ -1425,7 +1617,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 						},
 						LastNFCntDown: 10,
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 				})
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
@@ -1496,7 +1687,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 						DeviceClass:    ttnpb.CLASS_C,
 						LoRaWANVersion: ttnpb.MAC_V1_0_2,
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 				})
 				if !a.So(err, should.BeError) {
 					t.Error("Error was expected")
@@ -1621,7 +1811,7 @@ func TestDownlinkQueueList(t *testing.T) {
 		},
 
 		{
-			Name: "Valid request/empty queue",
+			Name: "Valid request/empty queues",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -1639,7 +1829,9 @@ func TestDownlinkQueueList(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"pending_session.queued_application_downlinks",
 					"queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1657,7 +1849,7 @@ func TestDownlinkQueueList(t *testing.T) {
 		},
 
 		{
-			Name: "Valid request/non-empty queue",
+			Name: "Valid request/active session queue",
 			ContextFunc: func(ctx context.Context) context.Context {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
@@ -1675,7 +1867,9 @@ func TestDownlinkQueueList(t *testing.T) {
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
 				a.So(gets, should.HaveSameElementsDeep, []string{
+					"pending_session.queued_application_downlinks",
 					"queued_application_downlinks",
+					"session.queued_application_downlinks",
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -1686,10 +1880,10 @@ func TestDownlinkQueueList(t *testing.T) {
 						SessionKeys: ttnpb.SessionKeys{
 							SessionKeyID: []byte("testSession"),
 						},
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{SessionKeyID: []byte("testSession"), FCnt: 0},
-						{SessionKeyID: []byte("testSession"), FCnt: 42},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 0},
+							{SessionKeyID: []byte("testSession"), FCnt: 42},
+						},
 					},
 				}, ctx, nil
 			},
@@ -1701,6 +1895,125 @@ func TestDownlinkQueueList(t *testing.T) {
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyID: []byte("testSession"), FCnt: 0},
 					{SessionKeyID: []byte("testSession"), FCnt: 42},
+				},
+			},
+			GetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/pending session queue",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"pending_session.queued_application_downlinks",
+					"queued_application_downlinks",
+					"session.queued_application_downlinks",
+				})
+				return &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					PendingSession: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: []byte("testPendingSession"),
+						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 44},
+						},
+					},
+				}, ctx, nil
+			},
+			Request: &ttnpb.EndDeviceIdentifiers{
+				DeviceID:               "test-dev-id",
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+			},
+			Downlinks: &ttnpb.ApplicationDownlinks{
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 44},
+				},
+			},
+			GetByIDCalls: 1,
+		},
+
+		{
+			Name: "Valid request/both queues present",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, rights.Rights{
+					ApplicationRights: map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.RIGHT_APPLICATION_LINK,
+							},
+						},
+					},
+				})
+			},
+			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+				t := test.MustTFromContext(ctx)
+				a := assertions.New(t)
+				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.HaveSameElementsDeep, []string{
+					"pending_session.queued_application_downlinks",
+					"queued_application_downlinks",
+					"session.queued_application_downlinks",
+				})
+				return &ttnpb.EndDevice{
+					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						DeviceID:               "test-dev-id",
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+					},
+					Session: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: []byte("testSession"),
+						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testSession"), FCnt: 0},
+							{SessionKeyID: []byte("testSession"), FCnt: 42},
+						},
+					},
+					PendingSession: &ttnpb.Session{
+						SessionKeys: ttnpb.SessionKeys{
+							SessionKeyID: []byte("testPendingSession"),
+						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+							{SessionKeyID: []byte("testPendingSession"), FCnt: 44},
+						},
+					},
+				}, ctx, nil
+			},
+			Request: &ttnpb.EndDeviceIdentifiers{
+				DeviceID:               "test-dev-id",
+				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"},
+			},
+			Downlinks: &ttnpb.ApplicationDownlinks{
+				Downlinks: []*ttnpb.ApplicationDownlink{
+					{SessionKeyID: []byte("testSession"), FCnt: 0},
+					{SessionKeyID: []byte("testSession"), FCnt: 42},
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 1},
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 43},
+					{SessionKeyID: []byte("testPendingSession"), FCnt: 44},
 				},
 			},
 			GetByIDCalls: 1,

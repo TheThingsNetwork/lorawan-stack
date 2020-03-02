@@ -354,7 +354,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, nil)
@@ -372,8 +372,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.BeNil)
-					a.So(resp.Device, should.BeNil)
+					a.So(resp.Paths, should.BeEmpty)
+					a.So(resp.Device, should.ResembleFields, &ttnpb.EndDevice{}, resp.Paths)
 				}
 				close(setFuncRespCh)
 
@@ -450,7 +450,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
 					},
 				}
 
@@ -468,7 +468,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -488,8 +488,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.BeNil)
-					a.So(resp.Device, should.NotBeNil)
+					a.So(resp.Paths, should.BeEmpty)
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
 
@@ -556,23 +556,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-time.Second),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -587,13 +570,28 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-time.Second),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
 					},
 				}
 
@@ -611,7 +609,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -631,8 +629,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.BeNil)
-					a.So(resp.Device, should.NotBeNil)
+					a.So(resp.Paths, should.BeEmpty)
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
 
@@ -713,7 +711,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
 					},
 				}
 
@@ -731,7 +729,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -744,6 +742,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
+				setDevice.MACState.RxWindowsAvailable = false
 
 				select {
 				case <-ctx.Done():
@@ -755,7 +754,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						"mac_state.queued_responses",
 						"mac_state.rx_windows_available",
 					})
-					a.So(resp.Device, should.NotBeNil)
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
 
@@ -822,23 +821,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-time.Second),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -853,7 +835,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-time.Second),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 					},
 				}
@@ -872,7 +869,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -892,8 +889,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.BeNil)
-					a.So(resp.Device, should.NotBeNil)
+					a.So(resp.Paths, should.BeEmpty)
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
 
@@ -960,23 +957,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-3 * time.Second),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -992,7 +972,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 						LoRaWANVersion:     ttnpb.MAC_V1_1,
 						RxWindowsAvailable: true,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-3 * time.Second),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 					},
 					MACSettings: &ttnpb.MACSettings{
@@ -1002,7 +997,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
 					},
 				}
 
@@ -1020,7 +1015,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -1033,6 +1028,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
+				setDevice.MACState.RxWindowsAvailable = false
 
 				select {
 				case <-ctx.Done():
@@ -1044,9 +1040,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						"mac_state.queued_responses",
 						"mac_state.rx_windows_available",
 					})
-					if a.So(resp.Device, should.NotBeNil) && a.So(resp.Device.MACState, should.NotBeNil) {
-						a.So(resp.Device.MACState.RxWindowsAvailable, should.BeFalse)
-					}
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
 
@@ -1113,23 +1107,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-100 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -1144,7 +1121,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-100 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
 					},
@@ -1155,7 +1147,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
 					},
 				}
 
@@ -1173,7 +1165,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -1193,8 +1185,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
-					a.So(resp.Paths, should.BeNil)
-					a.So(resp.Device, should.NotBeNil)
+					a.So(resp.Paths, should.BeEmpty)
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
 
@@ -1261,23 +1253,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-500 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -1292,7 +1267,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_0_3,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-500 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
 					},
@@ -1300,28 +1290,28 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 						StatusTimePeriodicity:  DurationPtr(0),
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x22,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
-						{
-							CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
-							FCnt:           0x23,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
-					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x22,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+							{
+								CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
+								FCnt:           0x23,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -1339,7 +1329,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -1351,6 +1341,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID callback to return")
@@ -1358,16 +1351,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"queued_application_downlinks",
+						"session.queued_application_downlinks",
 					})
-					if a.So(resp.Device, should.NotBeNil) {
-						a.So(resp.Device.QueuedApplicationDownlinks, should.BeEmpty)
-					}
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
-
-				setDevice := CopyEndDevice(getDevice)
-				setDevice.QueuedApplicationDownlinks = nil
 
 				select {
 				case <-ctx.Done():
@@ -1379,6 +1367,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
@@ -1391,7 +1380,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							CorrelationIDs:       lastUp.CorrelationIDs,
 							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
-									Downlinks:    getDevice.QueuedApplicationDownlinks,
+									Downlinks:    getDevice.Session.QueuedApplicationDownlinks,
 									LastFCntDown: getDevice.Session.LastNFCntDown,
 								},
 							},
@@ -1453,23 +1442,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-500 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -1484,7 +1456,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_0_3,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-500 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
 					},
@@ -1492,20 +1479,20 @@ func TestProcessDownlinkTask(t *testing.T) {
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 						StatusTimePeriodicity:  DurationPtr(0),
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     bytes.Repeat([]byte("x"), 250),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
-					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     bytes.Repeat([]byte("x"), 250),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -1523,7 +1510,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -1535,6 +1522,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for DeviceRegistry.SetByID callback to return")
@@ -1542,16 +1532,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"queued_application_downlinks",
+						"session.queued_application_downlinks",
 					})
-					if a.So(resp.Device, should.NotBeNil) {
-						a.So(resp.Device.QueuedApplicationDownlinks, should.BeEmpty)
-					}
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
-
-				setDevice := CopyEndDevice(getDevice)
-				setDevice.QueuedApplicationDownlinks = nil
 
 				select {
 				case <-ctx.Done():
@@ -1563,6 +1548,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
@@ -1572,10 +1558,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Uplinks, should.Resemble, []*ttnpb.ApplicationUp{
 						{
 							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
-							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.QueuedApplicationDownlinks[0].CorrelationIDs...),
+							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[0],
+									ApplicationDownlink: *getDevice.Session.QueuedApplicationDownlinks[0],
 									Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong.WithAttributes("length", 250, "max", uint16(51))),
 								},
 							},
@@ -1637,23 +1623,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -1677,24 +1646,39 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -1712,7 +1696,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -1816,11 +1800,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
 					for _, cid := range lastUp.CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
@@ -1906,23 +1891,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-500 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -1946,24 +1914,39 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-500 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -1981,7 +1964,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -2089,11 +2072,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
 					for _, cid := range lastUp.CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
@@ -2110,7 +2094,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					lastDown,
 				}
 				setDevice.MACState.RxWindowsAvailable = false
-				setDevice.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 				setDevice.RecentDownlinks = []*ttnpb.DownlinkMessage{
 					lastDown,
 				}
@@ -2128,7 +2112,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						"mac_state.queued_responses",
 						"mac_state.recent_downlinks",
 						"mac_state.rx_windows_available",
-						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
 					})
@@ -2199,23 +2182,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-500 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				// NOTE: Maximum MACPayload length in both Rx1(DR0) and RX2(DR1) is 59. There are 6 bytes of FOpts, hence maximum fitting application downlink length is 59-8-6 == 45.
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -2240,24 +2206,39 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-500 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x15,
-							FRMPayload:     bytes.Repeat([]byte{0x42}, 46),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x15,
+								FRMPayload:     bytes.Repeat([]byte{0x42}, 46),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -2275,7 +2256,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -2380,6 +2361,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
 				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)) {
 					for _, cid := range lastUp.CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
@@ -2487,23 +2469,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-500 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_6,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -2527,24 +2492,39 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-500 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_6,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x15,
-							FRMPayload:     []byte("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUU="),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x15,
+								FRMPayload:     []byte("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUU="),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -2562,7 +2542,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -2668,51 +2648,28 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
 					for _, cid := range lastUp.CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
 
-				setDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
-						DevAddr:                &devAddr,
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					MACState: &ttnpb.MACState{
-						CurrentParameters:       makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
-						DesiredParameters:       makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
-						DeviceClass:             ttnpb.CLASS_A,
-						LoRaWANVersion:          ttnpb.MAC_V1_1,
-						LastConfirmedDownlinkAt: &downAt,
-						PendingRequests: []*ttnpb.MACCommand{
-							{
-								CID: ttnpb.CID_DEV_STATUS,
-							},
-						},
-						RecentDownlinks: []*ttnpb.DownlinkMessage{
-							lastDown,
-						},
-						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
-						},
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
-					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						lastDown,
-					},
-					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
-						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.MACState.LastConfirmedDownlinkAt = &downAt
+				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
+					{
+						CID: ttnpb.CID_DEV_STATUS,
 					},
 				}
+				setDevice.MACState.QueuedResponses = nil
+				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
+				setDevice.MACState.RxWindowsAvailable = false
+				setDevice.RecentDownlinks = append(setDevice.RecentDownlinks, lastDown)
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 
 				select {
 				case <-ctx.Done():
@@ -2727,7 +2684,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						"mac_state.queued_responses",
 						"mac_state.recent_downlinks",
 						"mac_state.rx_windows_available",
-						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
 					})
@@ -2798,29 +2754,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
-							FHDR: ttnpb.FHDR{
-								FCtrl: ttnpb.FCtrl{
-									ClassB: true,
-								},
-							},
-						}},
-					},
-					ReceivedAt: start.Add(-500 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -2841,23 +2774,44 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Value: ttnpb.PING_EVERY_8S,
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
-						},
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{
+										FHDR: ttnpb.FHDR{
+											FCtrl: ttnpb.FCtrl{
+												ClassB: true,
+											},
+										},
+									}},
+								},
+								ReceivedAt: start.Add(-500 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -2884,7 +2838,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -2982,8 +2936,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				downAt := clock.Now().Add(time.Second)
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
@@ -2998,7 +2952,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
 				setDevice.RecentDownlinks = append(setDevice.RecentDownlinks, lastDown)
-				setDevice.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 
 				select {
 				case <-ctx.Done():
@@ -3014,7 +2968,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						"mac_state.queued_responses",
 						"mac_state.recent_downlinks",
 						"mac_state.rx_windows_available",
-						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
 					})
@@ -3106,23 +3059,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-500 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -3149,24 +3085,39 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-500 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -3184,7 +3135,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -3292,11 +3243,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
 					for _, cid := range lastUp.CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
@@ -3330,14 +3282,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 							CopyUplinkMessage(lastUp),
 						},
 					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						lastDown,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
-						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						DevAddr:                    devAddr,
+						LastNFCntDown:              0x24,
+						SessionKeys:                *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 					},
 				}
 
@@ -3354,7 +3306,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						"mac_state.queued_responses",
 						"mac_state.recent_downlinks",
 						"mac_state.rx_windows_available",
-						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
 					})
@@ -3437,23 +3388,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: time.Now().Add(-500 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -3480,24 +3414,39 @@ func TestProcessDownlinkTask(t *testing.T) {
 							}).MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: time.Now().Add(-500 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
+						},
 					},
 				}
 
@@ -3515,7 +3464,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -3692,8 +3641,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
@@ -3709,7 +3658,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				setDevice.MACState.QueuedResponses = nil
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
 				setDevice.MACState.RxWindowsAvailable = false
-				setDevice.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 				setDevice.RecentDownlinks = append(setDevice.RecentDownlinks, lastDown)
 
 				select {
@@ -3726,7 +3675,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						"mac_state.queued_responses",
 						"mac_state.recent_downlinks",
 						"mac_state.rx_windows_available",
-						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
 					})
@@ -3809,23 +3757,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-2 * time.Second),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				absTime := start.Add(infrastructureDelay)
 
 				getDevice := &ttnpb.EndDevice{
@@ -3847,27 +3778,42 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
-						},
-						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-2 * time.Second),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
 							},
 						},
+						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+									AbsoluteTime: &absTime,
+								},
+							},
+						},
 					},
 				}
 
@@ -3885,7 +3831,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -3976,8 +3922,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
@@ -3986,7 +3932,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				setDevice.MACState.LastNetworkInitiatedDownlinkAt = &downAt
 				setDevice.MACState.RxWindowsAvailable = false
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
-				setDevice.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 				setDevice.RecentDownlinks = append(setDevice.RecentDownlinks, lastDown)
 
 				select {
@@ -4003,7 +3949,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						"mac_state.queued_responses",
 						"mac_state.recent_downlinks",
 						"mac_state.rx_windows_available",
-						"queued_application_downlinks",
 						"recent_downlinks",
 						"session",
 					})
@@ -4086,23 +4031,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-100 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				absTime := start.Add(3 * time.Second).UTC()
 
 				getDevice := &ttnpb.EndDevice{
@@ -4122,27 +4050,42 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
-						},
-						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-100 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
 							},
 						},
+						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+									AbsoluteTime: &absTime,
+								},
+							},
+						},
 					},
 				}
 
@@ -4160,7 +4103,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -4272,6 +4215,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
 				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)) {
 					for _, cid := range lastUp.CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
@@ -4369,8 +4313,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
@@ -4379,7 +4323,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				setDevice.MACState.RxWindowsAvailable = false
 				setDevice.MACState.QueuedResponses = nil
 				setDevice.Session.LastNFCntDown = getDevice.Session.LastNFCntDown + 1
-				setDevice.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 
 				select {
 				case <-ctx.Done():
@@ -4390,7 +4334,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
 						"mac_state.queued_responses",
 						"mac_state.rx_windows_available",
-						"queued_application_downlinks",
+						"session.queued_application_downlinks",
 					})
 					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
@@ -4415,10 +4359,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Uplinks, should.Resemble, []*ttnpb.ApplicationUp{
 						{
 							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
-							CorrelationIDs:       getDevice.QueuedApplicationDownlinks[0].CorrelationIDs,
+							CorrelationIDs:       getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs,
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[0],
+									ApplicationDownlink: *getDevice.Session.QueuedApplicationDownlinks[0],
 									Error:               *ttnpb.ErrorDetailsToProto(errInvalidAbsoluteTime),
 								},
 							},
@@ -4498,23 +4442,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 				now := clock.Add(time.Millisecond)
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-100 * time.Millisecond),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				absTime := now.Add(3 * infrastructureDelay).UTC()
 
 				getDevice := &ttnpb.EndDevice{
@@ -4534,27 +4461,42 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
-						},
-						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-100 * time.Millisecond),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
 							},
 						},
+						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+									AbsoluteTime: &absTime,
+								},
+							},
+						},
 					},
 				}
 
@@ -4572,7 +4514,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -4684,6 +4626,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
 				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)) {
 					for _, cid := range lastUp.CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
@@ -4781,8 +4724,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
-				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.QueuedApplicationDownlinks[0].CorrelationIDs)) {
-					for _, cid := range getDevice.QueuedApplicationDownlinks[0].CorrelationIDs {
+				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs)) {
+					for _, cid := range getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
@@ -4884,23 +4827,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: time.Now().Add(-time.Second),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				absTime := time.Now().Add(42 * time.Hour).UTC()
 
 				getDevice := &ttnpb.EndDevice{
@@ -4922,27 +4848,42 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
-						},
-						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: deepcopy.Copy(&absTime).(*time.Time),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: time.Now().Add(-time.Second),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
 							},
 						},
+						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+									AbsoluteTime: &absTime,
+								},
+							},
+						},
 					},
 				}
 
@@ -4960,7 +4901,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -4981,7 +4922,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.BeEmpty)
-					a.So(resp.Device, should.NotBeNil)
+					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
 				close(setFuncRespCh)
 
@@ -5060,23 +5001,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
-						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
-					},
-					ReceivedAt: start.Add(-time.Second),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
@@ -5096,38 +5020,53 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_C,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{
-							CopyUplinkMessage(lastUp),
+							{
+								CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+								DeviceChannelIndex: 3,
+								Payload: &ttnpb.Message{
+									MHDR: ttnpb.MHDR{
+										MType: ttnpb.MType_UNCONFIRMED_UP,
+									},
+									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
+								},
+								ReceivedAt: start.Add(-time.Second),
+								RxMetadata: rxMetadata,
+								Settings: ttnpb.TxSettings{
+									DataRateIndex: ttnpb.DATA_RATE_0,
+									Frequency:     430000000,
+								},
+							},
 						},
 						RxWindowsAvailable: true,
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: TimePtr(start.Add(-2).UTC()),
-							},
-						},
-						{
-							CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: TimePtr(start.Add(-1).UTC()),
-							},
-						},
 					},
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 0x24,
-						SessionKeys:   *CopySessionKeys(sessionKeys),
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+									AbsoluteTime: TimePtr(start.Add(-2).UTC()),
+								},
+							},
+							{
+								CorrelationIDs: []string{"correlation-app-down-3", "correlation-app-down-4"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+								ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
+									AbsoluteTime: TimePtr(start.Add(-1).UTC()),
+								},
+							},
+						},
 					},
 				}
 
@@ -5145,7 +5084,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -5158,7 +5097,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 
 				setDevice := CopyEndDevice(getDevice)
-				setDevice.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
 
 				select {
 				case <-ctx.Done():
@@ -5167,7 +5106,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				case resp := <-setFuncRespCh:
 					a.So(resp.Error, should.BeNil)
 					a.So(resp.Paths, should.HaveSameElementsDeep, []string{
-						"queued_application_downlinks",
+						"session.queued_application_downlinks",
 					})
 					a.So(resp.Device, should.ResembleFields, setDevice, resp.Paths)
 				}
@@ -5183,6 +5122,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
+				lastUp := lastUplink(getDevice.MACState.RecentUplinks...)
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
@@ -5192,20 +5132,20 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Uplinks, should.Resemble, []*ttnpb.ApplicationUp{
 						{
 							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
-							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.QueuedApplicationDownlinks[0].CorrelationIDs...),
+							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.Session.QueuedApplicationDownlinks[0].CorrelationIDs...),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[0],
+									ApplicationDownlink: *getDevice.Session.QueuedApplicationDownlinks[0],
 									Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
 								},
 							},
 						},
 						{
 							EndDeviceIdentifiers: getDevice.EndDeviceIdentifiers,
-							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.QueuedApplicationDownlinks[1].CorrelationIDs...),
+							CorrelationIDs:       append(lastUp.CorrelationIDs, getDevice.Session.QueuedApplicationDownlinks[1].CorrelationIDs...),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: *getDevice.QueuedApplicationDownlinks[1],
+									ApplicationDownlink: *getDevice.Session.QueuedApplicationDownlinks[1],
 									Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
 								},
 							},
@@ -5267,31 +5207,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}()
 				}
 
-				lastUp := &ttnpb.UplinkMessage{
-					CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
-					DeviceChannelIndex: 3,
-					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_JOIN_REQUEST,
-						},
-						Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							JoinEUI:  types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-							DevEUI:   types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-							DevNonce: types.DevNonce{0x00, 0x42},
-						}},
-					},
-					ReceivedAt: start.Add(-time.Second),
-					RxMetadata: deepcopy.Copy(rxMetadata).([]*ttnpb.RxMetadata),
-					Settings: ttnpb.TxSettings{
-						DataRateIndex: ttnpb.DATA_RATE_0,
-						Frequency:     430000000,
-					},
-				}
-
 				getDevice := &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: appID,
 						DeviceID:               devID,
+						DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
 						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					},
@@ -5303,7 +5223,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						DeviceClass:       ttnpb.CLASS_A,
 						LoRaWANVersion:    ttnpb.MAC_V1_1,
 						QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
-							Keys:    *CopySessionKeys(sessionKeys),
+							Keys:    *sessionKeys,
 							Payload: bytes.Repeat([]byte{0x42}, 33),
 							Request: ttnpb.JoinRequest{
 								DevAddr: devAddr,
@@ -5312,16 +5232,40 @@ func TestProcessDownlinkTask(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					RecentUplinks: []*ttnpb.UplinkMessage{
-						CopyUplinkMessage(lastUp),
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							CorrelationIDs:     []string{"correlation-up-1", "correlation-up-2"},
+							DeviceChannelIndex: 3,
+							Payload: &ttnpb.Message{
+								MHDR: ttnpb.MHDR{
+									MType: ttnpb.MType_JOIN_REQUEST,
+								},
+								Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
+									JoinEUI:  types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+									DevEUI:   types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+									DevNonce: types.DevNonce{0x00, 0x42},
+								}},
+							},
+							ReceivedAt: start.Add(-time.Second),
+							RxMetadata: rxMetadata,
+							Settings: ttnpb.TxSettings{
+								DataRateIndex: ttnpb.DATA_RATE_0,
+								Frequency:     430000000,
+							},
+						},
+					},
+					Session: &ttnpb.Session{
+						DevAddr:       devAddr,
+						LastNFCntDown: 0x24,
+						SessionKeys:   *sessionKeys,
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+							{
+								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
+								FCnt:           0x42,
+								FPort:          0x1,
+								FRMPayload:     []byte("testPayload"),
+								Priority:       ttnpb.TxSchedulePriority_HIGHEST,
+								SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
+							},
 						},
 					},
 					SupportsJoin: true,
@@ -5341,7 +5285,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx)
 					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
 					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.Resemble, getPaths)
+					a.So(req.Paths, should.HaveSameElementsDeep, getPaths)
 
 					go func() {
 						dev, sets, err := req.Func(req.Context, CopyEndDevice(getDevice))
@@ -5403,52 +5347,24 @@ func TestProcessDownlinkTask(t *testing.T) {
 					return false
 				}
 
+				lastUp := lastUplink(getDevice.RecentUplinks...)
 				if a.So(lastDown.CorrelationIDs, should.HaveLength, 1+len(lastUp.CorrelationIDs)) {
 					for _, cid := range lastUp.CorrelationIDs {
 						a.So(lastDown.CorrelationIDs, should.Contain, cid)
 					}
 				}
 
-				setDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: appID,
-						DeviceID:               devID,
-						JoinEUI:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-						DevEUI:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					},
-					FrequencyPlanID:   test.EUFrequencyPlanID,
-					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-					PendingMACState: &ttnpb.MACState{
-						CurrentParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
-						DesiredParameters: makeEU868macParameters(ttnpb.PHY_V1_1_REV_B),
-						DeviceClass:       ttnpb.CLASS_A,
-						LoRaWANVersion:    ttnpb.MAC_V1_1,
-						PendingJoinRequest: &ttnpb.JoinRequest{
-							DevAddr: devAddr,
-						},
-					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						CopyUplinkMessage(lastUp),
-					},
-					PendingSession: &ttnpb.Session{
-						DevAddr:     devAddr,
-						SessionKeys: *CopySessionKeys(sessionKeys),
-					},
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-						{
-							CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
-							FCnt:           0x42,
-							FPort:          0x1,
-							FRMPayload:     []byte("testPayload"),
-							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
-							SessionKeyID:   []byte{0x11, 0x22, 0x33, 0x44},
-						},
-					},
-					RecentDownlinks: []*ttnpb.DownlinkMessage{
-						lastDown,
-					},
-					SupportsJoin: true,
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.PendingMACState.QueuedJoinAccept = nil
+				setDevice.PendingMACState.PendingJoinRequest = &ttnpb.JoinRequest{
+					DevAddr: devAddr,
 				}
+				setDevice.PendingMACState.RxWindowsAvailable = false
+				setDevice.PendingSession = &ttnpb.Session{
+					DevAddr:     devAddr,
+					SessionKeys: *sessionKeys,
+				}
+				setDevice.RecentDownlinks = append(setDevice.RecentDownlinks, lastDown)
 
 				select {
 				case <-ctx.Done():
@@ -5840,13 +5756,13 @@ func TestGenerateDownlink(t *testing.T) {
 							Key: &sNwkSIntKey,
 						},
 					},
-				},
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					{
-						Confirmed:  false,
-						FCnt:       42,
-						FPort:      1,
-						FRMPayload: []byte("test"),
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							Confirmed:  false,
+							FCnt:       42,
+							FPort:      1,
+							FRMPayload: []byte("test"),
+						},
 					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -5909,10 +5825,10 @@ func TestGenerateDownlink(t *testing.T) {
 								Key: &sNwkSIntKey,
 							},
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 					},
-					LoRaWANPHYVersion:          ttnpb.PHY_V1_1_REV_B,
-					FrequencyPlanID:            band.EU_863_870,
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 				})
 			},
 		},
@@ -5952,13 +5868,13 @@ func TestGenerateDownlink(t *testing.T) {
 							Key: &sNwkSIntKey,
 						},
 					},
-				},
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					{
-						Confirmed:  false,
-						FCnt:       42,
-						FPort:      1,
-						FRMPayload: []byte("test"),
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							Confirmed:  false,
+							FCnt:       42,
+							FPort:      1,
+							FRMPayload: []byte("test"),
+						},
 					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -6027,10 +5943,10 @@ func TestGenerateDownlink(t *testing.T) {
 								Key: &sNwkSIntKey,
 							},
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 					},
-					LoRaWANPHYVersion:          ttnpb.PHY_V1_1_REV_B,
-					FrequencyPlanID:            band.EU_863_870,
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 				})
 			},
 		},
@@ -6063,13 +5979,13 @@ func TestGenerateDownlink(t *testing.T) {
 							Key: &sNwkSIntKey,
 						},
 					},
-				},
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					{
-						Confirmed:  true,
-						FCnt:       42,
-						FPort:      1,
-						FRMPayload: []byte("test"),
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							Confirmed:  true,
+							FCnt:       42,
+							FPort:      1,
+							FRMPayload: []byte("test"),
+						},
 					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
@@ -6135,10 +6051,10 @@ func TestGenerateDownlink(t *testing.T) {
 								Key: &sNwkSIntKey,
 							},
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 					},
-					LoRaWANPHYVersion:          ttnpb.PHY_V1_1_REV_B,
-					FrequencyPlanID:            band.EU_863_870,
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 				})
 			},
 		},
@@ -6178,17 +6094,17 @@ func TestGenerateDownlink(t *testing.T) {
 							Key: &sNwkSIntKey,
 						},
 					},
+					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+						{
+							Confirmed:  true,
+							FCnt:       42,
+							FPort:      1,
+							FRMPayload: []byte("test"),
+						},
+					},
 				},
 				LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
 				FrequencyPlanID:   band.EU_863_870,
-				QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-					{
-						Confirmed:  true,
-						FCnt:       42,
-						FPort:      1,
-						FRMPayload: []byte("test"),
-					},
-				},
 			},
 			Bytes: encodeMessage(&ttnpb.Message{
 				MHDR: ttnpb.MHDR{
@@ -6257,10 +6173,10 @@ func TestGenerateDownlink(t *testing.T) {
 								Key: &sNwkSIntKey,
 							},
 						},
+						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
 					},
-					LoRaWANPHYVersion:          ttnpb.PHY_V1_1_REV_B,
-					FrequencyPlanID:            band.EU_863_870,
-					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{},
+					LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
+					FrequencyPlanID:   band.EU_863_870,
 				})
 			},
 		},
