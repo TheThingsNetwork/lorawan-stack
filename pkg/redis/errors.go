@@ -20,9 +20,10 @@ import (
 )
 
 var (
+	errInvalidKeyValueType = errors.DefineInvalidArgument("value_type", "invalid value type for key `{key}`")
 	errNotFound            = errors.DefineNotFound("not_found", "entity not found")
 	errStore               = errors.Define("store", "store error")
-	errInvalidKeyValueType = errors.DefineInvalidArgument("value_type", "invalid value type for key `{key}`")
+	errTransactionFailed   = errors.DefineAborted("transaction_failed", "transaction failed")
 )
 
 // ConvertError converts Redis error into errors.Error.
@@ -36,6 +37,8 @@ func ConvertError(err error) error {
 		return nil
 	case redis.Nil:
 		return errNotFound
+	case redis.TxFailedErr:
+		return errTransactionFailed
 	}
 	return errStore.WithCause(err)
 }
