@@ -38,6 +38,7 @@ const render = () => {
   DOM.render(
     <Provider store={store}>
       <WithLocale>
+        <div id="modal-container" />
         <Init>
           <App history={history} />
         </Init>
