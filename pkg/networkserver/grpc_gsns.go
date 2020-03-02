@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"hash"
 	"math"
 	"sort"
 	"time"
@@ -54,26 +53,29 @@ const (
 	maxConfNbTrans = 5
 )
 
-func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage) (*metadataAccumulator, func(), bool) {
-	h := ns.hashPool.Get().(hash.Hash64)
-	_, _ = h.Write(up.RawPayload)
+// UplinkDeduplicator represents an entity, that deduplicates uplinks and accumulates metadata.
+type UplinkDeduplicator interface {
+	// DeduplicateUplink deduplicates an uplink message for specified time.Duration.
+	// DeduplicateUplink returns true if the uplink is not a duplicate or false and error, if any, otherwise.
+	DeduplicateUplink(context.Context, *ttnpb.UplinkMessage, time.Duration) (bool, error)
+	// AccumulatedMetadata returns accumulated metadata for specified uplink message and error, if any.
+	AccumulatedMetadata(context.Context, *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error)
+}
 
-	k := h.Sum64()
-
-	h.Reset()
-	ns.hashPool.Put(h)
-
-	acc := ns.metadataAccumulatorPool.Get().(*metadataAccumulator)
-	lv, isDup := ns.metadataAccumulators.LoadOrStore(k, acc)
-	lv.(*metadataAccumulator).Add(up.RxMetadata...)
-
-	if isDup {
-		ns.metadataAccumulatorPool.Put(acc)
-		return nil, nil, true
+func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage) (bool, error) {
+	log.FromContext(ctx).Debug("Deduplicate uplink")
+	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, ns.collectionWindow(ctx))
+	if err != nil {
+		log.FromContext(ctx).Error("Failed to deduplicate uplink")
+		return false, err
 	}
-	return acc, func() {
-		ns.metadataAccumulators.Delete(k)
-	}, false
+	if !ok {
+		log.FromContext(ctx).Debug("Dropped duplicate uplink")
+		registerReceiveUplinkDuplicate(ctx, up)
+		return false, nil
+	}
+	registerReceiveUplink(ctx, up)
+	return true, nil
 }
 
 func resetsFCnt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
@@ -828,7 +830,7 @@ var handleDataUplinkGetPaths = [...]string{
 	"supports_join",
 }
 
-func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
 	pld := up.Payload.GetMACPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -870,21 +872,35 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	logger.Debug("Matched device")
 
-	var queuedApplicationUplinks []*ttnpb.ApplicationUp
-	var queuedEvents []events.DefinitionDataClosure
-
+	ok, err := ns.deduplicateUplink(ctx, up)
+	if err != nil {
+		registerDropDataUplink(ctx, up, err)
+		logger.WithError(err).Error("Failed to deduplicate uplink")
+		return err
+	}
+	if !ok {
+		return nil
+	}
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
 	case <-ns.deduplicationDone(ctx, up):
 	}
 
-	up.RxMetadata = acc.Accumulated()
-	logger = logger.WithField("metadata_count", len(up.RxMetadata))
-	logger.Debug("Merged metadata")
-	ctx = log.NewContext(ctx, logger)
-	queuedEvents = append(queuedEvents, evtMergeMetadata.BindData(len(up.RxMetadata)))
-	registerMergeMetadata(ctx, up)
+	var queuedApplicationUplinks []*ttnpb.ApplicationUp
+	var queuedEvents []events.DefinitionDataClosure
+
+	mds, err := ns.uplinkDeduplicator.AccumulatedMetadata(ctx, up)
+	if err != nil {
+		logger.WithError(err).Error("Failed to merge metadata")
+	} else {
+		up.RxMetadata = mds
+		logger = logger.WithField("metadata_count", len(up.RxMetadata))
+		logger.Debug("Merged metadata")
+		ctx = log.NewContext(ctx, logger)
+		queuedEvents = append(queuedEvents, evtMergeMetadata.BindData(len(up.RxMetadata)))
+		registerMergeMetadata(ctx, up)
+	}
 
 	for _, f := range matched.DeferredMACHandlers {
 		evs, err := f(ctx, matched.Device, up)
@@ -1023,7 +1039,11 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 	return nil, errJoinServerNotFound
 }
 
-func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) deduplicationDone(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
+	return timeAfter(timeUntil(up.ReceivedAt.Add(ns.deduplicationWindow(ctx))))
+}
+
+func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
 	pld := up.Payload.GetJoinRequestPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -1038,7 +1058,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			"lorawan_phy_version",
 			"lorawan_version",
 			"mac_settings",
-			"session",
+			"session.dev_addr",
 			"supports_class_b",
 			"supports_class_c",
 			"supports_join",
@@ -1049,13 +1069,21 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		registerDropJoinRequest(ctx, up, err)
 		return err
 	}
-
-	defer func(dev *ttnpb.EndDevice) {
+	defer func() {
 		if err != nil {
 			events.Publish(evtDropJoinRequest(ctx, dev.EndDeviceIdentifiers, err))
 			registerDropJoinRequest(ctx, up, err)
 		}
-	}(dev)
+	}()
+
+	ok, err := ns.deduplicateUplink(ctx, up)
+	if err != nil {
+		logger.WithError(err).Error("Failed to deduplicate uplink")
+		return err
+	}
+	if !ok {
+		return nil
+	}
 
 	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
 
@@ -1142,9 +1170,19 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	case <-ns.deduplicationDone(ctx, up):
 	}
 
-	up.RxMetadata = acc.Accumulated()
-	events.Publish(evtMergeMetadata(ctx, dev.EndDeviceIdentifiers, len(up.RxMetadata)))
-	registerMergeMetadata(ctx, up)
+	var queuedEvents []events.DefinitionDataClosure
+
+	mds, err := ns.uplinkDeduplicator.AccumulatedMetadata(ctx, up)
+	if err != nil {
+		logger.WithError(err).Error("Failed to merge metadata")
+	} else {
+		up.RxMetadata = mds
+		logger = logger.WithField("metadata_count", len(up.RxMetadata))
+		logger.Debug("Merged metadata")
+		ctx = log.NewContext(ctx, logger)
+		queuedEvents = append(queuedEvents, evtMergeMetadata.BindData(len(up.RxMetadata)))
+		registerMergeMetadata(ctx, up)
+	}
 
 	var invalidatedQueue []*ttnpb.ApplicationDownlink
 	dev, ctx, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
@@ -1200,10 +1238,18 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}); err != nil {
 		logger.WithError(err).Warn("Failed to enqueue join-accept for sending to Application Server")
 	}
+
+	if n := len(queuedEvents); n > 0 {
+		logger := logger.WithField("event_count", n)
+		logger.Debug("Publish events")
+		for _, ev := range queuedEvents {
+			events.Publish(ev(ctx, dev.EndDeviceIdentifiers))
+		}
+	}
 	return nil
 }
 
-func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.UplinkMessage, acc *metadataAccumulator) (err error) {
+func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
 	defer func() {
 		if err != nil {
 			registerDropRejoinRequest(ctx, up, err)
@@ -1244,34 +1290,14 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	var handle func(context.Context, *ttnpb.UplinkMessage, *metadataAccumulator) error
 	switch up.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
-		handle = ns.handleDataUplink
+		return ttnpb.Empty, ns.handleDataUplink(ctx, up)
 	case ttnpb.MType_JOIN_REQUEST:
-		handle = ns.handleJoinRequest
+		return ttnpb.Empty, ns.handleJoinRequest(ctx, up)
 	case ttnpb.MType_REJOIN_REQUEST:
-		handle = ns.handleRejoinRequest
-	default:
-		logger.Debug("Unmatched MType")
-		return ttnpb.Empty, nil
+		return ttnpb.Empty, ns.handleRejoinRequest(ctx, up)
 	}
-
-	logger.Debug("Deduplicate uplink")
-	acc, stopDedup, ok := ns.deduplicateUplink(ctx, up)
-	if ok {
-		logger.Debug("Dropped duplicate uplink")
-		registerReceiveUplinkDuplicate(ctx, up)
-		return ttnpb.Empty, nil
-	}
-	registerReceiveUplink(ctx, up)
-
-	defer func() {
-		<-ns.collectionDone(ctx, up)
-		stopDedup()
-		logger.Debug("Done deduplicating uplink")
-	}()
-
-	logger.Debug("Handle uplink")
-	return ttnpb.Empty, handle(ctx, up, acc)
+	logger.Debug("Unmatched MType")
+	return ttnpb.Empty, nil
 }

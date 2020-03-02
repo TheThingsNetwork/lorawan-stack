@@ -26,10 +26,8 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/unique"
@@ -40,7 +38,7 @@ import (
 func TestLinkApplication(t *testing.T) {
 	a := assertions.New(t)
 
-	ns, ctx, env, stop := StartTest(t, Config{}, (1<<12)*test.Delay, true)
+	ns, ctx, env, stop := StartTest(t, component.Config{}, Config{}, (1<<12)*test.Delay)
 	defer stop()
 
 	<-env.DownlinkTasks.Pop
@@ -279,8 +277,8 @@ func TestLinkApplication(t *testing.T) {
 
 func TestDownlinkQueueReplace(t *testing.T) {
 	start := time.Now().UTC()
-	clock := MockClock(start)
-	defer SetTimeNow(clock.Now)()
+	clock := test.NewMockClock(start)
+	defer SetMockClock(clock)()
 
 	for _, tc := range []struct {
 		Name           string
@@ -1043,9 +1041,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 			var addCalls, setByIDCalls uint64
 
-			ns := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
-				&Config{
+			ns, ctx, _, stop := StartTest(
+				t,
+				component.Config{},
+				Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&setByIDCalls, 1)
@@ -1059,14 +1058,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 						PopFunc: DownlinkTaskPopBlockFunc,
 					},
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
 					DefaultMACSettings: MACSettingConfig{
 						StatusTimePeriodicity:  DurationPtr(0),
 						StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(0),
 					},
-				})).(*NetworkServer)
-			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+				},
+				(1<<9)*test.Delay,
+			)
+			defer stop()
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -1077,12 +1076,9 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			componenttest.StartComponent(t, ns.Component)
-			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
-
-			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueueReplace(test.Context(), req)
+			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueueReplace(ctx, req)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(res, should.BeNil)
 			} else if a.So(err, should.BeNil) {
@@ -1721,9 +1717,10 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 			var addCalls, setByIDCalls uint64
 
-			ns := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
-				&Config{
+			ns, ctx, env, stop := StartTest(
+				t,
+				component.Config{},
+				Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&setByIDCalls, 1)
@@ -1737,10 +1734,12 @@ func TestDownlinkQueuePush(t *testing.T) {
 						},
 						PopFunc: DownlinkTaskPopBlockFunc,
 					},
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-				})).(*NetworkServer)
-			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+				},
+				(1<<9)*test.Delay,
+			)
+			defer stop()
+
+			go LogEvents(t, env.Events)
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -1751,12 +1750,9 @@ func TestDownlinkQueuePush(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			componenttest.StartComponent(t, ns.Component)
-			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.DownlinkQueueRequest)
-
-			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueuePush(test.Context(), req)
+			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueuePush(ctx, req)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(res, should.BeNil)
 			} else if a.So(err, should.BeNil) {
@@ -2024,9 +2020,10 @@ func TestDownlinkQueueList(t *testing.T) {
 
 			var getByIDCalls uint64
 
-			ns := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
-				&Config{
+			ns, ctx, env, stop := StartTest(
+				t,
+				component.Config{},
+				Config{
 					Devices: &MockDeviceRegistry{
 						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&getByIDCalls, 1)
@@ -2036,9 +2033,12 @@ func TestDownlinkQueueList(t *testing.T) {
 					DownlinkTasks: &MockDownlinkTaskQueue{
 						PopFunc: DownlinkTaskPopBlockFunc,
 					},
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-				})).(*NetworkServer)
+				},
+				(1<<9)*test.Delay,
+			)
+			defer stop()
+
+			go LogEvents(t, env.Events)
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -2049,12 +2049,9 @@ func TestDownlinkQueueList(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			componenttest.StartComponent(t, ns.Component)
-			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
-
-			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueueList(test.Context(), req)
+			res, err := ttnpb.NewAsNsClient(ns.LoopbackConn()).DownlinkQueueList(ctx, req)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(res, should.BeNil)
 			} else if a.So(err, should.BeNil) {

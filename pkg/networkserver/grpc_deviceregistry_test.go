@@ -26,7 +26,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -347,28 +346,29 @@ func TestDeviceRegistryGet(t *testing.T) {
 
 			var getByIDCalls uint64
 
-			ns := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{
+			ns, ctx, env, stop := StartTest(
+				t,
+				component.Config{
 					ServiceBase: config.ServiceBase{
 						KeyVault: config.KeyVault{
 							Provider: "static",
 							Static:   tc.KeyVault,
 						},
 					},
-				}),
-				&Config{
+				},
+				Config{
 					Devices: &MockDeviceRegistry{
 						GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&getByIDCalls, 1)
 							return tc.GetByIDFunc(ctx, appID, devID, gets)
 						},
 					},
-					DownlinkTasks: &MockDownlinkTaskQueue{
-						PopFunc: DownlinkTaskPopBlockFunc,
-					},
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-				})).(*NetworkServer)
+				},
+				(1<<9)*test.Delay,
+			)
+			defer stop()
+
+			<-env.DownlinkTasks.Pop
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -379,12 +379,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			componenttest.StartComponent(t, ns.Component)
-			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.GetEndDeviceRequest)
-
-			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Get(test.Context(), req)
+			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Get(ctx, req)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(dev, should.BeNil)
 			} else if a.So(err, should.BeNil) {
@@ -1499,9 +1496,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 			var addCalls, setByIDCalls uint64
 
-			ns := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
-				&Config{
+			ns, ctx, env, stop := StartTest(
+				t,
+				component.Config{},
+				Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&setByIDCalls, 1)
@@ -1515,10 +1513,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 						},
 						PopFunc: DownlinkTaskPopBlockFunc,
 					},
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-				})).(*NetworkServer)
-			ns.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+				},
+				(1<<9)*test.Delay,
+			)
+			defer stop()
+
+			go LogEvents(t, env.Events)
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -1529,12 +1529,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			componenttest.StartComponent(t, ns.Component)
-			defer ns.Close()
 
-			ctx := ns.FillContext(test.Context())
 			req := deepcopy.Copy(tc.Request).(*ttnpb.SetEndDeviceRequest)
-
 			dev, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Set(ctx, req)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(dev, should.BeNil)
@@ -1667,9 +1663,10 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 			var setByIDCalls uint64
 
-			ns := test.Must(New(
-				componenttest.NewComponent(t, &component.Config{}),
-				&Config{
+			ns, ctx, env, stop := StartTest(
+				t,
+				component.Config{},
+				Config{
 					Devices: &MockDeviceRegistry{
 						SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 							atomic.AddUint64(&setByIDCalls, 1)
@@ -1679,9 +1676,12 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					DownlinkTasks: &MockDownlinkTaskQueue{
 						PopFunc: DownlinkTaskPopBlockFunc,
 					},
-					DeduplicationWindow: 42,
-					CooldownWindow:      42,
-				})).(*NetworkServer)
+				},
+				(1<<9)*test.Delay,
+			)
+			defer stop()
+
+			go LogEvents(t, env.Events)
 
 			ns.AddContextFiller(tc.ContextFunc)
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
@@ -1692,12 +1692,9 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			ns.AddContextFiller(func(ctx context.Context) context.Context {
 				return test.ContextWithT(ctx, t)
 			})
-			componenttest.StartComponent(t, ns.Component)
-			defer ns.Close()
 
 			req := deepcopy.Copy(tc.Request).(*ttnpb.EndDeviceIdentifiers)
-
-			res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(test.Context(), req)
+			res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(ctx, req)
 			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
 			if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(res, should.BeNil)

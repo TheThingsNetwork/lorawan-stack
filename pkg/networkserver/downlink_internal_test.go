@@ -141,7 +141,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 		SessionKeyID: []byte{0x11, 0x22, 0x33, 0x44},
 	}
 
-	rxMetadata := MakeRxMetadataSlice()
 	makeEU868macParameters := func(ver ttnpb.PHYVersion) ttnpb.MACParameters {
 		params := MakeDefaultEU868CurrentMACParameters(ver)
 		params.Rx1Delay = ttnpb.RX_DELAY_2 // Due to infrastructureDelay being 1 second, Network Server never schedules Rx1 for devices with RxDelay == 1.
@@ -417,8 +416,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -534,8 +533,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -579,7 +578,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-time.Second),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -799,8 +798,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -844,7 +843,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-time.Second),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -935,8 +934,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -981,7 +980,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-3 * time.Second),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -1085,8 +1084,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -1130,7 +1129,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-100 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -1231,8 +1230,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -1276,7 +1275,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -1420,8 +1419,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -1465,7 +1464,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -1601,8 +1600,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -1655,7 +1654,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -1869,8 +1868,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -1923,7 +1922,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -2160,8 +2159,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -2215,7 +2214,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -2447,8 +2446,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -2501,7 +2500,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_6,
 									Frequency:     430000000,
@@ -2732,8 +2731,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := gpstime.Parse(10000 * beaconPeriod).Add(time.Second + 200*time.Millisecond)
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -2789,7 +2788,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									}},
 								},
 								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -3037,8 +3036,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -3094,7 +3093,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-500 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -3366,8 +3365,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -3423,7 +3422,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: time.Now().Add(-500 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -3735,8 +3734,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -3787,7 +3786,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-2 * time.Second),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -4009,8 +4008,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -4059,7 +4058,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-100 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -4418,8 +4417,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -4470,7 +4469,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-100 * time.Millisecond),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -4805,8 +4804,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -4857,7 +4856,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: time.Now().Add(-time.Second),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -4979,8 +4978,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -5029,7 +5028,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 									Payload: &ttnpb.Message_MACPayload{MACPayload: &ttnpb.MACPayload{}},
 								},
 								ReceivedAt: start.Add(-time.Second),
-								RxMetadata: rxMetadata,
+								RxMetadata: RxMetadata[:],
 								Settings: ttnpb.TxSettings{
 									DataRateIndex: ttnpb.DATA_RATE_0,
 									Frequency:     430000000,
@@ -5185,8 +5184,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				a := assertions.New(t)
 
 				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
+				clock := test.NewMockClock(start)
+				defer SetMockClock(clock)()
 
 				var popRespCh chan<- error
 				popFuncRespCh := make(chan error)
@@ -5245,7 +5244,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								}},
 							},
 							ReceivedAt: start.Add(-time.Second),
-							RxMetadata: rxMetadata,
+							RxMetadata: RxMetadata[:],
 							Settings: ttnpb.TxSettings{
 								DataRateIndex: ttnpb.DATA_RATE_0,
 								Frequency:     430000000,
@@ -5416,16 +5415,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ns, ctx, env, stopTest := StartTest(t, Config{}, (1<<10)*test.Delay, true)
+			ns, ctx, env, stop := StartTest(t, component.Config{}, Config{}, (1<<10)*test.Delay)
+			defer stop()
+			go LogEvents(t, env.Events)
 
 			ns.downlinkPriorities = tc.DownlinkPriorities
-
-			go func() {
-				for ev := range env.Events {
-					t.Logf("Event %s published with data %v", ev.Event.Name(), ev.Event.Data())
-					ev.Response <- struct{}{}
-				}
-			}()
 
 			<-env.DownlinkTasks.Pop
 
@@ -5460,8 +5454,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 			}
 			close(processDownlinkTaskErrCh)
-
-			stopTest()
 		})
 	}
 }
