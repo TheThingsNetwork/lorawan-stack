@@ -201,7 +201,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 			continue
 		}
 
-		drIdx, dr, ok := phy.FindDataRate(up.Settings.DataRate)
+		drIdx, dr, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
 		if !ok {
 			logger.WithError(err).Debug("Data rate not found in PHY, skip")
 			continue
@@ -1127,7 +1127,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	up.DeviceChannelIndex = uint32(chIdx)
 
-	drIdx, _, ok := phy.FindDataRate(up.Settings.DataRate)
+	drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
 	if !ok {
 		return errDataRateNotFound
 	}
