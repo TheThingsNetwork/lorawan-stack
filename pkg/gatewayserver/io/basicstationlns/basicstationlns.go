@@ -135,12 +135,14 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ids := ttnpb.GatewayIdentifiers{
 		EUI: &req.EUI.EUI64,
 	}
-	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
+	filledCtx, ids, err := s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to fetch gateway")
 		writeDiscoverError(ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
 		return err
 	}
+
+	ctx = filledCtx
 
 	scheme := "ws"
 	if c.IsTLS() || s.useTrafficTLSAddress {
