@@ -19,7 +19,6 @@ import SubmitButton from '../../../../components/submit-button'
 import SubmitBar from '../../../../components/submit-bar'
 import Input from '../../../../components/input'
 import Form from '../../../../components/form'
-import DevAddrInput from '../../../containers/dev-addr-input'
 
 import diff from '../../../../lib/diff'
 import m from '../../../components/device-data-form/messages'
@@ -27,14 +26,10 @@ import randomByteString from '../../../lib/random-bytes'
 import PropTypes from '../../../../lib/prop-types'
 import sharedMessages from '../../../../lib/shared-messages'
 
-const random16BytesString = () => randomByteString(32)
-const toUndefined = value => (!Boolean(value) ? undefined : value)
+const random16BytesString = () => randomByteString(32) const toUndefined = value => (!Boolean(value) ? undefined : value)
 
 const validationSchema = Yup.object().shape({
   session: Yup.object().shape({
-    dev_addr: Yup.string()
-      .length(4 * 2, m.validate8) // 4 Byte hex
-      .required(sharedMessages.validateRequired),
     keys: Yup.object().shape({
       app_s_key: Yup.object().shape({
         key: Yup.string()
@@ -52,7 +47,7 @@ const ApplicationServerForm = React.memo(props => {
   const [error, setError] = React.useState('')
 
   const initialValues = React.useMemo(() => {
-    const { session = {}, ids } = device
+    const { session = {}, } = device
     const {
       keys = {
         app_s_key: {},
@@ -61,7 +56,6 @@ const ApplicationServerForm = React.memo(props => {
 
     return {
       session: {
-        dev_addr: session.dev_addr || ids.dev_addr,
         keys: {
           app_s_key: keys.app_s_key,
         },
@@ -95,14 +89,6 @@ const ApplicationServerForm = React.memo(props => {
       error={error}
       enableReinitialize
     >
-      <DevAddrInput
-        title={sharedMessages.devAddr}
-        name="session.dev_addr"
-        placeholder={m.leaveBlankPlaceholder}
-        description={m.deviceAddrDescription}
-        disabled
-        required
-      />
       <Form.Field
         title={sharedMessages.appSKey}
         name="session.keys.app_s_key.key"
