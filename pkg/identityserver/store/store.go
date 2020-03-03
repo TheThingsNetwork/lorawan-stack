@@ -95,8 +95,9 @@ var (
 var uniqueViolationRegex = regexp.MustCompile(`duplicate key value \(([^)]+)\)=\(([^)]+)\)`)
 
 func convertError(err error) error {
-	if err == nil {
-		return nil
+	switch err {
+	case nil, context.Canceled, context.DeadlineExceeded:
+		return err
 	}
 	if ttnErr, ok := errors.From(err); ok {
 		return ttnErr
