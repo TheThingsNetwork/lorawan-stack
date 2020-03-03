@@ -32,15 +32,16 @@ const validationSchema = Yup.object()
       ACTIVATION_MODES.OTAA,
       ACTIVATION_MODES.MULTICAST,
     ]),
+    _may_edit_keys: Yup.boolean().default(false),
     lorawan_version: Yup.string().required(sharedMessages.validateRequired),
     lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
     frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
     supports_class_c: Yup.boolean().default(false),
     session: Yup.object().when(
-      ['_activation_mode', 'lorawan_version', '_joined', '_generate_keys'],
-      (mode, version, isJoined, generateKeys, schema) => {
+      ['_activation_mode', 'lorawan_version', '_joined', '_may_edit_keys'],
+      (mode, version, isJoined, mayEditKeys, schema) => {
         if (
-          generateKeys &&
+          mayEditKeys &&
           (mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.MULTICAST || isJoined)
         ) {
           const isNewVersion = parseLorawanMacVersion(version) >= 110
@@ -91,9 +92,9 @@ const validationSchema = Yup.object()
       return schema.strip()
     }),
     root_keys: Yup.object().when(
-      ['_external_js', 'lorawan_version', '_activation_mode', '_generate_keys'],
-      (externalJs, version, mode, generateKeys, schema) => {
-        if (generateKeys && mode === ACTIVATION_MODES.OTAA) {
+      ['_external_js', 'lorawan_version', '_activation_mode', '_may_edit_keys'],
+      (externalJs, version, mode, mayEditKeys, schema) => {
+        if (mayEditKeys && mode === ACTIVATION_MODES.OTAA) {
           const strippedSchema = Yup.object().strip()
           const keySchema = Yup.lazy(() => {
             return !externalJs
