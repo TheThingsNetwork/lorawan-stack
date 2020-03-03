@@ -19,9 +19,11 @@ import SubmitBar from '../../../../components/submit-bar'
 import Input from '../../../../components/input'
 import Checkbox from '../../../../components/checkbox'
 import Form from '../../../../components/form'
+import Notification from '../../../../components/notification'
 
 import diff from '../../../../lib/diff'
 import m from '../../../components/device-data-form/messages'
+import messages from '../messages'
 import PropTypes from '../../../../lib/prop-types'
 import sharedMessages from '../../../../lib/shared-messages'
 
@@ -52,9 +54,9 @@ const JoinServerForm = React.memo(props => {
   const initialValues = React.useMemo(() => {
     const values = {
       ...device,
-      _external_js: hasExternalJs(device),
+      _external_js: hasExternalJs(device) && mayReadKeys,
       _lorawan_version: device.lorawan_version,
-      _generate_keys: mayReadKeys && mayEditKeys,
+      _may_edit_keys: mayEditKeys,
     }
 
     return validationSchema.cast(values)
@@ -74,7 +76,7 @@ const JoinServerForm = React.memo(props => {
       const updatedValues = diff(initialValues, castedValues, [
         '_external_js',
         '_lorawan_version',
-        '_generate_keys',
+        '_may_edit_keys',
       ])
 
       setError('')
@@ -107,10 +109,9 @@ const JoinServerForm = React.memo(props => {
     nwkKeyPlaceholder = m.unexposed
   }
 
-  // We dont want to let the users edit `root_keys` without read/write rights. Without the write right
-  // the stack will reject this operation and without the read right we cannot determine whether the
-  // keys are provisioned by external or cluster JS.
-  const showKeys = mayReadKeys && mayEditKeys
+  // Notify the user that the root keys might be there, but since there are no rights
+  // to read the keys we cannot display them.
+  const showResetNotification = !mayReadKeys && mayEditKeys && !Boolean(device.root_keys)
 
   return (
     <Form
@@ -121,43 +122,6 @@ const JoinServerForm = React.memo(props => {
       error={error}
       enableReinitialize
     >
-      {showKeys && (
-        <>
-          <Form.Field
-            title={sharedMessages.appKey}
-            name="root_keys.app_key.key"
-            type="byte"
-            min={16}
-            max={16}
-            placeholder={appKeyPlaceholder}
-            description={isNewLorawanVersion ? m.appKeyNewDescription : m.appKeyDescription}
-            component={Input}
-            disabled={appKeyHidden}
-          />
-          {isNewLorawanVersion && (
-            <Form.Field
-              title={sharedMessages.nwkKey}
-              name="root_keys.nwk_key.key"
-              type="byte"
-              min={16}
-              max={16}
-              placeholder={nwkKeyPlaceholder}
-              description={m.nwkKeyDescription}
-              component={Input}
-              disabled={nwkKeyHidden}
-            />
-          )}
-        </>
-      )}
-      {isNewLorawanVersion && (
-        <Form.Field
-          title={m.resetsJoinNonces}
-          onChange={handleResetsJoinNoncesChange}
-          warning={resetsJoinNonces ? m.resetWarning : undefined}
-          name="resets_join_nonces"
-          component={Checkbox}
-        />
-      )}
       <Form.Field
         title={m.homeNetID}
         description={m.homeNetIDDescription}
@@ -185,6 +149,40 @@ const JoinServerForm = React.memo(props => {
         description={m.nsServerKekLabelDescription}
         component={Input}
       />
+      {isNewLorawanVersion && (
+        <Form.Field
+          title={m.resetsJoinNonces}
+          onChange={handleResetsJoinNoncesChange}
+          warning={resetsJoinNonces ? m.resetWarning : undefined}
+          name="resets_join_nonces"
+          component={Checkbox}
+        />
+      )}
+      {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
+      <Form.Field
+        title={sharedMessages.appKey}
+        name="root_keys.app_key.key"
+        type="byte"
+        min={16}
+        max={16}
+        placeholder={appKeyPlaceholder}
+        description={isNewLorawanVersion ? m.appKeyNewDescription : m.appKeyDescription}
+        component={Input}
+        disabled={appKeyHidden || !mayEditKeys}
+      />
+      {isNewLorawanVersion && (
+        <Form.Field
+          title={sharedMessages.nwkKey}
+          name="root_keys.nwk_key.key"
+          type="byte"
+          min={16}
+          max={16}
+          placeholder={nwkKeyPlaceholder}
+          description={m.nwkKeyDescription}
+          component={Input}
+          disabled={nwkKeyHidden || !mayEditKeys}
+        />
+      )}
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
       </SubmitBar>
