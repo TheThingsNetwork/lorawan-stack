@@ -60,7 +60,7 @@ class EventsWidget extends React.PureComponent {
   }
 
   renderEvent(event) {
-    const { component: Component, type } = getEventComponentByName(event.name)
+    const { component: Component, type } = getEventComponentByName(event)
 
     return (
       <List.Item>
