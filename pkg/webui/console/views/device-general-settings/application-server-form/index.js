@@ -29,16 +29,12 @@ import PropTypes from '../../../../lib/prop-types'
 import sharedMessages from '../../../../lib/shared-messages'
 
 const random16BytesString = () => randomByteString(32)
-const toUndefined = value => (!Boolean(value) ? undefined : value)
 
 const validationSchema = Yup.object().shape({
   session: Yup.object().shape({
     keys: Yup.object().shape({
       app_s_key: Yup.object().shape({
-        key: Yup.string()
-          .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-          .transform(toUndefined)
-          .default(random16BytesString),
+        key: Yup.string().emptyOrLength(16 * 2, m.validate32), // 16 Byte hex
       }),
     }),
   }),
@@ -53,7 +49,9 @@ const ApplicationServerForm = React.memo(props => {
     const { session = {} } = device
     const {
       keys = {
-        app_s_key: {},
+        app_s_key: {
+          key: '',
+        },
       },
     } = session
 
@@ -104,9 +102,10 @@ const ApplicationServerForm = React.memo(props => {
         type="byte"
         min={16}
         max={16}
-        placeholder={m.leaveBlankPlaceholder}
         description={m.appSKeyDescription}
-        component={Input}
+        component={Input.Generate}
+        mayGenerateValue={mayEditKeys}
+        onGenerateValue={random16BytesString}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
