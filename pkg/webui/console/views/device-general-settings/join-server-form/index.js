@@ -26,9 +26,12 @@ import m from '../../../components/device-data-form/messages'
 import messages from '../messages'
 import PropTypes from '../../../../lib/prop-types'
 import sharedMessages from '../../../../lib/shared-messages'
+import randomByteString from '../../../lib/random-bytes'
 
 import { parseLorawanMacVersion, hasExternalJs } from '../utils'
 import validationSchema from './validation-schema'
+
+const random16BytesString = () => randomByteString(32)
 
 // The Join Server can store end device fields while not exposing the root keys. This means
 // that the `root_keys` object is present, same for `root_keys.nwk_key` and `root_keys.app_key`,
@@ -57,6 +60,7 @@ const JoinServerForm = React.memo(props => {
       _external_js: hasExternalJs(device) && mayReadKeys,
       _lorawan_version: device.lorawan_version,
       _may_edit_keys: mayEditKeys,
+      _may_read_keys: mayReadKeys,
     }
 
     return validationSchema.cast(values)
@@ -77,6 +81,7 @@ const JoinServerForm = React.memo(props => {
         '_external_js',
         '_lorawan_version',
         '_may_edit_keys',
+        '_may_read_keys',
       ])
 
       setError('')
@@ -95,14 +100,14 @@ const JoinServerForm = React.memo(props => {
   const nwkKeyHidden = isNwkKeyHidden(device)
   const appKeyHidden = isAppKeyHidden(device)
 
-  let appKeyPlaceholder = m.leaveBlankPlaceholder
+  let appKeyPlaceholder
   if (externalJs) {
     appKeyPlaceholder = sharedMessages.provisionedOnExternalJoinServer
   } else if (appKeyHidden) {
     appKeyPlaceholder = m.unexposed
   }
 
-  let nwkKeyPlaceholder = m.leaveBlankPlaceholder
+  let nwkKeyPlaceholder
   if (externalJs) {
     nwkKeyPlaceholder = sharedMessages.provisionedOnExternalJoinServer
   } else if (nwkKeyHidden) {
@@ -167,8 +172,10 @@ const JoinServerForm = React.memo(props => {
         max={16}
         placeholder={appKeyPlaceholder}
         description={isNewLorawanVersion ? m.appKeyNewDescription : m.appKeyDescription}
-        component={Input}
+        component={Input.Generate}
         disabled={appKeyHidden || !mayEditKeys}
+        mayGenerateValue={mayEditKeys && !appKeyHidden}
+        onGenerateValue={random16BytesString}
       />
       {isNewLorawanVersion && (
         <Form.Field
@@ -179,8 +186,10 @@ const JoinServerForm = React.memo(props => {
           max={16}
           placeholder={nwkKeyPlaceholder}
           description={m.nwkKeyDescription}
-          component={Input}
+          component={Input.Generate}
           disabled={nwkKeyHidden || !mayEditKeys}
+          mayGenerateValue={mayEditKeys && !nwkKeyHidden}
+          onGenerateValue={random16BytesString}
         />
       )}
       <SubmitBar>
