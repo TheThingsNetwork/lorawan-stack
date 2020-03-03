@@ -25,6 +25,7 @@ import CodeEditor from '../code-editor'
 import CRUDEvent from './types/crud'
 import DefaultEvent from './types/default'
 import MessageEvent from './types/message'
+import ErrorEvent from './types/error'
 
 import style from './event.styl'
 
@@ -162,5 +163,6 @@ class Event extends React.PureComponent {
 Event.CRUD = CRUDEvent
 Event.Default = DefaultEvent
 Event.Message = MessageEvent
+Event.Error = ErrorEvent
 
 export default Event
