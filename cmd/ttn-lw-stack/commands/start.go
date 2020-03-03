@@ -133,10 +133,7 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeIdentityServer.WithCause(err)
 			}
 			if config.Cache.Service == "redis" {
-				is.SetRedisCache(redis.New(&redis.Config{
-					Redis:     config.Cache.Redis,
-					Namespace: []string{"is", "cache"},
-				}))
+				is.SetRedisCache(redis.New(config.Cache.Redis.WithNamespace("is", "cache")))
 			}
 			if oauthMount := config.IS.OAuth.UI.MountPath(); oauthMount != "/" {
 				rootRedirect = web.Redirect("/", http.StatusFound, oauthMount)
@@ -156,18 +153,17 @@ var startCommand = &cobra.Command{
 			redisConsumerGroup := "ns"
 
 			logger.Info("Setting up Network Server")
-			config.NS.ApplicationUplinks = nsredis.NewApplicationUplinkQueue(redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"ns", "application-uplinks"},
-			}), 100, redisConsumerGroup, redisConsumerID)
-			config.NS.Devices = &nsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"ns", "devices"},
-			})}
-			nsDownlinkTasks := nsredis.NewDownlinkTaskQueue(redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"ns", "tasks"},
-			}), 100000, redisConsumerGroup, redisConsumerID)
+			config.NS.ApplicationUplinks = nsredis.NewApplicationUplinkQueue(
+				redis.New(config.Redis.WithNamespace("ns", "application-uplinks")),
+				100, redisConsumerGroup, redisConsumerID,
+			)
+			config.NS.Devices = &nsredis.DeviceRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("ns", "devices")),
+			}
+			nsDownlinkTasks := nsredis.NewDownlinkTaskQueue(
+				redis.New(config.Redis.WithNamespace("ns", "tasks")),
+				100000, redisConsumerGroup, redisConsumerID,
+			)
 			if err := nsDownlinkTasks.Init(); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
@@ -181,27 +177,22 @@ var startCommand = &cobra.Command{
 
 		if start.ApplicationServer || startDefault {
 			logger.Info("Setting up Application Server")
-			config.AS.Links = &asredis.LinkRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"as", "links"},
-			})}
-			config.AS.Devices = &asredis.DeviceRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"as", "devices"},
-			})}
-			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"as", "io", "pubsub"},
-			})}
-			config.AS.ApplicationPackages.Registry = &asioapredis.ApplicationPackagesRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"as", "io", "applicationpackages"},
-			})}
+			config.AS.Links = &asredis.LinkRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("as", "links")),
+			}
+			config.AS.Devices = &asredis.DeviceRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("as", "devices")),
+			}
+			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),
+			}
+			config.AS.ApplicationPackages.Registry = &asioapredis.ApplicationPackagesRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
+			}
 			if config.AS.Webhooks.Target != "" {
-				config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{Redis: redis.New(&redis.Config{
-					Redis:     config.Redis,
-					Namespace: []string{"as", "io", "webhooks"},
-				})}
+				config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{
+					Redis: redis.New(config.Redis.WithNamespace("as", "io", "webhooks")),
+				}
 			}
 			as, err := applicationserver.New(c, &config.AS)
 			if err != nil {
@@ -212,14 +203,12 @@ var startCommand = &cobra.Command{
 
 		if start.JoinServer || startDefault {
 			logger.Info("Setting up Join Server")
-			config.JS.Devices = &jsredis.DeviceRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"js", "devices"},
-			})}
-			config.JS.Keys = &jsredis.KeyRegistry{Redis: redis.New(&redis.Config{
-				Redis:     config.Redis,
-				Namespace: []string{"js", "keys"},
-			})}
+			config.JS.Devices = &jsredis.DeviceRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("js", "devices")),
+			}
+			config.JS.Keys = &jsredis.KeyRegistry{
+				Redis: redis.New(config.Redis.WithNamespace("js", "keys")),
+			}
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
 				return shared.ErrInitializeJoinServer.WithCause(err)
