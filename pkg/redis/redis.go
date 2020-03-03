@@ -27,7 +27,6 @@ import (
 
 	"github.com/go-redis/redis"
 	"github.com/gogo/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/config"
 )
 
 const (
@@ -76,12 +75,38 @@ type Client struct {
 
 // Config represents Redis configuration.
 type Config struct {
-	config.Redis
-	Namespace []string
+	Address       string         `name:"address" description:"Address of the Redis server"`
+	Password      string         `name:"password" description:"Password of the Redis server"`
+	Database      int            `name:"database" description:"Redis database to use"`
+	RootNamespace []string       `name:"namespace" description:"Namespace for Redis keys"`
+	PoolSize      int            `name:"pool-size" description:"The maximum number of database connections"`
+	Failover      FailoverConfig `name:"failover" description:"Redis failover configuration"`
+	namespace     []string
+}
+
+func (c Config) WithNamespace(namespace ...string) *Config {
+	deriv := c
+	deriv.namespace = namespace
+	return &deriv
+}
+
+// IsZero returns whether the Redis configuration is empty.
+func (c Config) IsZero() bool {
+	if c.Failover.Enable {
+		return c.Failover.MasterName == "" && len(c.Failover.Addresses) == 0
+	}
+	return c.Address == ""
+}
+
+// FailoverConfig represents Redis failover configuration.
+type FailoverConfig struct {
+	Enable     bool     `name:"enable" description:"Enable failover using Redis Sentinel"`
+	Addresses  []string `name:"addresses" description:"Redis Sentinel server addresses"`
+	MasterName string   `name:"master-name" description:"Redis Sentinel master name"`
 }
 
 // newRedisClient returns a Redis client, which connects using correct client type.
-func newRedisClient(conf config.Redis) *redis.Client {
+func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
 		redis.SetLogger(log.New(ioutil.Discard, "", 0))
 		return redis.NewFailoverClient(&redis.FailoverOptions{
@@ -103,8 +128,8 @@ func newRedisClient(conf config.Redis) *redis.Client {
 // New returns a new initialized Redis store.
 func New(conf *Config) *Client {
 	return &Client{
-		namespace: Key(append(conf.Redis.Namespace, conf.Namespace...)...),
-		Client:    newRedisClient(conf.Redis),
+		namespace: Key(append(conf.RootNamespace, conf.namespace...)...),
+		Client:    newRedisClient(conf),
 	}
 }
 

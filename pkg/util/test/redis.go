@@ -23,7 +23,6 @@ import (
 
 	"github.com/go-redis/redis"
 	ulid "github.com/oklog/ulid/v2"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 )
 
@@ -46,21 +45,18 @@ func NewRedis(t testing.TB, namespace ...string) (*ttnredis.Client, func()) {
 		panic("New called outside test")
 	}
 
-	conf := &ttnredis.Config{
-		Redis: config.Redis{
-			Address:   defaultAddress,
-			Database:  defaultDatabase,
-			Namespace: defaultNamespace[:],
-		},
-		Namespace: append(append([]string{ulid.MustNew(ulid.Now(), Randy).String()}, namespace...), t.Name()),
-	}
+	conf := ttnredis.Config{
+		Address:       defaultAddress,
+		Database:      defaultDatabase,
+		RootNamespace: defaultNamespace[:],
+	}.WithNamespace(append(append([]string{ulid.MustNew(ulid.Now(), Randy).String()}, namespace...), t.Name())...)
 
 	if addr := os.Getenv("REDIS_ADDRESS"); addr != "" {
-		conf.Redis.Address = addr
+		conf.Address = addr
 	}
 	if db := os.Getenv("REDIS_DB"); db != "" {
 		var err error
-		conf.Redis.Database, err = strconv.Atoi(db)
+		conf.Database, err = strconv.Atoi(db)
 		if err != nil {
 			t.Fatalf("Expected REDIS_DB to be an integer, got `%s`", db)
 			return nil, nil

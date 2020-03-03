@@ -26,7 +26,8 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -77,7 +78,7 @@ func TestGatewayServer(t *testing.T) {
 				Listen:                      ":9187",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 				NetworkServer:  nsAddr,
 			},
@@ -933,7 +934,7 @@ func TestGatewayServer(t *testing.T) {
 				})
 
 				t.Run("Downstream", func(t *testing.T) {
-					ctx := cluster.NewContext(test.Context(), nil)
+					ctx := clusterauth.NewContext(test.Context(), nil)
 					downlinkCount := 0
 					for _, tc := range []struct {
 						Name                     string
