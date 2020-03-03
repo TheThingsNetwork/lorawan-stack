@@ -58,7 +58,6 @@ const clean = function(str) {
   return str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '')
 }
 
-@bind
 export default class ByteInput extends React.Component {
   static propTypes = {
     className: PropTypes.string,
@@ -125,6 +124,7 @@ export default class ByteInput extends React.Component {
     }
   }
 
+  @bind
   onChange(evt) {
     this.props.onChange({
       target: {
@@ -133,6 +133,7 @@ export default class ByteInput extends React.Component {
     })
   }
 
+  @bind
   onCopy(evt) {
     const input = evt.target
     const value = input.value.substr(
@@ -143,6 +144,7 @@ export default class ByteInput extends React.Component {
     evt.preventDefault()
   }
 
+  @bind
   onCut(evt) {
     const input = evt.target
     const value = input.value.substr(
