@@ -22,7 +22,6 @@ import (
 	"os"
 	"strings"
 
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
@@ -105,21 +104,36 @@ func WithTLSConfig(tlsConfig *tls.Config) Option {
 	})
 }
 
+// Config represents clustering configuration.
+type Config struct {
+	Join              []string `name:"join" description:"Addresses of cluster peers to join"`
+	Name              string   `name:"name" description:"Name of the current cluster peer (default: $HOSTNAME)"`
+	Address           string   `name:"address" description:"Address to use for cluster communication"`
+	IdentityServer    string   `name:"identity-server" description:"Address for the Identity Server"`
+	GatewayServer     string   `name:"gateway-server" description:"Address for the Gateway Server"`
+	NetworkServer     string   `name:"network-server" description:"Address for the Network Server"`
+	ApplicationServer string   `name:"application-server" description:"Address for the Application Server"`
+	JoinServer        string   `name:"join-server" description:"Address for the Join Server"`
+	CryptoServer      string   `name:"crypto-server" description:"Address for the Crypto Server"`
+	TLS               bool     `name:"tls" description:"Do cluster gRPC over TLS"`
+	Keys              []string `name:"keys" description:"Keys used to communicate between components of the cluster. The first one will be used by the cluster to identify itself"`
+}
+
 // CustomNew allows you to replace the clustering implementation. New will call CustomNew if not nil.
-var CustomNew func(ctx context.Context, config *config.Cluster, options ...Option) (Cluster, error)
+var CustomNew func(ctx context.Context, config *Config, options ...Option) (Cluster, error)
 
 // New instantiates a new clustering implementation.
 // The basic clustering implementation allows for a cluster setup with a single-instance deployment of each component
 // (GS/NS/AS/JS).
 // Network operators can use their own clustering logic, which can be activated by setting the CustomNew variable.
-func New(ctx context.Context, config *config.Cluster, options ...Option) (Cluster, error) {
+func New(ctx context.Context, config *Config, options ...Option) (Cluster, error) {
 	if CustomNew != nil {
 		return CustomNew(ctx, config, options...)
 	}
 	return defaultNew(ctx, config, options...)
 }
 
-func defaultNew(ctx context.Context, config *config.Cluster, options ...Option) (Cluster, error) {
+func defaultNew(ctx context.Context, config *Config, options ...Option) (Cluster, error) {
 	c := &cluster{
 		ctx:   ctx,
 		tls:   config.TLS,

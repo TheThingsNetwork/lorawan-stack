@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider"
 	mock_provider "go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/provider/mock"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/pubsub/redis"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -87,7 +88,7 @@ func TestIntegrate(t *testing.T) {
 				Listen:                      ":9185",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
 		},

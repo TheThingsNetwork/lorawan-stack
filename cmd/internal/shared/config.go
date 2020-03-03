@@ -17,6 +17,7 @@ package shared
 import (
 	"time"
 
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/redis"
@@ -43,7 +44,7 @@ var DefaultTLSConfig = config.TLS{
 }
 
 // DefaultClusterConfig is the default cluster configuration.
-var DefaultClusterConfig = config.Cluster{}
+var DefaultClusterConfig = cluster.Config{}
 
 // DefaultHTTPConfig is the default HTTP config.
 var DefaultHTTPConfig = config.HTTP{

@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/packages/redis"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -89,7 +90,7 @@ func TestAuthentication(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
 		},
@@ -168,7 +169,7 @@ func TestAssociations(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
 		},

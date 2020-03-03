@@ -23,6 +23,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	ttnblob "go.thethings.network/lorawan-stack/pkg/blob"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -46,21 +47,6 @@ type Log struct {
 // Sentry represents configuration for error tracking using Sentry.
 type Sentry struct {
 	DSN string `name:"dsn" description:"Sentry Data Source Name"`
-}
-
-// Cluster represents clustering configuration.
-type Cluster struct {
-	Join              []string `name:"join" description:"Addresses of cluster peers to join"`
-	Name              string   `name:"name" description:"Name of the current cluster peer (default: $HOSTNAME)"`
-	Address           string   `name:"address" description:"Address to use for cluster communication"`
-	IdentityServer    string   `name:"identity-server" description:"Address for the Identity Server"`
-	GatewayServer     string   `name:"gateway-server" description:"Address for the Gateway Server"`
-	NetworkServer     string   `name:"network-server" description:"Address for the Network Server"`
-	ApplicationServer string   `name:"application-server" description:"Address for the Application Server"`
-	JoinServer        string   `name:"join-server" description:"Address for the Join Server"`
-	CryptoServer      string   `name:"crypto-server" description:"Address for the Crypto Server"`
-	TLS               bool     `name:"tls" description:"Do cluster gRPC over TLS"`
-	Keys              []string `name:"keys" description:"Keys used to communicate between components of the cluster. The first one will be used by the cluster to identify itself"`
 }
 
 // GRPC represents gRPC listener configuration.
@@ -418,7 +404,7 @@ type InteropServer struct {
 // ServiceBase represents base service configuration.
 type ServiceBase struct {
 	Base             `name:",squash"`
-	Cluster          Cluster                `name:"cluster"`
+	Cluster          cluster.Config         `name:"cluster"`
 	Cache            Cache                  `name:"cache"`
 	Redis            redis.Config           `name:"redis"`
 	Events           Events                 `name:"events"`
