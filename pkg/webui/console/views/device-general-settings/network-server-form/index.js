@@ -23,9 +23,11 @@ import Select from '../../../../components/select'
 import Form from '../../../../components/form'
 import { NsFrequencyPlansSelect } from '../../../containers/freq-plans-select'
 import DevAddrInput from '../../../containers/dev-addr-input'
+import Notification from '../../../../components/notification'
 
 import diff from '../../../../lib/diff'
 import m from '../../../components/device-data-form/messages'
+import messages from '../messages'
 import sharedMessages from '../../../../lib/shared-messages'
 import PropTypes from '../../../../lib/prop-types'
 
@@ -89,9 +91,9 @@ const NetworkServerForm = React.memo(props => {
     const values = {
       ...device,
       _activation_mode,
-      _external_js: hasExternalJs(device),
+      _external_js: hasExternalJs(device) && mayReadKeys,
       _joined: isDeviceOTAA(device) && isDeviceJoined(device),
-      _generate_keys: mayReadKeys && mayEditKeys,
+      _may_edit_keys: mayEditKeys,
     }
 
     return validationSchema.cast(values)
@@ -107,16 +109,20 @@ const NetworkServerForm = React.memo(props => {
         '_activation_mode',
         '_external_js',
         '_joined',
-        '_generate_keys',
+        '_may_edit_keys',
       ])
 
       if (isABP) {
         // Do not reset session keys
-        if (updatedValues.session.keys && Object.keys(updatedValues.session.keys).length === 0) {
+        if (
+          updatedValues.session &&
+          updatedValues.session.keys &&
+          Object.keys(updatedValues.session.keys).length === 0
+        ) {
           delete updatedValues.session.keys
         }
 
-        if (Object.keys(updatedValues.session).length === 0) {
+        if (updatedValues.session && Object.keys(updatedValues.session).length === 0) {
           delete updatedValues.session
         }
       } else if (isOTAA) {
@@ -188,9 +194,9 @@ const NetworkServerForm = React.memo(props => {
     [initialValues],
   )
 
-  // We dont want to let the users edit `session` without read/write rights. This is unlikely to happen
-  // and such scenario is specific for some API keys, not for users.
-  const showKeys = mayReadKeys && mayEditKeys
+  // Notify the user that the session keys might be there, but since there are no rights
+  // to read the keys we cannot display them.
+  const showResetNotification = !mayReadKeys && mayEditKeys && !Boolean(device.session)
 
   return (
     <Form
@@ -234,53 +240,6 @@ const NetworkServerForm = React.memo(props => {
       </Form.Field>
       {(isABP || isMulticast || isJoinedOTAA) && (
         <>
-          {showKeys && (
-            <>
-              <DevAddrInput
-                title={sharedMessages.devAddr}
-                name="session.dev_addr"
-                placeholder={m.leaveBlankPlaceholder}
-                description={m.deviceAddrDescription}
-                required
-              />
-              <Form.Field
-                title={lorawanVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
-                name="session.keys.f_nwk_s_int_key.key"
-                type="byte"
-                min={16}
-                max={16}
-                placeholder={m.leaveBlankPlaceholder}
-                description={
-                  lorawanVersion >= 110 ? m.fNwkSIntKeyDescription : m.nwkSKeyDescription
-                }
-                component={Input}
-              />
-              {lorawanVersion >= 110 && (
-                <Form.Field
-                  title={sharedMessages.sNwkSIKey}
-                  name="session.keys.s_nwk_s_int_key.key"
-                  type="byte"
-                  min={16}
-                  max={16}
-                  placeholder={m.leaveBlankPlaceholder}
-                  description={m.sNwkSIKeyDescription}
-                  component={Input}
-                />
-              )}
-              {lorawanVersion >= 110 && (
-                <Form.Field
-                  title={sharedMessages.nwkSEncKey}
-                  name="session.keys.nwk_s_enc_key.key"
-                  type="byte"
-                  min={16}
-                  max={16}
-                  placeholder={m.leaveBlankPlaceholder}
-                  description={m.nwkSEncKeyDescription}
-                  component={Input}
-                />
-              )}
-            </>
-          )}
           {!isMulticast && !isJoinedOTAA && (
             <Form.Field
               title={m.resetsFCnt}
@@ -288,6 +247,52 @@ const NetworkServerForm = React.memo(props => {
               warning={resetsFCnt ? m.resetWarning : undefined}
               name="mac_settings.resets_f_cnt"
               component={Checkbox}
+            />
+          )}
+          {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
+          <DevAddrInput
+            title={sharedMessages.devAddr}
+            name="session.dev_addr"
+            placeholder={m.leaveBlankPlaceholder}
+            description={m.deviceAddrDescription}
+            disabled={!mayEditKeys}
+            required
+          />
+          <Form.Field
+            title={lorawanVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
+            name="session.keys.f_nwk_s_int_key.key"
+            type="byte"
+            min={16}
+            max={16}
+            placeholder={m.leaveBlankPlaceholder}
+            description={lorawanVersion >= 110 ? m.fNwkSIntKeyDescription : m.nwkSKeyDescription}
+            disabled={!mayEditKeys}
+            component={Input}
+          />
+          {lorawanVersion >= 110 && (
+            <Form.Field
+              title={sharedMessages.sNwkSIKey}
+              name="session.keys.s_nwk_s_int_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              placeholder={m.leaveBlankPlaceholder}
+              description={m.sNwkSIKeyDescription}
+              disabled={!mayEditKeys}
+              component={Input}
+            />
+          )}
+          {lorawanVersion >= 110 && (
+            <Form.Field
+              title={sharedMessages.nwkSEncKey}
+              name="session.keys.nwk_s_enc_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              placeholder={m.leaveBlankPlaceholder}
+              description={m.nwkSEncKeyDescription}
+              disabled={!mayEditKeys}
+              component={Input}
             />
           )}
         </>
