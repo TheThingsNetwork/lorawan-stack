@@ -132,6 +132,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 	// Setup forwarding table.
 	for name, prefix := range gs.forward {
+		if len(prefix) == 0 {
+			continue
+		}
 		if name == "" {
 			name = "cluster"
 		}

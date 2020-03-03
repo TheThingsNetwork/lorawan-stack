@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Network and Application Servers now maintain application downlink queue per-session.
+- Gateway Server skips setting up an upstream if the DevAddr prefixes to forward are empty.
 
 ### Deprecated
 
