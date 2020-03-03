@@ -76,6 +76,7 @@ message UserIdentifiers {
 // OrganizationOrUserIdentifiers contains either organization or user identifiers.
 message OrganizationOrUserIdentifiers {
   oneof ids {
+    option (validate.required) = true;
     OrganizationIdentifiers organization_ids = 1 [(gogoproto.customname) = "OrganizationIDs"];
     UserIdentifiers user_ids = 2 [(gogoproto.customname) = "UserIDs"];
   }
@@ -84,6 +85,7 @@ message OrganizationOrUserIdentifiers {
 // EntityIdentifiers contains one of the possible entity identifiers.
 message EntityIdentifiers {
   oneof ids {
+    option (validate.required) = true;
     ApplicationIdentifiers application_ids = 1 [(gogoproto.customname) = "ApplicationIDs"];
     ClientIdentifiers client_ids = 2 [(gogoproto.customname) = "ClientIDs"];
     EndDeviceIdentifiers device_ids = 3 [(gogoproto.customname) = "DeviceIDs"];
