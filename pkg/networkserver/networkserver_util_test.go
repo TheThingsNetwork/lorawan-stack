@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -1312,7 +1311,7 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplicati
 		componenttest.NewComponent(
 			t,
 			&component.Config{},
-			component.WithClusterNew(func(context.Context, *config.Cluster, ...cluster.Option) (cluster.Cluster, error) {
+			component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
 				return &test.MockCluster{
 					AuthFunc:    test.MakeClusterAuthChFunc(authCh),
 					GetPeerFunc: test.MakeClusterGetPeerChFunc(getPeerCh),

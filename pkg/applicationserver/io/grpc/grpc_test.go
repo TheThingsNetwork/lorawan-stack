@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
 	. "go.thethings.network/lorawan-stack/pkg/applicationserver/io/grpc"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -58,7 +59,7 @@ func TestAuthentication(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
 		},
@@ -143,7 +144,7 @@ func TestTraffic(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
 		},
@@ -369,7 +370,7 @@ func TestMQTTConfig(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
 		},

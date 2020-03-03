@@ -30,7 +30,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -6408,7 +6407,7 @@ func TestGenerateDownlink(t *testing.T) {
 			c := component.MustNew(
 				log.Noop,
 				&component.Config{},
-				component.WithClusterNew(func(context.Context, *config.Cluster, ...cluster.Option) (cluster.Cluster, error) {
+				component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
 					return &test.MockCluster{
 						JoinFunc: test.ClusterJoinNilFunc,
 					}, nil

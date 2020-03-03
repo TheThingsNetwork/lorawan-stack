@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io/web/redis"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -343,7 +344,7 @@ func TestWebhooks(t *testing.T) {
 					Listen:                      ":0",
 					AllowInsecureForCredentials: true,
 				},
-				Cluster: config.Cluster{
+				Cluster: cluster.Config{
 					IdentityServer: isAddr,
 				},
 				HTTP: config.HTTP{
