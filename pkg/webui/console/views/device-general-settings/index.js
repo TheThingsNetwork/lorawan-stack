@@ -200,12 +200,9 @@ export default class DeviceGeneralSettings extends React.Component {
     // 2. Disable the section if the device is OTAA and joined since no fields are stored in the AS.
     // 3. Disable the section if NS is not in cluster, since activation mode is unknown.
     // 4. Disable the seciton if `application_server_address` is not equal to the cluster AS address.
-    // 5. Disable the section if the user has no appropriate rights to edit keys.
     const sameAsAddress = getComponentBaseUrl(asConfig) === device.application_server_address
     const isJoined = isDeviceJoined(device)
-    const showKeys = mayReadKeys && mayEditKeys
-    const asDisabled =
-      !asEnabled || (isOTAA && !isJoined) || !nsEnabled || !sameAsAddress || !showKeys
+    const asDisabled = !asEnabled || (isOTAA && !isJoined) || !nsEnabled || !sameAsAddress
     let asDescription = m.asDescription
     if (!asEnabled) {
       asDescription = m.asDescriptionMissing
@@ -278,6 +275,8 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
             <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
