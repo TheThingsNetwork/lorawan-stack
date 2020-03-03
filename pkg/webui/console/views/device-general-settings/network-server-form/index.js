@@ -29,6 +29,7 @@ import diff from '../../../../lib/diff'
 import m from '../../../components/device-data-form/messages'
 import messages from '../messages'
 import sharedMessages from '../../../../lib/shared-messages'
+import randomByteString from '../../../lib/random-bytes'
 import PropTypes from '../../../../lib/prop-types'
 
 import {
@@ -41,6 +42,8 @@ import {
   isDeviceOTAA,
 } from '../utils'
 import validationSchema from './validation-schema'
+
+const random16BytesString = () => randomByteString(32)
 
 const lorawanVersions = [
   { value: '1.0.0', label: 'MAC V1.0' },
@@ -94,6 +97,7 @@ const NetworkServerForm = React.memo(props => {
       _external_js: hasExternalJs(device) && mayReadKeys,
       _joined: isDeviceOTAA(device) && isDeviceJoined(device),
       _may_edit_keys: mayEditKeys,
+      _may_read_keys: mayReadKeys,
     }
 
     return validationSchema.cast(values)
@@ -101,35 +105,14 @@ const NetworkServerForm = React.memo(props => {
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      const isABP = initialValues._activation_mode === ACTIVATION_MODES.ABP
-      const isOTAA = initialValues._activation_mode === ACTIVATION_MODES.OTAA
-
       const castedValues = validationSchema.cast(values)
       const updatedValues = diff(initialValues, castedValues, [
         '_activation_mode',
         '_external_js',
         '_joined',
         '_may_edit_keys',
+        '_may_read_keys',
       ])
-
-      if (isABP) {
-        // Do not reset session keys
-        if (
-          updatedValues.session &&
-          updatedValues.session.keys &&
-          Object.keys(updatedValues.session.keys).length === 0
-        ) {
-          delete updatedValues.session.keys
-        }
-
-        if (updatedValues.session && Object.keys(updatedValues.session).length === 0) {
-          delete updatedValues.session
-        }
-      } else if (isOTAA) {
-        if (updatedValues.root_keys && Object.keys(updatedValues.root_keys).length === 0) {
-          delete updatedValues.root_keys
-        }
-      }
 
       setError('')
       try {
@@ -256,7 +239,7 @@ const NetworkServerForm = React.memo(props => {
             placeholder={m.leaveBlankPlaceholder}
             description={m.deviceAddrDescription}
             disabled={!mayEditKeys}
-            required
+            required={mayReadKeys && mayEditKeys}
           />
           <Form.Field
             title={lorawanVersion >= 110 ? sharedMessages.fNwkSIntKey : sharedMessages.nwkSKey}
@@ -264,10 +247,11 @@ const NetworkServerForm = React.memo(props => {
             type="byte"
             min={16}
             max={16}
-            placeholder={m.leaveBlankPlaceholder}
             description={lorawanVersion >= 110 ? m.fNwkSIntKeyDescription : m.nwkSKeyDescription}
             disabled={!mayEditKeys}
-            component={Input}
+            component={Input.Generate}
+            mayGenerateValue={mayEditKeys}
+            onGenerateValue={random16BytesString}
           />
           {lorawanVersion >= 110 && (
             <Form.Field
@@ -276,10 +260,11 @@ const NetworkServerForm = React.memo(props => {
               type="byte"
               min={16}
               max={16}
-              placeholder={m.leaveBlankPlaceholder}
               description={m.sNwkSIKeyDescription}
               disabled={!mayEditKeys}
-              component={Input}
+              component={Input.Generate}
+              mayGenerateValue={mayEditKeys}
+              onGenerateValue={random16BytesString}
             />
           )}
           {lorawanVersion >= 110 && (
@@ -289,10 +274,11 @@ const NetworkServerForm = React.memo(props => {
               type="byte"
               min={16}
               max={16}
-              placeholder={m.leaveBlankPlaceholder}
               description={m.nwkSEncKeyDescription}
               disabled={!mayEditKeys}
-              component={Input}
+              component={Input.Generate}
+              mayGenerateValue={mayEditKeys}
+              onGenerateValue={random16BytesString}
             />
           )}
         </>
