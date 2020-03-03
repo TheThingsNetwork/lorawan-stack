@@ -63,8 +63,8 @@ const buttonChildren = ({ icon, busy, message }) => (
 )
 
 @injectIntl
-@bind
 class Button extends React.PureComponent {
+  @bind
   handleClick(evt) {
     const { busy, disabled, onClick } = this.props
 
