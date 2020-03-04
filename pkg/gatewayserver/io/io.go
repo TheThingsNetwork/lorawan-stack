@@ -89,6 +89,7 @@ type Connection struct {
 	txAckCh  chan *ttnpb.TxAcknowledgment
 
 	statsChangedCh chan struct{}
+	locCh          chan struct{}
 }
 
 var (
@@ -149,6 +150,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		downCh:      make(chan *ttnpb.DownlinkMessage, bufferSize),
 		statusCh:    make(chan *ttnpb.GatewayStatus, bufferSize),
 		txAckCh:     make(chan *ttnpb.TxAcknowledgment, bufferSize),
+		locCh:       make(chan struct{}, 1),
 		connectTime: time.Now().UnixNano(),
 
 		statsChangedCh: make(chan struct{}, 1),
@@ -239,6 +241,13 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 		c.lastStatus.Store(status)
 		atomic.StoreInt64(&c.lastStatusTime, time.Now().UnixNano())
 		c.notifyStatsChanged()
+
+		if len(status.AntennaLocations) > 0 && c.gateway.UpdateLocationFromStatus {
+			select {
+			case c.locCh <- struct{}{}:
+			default:
+			}
+		}
 	default:
 		return errBufferFull
 	}
@@ -521,6 +530,11 @@ func (c *Connection) TxAck() <-chan *ttnpb.TxAcknowledgment {
 // StatsChanged returns the stats changed channel.
 func (c *Connection) StatsChanged() <-chan struct{} {
 	return c.statsChangedCh
+}
+
+// LocationChanged returns the location updates channel.
+func (c *Connection) LocationChanged() <-chan struct{} {
+	return c.locCh
 }
 
 // ConnectTime returns the time the gateway connected.

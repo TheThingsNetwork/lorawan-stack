@@ -26,7 +26,8 @@ import (
 
 // DefaultGatewayServerConfig is the default configuration for the GatewayServer.
 var DefaultGatewayServerConfig = gatewayserver.Config{
-	RequireRegisteredGateways: false,
+	RequireRegisteredGateways:         false,
+	UpdateGatewayLocationDebounceTime: time.Hour,
 	Forward: map[string][]string{
 		"": {"00000000/0"},
 	},

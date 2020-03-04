@@ -2508,6 +2508,7 @@ Gateway is the message that defines a gateway on the network.
 | `enforce_duty_cycle` | [`bool`](#bool) |  | Enforcing gateway duty cycle is recommended for all gateways to respect spectrum regulations. Disable enforcing the duty cycle only in controlled research and development environments. |
 | `downlink_path_constraint` | [`DownlinkPathConstraint`](#ttn.lorawan.v3.DownlinkPathConstraint) |  |  |
 | `schedule_anytime_delay` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite. |
+| `update_location_from_status` | [`bool`](#bool) |  | update the location of this gateway from status messages |
 
 #### Field Rules
 

@@ -66,7 +66,7 @@ func startMockIS(ctx context.Context) (*mockIS, string) {
 	return is, lis.Addr().String()
 }
 
-func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string, locationPublic bool) {
+func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string, locationPublic bool, updateLocationFromStatus bool) {
 	uid := unique.ID(ctx, ids)
 	is.gateways[uid] = &ttnpb.Gateway{
 		GatewayIdentifiers: ids,
@@ -79,7 +79,8 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 				},
 			},
 		},
-		LocationPublic: locationPublic,
+		LocationPublic:           locationPublic,
+		UpdateLocationFromStatus: updateLocationFromStatus,
 	}
 	if key != "" {
 		is.gatewayAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
@@ -94,6 +95,17 @@ func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb
 	if !ok {
 		return nil, errNotFound
 	}
+	return gtw, nil
+}
+
+func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+	uid := unique.ID(ctx, req.Gateway.GatewayIdentifiers)
+	gtw, ok := is.gateways[uid]
+	if !ok {
+		return nil, errNotFound
+	}
+	// Just update antennas
+	gtw.Antennas = req.Antennas
 	return gtw, nil
 }
 

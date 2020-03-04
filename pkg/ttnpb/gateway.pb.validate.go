@@ -774,6 +774,8 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "update_location_from_status":
+			// no validation rules for UpdateLocationFromStatus
 		default:
 			return GatewayValidationError{
 				field:  name,

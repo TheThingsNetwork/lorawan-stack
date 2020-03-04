@@ -10,6 +10,12 @@ The Gateway Server forwards traffic to upstream hosts based on the `gs.forward` 
 
 - `gs.forward`: Forward the DevAddr prefixes to the specified hosts. This parameter accepts a string in the format `name=devaddrprefixes`
 
+## Location Update Options
+
+The Gateway Server can be configured to update the location of gateway antennas from incoming status messages.
+
+- `gs.update-gateway-location-debounce-time`: Debounce time for gateway location updates from status messages.
+
 ## Security Options
 
 - `gs.require-registered-gateways`: Require the gateways to be registered in the Identity Server
