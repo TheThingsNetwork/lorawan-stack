@@ -167,6 +167,9 @@ var startCommand = &cobra.Command{
 			config.NS.Devices = &nsredis.DeviceRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("ns", "devices")),
 			}
+			config.NS.UplinkDeduplicator = &nsredis.UplinkDeduplicator{
+				Redis: redis.New(config.Cache.Redis.WithNamespace("ns", "uplink-deduplication")),
+			}
 			nsDownlinkTasks := nsredis.NewDownlinkTaskQueue(
 				redis.New(config.Redis.WithNamespace("ns", "tasks")),
 				100000, redisConsumerGroup, redisConsumerID,
