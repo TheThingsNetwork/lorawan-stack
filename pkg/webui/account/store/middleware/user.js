@@ -45,4 +45,16 @@ const getUserLogic = createRequestLogic({
   },
 })
 
-export default [logoutLogic, getUserLogic]
+const updateUserLogic = createRequestLogic({
+  type: user.UPDATE_USER,
+  process: async ({ action, getState }) => {
+    const userId = selectUserId(getState())
+    const { patch } = action.payload
+
+    const result = await ttnClient.Users.updateById(userId, patch)
+
+    return { ...patch, ...result }
+  },
+})
+
+export default [logoutLogic, userLogic, updateUserLogic]

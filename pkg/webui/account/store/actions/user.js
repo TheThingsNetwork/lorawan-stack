@@ -20,6 +20,12 @@ export const [
   { request: getUser, success: getUserSuccess, failure: getUserFailure },
 ] = createRequestActions(GET_USER_BASE, id => ({ id }), (id, selector) => ({ selector }))
 
+export const UPDATE_USER_BASE = 'UPDATE_USER'
+export const [
+  { request: UPDATE_USER, success: UPDATE_USER_SUCCESS, failure: UPDATE_USER_FAILURE },
+  { request: updateUser, success: updateUserSuccess, failure: updateUserFailure },
+] = createRequestActions(UPDATE_USER_BASE, patch => ({ patch }))
+
 export const LOGOUT_BASE = 'LOGOUT'
 export const [
   { request: LOGOUT, success: LOGOUT_SUCCESS, failure: LOGOUT_FAILURE },
