@@ -62,3 +62,8 @@ Using the `packet-buffer` and `packet-handlers` options, the throughput of UDP p
 - `gs.udp.packet-buffer`: Buffer size of unhandled packets
 - `gs.udp.packet-handlers`: Number of concurrent packet handlers
 
+## Statistics Options
+
+Specify options for gateway connection statistics:
+
+- `gs.update-connection-stats-debounce-time`: Time before repeated refresh of the gateway connection stats
