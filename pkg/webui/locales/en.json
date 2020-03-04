@@ -16,6 +16,7 @@
   "components.file-input.index.remove": "Remove",
   "components.footer.index.footer": "You are the network. Let's build this thing together.",
   "components.footer.index.getSupport": "Get Support",
+  "components.input.generate.generate": "Generate",
   "components.key-value-map.entry.deleteEntry": "Delete Entry",
   "components.key-value-map.index.addEntry": "Add entry",
   "components.mobile-menu.index.loggedInAs": "Logged in as <b>{userId}</b>",
