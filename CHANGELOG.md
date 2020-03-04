@@ -76,6 +76,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reconnections of gateways whose previous connection was not cleaned up properly. New connections from the same gateway now actively disconnects existing connections.
 - `ttn-lw-stack` and `ttn-lw-cli` file permission errors when installed using snap.
   - You may need to run `sudo snap connect ttn-lw-stack:personal-files`
+- Changing username and password to be not required in pubsub integration
+
+### Security
 
 ## [3.5.2] (2020-02-06)
 

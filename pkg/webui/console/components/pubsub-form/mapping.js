@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { omit } from 'lodash'
 import { natsUrl as natsUrlRegexp } from '../../lib/regexp'
 
 const natsBlankValues = {
@@ -20,6 +21,7 @@ const natsBlankValues = {
   address: '',
   port: '',
   secure: false,
+  use_credentials: true,
 }
 
 const mqttBlankValues = {
@@ -33,9 +35,14 @@ const mqttBlankValues = {
   tls_ca: '',
   tls_client_cert: '',
   tls_client_key: '',
+  use_credentials: true,
 }
 
-const mapNatsServerUrlToFormValue = function(server_url) {
+const omitCredentials = function(result) {
+  return omit(result, 'mqtt.use_credentials')
+}
+
+export const mapNatsServerUrlToFormValue = function(server_url) {
   try {
     const res = server_url.match(natsUrlRegexp)
     return {
@@ -44,6 +51,7 @@ const mapNatsServerUrlToFormValue = function(server_url) {
       password: res[7],
       address: res[8],
       port: res[10],
+      use_credentials: Boolean(res[5] || res[7]),
     }
   } catch {
     return {}
@@ -84,12 +92,31 @@ export const mapPubsubToFormValues = function(pubsub) {
   if (!result.mqtt.tls_client_key) {
     result.mqtt.tls_client_key = ''
   }
+  if (!result.mqtt.username) {
+    result.mqtt.username = ''
+  }
+  if (!result.mqtt.password) {
+    result.mqtt.password = ''
+  }
+  if (isMqtt) {
+    result.mqtt.use_credentials = Boolean(result.mqtt.username || result.mqtt.password)
+  }
 
   return result
 }
 
-const mapNatsConfigFormValueToNatsServerUrl = ({ username, password, address, port, secure }) =>
-  `${secure ? 'tls' : 'nats'}://${username}:${password}@${address}:${port}`
+const mapNatsConfigFormValueToNatsServerUrl = function({
+  username,
+  password,
+  address,
+  port,
+  secure,
+  use_credentials,
+}) {
+  return `${secure ? 'tls' : 'nats'}://${
+    use_credentials ? `${username}:${password}@` : ''
+  }${address}:${port}`
+}
 
 const mapMessageTypeFormValueToPubsubMessageType = formValue =>
   (formValue.enabled && { topic: formValue.value }) || null
@@ -122,6 +149,7 @@ export const mapFormValuesToPubsub = function(values, appId) {
     }
   } else if (values._provider === 'mqtt') {
     result.mqtt = values.mqtt
+    return omitCredentials(result)
   }
 
   return result
