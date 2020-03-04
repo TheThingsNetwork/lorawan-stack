@@ -119,6 +119,21 @@ class Users {
 
     return Marshaler.unwrapRights(result)
   }
+
+  updatePasswordById(id, payload) {
+    return this._api.UserRegistry.UpdatePassword(
+      {
+        routeParams: {
+          'user_ids.user_id': id,
+        },
+      },
+      {
+        new: payload.new,
+        old: payload.old,
+        revoke_all_access: payload.revoke_all_access,
+      },
+    )
+  }
 }
 
 export default Users
