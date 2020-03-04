@@ -110,7 +110,7 @@ class FormField extends React.Component {
 
   extractValue(value) {
     let newValue = value
-    if (typeof value === 'object' && 'target' in value) {
+    if (typeof value === 'object' && value !== null && 'target' in value) {
       const target = value.target
       if ('type' in target && target.type === 'checkbox') {
         newValue = target.checked
