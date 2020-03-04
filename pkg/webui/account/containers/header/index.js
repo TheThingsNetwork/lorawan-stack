@@ -44,6 +44,12 @@ const Header = ({ handleSearchRequest, searchable }) => {
       exact: true,
       hidden: false,
     },
+    {
+      title: sharedMessages.profileSettings,
+      icon: 'user',
+      path: '/profile-settings',
+      exact: true,
+    },
   ]
 
   const navigationEntries = (
