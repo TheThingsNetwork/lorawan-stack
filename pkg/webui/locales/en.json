@@ -294,6 +294,7 @@
   "console.views.device-general-settings.messages.activationModeUnknown": "Activation mode unknown because Network Server is not available",
   "console.views.device-general-settings.messages.notInCluster": "Not registered in this cluster",
   "console.views.device-general-settings.messages.updateSuccess": "The end device has been updated successfully",
+  "console.views.device-general-settings.messages.keysResetWarning": "You're not authorized to view the end device keys. However, overwriting is allowed.",
   "console.views.device-location.index.setDeviceLocation": "Set Device Location",
   "console.views.device-overview.index.activationInfo": "Activation Information",
   "console.views.device-overview.index.rootKeyId": "Root Key ID",

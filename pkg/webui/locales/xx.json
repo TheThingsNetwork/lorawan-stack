@@ -294,6 +294,7 @@
   "console.views.device-general-settings.messages.activationModeUnknown": "Xxxxxxxxxx xxxx xxxxxxx xxxxxxx Xxxxxxx Xxxxxx xx xxx xxxxxxxxx",
   "console.views.device-general-settings.messages.notInCluster": "Xxx xxxxxxxxxx xx xxxx xxxxxxx",
   "console.views.device-general-settings.messages.updateSuccess": "Xxx xxx xxxxxx xxx xxxx xxxxxxx xxxxxxxxxxxx",
+  "console.views.device-general-settings.messages.keysResetWarning": "Xxx'xx xxx xxxxxxxxxx xx xxxx xxx xxx xxxxxx xxxx. Xxxxxxx, xxxxxxxxxxx xx xxxxxxx.",
   "console.views.device-location.index.setDeviceLocation": "Xxx Xxxxxx Xxxxxxxx",
   "console.views.device-overview.index.activationInfo": "Xxxxxxxxxx Xxxxxxxxxxx",
   "console.views.device-overview.index.rootKeyId": "Xxxx Xxx XX",
