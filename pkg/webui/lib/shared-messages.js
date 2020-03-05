@@ -281,6 +281,7 @@ export default defineMessages({
     'The Regional Parameters version (PHY), as provided by the device manufacturer',
   port: 'Port',
   privacyPolicy: 'Privacy policy',
+  profileSettings: 'Profile settings',
   provider: 'Provider',
   provisionedOnExternalJoinServer: 'Provisioned on external Join Server',
   public: 'Public',
