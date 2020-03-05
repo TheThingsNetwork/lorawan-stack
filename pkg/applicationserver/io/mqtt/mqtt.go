@@ -73,7 +73,9 @@ func (s *srv) accept() error {
 			ctx := log.NewContextWithFields(s.ctx, log.Fields("remote_addr", mqttConn.RemoteAddr().String()))
 			conn := &connection{server: s.server, mqtt: mqttConn, format: s.format}
 			if err := conn.setup(ctx); err != nil {
-				log.FromContext(ctx).WithError(err).Warn("Failed to setup connection")
+				if err != stdio.EOF {
+					log.FromContext(ctx).WithError(err).Warn("Failed to setup connection")
+				}
 				mqttConn.Close()
 				return
 			}
