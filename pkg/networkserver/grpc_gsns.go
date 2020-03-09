@@ -870,9 +870,15 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	logger.Debug("Matched device")
 
+	defer func() {
+		if err != nil {
+			events.Publish(evtDropDataUplink(ctx, matched.Device.EndDeviceIdentifiers, err))
+			registerDropDataUplink(ctx, up, err)
+		}
+	}()
+
 	ok, err := ns.deduplicateUplink(ctx, up)
 	if err != nil {
-		registerDropDataUplink(ctx, up, err)
 		logger.WithError(err).Error("Failed to deduplicate uplink")
 		return err
 	}
@@ -959,8 +965,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	if err != nil {
 		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
 		logRegistryRPCError(ctx, err, "Failed to update device in registry")
-		events.Publish(evtDropDataUplink(ctx, matched.Device.EndDeviceIdentifiers, err))
-		registerDropDataUplink(ctx, up, err)
 		return err
 	}
 
