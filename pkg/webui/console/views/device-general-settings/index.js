@@ -38,7 +38,12 @@ import {
   selectJsConfig,
   selectNsConfig,
 } from '../../../lib/selectors/env'
-import { hasExternalJs, isDeviceOTAA, isDeviceJoined } from './utils'
+import {
+  mayEditApplicationDeviceKeys,
+  mayReadApplicationDeviceKeys,
+} from '../../lib/feature-checks'
+
+import { isDeviceOTAA, isDeviceJoined } from './utils'
 import m from './messages'
 
 import IdentityServerForm from './identity-server-form'
@@ -66,6 +71,12 @@ const getComponentBaseUrl = config => {
     asConfig: selectAsConfig(),
     jsConfig: selectJsConfig(),
     nsConfig: selectNsConfig(),
+    mayReadKeys: mayReadApplicationDeviceKeys.check(
+      mayReadApplicationDeviceKeys.rightsSelector(state),
+    ),
+    mayEditKeys: mayEditApplicationDeviceKeys.check(
+      mayEditApplicationDeviceKeys.rightsSelector(state),
+    ),
   }),
   dispatch => ({
     ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
@@ -94,6 +105,8 @@ export default class DeviceGeneralSettings extends React.Component {
     device: PropTypes.device.isRequired,
     isConfig: PropTypes.stackComponent.isRequired,
     jsConfig: PropTypes.stackComponent.isRequired,
+    mayEditKeys: PropTypes.bool.isRequired,
+    mayReadKeys: PropTypes.bool.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     updateDevice: PropTypes.func.isRequired,
@@ -168,7 +181,7 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   render() {
-    const { device, isConfig, asConfig, jsConfig, nsConfig } = this.props
+    const { device, isConfig, asConfig, jsConfig, nsConfig, mayEditKeys, mayReadKeys } = this.props
 
     const isOTAA = isDeviceOTAA(device)
     const { enabled: isEnabled } = isConfig
@@ -205,14 +218,12 @@ export default class DeviceGeneralSettings extends React.Component {
     // 2. Disable the section if the device is ABP/Multicast, since JS does not store ABP/Multicast
     // devices.
     // 3. Disable the seciton if `join_server_address` is not equal to the cluster JS address.
-    // 4. Disable the seciton if an external JS is used.
     const sameJsAddress = getComponentBaseUrl(jsConfig) === device.join_server_address
-    const externalJs = hasExternalJs(device)
-    const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress || externalJs
+    const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress
     let jsDescription = m.jsDescription
     if (!jsEnabled) {
       jsDescription = m.jsDescriptionMissing
-    } else if (!sameJsAddress || externalJs) {
+    } else if (!sameJsAddress) {
       jsDescription = m.notInCluster
     } else if (nsEnabled && !isOTAA) {
       jsDescription = m.jsDescriptionOTAA
@@ -248,6 +259,7 @@ export default class DeviceGeneralSettings extends React.Component {
                 onDeleteSuccess={this.handleDeleteSuccess}
                 onDeleteFailure={this.handleDeleteFailure}
                 jsConfig={jsConfig}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
             <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
@@ -255,6 +267,8 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
             <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
@@ -262,6 +276,8 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
             <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
@@ -269,6 +285,8 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
           </Col>
