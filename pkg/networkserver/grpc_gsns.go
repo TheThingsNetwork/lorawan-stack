@@ -980,15 +980,15 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				ReceivedAt:   up.ReceivedAt,
 			}},
 		})
-		queuedEvents = append(queuedEvents, evtForwardDataUplink.BindData(nil))
-		registerForwardDataUplink(ctx, up)
 	}
-
 	if n := len(queuedApplicationUplinks); n > 0 {
 		logger := logger.WithField("uplink_count", n)
 		logger.Debug("Enqueue application uplinks for sending to Application Server")
 		if err := ns.applicationUplinks.Add(ctx, queuedApplicationUplinks...); err != nil {
 			logger.WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
+		} else if matched.NbTrans == 1 {
+			queuedEvents = append(queuedEvents, evtForwardDataUplink.BindData(nil))
+			registerForwardDataUplink(ctx, up)
 		}
 	}
 	if n := len(queuedEvents); n > 0 {
