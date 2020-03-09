@@ -35,8 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/unique"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -1249,6 +1247,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	return nil
 }
 
+var errRejoinRequest = errors.DefineUnimplemented("rejoin_request", "rejoin-request handling is not implemented")
+
 func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
 	defer func() {
 		if err != nil {
@@ -1256,7 +1256,7 @@ func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.Upli
 		}
 	}()
 	// TODO: Implement https://github.com/TheThingsNetwork/lorawan-stack/issues/8
-	return status.Errorf(codes.Unimplemented, "not implemented")
+	return errRejoinRequest
 }
 
 // HandleUplink is called by the Gateway Server when an uplink message arrives.
