@@ -61,7 +61,6 @@ type UplinkDeduplicator interface {
 }
 
 func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage) (bool, error) {
-	log.FromContext(ctx).Debug("Deduplicate uplink")
 	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, ns.collectionWindow(ctx))
 	if err != nil {
 		log.FromContext(ctx).Error("Failed to deduplicate uplink")
@@ -844,8 +843,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	logger.Debug("Match device")
-
 	var addrMatches []contextualEndDevice
 	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, dev *ttnpb.EndDevice) bool {
@@ -868,8 +865,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	ctx = matched.Context
 	logger = log.FromContext(ctx)
 
-	logger.Debug("Matched device")
-
 	defer func() {
 		if err != nil {
 			events.Publish(evtDropDataUplink(ctx, matched.Device.EndDeviceIdentifiers, err))
@@ -879,7 +874,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	ok, err := ns.deduplicateUplink(ctx, up)
 	if err != nil {
-		logger.WithError(err).Error("Failed to deduplicate uplink")
 		return err
 	}
 	if !ok {
@@ -1080,7 +1074,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 	ok, err := ns.deduplicateUplink(ctx, up)
 	if err != nil {
-		logger.WithError(err).Error("Failed to deduplicate uplink")
 		return err
 	}
 	if !ok {
