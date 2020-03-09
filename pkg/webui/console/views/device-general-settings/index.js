@@ -24,9 +24,10 @@ import diff from '../../../lib/diff'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import getHostnameFromUrl from '../../../lib/host-from-url'
 import PropTypes from '../../../lib/prop-types'
-import api from '../../api'
 import toast from '../../../components/toast'
+import api from '../../api'
 
 import { updateDevice } from '../../store/actions/devices'
 import { attachPromise } from '../../store/actions/lib'
@@ -53,14 +54,6 @@ import NetworkServerForm from './network-server-form'
 import Collapse from './collapse'
 
 import style from './device-general-settings.styl'
-
-const getComponentBaseUrl = config => {
-  try {
-    const { base_url } = config
-
-    return new URL(base_url).hostname
-  } catch (e) {}
-}
 
 @connect(
   state => ({
@@ -185,9 +178,9 @@ export default class DeviceGeneralSettings extends React.Component {
 
     const isOTAA = isDeviceOTAA(device)
     const { enabled: isEnabled } = isConfig
-    const { enabled: asEnabled } = asConfig
-    const { enabled: jsEnabled } = jsConfig
-    const { enabled: nsEnabled } = nsConfig
+    const { enabled: asEnabled, base_url: stackAsUrl } = asConfig
+    const { enabled: jsEnabled, base_url: stackJsUrl } = jsConfig
+    const { enabled: nsEnabled, base_url: stackNsUrl } = nsConfig
 
     // 1. Disable the section if IS is not in cluster.
     const isDisabled = !isEnabled
@@ -200,7 +193,7 @@ export default class DeviceGeneralSettings extends React.Component {
     // 2. Disable the section if the device is OTAA and joined since no fields are stored in the AS.
     // 3. Disable the section if NS is not in cluster, since activation mode is unknown.
     // 4. Disable the seciton if `application_server_address` is not equal to the cluster AS address.
-    const sameAsAddress = getComponentBaseUrl(asConfig) === device.application_server_address
+    const sameAsAddress = getHostnameFromUrl(stackAsUrl) === device.application_server_address
     const isJoined = isDeviceJoined(device)
     const asDisabled = !asEnabled || (isOTAA && !isJoined) || !nsEnabled || !sameAsAddress
     let asDescription = m.asDescription
@@ -218,7 +211,7 @@ export default class DeviceGeneralSettings extends React.Component {
     // 2. Disable the section if the device is ABP/Multicast, since JS does not store ABP/Multicast
     // devices.
     // 3. Disable the seciton if `join_server_address` is not equal to the cluster JS address.
-    const sameJsAddress = getComponentBaseUrl(jsConfig) === device.join_server_address
+    const sameJsAddress = getHostnameFromUrl(stackJsUrl) === device.join_server_address
     const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress
     let jsDescription = m.jsDescription
     if (!jsEnabled) {
@@ -231,7 +224,7 @@ export default class DeviceGeneralSettings extends React.Component {
 
     // 1. Disable the section if NS is not in cluster.
     // 2. Disable the seciton if `network_server_address` is not equal to the cluster NS address.
-    const sameNsAddress = getComponentBaseUrl(nsConfig) === device.network_server_address
+    const sameNsAddress = getHostnameFromUrl(stackNsUrl) === device.network_server_address
     const nsDisabled = !nsEnabled || !sameNsAddress
     let nsDescription = m.nsDescription
     if (!nsEnabled) {
