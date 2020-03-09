@@ -143,8 +143,11 @@ var startCommand = &cobra.Command{
 
 		if start.GatewayServer || startDefault {
 			logger.Info("Setting up Gateway Server")
-			config.GS.Stats = &gsredis.GatewayConnectionStatsRegistry{
-				Redis: redis.New(config.Cache.Redis.WithNamespace("gs", "connection", "stats")),
+			switch config.Cache.Service {
+			case "redis":
+				config.GS.Stats = &gsredis.GatewayConnectionStatsRegistry{
+					Redis: redis.New(config.Cache.Redis.WithNamespace("gs", "cache", "connstats")),
+				}
 			}
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {

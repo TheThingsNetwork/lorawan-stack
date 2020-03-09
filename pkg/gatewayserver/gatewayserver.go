@@ -447,8 +447,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	registerGatewayConnect(ctx, ids, frontend.Protocol())
 	logger.Info("Connected")
 	go gs.handleUpstream(connEntry)
-	go gs.updateConnStats(connEntry)
-
+	if gs.statsRegistry != nil {
+		go gs.updateConnStats(connEntry)
+	}
 	if gtw.UpdateLocationFromStatus {
 		go gs.handleLocationUpdates(connEntry)
 	}
