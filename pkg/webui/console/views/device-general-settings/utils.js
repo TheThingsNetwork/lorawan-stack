@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { selectJsConfig } from '../../../lib/selectors/env'
+import getHostnameFromUrl from '../../../lib/host-from-url'
 
 const lwRegexp = /^[1-9].[0-9].[0-9]$/
 const lwCache = {}
@@ -75,20 +76,17 @@ export const isDeviceABP = device =>
 export const isDeviceMulticast = device => Boolean(device) && Boolean(device.multicast)
 
 /**
- * Returns whether device keys are provisioned on external join server. Note: It is possible
- * to create end devices with root keys being provisioned by an external Join Server.
- * In this case both `root_keys.nwk_key` and `root_keys.app_key` must be missing in the payload.
+ * Returns whether an end device is provisioned on an external join server.
  * @param {Object} device - The device object.
- * @returns {boolean} `true` if device keys are provisioned on an external join server, `false` otherwise.
+ * @returns {boolean} `true` if the end device is provisioned on an external join server, `false` otherwise.
  */
 export const hasExternalJs = device => {
-  const jsEnabled = selectJsConfig().enabled
-  const noRootKeys =
-    Boolean(device) &&
-    (!Boolean(device.root_keys) || !Boolean(Object.keys(device.root_keys).length))
+  const { enabled, base_url } = selectJsConfig()
 
-  // If Join Server is not available then `root_keys` wont be in the device payload.
-  return jsEnabled && noRootKeys
+  const deviceJs = device.join_server_address
+  const stackJs = getHostnameFromUrl(base_url)
+
+  return !enabled || typeof deviceJs === 'undefined' || deviceJs !== stackJs
 }
 
 export const isDeviceJoined = device =>
