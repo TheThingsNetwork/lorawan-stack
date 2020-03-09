@@ -909,7 +909,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		matched.QueuedEvents = append(matched.QueuedEvents, evs...)
 	}
 
-	stored, ctx, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
+	stored, storedCtx, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceID, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during uplink handling, drop")
@@ -961,6 +961,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		logRegistryRPCError(ctx, err, "Failed to update device in registry")
 		return err
 	}
+	ctx = storedCtx
 
 	if err := ns.updateDataDownlinkTask(ctx, stored, time.Time{}); err != nil {
 		logger.WithError(err).Error("Failed to update downlink task queue after data uplink")
@@ -1048,7 +1049,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	dev, ctx, err := ns.devices.GetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
+	matched, matchedCtx, err := ns.devices.GetByEUI(ctx, pld.JoinEUI, pld.DevEUI,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
@@ -1065,9 +1066,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		registerDropJoinRequest(ctx, up, err)
 		return err
 	}
+	ctx = matchedCtx
+
 	defer func() {
 		if err != nil {
-			events.Publish(evtDropJoinRequest(ctx, dev.EndDeviceIdentifiers, err))
+			events.Publish(evtDropJoinRequest(ctx, matched.EndDeviceIdentifiers, err))
 			registerDropJoinRequest(ctx, up, err)
 		}
 	}()
@@ -1080,50 +1083,50 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return nil
 	}
 
-	logger = logger.WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
+	logger = logger.WithField("device_uid", unique.ID(ctx, matched.EndDeviceIdentifiers))
 
-	if !dev.SupportsJoin {
+	if !matched.SupportsJoin {
 		logger.Warn("ABP device sent a join-request, drop")
 		return errABPJoinRequest
 	}
 
 	ctx = log.NewContext(ctx, logger)
 
-	devAddr := ns.newDevAddr(ctx, dev)
-	for dev.Session != nil && devAddr.Equal(dev.Session.DevAddr) {
-		devAddr = ns.newDevAddr(ctx, dev)
+	devAddr := ns.newDevAddr(ctx, matched)
+	for matched.Session != nil && devAddr.Equal(matched.Session.DevAddr) {
+		devAddr = ns.newDevAddr(ctx, matched)
 	}
 	logger = logger.WithField("dev_addr", devAddr)
 	ctx = log.NewContext(ctx, logger)
 
-	macState, err := newMACState(dev, ns.FrequencyPlans, ns.defaultMACSettings)
+	macState, err := newMACState(matched, ns.FrequencyPlans, ns.defaultMACSettings)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to reset device's MAC state")
 		return err
 	}
 
-	fp, phy, err := getDeviceBandVersion(dev, ns.FrequencyPlans)
+	fp, phy, err := getDeviceBandVersion(matched, ns.FrequencyPlans)
 	if err != nil {
 		return err
 	}
 
 	req := &ttnpb.JoinRequest{
 		Payload:            up.Payload,
-		CFList:             frequencyplans.CFList(*fp, dev.LoRaWANPHYVersion),
+		CFList:             frequencyplans.CFList(*fp, matched.LoRaWANPHYVersion),
 		CorrelationIDs:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr,
 		NetID:              ns.netID,
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
-		SelectedMACVersion: dev.LoRaWANVersion, // Assume NS version is always higher than the version of the device
+		SelectedMACVersion: matched.LoRaWANVersion, // Assume NS version is always higher than the version of the device
 		DownlinkSettings: ttnpb.DLSettings{
 			Rx1DROffset: macState.DesiredParameters.Rx1DataRateOffset,
 			Rx2DR:       macState.DesiredParameters.Rx2DataRateIndex,
-			OptNeg:      dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+			OptNeg:      matched.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 		},
 	}
 
-	resp, err := ns.sendJoinRequest(ctx, dev.EndDeviceIdentifiers, req)
+	resp, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, req)
 	if err != nil {
 		return err
 	}
@@ -1156,7 +1159,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	up.Settings.DataRateIndex = drIdx
 
-	events.Publish(evtForwardJoinRequest(ctx, dev.EndDeviceIdentifiers, nil))
+	events.Publish(evtForwardJoinRequest(ctx, matched.EndDeviceIdentifiers, nil))
 	registerForwardJoinRequest(ctx, up)
 
 	select {
@@ -1180,7 +1183,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 
 	var invalidatedQueue []*ttnpb.ApplicationDownlink
-	dev, ctx, err = ns.devices.SetByID(ctx, dev.EndDeviceIdentifiers.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceID,
+	stored, storedCtx, err := ns.devices.SetByID(ctx, matched.EndDeviceIdentifiers.ApplicationIdentifiers, matched.EndDeviceIdentifiers.DeviceID,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
@@ -1204,23 +1207,23 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	if err != nil {
 		// TODO: Retry transaction. (https://github.com/TheThingsNetwork/lorawan-stack/issues/33)
 		logRegistryRPCError(ctx, err, "Failed to update device in registry")
-	}
-	if err != nil {
 		return err
 	}
+	matched = stored
+	ctx = storedCtx
 
 	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - req.RxDelay.Duration()/2 - nsScheduleWindow())
 	logger.WithField("start_at", downAt).Debug("Add downlink task")
-	if err := ns.downlinkTasks.Add(ctx, dev.EndDeviceIdentifiers, downAt, true); err != nil {
+	if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task after join-request")
 	}
 	logger.Debug("Enqueue join-accept for sending to Application Server")
 	if err := ns.applicationUplinks.Add(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: dev.EndDeviceIdentifiers.ApplicationIdentifiers,
-			DeviceID:               dev.EndDeviceIdentifiers.DeviceID,
-			DevEUI:                 dev.EndDeviceIdentifiers.DevEUI,
-			JoinEUI:                dev.EndDeviceIdentifiers.JoinEUI,
+			ApplicationIdentifiers: stored.EndDeviceIdentifiers.ApplicationIdentifiers,
+			DeviceID:               stored.EndDeviceIdentifiers.DeviceID,
+			DevEUI:                 stored.EndDeviceIdentifiers.DevEUI,
+			JoinEUI:                stored.EndDeviceIdentifiers.JoinEUI,
 			DevAddr:                &devAddr,
 		},
 		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
@@ -1238,7 +1241,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		logger := logger.WithField("event_count", n)
 		logger.Debug("Publish events")
 		for _, ev := range queuedEvents {
-			events.Publish(ev(ctx, dev.EndDeviceIdentifiers))
+			events.Publish(ev(ctx, stored.EndDeviceIdentifiers))
 		}
 	}
 	return nil
