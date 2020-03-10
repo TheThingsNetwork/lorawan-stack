@@ -20,10 +20,18 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+const gatewayIDV2 = "test"
+
 func TestV2Topics(t *testing.T) {
+	ctx := test.Context()
+	v2 := topics.NewV2(ctx)
+	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: gatewayIDV2})
 	for _, tc := range []struct {
 		UID      string
 		Func     func(string) []string
@@ -32,18 +40,18 @@ func TestV2Topics(t *testing.T) {
 		IsNot    []func([]string) bool
 	}{
 		{
-			UID:      "test",
-			Func:     topics.V2.UplinkTopic,
-			Expected: []string{"test", "up"},
-			Is:       topics.V2.IsUplinkTopic,
-			IsNot:    []func([]string) bool{topics.V2.IsStatusTopic, topics.V2.IsTxAckTopic},
+			UID:      uid,
+			Func:     v2.UplinkTopic,
+			Expected: []string{uid, "up"},
+			Is:       v2.IsUplinkTopic,
+			IsNot:    []func([]string) bool{v2.IsStatusTopic, v2.IsTxAckTopic},
 		},
 		{
-			UID:      "test",
-			Func:     topics.V2.StatusTopic,
-			Expected: []string{"test", "status"},
-			Is:       topics.V2.IsStatusTopic,
-			IsNot:    []func([]string) bool{topics.V2.IsUplinkTopic, topics.V2.IsTxAckTopic},
+			UID:      uid,
+			Func:     v2.StatusTopic,
+			Expected: []string{uid, "status"},
+			Is:       v2.IsStatusTopic,
+			IsNot:    []func([]string) bool{v2.IsUplinkTopic, v2.IsTxAckTopic},
 		},
 	} {
 		t.Run(topic.Join(tc.Expected), func(t *testing.T) {
