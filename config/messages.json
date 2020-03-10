@@ -5588,6 +5588,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:rejoin_request": {
+    "translations": {
+      "en": "rejoin-request handling is not implemented"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:schedule": {
     "translations": {
       "en": "all downlink scheduling attempts failed"
@@ -5946,6 +5955,33 @@
     "description": {
       "package": "pkg/qrcodegenerator",
       "file": "qrcodegenerator.go"
+    }
+  },
+  "error:pkg/redis:decode": {
+    "translations": {
+      "en": "failed to decode value"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/redis:encode": {
+    "translations": {
+      "en": "failed to encode value"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/redis:no_arguments": {
+    "translations": {
+      "en": "no arguments"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
     }
   },
   "error:pkg/redis:not_found": {
