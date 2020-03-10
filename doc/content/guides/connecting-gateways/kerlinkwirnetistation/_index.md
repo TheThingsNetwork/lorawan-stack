@@ -24,7 +24,7 @@ All further steps will assume the gateway is available at `192.168.4.155`, the s
 
 1. Execute: 
 ```bash
-$ curl -sL https://raw.githubusercontent.com/TheThingsNetwork/kerlink-wirnet-firmware/v0.0.1/provision.sh | bash -s -- 'wirnet-istation' '192.168.4.155' 'thethings.example.com' 'example-gtw' 'NNSXS.GTSZYGHE4NBR4XJZHJWEEMLXWYIFHEYZ4WR7UAI.YAT3OFLWLUVGQ45YYXSNS7HTVTFALWYSXK6YLJ6BDUNBPJMRH3UQ'
+$ curl -sL 'https://raw.githubusercontent.com/TheThingsNetwork/kerlink-wirnet-firmware/v0.0.2/provision.sh' | bash -s -- 'wirnet-istation' '192.168.4.155' 'thethings.example.com' 'example-gtw' 'NNSXS.GTSZYGHE4NBR4XJZHJWEEMLXWYIFHEYZ4WR7UAI.YAT3OFLWLUVGQ45YYXSNS7HTVTFALWYSXK6YLJ6BDUNBPJMRH3UQ'
 ```
 
 Please refer to [Kerlink Wirnet provisioning documentation](https://github.com/TheThingsNetwork/kerlink-wirnet-firmware/tree/v0.0.1#provisioning) if more detailed up-to-date documentation is necessary.
