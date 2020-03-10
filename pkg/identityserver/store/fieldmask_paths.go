@@ -45,6 +45,7 @@ const (
 	primaryEmailAddressValidatedAtField = "primary_email_address_validated_at"
 	profilePictureField                 = "profile_picture"
 	redirectURIsField                   = "redirect_uris"
+	logoutRedirectURIsField             = "logout_redirect_uris"
 	requirePasswordUpdateField          = "require_password_update"
 	rightsField                         = "rights"
 	scheduleDownlinkLateField           = "schedule_downlink_late"

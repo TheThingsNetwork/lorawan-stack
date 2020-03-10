@@ -56,22 +56,26 @@ message Client {
   // If the authorization request does not pass a redirect URI, the first one
   // from this list is taken.
   repeated string redirect_uris = 9 [(gogoproto.customname) = "RedirectURIs"];
+  // The allowed logout redirect URIs against which client initiated logout
+  // requests are checked. If the authorization request does not pass a redirect
+  // URI, the first one from this list is taken.
+  repeated string logout_redirect_uris = 10 [(gogoproto.customname) = "LogoutRedirectURIs"];
   // The reviewing state of the client.
   // This field can only be modified by admins.
-  State state = 10 [(validate.rules).enum.defined_only = true];
+  State state = 11 [(validate.rules).enum.defined_only = true];
   // If set, the authorization page will be skipped.
   // This field can only be modified by admins.
-  bool skip_authorization = 11;
+  bool skip_authorization = 12;
   // If set, the authorization page will show endorsement.
   // This field can only be modified by admins.
-  bool endorsed = 12;
+  bool endorsed = 13;
   // OAuth flows that can be used for the client to get a token.
   // After a client is created, this field can only be modified by admins.
-  repeated GrantType grants = 13 [(validate.rules).repeated.items.enum.defined_only = true];
+  repeated GrantType grants = 14 [(validate.rules).repeated.items.enum.defined_only = true];
   // Rights denotes what rights the client will have access to.
   // Users that previously authorized this client will have to re-authorize the
   // client after rights are added to this list.
-  repeated Right rights = 14 [(validate.rules).repeated.items.enum.defined_only = true];
+  repeated Right rights = 15 [(validate.rules).repeated.items.enum.defined_only = true];
 }
 
 message Clients {
