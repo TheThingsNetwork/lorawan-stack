@@ -32,6 +32,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
+// RateLimitingConfig contains configuration settings for the rate limiting
+// capabilities of the UDP gateway frontend firewall.
+type RateLimitingConfig struct {
+	Enable    bool          `name:"enable" description:"Enable rate limiting for gateways"`
+	Messages  int           `name:"messages" description:"Number of past messages to check timestamp for"`
+	Threshold time.Duration `name:"threshold" description:"Filter packet if timestamp is not newer than the older timestamps of the previous messages by this threshold"`
+}
+
 // Config contains configuration settings for the UDP gateway frontend.
 // Use DefaultConfig for recommended settings.
 type Config struct {
@@ -51,6 +59,8 @@ type Config struct {
 	ScheduleLateTime time.Duration `name:"schedule-late-time" description:"Time in advance to send downlink to the gateway when scheduling late"`
 	// AddrChangeBlock defines the time to block traffic when the address changes.
 	AddrChangeBlock time.Duration `name:"addr-change-block" description:"Time to block traffic when a gateway's address changes"`
+	// RateLimitingConfig is the configuration for the rate limiting firewall capabilities.
+	RateLimiting RateLimitingConfig `name:"rate-limiting"`
 }
 
 // DefaultConfig contains the default configuration.
@@ -61,6 +71,11 @@ var DefaultConfig = Config{
 	ConnectionExpires:   1 * time.Minute,  // Expire connection after missing typically 2 status messages.
 	ScheduleLateTime:    800 * time.Millisecond,
 	AddrChangeBlock:     1 * time.Minute, // Release address when the connection expires.
+	RateLimiting: RateLimitingConfig{
+		Enable:    true,
+		Messages:  10,
+		Threshold: 10 * time.Millisecond,
+	},
 }
 
 type srv struct {
@@ -83,6 +98,9 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	var firewall Firewall
 	if config.AddrChangeBlock > 0 {
 		firewall = NewMemoryFirewall(ctx, config.AddrChangeBlock)
+	}
+	if config.RateLimiting.Enable == true {
+		firewall = NewRateLimitingFirewall(firewall, config.RateLimiting.Messages, config.RateLimiting.Threshold)
 	}
 	s := &srv{
 		ctx:      ctx,

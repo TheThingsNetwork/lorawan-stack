@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Device Claim Authentication Code page in the Console.
 - Update gateway antenna location from incoming status message (see `update_location_from_status` gateway field and `--gs.update-gateway-location-debounce-time` option).
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- Gateway Server rate limiting support for the UDP frontend, see (`--gs.udp.rate-limiting` options).
 
 ### Changed
 
