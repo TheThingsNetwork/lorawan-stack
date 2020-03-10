@@ -3482,6 +3482,15 @@
       "file": "firewall.go"
     }
   },
+  "error:pkg/gatewayserver/io/udp:rate_exceeded": {
+    "translations": {
+      "en": "gateway traffic exceeded allowed rate"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "firewall_ratelimit.go"
+    }
+  },
   "error:pkg/gatewayserver/io:buffer_full": {
     "translations": {
       "en": "buffer is full"

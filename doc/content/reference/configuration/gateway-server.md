@@ -73,3 +73,11 @@ Using the `packet-buffer` and `packet-handlers` options, the throughput of UDP p
 Specify options for gateway connection statistics:
 
 - `gs.update-connection-stats-debounce-time`: Time before repeated refresh of the gateway connection stats
+
+## UDP Rate Limiting Options
+
+The Gateway Server supports rate limiting traffic for gateways that are using the Semtech UDP protocol.
+
+- `gs.udp.rate-limiting.enable`: Enable rate limiting for gateways
+- `gs.udp.rate-limiting.messages`: Number of past messages to check timestamp for
+- `gs.udp.rate-limiting.threshold`: Filter packet if timestamp is not newer than the older timestamps of the previous messages by this threshold
