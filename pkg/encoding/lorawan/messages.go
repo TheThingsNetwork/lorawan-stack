@@ -105,10 +105,7 @@ func AppendFHDR(dst []byte, msg ttnpb.FHDR, isUplink bool) ([]byte, error) {
 	if err != nil {
 		return nil, errFailedEncoding("FCtrl").WithCause(err)
 	}
-	if msg.FCnt > math.MaxUint16 {
-		return nil, errExpectedLowerOrEqual("FCnt", math.MaxUint16)(msg.FCnt)
-	}
-	dst = appendUint32(dst, msg.FCnt, 2)
+	dst = appendUint32(dst, msg.FCnt&0xffff, 2)
 	dst = append(dst, msg.FOpts...)
 	return dst, nil
 }
@@ -124,6 +121,10 @@ func UnmarshalFHDR(b []byte, msg *ttnpb.FHDR, isUplink bool) error {
 		return errFailedDecoding("FCtrl").WithCause(err)
 	}
 	msg.FCnt = parseUint32(b[5:7])
+	if n == 7 {
+		// No FOpts
+		return nil
+	}
 	msg.FOpts = make([]byte, 0, n-7)
 	msg.FOpts = append(msg.FOpts, b[7:n]...)
 	return nil
