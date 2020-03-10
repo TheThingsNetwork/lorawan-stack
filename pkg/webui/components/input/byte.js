@@ -63,6 +63,7 @@ export default class ByteInput extends React.Component {
     className: PropTypes.string,
     max: PropTypes.number,
     min: PropTypes.number,
+    onBlur: PropTypes.func,
     onChange: PropTypes.func.isRequired,
     placeholder: PropTypes.message,
     showPerChar: PropTypes.bool,
@@ -75,6 +76,7 @@ export default class ByteInput extends React.Component {
     max: 256,
     placeholder: undefined,
     showPerChar: false,
+    onBlur: () => null,
   }
 
   input = React.createRef()
@@ -86,7 +88,17 @@ export default class ByteInput extends React.Component {
   }
 
   render() {
-    const { value, className, min, max, onChange, placeholder, showPerChar, ...rest } = this.props
+    const {
+      onBlur,
+      value,
+      className,
+      min,
+      max,
+      onChange,
+      placeholder,
+      showPerChar,
+      ...rest
+    } = this.props
 
     return (
       <MaskedInput
@@ -102,6 +114,7 @@ export default class ByteInput extends React.Component {
         placeholder={placeholder}
         onCopy={this.onCopy}
         onCut={this.onCut}
+        onBlur={this.onBlur}
         showMask={!placeholder}
         {...rest}
       />
@@ -127,6 +140,15 @@ export default class ByteInput extends React.Component {
   @bind
   onChange(evt) {
     this.props.onChange({
+      target: {
+        value: clean(evt.target.value),
+      },
+    })
+  }
+
+  @bind
+  onBlur(evt) {
+    this.props.onBlur({
       target: {
         value: clean(evt.target.value),
       },
