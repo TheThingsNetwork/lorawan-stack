@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New `list` and `request-validation` subcommands for the CLI's `contact-info` commands.
 - Device Claim Authentication Code page in the Console.
 - Gateway Server rate limiting support for the UDP frontend, see (`--gs.udp.rate-limiting` options).
+- Uplink deduplication via Redis in Network Server.
 
 ### Changed
 
@@ -28,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Telemetry and events for gateway statuses.
 - Handling of downlink frame counters exceeding 65535.
 - Creating 1.0.4 ABP end devices via the Console.
+- ADR uplink handling.
+- Uplink retransmission handling.
 
 ### Security
 
