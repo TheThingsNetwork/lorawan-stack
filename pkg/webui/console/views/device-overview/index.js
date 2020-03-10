@@ -163,7 +163,7 @@ class DeviceOverview extends React.Component {
       sessionInfoData.items.push(
         { key: sharedMessages.devAddr, value: ids.dev_addr, type: 'byte', sensitive: false },
         {
-          key: sharedMessages.fwdNtwkKey,
+          key: sharedMessages.nwkSKey,
           value: f_nwk_s_int_key.key,
           type: 'code',
           sensitive: true,
