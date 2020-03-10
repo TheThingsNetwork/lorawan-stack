@@ -16,45 +16,40 @@ package oauthclient
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"google.golang.org/grpc"
 )
 
-// HandleLogout invalidates the user's authorization and removes the auth
-// cookie.
+// HandleLogout invalidates the user's authorization, removes the auth
+// cookie and provides a URL to logout of the OAuth provider as well.
 func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 	token, err := oc.freshToken(c)
 	if err != nil {
 		return err
 	}
-
-	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
-		AuthType:      "Bearer",
-		AuthValue:     token.AccessToken,
-		AllowInsecure: oc.component.AllowInsecureForCredentials(),
-	})
-
-	ctx := c.Request().Context()
-
-	if cc, err := oc.component.GetPeerConn(ctx, ttnpb.ClusterRole_ACCESS, nil); err == nil {
-		if res, err := ttnpb.NewEntityAccessClient(cc).AuthInfo(ctx, ttnpb.Empty, creds); err == nil {
-			if tokenInfo := res.GetOAuthAccessToken(); tokenInfo != nil {
-				_, err := ttnpb.NewOAuthAuthorizationRegistryClient(cc).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
-					UserIDs:   tokenInfo.UserIDs,
-					ClientIDs: tokenInfo.ClientIDs,
-					ID:        tokenInfo.ID,
-				}, creds)
-				if err != nil {
-					log.FromContext(ctx).WithError(err).Error("Could not invalidate access token")
-				}
-			}
+	oc.removeAuthCookie(c)
+	u, err := url.Parse(oc.config.LogoutURL)
+	if err != nil {
+		return err
+	}
+	logoutURL := oc.config.LogoutURL
+	redirectURL := strings.TrimSuffix(oc.config.RootURL, "/")
+	if oauthRootURL, err := url.Parse(oc.config.RootURL); err == nil {
+		rootURL := (&url.URL{Scheme: oauthRootURL.Scheme, Host: oauthRootURL.Host}).String()
+		if strings.HasPrefix(logoutURL, rootURL) {
+			redirectURL = strings.TrimPrefix(redirectURL, rootURL)
 		}
 	}
-
-	oc.removeAuthCookie(c)
-	return c.NoContent(http.StatusNoContent)
+	query := url.Values{
+		"access_token":             []string{token.AccessToken},
+		"post_logout_redirect_uri": []string{redirectURL},
+	}
+	u.RawQuery = query.Encode()
+	return c.JSON(http.StatusOK, struct {
+		OpLogoutURI string `json:"op_logout_uri"`
+	}{
+		OpLogoutURI: u.String(),
+	})
 }
