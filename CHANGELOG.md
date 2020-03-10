@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Telemetry and events for gateway statuses.
+- Handling of downlink frame counters exceeding 65535.
+
 ### Security
 
 ## [3.6.0] (2020-02-27)
