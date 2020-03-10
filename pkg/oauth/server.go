@@ -79,8 +79,9 @@ type FrontendConfig struct {
 
 // Config is the configuration for the OAuth server.
 type Config struct {
-	Mount string   `name:"mount" description:"Path on the server where the OAuth server will be served"`
-	UI    UIConfig `name:"ui"`
+	DefaultRedirectURI string   `name:"default-redirect-uri" description:"The default URI the OAuth server will redirect to after login succeeded"`
+	Mount              string   `name:"mount" description:"Path on the server where the OAuth server will be served"`
+	UI                 UIConfig `name:"ui"`
 }
 
 // NewServer returns a new OAuth server on top of the given store.
@@ -221,6 +222,14 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 	return c.JSON(resp.StatusCode, resp.Output)
 }
 
+func (s *server) handleRoot(c echo.Context) error {
+	_, err := s.getSession(c)
+	if err != nil {
+		return c.Redirect(http.StatusFound, s.config.Mount+"/login")
+	}
+	return c.Redirect(http.StatusFound, s.config.DefaultRedirectURI)
+}
+
 func (s *server) RegisterRoutes(server *web.Server) {
 	group := server.Group(
 		s.config.Mount,
@@ -245,20 +254,21 @@ func (s *server) RegisterRoutes(server *web.Server) {
 
 	api := group.Group("/api", middleware.CSRF())
 	api.POST("/auth/login", s.Login)
-	api.POST("/auth/logout", s.Logout, s.requireLogin)
 	api.GET("/me", s.CurrentUser, s.requireLogin)
 
 	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
 		TokenLookup: "form:csrf",
 	}))
 	page.GET("/login", webui.Template.Handler, s.redirectToNext)
+	page.GET("/logout", s.Logout, s.requireLogin)
 	page.GET("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 	page.POST("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
 
 	if s.config.Mount != "" && s.config.Mount != "/" {
-		group.GET("", webui.Template.Handler, middleware.CSRF())
+		group.GET("", webui.Template.Handler)
 	}
-	group.GET("/*", webui.Template.Handler, middleware.CSRF())
+	group.GET("/*", webui.Template.Handler)
+	group.GET("", s.handleRoot)
 
 	// No CSRF here:
 	group.GET("/code", webui.Template.Handler)

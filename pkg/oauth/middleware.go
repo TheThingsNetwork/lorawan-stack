@@ -56,7 +56,7 @@ func (s *server) redirectToNext(next echo.HandlerFunc) echo.HandlerFunc {
 		if err == nil {
 			next := c.QueryParam(nextKey)
 			if next == "" {
-				next = s.config.UI.MountPath()
+				next = s.config.DefaultRedirectURI
 			}
 			url, err := url.Parse(next)
 			if err != nil {
