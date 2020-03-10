@@ -27,12 +27,15 @@ import { NsFrequencyPlansSelect } from '../../containers/freq-plans-select'
 import DevAddrInput from '../../containers/dev-addr-input'
 import JoinEUIPrefixesInput from '../../containers/join-eui-prefixes-input'
 
+import randomByteString from '../../lib/random-bytes'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import errorMessages from '../../../lib/errors/error-messages'
 import PropTypes from '../../../lib/prop-types'
 import m from './messages'
 import validationSchema from './validation-schema'
+
+const random16BytesString = () => randomByteString(32)
 
 class DeviceDataForm extends Component {
   static propTypes = {
@@ -51,6 +54,7 @@ class DeviceDataForm extends Component {
     resets_join_nonces: false,
     resets_f_cnt: false,
     external_js: true,
+    lorawan_version: '',
   }
 
   @bind
@@ -71,6 +75,11 @@ class DeviceDataForm extends Component {
   @bind
   handleResetsFrameCountersChange(evt) {
     this.setState({ resets_f_cnt: evt.target.checked })
+  }
+
+  @bind
+  handleLorawanVersionChange(lorawan_version) {
+    this.setState({ lorawan_version })
   }
 
   @bind
@@ -135,7 +144,10 @@ class DeviceDataForm extends Component {
   }
 
   get ABPSection() {
-    const { resets_f_cnt } = this.state
+    const { resets_f_cnt, lorawan_version } = this.state
+
+    const isNewVersion =
+      Boolean(lorawan_version) && parseInt(lorawan_version.replace(/\D/g, '').padEnd(3, 0)) >= 110
 
     return (
       <>
@@ -152,29 +164,10 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={m.leaveBlankPlaceholder}
           description={m.nwkSKeyDescription}
-          component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.sNwkSIKey}
-          name="session.keys.s_nwk_s_int_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={m.leaveBlankPlaceholder}
-          description={m.sNwkSIKeyDescription}
-          component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.nwkSEncKey}
-          name="session.keys.nwk_s_enc_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={m.leaveBlankPlaceholder}
-          description={m.nwkSEncKeyDescription}
-          component={Input}
+          component={Input.Generate}
+          onGenerateValue={random16BytesString}
+          required
         />
         <Form.Field
           title={sharedMessages.appSKey}
@@ -182,10 +175,37 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={m.leaveBlankPlaceholder}
           description={m.appSKeyDescription}
-          component={Input}
+          component={Input.Generate}
+          onGenerateValue={random16BytesString}
+          required
         />
+        {isNewVersion && (
+          <>
+            <Form.Field
+              title={sharedMessages.sNwkSIKey}
+              name="session.keys.s_nwk_s_int_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              description={m.sNwkSIKeyDescription}
+              component={Input.Generate}
+              onGenerateValue={random16BytesString}
+              required
+            />
+            <Form.Field
+              title={sharedMessages.nwkSEncKey}
+              name="session.keys.nwk_s_enc_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              description={m.nwkSEncKeyDescription}
+              component={Input.Generate}
+              onGenerateValue={random16BytesString}
+              required
+            />
+          </>
+        )}
         <Form.Field
           title={m.resetsFCnt}
           onChange={this.handleResetsFrameCountersChange}
@@ -242,10 +262,12 @@ class DeviceDataForm extends Component {
               type="byte"
               min={16}
               max={16}
-              placeholder={m.leaveBlankPlaceholder}
               description={m.appKeyDescription}
-              component={Input}
+              placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
+              component={Input.Generate}
               disabled={external_js}
+              onGenerateValue={random16BytesString}
+              mayGenerateValue={!external_js && mayEditKeys}
             />
             <Form.Field
               title={sharedMessages.nwkKey}
@@ -253,10 +275,12 @@ class DeviceDataForm extends Component {
               type="byte"
               min={16}
               max={16}
-              placeholder={m.leaveBlankPlaceholder}
               description={m.nwkKeyDescription}
-              component={Input}
+              placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
+              component={Input.Generate}
               disabled={external_js}
+              onGenerateValue={random16BytesString}
+              mayGenerateValue={!external_js && mayEditKeys}
             />
           </>
         )}
@@ -330,10 +354,10 @@ class DeviceDataForm extends Component {
       session: {
         dev_addr: undefined,
         keys: {
-          f_nwk_s_int_key: {},
-          s_nwk_s_int_key: {},
-          nwk_s_enc_key: {},
-          app_s_key: {},
+          f_nwk_s_int_key: { key: undefined },
+          s_nwk_s_int_key: { key: undefined },
+          nwk_s_enc_key: { key: undefined },
+          app_s_key: { key: undefined },
         },
       },
       mac_settings: {
@@ -394,6 +418,7 @@ class DeviceDataForm extends Component {
           name="lorawan_version"
           component={Select}
           required
+          onChange={this.handleLorawanVersionChange}
           options={[
             { value: '1.0.0', label: 'MAC V1.0' },
             { value: '1.0.1', label: 'MAC V1.0.1' },
