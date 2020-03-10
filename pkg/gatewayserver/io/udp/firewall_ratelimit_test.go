@@ -73,6 +73,17 @@ func TestRateLimitingFirewall(t *testing.T) {
 					}
 				}
 
+				// Ensure filtering is not affected by port
+				err := f.Filter(encoding.Packet{
+					GatewayEUI: eui1,
+					GatewayAddr: &net.UDPAddr{
+						IP:   []byte{0x03, 0x03, 0x03, 0x03},
+						Port: 4,
+					},
+					PacketType: encoding.PullData,
+				})
+				a.So(tc.errorAssertion(err), should.BeTrue)
+
 				// Ensure other gateways are not affected
 				a.So(f.Filter(encoding.Packet{
 					GatewayEUI: eui2,
