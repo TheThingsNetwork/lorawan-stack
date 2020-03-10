@@ -38,12 +38,12 @@ const validationSchema = Yup.object({
     addressRegexp,
     sharedMessages.validateAddressFormat,
   ),
-  join_server_address: Yup.string().when('external_js', {
+  join_server_address: Yup.string().when('_external_js', {
     is: false,
     then: schema => schema.matches(addressRegexp, sharedMessages.validateAddressFormat),
     otherwise: schema => schema.default(''),
   }),
-  activation_mode: Yup.string().required(),
+  _activation_mode: Yup.string().required(),
   supports_join_nonces: Yup.boolean(),
 }) // OTAA related entries
   .shape({
@@ -55,7 +55,7 @@ const validationSchema = Yup.object({
           .max(36, sharedMessages.validateTooLong)
           .required(sharedMessages.validateRequired),
       })
-      .when('activation_mode', {
+      .when('_activation_mode', {
         is: isOTAA,
         then: schema =>
           schema.shape({
@@ -72,7 +72,7 @@ const validationSchema = Yup.object({
             dev_eui: Yup.string().strip(),
           }),
       }),
-    mac_settings: Yup.object().when('activation_mode', {
+    mac_settings: Yup.object().when('_activation_mode', {
       is: isABP,
       then: schema =>
         schema.shape({
@@ -80,60 +80,77 @@ const validationSchema = Yup.object({
         }),
       otherwise: schema => schema.strip(),
     }),
-    external_js: Yup.boolean(),
-    root_keys: Yup.object().when(['activation_mode', 'external_js'], {
-      is: (mode, externalJs) => isOTAA(mode) && !externalJs,
+    _external_js: Yup.boolean().default(true),
+    _may_edit_keys: Yup.boolean().default(false),
+    supports_join: Yup.boolean().when('_activation_mode', {
+      is: 'otaa',
+      then: schema => schema.default(true),
+      otherwise: schema => schema.default(false),
+    }),
+    root_keys: Yup.object().when(
+      ['_activation_mode', '_external_js', '_may_edit_keys'],
+      (mode, externalJs, mayEditKeys, schema) => {
+        if (isOTAA(mode) && !externalJs && mayEditKeys) {
+          return schema.shape({
+            nwk_key: Yup.lazy(
+              value =>
+                value !== undefined
+                  ? Yup.object().shape({
+                      key: Yup.string()
+                        .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                        .transform(toUndefined)
+                        .default(random16BytesString),
+                    })
+                  : Yup.object().strip(), // Avoid generating when key is unexposed
+            ),
+            app_key: Yup.lazy(
+              value =>
+                value !== undefined
+                  ? Yup.object().shape({
+                      key: Yup.string()
+                        .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                        .transform(toUndefined)
+                        .default(random16BytesString),
+                    })
+                  : Yup.object().strip(), // Avoid generating when key is unexposed
+            ),
+          })
+        }
+
+        return schema.strip()
+      },
+    ),
+    net_id: Yup.nullableString().when('_external_js', {
+      is: false,
       then: schema =>
-        schema.shape({
-          nwk_key: Yup.lazy(
-            value =>
-              value !== undefined
-                ? Yup.object().shape({
-                    key: Yup.string()
-                      .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                      .transform(toUndefined)
-                      .default(random16BytesString),
-                  })
-                : Yup.object().strip(), // Avoid generating when key is unexposed
-          ),
-          app_key: Yup.lazy(
-            value =>
-              value !== undefined
-                ? Yup.object().shape({
-                    key: Yup.string()
-                      .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                      .transform(toUndefined)
-                      .default(random16BytesString),
-                  })
-                : Yup.object().strip(), // Avoid generating when key is unexposed
-          ),
-        }),
-      net_id: Yup.nullableString()
-        .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
-        .default(''),
-      application_server_id: Yup.string()
-        .max(100, sharedMessages.validateTooLong)
-        .default(''),
-      application_server_kek_label: Yup.string()
-        .max(2048, sharedMessages.validateTooLong)
-        .default(''),
-      network_server_kek_label: Yup.string()
-        .max(2048, sharedMessages.validateTooLong)
-        .default(''),
-      otherwise: schema =>
-        schema.shape({
-          nwk_key: Yup.object().strip(),
-          app_key: Yup.object().strip(),
-        }),
+        schema
+          .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
+          .default(''),
+      otherwise: schema => schema.strip(),
+    }),
+    application_server_id: Yup.string().when('_external_js', {
+      is: false,
+      then: schema => schema.max(100, sharedMessages.validateTooLong).default(''),
+      otherwise: schema => schema.strip(),
+    }),
+    application_server_kek_label: Yup.string().when('_external_js', {
+      is: false,
+      then: schema => schema.max(2048, sharedMessages.validateTooLong).default(''),
+      otherwise: schema => schema.strip(),
+    }),
+    network_server_kek_label: Yup.string().when('_external_js', {
+      is: false,
+      then: schema => schema.max(2048, sharedMessages.validateTooLong).default(''),
+      otherwise: schema => schema.strip(),
     }),
   }) // ABP related entries
   .shape({
-    resets_join_nonces: Yup.boolean().when(['activation_mode', 'external_js'], {
+    resets_join_nonces: Yup.boolean().when(['_activation_mode', '_external_js'], {
       is: (mode, externalJs) => isOTAA(mode) && !externalJs,
       then: schema => schema,
       otherwise: schema => schema.strip(),
     }),
-    session: Yup.object().when(['activation_mode', 'lorawan_version'], (mode, version, schema) => {
+    session: Yup.object().when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
       if (isABP(mode)) {
         // Check if the version is 1.1.x or higher
         const isNewVersion =
