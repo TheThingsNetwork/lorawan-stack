@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New `list` and `request-validation` subcommands for the CLI's `contact-info` commands.
 - Device Claim Authentication Code page in the Console.
+- Gateway Server rate limiting support for the UDP frontend, see (`--gs.udp.rate-limiting` options).
 
 ### Changed
 
