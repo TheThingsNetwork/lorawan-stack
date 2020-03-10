@@ -35,6 +35,16 @@ import m from './messages'
 import validationSchema from './validation-schema'
 
 class DeviceDataForm extends Component {
+  static propTypes = {
+    mayEditKeys: PropTypes.bool.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onSubmitSuccess: PropTypes.func,
+  }
+
+  static defaultProps = {
+    onSubmitSuccess: () => null,
+  }
+
   formRef = React.createRef()
   state = {
     otaa: true,
@@ -85,7 +95,7 @@ class DeviceDataForm extends Component {
         },
         resets_join_nonces: false,
         join_server_address: undefined,
-        external_js,
+        _external_js: external_js,
       })
     } else {
       let join_server_address = state.join_server_address
@@ -98,7 +108,7 @@ class DeviceDataForm extends Component {
       setValues({
         ...state.values,
         join_server_address,
-        external_js,
+        _external_js: external_js,
       })
     }
   }
@@ -106,7 +116,12 @@ class DeviceDataForm extends Component {
   @bind
   async handleSubmit(values, { setSubmitting }) {
     const { onSubmit, onSubmitSuccess } = this.props
-    const { external_js, ...castedValues } = validationSchema.cast(values)
+    const {
+      _external_js,
+      _may_edit_keys,
+      _activation_mode,
+      ...castedValues
+    } = validationSchema.cast(values)
     await this.setState({ error: '' })
 
     try {
@@ -121,8 +136,9 @@ class DeviceDataForm extends Component {
 
   get ABPSection() {
     const { resets_f_cnt } = this.state
+
     return (
-      <React.Fragment>
+      <>
         <DevAddrInput
           title={sharedMessages.devAddr}
           name="session.dev_addr"
@@ -177,15 +193,16 @@ class DeviceDataForm extends Component {
           name="mac_settings.resets_f_cnt"
           component={Checkbox}
         />
-      </React.Fragment>
+      </>
     )
   }
 
   get OTAASection() {
+    const { mayEditKeys } = this.props
     const { resets_join_nonces, external_js } = this.state
 
     return (
-      <React.Fragment>
+      <>
         <JoinEUIPrefixesInput
           title={sharedMessages.joinEUI}
           name="ids.join_eui"
@@ -206,7 +223,7 @@ class DeviceDataForm extends Component {
         <Form.Field
           title={m.externalJoinServer}
           description={m.externalJoinServerDescription}
-          name="external_js"
+          name="_external_js"
           onChange={this.handleExternalJoinServerChange}
           component={Checkbox}
         />
@@ -217,28 +234,32 @@ class DeviceDataForm extends Component {
           component={Input}
           disabled={external_js}
         />
-        <Form.Field
-          title={sharedMessages.appKey}
-          name="root_keys.app_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={m.leaveBlankPlaceholder}
-          description={m.appKeyDescription}
-          component={Input}
-          disabled={external_js}
-        />
-        <Form.Field
-          title={sharedMessages.nwkKey}
-          name="root_keys.nwk_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={m.leaveBlankPlaceholder}
-          description={m.nwkKeyDescription}
-          component={Input}
-          disabled={external_js}
-        />
+        {mayEditKeys && (
+          <>
+            <Form.Field
+              title={sharedMessages.appKey}
+              name="root_keys.app_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              placeholder={m.leaveBlankPlaceholder}
+              description={m.appKeyDescription}
+              component={Input}
+              disabled={external_js}
+            />
+            <Form.Field
+              title={sharedMessages.nwkKey}
+              name="root_keys.nwk_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              placeholder={m.leaveBlankPlaceholder}
+              description={m.nwkKeyDescription}
+              component={Input}
+              disabled={external_js}
+            />
+          </>
+        )}
         <Form.Field
           title={m.resetsJoinNonces}
           onChange={this.handleResetsJoinNoncesChange}
@@ -282,11 +303,12 @@ class DeviceDataForm extends Component {
           component={Input}
           disabled={external_js}
         />
-      </React.Fragment>
+      </>
     )
   }
 
   render() {
+    const { mayEditKeys } = this.props
     const { otaa, error, external_js } = this.state
 
     const emptyValues = {
@@ -295,7 +317,7 @@ class DeviceDataForm extends Component {
         join_eui: undefined,
         dev_eui: undefined,
       },
-      activation_mode: 'otaa',
+      _activation_mode: 'otaa',
       lorawan_version: undefined,
       lorawan_phy_version: undefined,
       frequency_plan_id: undefined,
@@ -329,8 +351,9 @@ class DeviceDataForm extends Component {
       network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
       application_server_address: asConfig.enabled ? new URL(asConfig.base_url).hostname : '',
       join_server_address: external_js ? undefined : joinServerAddress,
-      activation_mode: otaa ? 'otaa' : 'abp',
-      external_js,
+      _activation_mode: otaa ? 'otaa' : 'abp',
+      _external_js: external_js,
+      _may_edit_keys: mayEditKeys,
     }
 
     return (
@@ -410,7 +433,12 @@ class DeviceDataForm extends Component {
           component={Input}
         />
         <Message component="h4" content={m.activationSettings} />
-        <Form.Field title={m.activationMode} name="activation_mode" component={Radio.Group}>
+        <Form.Field
+          title={m.activationMode}
+          name="_activation_mode"
+          component={Radio.Group}
+          disabled={!mayEditKeys}
+        >
           <Radio label={m.otaa} value="otaa" onChange={this.handleOTAASelect} />
           <Radio label={m.abp} value="abp" onChange={this.handleABPSelect} />
         </Form.Field>
@@ -421,15 +449,6 @@ class DeviceDataForm extends Component {
       </Form>
     )
   }
-}
-
-DeviceDataForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  onSubmitSuccess: PropTypes.func,
-}
-
-DeviceDataForm.defaultProps = {
-  onSubmitSuccess: () => null,
 }
 
 export default DeviceDataForm
