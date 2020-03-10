@@ -20,10 +20,18 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
 )
 
+const gatewayID = "test"
+
 func TestDefaultTopics(t *testing.T) {
+	ctx := test.Context()
+	v3 := topics.New(ctx)
+	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayID: gatewayID})
 	for _, tc := range []struct {
 		UID      string
 		Func     func(string) []string
@@ -32,25 +40,25 @@ func TestDefaultTopics(t *testing.T) {
 		IsNot    []func([]string) bool
 	}{
 		{
-			UID:      "test",
-			Func:     topics.Default.UplinkTopic,
-			Expected: []string{"v3", "test", "up"},
-			Is:       topics.Default.IsUplinkTopic,
-			IsNot:    []func([]string) bool{topics.Default.IsStatusTopic, topics.Default.IsTxAckTopic},
+			UID:      uid,
+			Func:     v3.UplinkTopic,
+			Expected: []string{"v3", uid, "up"},
+			Is:       v3.IsUplinkTopic,
+			IsNot:    []func([]string) bool{v3.IsStatusTopic, v3.IsTxAckTopic},
 		},
 		{
-			UID:      "test",
-			Func:     topics.Default.StatusTopic,
-			Expected: []string{"v3", "test", "status"},
-			Is:       topics.Default.IsStatusTopic,
-			IsNot:    []func([]string) bool{topics.Default.IsUplinkTopic, topics.Default.IsTxAckTopic},
+			UID:      uid,
+			Func:     v3.StatusTopic,
+			Expected: []string{"v3", uid, "status"},
+			Is:       v3.IsStatusTopic,
+			IsNot:    []func([]string) bool{v3.IsUplinkTopic, v3.IsTxAckTopic},
 		},
 		{
-			UID:      "test",
-			Func:     topics.Default.TxAckTopic,
-			Expected: []string{"v3", "test", "down", "ack"},
-			Is:       topics.Default.IsTxAckTopic,
-			IsNot:    []func([]string) bool{topics.Default.IsUplinkTopic, topics.Default.IsStatusTopic},
+			UID:      uid,
+			Func:     v3.TxAckTopic,
+			Expected: []string{"v3", uid, "down", "ack"},
+			Is:       v3.IsTxAckTopic,
+			IsNot:    []func([]string) bool{v3.IsUplinkTopic, v3.IsStatusTopic},
 		},
 	} {
 		t.Run(topic.Join(tc.Expected), func(t *testing.T) {

@@ -79,7 +79,7 @@ func TestAuthentication(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	go Serve(ctx, gs, lis, Protobuf, "tcp")
+	go Serve(ctx, gs, lis, NewProtobuf(ctx), "tcp")
 
 	for _, tc := range []struct {
 		UID string
@@ -157,7 +157,7 @@ func TestTraffic(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	go Serve(ctx, gs, lis, Protobuf, "tcp")
+	go Serve(ctx, gs, lis, NewProtobuf(ctx), "tcp")
 
 	clientOpts := mqtt.NewClientOptions()
 	clientOpts.AddBroker(fmt.Sprintf("tcp://%v", lis.Addr()))

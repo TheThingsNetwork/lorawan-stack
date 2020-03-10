@@ -190,11 +190,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		Config config.MQTT
 	}{
 		{
-			Format: mqtt.Protobuf,
+			Format: mqtt.NewProtobuf(gs.ctx),
 			Config: conf.MQTT,
 		},
 		{
-			Format: mqtt.ProtobufV2,
+			Format: mqtt.NewProtobufV2(gs.ctx),
 			Config: conf.MQTTV2,
 		},
 	} {
