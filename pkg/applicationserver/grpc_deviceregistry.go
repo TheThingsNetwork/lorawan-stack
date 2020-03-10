@@ -123,6 +123,13 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"session.keys.session_key_id",
+	) {
+		if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+			return nil, err
+		}
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
 		"pending_session.keys.app_s_key.encrypted_key",
 		"pending_session.keys.app_s_key.kek_label",
 		"pending_session.keys.app_s_key.key",
@@ -130,9 +137,8 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		"session.keys.app_s_key.encrypted_key",
 		"session.keys.app_s_key.kek_label",
 		"session.keys.app_s_key.key",
-		"session.keys.session_key_id",
 	) {
-		if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}
 	}

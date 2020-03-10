@@ -747,6 +747,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+								ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
 								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 							},
 						},
@@ -938,6 +939,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+								ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
 								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 							},
 						},
@@ -1119,6 +1121,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "test-app-id"}): {
 							Rights: []ttnpb.Right{
 								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+								ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
 								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 							},
 						},

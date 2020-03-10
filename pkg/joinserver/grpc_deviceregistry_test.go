@@ -707,6 +707,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: registeredApplicationID}): ttnpb.RightsFrom(
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
 							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 						),
 					},

@@ -251,6 +251,15 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths,
+		"mac_state.queued_join_accept.keys.session_key_id",
+		"pending_session.keys.session_key_id",
+		"session.keys.session_key_id",
+	) {
+		if err = rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+			return nil, err
+		}
+	}
+	if ttnpb.HasAnyField(req.FieldMask.Paths,
 		"mac_state.queued_join_accept.keys.app_s_key.encrypted_key",
 		"mac_state.queued_join_accept.keys.app_s_key.kek_label",
 		"mac_state.queued_join_accept.keys.app_s_key.key",
@@ -263,7 +272,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.encrypted_key",
 		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
 		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
-		"mac_state.queued_join_accept.keys.session_key_id",
 		"pending_session.keys.f_nwk_s_int_key.encrypted_key",
 		"pending_session.keys.f_nwk_s_int_key.kek_label",
 		"pending_session.keys.f_nwk_s_int_key.key",
@@ -273,7 +281,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"pending_session.keys.s_nwk_s_int_key.encrypted_key",
 		"pending_session.keys.s_nwk_s_int_key.kek_label",
 		"pending_session.keys.s_nwk_s_int_key.key",
-		"pending_session.keys.session_key_id",
 		"session.keys.f_nwk_s_int_key.encrypted_key",
 		"session.keys.f_nwk_s_int_key.kek_label",
 		"session.keys.f_nwk_s_int_key.key",
@@ -283,9 +290,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"session.keys.s_nwk_s_int_key.encrypted_key",
 		"session.keys.s_nwk_s_int_key.kek_label",
 		"session.keys.s_nwk_s_int_key.key",
-		"session.keys.session_key_id",
 	) {
-		if err = rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+		if err = rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}
 	}
