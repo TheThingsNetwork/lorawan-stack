@@ -22,7 +22,6 @@ import withEnv from '../../../lib/components/env'
 import ErrorView from '../../../lib/components/error-view'
 import dev from '../../../lib/dev'
 
-import Landing from '../landing'
 import Login from '../login'
 import Authorize from '../authorize'
 import CreateAccount from '../create-account'
@@ -59,7 +58,6 @@ class OAuthApp extends React.PureComponent {
               defaultTitle={`${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}
             />
             <Switch>
-              <Route path="/" exact component={Landing} />
               <Route path="/login" component={Login} />
               <Route path="/authorize" component={Authorize} />
               <Route path="/register" component={CreateAccount} />
