@@ -18,7 +18,7 @@ import grpcErrToHttpErr from './grpc-error-map'
 /**
  * Tests wether the error is a backend error object
  * @param {Object} error - The error to be tested.
- * @returns {boolean} `true` if `error` is translated, `false` otherwise.
+ * @returns {boolean} `true` if `error` is a well known backend error object
  */
 export const isBackend = error =>
   Boolean(error) &&
@@ -38,7 +38,7 @@ export const isFrontend = error => Boolean(error) && typeof error === 'object' &
 /**
  * Returns wether the error has a shape that is not well-known
  * @param {Object} error - The error to be tested.
- * @returns {boolean} `true` if `error` is translated, `false` otherwise.
+ * @returns {boolean} `true` if `error` is not of a well known shape
  */
 export const isUnknown = error => !isBackend(error) && !isFrontend(error)
 
