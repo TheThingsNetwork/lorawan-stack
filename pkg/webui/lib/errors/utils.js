@@ -31,12 +31,9 @@ export const isBackend = error =>
 /**
  * Returns wether the error is a frontend defined error object
  * @param {Object} error - The error to be tested.
- * @returns {boolean} `true` if `error` is translated, `false` otherwise.
+ * @returns {boolean} `true` if `error` is a well known frontend error object
  */
-export const isFrontend = error =>
-  // TODO: Define proper object shape, once we need it, for now translated
-  // messages are enough
-  Boolean(error) && typeof error === 'object' && error.id && error.defaultMessage
+export const isFrontend = error => Boolean(error) && typeof error === 'object' && error.isFrontend
 
 /**
  * Returns wether the error has a shape that is not well-known
@@ -44,6 +41,18 @@ export const isFrontend = error =>
  * @returns {boolean} `true` if `error` is translated, `false` otherwise.
  */
 export const isUnknown = error => !isBackend(error) && !isFrontend(error)
+
+/**
+ * Returns a frontend error object, to be passed to error components
+ * @param {Object} errorTitle - The error message title (i18n message)
+ * @param {Object} errorMessage - The error message object (i18n message)
+ * @returns {Object} A frontend error object to be passed to error components
+ */
+export const createFrontendError = (errorTitle, errorMessage) => ({
+  errorTitle,
+  errorMessage,
+  isFrontend: true,
+})
 
 /**
  * Maps the error type to a HTTP Status code. Useful for quickly
