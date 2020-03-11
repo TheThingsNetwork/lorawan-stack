@@ -31,6 +31,7 @@ import {
   httpStatusCode,
   isUnknown as isUnknownError,
   isNotFoundError,
+  isFrontend as isFrontendError,
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -43,6 +44,7 @@ const FullViewErrorInner = function({ error, env }) {
   const isUnknown = isUnknownError(error)
   const statusCode = httpStatusCode(error)
   const isNotFound = isNotFoundError(error)
+  const isFrontend = isFrontendError(error)
 
   let errorTitleMessage = errorMessages.unknownErrorTitle
   let errorMessageMessage = errorMessages.contactAdministrator
@@ -53,6 +55,25 @@ const FullViewErrorInner = function({ error, env }) {
   }
   if (statusCode) {
     errorTitleMessage = statusCodeMessages[statusCode]
+  }
+  if (isFrontend) {
+    errorMessageMessage = error.errorMessage
+    if (Boolean(error.errorTitle)) {
+      errorTitleMessage = error.errorTitle
+    }
+  }
+
+  let action = undefined
+  if (isNotFound) {
+    action = (
+      <Button.AnchorLink
+        icon="keyboard_arrow_left"
+        message={sharedMessages.takeMeBack}
+        href={env.appRoot}
+      />
+    )
+  } else if (isUnknown) {
+    action = <Button icon="refresh" message={sharedMessages.refreshPage} onClick={reload} />
   }
 
   return (
@@ -67,15 +88,7 @@ const FullViewErrorInner = function({ error, env }) {
               content={errorTitleMessage}
             />
             <ErrorMessage className={style.fullViewErrorSub} content={errorMessageMessage} />
-            {isNotFoundError(error) ? (
-              <Button.AnchorLink
-                icon="keyboard_arrow_left"
-                message={sharedMessages.takeMeBack}
-                href={env.appRoot}
-              />
-            ) : (
-              <Button icon="refresh" message={sharedMessages.refreshPage} onClick={reload} />
-            )}
+            {action}
           </Col>
         </Row>
       </Container>
@@ -89,7 +102,9 @@ const FullViewError = function({ error }) {
   return (
     <div className={style.wrapper}>
       <Header className={style.header} anchored />
-      <FullViewErrorInnerWithEnv error={error} />
+      <div className={style.flexWrapper}>
+        <FullViewErrorInnerWithEnv error={error} />
+      </div>
       <Footer />
     </div>
   )
