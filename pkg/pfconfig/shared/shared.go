@@ -33,7 +33,7 @@ import (
 // SX1301Config contains the configuration for the SX1301 concentrator.
 type SX1301Config struct {
 	LoRaWANPublic       bool
-	ClockSource         uint8
+	ClockSource         uint8 `json:"omitempty"`
 	AntennaGain         float32
 	LBTConfig           *LBTConfig
 	Radios              []RFConfig
@@ -209,8 +209,8 @@ type RFConfig struct {
 	Enable      bool    `json:"enable"`
 	Type        string  `json:"type,omitempty"`
 	Frequency   uint64  `json:"freq"`
-	RSSIOffset  float32 `json:"rssi_offset"`
-	TxEnable    bool    `json:"tx_enable"`
+	RSSIOffset  float32 `json:"rssi_offset,omitempty"`
+	TxEnable    bool    `json:"tx_enable,omitempty"`
 	TxFreqMin   uint64  `json:"tx_freq_min,omitempty"`
 	TxFreqMax   uint64  `json:"tx_freq_max,omitempty"`
 	TxNotchFreq uint64  `json:"tx_notch_freq,omitempty"`

@@ -109,12 +109,10 @@ func TestGetRouterConfig(t *testing.T) {
 							{
 								Enable:    true,
 								Frequency: 922300000,
-								TxEnable:  true,
 							},
 							{
 								Enable:    false,
 								Frequency: 923000000,
-								TxEnable:  false,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -184,12 +182,10 @@ func TestGetRouterConfig(t *testing.T) {
 							{
 								Enable:    true,
 								Frequency: 922300000,
-								TxEnable:  true,
 							},
 							{
 								Enable:    false,
 								Frequency: 923000000,
-								TxEnable:  false,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -312,12 +308,10 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 							{
 								Enable:    true,
 								Frequency: 924300000,
-								TxEnable:  true,
 							},
 							{
 								Enable:    false,
 								Frequency: 925000000,
-								TxEnable:  false,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -341,12 +335,10 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 							{
 								Enable:    true,
 								Frequency: 924300000,
-								TxEnable:  true,
 							},
 							{
 								Enable:    false,
 								Frequency: 925000000,
-								TxEnable:  false,
 							},
 						},
 						Channels: []shared.IFConfig{
