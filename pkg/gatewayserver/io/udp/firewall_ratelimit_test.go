@@ -96,4 +96,28 @@ func TestRateLimitingFirewall(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("Recover", func(t *testing.T) {
+		a := assertions.New(t)
+		duration := (1 << 6) * test.Delay
+		f := NewRateLimitingFirewall(NewMemoryFirewall(ctx, time.Hour), 3, duration)
+
+		packet := encoding.Packet{
+			GatewayEUI: eui1,
+			GatewayAddr: &net.UDPAddr{
+				IP:   []byte{0x03, 0x03, 0x03, 0x03},
+				Port: 4,
+			},
+			PacketType: encoding.PullData,
+		}
+
+		a.So(f.Filter(packet), should.BeNil)
+		a.So(f.Filter(packet), should.BeNil)
+		a.So(f.Filter(packet), should.BeNil)
+		a.So(errors.IsResourceExhausted(f.Filter(packet)), should.BeTrue)
+		a.So(errors.IsResourceExhausted(f.Filter(packet)), should.BeTrue)
+
+		time.Sleep(2 * duration)
+		a.So(f.Filter(packet), should.BeNil)
+	})
 }
