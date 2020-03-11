@@ -26,11 +26,14 @@ import sharedMessages from '../../../lib/shared-messages'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
 import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
+import { mayEditApplicationDeviceKeys, checkFromState } from '../../lib/feature-checks'
+
 import api from '../../api'
 
 @connect(
   state => ({
     appId: selectSelectedApplicationId(state),
+    mayEditKeys: checkFromState(mayEditApplicationDeviceKeys, state),
   }),
   dispatch => ({
     redirectToList: (appId, deviceId) =>
@@ -44,16 +47,16 @@ import api from '../../api'
 export default class DeviceAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    mayEditKeys: PropTypes.bool.isRequired,
     redirectToList: PropTypes.func.isRequired,
   }
 
   @bind
-  async handleSubmit(values) {
+  async handleSubmit(device) {
     const { appId } = this.props
-    const { activation_mode, ...device } = values
 
     return api.device.create(appId, device, {
-      otaa: activation_mode === 'otaa',
+      otaa: device.supports_join,
     })
   }
 
@@ -66,6 +69,8 @@ export default class DeviceAdd extends Component {
   }
 
   render() {
+    const { mayEditKeys } = this.props
+
     return (
       <Container>
         <PageTitle title={sharedMessages.addDevice} />
@@ -74,6 +79,7 @@ export default class DeviceAdd extends Component {
             <DeviceDataForm
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
+              mayEditKeys={mayEditKeys}
             />
           </Col>
         </Row>
