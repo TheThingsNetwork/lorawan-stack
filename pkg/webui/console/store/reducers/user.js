@@ -23,6 +23,7 @@ import {
 const defaultState = {
   user: undefined,
   error: undefined,
+  rights: undefined,
 }
 
 const user = function(state = defaultState, { type, payload }) {
