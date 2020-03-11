@@ -14,7 +14,16 @@
 
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
+import { connect } from 'react-redux'
 
+import PropTypes from '../../../lib/prop-types'
+import {
+  selectUser,
+  selectUserFetching,
+  selectUserError,
+  selectUserRights,
+  selectUserIsAdmin,
+} from '../../store/selectors/user'
 import WithAuth from '../../../lib/components/with-auth'
 import Overview from '../overview'
 import Applications from '../applications'
@@ -27,11 +36,40 @@ import style from './landing.styl'
 
 const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 
+@connect(state => ({
+  user: selectUser(state),
+  fetching: selectUserFetching(state),
+  error: selectUserError(state),
+  rights: selectUserRights(state),
+  isAdmin: selectUserIsAdmin(state),
+}))
 export default class Landing extends React.PureComponent {
+  static propTypes = {
+    error: PropTypes.error,
+    fetching: PropTypes.bool.isRequired,
+    isAdmin: PropTypes.bool,
+    rights: PropTypes.rights,
+    user: PropTypes.user,
+  }
+  static defaultProps = {
+    user: undefined,
+    error: undefined,
+    rights: undefined,
+    isAdmin: undefined,
+  }
   render() {
+    const { user, fetching, error, rights, isAdmin } = this.props
+
     return (
-      <div className={style.container}>
-        <WithAuth>
+      <WithAuth
+        user={user}
+        fetching={fetching}
+        error={error}
+        errorComponent={FullViewErrorInner}
+        rights={rights}
+        isAdmin={isAdmin}
+      >
+        <div className={style.container}>
           <Switch>
             <Route exact path="/" component={Overview} />
             <Route path="/applications" component={Applications} />
@@ -40,8 +78,8 @@ export default class Landing extends React.PureComponent {
             <Route path="/admin" component={Admin} />
             <Route component={GenericNotFound} />
           </Switch>
-        </WithAuth>
-      </div>
+        </div>
+      </WithAuth>
     )
   }
 }

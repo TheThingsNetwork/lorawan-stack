@@ -13,11 +13,35 @@
 // limitations under the License.
 
 import React from 'react'
-import { withRouter, Redirect } from 'react-router-dom'
-import { connect } from 'react-redux'
-import PropTypes from '../prop-types'
+import { withRouter } from 'react-router-dom'
+import Query from 'query-string'
+import { defineMessages } from 'react-intl'
 
-import { withEnv } from '../../lib/components/env'
+import sharedMessages from '../shared-messages'
+import { selectApplicationRootPath } from '../../lib/selectors/env'
+import { createFrontendError } from '../../lib/errors/utils'
+import PropTypes from '../prop-types'
+import Spinner from '../../components/spinner'
+import Message from './message'
+
+// Define a minimum set of rights, without which it makes no sense to access the
+// console
+const minimumRights = ['RIGHT_APPLICATION', 'RIGHT_GATEWAY', 'RIGHT_ORGANIZATION']
+
+const m = defineMessages({
+  errTooFewRights: 'Your account does not possess sufficient rights to use the console.',
+  errTooFewRightsTitle: 'Insufficient rights',
+  errStateRequested:
+    'Your account still needs to be approved by an administrator. You will receive a confirmation email once your account is approved.',
+  errStateRequestedTitle: 'Account unapproved',
+  errStateRejected: 'Your account has been rejected by an administrator.',
+  errStateRejectedTitle: 'Account rejected',
+  errStateSuspended:
+    'Your account has been suspended by an administrator. Please contact support for further information about your account status.',
+  errStateSuspendedTitle: 'Account suspended',
+  errEmailValidation: 'Your account is restricted until your email address has been validated.',
+  errEmailValidationTitle: 'Email validation pending',
+})
 
 /**
  * Auth is a component that wraps a tree that requires the user
@@ -25,45 +49,88 @@ import { withEnv } from '../../lib/components/env'
  *
  * If no user is authenticated, it renders the login view.
  */
-@withEnv
 @withRouter
-@connect(state => ({
-  fetching: state.user.fetching,
-  user: state.user.user,
-}))
 class Auth extends React.PureComponent {
+  static propTypes = {
+    children: PropTypes.node.isRequired,
+    error: PropTypes.error,
+    errorComponent: PropTypes.elementType.isRequired,
+    fetching: PropTypes.bool.isRequired,
+    isAdmin: PropTypes.bool,
+    location: PropTypes.location.isRequired,
+    rights: PropTypes.rights,
+    user: PropTypes.user,
+  }
+  static defaultProps = {
+    user: undefined,
+    error: undefined,
+    isAdmin: undefined,
+    rights: undefined,
+  }
+
   render() {
     const {
       user,
       fetching,
+      error,
+      errorComponent,
       children,
-      env: { appRoot },
+      location,
+      rights,
+      isAdmin,
     } = this.props
 
     if (fetching) {
-      return null
+      return (
+        <Spinner center>
+          <Message content={sharedMessages.fetching} />
+        </Spinner>
+      )
+    }
+
+    let err
+
+    if (error) {
+      err = error
+    } else if (
+      // Check whether the user has at least basic rights, without which it
+      // makes no sense to access the console
+      Boolean(user) &&
+      !isAdmin &&
+      !rights.some(r => minimumRights.some(mr => r.startsWith(mr)))
+    ) {
+      // Provide relevant error messages if possible
+      if (user.state === 'STATE_REQUESTED') {
+        err = createFrontendError(m.errStateRequestedTitle, m.errStateRequested)
+      } else if (user.state === 'STATE_REJECTED') {
+        err = createFrontendError(m.errStateRejectedTitle, m.errStateRejected)
+      } else if (user.state === 'STATE_SUSPENDED') {
+        err = createFrontendError(m.errStateSuspendedTitle, m.errStateSuspended)
+      } else if (!user.primary_email_address_validated_at) {
+        err = createFrontendError(m.errEmailValidationTitle, m.errEmailValidation)
+      } else {
+        err = createFrontendError(m.errTooFewRightsTitle, m.errTooFewRights)
+      }
+    }
+
+    if (err) {
+      const Component = errorComponent
+      return <Component error={err} />
     }
 
     if (!Boolean(user)) {
-      const redirectPath = window.location.pathname.substring(appRoot.length)
+      // If the user is logged out, redirect to the login endpoint and show
+      // a loading spinner
+      window.location = `${selectApplicationRootPath()}/login/ttn-stack?next=${location.pathname}`
       return (
-        <Redirect
-          to={{
-            pathname: `/login`,
-            search: redirectPath && `?next=${redirectPath}`,
-            state: { from: this.props.location.pathname },
-          }}
-        />
+        <Spinner after={0} center>
+          <Message content={sharedMessages.redirecting} />
+        </Spinner>
       )
     }
 
     return children
   }
-}
-
-Auth.propTypes = {
-  user: PropTypes.object,
-  fetching: PropTypes.bool,
 }
 
 export default Auth
