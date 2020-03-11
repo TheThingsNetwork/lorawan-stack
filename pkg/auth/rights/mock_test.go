@@ -68,18 +68,22 @@ func (f *mockFetcher) ApplicationRights(ctx context.Context, ids ttnpb.Applicati
 	f.applicationCtx, f.applicationIDs = ctx, ids
 	return f.applicationRights, f.applicationError
 }
+
 func (f *mockFetcher) ClientRights(ctx context.Context, ids ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
 	f.clientCtx, f.clientIDs = ctx, ids
 	return f.clientRights, f.clientError
 }
+
 func (f *mockFetcher) GatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	f.gatewayCtx, f.gatewayIDs = ctx, ids
 	return f.gatewayRights, f.gatewayError
 }
+
 func (f *mockFetcher) OrganizationRights(ctx context.Context, ids ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	f.organizationCtx, f.organizationIDs = ctx, ids
 	return f.organizationRights, f.organizationError
 }
+
 func (f *mockFetcher) UserRights(ctx context.Context, ids ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
 	f.userCtx, f.userIDs = ctx, ids
 	return f.userRights, f.userError
