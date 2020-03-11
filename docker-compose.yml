@@ -19,7 +19,7 @@ services:
   #   environment:
   #     - POSTGRES_PASSWORD=root
   #     - POSTGRES_USER=root
-  #     - POSTGRES_DB=${DEV_DATABASE_NAME:-ttn_lorawan}
+  #     - POSTGRES_DB=ttn_lorawan
   #   volumes:
   #     - ${DEV_DATA_DIR:-.env/data}/postgres:/var/lib/postgresql/data
   #   ports:
