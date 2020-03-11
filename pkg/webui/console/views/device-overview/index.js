@@ -125,12 +125,14 @@ class DeviceOverview extends React.Component {
           ]
         } else {
           infoEntry.subItems = [
-            {
-              key: sharedMessages.appKey,
-              value: root_keys.app_key.key,
-              type: 'byte',
-              sensitive: true,
-            },
+            ...(root_keys.app_key
+              ? {
+                  key: sharedMessages.appKey,
+                  value: root_keys.app_key.key,
+                  type: 'byte',
+                  sensitive: true,
+                }
+              : { key: sharedMessages.appKey, value: undefined }),
             ...(root_keys.nwk_key
               ? {
                   key: sharedMessages.nwkKey,
