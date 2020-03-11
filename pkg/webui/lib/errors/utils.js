@@ -19,7 +19,7 @@ import grpcErrToHttpErr from './grpc-error-map'
  * Tests wether the error is a backend error object.
  *
  * @param {object} error - The error to be tested.
- * @returns {boolean} `true` if `error` is translated, `false` otherwise.
+ * @returns {boolean} `true` if `error` is a well known backend error object.
  */
 export const isBackend = error =>
   Boolean(error) &&
@@ -41,7 +41,7 @@ export const isFrontend = error => Boolean(error) && typeof error === 'object' &
  * Returns wether the error has a shape that is not well-known.
  *
  * @param {object} error - The error to be tested.
- * @returns {boolean} `true` if `error` is translated, `false` otherwise.
+ * @returns {boolean} `true` if `error` is not of a well known shape.
  */
 export const isUnknown = error => !isBackend(error) && !isFrontend(error)
 
@@ -50,11 +50,18 @@ export const isUnknown = error => !isBackend(error) && !isFrontend(error)
  *
  * @param {object} errorTitle - The error message title (i18n message).
  * @param {object} errorMessage - The error message object (i18n message).
+ * @param {string} errorCode - An optional error code to be used to identify
+ * a specific error type easily. E.g. `user_status_unapproved`.
+ * @param {number} statusCode - An optional status code corresponding to
+ * the well known HTTP status codes. This can help categorizing the error if
+ * necessary.
  * @returns {object} A frontend error object to be passed to error components.
  */
-export const createFrontendError = (errorTitle, errorMessage) => ({
+export const createFrontendError = (errorTitle, errorMessage, errorCode, statusCode) => ({
   errorTitle,
   errorMessage,
+  errorCode,
+  statusCode,
   isFrontend: true,
 })
 
@@ -64,13 +71,25 @@ export const createFrontendError = (errorTitle, errorMessage) => ({
  * determined.
  *
  * @param {object} error - The error to be tested.
- * @returns {number} The (clostest when grpc error) HTTP Status Code.
+ * @returns {number} The (closest when grpc error) HTTP Status Code, otherwise
+ * `undefined`.
  */
-export const httpStatusCode = error =>
-  isBackend(error)
-    ? error.http_code || grpcErrToHttpErr(error.code || error.grpc_code)
-    : Boolean(error) && error.statusCode
+export const httpStatusCode = error => {
+  if (!Boolean(error)) {
+    return undefined
+  }
 
+  let statusCode = undefined
+  if (isBackend(error)) {
+    statusCode = error.http_code || grpcErrToHttpErr(error.code || error.grpc_code)
+  } else if (isFrontend(error)) {
+    statusCode = error.statusCode
+  } else if (Boolean(error.statusCode)) {
+    statusCode = error.statusCode
+  }
+
+  return Boolean(statusCode) ? parseInt(statusCode) : undefined
+}
 /**
  * Returns the GRPC Status code in case of a backend error.
  *
@@ -144,7 +163,8 @@ export const isUnauthenticatedError = error =>
  * @param {object} error - The error to be tested.
  * @returns {boolean} `true` if `error` has translation ids, `false` otherwise.
  */
-export const isTranslated = error => isBackend(error) || (typeof error === 'object' && error.id)
+export const isTranslated = error =>
+  isBackend(error) || isFrontend(error) || (typeof error === 'object' && error.id)
 
 /**
  * Returns the id of the error, used as message id.
@@ -160,7 +180,6 @@ export const getBackendErrorId = error => error.message.split(' ')[0]
  * @param {object} error - The backend error object.
  * @returns {object} - Display error details or not.
  */
-
 export const getBackendErrorDetails = error => (error.details[0].cause ? error : undefined)
 
 /**
@@ -207,6 +226,8 @@ export const toMessageProps = function(error) {
       },
       values: getBackendErrorMessageAttributes(error),
     }
+  } else if (isFrontend(error)) {
+    props = { content: error.errorMessage }
   } else if (isTranslated(error)) {
     // Fall back to normal message.
     props = { content: error }
