@@ -146,11 +146,22 @@ class DeviceDataForm extends Component {
   get ABPSection() {
     const { resets_f_cnt, lorawan_version } = this.state
 
-    const isNewVersion =
-      Boolean(lorawan_version) && parseInt(lorawan_version.replace(/\D/g, '').padEnd(3, 0)) >= 110
+    const lwVersion = Boolean(lorawan_version)
+      ? parseInt(lorawan_version.replace(/\D/g, '').padEnd(3, 0))
+      : 0
 
     return (
       <>
+        <Form.Field
+          title={sharedMessages.devEUI}
+          name="ids.dev_eui"
+          type="byte"
+          min={8}
+          max={8}
+          description={m.deviceEUIDescription}
+          required={lwVersion === 104}
+          component={Input}
+        />
         <DevAddrInput
           title={sharedMessages.devAddr}
           name="session.dev_addr"
@@ -180,7 +191,7 @@ class DeviceDataForm extends Component {
           onGenerateValue={random16BytesString}
           required
         />
-        {isNewVersion && (
+        {lwVersion >= 110 && (
           <>
             <Form.Field
               title={sharedMessages.sNwkSIKey}

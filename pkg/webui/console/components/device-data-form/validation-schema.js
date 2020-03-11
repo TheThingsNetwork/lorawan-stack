@@ -42,33 +42,38 @@ const validationSchema = Yup.object({
   }),
   _activation_mode: Yup.string().required(),
   supports_join_nonces: Yup.boolean(),
+  ids: Yup.object()
+    .shape({
+      device_id: Yup.string()
+        .matches(deviceIdRegexp, sharedMessages.validateIdFormat)
+        .min(2, sharedMessages.validateTooShort)
+        .max(36, sharedMessages.validateTooLong)
+        .required(sharedMessages.validateRequired),
+    })
+    .when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
+      const isLw104 = Boolean(version) && parseInt(version.replace(/\D/g, '').padEnd(3, 0)) === 104
+      const isModeOTAA = isOTAA(mode)
+
+      return schema.shape({
+        join_eui: Yup.lazy(() =>
+          isModeOTAA
+            ? Yup.string()
+                .length(8 * 2, m.validate16) // 8 Byte hex
+                .required(sharedMessages.validateRequired)
+            : Yup.string().strip(),
+        ),
+        dev_eui: Yup.lazy(
+          () =>
+            isModeOTAA || isLw104
+              ? Yup.string()
+                  .length(8 * 2, m.validate16) // 8 Byte hex
+                  .required(sharedMessages.validateRequired)
+              : Yup.nullableString().emptyOrLength(8 * 2, m.validate16), // 8 Byte hex
+        ),
+      })
+    }),
 }) // OTAA related entries
   .shape({
-    ids: Yup.object()
-      .shape({
-        device_id: Yup.string()
-          .matches(deviceIdRegexp, sharedMessages.validateIdFormat)
-          .min(2, sharedMessages.validateTooShort)
-          .max(36, sharedMessages.validateTooLong)
-          .required(sharedMessages.validateRequired),
-      })
-      .when('_activation_mode', {
-        is: isOTAA,
-        then: schema =>
-          schema.shape({
-            join_eui: Yup.string()
-              .length(8 * 2, m.validate16) // 8 Byte hex
-              .required(sharedMessages.validateRequired),
-            dev_eui: Yup.string()
-              .length(8 * 2, m.validate16) // 8 Byte hex
-              .required(sharedMessages.validateRequired),
-          }),
-        otherwise: schema =>
-          schema.shape({
-            join_eui: Yup.string().strip(),
-            dev_eui: Yup.string().strip(),
-          }),
-      }),
     mac_settings: Yup.object().when('_activation_mode', {
       is: isABP,
       then: schema =>
