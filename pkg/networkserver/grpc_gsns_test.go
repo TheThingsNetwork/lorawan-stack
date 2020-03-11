@@ -153,6 +153,7 @@ func TestHandleUplink(t *testing.T) {
 	joinSetByIDGetPaths := [...]string{
 		"frequency_plan_id",
 		"lorawan_phy_version",
+		"pending_session.queued_application_downlinks",
 		"queued_application_downlinks",
 		"recent_uplinks",
 		"session.queued_application_downlinks",

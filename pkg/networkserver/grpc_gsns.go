@@ -1151,6 +1151,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
+			"pending_session.queued_application_downlinks",
 			"recent_uplinks",
 			"session.queued_application_downlinks",
 		},
@@ -1159,7 +1160,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 				logger.Warn("Device deleted during join-request handling, drop")
 				return nil, nil, errOutdatedData
 			}
-			invalidatedQueue = stored.GetSession().GetQueuedApplicationDownlinks()
+			invalidatedQueue = append(stored.GetSession().GetQueuedApplicationDownlinks(), stored.GetPendingSession().GetQueuedApplicationDownlinks()...)
 			stored.PendingMACState = macState
 			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
 			return stored, []string{
