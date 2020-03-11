@@ -184,6 +184,7 @@ func init() {
 var gatewayColumnNames = map[string][]string{
 	"ids.eui":                     {"gateway_eui"},
 	attributesField:               {},
+	autoUpdateField:               {autoUpdateField},
 	contactInfoField:              {},
 	nameField:                     {nameField},
 	descriptionField:              {descriptionField},
