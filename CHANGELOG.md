@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Telemetry and events for gateway statuses.
 - Handling of downlink frame counters exceeding 65535.
+- Creating 1.0.4 ABP end devices via the Console.
 
 ### Security
 
