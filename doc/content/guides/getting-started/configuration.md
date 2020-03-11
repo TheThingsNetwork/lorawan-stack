@@ -44,11 +44,13 @@ Before we go into the details of {{% tts %}}'s configuration, we'll take a look 
 
 The `ports` section exposes {{% tts %}}'s ports to the world. Port `80` and `443` are mapped to the internal HTTP and HTTPS ports. The other ports have a direct mapping. If you don't need support for gateways and applications that don't support TLS, you can remove ports starting with `188`.
 
+In the `environment` section, we configure the databases used by the stack. We will set these to the CockroachDB and Redis instances that are defined in the `docker-compose.yml` above.
+
 ```yaml
 stack:
   image: 'thethingsnetwork/lorawan-stack:<the tag>'
-  entrypoint: 'ttn-lw-stack'
-  command: 'start all -c /config/ttn-lw-stack.yml'
+  entrypoint: 'ttn-lw-stack -c /config/ttn-lw-stack.yml'
+  command: 'start'
   restart: 'unless-stopped'
   depends_on:
     - 'cockroach'
@@ -72,6 +74,10 @@ stack:
     - '1887:1887'
     - '8887:8887'
     - '1700:1700/udp'
+  environment:
+    TTN_LW_BLOB_LOCAL_DIRECTORY: '/srv/ttn-lorawan/public/blob'
+    TTN_LW_REDIS_ADDRESS: 'redis:6379'
+    TTN_LW_IS_DATABASE_URL: 'postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable'
 
   # If using (self) signed certificates
   # secrets:
@@ -88,11 +94,7 @@ stack:
 
 Next, we'll have a look at the configuration options for your private deployment. We'll set these options in the `ttn-lw-stack.yml` file that is mounted as a volume on the `stack` service in `docker-compose.yml`.
 
-The first thing we should configure are the databases used by the stack. We will
-set these to the CockroachDB and Redis instances that were defined in the
-`docker-compose.yml` file above.
-
-Next is TLS with Let's Encrypt. Since we're deploying {{% tts %}} on
+First is TLS with Let's Encrypt. Since we're deploying {{% tts %}} on
 `thethings.example.com`, we configure it to only request certificates for that
 host, and also to use it as the default host.
 
@@ -113,18 +115,8 @@ Below is an example `ttn-lw-stack.yml` file:
 ```yaml
 # Example ttn-lw-stack configuration file
 
-# Redis configuration
-redis:
-  address: 'redis:6379'
-
 # Identity Server configuration
 is:
-  # If using CockroachDB
-  database-uri: 'postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable'
-
-  # If using PostgreSQL:
-  # database-uri: 'postgres://root@postgres:5432/ttn_lorawan?sslmode=disable'
-
   # Email configuration for "thethings.example.com"
   email:
     sender-name: 'The Things Stack'
