@@ -198,6 +198,7 @@ export default defineMessages({
   pubsubFormat: 'Pub-sub format',
   pubsubId: 'Pub-sub ID',
   pubsubs: 'Pub-subs',
+  redirecting: 'Redirecting…',
   refresh: 'Refresh',
   refreshPage: 'Refresh page',
   removeCollaborator: 'Remove collaborator',
