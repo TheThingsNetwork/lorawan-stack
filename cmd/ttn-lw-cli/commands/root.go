@@ -113,11 +113,21 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		if config.Insecure {
 			api.SetInsecure(true)
 		}
-		if config.CA != "" {
-			pemBytes, err := ioutil.ReadFile(config.CA)
+
+		useCA := true
+		var pemBytes []byte
+		if config.CAFile != "" {
+			pemBytes, err = ioutil.ReadFile(config.CAFile)
 			if err != nil {
 				return err
 			}
+		} else if config.CA != "" {
+			pemBytes = []byte(config.CA)
+		} else {
+			useCA = false
+		}
+
+		if useCA {
 			rootCAs := http.DefaultTransport.(*http.Transport).TLSClientConfig.RootCAs
 			if rootCAs == nil {
 				if rootCAs, err = x509.SystemCertPool(); err != nil {

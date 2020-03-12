@@ -10,9 +10,10 @@ Under normal circumstances, only `info`, `warn` and `error` logs are printed to 
 
 - `log.level`: The minimum level log messages must have to be shown
 
-By default the CLI assumes that it is connecting to servers that use TLS certificates that are trusted by the operating system. When connecting to servers with self-signed certificates or a custom CA, the `ca` option can be used to trust those certificates. When connecting servers that don't use TLS, the `insecure` option can be used.
+By default the CLI assumes that it is connecting to servers that use TLS certificates that are trusted by the operating system. When connecting to servers with self-signed certificates or a custom CA, the `ca` or `ca-cert` options can be used to trust those certificates. When connecting servers that don't use TLS, the `insecure` option can be used.
 
 - `ca`: CA certificate file
+- `ca-cert`: CA certificate
 - `insecure`: Connect without TLS
 
 The CLI can keep track of multiple configurations and multiple credentials. The `credentials-id` flag selects the set of credentials that are used to connect to servers. The `login` command registers the hosts that are configured at that moment, and will prevent leaking credentials to other hosts. This can be circumvented with the `allow-unknown-hosts` option.

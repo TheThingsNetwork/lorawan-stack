@@ -47,7 +47,8 @@ type Config struct {
 	DeviceClaimingServerGRPCAddress    string `name:"device-claiming-server-grpc-address" description:"Device Claiming Server address"`
 	QRCodeGeneratorGRPCAddress         string `name:"qr-code-generator-grpc-address" description:"QR Code Generator address"`
 	Insecure                           bool   `name:"insecure" description:"Connect without TLS"`
-	CA                                 string `name:"ca" description:"CA certificate file"`
+	CAFile                             string `name:"ca" description:"CA certificate file"`
+	CA                                 string `name:"ca-cert" description:"CA certificate"`
 }
 
 func (c Config) getHosts() []string {
