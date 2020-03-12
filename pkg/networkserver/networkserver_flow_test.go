@@ -628,6 +628,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 					return
 				}
 				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
+				time.Sleep(test.Delay)
 				go sendFirstUplink()
 			}
 		}
@@ -1372,6 +1373,7 @@ func handleClassAOTAAUS915FlowTest1_0_3(ctx context.Context, conn *grpc.ClientCo
 					return
 				}
 				t.Log("Uplink handling failed with a not-found error. The join-accept was scheduled, but the new device state most probably had not been written to the registry on time, retry.")
+				time.Sleep(test.Delay)
 				go sendFirstUplink()
 			}
 		}
