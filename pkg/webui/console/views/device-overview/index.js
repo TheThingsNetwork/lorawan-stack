@@ -57,6 +57,7 @@ class DeviceOverview extends React.Component {
       root_keys = {},
       session = {},
       created_at,
+      supports_join,
     } = this.props.device
 
     // Get session keys
@@ -144,7 +145,7 @@ class DeviceOverview extends React.Component {
           ]
         }
         activationInfoData.items.push(infoEntry)
-      } else {
+      } else if (supports_join) {
         activationInfoData.items.push({
           key: m.rootKeys,
           value: <Message content={sharedMessages.provisionedOnExternalJoinServer} />,
