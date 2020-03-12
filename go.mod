@@ -94,7 +94,7 @@ require (
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/mattn/go-isatty v0.0.11
 	github.com/mattn/goveralls v0.0.4
-	github.com/mdempsky/unconvert v0.0.0-20190921185256-3ecd357795af
+	github.com/mdempsky/unconvert v0.0.0-20200228143138-95ecdbfc0b5f
 	github.com/mgechev/revive v1.0.1
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -129,11 +129,11 @@ require (
 	gocloud.dev/pubsub/natspubsub v0.18.0
 	golang.org/x/crypto v0.0.0-20200109152110-61a87790db17
 	golang.org/x/image v0.0.0-20191214001246-9130b4cfad52 // indirect
-	golang.org/x/net v0.0.0-20200222125558-5a598a2470a0
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
-	golang.org/x/tools v0.0.0-20200110042803-e2f26524b78c
+	golang.org/x/tools v0.0.0-20200312045724-11d5b4c81c7d
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20200225123651-fc8f55426688
