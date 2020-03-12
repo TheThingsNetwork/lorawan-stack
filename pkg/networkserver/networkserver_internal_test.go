@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -25,14 +26,17 @@ import (
 
 func TestNewDevAddr(t *testing.T) {
 	t.Run("From NetID", func(t *testing.T) {
-		ns, ctx, _, stop := StartTest(t, Config{
-			NetID:               types.NetID{0x00, 0x00, 0x13},
-			DeduplicationWindow: 42,
-			CooldownWindow:      42,
-			DownlinkTasks: MockDownlinkTaskQueue{
-				PopFunc: DownlinkTaskPopBlockFunc,
+		ns, ctx, _, stop := StartTest(
+			t,
+			component.Config{},
+			Config{
+				NetID: types.NetID{0x00, 0x00, 0x13},
+				DownlinkTasks: MockDownlinkTaskQueue{
+					PopFunc: DownlinkTaskPopBlockFunc,
+				},
 			},
-		}, (1<<2)*test.Delay, false)
+			(1<<3)*test.Delay,
+		)
 		defer stop()
 
 		assertions.New(t).So(ns.newDevAddr(ctx, nil).HasPrefix(types.DevAddrPrefix{
@@ -56,15 +60,18 @@ func TestNewDevAddr(t *testing.T) {
 				Length:  8,
 			},
 		}
-		ns, ctx, _, stop := StartTest(t, Config{
-			NetID:               types.NetID{0x00, 0x00, 0x13},
-			DevAddrPrefixes:     ps,
-			DeduplicationWindow: 42,
-			CooldownWindow:      42,
-			DownlinkTasks: MockDownlinkTaskQueue{
-				PopFunc: DownlinkTaskPopBlockFunc,
+		ns, ctx, _, stop := StartTest(
+			t,
+			component.Config{},
+			Config{
+				NetID: types.NetID{0x00, 0x00, 0x13},
+				DownlinkTasks: MockDownlinkTaskQueue{
+					PopFunc: DownlinkTaskPopBlockFunc,
+				},
+				DevAddrPrefixes: ps,
 			},
-		}, (1<<3)*test.Delay, false)
+			(1<<3)*test.Delay,
+		)
 		defer stop()
 
 		seen := map[types.DevAddrPrefix]int{}

@@ -17,14 +17,21 @@ package networkserver_test
 import (
 	"bytes"
 	"context"
-	"math/rand"
-	"sync"
+	"encoding/binary"
+	"fmt"
 	"testing"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
+	"go.thethings.network/lorawan-stack/pkg/component"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -33,93 +40,31 @@ import (
 	"google.golang.org/grpc"
 )
 
-func sendUplinkDuplicates(ctx context.Context, handle func(ctx context.Context, up *ttnpb.UplinkMessage) <-chan error, windowEndCh <-chan WindowEndRequest, makeMessage func(decoded bool) *ttnpb.UplinkMessage, start time.Time, n int) []*ttnpb.RxMetadata {
-	t := test.MustTFromContext(ctx)
-	t.Helper()
-
-	a := assertions.New(t)
-
-	var weResp chan<- time.Time
-	select {
-	case <-ctx.Done():
-		t.Fatal("Timed out while waiting for window end request to arrive")
-		return nil
-
-	case req := <-windowEndCh:
-		expectedMsg := makeMessage(true)
-		for _, id := range expectedMsg.CorrelationIDs {
-			a.So(req.Message.CorrelationIDs, should.Contain, id)
-		}
-		a.So(len(req.Message.CorrelationIDs), should.BeGreaterThan, len(expectedMsg.CorrelationIDs))
-		for _, md := range expectedMsg.RxMetadata {
-			a.So(req.Message.RxMetadata, should.Contain, md)
-		}
-		a.So(len(req.Message.RxMetadata), should.BeGreaterThanOrEqualTo, len(expectedMsg.RxMetadata))
-		a.So([]time.Time{start, req.Message.ReceivedAt, time.Now()}, should.BeChronological)
-		expectedMsg.ReceivedAt = req.Message.ReceivedAt
-		expectedMsg.CorrelationIDs = req.Message.CorrelationIDs
-		expectedMsg.RxMetadata = req.Message.RxMetadata
-		a.So(req.Message, should.HaveEmptyDiff, expectedMsg)
-
-		weResp = req.Response
-	}
-
-	mdCh := make(chan *ttnpb.RxMetadata, n)
-	if !t.Run("duplicates", func(t *testing.T) {
-		a := assertions.New(t)
-
-		wg := &sync.WaitGroup{}
-		wg.Add(n)
-
-		for i := 0; i < n; i++ {
-			go func() {
-				defer wg.Done()
-
-				msg := makeMessage(false)
-
-				msg.RxMetadata = nil
-				n := rand.Intn(10)
-				for i := 0; i < n; i++ {
-					md := ttnpb.NewPopulatedRxMetadata(test.Randy, false)
-					msg.RxMetadata = append(msg.RxMetadata, md)
-					mdCh <- md
-				}
-
-				err := <-handle(ctx, msg)
-				a.So(err, should.BeNil)
-			}()
-		}
-
-		go func() {
-			if !test.WaitContext(ctx, wg.Wait) {
-				t.Log("Timed out while waiting for duplicate uplinks to be processed")
-				return
-			}
-
-			select {
-			case <-ctx.Done():
-				t.Log("Timed out while waiting for metadata collection to stop")
-				return
-
-			case weResp <- time.Now():
-			}
-
-			close(mdCh)
-		}()
-	}) {
-		t.Error("Failed to send duplicates")
-		return nil
-	}
-
-	var mds []*ttnpb.RxMetadata
-	for md := range mdCh {
-		mds = append(mds, md)
-	}
-	return mds
-}
-
 func TestHandleUplink(t *testing.T) {
-	dataGetPaths := [...]string{
+	joinGetByEUIPaths := [...]string{
+		"frequency_plan_id",
+		"lorawan_phy_version",
+		"lorawan_version",
+		"mac_settings",
+		"session.dev_addr",
+		"supports_class_b",
+		"supports_class_c",
+		"supports_join",
+	}
+	joinSetByIDGetPaths := [...]string{
+		"frequency_plan_id",
+		"lorawan_phy_version",
+		"pending_session.queued_application_downlinks",
+		"queued_application_downlinks",
+		"recent_uplinks",
+		"session.queued_application_downlinks",
+	}
+	joinSetByIDSetPaths := [...]string{
+		"pending_mac_state",
+		"recent_uplinks",
+	}
+
+	dataSetByIDGetPaths := [...]string{
 		"frequency_plan_id",
 		"last_dev_status_received_at",
 		"lorawan_phy_version",
@@ -129,365 +74,57 @@ func TestHandleUplink(t *testing.T) {
 		"multicast",
 		"pending_mac_state",
 		"pending_session",
-		"queued_application_downlinks",
-		"recent_downlinks",
+		"queued_application_downlinks", // deprecated
+		"recent_adr_uplinks",
 		"recent_uplinks",
 		"session",
 		"supports_class_b",
 		"supports_class_c",
-		"supports_join",
 	}
+	dataRangeByAddrPaths := dataSetByIDGetPaths
 
-	joinGetByEUIPaths := [...]string{
-		"frequency_plan_id",
-		"lorawan_phy_version",
-		"lorawan_version",
-		"mac_settings",
-		"session",
-		"supports_class_b",
-		"supports_class_c",
-		"supports_join",
-		"queued_application_downlinks",
-	}
+	const (
+		DeduplicationWindow = 24 * time.Millisecond
+		CooldownWindow      = 42 * time.Millisecond
+		CollectionWindow    = DeduplicationWindow + CooldownWindow
 
-	joinSetByIDGetPaths := [...]string{
-		"frequency_plan_id",
-		"lorawan_phy_version",
-		"pending_session.queued_application_downlinks",
-		"queued_application_downlinks",
-		"recent_uplinks",
-		"session.queued_application_downlinks",
-	}
+		Rx1Delay = ttnpb.RX_DELAY_5
 
-	joinSetByIDSetPaths := [...]string{
-		"pending_mac_state",
-		"recent_uplinks",
-	}
+		FPort = 0x42
+		FCnt  = 42
+	)
 
-	const duplicateCount = 6
-	const fPort = 0x42
+	NetID := test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
 
-	netID := test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
+	const AppIDString = "handle-uplink-test-app-id"
+	AppID := ttnpb.ApplicationIdentifiers{ApplicationID: AppIDString}
+	const DevID = "handle-uplink-test-dev-id"
 
-	const appIDString = "handle-uplink-test-app-id"
-	appID := ttnpb.ApplicationIdentifiers{ApplicationID: appIDString}
-	const devID = "handle-uplink-test-dev-id"
+	JoinEUI := types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+	DevEUI := types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
-	joinEUI := types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	devEUI := types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+	DevAddr := types.DevAddr{0x42, 0x00, 0x00, 0x00}
 
-	devAddr := types.DevAddr{0x42, 0x00, 0x00, 0x00}
-
-	fNwkSIntKey := types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	nwkSEncKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	sNwkSIntKey := types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	appSKey := types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-
-	correlationIDs := [...]string{
-		"handle-uplink-test-1",
-		"handle-uplink-test-2",
-	}
-
-	now := time.Now().UTC()
+	FNwkSIntKey := types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	NwkSEncKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	SNwkSIntKey := types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	AppSKey := types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
 	makeOTAAIdentifiers := func(devAddr *types.DevAddr) *ttnpb.EndDeviceIdentifiers {
 		return &ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: appID,
-			DeviceID:               devID,
+			ApplicationIdentifiers: AppID,
+			DeviceID:               DevID,
 
-			DevEUI:  devEUI.Copy(&types.EUI64{}),
-			JoinEUI: joinEUI.Copy(&types.EUI64{}),
+			DevEUI:  DevEUI.Copy(&types.EUI64{}),
+			JoinEUI: JoinEUI.Copy(&types.EUI64{}),
 
-			DevAddr: devAddr,
+			DevAddr: DevAddr.Copy(&types.DevAddr{}),
 		}
 	}
-
-	makeSessionKeys := func(ver ttnpb.MACVersion) *ttnpb.SessionKeys {
-		sk := &ttnpb.SessionKeys{
-			FNwkSIntKey: &ttnpb.KeyEnvelope{
-				Key: &fNwkSIntKey,
-			},
-			NwkSEncKey: &ttnpb.KeyEnvelope{
-				Key: &nwkSEncKey,
-			},
-			SNwkSIntKey: &ttnpb.KeyEnvelope{
-				Key: &sNwkSIntKey,
-			},
-			SessionKeyID: []byte("handle-uplink-test-session-key-id"),
-		}
-		if ver.Compare(ttnpb.MAC_V1_1) < 0 {
-			sk.NwkSEncKey = sk.FNwkSIntKey
-			sk.SNwkSIntKey = sk.FNwkSIntKey
-		}
-		return CopySessionKeys(sk)
-	}
-
-	makeSession := func(ver ttnpb.MACVersion, devAddr types.DevAddr, lastFCntUp uint32) *ttnpb.Session {
-		return &ttnpb.Session{
-			DevAddr:     devAddr,
-			LastFCntUp:  lastFCntUp,
-			SessionKeys: *makeSessionKeys(ver),
-			StartedAt:   now,
-		}
-	}
-
-	makeJoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
-		msg := &ttnpb.UplinkMessage{
-			CorrelationIDs: correlationIDs[:],
-			RawPayload: []byte{
-				/* MHDR */
-				0b000_000_00,
-				/* Join-request */
-				/** JoinEUI **/
-				joinEUI[7], joinEUI[6], joinEUI[5], joinEUI[4], joinEUI[3], joinEUI[2], joinEUI[1], joinEUI[0],
-				/** DevEUI **/
-				devEUI[7], devEUI[6], devEUI[5], devEUI[4], devEUI[3], devEUI[2], devEUI[1], devEUI[0],
-				/** DevNonce **/
-				0x01, 0x00,
-				/* MIC */
-				0x03, 0x02, 0x01, 0x00,
-			},
-			RxMetadata: MakeRxMetadataSlice(),
-			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-						Bandwidth:       125000,
-						SpreadingFactor: 11,
-					}},
-				},
-				EnableCRC: true,
-				Frequency: 868500000,
-				Timestamp: 42,
-			},
-		}
-		if decodePayload {
-			msg.Payload = &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
-					MType: ttnpb.MType_JOIN_REQUEST,
-					Major: ttnpb.Major_LORAWAN_R1,
-				},
-				MIC: []byte{0x03, 0x02, 0x01, 0x00},
-				Payload: &ttnpb.Message_JoinRequestPayload{
-					JoinRequestPayload: &ttnpb.JoinRequestPayload{
-						DevEUI:   devEUI,
-						JoinEUI:  joinEUI,
-						DevNonce: types.DevNonce{0x00, 0x01},
-					},
-				},
-			}
-		}
-		return msg
-	}
-
-	makeJoinRequestWithSettings := func(decodePayload bool) *ttnpb.UplinkMessage {
-		msg := makeJoinRequest(decodePayload)
-		if !decodePayload {
-			return msg
-		}
-		msg.Settings.DataRateIndex = ttnpb.DATA_RATE_1
-		msg.DeviceChannelIndex = 2
-		return msg
-	}
-
-	makeRejoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
-		msg := &ttnpb.UplinkMessage{
-			CorrelationIDs: correlationIDs[:],
-			RawPayload: []byte{
-				/* MHDR */
-				0b110_000_00,
-				/* Rejoin-request */
-				/** Rejoin Type **/
-				0x00,
-				/** JoinEUI **/
-				netID[2], netID[1], netID[0],
-				/** DevEUI **/
-				devEUI[7], devEUI[6], devEUI[5], devEUI[4], devEUI[3], devEUI[2], devEUI[1], devEUI[0],
-				/** RJcount0 **/
-				0x01, 0x00,
-				/* MIC */
-				0x03, 0x02, 0x01, 0x00,
-			},
-			RxMetadata: MakeRxMetadataSlice(),
-			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
-					Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-						Bandwidth:       125000,
-						SpreadingFactor: 11,
-					}},
-				},
-				EnableCRC: true,
-				Frequency: 868500000,
-				Timestamp: 42,
-			},
-		}
-		if decodePayload {
-			msg.Payload = &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
-					MType: ttnpb.MType_REJOIN_REQUEST,
-					Major: ttnpb.Major_LORAWAN_R1,
-				},
-				MIC: []byte{0x03, 0x02, 0x01, 0x00},
-				Payload: &ttnpb.Message_RejoinRequestPayload{
-					RejoinRequestPayload: &ttnpb.RejoinRequestPayload{
-						DevEUI:     devEUI,
-						NetID:      netID,
-						RejoinCnt:  1,
-						RejoinType: ttnpb.RejoinType_CONTEXT,
-					},
-				},
-			}
-		}
-		return msg
-	}
-
-	makeDataUplinkFRMPayload := func(fCnt uint32) []byte {
-		return MustEncryptUplink(appSKey, devAddr, fCnt, 't', 'e', 's', 't')
-	}
-
-	makeDataUplinkSettings := func() ttnpb.TxSettings {
-		return ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
-				Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-					Bandwidth:       125000,
-					SpreadingFactor: 10,
-				}},
-			},
-			EnableCRC: true,
-			Frequency: 868300000,
-			Timestamp: 42,
-		}
-	}
-
-	makeDecodedDataUplinkPayload := func(fCnt uint32, fOpts []byte, payload ...byte) *ttnpb.Message {
-		return &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
-				MType: ttnpb.MType_UNCONFIRMED_UP,
-				Major: ttnpb.Major_LORAWAN_R1,
-			},
-			MIC: payload[len(payload)-4:],
-			Payload: &ttnpb.Message_MACPayload{
-				MACPayload: &ttnpb.MACPayload{
-					FHDR: ttnpb.FHDR{
-						DevAddr: *devAddr.Copy(&types.DevAddr{}),
-						FCnt:    fCnt,
-						FOpts:   fOpts,
-					},
-					FPort:      fPort,
-					FRMPayload: makeDataUplinkFRMPayload(fCnt),
-				},
-			},
-		}
-	}
-
-	makeDataUplink1_0 := func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
-		msg := &ttnpb.UplinkMessage{
-			CorrelationIDs: correlationIDs[:],
-			RawPayload: MustAppendLegacyUplinkMIC(
-				fNwkSIntKey,
-				devAddr,
-				uint32(fCnt),
-				append([]byte{
-					/* MHDR */
-					0b010_000_00,
-					/* MACPayload */
-					/** FHDR **/
-					/*** DevAddr ***/
-					devAddr[3], devAddr[2], devAddr[1], devAddr[0],
-					/*** FCtrl ***/
-					0x01,
-					/*** FCnt ***/
-					fCnt, 0x00,
-					/*** FOpts ***/
-					/**** LinkCheckReq ****/
-					0x02,
-					/** FPort **/
-					fPort,
-				},
-					makeDataUplinkFRMPayload(uint32(fCnt))...,
-				)...,
-			),
-			RxMetadata: MakeRxMetadataSlice(),
-			Settings:   makeDataUplinkSettings(),
-		}
-		if decodePayload {
-			msg.Payload = makeDecodedDataUplinkPayload(uint32(fCnt), []byte{0x02}, msg.RawPayload...)
-			msg.ReceivedAt = now
-		}
-		return msg
-	}
-
-	makeDataUplink1_1 := func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
-		sets := makeDataUplinkSettings()
-		mds := MakeRxMetadataSlice()
-		fOpts := MustEncryptUplink(nwkSEncKey, devAddr, uint32(fCnt), 0x02)
-		msg := &ttnpb.UplinkMessage{
-			CorrelationIDs: correlationIDs[:],
-			RawPayload: MustAppendUplinkMIC(
-				sNwkSIntKey,
-				fNwkSIntKey,
-				0,
-				2,
-				1,
-				devAddr,
-				uint32(fCnt),
-				append(
-					append(
-						append([]byte{
-							/* MHDR */
-							0b010_000_00,
-							/* MACPayload */
-							/** FHDR **/
-							/*** DevAddr ***/
-							devAddr[3], devAddr[2], devAddr[1], devAddr[0],
-							/*** FCtrl ***/
-							0x01,
-							/*** FCnt ***/
-							fCnt, 0x00,
-						},
-							/*** FOpts ***/
-							fOpts...,
-						),
-						/** FPort **/
-						fPort,
-					),
-					makeDataUplinkFRMPayload(uint32(fCnt))...,
-				)...,
-			),
-			RxMetadata: mds,
-			Settings:   sets,
-		}
-		if decodePayload {
-			msg.Payload = makeDecodedDataUplinkPayload(uint32(fCnt), fOpts, msg.RawPayload...)
-			msg.ReceivedAt = now
-		}
-		return msg
-	}
-
-	wrapMakeDataUplinkWithSettings := func(f func(uint8, bool) *ttnpb.UplinkMessage) func(uint8, bool) *ttnpb.UplinkMessage {
-		return func(fCnt uint8, decodePayload bool) *ttnpb.UplinkMessage {
-			msg := f(fCnt, decodePayload)
-			if !decodePayload {
-				return msg
-			}
-			msg.DeviceChannelIndex = 1
-			msg.Settings.DataRateIndex = ttnpb.DATA_RATE_2
-			return msg
-		}
-	}
-
-	bindMakeDataUplinkFCnt := func(f func(uint8, bool) *ttnpb.UplinkMessage, fCnt uint8) func(bool) *ttnpb.UplinkMessage {
-		return func(decodePayload bool) *ttnpb.UplinkMessage {
-			return f(fCnt, decodePayload)
-		}
-	}
-
-	makeDataUplinkWithSettings1_0 := wrapMakeDataUplinkWithSettings(makeDataUplink1_0)
-	makeDataUplinkWithSettings1_1 := wrapMakeDataUplinkWithSettings(makeDataUplink1_1)
-
 	makeApplicationDownlink := func() *ttnpb.ApplicationDownlink {
 		return &ttnpb.ApplicationDownlink{
 			SessionKeyID: []byte("app-down-1-session-key-id"),
-			FPort:        fPort,
+			FPort:        FPort,
 			FCnt:         0x32,
 			FRMPayload:   []byte("app-down-1-frm-payload"),
 			Confirmed:    true,
@@ -497,2759 +134,1729 @@ func TestHandleUplink(t *testing.T) {
 			},
 		}
 	}
-
-	makeJoinResponse := func(ver ttnpb.MACVersion) *ttnpb.JoinResponse {
-		return &ttnpb.JoinResponse{
-			RawPayload:  bytes.Repeat([]byte{0x42}, 17),
-			SessionKeys: *makeSessionKeys(ver),
+	makeUplinkSettings := func(dr ttnpb.DataRate, ch band.Channel) ttnpb.TxSettings {
+		return ttnpb.TxSettings{
+			DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
+			EnableCRC: true,
+			Frequency: ch.Frequency,
+			Timestamp: 42,
 		}
 	}
 
-	assertHandleUplinkResponse := func(ctx context.Context, handleUplinkErrCh <-chan error, assert func(error) bool) bool {
+	filterEndDevice := func(dev *ttnpb.EndDevice, paths ...string) *ttnpb.EndDevice {
+		dev, err := ttnpb.FilterGetEndDevice(dev, paths...)
+		if err != nil {
+			panic(fmt.Errorf("failed to filter device: %w", err))
+		}
+		return dev
+	}
+
+	assertHandleUplinkResponse := func(ctx context.Context, handleUplinkErrCh <-chan error, expectedErr error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
+		a := assertions.New(t)
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for NetworkServer.HandleUplink to return")
 			return false
 
-		case err := <-handleUplinkErrCh:
-			return assert(err)
+		case resErr := <-handleUplinkErrCh:
+			return a.So(resErr, should.EqualErrorOrDefinition, expectedErr)
 		}
 	}
+	assertHandleUplink := func(ctx context.Context, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error, up *ttnpb.UplinkMessage, f func() bool, expectedErr error) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		errCh := handle(ctx, up)
+		return assertions.New(t).So(AllTrue(
+			f(),
+			assertHandleUplinkResponse(ctx, errCh, expectedErr),
+		), should.BeTrue)
+	}
+	assertDeduplicateUplink := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedUp *ttnpb.UplinkMessage, ok bool, err error) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		return AssertDeduplicateUplink(ctx, env.UplinkDeduplicator.DeduplicateUplink, func(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration) bool {
+			return AllTrue(
+				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+				a.So(up, should.Resemble, expectedUp),
+				a.So(window, should.Resemble, CollectionWindow),
+			)
+		},
+			UplinkDeduplicatorDeduplicateUplinkResponse{
+				Ok:    ok,
+				Error: err,
+			},
+		)
+	}
+	assertAccumulatedMetadata := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedUp *ttnpb.UplinkMessage, mds []*ttnpb.RxMetadata, err error) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		return AssertAccumulatedMetadata(ctx, env.UplinkDeduplicator.AccumulatedMetadata, func(ctx context.Context, up *ttnpb.UplinkMessage) bool {
+			return AllTrue(
+				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+				a.So(up, should.Resemble, expectedUp),
+			)
+		},
+			UplinkDeduplicatorAccumulatedMetadataResponse{
+				Metadata: mds,
+				Error:    err,
+			},
+		)
+	}
+	assertPublishMergeMetadata := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, mds ...*ttnpb.RxMetadata) bool {
+		t := test.MustTFromContext(ctx)
+		a := assertions.New(t)
+		return a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtMergeMetadata(expectedCtx, expectedIDs, len(mds)))
+		}), should.BeTrue)
+	}
+	assertDownlinkTaskAdd := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, expectedStartAt time.Time, replace bool, err error) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		return AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+			return AllTrue(
+				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+				a.So(ids, should.Resemble, expectedIDs),
+				a.So(startAt, should.Resemble, expectedStartAt),
+				a.So(replace, should.Equal, replace),
+			)
+		},
+			err,
+		)
+	}
+	assertInteropJoin := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		return AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
+			func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
+				joinReq.DevAddr = req.DevAddr
+				return AllTrue(
+					a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+					a.So(id, should.Equal, NetID),
+					a.So(req, should.NotBeNil),
+					a.So(req.DevAddr, should.NotBeEmpty),
+					a.So(req.DevAddr.NwkID(), should.Resemble, NetID.ID()),
+					a.So(req.DevAddr.NetIDType(), should.Equal, NetID.Type()),
+					a.So(req, should.Resemble, joinReq),
+				)
+			},
+			InteropClientHandleJoinRequestResponse{
+				Response: joinResp,
+				Error:    err,
+			},
+		)
+	}
+	assertClusterLocalJoin := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		return AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
+			func(ctx context.Context, ids ttnpb.Identifiers) bool {
+				return AllTrue(
+					a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+					a.So(ids, should.Resemble, expectedIDs),
+				)
+			},
+			func(ctx context.Context, req *ttnpb.JoinRequest) bool {
+				joinReq.DevAddr = req.DevAddr
+				return AllTrue(
+					a.So(req, should.NotBeNil),
+					a.So(req.DevAddr, should.NotBeEmpty),
+					a.So(req.DevAddr.NwkID(), should.Resemble, NetID.ID()),
+					a.So(req.DevAddr.NetIDType(), should.Equal, NetID.Type()),
+					a.So(req, should.Resemble, joinReq),
+				)
+			},
+			&grpc.EmptyCallOption{},
+			NsJsHandleJoinResponse{
+				Response: joinResp,
+				Error:    err,
+			},
+		)
+	}
+	assertJoinGetByEUI := func(ctx context.Context, env TestEnvironment, upCIDs []string, getDevice *ttnpb.EndDevice, err error) (context.Context, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		var getCtx context.Context
+		return getCtx, AssertDeviceRegistryGetByEUI(ctx, env.DeviceRegistry.GetByEUI, func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) bool {
+			getCtx = ctx
+			ctxCIDs := events.CorrelationIDsFromContext(ctx)
+			for _, id := range upCIDs {
+				a.So(ctxCIDs, should.Contain, id)
+			}
+			return AllTrue(
+				a.So(ctxCIDs, should.HaveLength, 2+len(upCIDs)),
+				a.So(joinEUI, should.Resemble, JoinEUI),
+				a.So(devEUI, should.Resemble, DevEUI),
+				a.So(paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:]),
+			)
+		},
+			func(ctx context.Context) DeviceRegistryGetByEUIResponse {
+				if getDevice != nil {
+					getDevice = filterEndDevice(CopyEndDevice(getDevice), joinGetByEUIPaths[:]...)
+				}
+				getCtx = context.WithValue(getCtx, struct{}{}, "get")
+				return DeviceRegistryGetByEUIResponse{
+					Device:  getDevice,
+					Context: getCtx,
+					Error:   err,
+				}
+			})
+	}
+	assertJoinSetByID := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, getDevice, setDevice *ttnpb.EndDevice, expectedErr error, err error) (context.Context, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		var setCtx context.Context
+		return setCtx, AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
+			setCtx = ctx
+			dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+			var expectedSetPaths []string
+			if setDevice != nil {
+				expectedSetPaths = joinSetByIDSetPaths[:]
+			}
+			return AllTrue(
+				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+				a.So(appID, should.Resemble, AppID),
+				a.So(devID, should.Resemble, DevID),
+				a.So(gets, should.HaveSameElementsDeep, joinSetByIDGetPaths),
+				a.So(sets, should.HaveSameElementsDeep, expectedSetPaths),
+				a.So(dev, should.ResembleFields, setDevice, sets),
+				a.So(err, should.EqualErrorOrDefinition, expectedErr),
+			)
+		},
+			func(ctx context.Context) DeviceRegistrySetByIDResponse {
+				if setDevice != nil {
+					setDevice = filterEndDevice(CopyEndDevice(setDevice), joinSetByIDGetPaths[:]...)
+				}
+				setCtx = context.WithValue(setCtx, struct{}{}, "set")
+				return DeviceRegistrySetByIDResponse{
+					Device:  setDevice,
+					Context: setCtx,
+					Error:   err,
+				}
+			})
+	}
+	assertJoinApplicationUp := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, recvAt time.Time, err error) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		return AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+			ids := *deepcopy.Copy(&setDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers)
+			ids.DevAddr = &setDevice.PendingMACState.QueuedJoinAccept.Request.DevAddr
+			return AllTrue(
+				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+				a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+					{
+						CorrelationIDs:       events.CorrelationIDsFromContext(expectedCtx),
+						EndDeviceIdentifiers: ids,
+						Up: &ttnpb.ApplicationUp_JoinAccept{
+							JoinAccept: &ttnpb.ApplicationJoinAccept{
+								AppSKey:              setDevice.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
+								InvalidatedDownlinks: setDevice.GetSession().GetQueuedApplicationDownlinks(),
+								ReceivedAt:           recvAt,
+								SessionKeyID:         setDevice.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+							},
+						},
+					},
+				}),
+			)
+		}, err)
+	}
+	assertJoinDeduplicateSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, dev *ttnpb.EndDevice, ok bool, err error) (context.Context, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		getCtx, getOk := assertJoinGetByEUI(ctx, env, msg.CorrelationIDs, dev, nil)
+		if !a.So(getOk, should.BeTrue) {
+			return nil, false
+		}
+		msg.ReceivedAt = clock.Now()
+		msg.CorrelationIDs = events.CorrelationIDsFromContext(getCtx)
+		clock.Add(time.Nanosecond)
+		return getCtx, assertDeduplicateUplink(ctx, env, getCtx, msg, ok, err)
+	}
+	assertJoinGetPeerSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, dev *ttnpb.EndDevice, peer cluster.Peer, err error) (context.Context, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, msg, dev, true, nil)
+		if !a.So(ok, should.BeTrue) {
+			return nil, false
+		}
+		return getCtx, test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
+			return AllTrue(
+				a.So(ctx, should.HaveParentContextOrEqual, getCtx),
+				a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER),
+				a.So(ids, should.Resemble, dev.EndDeviceIdentifiers),
+			)
+		},
+			test.ClusterGetPeerResponse{
+				Peer:  peer,
+				Error: err,
+			},
+		)
+	}
+	assertJoinClusterLocalSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, time.Time, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, msg, dev, true, nil)
+		if !a.So(ok, should.BeTrue) {
+			return nil, time.Time{}, false
+		}
+		joinReq.CorrelationIDs = msg.CorrelationIDs
+		return getCtx, clock.Add(time.Nanosecond), assertClusterLocalJoin(ctx, env, getCtx, dev.EndDeviceIdentifiers, joinReq, joinResp, err)
+	}
+	assertJoinInteropSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, peerNotFound bool, msg *ttnpb.UplinkMessage, dev *ttnpb.EndDevice, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse, err error) (context.Context, time.Time, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		var getCtx context.Context
+		var ok bool
+		if peerNotFound {
+			getCtx, ok = assertJoinGetPeerSequence(ctx, env, clock, msg, dev, nil, ErrTestNotFound)
+			joinReq.CorrelationIDs = msg.CorrelationIDs
+		} else {
+			getCtx, _, ok = assertJoinClusterLocalSequence(ctx, env, clock, msg, dev, joinReq, nil, ErrTestNotFound)
+		}
+		if !a.So(ok, should.BeTrue) {
+			return nil, time.Time{}, false
+		}
+		return getCtx, clock.Add(time.Nanosecond), assertInteropJoin(ctx, env, getCtx, joinReq, joinResp, err)
+	}
+	assertPublishForwardJoinRequest := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers) bool {
+		t := test.MustTFromContext(ctx)
+		a := assertions.New(t)
+		return a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(expectedCtx, expectedIDs, nil))
+		}), should.BeTrue)
+	}
+	assertPublishDropJoinRequestLocalError := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, expectedErr error) bool {
+		t := test.MustTFromContext(ctx)
+		a := assertions.New(t)
+		return a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(expectedCtx, expectedIDs, expectedErr))
+		}), should.BeTrue)
+	}
+	assertPublishDropJoinRequestRPCError := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, expectedErr error) bool {
+		t := test.MustTFromContext(ctx)
+		a := assertions.New(t)
+		return a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			err, ok := ev.Data().(errors.Interface)
+			return AllTrue(
+				a.So(ok, should.BeTrue),
+				a.So(err, should.EqualErrorOrDefinition, expectedErr),
+				a.So(ev, should.ResembleEvent, EvtDropJoinRequest(expectedCtx, expectedIDs, err)),
+			)
+		}), should.BeTrue)
+	}
 
-	errTest := errors.New("testError")
+	assertDataRangeByAddr := func(ctx context.Context, env TestEnvironment, upCIDs []string, err error, getDevices ...*ttnpb.EndDevice) ([]context.Context, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		var rangeCtx context.Context
+		var fCtxs []context.Context
+		return fCtxs, AssertDeviceRegistryRangeByAddr(ctx, env.DeviceRegistry.RangeByAddr, func(ctx context.Context, devAddr types.DevAddr, paths []string, f func(context.Context, *ttnpb.EndDevice) bool) bool {
+			rangeCtx = ctx
+			ctxCIDs := events.CorrelationIDsFromContext(ctx)
+			for _, id := range upCIDs {
+				a.So(ctxCIDs, should.Contain, id)
+			}
+			if !a.So(AllTrue(
+				a.So(ctxCIDs, should.HaveLength, 2+len(upCIDs)),
+				a.So(devAddr, should.Resemble, DevAddr),
+				a.So(paths, should.HaveSameElementsDeep, dataRangeByAddrPaths[:]),
+			), should.BeTrue) {
+				return false
+			}
+			for i, getDevice := range getDevices {
+				fCtx := context.WithValue(rangeCtx, &struct{}{}, fmt.Sprintf("range:%d", i))
+				fCtxs = append(fCtxs, fCtx)
+				a.So(f(
+					fCtx,
+					filterEndDevice(CopyEndDevice(getDevice), dataRangeByAddrPaths[:]...),
+				), should.BeTrue)
+			}
+			return true
+		},
+			err,
+		)
+	}
+	assertDataDeduplicateSequence := func(ctx context.Context, env TestEnvironment, clock *test.MockClock, msg *ttnpb.UplinkMessage, devs []*ttnpb.EndDevice, idx int, ok bool, err error) (context.Context, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		rangeCtxs, rangeOk := assertDataRangeByAddr(ctx, env, msg.CorrelationIDs, nil, devs...)
+		if !a.So(rangeOk, should.BeTrue) || !a.So(len(rangeCtxs), should.BeGreaterThan, idx) {
+			return nil, false
+		}
+		rangeCtx := rangeCtxs[idx]
+		msg.ReceivedAt = clock.Now()
+		msg.CorrelationIDs = events.CorrelationIDsFromContext(rangeCtx)
+		clock.Add(time.Nanosecond)
+		return rangeCtx, assertDeduplicateUplink(ctx, env, rangeCtx, msg, ok, err)
+	}
+	assertDataSetByID := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, getDevice, setDevice *ttnpb.EndDevice, expectedSets []string, expectedErr error, err error) (context.Context, bool) {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		var setCtx context.Context
+		return setCtx, AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
+			setCtx = ctx
+			dev, sets, err := f(ctx, CopyEndDevice(getDevice))
+			return AllTrue(
+				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+				a.So(appID, should.Resemble, AppID),
+				a.So(devID, should.Resemble, DevID),
+				a.So(gets, should.HaveSameElementsDeep, dataSetByIDGetPaths),
+				a.So(sets, should.HaveSameElementsDeep, expectedSets),
+				a.So(dev, should.ResembleFields, setDevice, sets),
+				a.So(err, should.EqualErrorOrDefinition, expectedErr),
+			)
+		},
+			func(ctx context.Context) DeviceRegistrySetByIDResponse {
+				if setDevice != nil {
+					setDevice = filterEndDevice(CopyEndDevice(setDevice), dataSetByIDGetPaths[:]...)
+				}
+				setCtx = context.WithValue(setCtx, struct{}{}, "set")
+				return DeviceRegistrySetByIDResponse{
+					Device:  setDevice,
+					Context: setCtx,
+					Error:   err,
+				}
+			})
+	}
+	assertDataApplicationUp := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, msg *ttnpb.UplinkMessage, err error) bool {
+		t := test.MustTFromContext(ctx)
+		t.Helper()
+		a := assertions.New(t)
+		macPayload := msg.Payload.GetMACPayload()
+		return AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+			return AllTrue(
+				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
+				a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
+					{
+						CorrelationIDs:       events.CorrelationIDsFromContext(expectedCtx),
+						EndDeviceIdentifiers: setDevice.EndDeviceIdentifiers,
+						Up: &ttnpb.ApplicationUp_UplinkMessage{
+							UplinkMessage: &ttnpb.ApplicationUplink{
+								FCnt:         macPayload.FCnt,
+								FPort:        macPayload.FPort,
+								FRMPayload:   macPayload.FRMPayload,
+								ReceivedAt:   msg.ReceivedAt,
+								RxMetadata:   msg.RxMetadata,
+								SessionKeyID: setDevice.Session.SessionKeyID,
+								Settings:     msg.Settings,
+							},
+						},
+					},
+				}),
+			)
+		}, err)
+	}
+	assertPublishDropDataUplink := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers, expectedErr error) bool {
+		t := test.MustTFromContext(ctx)
+		a := assertions.New(t)
+		return a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtDropDataUplink(expectedCtx, expectedIDs, expectedErr))
+		}), should.BeTrue)
+	}
+	assertPublishDefinitionDataClosures := func(ctx context.Context, env TestEnvironment, expectedEvs []events.DefinitionDataClosure, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers) bool {
+		t := test.MustTFromContext(ctx)
+		a := assertions.New(t)
+		return a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, len(expectedEvs), func(evs ...events.Event) bool {
+			for i, expectedEv := range expectedEvs {
+				if !a.So(evs[i], should.ResembleEvent, expectedEv(expectedCtx, expectedIDs)) {
+					return false
+				}
+			}
+			return true
+		}), should.BeTrue)
+	}
+	assertPublishForwardDataUplink := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, expectedIDs ttnpb.EndDeviceIdentifiers) bool {
+		t := test.MustTFromContext(ctx)
+		a := assertions.New(t)
+		return a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
+			return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(expectedCtx, expectedIDs, nil))
+		}), should.BeTrue)
+	}
 
-	for _, tc := range []struct {
+	uplinkValidationErr, ok := errors.From((&ttnpb.UplinkMessage{}).ValidateFields())
+	if !ok {
+		t.Fatal("Failed to construct uplink validation error")
+	}
+	invalidUplinkSettingsErr := uplinkValidationErr.WithAttributes("field", "settings")
+
+	makeChDRName := func(chIdx int, drIdx ttnpb.DataRateIndex, parts ...string) string {
+		return MakeTestCaseName(append(parts, fmt.Sprintf("Channel:%d", chIdx), fmt.Sprintf("DR:%d", drIdx))...)
+	}
+	makeSessionKeys := func(macVersion ttnpb.MACVersion, withAppSKey bool) *ttnpb.SessionKeys {
+		sk := &ttnpb.SessionKeys{
+			FNwkSIntKey: &ttnpb.KeyEnvelope{
+				Key: &FNwkSIntKey,
+			},
+			SessionKeyID: []byte("handle-uplink-test-session-key-id"),
+		}
+		if withAppSKey {
+			sk.AppSKey = &ttnpb.KeyEnvelope{
+				Key: &AppSKey,
+			}
+		}
+		switch {
+		case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
+			sk.NwkSEncKey = sk.FNwkSIntKey
+			sk.SNwkSIntKey = sk.FNwkSIntKey
+		default:
+			sk.NwkSEncKey = &ttnpb.KeyEnvelope{
+				Key: &NwkSEncKey,
+			}
+			sk.SNwkSIntKey = &ttnpb.KeyEnvelope{
+				Key: &SNwkSIntKey,
+			}
+		}
+		return CopySessionKeys(sk)
+	}
+	withMatchedUplinkSettings := func(chIdx int, drIdx ttnpb.DataRateIndex, msg *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
+		msg = CopyUplinkMessage(msg)
+		msg.Settings.DataRateIndex = drIdx
+		msg.DeviceChannelIndex = uint32(chIdx)
+		return msg
+	}
+
+	type TestCase struct {
 		Name    string
-		Handler func(context.Context, TestEnvironment, func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool
-	}{
+		Handler func(context.Context, TestEnvironment, *test.MockClock, func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool
+	}
+	tcs := []TestCase{
 		{
-			Name: "Invalid payload",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+			Name: "No settings",
+			Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-
-				makeMsg := func(_ bool) *ttnpb.UplinkMessage {
-					return &ttnpb.UplinkMessage{
-						RxMetadata: MakeRxMetadataSlice(),
-						Settings:   makeDataUplinkSettings(),
-					}
-				}
-
-				handleUplinkErrCh := handle(ctx, makeMsg(false))
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.HaveSameErrorDefinitionAs, ErrDecodePayload)
-				})
+				return a.So(AllTrue(
+					assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{}), invalidUplinkSettingsErr),
+					assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
+						RawPayload: []byte("testpayload"),
+						RxMetadata: RxMetadata[:1],
+					}), invalidUplinkSettingsErr),
+					assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
+						RawPayload: []byte("testpayload"),
+					}), invalidUplinkSettingsErr),
+				), should.BeTrue)
 			},
 		},
+	}
+	for _, uplinkMDs := range [][]*ttnpb.RxMetadata{
+		nil,
+		RxMetadata[0:1],
+		append(RxMetadata[1:4]),
+	} {
+		uplinkMDs := uplinkMDs
+		makeMDName := func(parts ...string) string {
+			return MakeTestCaseName(append(parts, fmt.Sprintf("Metadata length:%d", len(uplinkMDs)))...)
+		}
+		ForEachBand(t, func(makeLoopName func(...string) string, phy band.Band, phyVersion ttnpb.PHYVersion) {
+			switch phyVersion {
+			case ttnpb.PHY_V1_0_3_REV_A:
+			case ttnpb.PHY_V1_1_REV_B, ttnpb.PHY_V1_0_2_REV_B:
+				if testing.Short() {
+					return
+				}
+			default:
+				return
+			}
 
-		{
-			Name: "Unknown Major",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
+			chIdx := len(phy.UplinkChannels) - 1
+			ch := phy.UplinkChannels[chIdx]
+			drIdx := ch.MaxDataRate
+			dr := phy.DataRates[drIdx].Rate
 
-				makeMsg := func(_ bool) *ttnpb.UplinkMessage {
-					return &ttnpb.UplinkMessage{
-						RawPayload: []byte{
+			makeName := func(parts ...string) string {
+				return makeMDName(makeChDRName(chIdx, drIdx, makeLoopName(parts...)))
+			}
+			tcs = append(tcs,
+				TestCase{
+					Name: makeName("No payload"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
+							RxMetadata: uplinkMDs,
+							Settings:   makeUplinkSettings(dr, ch),
+						}), ErrDecodePayload.WithCause(lorawan.UnmarshalMessage(nil, nil))), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeName("Unknown Major"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
+							RawPayload: []byte{
+								/* MHDR */
+								0b000_000_01,
+								/* Join-request */
+								/** JoinEUI **/
+								JoinEUI[7], JoinEUI[6], JoinEUI[5], JoinEUI[4], JoinEUI[3], JoinEUI[2], JoinEUI[1], JoinEUI[0],
+								/** DevEUI **/
+								DevEUI[7], DevEUI[6], DevEUI[5], DevEUI[4], DevEUI[3], DevEUI[2], DevEUI[1], DevEUI[0],
+								/** DevNonce **/
+								0x01, 0x00,
+								/* MIC */
+								0x03, 0x02, 0x01, 0x00,
+							},
+							RxMetadata: uplinkMDs,
+							Settings:   makeUplinkSettings(dr, ch),
+						}), ErrUnsupportedLoRaWANVersion.WithAttributes("version", uint32(1))), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeName("Invalid MType"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
+							RawPayload: bytes.Repeat([]byte{0x20}, 33),
+							RxMetadata: uplinkMDs,
+							Settings:   makeUplinkSettings(dr, ch),
+						}), nil), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeName("Proprietary MType"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						phyPayload := []byte{
 							/* MHDR */
-							0b000_000_01,
-							/* Join-request */
-							/** JoinEUI **/
-							joinEUI[7], joinEUI[6], joinEUI[5], joinEUI[4], joinEUI[3], joinEUI[2], joinEUI[1], joinEUI[0],
-							/** DevEUI **/
-							devEUI[7], devEUI[6], devEUI[5], devEUI[4], devEUI[3], devEUI[2], devEUI[1], devEUI[0],
-							/** DevNonce **/
+							0b111_000_00,
+						}
+						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
+							RawPayload: phyPayload,
+							RxMetadata: uplinkMDs,
+							Settings:   makeUplinkSettings(dr, ch),
+						}), ErrDecodePayload.WithCause(lorawan.UnmarshalMessage(phyPayload, &ttnpb.Message{}))), should.BeTrue)
+					},
+				},
+			)
+		})
+
+		ForEachFrequencyPlanBandMACVersion(t, func(makeLoopName func(...string) string, fpID string, fp *frequencyplans.FrequencyPlan, phy band.Band, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
+			switch fpID {
+			case test.EUFrequencyPlanID, test.USFrequencyPlanID:
+			default:
+				return
+			}
+			switch phyVersion {
+			case ttnpb.PHY_V1_0_3_REV_A:
+			case ttnpb.PHY_V1_1_REV_B, ttnpb.PHY_V1_0_2_REV_B:
+				if testing.Short() {
+					return
+				}
+			default:
+				return
+			}
+			switch macVersion {
+			case ttnpb.MAC_V1_0_4:
+			case ttnpb.MAC_V1_1, ttnpb.MAC_V1_0_3:
+				if testing.Short() {
+					return
+				}
+			default:
+				return
+			}
+
+			makeJoinResponse := func(withAppSKey bool) *ttnpb.JoinResponse {
+				return &ttnpb.JoinResponse{
+					RawPayload:  bytes.Repeat([]byte{0x42}, 17),
+					SessionKeys: *makeSessionKeys(macVersion, withAppSKey),
+				}
+			}
+			makeJoinDevice := func(clock *test.MockClock) *ttnpb.EndDevice {
+				return &ttnpb.EndDevice{
+					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
+					FrequencyPlanID:      fpID,
+					LoRaWANPHYVersion:    phyVersion,
+					LoRaWANVersion:       macVersion,
+					MACSettings: &ttnpb.MACSettings{
+						Rx1Delay: &ttnpb.RxDelayValue{
+							Value: ttnpb.RX_DELAY_3,
+						},
+						DesiredRx2DataRateIndex: &ttnpb.DataRateIndexValue{
+							Value: ttnpb.DATA_RATE_2,
+						},
+					},
+					SupportsJoin: true,
+					CreatedAt:    clock.Now(),
+					UpdatedAt:    clock.Now(),
+				}
+			}
+
+			chIdx := len(phy.UplinkChannels) - 1
+			ch := phy.UplinkChannels[chIdx]
+			drIdx := ch.MaxDataRate
+			dr := phy.DataRates[drIdx].Rate
+
+			makeJoinRequestDevNonce := func() types.DevNonce {
+				return types.DevNonce{0x00, 0x01}
+			}
+			makeJoinRequestMIC := func() [4]byte {
+				return [...]byte{0x03, 0x02, 0x01, 0x00}
+			}
+			makeJoinRequestPHYPayload := func() [23]byte {
+				devNonce := makeJoinRequestDevNonce()
+				mic := makeJoinRequestMIC()
+				return [...]byte{
+					/* MHDR */
+					0b000_000_00,
+					JoinEUI[7], JoinEUI[6], JoinEUI[5], JoinEUI[4], JoinEUI[3], JoinEUI[2], JoinEUI[1], JoinEUI[0],
+					DevEUI[7], DevEUI[6], DevEUI[5], DevEUI[4], DevEUI[3], DevEUI[2], DevEUI[1], DevEUI[0],
+					/* DevNonce */
+					devNonce[1], devNonce[0],
+					/* MIC */
+					mic[0], mic[1], mic[2], mic[3],
+				}
+			}
+			makeJoinRequestDecodedPayload := func() *ttnpb.Message {
+				mic := makeJoinRequestMIC()
+				devNonce := makeJoinRequestDevNonce()
+				return &ttnpb.Message{
+					MHDR: ttnpb.MHDR{
+						MType: ttnpb.MType_JOIN_REQUEST,
+						Major: ttnpb.Major_LORAWAN_R1,
+					},
+					MIC: mic[:],
+					Payload: &ttnpb.Message_JoinRequestPayload{
+						JoinRequestPayload: &ttnpb.JoinRequestPayload{
+							JoinEUI:  *JoinEUI.Copy(&types.EUI64{}),
+							DevEUI:   *DevEUI.Copy(&types.EUI64{}),
+							DevNonce: devNonce,
+						},
+					},
+				}
+			}
+			makeNsJsJoinRequest := func(devAddr *types.DevAddr, correlationIDs ...string) *ttnpb.JoinRequest {
+				phyPayload := makeJoinRequestPHYPayload()
+				return &ttnpb.JoinRequest{
+					CFList:         frequencyplans.CFList(*fp, phyVersion),
+					CorrelationIDs: correlationIDs,
+					DevAddr: func() types.DevAddr {
+						if devAddr != nil {
+							return *devAddr
+						} else {
+							return types.DevAddr{}
+						}
+					}(),
+					NetID:              *NetID.Copy(&types.NetID{}),
+					RawPayload:         phyPayload[:],
+					Payload:            makeJoinRequestDecodedPayload(),
+					RxDelay:            ttnpb.RX_DELAY_3,
+					SelectedMACVersion: macVersion,
+					DownlinkSettings: ttnpb.DLSettings{
+						OptNeg: macVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+						Rx2DR:  ttnpb.DATA_RATE_2,
+					},
+				}
+			}
+			makeJoinSetDevice := func(getDevice *ttnpb.EndDevice, decodedMsg *ttnpb.UplinkMessage, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse) *ttnpb.EndDevice {
+				macState := test.Must(NewMACState(getDevice, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})).(*ttnpb.MACState)
+				macState.RxWindowsAvailable = true
+				macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
+					Keys:    joinResp.SessionKeys,
+					Payload: joinResp.RawPayload,
+					Request: *joinReq,
+				}
+				setDevice := CopyEndDevice(getDevice)
+				setDevice.RecentUplinks = AppendRecentUplink(setDevice.RecentUplinks, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), RecentUplinkCount)
+				setDevice.PendingMACState = macState
+				return setDevice
+			}
+
+			makeJoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
+				phyPayload := makeJoinRequestPHYPayload()
+				msg := &ttnpb.UplinkMessage{
+					CorrelationIDs: []string{
+						"join-request-correlation-id-1",
+						"join-request-correlation-id-2",
+						"join-request-correlation-id-3",
+					},
+					RawPayload: phyPayload[:],
+					RxMetadata: uplinkMDs,
+					Settings:   makeUplinkSettings(dr, ch),
+				}
+				if decodePayload {
+					msg.Payload = makeJoinRequestDecodedPayload()
+				}
+				return msg
+			}
+
+			makeJoinName := func(parts ...string) string {
+				return makeMDName(makeChDRName(chIdx, drIdx, makeLoopName(append([]string{"Join-request"}, parts...)...)))
+			}
+			tcs = append(tcs,
+				TestCase{
+					Name: makeJoinName("Get fail"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							_, ok := assertJoinGetByEUI(ctx, env, msg.CorrelationIDs, nil, ErrTestInternal)
+							if !a.So(ok, should.BeTrue) {
+								return false
+							}
+							return ok
+						}, ErrTestInternal), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get ABP device", "Deduplication fail"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.SupportsJoin = false
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), false, ErrTestInternal)
+							return AllTrue(
+								ok,
+								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
+							)
+						}, ErrTestInternal), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "Deduplication fail"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), false, ErrTestInternal)
+							return AllTrue(
+								ok,
+								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
+							)
+						}, ErrTestInternal), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get ABP device", "Duplicate uplink"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.SupportsJoin = false
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							_, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), false, nil)
+							return ok
+						}, nil), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "Duplicate uplink"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							_, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), false, nil)
+							return ok
+						}, nil), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get ABP device", "First uplink"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.SupportsJoin = false
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), true, nil)
+							return AllTrue(
+								ok,
+								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrABPJoinRequest),
+							)
+						}, ErrABPJoinRequest), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS fail"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, _, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), makeNsJsJoinRequest(nil), nil, ErrTestInternal)
+							return AllTrue(
+								ok,
+								assertPublishDropJoinRequestRPCError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
+							)
+						}, ErrTestInternal), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS not found", "Interop JS fail"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, _, ok := assertJoinInteropSequence(ctx, env, clock, true, decodedMsg, CopyEndDevice(getDevice), makeNsJsJoinRequest(nil), nil, ErrTestInternal)
+							return AllTrue(
+								ok,
+								assertPublishDropJoinRequestRPCError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
+							)
+						}, ErrTestInternal), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set fail on read"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.Session = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink(),
+							},
+						}
+						getDevice.DevAddr = &getDevice.Session.DevAddr
+						joinResp := makeJoinResponse(true)
+						joinReq := makeNsJsJoinRequest(nil)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, _, ok := assertJoinInteropSequence(ctx, env, clock, false, decodedMsg, CopyEndDevice(getDevice), joinReq, joinResp, nil)
+							if !a.So(AllTrue(
+								ok,
+								assertPublishForwardJoinRequest(ctx, env, getCtx, getDevice.EndDeviceIdentifiers),
+							), should.BeTrue) {
+								return false
+							}
+							clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+							if !a.So(assertAccumulatedMetadata(ctx, env, getCtx, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), nil, ErrTestInternal), should.BeTrue) {
+								return true
+							}
+							return a.So(AllTrue(AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
+								return AllTrue(
+									a.So(ctx, should.HaveParentContextOrEqual, getCtx),
+									a.So(appID, should.Resemble, AppID),
+									a.So(devID, should.Resemble, DevID),
+									a.So(gets, should.HaveSameElementsDeep, joinSetByIDGetPaths),
+								)
+							}, func(context.Context) DeviceRegistrySetByIDResponse {
+								return DeviceRegistrySetByIDResponse{
+									Error: ErrTestInternal,
+								}
+							}),
+								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
+							), should.BeTrue)
+						}, ErrTestInternal), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Device deleted during handling"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.Session = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink(),
+							},
+						}
+						getDevice.DevAddr = &getDevice.Session.DevAddr
+						joinResp := makeJoinResponse(true)
+						joinReq := makeNsJsJoinRequest(nil)
+						innerErr := ErrOutdatedData
+						registryErr := ErrTestInternal.WithCause(innerErr)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, _, ok := assertJoinInteropSequence(ctx, env, clock, false, decodedMsg, CopyEndDevice(getDevice), joinReq, joinResp, nil)
+							if !a.So(AllTrue(
+								ok,
+								assertPublishForwardJoinRequest(ctx, env, getCtx, getDevice.EndDeviceIdentifiers),
+							), should.BeTrue) {
+								return false
+							}
+							clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+							if !a.So(assertAccumulatedMetadata(ctx, env, getCtx, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), nil, ErrTestInternal), should.BeTrue) {
+								return true
+							}
+							_, ok = assertJoinSetByID(ctx, env, getCtx, nil, nil, innerErr, registryErr)
+							return AllTrue(
+								ok,
+								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, registryErr),
+							)
+						}, registryErr), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set fail on write"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.Session = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink(),
+							},
+						}
+						getDevice.DevAddr = &getDevice.Session.DevAddr
+						joinResp := makeJoinResponse(true)
+						joinReq := makeNsJsJoinRequest(nil)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, _, ok := assertJoinInteropSequence(ctx, env, clock, false, decodedMsg, CopyEndDevice(getDevice), joinReq, joinResp, nil)
+							if !a.So(AllTrue(
+								ok,
+								assertPublishForwardJoinRequest(ctx, env, getCtx, getDevice.EndDeviceIdentifiers),
+							), should.BeTrue) {
+								return false
+							}
+							clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+							if !a.So(assertAccumulatedMetadata(ctx, env, getCtx, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), nil, ErrTestInternal), should.BeTrue) {
+								return true
+							}
+							_, ok = assertJoinSetByID(ctx, env, getCtx, getDevice, makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp), nil, ErrTestInternal)
+							return AllTrue(
+								ok,
+								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
+							)
+						}, ErrTestInternal), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set success", "Downlink add success", "AppSKey present", "Application uplink add success"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.Session = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink(),
+							},
+						}
+						getDevice.DevAddr = &getDevice.Session.DevAddr
+						joinResp := makeJoinResponse(true)
+						joinReq := makeNsJsJoinRequest(nil)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, joinRespRecvAt, ok := assertJoinInteropSequence(ctx, env, clock, false, decodedMsg, CopyEndDevice(getDevice), joinReq, joinResp, nil)
+							if !a.So(AllTrue(
+								ok,
+								assertPublishForwardJoinRequest(ctx, env, getCtx, getDevice.EndDeviceIdentifiers),
+							), should.BeTrue) {
+								return false
+							}
+							clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+							if !a.So(assertAccumulatedMetadata(ctx, env, getCtx, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), nil, ErrTestInternal), should.BeTrue) {
+								return true
+							}
+							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
+							setCtx, ok := assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, nil)
+							return AllTrue(
+								ok,
+								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, nil),
+								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, nil),
+							)
+						}, nil), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "No downlink queue", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add fail"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						joinResp := makeJoinResponse(false)
+						joinReq := makeNsJsJoinRequest(nil)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, joinRespRecvAt, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), joinReq, joinResp, nil)
+							if !a.So(AllTrue(
+								ok,
+								assertPublishForwardJoinRequest(ctx, env, getCtx, getDevice.EndDeviceIdentifiers),
+							), should.BeTrue) {
+								return false
+							}
+							clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+							if !a.So(assertAccumulatedMetadata(ctx, env, getCtx, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), RxMetadata[:], nil), should.BeTrue) {
+								return true
+							}
+							decodedMsg.RxMetadata = RxMetadata[:]
+							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
+							setCtx, ok := assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, nil)
+							return a.So(AllTrue(
+								ok,
+								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
+								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, ErrTestInternal),
+								assertPublishMergeMetadata(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, RxMetadata[:]...),
+							), should.BeTrue)
+						}, nil), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "No downlink queue", "Set fail on write"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						joinResp := makeJoinResponse(false)
+						joinReq := makeNsJsJoinRequest(nil)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, _, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), joinReq, joinResp, nil)
+							if !a.So(AllTrue(
+								ok,
+								assertPublishForwardJoinRequest(ctx, env, getCtx, getDevice.EndDeviceIdentifiers),
+							), should.BeTrue) {
+								return false
+							}
+							clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+							if !a.So(assertAccumulatedMetadata(ctx, env, getCtx, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), RxMetadata[:], nil), should.BeTrue) {
+								return true
+							}
+							decodedMsg.RxMetadata = RxMetadata[:]
+							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
+							_, ok = assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, ErrTestInternal)
+							return a.So(AllTrue(
+								ok,
+								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
+							), should.BeTrue)
+						}, ErrTestInternal), should.BeTrue)
+					},
+				},
+			)
+
+			for _, typ := range []ttnpb.RejoinType{
+				ttnpb.RejoinType_CONTEXT,
+				ttnpb.RejoinType_KEYS,
+				ttnpb.RejoinType_SESSION,
+			} {
+				typ := typ
+				if macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+					continue
+				}
+				makeRejoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
+					var phyPayload []byte
+					switch typ {
+					case ttnpb.RejoinType_CONTEXT, ttnpb.RejoinType_KEYS:
+						phyPayload = []byte{
+							/* MHDR */
+							0b110_000_00,
+							byte(typ),
+							NetID[2], NetID[1], NetID[0],
+							DevEUI[7], DevEUI[6], DevEUI[5], DevEUI[4], DevEUI[3], DevEUI[2], DevEUI[1], DevEUI[0],
+							/* RejoinCnt0 */
 							0x01, 0x00,
 							/* MIC */
 							0x03, 0x02, 0x01, 0x00,
-						},
-						RxMetadata: MakeRxMetadataSlice(),
-						Settings:   makeDataUplinkSettings(),
-					}
-				}
-
-				handleUplinkErrCh := handle(ctx, makeMsg(false))
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.HaveSameErrorDefinitionAs, ErrUnsupportedLoRaWANVersion)
-				})
-			},
-		},
-
-		{
-			Name: "Invalid MType",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				makeMsg := func(_ bool) *ttnpb.UplinkMessage {
-					return &ttnpb.UplinkMessage{
-						RawPayload: bytes.Repeat([]byte{0x20}, 33),
-						RxMetadata: MakeRxMetadataSlice(),
-						Settings:   makeDataUplinkSettings(),
-					}
-				}
-
-				handleUplinkErrCh := handle(ctx, makeMsg(false))
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				})
-			},
-		},
-
-		{
-			Name: "Proprietary MType",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				makeMsg := func(_ bool) *ttnpb.UplinkMessage {
-					return &ttnpb.UplinkMessage{
-						RawPayload: []byte{
+						}
+					case ttnpb.RejoinType_SESSION:
+						phyPayload = []byte{
 							/* MHDR */
-							0b111_000_00,
+							0b110_000_00,
+							byte(typ),
+							JoinEUI[7], JoinEUI[6], JoinEUI[5], JoinEUI[4], JoinEUI[3], JoinEUI[2], JoinEUI[1], JoinEUI[0],
+							DevEUI[7], DevEUI[6], DevEUI[5], DevEUI[4], DevEUI[3], DevEUI[2], DevEUI[1], DevEUI[0],
+							/* RejoinCnt1 */
+							0x01, 0x00,
+							/* MIC */
+							0x03, 0x02, 0x01, 0x00,
+						}
+					default:
+						panic(fmt.Sprintf("unknown rejoin type `%d`", typ))
+					}
+					msg := &ttnpb.UplinkMessage{
+						CorrelationIDs: []string{
+							"rejoin-request-correlation-id-1",
+							"rejoin-request-correlation-id-2",
+							"rejoin-request-correlation-id-3",
 						},
-						RxMetadata: MakeRxMetadataSlice(),
-						Settings:   makeDataUplinkSettings(),
+						RawPayload: phyPayload,
+						RxMetadata: uplinkMDs,
+						Settings:   makeUplinkSettings(dr, ch),
 					}
+					if decodePayload {
+						var pld *ttnpb.RejoinRequestPayload
+						switch typ {
+						case ttnpb.RejoinType_CONTEXT, ttnpb.RejoinType_KEYS:
+							pld = &ttnpb.RejoinRequestPayload{
+								DevEUI:     *DevEUI.Copy(&types.EUI64{}),
+								NetID:      *NetID.Copy(&types.NetID{}),
+								RejoinCnt:  uint32(binary.LittleEndian.Uint16(phyPayload[13:14])),
+								RejoinType: typ,
+							}
+						case ttnpb.RejoinType_SESSION:
+							pld = &ttnpb.RejoinRequestPayload{
+								JoinEUI:    *JoinEUI.Copy(&types.EUI64{}),
+								DevEUI:     *DevEUI.Copy(&types.EUI64{}),
+								RejoinCnt:  uint32(binary.LittleEndian.Uint16(phyPayload[18:19])),
+								RejoinType: typ,
+							}
+						}
+						msg.Payload = &ttnpb.Message{
+							MHDR: ttnpb.MHDR{
+								MType: ttnpb.MType_REJOIN_REQUEST,
+								Major: ttnpb.Major_LORAWAN_R1,
+							},
+							MIC: phyPayload[len(phyPayload)-4:],
+							Payload: &ttnpb.Message_RejoinRequestPayload{
+								RejoinRequestPayload: pld,
+							},
+						}
+					}
+					return msg
 				}
 
-				handleUplinkErrCh := handle(ctx, makeMsg(false))
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.HaveSameErrorDefinitionAs, ErrDecodePayload)
+				tcs = append(tcs, TestCase{
+					Name: makeMDName(makeChDRName(chIdx, drIdx, makeLoopName(append([]string{fmt.Sprintf("Rejoin-request Type %d", typ)})...))),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, makeRejoinRequest(false)), ErrRejoinRequest), should.BeTrue)
+					},
 				})
-			},
-		},
+			}
+		})
 
-		{
-			Name: "Join-request/Get fail",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					reqCorrelationIDs := events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Context: req.Context,
-						Error:   errTest,
-					}
+		ForEachMACVersion(func(makeLoopName func(...string) string, macVersion ttnpb.MACVersion) {
+			switch macVersion {
+			case ttnpb.MAC_V1_0_4:
+			case ttnpb.MAC_V1_1, ttnpb.MAC_V1_0_3:
+				if testing.Short() {
+					return
 				}
+			default:
+				return
+			}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequest, start, duplicateCount)
+			fpID := test.EUFrequencyPlanID
+			phyVersion := ttnpb.PHY_V1_1_REV_B
+			fp := test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(fpID)).(*frequencyplans.FrequencyPlan)
+			phy := test.Must(test.Must(band.GetByID(fp.BandID)).(band.Band).Version(phyVersion)).(band.Band)
+			chIdx := len(phy.UplinkChannels) - 1
+			ch := phy.UplinkChannels[chIdx]
+			drIdx := ch.MaxDataRate
+			dr := phy.DataRates[drIdx].Rate
 
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.EqualErrorOrDefinition, errTest)
-				})
-			},
-		},
-
-		{
-			Name: "Join-request/Get ABP device",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0,
-					LoRaWANVersion:       ttnpb.MAC_V1_0,
-					CreatedAt:            start,
-					UpdatedAt:            time.Now(),
-				}
-
-				var getCtx context.Context
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs := events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), ErrABPJoinRequest))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequest, start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.EqualErrorOrDefinition, ErrABPJoinRequest)
-				})
-			},
-		},
-
-		{
-			Name: "Join-request/Get multicast device",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0,
-					LoRaWANVersion:       ttnpb.MAC_V1_0,
-					Multicast:            true,
-					CreatedAt:            start,
-					UpdatedAt:            time.Now(),
-				}
-
-				var getCtx context.Context
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs := events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), ErrABPJoinRequest))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequest, start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.EqualErrorOrDefinition, ErrABPJoinRequest)
-				})
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.0.2/JS fail",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
+			makeDataRangeDevice := func(clock *test.MockClock, useADR bool) *ttnpb.EndDevice {
+				sk := *makeSessionKeys(macVersion, false)
+				dev := &ttnpb.EndDevice{
+					EndDeviceIdentifiers: *makeOTAAIdentifiers(&DevAddr),
+					FrequencyPlanID:      fpID,
+					LoRaWANPHYVersion:    phyVersion,
+					LoRaWANVersion:       macVersion,
 					MACSettings: &ttnpb.MACSettings{
+						UseADR: &pbtypes.BoolValue{
+							Value: useADR,
+						},
 						Rx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
+							Value: Rx1Delay,
 						},
 					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
-				}
-
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
-					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
-					},
-					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
-						return a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-								},
-								CorrelationIDs:     req.CorrelationIDs,
-								DevAddr:            req.DevAddr,
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_0_2,
-							})
-					},
-					&grpc.EmptyCallOption{},
-					NsJsHandleJoinResponse{
-						Error: errTest,
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					if !a.So(ev.Data(), should.BeError) {
-						return false
-					}
-					err, ok := errors.From(ev.Data().(error))
-					if !a.So(ok, should.BeTrue) {
-						return false
-					}
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), err))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequest, start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeError)
-				})
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.1/JS fail",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
-						},
-					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
-				}
-
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
-					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
-					},
-					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
-						return a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-								},
-								CorrelationIDs: req.CorrelationIDs,
-								DevAddr:        req.DevAddr,
-								DownlinkSettings: ttnpb.DLSettings{
-									OptNeg: true,
-								},
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_1,
-							})
-					},
-					&grpc.EmptyCallOption{},
-					NsJsHandleJoinResponse{
-						Error: errTest,
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					if !a.So(ev.Data(), should.BeError) {
-						return false
-					}
-					err, ok := errors.From(ev.Data().(error))
-					if !a.So(ok, should.BeTrue) {
-						return false
-					}
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), err))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequest, start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeError)
-				})
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.0.3/Cluster-local JS not found/Interop JS fail",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_3_REV_A,
-					LoRaWANVersion:       ttnpb.MAC_V1_0_3,
-					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
-						},
-					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
-				}
-
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
-						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
-				},
-					test.ClusterGetPeerResponse{Error: errors.New("peer not found")},
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
-					func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-							a.So(id, should.Equal, netID) &&
-							a.So(req, should.NotBeNil) &&
-							a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-								},
-								CorrelationIDs:     req.CorrelationIDs,
-								DevAddr:            req.DevAddr,
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_0_3,
-							})
-					},
-					InteropClientHandleJoinRequestResponse{
-						Error: errors.New("test"),
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					if !a.So(ev.Data(), should.BeError) {
-						return false
-					}
-					err, ok := errors.From(ev.Data().(error))
-					if !a.So(ok, should.BeTrue) {
-						return false
-					}
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), err))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequest, start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeError)
-				})
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.1/Cluster-local JS not found/Interop JS fail",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
-						},
-					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
-				}
-
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
-						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
-				},
-					test.ClusterGetPeerResponse{Error: errors.New("peer not found")},
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
-					func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-							a.So(id, should.Equal, netID) &&
-							a.So(req, should.NotBeNil) &&
-							a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-								},
-								CorrelationIDs: req.CorrelationIDs,
-								DevAddr:        req.DevAddr,
-								DownlinkSettings: ttnpb.DLSettings{
-									OptNeg: true,
-								},
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_1,
-							})
-					},
-					InteropClientHandleJoinRequestResponse{
-						Error: errors.New("test"),
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					if !a.So(ev.Data(), should.BeError) {
-						return false
-					}
-					err, ok := errors.From(ev.Data().(error))
-					if !a.So(ok, should.BeTrue) {
-						return false
-					}
-					return a.So(ev, should.ResembleEvent, EvtDropJoinRequest(getCtx, makeOTAAIdentifiers(nil), err))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequest, start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeError)
-				})
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.1/Cluster-local JS not found/Interop JS accept/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACSettings: &ttnpb.MACSettings{
-						Rx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
-						},
-					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink1_1(33, true),
-					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
-				}
-
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-						a.So(role, should.Equal, ttnpb.ClusterRole_JOIN_SERVER) &&
-						a.So(ids, should.Resemble, getDevice.EndDeviceIdentifiers)
-				},
-					test.ClusterGetPeerResponse{Error: errors.New("peer not found")},
-				), should.BeTrue) {
-					return false
-				}
-
-				joinResp := makeJoinResponse(ttnpb.MAC_V1_1)
-
-				now := clock.Add(time.Nanosecond)
-				joinAt := now
-
-				var joinReq *ttnpb.JoinRequest
-				if !a.So(AssertInteropClientHandleJoinRequestRequest(ctx, env.InteropClient.HandleJoinRequest,
-					func(ctx context.Context, id types.NetID, req *ttnpb.JoinRequest) bool {
-						joinReq = req
-						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-							a.So(id, should.Equal, netID) &&
-							a.So(req, should.NotBeNil) &&
-							a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-								},
-								CorrelationIDs: req.CorrelationIDs,
-								DevAddr:        req.DevAddr,
-								DownlinkSettings: ttnpb.DLSettings{
-									OptNeg: true,
-								},
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_1,
-							})
-					},
-					InteropClientHandleJoinRequestResponse{
-						Response: joinResp,
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				now = clock.Add(time.Nanosecond)
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				var setCtx context.Context
-				var recentUp *ttnpb.UplinkMessage
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
-					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeDataUplink1_1(33, true),
-						},
+					Session: &ttnpb.Session{
+						DevAddr:     *DevAddr.Copy(&types.DevAddr{}),
+						SessionKeys: sk,
+						LastFCntUp:  FCnt - 1,
+						StartedAt:   clock.Now(),
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							makeApplicationDownlink(),
-						},
-					})
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
-
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
-					macState.CurrentParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.RxWindowsAvailable = true
-					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-						Keys:    *makeSessionKeys(ttnpb.MAC_V1_1),
-						Payload: joinResp.RawPayload,
-						Request: *joinReq,
-					}
-					a.So(dev.PendingMACState, should.Resemble, macState)
-					a.So(dev.QueuedApplicationDownlinks, should.BeNil)
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequestWithSettings(true)
-						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
-					}
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Device: &ttnpb.EndDevice{
-							EndDeviceIdentifiers:       *makeOTAAIdentifiers(nil),
-							PendingMACState:            macState,
-							QueuedApplicationDownlinks: dev.QueuedApplicationDownlinks,
-							RecentUplinks:              dev.RecentUplinks,
-							CreatedAt:                  start,
-							UpdatedAt:                  time.Now(),
-						},
-						Context: setCtx,
-					}
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(-InfrastructureDelay/2+5*time.Second-joinReq.RxDelay.Duration()/2-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
 							{
-								CorrelationIDs:       reqCorrelationIDs,
-								EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
-								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-									AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
-									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-										makeApplicationDownlink(),
-									},
-									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-									ReceivedAt:   joinAt,
-								}},
+								SessionKeyID: sk.SessionKeyID,
+								FPort:        FPort,
+								FCnt:         42,
 							},
-						})
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
-
-				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				}) {
-					return false
-				}
-				return true
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.0.2/JS accept/Set fail",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-					MACSettings: &ttnpb.MACSettings{
-						DesiredRx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
 						},
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink1_0(33, true),
-					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
+					CreatedAt: clock.Now(),
+					UpdatedAt: clock.Now(),
 				}
+				dev.MACState = test.Must(NewMACState(dev, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})).(*ttnpb.MACState)
+				dev.MACState.CurrentParameters.ADRNbTrans = 2
+				return dev
+			}
 
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
+			const matchIdx = 2
+			makeDataRangeDevices := func(clock *test.MockClock, withMatch bool, useADR bool) []*ttnpb.EndDevice {
+				withLastFCntUp := func(dev *ttnpb.EndDevice, fCnt uint32) *ttnpb.EndDevice {
+					ret := CopyEndDevice(dev)
+					ret.Session.LastFCntUp = fCnt
+					return ret
 				}
+				match := makeDataRangeDevice(clock, useADR)
+				rets := []*ttnpb.EndDevice{
+					withLastFCntUp(match, FCnt+2),
+					withLastFCntUp(match, FCnt+25),
+				}
+				if withMatch {
+					rets = append(rets, match)
+				}
+				return append(rets,
+					withLastFCntUp(match, FCnt+42),
+				)
+			}
 
-				joinResp := makeJoinResponse(ttnpb.MAC_V1_0_2)
-
-				var joinReq *ttnpb.JoinRequest
-				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
-					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
-					},
-					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
-						joinReq = req
-						return a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
+			for _, confirmed := range [2]bool{true, false} {
+				confirmed := confirmed
+				makeDataUplink := func(decodePayload bool, adr bool, frmPayload []byte) *ttnpb.UplinkMessage {
+					mType := ttnpb.MType_UNCONFIRMED_UP
+					if confirmed {
+						mType = ttnpb.MType_CONFIRMED_UP
+					}
+					mhdr := ttnpb.MHDR{
+						MType: mType,
+						Major: ttnpb.Major_LORAWAN_R1,
+					}
+					fOpts := []byte{0x02}
+					if macVersion.EncryptFOpts() {
+						fOpts = MustEncryptUplink(NwkSEncKey, DevAddr, FCnt, fOpts...)
+					}
+					fhdr := ttnpb.FHDR{
+						DevAddr: *DevAddr.Copy(&types.DevAddr{}),
+						FCtrl: ttnpb.FCtrl{
+							ADR: adr,
+						},
+						FCnt:  FCnt,
+						FOpts: fOpts,
+					}
+					phyPayload := append(
+						append(
+							test.Must(lorawan.AppendFHDR(
+								test.Must(lorawan.AppendMHDR(nil, mhdr)).([]byte), fhdr, true),
+							).([]byte),
+							FPort),
+						frmPayload...)
+					switch {
+					case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
+						phyPayload = MustAppendLegacyUplinkMIC(
+							FNwkSIntKey,
+							DevAddr,
+							FCnt,
+							phyPayload...,
+						)
+					default:
+						phyPayload = MustAppendUplinkMIC(
+							SNwkSIntKey,
+							FNwkSIntKey,
+							0,
+							uint8(drIdx),
+							uint8(chIdx),
+							DevAddr,
+							FCnt,
+							phyPayload...,
+						)
+					}
+					msg := &ttnpb.UplinkMessage{
+						CorrelationIDs: []string{
+							"data-uplink-correlation-id-1",
+							"data-uplink-correlation-id-2",
+							"data-uplink-correlation-id-3",
+						},
+						RawPayload: phyPayload,
+						RxMetadata: uplinkMDs,
+						Settings:   makeUplinkSettings(dr, ch),
+					}
+					if decodePayload {
+						if frmPayload == nil {
+							frmPayload = []byte{}
+						}
+						msg.Payload = &ttnpb.Message{
+							MHDR: mhdr,
+							MIC:  phyPayload[len(phyPayload)-4:],
+							Payload: &ttnpb.Message_MACPayload{
+								MACPayload: &ttnpb.MACPayload{
+									FHDR:       fhdr,
+									FPort:      FPort,
+									FRMPayload: frmPayload,
 								},
-								CorrelationIDs:     req.CorrelationIDs,
-								DevAddr:            req.DevAddr,
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_0_2,
-							})
-					},
-					&grpc.EmptyCallOption{},
-					NsJsHandleJoinResponse{
-						Response: joinResp,
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				var setCtx context.Context
-				var recentUp *ttnpb.UplinkMessage
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
-					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeDataUplink1_0(33, true),
-						},
-						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							makeApplicationDownlink(),
-						},
-					})
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
-
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
-					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.RxWindowsAvailable = true
-					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-						Keys:    *makeSessionKeys(ttnpb.MAC_V1_0_2),
-						Payload: joinResp.RawPayload,
-						Request: *joinReq,
-					}
-					a.So(dev.PendingMACState, should.Resemble, macState)
-					a.So(dev.QueuedApplicationDownlinks, should.BeNil)
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequestWithSettings(true)
-						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
-					}
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Error:   errTest,
-						Context: setCtx,
-					}
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					a.So(ev, should.ResembleEvent, EvtDropJoinRequest(setCtx, makeOTAAIdentifiers(nil), errTest))
-					return true
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.EqualErrorOrDefinition, errTest)
-				})
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.1/JS accept/Set success/Downlink add fail",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACSettings: &ttnpb.MACSettings{
-						DesiredRx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
-						},
-					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink1_1(33, true),
-					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
-				}
-
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				joinResp := makeJoinResponse(ttnpb.MAC_V1_1)
-
-				now := clock.Add(time.Nanosecond)
-
-				var joinReq *ttnpb.JoinRequest
-				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
-					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
-					},
-					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
-						joinReq = req
-						return a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-								},
-								CorrelationIDs: req.CorrelationIDs,
-								DevAddr:        req.DevAddr,
-								DownlinkSettings: ttnpb.DLSettings{
-									OptNeg: true,
-								},
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_1,
-							})
-					},
-					&grpc.EmptyCallOption{},
-					NsJsHandleJoinResponse{
-						Response: joinResp,
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				now = clock.Add(time.Nanosecond)
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				var setCtx context.Context
-				var recentUp *ttnpb.UplinkMessage
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
-					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeDataUplink1_1(33, true),
-						},
-						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							makeApplicationDownlink(),
-						},
-					})
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
-
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
-					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.RxWindowsAvailable = true
-					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-						Keys:    *makeSessionKeys(ttnpb.MAC_V1_1),
-						Payload: joinResp.RawPayload,
-						Request: *joinReq,
-					}
-					a.So(dev.PendingMACState, should.Resemble, macState)
-					a.So(dev.QueuedApplicationDownlinks, should.BeNil)
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequestWithSettings(true)
-						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
-					}
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Device: &ttnpb.EndDevice{
-							EndDeviceIdentifiers:       *makeOTAAIdentifiers(nil),
-							PendingMACState:            macState,
-							QueuedApplicationDownlinks: dev.QueuedApplicationDownlinks,
-							RecentUplinks:              dev.RecentUplinks,
-							CreatedAt:                  start,
-							UpdatedAt:                  time.Now(),
-						},
-						Context: setCtx,
-					}
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(-InfrastructureDelay/2+5*time.Second-joinReq.RxDelay.Duration()/2-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					errTest,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
-							{
-								CorrelationIDs:       reqCorrelationIDs,
-								EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
-								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-									AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
-									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-										makeApplicationDownlink(),
-									},
-									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-									ReceivedAt:   now,
-								}},
 							},
-						})
-				},
-					nil,
-				), should.BeTrue) {
-					return false
+						}
+					}
+					return msg
+				}
+				dataSetByIDSetPaths := [...]string{
+					"mac_state",
+					"pending_mac_state",
+					"pending_session",
+					"recent_adr_uplinks",
+					"recent_uplinks",
+					"session",
+				}
+				makeDataSetDevice := func(getDevice *ttnpb.EndDevice, decodedMsg *ttnpb.UplinkMessage) (*ttnpb.EndDevice, []events.DefinitionDataClosure) {
+					setDevice := CopyEndDevice(getDevice)
+					setDevice.MACState.QueuedResponses = nil
+					evs := test.Must(HandleLinkCheckReq(test.Context(), setDevice, decodedMsg)).([]events.DefinitionDataClosure)
+					setDevice.MACState.RecentUplinks = AppendRecentUplink(setDevice.MACState.RecentUplinks, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), RecentUplinkCount)
+					setDevice.MACState.RxWindowsAvailable = true
+					setDevice.RecentUplinks = AppendRecentUplink(setDevice.RecentUplinks, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), RecentUplinkCount)
+					setDevice.Session.LastFCntUp = FCnt
+					if decodedMsg.Payload.GetMACPayload().ADR {
+						setDevice.RecentADRUplinks = AppendRecentUplink(setDevice.RecentADRUplinks, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), OptimalADRUplinkCount)
+						test.Must(nil, AdaptDataRate(setDevice, phy, ttnpb.MACSettings{}))
+					}
+					return setDevice, evs
 				}
 
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
-
-				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				}) {
-					return false
+				makeName := func(parts ...string) string {
+					mTypeStr := "Unconfirmed Data"
+					if confirmed {
+						mTypeStr = "Confirmed Data"
+					}
+					return makeMDName(makeChDRName(chIdx, drIdx, makeLoopName(append([]string{mTypeStr}, parts...)...)))
 				}
-				return true
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.0.2/JS accept/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-					MACSettings: &ttnpb.MACSettings{
-						DesiredRx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
+				for _, conf := range []struct {
+					MakeName       func(...string) string
+					MakeDataUplink func(bool) *ttnpb.UplinkMessage
+				}{
+					{
+						MakeName: func(parts ...string) string {
+							return makeName(append(parts, "No ADR", "No FRMPayload")...)
+						},
+						MakeDataUplink: func(decoded bool) *ttnpb.UplinkMessage {
+							return makeDataUplink(decoded, false, nil)
 						},
 					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink1_0(33, true),
-					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
-				}
-
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				joinResp := makeJoinResponse(ttnpb.MAC_V1_0_2)
-
-				now := clock.Add(time.Nanosecond)
-
-				var joinReq *ttnpb.JoinRequest
-				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
-					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
-					},
-					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
-						joinReq = req
-						return a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-								},
-								CorrelationIDs:     req.CorrelationIDs,
-								DevAddr:            req.DevAddr,
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_0_2,
-							})
-					},
-					&grpc.EmptyCallOption{},
-					NsJsHandleJoinResponse{
-						Response: joinResp,
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				now = clock.Add(time.Nanosecond)
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				var setCtx context.Context
-				var recentUp *ttnpb.UplinkMessage
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
-					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LoRaWANPHYVersion: ttnpb.PHY_V1_0_2_REV_B,
-						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeDataUplink1_0(33, true),
+					{
+						MakeName: func(parts ...string) string {
+							return makeName(append(parts, "No ADR", "FRMPayload")...)
 						},
-						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							makeApplicationDownlink(),
+						MakeDataUplink: func(decoded bool) *ttnpb.UplinkMessage {
+							return makeDataUplink(decoded, false, []byte("test"))
 						},
-					})
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
-
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
-					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.RxWindowsAvailable = true
-					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-						Keys:    *makeSessionKeys(ttnpb.MAC_V1_0_2),
-						Payload: joinResp.RawPayload,
-						Request: *joinReq,
-					}
-					a.So(dev.PendingMACState, should.Resemble, macState)
-					a.So(dev.QueuedApplicationDownlinks, should.BeNil)
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequestWithSettings(true)
-						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
-					}
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Device: &ttnpb.EndDevice{
-							EndDeviceIdentifiers:       *makeOTAAIdentifiers(nil),
-							PendingMACState:            macState,
-							QueuedApplicationDownlinks: dev.QueuedApplicationDownlinks,
-							RecentUplinks:              dev.RecentUplinks,
-							CreatedAt:                  start,
-							UpdatedAt:                  time.Now(),
+					},
+					{
+						MakeName: func(parts ...string) string {
+							return makeName(append(parts, "ADR", "No FRMPayload")...)
 						},
-						Context: setCtx,
-					}
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(-InfrastructureDelay/2+5*time.Second-joinReq.RxDelay.Duration()/2-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
-							{
-								CorrelationIDs:       reqCorrelationIDs,
-								EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
-								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-									AppSKey: makeSessionKeys(ttnpb.MAC_V1_0_2).AppSKey,
-									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-										makeApplicationDownlink(),
-									},
-									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_0_2).SessionKeyID,
-									ReceivedAt:   now,
-								}},
+						MakeDataUplink: func(decoded bool) *ttnpb.UplinkMessage {
+							return makeDataUplink(decoded, true, nil)
+						},
+					},
+					{
+						MakeName: func(parts ...string) string {
+							return makeName(append(parts, "ADR", "FRMPayload")...)
+						},
+						MakeDataUplink: func(decoded bool) *ttnpb.UplinkMessage {
+							return makeDataUplink(decoded, true, []byte("test"))
+						},
+					},
+				} {
+					conf := conf
+					tcs = append(tcs,
+						TestCase{
+							Name: conf.MakeName("Range fail"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									_, ok := assertDataRangeByAddr(ctx, env, msg.CorrelationIDs, ErrTestInternal)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									return ok
+								}, ErrTestInternal), should.BeTrue)
 							},
-						})
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
-
-				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				}) {
-					return false
-				}
-				return true
-			},
-		},
-
-		{
-			Name: "Join-request/Get OTAA device/1.1/JS accept/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeJoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				getDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACSettings: &ttnpb.MACSettings{
-						DesiredRx1Delay: &ttnpb.RxDelayValue{
-							Value: ttnpb.RX_DELAY_3,
 						},
-					},
-					RecentUplinks: []*ttnpb.UplinkMessage{
-						makeDataUplink1_1(33, true),
-					},
-					SupportsJoin: true,
-					CreatedAt:    start,
-					UpdatedAt:    time.Now(),
-				}
-
-				var getCtx context.Context
-				var reqCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.GetByEUI:
-					getCtx = context.WithValue(req.Context, struct{}{}, "get")
-					reqCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(reqCorrelationIDs, should.Contain, id)
-					}
-					a.So(reqCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.JoinEUI, should.Resemble, joinEUI)
-					a.So(req.DevEUI, should.Resemble, devEUI)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinGetByEUIPaths[:])
-					req.Response <- DeviceRegistryGetByEUIResponse{
-						Device:  CopyEndDevice(getDevice),
-						Context: getCtx,
-					}
-				}
-
-				joinResp := makeJoinResponse(ttnpb.MAC_V1_1)
-
-				now := clock.Add(time.Nanosecond)
-
-				var joinReq *ttnpb.JoinRequest
-				if !a.So(AssertNsJsPeerHandleAuthJoinRequest(ctx, env.Cluster.GetPeer, env.Cluster.Auth,
-					func(ctx context.Context, ids ttnpb.Identifiers) bool {
-						return a.So(ctx, should.HaveParentContextOrEqual, getCtx) &&
-							a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil))
-					},
-					func(ctx context.Context, req *ttnpb.JoinRequest) bool {
-						joinReq = req
-						return a.So(req.CorrelationIDs, should.HaveSameElementsDeep, reqCorrelationIDs) &&
-							a.So(req.DevAddr, should.NotBeEmpty) &&
-							a.So(req.DevAddr.NwkID(), should.Resemble, netID.ID()) &&
-							a.So(req.DevAddr.NetIDType(), should.Equal, netID.Type()) &&
-							a.So(req, should.Resemble, &ttnpb.JoinRequest{
-								CFList: &ttnpb.CFList{
-									Type: ttnpb.CFListType_FREQUENCIES,
-									Freq: []uint32{8671000, 8673000, 8675000, 8677000, 8679000},
-								},
-								CorrelationIDs: req.CorrelationIDs,
-								DevAddr:        req.DevAddr,
-								DownlinkSettings: ttnpb.DLSettings{
-									OptNeg: true,
-								},
-								NetID:              netID,
-								RawPayload:         msg.RawPayload,
-								Payload:            makeJoinRequest(true).Payload,
-								RxDelay:            ttnpb.RX_DELAY_3,
-								SelectedMACVersion: ttnpb.MAC_V1_1,
-							})
-					},
-					&grpc.EmptyCallOption{},
-					NsJsHandleJoinResponse{
-						Response: joinResp,
-					},
-				), should.BeTrue) {
-					return false
-				}
-
-				now = clock.Add(time.Nanosecond)
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardJoinRequest(getCtx, makeOTAAIdentifiers(nil), nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, makeJoinRequestWithSettings, start, duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(getCtx, makeOTAAIdentifiers(nil), len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				var setCtx context.Context
-				var recentUp *ttnpb.UplinkMessage
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, getCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, joinSetByIDGetPaths[:])
-					dev, sets, err := req.Func(ctx, &ttnpb.EndDevice{
-						FrequencyPlanID:   test.EUFrequencyPlanID,
-						LoRaWANPHYVersion: ttnpb.PHY_V1_1_REV_B,
-						RecentUplinks: []*ttnpb.UplinkMessage{
-							makeDataUplink1_1(33, true),
-						},
-						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-							makeApplicationDownlink(),
-						},
-					})
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, joinSetByIDSetPaths[:])
-
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
-					macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_3
-					macState.RxWindowsAvailable = true
-					macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-						Keys:    *makeSessionKeys(ttnpb.MAC_V1_1),
-						Payload: joinResp.RawPayload,
-						Request: *joinReq,
-					}
-					a.So(dev.PendingMACState, should.Resemble, macState)
-					a.So(dev.QueuedApplicationDownlinks, should.BeNil)
-					if a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						recentUp = dev.RecentUplinks[len(dev.RecentUplinks)-1]
-						a.So([]time.Time{start, recentUp.ReceivedAt, time.Now()}, should.BeChronological)
-						a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-						expectedUp := makeJoinRequestWithSettings(true)
-						expectedUp.CorrelationIDs = reqCorrelationIDs
-						expectedUp.ReceivedAt = recentUp.ReceivedAt
-						expectedUp.RxMetadata = recentUp.RxMetadata
-						a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(CopyUplinkMessages(getDevice.RecentUplinks...), expectedUp))
-					}
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Device: &ttnpb.EndDevice{
-							EndDeviceIdentifiers:       *makeOTAAIdentifiers(nil),
-							PendingMACState:            macState,
-							QueuedApplicationDownlinks: dev.QueuedApplicationDownlinks,
-							RecentUplinks:              dev.RecentUplinks,
-							CreatedAt:                  start,
-							UpdatedAt:                  time.Now(),
-						},
-						Context: setCtx,
-					}
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(nil)) &&
-						a.So(startAt, should.Resemble, recentUp.ReceivedAt.Add(-InfrastructureDelay/2+5*time.Second-joinReq.RxDelay.Duration()/2-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
-							{
-								CorrelationIDs:       reqCorrelationIDs,
-								EndDeviceIdentifiers: *makeOTAAIdentifiers(&joinReq.DevAddr),
-								Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-									AppSKey: makeSessionKeys(ttnpb.MAC_V1_1).AppSKey,
-									InvalidatedDownlinks: []*ttnpb.ApplicationDownlink{
-										makeApplicationDownlink(),
-									},
-									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-									ReceivedAt:   now,
-								}},
+						TestCase{
+							Name: conf.MakeName("Range success", "No devices"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									_, ok := assertDataRangeByAddr(ctx, env, msg.CorrelationIDs, nil)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									return ok
+								}, ErrDeviceNotFound), should.BeTrue)
 							},
-						})
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeJoinRequestWithSettings, start, duplicateCount)
-
-				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				}) {
-					return false
-				}
-				return true
-			},
-		},
-
-		{
-			Name: "Rejoin-request",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now()
-
-				msg := makeRejoinRequest(false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, makeRejoinRequest, start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.NotBeNil)
-				})
-			},
-		},
-
-		{
-			Name: "Data uplink/Matching device/No concurrent update/1.0.2/First transmission/No ADR/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeDataUplink1_0(34, false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
-					return []*ttnpb.UplinkMessage{
-						makeDataUplink1_0(31, true),
-						makeDataUplink1_0(32, true),
-					}
-				}
-
-				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
-					macState.RecentUplinks = makeRecentUplinks()
-					return macState
-				}
-
-				rangeDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-					MACState:             makeMACState(),
-					RecentUplinks:        makeRecentUplinks(),
-					Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
-					CreatedAt:            start,
-					UpdatedAt:            start,
-				}
-
-				var rangeCtx context.Context
-				var upCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(upCorrelationIDs, should.Contain, id)
-					}
-					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.DevAddr, should.Resemble, devAddr)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
-					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
-					multicastDevice := CopyEndDevice(rangeDevice)
-					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
-					multicastDevice.Multicast = true
-					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
-					fCntTooHighDevice := CopyEndDevice(rangeDevice)
-					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
-					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeDataUplink1_0(42, true))
-					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeDataUplink1_0(42, true))
-					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
-					req.Response <- nil
-				}
-
-				now := clock.Add(time.Nanosecond)
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-time.Nanosecond), duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				now = clock.Add(time.Nanosecond)
-
-				var setCtx context.Context
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					dev, sets, err := req.Func(ctx, CopyEndDevice(rangeDevice))
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, []string{
-						"mac_state",
-						"pending_mac_state",
-						"pending_session",
-						"recent_adr_uplinks",
-						"recent_uplinks",
-						"session",
-					})
-
-					a.So(dev.PendingMACState, should.BeNil)
-					a.So(dev.PendingSession, should.BeNil)
-					a.So(dev.RecentADRUplinks, should.BeNil)
-					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
-
-					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						return false
-					}
-					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-					expectedUp := makeDataUplinkWithSettings1_0(34, true)
-					expectedUp.CorrelationIDs = upCorrelationIDs
-					expectedUp.ReceivedAt = start
-					expectedUp.RxMetadata = recentUp.RxMetadata
-					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
-
-					macState := makeMACState()
-					macState.RecentUplinks = append(macState.RecentUplinks, expectedUp)
-					macState.RxWindowsAvailable = true
-					macState.QueuedResponses = []*ttnpb.MACCommand{
-						MakeLinkCheckAns(mds...),
-					}
-					a.So(dev.MACState, should.Resemble, macState)
-
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Device: &ttnpb.EndDevice{
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-							FrequencyPlanID:      test.EUFrequencyPlanID,
-							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-							MACState:             macState,
-							RecentUplinks:        dev.RecentUplinks,
-							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
-							CreatedAt:            start,
-							UpdatedAt:            now,
 						},
-						Context: setCtx,
-					}
-					mds = recentUp.RxMetadata
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, start.Add(-InfrastructureDelay/2+rangeDevice.MACState.DesiredParameters.Rx1Delay.Duration()/2+time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
-							{
-								CorrelationIDs:       upCorrelationIDs,
-								EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-									FPort:        fPort,
-									FCnt:         34,
-									FRMPayload:   makeDataUplinkFRMPayload(34),
-									RxMetadata:   mds,
-									Settings: ttnpb.TxSettings{
-										DataRateIndex: ttnpb.DATA_RATE_2,
-										DataRate: ttnpb.DataRate{
-											Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-												Bandwidth:       125000,
-												SpreadingFactor: 10,
-											}},
-										},
-										EnableCRC: true,
-										Frequency: 868300000,
-										Timestamp: 42,
-									},
-									ReceivedAt: start,
-								}},
+						TestCase{
+							Name: conf.MakeName("Range success", "No match"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									_, ok := assertDataRangeByAddr(ctx, env, msg.CorrelationIDs, nil, makeDataRangeDevices(clock, false, true)...)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									return ok
+								}, ErrDeviceNotFound), should.BeTrue)
 							},
-						})
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(setCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(setCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplinkWithSettings1_0, 34), start, duplicateCount)
-
-				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				}) {
-					return false
-				}
-				return true
-			},
-		},
-
-		{
-			Name: "Data uplink/Matching device/No concurrent update/1.1/First transmission/No ADR/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeDataUplink1_1(34, false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
-					return []*ttnpb.UplinkMessage{
-						makeDataUplink1_0(31, true),
-						makeDataUplink1_0(32, true),
-					}
-				}
-
-				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B)
-					macState.RecentUplinks = makeRecentUplinks()
-					return macState
-				}
-
-				rangeDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_1,
-					MACState:             makeMACState(),
-					RecentUplinks:        makeRecentUplinks(),
-					Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 32),
-					CreatedAt:            start,
-					UpdatedAt:            start,
-				}
-
-				var rangeCtx context.Context
-				var upCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(upCorrelationIDs, should.Contain, id)
-					}
-					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.DevAddr, should.Resemble, devAddr)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
-					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
-					multicastDevice := CopyEndDevice(rangeDevice)
-					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
-					multicastDevice.Multicast = true
-					a.So(req.Func(context.WithValue(req.Context, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
-					fCntTooHighDevice := CopyEndDevice(rangeDevice)
-					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
-					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeDataUplink1_0(42, true))
-					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeDataUplink1_0(42, true))
-					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(context.WithValue(req.Context, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
-					req.Response <- nil
-				}
-
-				now := clock.Add(time.Nanosecond)
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_1, 34), now.Add(-time.Nanosecond), duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				now = clock.Add(time.Nanosecond)
-
-				var setCtx context.Context
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					dev, sets, err := req.Func(ctx, CopyEndDevice(rangeDevice))
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, []string{
-						"mac_state",
-						"pending_mac_state",
-						"pending_session",
-						"recent_adr_uplinks",
-						"recent_uplinks",
-						"session",
-					})
-
-					a.So(dev.PendingMACState, should.BeNil)
-					a.So(dev.PendingSession, should.BeNil)
-					a.So(dev.RecentADRUplinks, should.BeNil)
-					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_1, devAddr, 34))
-
-					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						return false
-					}
-					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-					expectedUp := makeDataUplinkWithSettings1_1(34, true)
-					expectedUp.CorrelationIDs = upCorrelationIDs
-					expectedUp.ReceivedAt = start
-					expectedUp.RxMetadata = recentUp.RxMetadata
-					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
-
-					macState := makeMACState()
-					macState.RecentUplinks = append(macState.RecentUplinks, expectedUp)
-					macState.RxWindowsAvailable = true
-					macState.QueuedResponses = []*ttnpb.MACCommand{
-						MakeLinkCheckAns(mds...),
-					}
-					a.So(dev.MACState, should.Resemble, macState)
-
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Device: &ttnpb.EndDevice{
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-							FrequencyPlanID:      test.EUFrequencyPlanID,
-							LoRaWANPHYVersion:    ttnpb.PHY_V1_1_REV_B,
-							LoRaWANVersion:       ttnpb.MAC_V1_1,
-							MACState:             macState,
-							RecentUplinks:        dev.RecentUplinks,
-							Session:              makeSession(ttnpb.MAC_V1_1, devAddr, 34),
-							CreatedAt:            start,
-							UpdatedAt:            now,
 						},
-						Context: setCtx,
-					}
-					mds = recentUp.RxMetadata
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, start.Add(-InfrastructureDelay/2+rangeDevice.MACState.DesiredParameters.Rx1Delay.Duration()/2+time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
-							{
-								CorrelationIDs:       upCorrelationIDs,
-								EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-									FPort:        fPort,
-									FCnt:         34,
-									FRMPayload:   makeDataUplinkFRMPayload(34),
-									RxMetadata:   mds,
-									Settings: ttnpb.TxSettings{
-										DataRateIndex: ttnpb.DATA_RATE_2,
-										DataRate: ttnpb.DataRate{
-											Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-												Bandwidth:       125000,
-												SpreadingFactor: 10,
-											}},
-										},
-										EnableCRC: true,
-										Frequency: 868300000,
-										Timestamp: 42,
-									},
-									ReceivedAt: start,
-								}},
+						TestCase{
+							Name: conf.MakeName("Range success", "Deduplication fail"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								decodedMsg := conf.MakeDataUplink(true)
+								rangeDevices := makeDataRangeDevices(clock, true, true)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, rangeDevices, matchIdx, false, ErrTestInternal)
+									return a.So(AllTrue(
+										ok,
+										assertPublishDropDataUplink(ctx, env, rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, ErrTestInternal),
+									), should.BeTrue)
+								}, ErrTestInternal), should.BeTrue)
 							},
-						})
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(setCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(setCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplinkWithSettings1_1, 34), start, duplicateCount)
-
-				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				}) {
-					return false
-				}
-				return true
-			},
-		},
-
-		{
-			Name: "Data uplink/Matching device/Concurrent update/1.0.2/First transmission/No ADR/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeDataUplink1_0(34, false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
-					return []*ttnpb.UplinkMessage{
-						makeDataUplink1_0(31, true),
-						makeDataUplink1_0(32, true),
-					}
-				}
-
-				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
-					macState.RecentUplinks = makeRecentUplinks()
-					return macState
-				}
-
-				rangeDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-					MACState:             makeMACState(),
-					RecentUplinks:        makeRecentUplinks(),
-					Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
-					CreatedAt:            start,
-					UpdatedAt:            start,
-				}
-
-				var rangeCtx context.Context
-				var upCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(upCorrelationIDs, should.Contain, id)
-					}
-					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.DevAddr, should.Resemble, devAddr)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
-					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
-					multicastDevice := CopyEndDevice(rangeDevice)
-					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
-					multicastDevice.Multicast = true
-					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
-					fCntTooHighDevice := CopyEndDevice(rangeDevice)
-					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
-					fCntTooHighDevice.MACState.RecentUplinks = append(fCntTooHighDevice.MACState.RecentUplinks, makeDataUplink1_0(42, true))
-					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeDataUplink1_0(42, true))
-					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
-					req.Response <- nil
-				}
-
-				now := clock.Add(time.Nanosecond)
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-time.Nanosecond), duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				now = clock.Add(time.Nanosecond)
-
-				var setCtx context.Context
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					updatedDevice := CopyEndDevice(rangeDevice)
-					updatedDevice.UpdatedAt = time.Now()
-					dev, sets, err := req.Func(ctx, updatedDevice)
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, []string{
-						"mac_state",
-						"pending_mac_state",
-						"pending_session",
-						"recent_adr_uplinks",
-						"recent_uplinks",
-						"session",
-					})
-
-					a.So(dev.PendingMACState, should.BeNil)
-					a.So(dev.PendingSession, should.BeNil)
-					a.So(dev.RecentADRUplinks, should.BeNil)
-					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
-
-					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						return false
-					}
-					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-					expectedUp := makeDataUplinkWithSettings1_0(34, true)
-					expectedUp.CorrelationIDs = upCorrelationIDs
-					expectedUp.ReceivedAt = start
-					expectedUp.RxMetadata = recentUp.RxMetadata
-					a.So(dev.RecentUplinks, should.HaveEmptyDiff, append(makeRecentUplinks(), expectedUp))
-
-					macState := makeMACState()
-					macState.RecentUplinks = append(macState.RecentUplinks, expectedUp)
-					macState.RxWindowsAvailable = true
-					macState.QueuedResponses = []*ttnpb.MACCommand{
-						MakeLinkCheckAns(mds...),
-					}
-					a.So(dev.MACState, should.Resemble, macState)
-
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Device: &ttnpb.EndDevice{
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-							FrequencyPlanID:      test.EUFrequencyPlanID,
-							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-							MACState:             macState,
-							RecentUplinks:        dev.RecentUplinks,
-							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
-							CreatedAt:            start,
-							UpdatedAt:            now,
 						},
-						Context: setCtx,
-					}
-					mds = recentUp.RxMetadata
-				}
-
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, start.Add(-InfrastructureDelay/2+rangeDevice.MACState.DesiredParameters.Rx1Delay.Duration()/2+time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
-							{
-								CorrelationIDs:       upCorrelationIDs,
-								EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-								Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-									SessionKeyID: makeSessionKeys(ttnpb.MAC_V1_1).SessionKeyID,
-									FPort:        fPort,
-									FCnt:         34,
-									FRMPayload:   makeDataUplinkFRMPayload(34),
-									RxMetadata:   mds,
-									Settings: ttnpb.TxSettings{
-										DataRateIndex: ttnpb.DATA_RATE_2,
-										DataRate: ttnpb.DataRate{
-											Modulation: &ttnpb.DataRate_LoRa{LoRa: &ttnpb.LoRaDataRate{
-												Bandwidth:       125000,
-												SpreadingFactor: 10,
-											}},
-										},
-										EnableCRC: true,
-										Frequency: 868300000,
-										Timestamp: 42,
-									},
-									ReceivedAt: start,
-								}},
+						TestCase{
+							Name: conf.MakeName("Range success", "Duplicate uplink"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								decodedMsg := conf.MakeDataUplink(true)
+								rangeDevices := makeDataRangeDevices(clock, true, true)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									_, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, rangeDevices, matchIdx, false, nil)
+									return a.So(ok, should.BeTrue)
+								}, nil), should.BeTrue)
 							},
-						})
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(setCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(setCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtForwardDataUplink(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplinkWithSettings1_0, 34), start, duplicateCount)
-
-				if !assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				}) {
-					return false
-				}
-				return true
-			},
-		},
-
-		{
-			Name: "Data uplink/Matching device/Concurrent update/1.0.2/First transmission/Rematch fail",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeDataUplink1_0(34, false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
-					return []*ttnpb.UplinkMessage{
-						makeDataUplink1_0(31, true),
-						makeDataUplink1_0(32, true),
-					}
-				}
-
-				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
-					macState.RecentUplinks = makeRecentUplinks()
-					return macState
-				}
-
-				rangeDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-					MACState:             makeMACState(),
-					RecentUplinks:        makeRecentUplinks(),
-					Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 32),
-					CreatedAt:            start,
-					UpdatedAt:            start,
-				}
-
-				var rangeCtx context.Context
-				var upCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(upCorrelationIDs, should.Contain, id)
-					}
-					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.DevAddr, should.Resemble, devAddr)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
-					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
-					req.Response <- nil
-				}
-
-				now := clock.Add(time.Nanosecond)
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-time.Nanosecond), duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				now = clock.Add(time.Nanosecond)
-
-				var setCtx context.Context
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					updatedDevice := CopyEndDevice(rangeDevice)
-					updatedDevice.UpdatedAt = now
-					updatedDevice.Session.LastFCntUp = 34
-					dev, sets, err := req.Func(ctx, updatedDevice)
-					if !a.So(err, should.EqualErrorOrDefinition, ErrOutdatedData.WithCause(ErrDeviceNotFound)) || !a.So(dev, should.BeNil) || !a.So(sets, should.BeNil) {
-						return false
-					}
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Context: setCtx,
-						Error:   err,
-					}
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtDropDataUplink(setCtx, rangeDevice.EndDeviceIdentifiers, ErrOutdatedData.WithCause(ErrDeviceNotFound)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-2*time.Nanosecond), duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.HaveSameErrorDefinitionAs, ErrOutdatedData.WithCause(ErrDeviceNotFound))
-				})
-			},
-		},
-
-		{
-			Name: "Data uplink/Matching device/No concurrent update/1.0.2/Second transmission/No ADR/Set success/Downlink add success",
-			Handler: func(ctx context.Context, env TestEnvironment, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
-				t := test.MustTFromContext(ctx)
-				a := assertions.New(t)
-
-				start := time.Now().UTC()
-				clock := MockClock(start)
-				defer SetTimeNow(clock.Now)()
-
-				msg := makeDataUplink1_0(34, false)
-
-				handleUplinkErrCh := handle(ctx, msg)
-
-				makeRecentUplinks := func() []*ttnpb.UplinkMessage {
-					return []*ttnpb.UplinkMessage{
-						makeDataUplink1_0(31, true),
-						makeDataUplink1_0(32, true),
-						makeDataUplink1_0(34, true),
-					}
-				}
-
-				makeMACState := func() *ttnpb.MACState {
-					macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.PHY_V1_0_2_REV_B)
-					macState.CurrentParameters.ADRNbTrans = 2
-					macState.DesiredParameters.ADRNbTrans = 2
-					macState.RecentUplinks = makeRecentUplinks()
-					return macState
-				}
-
-				rangeDevice := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-					FrequencyPlanID:      test.EUFrequencyPlanID,
-					LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-					LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-					MACState:             makeMACState(),
-					RecentUplinks:        makeRecentUplinks(),
-					Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
-					CreatedAt:            start,
-					UpdatedAt:            start,
-				}
-
-				var rangeCtx context.Context
-				var upCorrelationIDs []string
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.RangeByAddr:
-					upCorrelationIDs = events.CorrelationIDsFromContext(req.Context)
-					for _, id := range correlationIDs {
-						a.So(upCorrelationIDs, should.Contain, id)
-					}
-					a.So(upCorrelationIDs, should.HaveLength, len(correlationIDs)+2)
-					a.So(req.DevAddr, should.Resemble, devAddr)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					rangeCtx = context.WithValue(req.Context, struct{}{}, "range")
-					a.So(req.Func(rangeCtx, CopyEndDevice(rangeDevice)), should.BeTrue)
-					multicastDevice := CopyEndDevice(rangeDevice)
-					multicastDevice.EndDeviceIdentifiers.DeviceID += "-multicast"
-					multicastDevice.Multicast = true
-					a.So(req.Func(context.WithValue(ctx, struct{}{}, "multicast"), multicastDevice), should.BeTrue)
-					fCntTooHighDevice := CopyEndDevice(rangeDevice)
-					fCntTooHighDevice.EndDeviceIdentifiers.DeviceID += "-too-high"
-					fCntTooHighDevice.RecentUplinks = append(fCntTooHighDevice.RecentUplinks, makeDataUplink1_0(42, true))
-					fCntTooHighDevice.Session.LastFCntUp = 42
-					a.So(req.Func(context.WithValue(ctx, struct{}{}, "fcnt-too-high"), fCntTooHighDevice), should.BeTrue)
-					req.Response <- nil
-				}
-
-				now := clock.Add(time.Nanosecond)
-
-				mds := sendUplinkDuplicates(ctx, handle, env.DeduplicationDone, bindMakeDataUplinkFCnt(makeDataUplink1_0, 34), now.Add(-time.Nanosecond), duplicateCount)
-				mds = append(mds, msg.RxMetadata...)
-
-				now = clock.Add(time.Nanosecond)
-
-				var setCtx context.Context
-				select {
-				case <-ctx.Done():
-					t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
-					return false
-
-				case req := <-env.DeviceRegistry.SetByID:
-					a.So(req.Context, should.HaveParentContextOrEqual, rangeCtx)
-					a.So(req.ApplicationIdentifiers, should.Resemble, appID)
-					a.So(req.DeviceID, should.Resemble, devID)
-					a.So(req.Paths, should.HaveSameElementsDeep, dataGetPaths[:])
-					dev, sets, err := req.Func(ctx, CopyEndDevice(rangeDevice))
-					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
-						return false
-					}
-					a.So(sets, should.HaveSameElementsDeep, []string{
-						"mac_state",
-						"pending_mac_state",
-						"pending_session",
-						"recent_adr_uplinks",
-						"recent_uplinks",
-						"session",
-					})
-
-					a.So(dev.PendingMACState, should.BeNil)
-					a.So(dev.PendingSession, should.BeNil)
-					a.So(dev.RecentADRUplinks, should.BeNil)
-					a.So(dev.Session, should.Resemble, makeSession(ttnpb.MAC_V1_0_2, devAddr, 34))
-
-					if !a.So(dev.RecentUplinks, should.NotBeEmpty) {
-						return false
-					}
-					recentUp := dev.RecentUplinks[len(dev.RecentUplinks)-1]
-					a.So(recentUp.RxMetadata, should.HaveSameElementsDiff, mds)
-					expectedUp := makeDataUplinkWithSettings1_0(34, true)
-					expectedUp.CorrelationIDs = upCorrelationIDs
-					expectedUp.ReceivedAt = start
-					expectedUp.RxMetadata = recentUp.RxMetadata
-					a.So(dev.RecentUplinks, should.Resemble, append(makeRecentUplinks(), expectedUp))
-
-					macState := makeMACState()
-					macState.RecentUplinks = append(macState.RecentUplinks, expectedUp)
-					macState.RxWindowsAvailable = true
-					macState.QueuedResponses = []*ttnpb.MACCommand{
-						MakeLinkCheckAns(mds...),
-					}
-					a.So(dev.MACState, should.Resemble, macState)
-
-					setCtx = context.WithValue(req.Context, struct{}{}, "set")
-					req.Response <- DeviceRegistrySetByIDResponse{
-						Device: &ttnpb.EndDevice{
-							EndDeviceIdentifiers: *makeOTAAIdentifiers(&devAddr),
-							FrequencyPlanID:      test.EUFrequencyPlanID,
-							LoRaWANPHYVersion:    ttnpb.PHY_V1_0_2_REV_B,
-							LoRaWANVersion:       ttnpb.MAC_V1_0_2,
-							MACState:             macState,
-							RecentUplinks:        dev.RecentUplinks,
-							Session:              makeSession(ttnpb.MAC_V1_0_2, devAddr, 34),
-							CreatedAt:            start,
-							UpdatedAt:            now,
 						},
-						Context: setCtx,
-					}
-					mds = recentUp.RxMetadata
+						TestCase{
+							Name: conf.MakeName("Range success", "First uplink", "Metadata merge fail", "Set fail on read"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								decodedMsg := conf.MakeDataUplink(true)
+								rangeDevices := makeDataRangeDevices(clock, true, true)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, rangeDevices, matchIdx, true, nil)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+									return a.So(AllTrue(
+										assertAccumulatedMetadata(ctx, env, rangeCtx, decodedMsg, nil, ErrTestInternal),
+										AssertDeviceRegistrySetByID(ctx, env.DeviceRegistry.SetByID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool {
+											return AllTrue(
+												a.So(ctx, should.HaveParentContextOrEqual, rangeCtx),
+												a.So(appID, should.Resemble, AppID),
+												a.So(devID, should.Resemble, DevID),
+												a.So(gets, should.HaveSameElementsDeep, dataSetByIDGetPaths),
+											)
+										}, func(context.Context) DeviceRegistrySetByIDResponse {
+											return DeviceRegistrySetByIDResponse{
+												Error: ErrTestInternal,
+											}
+										}),
+										assertPublishDropDataUplink(ctx, env, rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, ErrTestInternal),
+									), should.BeTrue)
+								}, ErrTestInternal), should.BeTrue)
+							},
+						},
+						TestCase{
+							Name: conf.MakeName("Range success", "First uplink", "Metadata merge success", "Device deleted during handling"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								decodedMsg := conf.MakeDataUplink(true)
+								rangeDevices := makeDataRangeDevices(clock, true, true)
+								innerErr := ErrOutdatedData
+								registryErr := ErrTestInternal.WithCause(innerErr)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, rangeDevices, matchIdx, true, nil)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+									if !a.So(assertAccumulatedMetadata(ctx, env, rangeCtx, decodedMsg, RxMetadata[:], nil), should.BeTrue) {
+										return false
+									}
+									_, ok = assertDataSetByID(ctx, env, rangeCtx, nil, nil, nil, innerErr, registryErr)
+									return a.So(AllTrue(
+										ok,
+										assertPublishDropDataUplink(ctx, env, rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, registryErr),
+									), should.BeTrue)
+								}, registryErr), should.BeTrue)
+							},
+						},
+						TestCase{
+							Name: conf.MakeName("Range success", "First uplink", "Metadata merge success", "Rematch fail"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								decodedMsg := conf.MakeDataUplink(true)
+								rangeDevices := makeDataRangeDevices(clock, true, true)
+								innerErr := ErrOutdatedData.WithCause(ErrDeviceNotFound)
+								registryErr := ErrTestInternal.WithCause(innerErr)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, rangeDevices, matchIdx, true, nil)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+									if !a.So(assertAccumulatedMetadata(ctx, env, rangeCtx, decodedMsg, RxMetadata[:], nil), should.BeTrue) {
+										return false
+									}
+									decodedMsg.RxMetadata = RxMetadata[:]
+									getDevice := CopyEndDevice(rangeDevices[matchIdx])
+									getDevice.UpdatedAt = clock.Now()
+									getDevice.MACState = nil
+									getDevice.Session = nil
+									_, ok = assertDataSetByID(ctx, env, rangeCtx, getDevice, nil, nil, innerErr, registryErr)
+									return a.So(AllTrue(
+										ok,
+										assertPublishDropDataUplink(ctx, env, rangeCtx, rangeDevices[matchIdx].EndDeviceIdentifiers, registryErr),
+									), should.BeTrue)
+								}, registryErr), should.BeTrue)
+							},
+						},
+						TestCase{
+							Name: conf.MakeName("Range success", "First uplink", "Metadata merge fail", "No rematch", "Set success", "NbTrans=1", "Downlink add fail", "Application uplink add fail"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								decodedMsg := conf.MakeDataUplink(true)
+								rangeDevices := makeDataRangeDevices(clock, true, true)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, rangeDevices, matchIdx, true, nil)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+									if !a.So(assertAccumulatedMetadata(ctx, env, rangeCtx, decodedMsg, nil, ErrTestInternal), should.BeTrue) {
+										return false
+									}
+									getDevice := CopyEndDevice(rangeDevices[matchIdx])
+									setDevice, macEvs := makeDataSetDevice(getDevice, decodedMsg)
+									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
+									return a.So(AllTrue(
+										ok,
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
+										assertDataApplicationUp(ctx, env, setCtx, setDevice, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), ErrTestInternal),
+										assertPublishDefinitionDataClosures(ctx, env, macEvs, setCtx, setDevice.EndDeviceIdentifiers),
+									), should.BeTrue)
+								}, nil), should.BeTrue)
+							},
+						},
+						TestCase{
+							Name: conf.MakeName("Range success", "First uplink", "Metadata merge success", "Rematch success", "Set success", "NbTrans=1", "Downlink add success", "Application uplink add success"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								decodedMsg := conf.MakeDataUplink(true)
+								rangeDevices := makeDataRangeDevices(clock, true, true)
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, rangeDevices, matchIdx, true, nil)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+									if !a.So(assertAccumulatedMetadata(ctx, env, rangeCtx, decodedMsg, RxMetadata[:], nil), should.BeTrue) {
+										return false
+									}
+									decodedMsg.RxMetadata = RxMetadata[:]
+									getDevice := CopyEndDevice(rangeDevices[matchIdx])
+									getDevice.UpdatedAt = clock.Now()
+									setDevice, macEvs := makeDataSetDevice(getDevice, decodedMsg)
+									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
+									return a.So(AllTrue(
+										ok,
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, nil),
+										assertDataApplicationUp(ctx, env, setCtx, setDevice, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), nil),
+										assertPublishMergeMetadata(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, RxMetadata[:]...),
+										assertPublishDefinitionDataClosures(ctx, env, macEvs, setCtx, setDevice.EndDeviceIdentifiers),
+										assertPublishForwardDataUplink(ctx, env, setCtx, setDevice.EndDeviceIdentifiers),
+									), should.BeTrue)
+								}, nil), should.BeTrue)
+							},
+						},
+						TestCase{
+							Name: conf.MakeName("Range success", "First uplink", "Metadata merge success", "No rematch", "Set success", "NbTrans=2", "Downlink add success"),
+							Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+								t := test.MustTFromContext(ctx)
+								a := assertions.New(t)
+								msg := conf.MakeDataUplink(false)
+								decodedMsg := conf.MakeDataUplink(true)
+								rangeDevices := makeDataRangeDevices(clock, true, true)
+								prevMsg := CopyUplinkMessage(decodedMsg)
+								prevMsg.ReceivedAt = clock.Now()
+								rangeDevice, _ := makeDataSetDevice(rangeDevices[matchIdx], prevMsg)
+								rangeDevices[matchIdx] = rangeDevice
+								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, rangeDevices, matchIdx, true, nil)
+									if !a.So(ok, should.BeTrue) {
+										return false
+									}
+									clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+									if !a.So(assertAccumulatedMetadata(ctx, env, rangeCtx, decodedMsg, RxMetadata[:], nil), should.BeTrue) {
+										return false
+									}
+									decodedMsg.RxMetadata = RxMetadata[:]
+									setDevice, macEvs := makeDataSetDevice(rangeDevice, decodedMsg)
+									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, rangeDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
+									return a.So(AllTrue(
+										ok,
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
+										assertPublishMergeMetadata(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, RxMetadata[:]...),
+										assertPublishDefinitionDataClosures(ctx, env, macEvs, setCtx, setDevice.EndDeviceIdentifiers),
+									), should.BeTrue)
+								}, nil), should.BeTrue)
+							},
+						},
+					)
 				}
+			}
+		})
+	}
 
-				if !a.So(AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(ctx, should.HaveParentContextOrEqual, setCtx) &&
-						a.So(ids, should.Resemble, *makeOTAAIdentifiers(&devAddr)) &&
-						a.So(startAt, should.Resemble, start.Add(-InfrastructureDelay/2+rangeDevice.MACState.DesiredParameters.Rx1Delay.Duration()/2+time.Second-NSScheduleWindow())) &&
-						a.So(replace, should.BeTrue)
-				},
-					nil,
-				), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtMergeMetadata(setCtx, rangeDevice.EndDeviceIdentifiers, len(mds)))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtReceiveLinkCheckRequest(setCtx, rangeDevice.EndDeviceIdentifiers, nil))
-				}), should.BeTrue) {
-					return false
-				}
-
-				if !a.So(test.AssertEventPubSubPublishRequest(ctx, env.Events, func(ev events.Event) bool {
-					return a.So(ev, should.ResembleEvent, EvtEnqueueLinkCheckAnswer(setCtx, rangeDevice.EndDeviceIdentifiers, MakeLinkCheckAns(mds...).GetLinkCheckAns()))
-				}), should.BeTrue) {
-					return false
-				}
-
-				_ = sendUplinkDuplicates(ctx, handle, env.CollectionDone, bindMakeDataUplinkFCnt(makeDataUplinkWithSettings1_0, 34), start, duplicateCount)
-
-				return assertHandleUplinkResponse(ctx, handleUplinkErrCh, func(err error) bool {
-					return a.So(err, should.BeNil)
-				})
-			},
-		},
-	} {
+	for _, tc := range tcs {
 		t.Run(tc.Name, func(t *testing.T) {
-			ns, ctx, env, stop := StartTest(t, Config{
-				NetID:              *netID.Copy(&types.NetID{}),
-				DefaultMACSettings: MACSettingConfig{},
-			}, (1<<12)*test.Delay, true)
+			ns, ctx, env, stop := StartTest(
+				t,
+				component.Config{},
+				Config{
+					NetID:               *NetID.Copy(&types.NetID{}),
+					DefaultMACSettings:  MACSettingConfig{},
+					DeduplicationWindow: DeduplicationWindow,
+					CooldownWindow:      CooldownWindow,
+				},
+				(1<<10)*test.Delay,
+			)
 			defer stop()
 
 			<-env.DownlinkTasks.Pop
 
-			if !tc.Handler(ctx, env, func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan error {
+			clock := test.NewMockClock(time.Now().UTC())
+			defer SetMockClock(clock)()
+
+			if !tc.Handler(ctx, env, clock, func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan error {
 				ch := make(chan error)
 				go func() {
 					_, err := ttnpb.NewGsNsClient(ns.LoopbackConn()).HandleUplink(ctx, CopyUplinkMessage(msg))

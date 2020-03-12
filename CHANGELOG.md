@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update gateway antenna location from incoming status message (see `update_location_from_status` gateway field and `--gs.update-gateway-location-debounce-time` option).
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Gateway Server rate limiting support for the UDP frontend, see (`--gs.udp.rate-limiting` options).
+- Uplink deduplication via Redis in Network Server.
 
 ### Changed
 
@@ -30,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Telemetry and events for gateway statuses.
 - Handling of downlink frame counters exceeding 65535.
 - Creating 1.0.4 ABP end devices via the Console.
+- ADR uplink handling.
+- Uplink retransmission handling.
 
 ### Security
 

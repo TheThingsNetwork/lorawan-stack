@@ -84,7 +84,7 @@ func getDataRateIndexFromDataRate(bandID string, dr ttnpb.DataRate) (int, error)
 	if err != nil {
 		return 0, err
 	}
-	i, _, ok := phy.FindDataRate(dr)
+	i, _, ok := phy.FindUplinkDataRate(dr)
 	if !ok {
 		return 0, errDataRate
 	}

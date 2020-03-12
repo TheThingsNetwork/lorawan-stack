@@ -22,8 +22,10 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	. "go.thethings.network/lorawan-stack/pkg/redis"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -673,4 +675,105 @@ func TestTaskQueue(t *testing.T) {
 	case <-time.After(Timeout):
 		t.Error("Timed out waiting for Run to return")
 	}
+}
+
+func TestProtoDeduplicator(t *testing.T) {
+	a := assertions.New(t)
+
+	ctx := test.ContextWithT(test.Context(), t)
+	ctx = log.NewContext(ctx, test.GetLogger(t))
+
+	cl, flush := test.NewRedis(t, "redis_test")
+	defer flush()
+	defer cl.Close()
+
+	makeMockProto := func(s string) proto.Message {
+		return &test.MockProtoMessageMarshalUnmarshaler{
+			MockProtoMarshaler: test.MockProtoMarshaler{
+				MarshalFunc: func() ([]byte, error) {
+					return []byte(s), nil
+				},
+			},
+		}
+	}
+
+	ttl := test.Delay << 12
+	key1 := cl.Key("test1")
+	key2 := cl.Key("test2")
+
+	v, err := DeduplicateProtos(ctx, cl, key1, ttl)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(v, should.BeTrue)
+
+	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeMockProto("proto1"))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(v, should.BeFalse)
+
+	v, err = DeduplicateProtos(ctx, cl, key2, ttl, makeMockProto("proto1"))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(v, should.BeTrue)
+
+	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeMockProto("proto1"))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(v, should.BeFalse)
+
+	v, err = DeduplicateProtos(ctx, cl, key1, ttl, makeMockProto("proto2"), makeMockProto("proto3"))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(v, should.BeFalse)
+
+	v, err = DeduplicateProtos(ctx, cl, key2, ttl, makeMockProto("proto2"))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(v, should.BeFalse)
+
+	ss, err := cl.LRange(DeduplicationListKey(key1), 0, -1).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	lockTTL, err := cl.PTTL(DeduplicationLockKey(key1)).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	listTTL, err := cl.PTTL(DeduplicationListKey(key1)).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(ss, should.Resemble, []string{
+		Encoding.EncodeToString([]byte("proto1")),
+		Encoding.EncodeToString([]byte("proto1")),
+		Encoding.EncodeToString([]byte("proto2")),
+		Encoding.EncodeToString([]byte("proto3")),
+	})
+	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
+	a.So(listTTL, should.BeLessThanOrEqualTo, lockTTL)
+
+	ss, err = cl.LRange(DeduplicationListKey(key2), 0, -1).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	lockTTL, err = cl.PTTL(DeduplicationLockKey(key2)).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	listTTL, err = cl.PTTL(DeduplicationListKey(key2)).Result()
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(ss, should.Resemble, []string{
+		Encoding.EncodeToString([]byte("proto1")),
+		Encoding.EncodeToString([]byte("proto2")),
+	})
+	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
+	a.So(listTTL, should.BeLessThanOrEqualTo, lockTTL)
 }

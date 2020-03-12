@@ -37,7 +37,10 @@ func nsScheduleWindow() time.Duration {
 	return 200 * time.Millisecond
 }
 
-var timeNow func() time.Time = time.Now
+var (
+	timeNow   func() time.Time                       = time.Now
+	timeAfter func(d time.Duration) <-chan time.Time = time.After
+)
 
 func timeUntil(t time.Time) time.Duration {
 	return t.Sub(timeNow())

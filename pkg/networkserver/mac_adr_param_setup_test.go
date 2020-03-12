@@ -35,7 +35,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 	}
 	var tcs []TestCase
 
-	ForEachBand(t, func(makeBandName func(parts ...string) string, phy band.Band) {
+	ForEachBand(t, func(makeBandName func(parts ...string) string, phy band.Band, _ ttnpb.PHYVersion) {
 		tcs = append(tcs,
 			TestCase{
 				Name:        makeBandName("no MAC state"),

@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -42,14 +43,25 @@ import (
 	"google.golang.org/grpc"
 )
 
+const (
+	RecentUplinkCount     = recentUplinkCount
+	RecentDownlinkCount   = recentDownlinkCount
+	OptimalADRUplinkCount = optimalADRUplinkCount
+)
+
 var (
-	NewMACState = newMACState
-	TimePtr     = timePtr
+	AppendRecentDownlink = appendRecentDownlink
+	AppendRecentUplink   = appendRecentUplink
+	AdaptDataRate        = adaptDataRate
+	HandleLinkCheckReq   = handleLinkCheckReq
+	NewMACState          = newMACState
+	TimePtr              = timePtr
 
 	ErrABPJoinRequest            = errABPJoinRequest
 	ErrDecodePayload             = errDecodePayload
 	ErrDeviceNotFound            = errDeviceNotFound
 	ErrOutdatedData              = errOutdatedData
+	ErrRejoinRequest             = errRejoinRequest
 	ErrUnsupportedLoRaWANVersion = errUnsupportedLoRaWANVersion
 
 	EvtBeginApplicationLink    = evtBeginApplicationLink
@@ -67,39 +79,28 @@ var (
 	EvtUpdateEndDevice         = evtUpdateEndDevice
 
 	Timeout = (1 << 10) * test.Delay
+
+	ErrTestInternal = errors.DefineInternal("test_internal", "test error")
+	ErrTestNotFound = errors.DefineNotFound("test_not_found", "test error")
 )
 
-var timeNowMu sync.RWMutex
+var timeMu sync.RWMutex
 
-func SetTimeNow(f func() time.Time) func() {
-	timeNowMu.Lock()
-	old := timeNow
-	timeNow = f
+func SetMockClock(clock *test.MockClock) func() {
+	timeMu.Lock()
+	oldNow := timeNow
+	oldAfter := timeAfter
+	timeNow = clock.Now
+	timeAfter = clock.After
 	return func() {
-		timeNow = old
-		timeNowMu.Unlock()
+		timeNow = oldNow
+		timeAfter = oldAfter
+		timeMu.Unlock()
 	}
 }
 
-type MockClock time.Time
-
-// Set sets clock to time t and returns old clock time.
-func (m *MockClock) Set(t time.Time) time.Time {
-	old := time.Time(*m)
-	*m = MockClock(t)
-	return old
-}
-
-// Add adds d to clock and returns current clock time.
-func (m *MockClock) Add(d time.Duration) time.Time {
-	t := time.Time(*m).Add(d)
-	*m = MockClock(t)
-	return t
-}
-
-// Now returns current clock time.
-func (m *MockClock) Now() time.Time {
-	return time.Time(*m)
+func TimeNow() time.Time {
+	return timeNow()
 }
 
 func NSScheduleWindow() time.Duration {
@@ -270,12 +271,12 @@ func MakeDefaultEU868DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParamet
 	return params
 }
 
-func MakeDefaultEU868MACState(class ttnpb.Class, macVer ttnpb.MACVersion, phyVer ttnpb.PHYVersion) *ttnpb.MACState {
+func MakeDefaultEU868MACState(class ttnpb.Class, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
 		DeviceClass:       class,
-		LoRaWANVersion:    macVer,
-		CurrentParameters: MakeDefaultEU868CurrentMACParameters(phyVer),
-		DesiredParameters: MakeDefaultEU868DesiredMACParameters(phyVer),
+		LoRaWANVersion:    macVersion,
+		CurrentParameters: MakeDefaultEU868CurrentMACParameters(phyVersion),
+		DesiredParameters: MakeDefaultEU868DesiredMACParameters(phyVersion),
 	}
 }
 
@@ -335,54 +336,52 @@ func MakeDefaultUS915FSB2DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACPar
 	return params
 }
 
-func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVer ttnpb.MACVersion, phyVer ttnpb.PHYVersion) *ttnpb.MACState {
+func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) *ttnpb.MACState {
 	return &ttnpb.MACState{
 		DeviceClass:       class,
-		LoRaWANVersion:    macVer,
-		CurrentParameters: MakeDefaultUS915CurrentMACParameters(phyVer),
-		DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(phyVer),
+		LoRaWANVersion:    macVersion,
+		CurrentParameters: MakeDefaultUS915CurrentMACParameters(phyVersion),
+		DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(phyVersion),
 	}
 }
 
-func MakeRxMetadataSlice(mds ...*ttnpb.RxMetadata) []*ttnpb.RxMetadata {
-	return append([]*ttnpb.RxMetadata{
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-1"},
-			SNR:                    -9,
-			UplinkToken:            []byte("token-gtw-1"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-3"},
-			SNR:                    -5.3,
-			UplinkToken:            []byte("token-gtw-3"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-5"},
-			SNR:                    12,
-			UplinkToken:            []byte("token-gtw-5"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-0"},
-			SNR:                    5.2,
-			UplinkToken:            []byte("token-gtw-0"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-2"},
-			SNR:                    6.3,
-			UplinkToken:            []byte("token-gtw-2"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
-		},
-		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-4"},
-			SNR:                    -7,
-			UplinkToken:            []byte("token-gtw-4"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
-		},
-	}, mds...)
+var RxMetadata = [...]*ttnpb.RxMetadata{
+	{
+		GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-1"},
+		SNR:                    -9,
+		UplinkToken:            []byte("token-gtw-1"),
+		DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+	},
+	{
+		GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-3"},
+		SNR:                    -5.3,
+		UplinkToken:            []byte("token-gtw-3"),
+		DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
+	},
+	{
+		GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-5"},
+		SNR:                    12,
+		UplinkToken:            []byte("token-gtw-5"),
+		DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
+	},
+	{
+		GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-0"},
+		SNR:                    5.2,
+		UplinkToken:            []byte("token-gtw-0"),
+		DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+	},
+	{
+		GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-2"},
+		SNR:                    6.3,
+		UplinkToken:            []byte("token-gtw-2"),
+		DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
+	},
+	{
+		GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-4"},
+		SNR:                    -7,
+		UplinkToken:            []byte("token-gtw-4"),
+		DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
+	},
 }
 
 func NewISPeer(ctx context.Context, is interface {
@@ -844,21 +843,76 @@ func MakeNsGsScheduleDownlinkChFunc(reqCh chan<- NsGsScheduleDownlinkRequest) fu
 	}
 }
 
-type WindowEndRequest struct {
-	Context  context.Context
-	Message  *ttnpb.UplinkMessage
-	Response chan<- time.Time
+var _ UplinkDeduplicator = &MockUplinkDeduplicator{}
+
+type MockUplinkDeduplicator struct {
+	DeduplicateUplinkFunc   func(context.Context, *ttnpb.UplinkMessage, time.Duration) (bool, error)
+	AccumulatedMetadataFunc func(context.Context, *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error)
 }
 
-func MakeWindowEndChFunc(reqCh chan<- WindowEndRequest) func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
-	return func(ctx context.Context, msg *ttnpb.UplinkMessage) <-chan time.Time {
-		respCh := make(chan time.Time)
-		reqCh <- WindowEndRequest{
+// DeduplicateUplink calls DeduplicateUplinkFunc if set and panics otherwise.
+func (m MockUplinkDeduplicator) DeduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, d time.Duration) (bool, error) {
+	if m.DeduplicateUplinkFunc == nil {
+		panic("DeduplicateUplink called, but not set")
+	}
+	return m.DeduplicateUplinkFunc(ctx, up, d)
+}
+
+// AccumulatedMetadata calls AccumulatedMetadataFunc if set and panics otherwise.
+func (m MockUplinkDeduplicator) AccumulatedMetadata(ctx context.Context, up *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error) {
+	if m.AccumulatedMetadataFunc == nil {
+		panic("AccumulatedMetadata called, but not set")
+	}
+	return m.AccumulatedMetadataFunc(ctx, up)
+}
+
+type UplinkDeduplicatorDeduplicateUplinkResponse struct {
+	Ok    bool
+	Error error
+}
+
+type UplinkDeduplicatorDeduplicateUplinkRequest struct {
+	Context  context.Context
+	Uplink   *ttnpb.UplinkMessage
+	Window   time.Duration
+	Response chan<- UplinkDeduplicatorDeduplicateUplinkResponse
+}
+
+func MakeUplinkDeduplicatorDeduplicateUplinkChFunc(reqCh chan<- UplinkDeduplicatorDeduplicateUplinkRequest) func(context.Context, *ttnpb.UplinkMessage, time.Duration) (bool, error) {
+	return func(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration) (bool, error) {
+		respCh := make(chan UplinkDeduplicatorDeduplicateUplinkResponse)
+		reqCh <- UplinkDeduplicatorDeduplicateUplinkRequest{
 			Context:  ctx,
-			Message:  msg,
+			Uplink:   up,
+			Window:   window,
 			Response: respCh,
 		}
-		return respCh
+		resp := <-respCh
+		return resp.Ok, resp.Error
+	}
+}
+
+type UplinkDeduplicatorAccumulatedMetadataResponse struct {
+	Metadata []*ttnpb.RxMetadata
+	Error    error
+}
+
+type UplinkDeduplicatorAccumulatedMetadataRequest struct {
+	Context  context.Context
+	Uplink   *ttnpb.UplinkMessage
+	Response chan<- UplinkDeduplicatorAccumulatedMetadataResponse
+}
+
+func MakeUplinkDeduplicatorAccumulatedMetadataChFunc(reqCh chan<- UplinkDeduplicatorAccumulatedMetadataRequest) func(context.Context, *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error) {
+	return func(ctx context.Context, up *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error) {
+		respCh := make(chan UplinkDeduplicatorAccumulatedMetadataResponse)
+		reqCh <- UplinkDeduplicatorAccumulatedMetadataRequest{
+			Context:  ctx,
+			Uplink:   up,
+			Response: respCh,
+		}
+		resp := <-respCh
+		return resp.Metadata, resp.Error
 	}
 }
 
@@ -877,6 +931,121 @@ func AssertDownlinkTaskAddRequest(ctx context.Context, reqCh <-chan DownlinkTask
 		select {
 		case <-ctx.Done():
 			t.Error("Timed out while waiting for DownlinkTasks.Add response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
+	}
+}
+
+func AssertDeduplicateUplink(ctx context.Context, reqCh <-chan UplinkDeduplicatorDeduplicateUplinkRequest, assert func(context.Context, *ttnpb.UplinkMessage, time.Duration) bool, resp UplinkDeduplicatorDeduplicateUplinkResponse) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for UplinkDeduplicator.DeduplicateUplink to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.Uplink, req.Window) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for UplinkDeduplicator.DeduplicateUplink response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
+	}
+}
+
+func AssertAccumulatedMetadata(ctx context.Context, reqCh <-chan UplinkDeduplicatorAccumulatedMetadataRequest, assert func(context.Context, *ttnpb.UplinkMessage) bool, resp UplinkDeduplicatorAccumulatedMetadataResponse) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for UplinkDeduplicator.AccumulatedMetadata to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.Uplink) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for UplinkDeduplicator.AccumulatedMetadata response to be processed")
+			return false
+
+		case req.Response <- resp:
+			return true
+		}
+	}
+}
+
+func AssertDeviceRegistryGetByEUI(ctx context.Context, reqCh <-chan DeviceRegistryGetByEUIRequest, assert func(context.Context, types.EUI64, types.EUI64, []string) bool, respFunc func(context.Context) DeviceRegistryGetByEUIResponse) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for DeviceRegistry.GetByEUI to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.JoinEUI, req.DevEUI, req.Paths) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for DeviceRegistry.GetByEUI response to be processed")
+			return false
+
+		case req.Response <- respFunc(req.Context):
+			return true
+		}
+	}
+}
+
+func AssertDeviceRegistrySetByID(ctx context.Context, reqCh <-chan DeviceRegistrySetByIDRequest, assert func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) bool, respFunc func(context.Context) DeviceRegistrySetByIDResponse) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for DeviceRegistry.SetByID to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.ApplicationIdentifiers, req.DeviceID, req.Paths, req.Func) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for DeviceRegistry.SetByID response to be processed")
+			return false
+
+		case req.Response <- respFunc(req.Context):
+			return true
+		}
+	}
+}
+
+func AssertDeviceRegistryRangeByAddr(ctx context.Context, reqCh <-chan DeviceRegistryRangeByAddrRequest, assert func(context.Context, types.DevAddr, []string, func(context.Context, *ttnpb.EndDevice) bool) bool, resp error) bool {
+	t := test.MustTFromContext(ctx)
+	t.Helper()
+	select {
+	case <-ctx.Done():
+		t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr to be called")
+		return false
+
+	case req := <-reqCh:
+		if !assert(req.Context, req.DevAddr, req.Paths, req.Func) {
+			return false
+		}
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for DeviceRegistry.RangeByAddr response to be processed")
 			return false
 
 		case req.Response <- resp:
@@ -1241,76 +1410,104 @@ func newMockInteropClient(t *testing.T) (InteropClient, InteropClientEnvironment
 		}
 }
 
+type UplinkDeduplicatorEnvironment struct {
+	DeduplicateUplink   <-chan UplinkDeduplicatorDeduplicateUplinkRequest
+	AccumulatedMetadata <-chan UplinkDeduplicatorAccumulatedMetadataRequest
+}
+
+func newMockUplinkDeduplicator(t *testing.T) (UplinkDeduplicator, UplinkDeduplicatorEnvironment, func()) {
+	t.Helper()
+
+	deduplicateUplinkCh := make(chan UplinkDeduplicatorDeduplicateUplinkRequest)
+	accumulatedMetadataCh := make(chan UplinkDeduplicatorAccumulatedMetadataRequest)
+	return &MockUplinkDeduplicator{
+			DeduplicateUplinkFunc:   MakeUplinkDeduplicatorDeduplicateUplinkChFunc(deduplicateUplinkCh),
+			AccumulatedMetadataFunc: MakeUplinkDeduplicatorAccumulatedMetadataChFunc(accumulatedMetadataCh),
+		}, UplinkDeduplicatorEnvironment{
+			DeduplicateUplink:   deduplicateUplinkCh,
+			AccumulatedMetadata: accumulatedMetadataCh,
+		},
+		func() {
+			select {
+			case <-deduplicateUplinkCh:
+				t.Error("UplinkDeduplicator.DeduplicateUplink call missed")
+			default:
+				close(deduplicateUplinkCh)
+			}
+			select {
+			case <-accumulatedMetadataCh:
+				t.Error("UplinkDeduplicator.AccumulatedMetadata call missed")
+			default:
+				close(accumulatedMetadataCh)
+			}
+		}
+}
+
 type TestEnvironment struct {
 	Cluster struct {
 		Auth    <-chan test.ClusterAuthRequest
 		GetPeer <-chan test.ClusterGetPeerRequest
 	}
-	CollectionDone     <-chan WindowEndRequest
-	DeduplicationDone  <-chan WindowEndRequest
 	ApplicationUplinks *ApplicationUplinkQueueEnvironment
 	DeviceRegistry     *DeviceRegistryEnvironment
 	DownlinkTasks      *DownlinkTaskQueueEnvironment
 	Events             <-chan test.EventPubSubPublishRequest
 	InteropClient      *InteropClientEnvironment
+	UplinkDeduplicator *UplinkDeduplicatorEnvironment
 }
 
-func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplication bool, opts ...Option) (*NetworkServer, context.Context, TestEnvironment, func()) {
+func StartTest(t *testing.T, cmpConf component.Config, nsConf Config, timeout time.Duration, opts ...Option) (*NetworkServer, context.Context, TestEnvironment, func()) {
 	t.Helper()
 
 	authCh := make(chan test.ClusterAuthRequest)
 	getPeerCh := make(chan test.ClusterGetPeerRequest)
 	eventsPublishCh := make(chan test.EventPubSubPublishRequest)
 
-	var collectionDoneCh, deduplicationDoneCh chan WindowEndRequest
-	if stubDeduplication {
-		conf.CooldownWindow = 42
-		conf.DeduplicationWindow = 42
-
-		collectionDoneCh = make(chan WindowEndRequest)
-		deduplicationDoneCh = make(chan WindowEndRequest)
-
-		opts = append([]Option{
-			WithCollectionDoneFunc(MakeWindowEndChFunc(collectionDoneCh)),
-			WithDeduplicationDoneFunc(MakeWindowEndChFunc(deduplicationDoneCh)),
-		}, opts...)
-	}
-
 	env := TestEnvironment{
-		CollectionDone:    collectionDoneCh,
-		DeduplicationDone: deduplicationDoneCh,
+		Events: eventsPublishCh,
 	}
 	env.Cluster.Auth = authCh
 	env.Cluster.GetPeer = getPeerCh
-	env.Events = eventsPublishCh
 
 	var closeFuncs []func()
 	closeFuncs = append(closeFuncs, test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 		PublishFunc: test.MakeEventPubSubPublishChFunc(eventsPublishCh),
 	}))
-	if conf.ApplicationUplinks == nil {
+	if nsConf.ApplicationUplinks == nil {
 		m, mEnv, closeM := newMockApplicationUplinkQueue(t)
-		conf.ApplicationUplinks = m
+		nsConf.ApplicationUplinks = m
 		env.ApplicationUplinks = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
 	}
-	if conf.Devices == nil {
+	if nsConf.Devices == nil {
 		m, mEnv, closeM := newMockDeviceRegistry(t)
-		conf.Devices = m
+		nsConf.Devices = m
 		env.DeviceRegistry = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
 	}
-	if conf.DownlinkTasks == nil {
+	if nsConf.DownlinkTasks == nil {
 		m, mEnv, closeM := newMockDownlinkTaskQueue(t)
-		conf.DownlinkTasks = m
+		nsConf.DownlinkTasks = m
 		env.DownlinkTasks = &mEnv
 		closeFuncs = append(closeFuncs, closeM)
+	}
+	if nsConf.UplinkDeduplicator == nil {
+		m, mEnv, closeM := newMockUplinkDeduplicator(t)
+		nsConf.UplinkDeduplicator = m
+		env.UplinkDeduplicator = &mEnv
+		closeFuncs = append(closeFuncs, closeM)
+	}
+	if nsConf.DeduplicationWindow == 0 {
+		nsConf.DeduplicationWindow = time.Nanosecond
+	}
+	if nsConf.CooldownWindow == 0 {
+		nsConf.CooldownWindow = nsConf.DeduplicationWindow + time.Nanosecond
 	}
 
 	ns := test.Must(New(
 		componenttest.NewComponent(
 			t,
-			&component.Config{},
+			&cmpConf,
 			component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
 				return &test.MockCluster{
 					AuthFunc:    test.MakeClusterAuthChFunc(authCh),
@@ -1322,7 +1519,7 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplicati
 				}, nil
 			}),
 		),
-		&conf,
+		&nsConf,
 		opts...,
 	)).(*NetworkServer)
 	ns.Component.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
@@ -1365,55 +1562,147 @@ func StartTest(t *testing.T, conf Config, timeout time.Duration, stubDeduplicati
 	}
 }
 
-func ForEachBand(t *testing.T, f func(makeName func(parts ...string) string, phy band.Band)) {
+func MakeTestCaseName(parts ...string) string {
+	return strings.Join(parts, "/")
+}
+
+func ForEachBand(t *testing.T, f func(func(...string) string, band.Band, ttnpb.PHYVersion)) {
 	for phyID, phy := range band.All {
-		for _, phyVer := range phy.Versions() {
-			phy, err := phy.Version(phyVer)
+		for _, phyVersion := range phy.Versions() {
+			phy, err := phy.Version(phyVersion)
 			if err != nil {
-				t.Errorf("Failed to convert %s band to %s version", phyID, phyVer)
+				t.Errorf("Failed to convert %s band to %s version", phyID, phyVersion)
 				continue
 			}
 			f(func(parts ...string) string {
-				return fmt.Sprintf("%s/PHY:%s/%s", phyID, phyVer.String(), strings.Join(parts, "/"))
-			}, phy)
+				return MakeTestCaseName(append(parts, fmt.Sprintf("%s/PHY:%s", phyID, phyVersion.String()))...)
+			}, phy, phyVersion)
 		}
 	}
 }
 
-func ForEachMACVersion(f func(makeName func(parts ...string) string, macVersion ttnpb.MACVersion)) {
+func ForEachPHYVersion(f func(func(...string) string, ttnpb.PHYVersion)) {
+	for _, phyVersion := range []ttnpb.PHYVersion{
+		ttnpb.PHY_V1_0,
+		ttnpb.PHY_V1_0_1,
+		ttnpb.PHY_V1_0_2_REV_A,
+		ttnpb.PHY_V1_0_2_REV_B,
+		ttnpb.PHY_V1_0_3_REV_A,
+		ttnpb.PHY_V1_1_REV_A,
+		ttnpb.PHY_V1_1_REV_B,
+	} {
+		f(func(parts ...string) string {
+			return MakeTestCaseName(append(parts, fmt.Sprintf("PHY:%s", phyVersion.String()))...)
+		}, phyVersion)
+	}
+}
+
+func ForEachMACVersion(f func(func(...string) string, ttnpb.MACVersion)) {
 	for _, macVersion := range []ttnpb.MACVersion{
 		ttnpb.MAC_V1_0,
 		ttnpb.MAC_V1_0_1,
 		ttnpb.MAC_V1_0_2,
 		ttnpb.MAC_V1_0_3,
+		ttnpb.MAC_V1_0_4,
 		ttnpb.MAC_V1_1,
 	} {
 		f(func(parts ...string) string {
-			return fmt.Sprintf("MAC:%s/%s", macVersion.String(), strings.Join(parts, "/"))
+			return MakeTestCaseName(append(parts, fmt.Sprintf("MAC:%s", macVersion.String()))...)
 		}, macVersion)
 	}
 }
 
-func ForEachBandMACVersion(t *testing.T, f func(makeName func(parts ...string) string, phy band.Band, macVersion ttnpb.MACVersion)) {
-	ForEachBand(t, func(makeBandName func(...string) string, phy band.Band) {
-		ForEachMACVersion(func(makeMACName func(...string) string, macVersion ttnpb.MACVersion) {
-			f(func(parts ...string) string {
-				return makeBandName(makeMACName(parts...))
-			}, phy, macVersion)
-		})
-	})
-}
-
-func ForEachClass(f func(makeName func(parts ...string) string, class ttnpb.Class)) {
+func ForEachClass(f func(func(...string) string, ttnpb.Class)) {
 	for _, class := range []ttnpb.Class{
 		ttnpb.CLASS_A,
 		ttnpb.CLASS_B,
 		ttnpb.CLASS_C,
 	} {
 		f(func(parts ...string) string {
-			return fmt.Sprintf("Class:%s/%s", class.String(), strings.Join(parts, "/"))
+			return MakeTestCaseName(append(parts, fmt.Sprintf("Class:%s", class.String()))...)
 		}, class)
 	}
+}
+
+func ForEachFrequencyPlan(t *testing.T, f func(func(...string) string, string, *frequencyplans.FrequencyPlan)) {
+	fps := frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	fpIDs, err := fps.GetAllIDs()
+	if err != nil {
+		t.Errorf("failed to get frequency plans: %w", err)
+		return
+	}
+	for _, fpID := range fpIDs {
+		fp, err := fps.GetByID(fpID)
+		if err != nil {
+			t.Errorf("failed to get frequency plan `%s`: %w", fpID, err)
+			continue
+		}
+		f(func(parts ...string) string {
+			return MakeTestCaseName(append(parts, fmt.Sprintf("FP:%s", fpID))...)
+		}, fpID, fp)
+	}
+}
+
+func ForEachPHYMACVersion(f func(func(...string) string, ttnpb.PHYVersion, ttnpb.MACVersion)) {
+	ForEachPHYVersion(func(makePHYName func(...string) string, phyVersion ttnpb.PHYVersion) {
+		ForEachMACVersion(func(makeMACName func(...string) string, macVersion ttnpb.MACVersion) {
+			f(func(parts ...string) string {
+				return makePHYName(makeMACName(parts...))
+			}, phyVersion, macVersion)
+		})
+	})
+}
+
+func ForEachClassPHYMACVersion(f func(func(...string) string, ttnpb.Class, ttnpb.PHYVersion, ttnpb.MACVersion)) {
+	ForEachClass(func(makeClassName func(...string) string, class ttnpb.Class) {
+		ForEachPHYMACVersion(func(makePHYMACName func(parts ...string) string, phyVersion ttnpb.PHYVersion, macVersion ttnpb.MACVersion) {
+			f(func(parts ...string) string {
+				return makeClassName(makePHYMACName(parts...))
+			}, class, phyVersion, macVersion)
+		})
+	})
+}
+
+func ForEachClassMACVersion(f func(func(...string) string, ttnpb.Class, ttnpb.MACVersion)) {
+	ForEachClass(func(makeClassName func(...string) string, class ttnpb.Class) {
+		ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
+			f(func(parts ...string) string {
+				return makeClassName(makeMACName(parts...))
+			}, class, macVersion)
+		})
+	})
+}
+
+func ForEachFrequencyPlanBandMACVersion(t *testing.T, f func(func(...string) string, string, *frequencyplans.FrequencyPlan, band.Band, ttnpb.PHYVersion, ttnpb.MACVersion)) {
+	ForEachFrequencyPlan(t, func(makeFPName func(...string) string, fpID string, fp *frequencyplans.FrequencyPlan) {
+		phy, err := band.GetByID(fp.BandID)
+		if err != nil {
+			t.Errorf("failed to get PHY by id `%s` associated with frequency plan `%s`: %s", fp.BandID, fpID, err)
+			return
+		}
+		for _, phyVersion := range phy.Versions() {
+			phy, err := phy.Version(phyVersion)
+			if err != nil {
+				t.Errorf("Failed to convert band `%s` to version `%s`: %s", fp.BandID, phyVersion, err)
+				continue
+			}
+			ForEachMACVersion(func(makeMACName func(parts ...string) string, macVersion ttnpb.MACVersion) {
+				f(func(parts ...string) string {
+					return makeFPName(makeMACName(append(parts, fmt.Sprintf("PHY:%s", phyVersion))...))
+				}, fpID, fp, phy, phyVersion, macVersion)
+			})
+		}
+	})
+}
+
+func ForEachBandMACVersion(t *testing.T, f func(func(...string) string, band.Band, ttnpb.PHYVersion, ttnpb.MACVersion)) {
+	ForEachBand(t, func(makeBandName func(...string) string, phy band.Band, phyVersion ttnpb.PHYVersion) {
+		ForEachMACVersion(func(makeMACName func(...string) string, macVersion ttnpb.MACVersion) {
+			f(func(parts ...string) string {
+				return makeBandName(makeMACName(parts...))
+			}, phy, phyVersion, macVersion)
+		})
+	})
 }
 
 var redisNamespace = [...]string{
@@ -1488,4 +1777,31 @@ func NewRedisDownlinkTaskQueue(t testing.TB) (DownlinkTaskQueue, func() error) {
 			}
 			return closeErr
 		}
+}
+
+func NewRedisUplinkDeduplicator(t testing.TB) (UplinkDeduplicator, func() error) {
+	cl, flush := test.NewRedis(t, append(redisNamespace[:], "uplink-deduplication")...)
+	return &redis.UplinkDeduplicator{
+			Redis: cl,
+		},
+		func() error {
+			flush()
+			return cl.Close()
+		}
+}
+
+func AllTrue(vs ...bool) bool {
+	for _, v := range vs {
+		if !v {
+			return false
+		}
+	}
+	return true
+}
+
+func LogEvents(t *testing.T, ch <-chan test.EventPubSubPublishRequest) {
+	for ev := range ch {
+		t.Logf("Event %s published with data %v", ev.Event.Name(), ev.Event.Data())
+		ev.Response <- struct{}{}
+	}
 }
