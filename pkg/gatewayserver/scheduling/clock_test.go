@@ -112,3 +112,12 @@ func TestRolloverClock(t *testing.T) {
 		})
 	}
 }
+
+func TestSyncWithGatewayConcentrator(t *testing.T) {
+	a := assertions.New(t)
+
+	clock := &RolloverClock{}
+	clock.SyncWithGatewayConcentrator(0x496054D6, time.Now(), ConcentratorTime(0xAA496054D6)*ConcentratorTime(time.Microsecond))
+	v := int64(clock.FromTimestampTime(0x499D5DD6)) / int64(time.Microsecond)
+	a.So(v, should.Equal, int64(0xAA499D5DD6))
+}
