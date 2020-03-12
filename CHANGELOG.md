@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Creating 1.0.4 ABP end devices via the Console.
 - ADR uplink handling.
 - Uplink retransmission handling.
+- Synchronizing Basic Station concentrator time after reconnect or initial connect after long inactivity.
 
 ### Security
 
