@@ -86,7 +86,7 @@ func (m orderedMap) MarshalJSON() ([]byte, error) {
 func (c SX1301Config) MarshalJSON() ([]byte, error) {
 	var m orderedMap
 	m.add("lorawan_public", c.LoRaWANPublic)
-	m.add("clksrc", c.ClockSource)
+	m.add("clksrc,omitempty", c.ClockSource)
 	m.add("antenna_gain", c.AntennaGain)
 	if c.LBTConfig != nil {
 		m.add("lbt_cfg", *c.LBTConfig)
