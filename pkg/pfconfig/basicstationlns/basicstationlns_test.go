@@ -103,7 +103,6 @@ func TestGetRouterConfig(t *testing.T) {
 				SX1301Config: []shared.SX1301Config{
 					{
 						LoRaWANPublic: true,
-						ClockSource:   0,
 						AntennaGain:   0,
 						Radios: []shared.RFConfig{
 							{
@@ -176,7 +175,6 @@ func TestGetRouterConfig(t *testing.T) {
 				SX1301Config: []shared.SX1301Config{
 					{
 						LoRaWANPublic: true,
-						ClockSource:   0,
 						AntennaGain:   0,
 						Radios: []shared.RFConfig{
 							{
@@ -239,7 +237,8 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 			Name:   "ValidFrequencyPlan",
 			BandID: "US_902_928",
 			FrequencyPlans: map[string]*frequencyplans.FrequencyPlan{test.USFrequencyPlanID: {
-				BandID: "US_902_928",
+				ClockSource: 0,
+				BandID:      "US_902_928",
 				Radios: []frequencyplans.Radio{
 					{
 						Enable:    true,
@@ -302,7 +301,6 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 				SX1301Config: []shared.SX1301Config{
 					{
 						LoRaWANPublic: true,
-						ClockSource:   0,
 						AntennaGain:   0,
 						Radios: []shared.RFConfig{
 							{
@@ -329,7 +327,6 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 					},
 					{
 						LoRaWANPublic: true,
-						ClockSource:   0,
 						AntennaGain:   0,
 						Radios: []shared.RFConfig{
 							{

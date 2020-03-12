@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/pkg/util/pointers"
 )
 
 func TestSX1301Conf(t *testing.T) {
@@ -88,25 +89,24 @@ func TestSX1301Conf(t *testing.T) {
 			},
 			SX1301Config{
 				LoRaWANPublic: true,
-				ClockSource:   1,
+				ClockSource:   pointers.Uint8(1),
 				AntennaGain:   0,
 				Radios: []RFConfig{
 					{
 						Enable:     true,
 						Type:       "SX1257",
 						Frequency:  867500000,
-						TxEnable:   true,
+						TxEnable:   pointers.Bool(true),
 						TxFreqMin:  863000000,
 						TxFreqMax:  870000000,
-						RSSIOffset: -166,
+						RSSIOffset: pointers.Float32(-166),
 					},
 					{
 						Enable: true, Type: "SX1257",
 						Frequency:  868500000,
-						TxEnable:   false,
 						TxFreqMin:  0,
 						TxFreqMax:  0,
-						RSSIOffset: -166,
+						RSSIOffset: pointers.Float32(-166),
 					},
 				},
 				Channels: []IFConfig{

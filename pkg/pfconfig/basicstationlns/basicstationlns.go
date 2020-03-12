@@ -117,12 +117,12 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 		sx1301Conf.Radios[0].TxFreqMin = 0
 		sx1301Conf.Radios[0].TxFreqMax = 0
 		// Remove hardware specific values that are handled by the gateway itself.
-		sx1301Conf.ClockSource = 0
+		sx1301Conf.ClockSource = nil
 		sx1301Conf.TxLUTConfigs = nil
 		for i := range sx1301Conf.Radios {
 			sx1301Conf.Radios[i].Type = ""
-			sx1301Conf.Radios[i].TxEnable = false
-			sx1301Conf.Radios[i].RSSIOffset = 0
+			sx1301Conf.Radios[i].TxEnable = nil
+			sx1301Conf.Radios[i].RSSIOffset = nil
 		}
 		if err != nil {
 			return RouterConfig{}, err

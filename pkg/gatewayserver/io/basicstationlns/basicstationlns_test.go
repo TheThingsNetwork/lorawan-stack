@@ -491,22 +491,17 @@ func TestVersion(t *testing.T) {
 				SX1301Config: []shared.SX1301Config{
 					{
 						LoRaWANPublic: true,
-						ClockSource:   1,
 						AntennaGain:   0,
 						Radios: []shared.RFConfig{
 							{
-								Enable:     true,
-								Frequency:  867500000,
-								TxEnable:   true,
-								RSSIOffset: -166,
+								Enable:    true,
+								Frequency: 867500000,
 							},
 							{
-								Enable:     true,
-								Frequency:  868500000,
-								TxEnable:   false,
-								TxFreqMin:  0,
-								TxFreqMax:  0,
-								RSSIOffset: -166,
+								Enable:    true,
+								Frequency: 868500000,
+								TxFreqMin: 0,
+								TxFreqMax: 0,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -573,22 +568,17 @@ func TestVersion(t *testing.T) {
 				SX1301Config: []shared.SX1301Config{
 					{
 						LoRaWANPublic: true,
-						ClockSource:   1,
 						AntennaGain:   0,
 						Radios: []shared.RFConfig{
 							{
-								Enable:     true,
-								Frequency:  867500000,
-								TxEnable:   true,
-								RSSIOffset: -166,
+								Enable:    true,
+								Frequency: 867500000,
 							},
 							{
-								Enable:     true,
-								Frequency:  868500000,
-								TxEnable:   false,
-								TxFreqMin:  0,
-								TxFreqMax:  0,
-								RSSIOffset: -166,
+								Enable:    true,
+								Frequency: 868500000,
+								TxFreqMin: 0,
+								TxFreqMax: 0,
 							},
 						},
 						Channels: []shared.IFConfig{

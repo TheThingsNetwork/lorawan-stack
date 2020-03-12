@@ -28,12 +28,13 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/util/pointers"
 )
 
 // SX1301Config contains the configuration for the SX1301 concentrator.
 type SX1301Config struct {
 	LoRaWANPublic       bool
-	ClockSource         uint8 `json:"omitempty"`
+	ClockSource         *uint8
 	AntennaGain         float32
 	LBTConfig           *LBTConfig
 	Radios              []RFConfig
@@ -206,14 +207,14 @@ type LBTChannelConfig struct {
 
 // RFConfig contains the configuration for one of the radios.
 type RFConfig struct {
-	Enable      bool    `json:"enable"`
-	Type        string  `json:"type,omitempty"`
-	Frequency   uint64  `json:"freq"`
-	RSSIOffset  float32 `json:"rssi_offset,omitempty"`
-	TxEnable    bool    `json:"tx_enable,omitempty"`
-	TxFreqMin   uint64  `json:"tx_freq_min,omitempty"`
-	TxFreqMax   uint64  `json:"tx_freq_max,omitempty"`
-	TxNotchFreq uint64  `json:"tx_notch_freq,omitempty"`
+	Enable      bool     `json:"enable"`
+	Type        string   `json:"type,omitempty"`
+	Frequency   uint64   `json:"freq"`
+	RSSIOffset  *float32 `json:"rssi_offset,omitempty"`
+	TxEnable    *bool    `json:"tx_enable,omitempty"`
+	TxFreqMin   uint64   `json:"tx_freq_min,omitempty"`
+	TxFreqMax   uint64   `json:"tx_freq_max,omitempty"`
+	TxNotchFreq uint64   `json:"tx_notch_freq,omitempty"`
 }
 
 // IFConfig contains the configuration for one of the channels.
@@ -285,7 +286,7 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 	conf := new(SX1301Config)
 
 	conf.LoRaWANPublic = true
-	conf.ClockSource = frequencyPlan.ClockSource
+	conf.ClockSource = pointers.Uint8(frequencyPlan.ClockSource)
 
 	if frequencyPlan.LBT != nil {
 		lbtConfig := &LBTConfig{
@@ -311,10 +312,10 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 			Enable:     radio.Enable,
 			Type:       radio.ChipType,
 			Frequency:  radio.Frequency,
-			RSSIOffset: radio.RSSIOffset,
+			RSSIOffset: &radio.RSSIOffset,
 		}
 		if radio.TxConfiguration != nil {
-			rfConfig.TxEnable = true
+			rfConfig.TxEnable = pointers.Bool(true)
 			rfConfig.TxFreqMin = radio.TxConfiguration.MinFrequency
 			rfConfig.TxFreqMax = radio.TxConfiguration.MaxFrequency
 			if radio.TxConfiguration.NotchFrequency != nil {
