@@ -11418,6 +11418,9 @@
         "user_ids": {
           "$ref": "#/definitions/v3UserIdentifiers"
         },
+        "user_session_id": {
+          "type": "string"
+        },
         "client_ids": {
           "$ref": "#/definitions/v3ClientIdentifiers"
         },

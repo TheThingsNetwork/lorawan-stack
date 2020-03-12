@@ -159,6 +159,9 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 		State:       code.State,
 		ExpiresAt:   code.ExpiresAt,
 	}
+	if code.UserSessionID != "" {
+		codeModel.UserSessionID = &code.UserSessionID
+	}
 	codeModel.CreatedAt = cleanTime(code.CreatedAt)
 	return s.createEntity(ctx, &codeModel)
 }
@@ -216,6 +219,9 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 		ExpiresAt:    token.ExpiresAt,
+	}
+	if token.UserSessionID != "" {
+		tokenModel.UserSessionID = &token.UserSessionID
 	}
 	tokenModel.CreatedAt = cleanTime(token.CreatedAt)
 	return s.createEntity(ctx, &tokenModel)

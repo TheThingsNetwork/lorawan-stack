@@ -519,6 +519,15 @@ func (m *OAuthAuthorizationCode) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "user_session_id":
+
+			if utf8.RuneCountInString(m.GetUserSessionID()) > 64 {
+				return OAuthAuthorizationCodeValidationError{
+					field:  "user_session_id",
+					reason: "value length must be at most 64 runes",
+				}
+			}
+
 		case "client_ids":
 
 			if v, ok := interface{}(&m.ClientIDs).(interface{ ValidateFields(...string) error }); ok {
@@ -769,6 +778,15 @@ func (m *OAuthAccessToken) ValidateFields(paths ...string) error {
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
+				}
+			}
+
+		case "user_session_id":
+
+			if utf8.RuneCountInString(m.GetUserSessionID()) > 64 {
+				return OAuthAccessTokenValidationError{
+					field:  "user_session_id",
+					reason: "value length must be at most 64 runes",
 				}
 			}
 
