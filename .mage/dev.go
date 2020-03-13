@@ -164,6 +164,9 @@ func (Dev) InitStack() error {
 		"--redirect-uri", "https://localhost:8885/console/oauth/callback",
 		"--redirect-uri", "http://localhost:1885/console/oauth/callback",
 		"--redirect-uri", "/console/oauth/callback",
+		"--logout-redirect-uri", "https://localhost:8885/console",
+		"--logout-redirect-uri", "http://localhost:1885/console",
+		"--logout-redirect-uri", "/console",
 	)
 }
 
