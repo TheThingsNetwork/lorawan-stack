@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Changing username and password to be not required in pubsub integration.
+- Admin users that are suspended can no longer create, view or delete other users.
 
 ## [3.6.0] (2020-02-27)
 

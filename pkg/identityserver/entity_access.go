@@ -206,11 +206,6 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	}
 
 	if user != nil {
-		if user.Admin {
-			res.IsAdmin = true
-			res.UniversalRights = ttnpb.AllAdminRights.Implied().Intersect(userRights)
-		}
-
 		if is.configFromContext(ctx).UserRegistration.ContactInfoValidation.Required && user.PrimaryEmailAddressValidatedAt == nil {
 			// Go to profile page, edit basic settings (such as email), delete account.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE))
@@ -224,6 +219,10 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			warning.Add(ctx, "Restricted rights while account pending")
 		case ttnpb.STATE_APPROVED:
 			// Normal user.
+			if user.Admin {
+				res.IsAdmin = true
+				res.UniversalRights = ttnpb.AllAdminRights.Implied().Intersect(userRights)
+			}
 		case ttnpb.STATE_REJECTED:
 			// Go to profile page, delete account.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_DELETE))
