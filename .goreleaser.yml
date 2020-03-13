@@ -180,8 +180,6 @@ dockers:
       - ttn-lw-cli
       - ttn-lw-stack
     image_templates:
-      - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:latest'
-      - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:{{ .Major }}'
       - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:{{ .Major }}.{{ .Minor }}'
       - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:{{ .Version }}'
     skip_push: auto
