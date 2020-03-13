@@ -147,6 +147,8 @@ func (m *Client) ValidateFields(paths ...string) error {
 			// no validation rules for Secret
 		case "redirect_uris":
 
+		case "logout_redirect_uris":
+
 		case "state":
 
 			if _, ok := State_name[int32(m.GetState())]; !ok {

@@ -1407,6 +1407,7 @@ An OAuth client on the network.
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated |  |
 | `secret` | [`string`](#string) |  | The client secret is only visible to collaborators of the client. |
 | `redirect_uris` | [`string`](#string) | repeated | The allowed redirect URIs against which authorization requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. |
+| `logout_redirect_uris` | [`string`](#string) | repeated | The allowed logout redirect URIs against which client initiated logout requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. |
 | `state` | [`State`](#ttn.lorawan.v3.State) |  | The reviewing state of the client. This field can only be modified by admins. |
 | `skip_authorization` | [`bool`](#bool) |  | If set, the authorization page will be skipped. This field can only be modified by admins. |
 | `endorsed` | [`bool`](#bool) |  | If set, the authorization page will show endorsement. This field can only be modified by admins. |

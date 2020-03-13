@@ -107,6 +107,15 @@ func (dst *Client) SetFields(src *Client, paths ...string) error {
 			} else {
 				dst.RedirectURIs = nil
 			}
+		case "logout_redirect_uris":
+			if len(subs) > 0 {
+				return fmt.Errorf("'logout_redirect_uris' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LogoutRedirectURIs = src.LogoutRedirectURIs
+			} else {
+				dst.LogoutRedirectURIs = nil
+			}
 		case "state":
 			if len(subs) > 0 {
 				return fmt.Errorf("'state' has no subfields, but %s were specified", subs)

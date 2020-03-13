@@ -9155,6 +9155,13 @@
           },
           "description": "The allowed redirect URIs against which authorization requests are checked.\nIf the authorization request does not pass a redirect URI, the first one\nfrom this list is taken."
         },
+        "logout_redirect_uris": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The allowed logout redirect URIs against which client initiated logout\nrequests are checked. If the authorization request does not pass a redirect\nURI, the first one from this list is taken."
+        },
         "state": {
           "$ref": "#/definitions/v3State",
           "description": "The reviewing state of the client.\nThis field can only be modified by admins."
