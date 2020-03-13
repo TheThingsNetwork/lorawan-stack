@@ -25,7 +25,6 @@ import IntlHelmet from '../../../lib/components/intl-helmet'
 import withRequest from '../../../lib/components/with-request'
 import withEnv from '../../../lib/components/env'
 import NotFoundRoute from '../../../lib/components/not-found-route'
-import Require from '../../lib/components/require'
 
 import DeviceOverview from '../device-overview'
 import DeviceData from '../device-data'
@@ -143,7 +142,7 @@ export default class Device extends React.Component {
         params: { appId },
       },
       devId,
-      device: { name, description, join_server_address, supports_join },
+      device: { name, description, join_server_address, supports_join, root_keys },
       env: { siteName },
     } = this.props
 
@@ -151,7 +150,7 @@ export default class Device extends React.Component {
     const hasJs =
       jsConfig.enabled &&
       join_server_address === getHostnameFromUrl(jsConfig.base_url) &&
-      supports_join
+      (supports_join && Boolean(root_keys))
 
     const basePath = `/applications/${appId}/devices/${devId}`
 
@@ -196,9 +195,9 @@ export default class Device extends React.Component {
           <Route exact path={`${basePath}/location`} component={DeviceLocation} />
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
           <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
-          <Require condition={hasJs}>
+          {hasJs && (
             <Route path={`${basePath}/claim-auth-code`} component={DeviceClaimAuthenticationCode} />
-          </Require>
+          )}
           <NotFoundRoute />
         </Switch>
       </React.Fragment>
