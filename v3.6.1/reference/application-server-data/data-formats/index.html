@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Data Formats | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.6.1/reference/application-server-data/data-formats/" />
+  <link rel="icon" type="image/png" href="/v3.6.1/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.6.1/css/theme.min.e246cfe68b58bf0354a0d23df366dac7d501931cd2629adf06cb5d98115de18b.css" integrity="sha256-4kbP5otYvwNUoNI982bax9UBkxzSYprfBstdmBFd4Ys=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Data Formats">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Data Formats">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.6.1/reference/application-server-data/data-formats/">
+  <meta name="twitter:title" content="Data Formats" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.6.1/">
+        <img src="/v3.6.1/img/TTS-logo.svg">
+        <p class="navbar-item is-size-7">v3.6.1</p>
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.6.1/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.6.1/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.6.1/components/">Components</a>
+        <a class="navbar-item" href="/v3.6.1/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.6.1/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Application Server Data</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.6.1/reference/application-server-data/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/reference/application-server-data/webhooks/" class="">HTTP Webhooks</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/reference/application-server-data/mqtt/" class="">MQTT Server</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/reference/application-server-data/data-formats/" class="is-active">Data Formats</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Data Formats</h1>
+
+<div class="content"><p>The streaming data integrations provide multiple formats for the delivery of application uplink messages and downlink queue operations. This section will delve into the common formats used by them.</p>
+<h2 id="json">JSON</h2>
+<p>The JSON message format is described in the sections below.</p>
+<blockquote>
+<p>Note: Empty fields are omitted from payloads. As such, if a certain field has a value of <code>&quot;&quot;</code>, <code>0</code> or <code>false</code> it will not be present in the message.</p>
+</blockquote>
+<h3 id="join-accept-messages">Join-accept Messages</h3>
+<p>The JSON join-accept messages use the following format:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="s2">&#34;end_device_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;device_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>                    <span class="c1">// Device ID
+</span><span class="c1"></span>    <span class="s2">&#34;application_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&#34;application_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;app1&#34;</span>              <span class="c1">// Application ID
+</span><span class="c1"></span>    <span class="p">}</span><span class="p">,</span>
+    <span class="s2">&#34;dev_eui&#34;</span> <span class="o">:</span> <span class="s2">&#34;0004A30B001C0530&#34;</span><span class="p">,</span>          <span class="c1">// DevEUI of the end device
+</span><span class="c1"></span>    <span class="s2">&#34;join_eui&#34;</span> <span class="o">:</span> <span class="s2">&#34;800000000000000C&#34;</span><span class="p">,</span>         <span class="c1">// JoinEUI of the end device (also known as AppEUI in LoRaWAN versions below 1.1)
+</span><span class="c1"></span>    <span class="s2">&#34;dev_addr&#34;</span> <span class="o">:</span> <span class="s2">&#34;00BCB929&#34;</span>                  <span class="c1">// Device address known by the Network Server
+</span><span class="c1"></span>  <span class="p">}</span><span class="p">,</span>
+  <span class="s2">&#34;correlation_ids&#34;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&#34;as:up:01...&#34;</span> <span class="p">]</span><span class="p">,</span>     <span class="c1">// Correlation identifiers of the message
+</span><span class="c1"></span>  <span class="s2">&#34;received_at&#34;</span> <span class="o">:</span> <span class="s2">&#34;2020-02-12T15:15...&#34;</span>      <span class="c1">// ISO 8601 UTC timestamp at which the message has been received by the Application Server
+</span><span class="c1"></span>  <span class="s2">&#34;join_accept&#34;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;session_key_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;AXBSH1Pk6Z0G166...&#34;</span><span class="p">,</span> <span class="c1">// Join Server issued identifier for the session keys
+</span><span class="c1"></span>    <span class="s2">&#34;received_at&#34;</span> <span class="o">:</span> <span class="s2">&#34;2020-02-17T07:49...&#34;</span>    <span class="c1">// ISO 8601 UTC timestamp at which the uplink has been received by the Network Server
+</span><span class="c1"></span>  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><details><summary>Example join message</summary>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;device_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;application_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;application_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;app1&#34;</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="nt">&#34;dev_eui&#34;</span> <span class="p">:</span> <span class="s2">&#34;0004A30B001C0530&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;join_eui&#34;</span> <span class="p">:</span> <span class="s2">&#34;800000000000000C&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;dev_addr&#34;</span> <span class="p">:</span> <span class="s2">&#34;01497ECC&#34;</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="nt">&#34;correlation_ids&#34;</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&#34;as:up:01E191YN5F2HMBQCBCVRF731VY&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:conn:01E191S6ZEWB630NTR45K5QN4Q&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01E191YMZ2S7ZRTEGATVE2S3HH&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;ns:uplink:01E191YMZ2J64K6FEW5F0WE7TQ&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E191YMZ2KK3TJYG5C4XZP8JK&#34;</span>
+  <span class="p">]</span><span class="p">,</span>
+  <span class="nt">&#34;received_at&#34;</span> <span class="p">:</span> <span class="s2">&#34;2020-02-17T07:49:09.935284891Z&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;join_accept&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;session_key_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;AXBSH1Pk6Z0G166RlH16CQ==&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;received_at&#34;</span> <span class="p">:</span> <span class="s2">&#34;2020-02-17T07:49:09.736532315Z&#34;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></details>
+<h3 id="uplink-messages">Uplink Messages</h3>
+<p>The JSON uplink messages use the following format:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="s2">&#34;end_device_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;device_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>                    <span class="c1">// Device ID
+</span><span class="c1"></span>    <span class="s2">&#34;application_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&#34;application_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;app1&#34;</span>              <span class="c1">// Application ID
+</span><span class="c1"></span>    <span class="p">}</span><span class="p">,</span>
+    <span class="s2">&#34;dev_eui&#34;</span> <span class="o">:</span> <span class="s2">&#34;0004A30B001C0530&#34;</span><span class="p">,</span>          <span class="c1">// DevEUI of the end device
+</span><span class="c1"></span>    <span class="s2">&#34;join_eui&#34;</span> <span class="o">:</span> <span class="s2">&#34;800000000000000C&#34;</span><span class="p">,</span>         <span class="c1">// JoinEUI of the end device (also known as AppEUI in LoRaWAN versions below 1.1)
+</span><span class="c1"></span>    <span class="s2">&#34;dev_addr&#34;</span> <span class="o">:</span> <span class="s2">&#34;00BCB929&#34;</span>                  <span class="c1">// Device address known by the Network Server
+</span><span class="c1"></span>  <span class="p">}</span><span class="p">,</span>
+  <span class="s2">&#34;correlation_ids&#34;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&#34;as:up:01...&#34;</span><span class="p">,</span> <span class="p">...</span> <span class="p">]</span><span class="p">,</span><span class="c1">// Correlation identifiers of the message
+</span><span class="c1"></span>  <span class="s2">&#34;received_at&#34;</span> <span class="o">:</span> <span class="s2">&#34;2020-02-12T15:15...&#34;</span>      <span class="c1">// ISO 8601 UTC timestamp at which the message has been received by the Application Server
+</span><span class="c1"></span>  <span class="s2">&#34;uplink_message&#34;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;session_key_id&#34;</span><span class="o">:</span> <span class="s2">&#34;AXA50...&#34;</span><span class="p">,</span>            <span class="c1">// Join Server issued identifier for the session keys used by this uplink
+</span><span class="c1"></span>    <span class="s2">&#34;f_cnt&#34;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>                              <span class="c1">// Frame counter
+</span><span class="c1"></span>    <span class="s2">&#34;f_port&#34;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>                             <span class="c1">// Frame port
+</span><span class="c1"></span>    <span class="s2">&#34;frm_payload&#34;</span><span class="o">:</span> <span class="s2">&#34;gkHe&#34;</span><span class="p">,</span>                   <span class="c1">// Frame payload (Base64)
+</span><span class="c1"></span>    <span class="s2">&#34;decoded_payload&#34;</span> <span class="o">:</span> <span class="p">{</span>                    <span class="c1">// Decoded payload object, decoded by the device payload formatter
+</span><span class="c1"></span>      <span class="s2">&#34;temperature&#34;</span><span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span>
+      <span class="s2">&#34;luminosity&#34;</span><span class="o">:</span> <span class="mf">0.64</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="s2">&#34;rx_metadata&#34;</span><span class="o">:</span> <span class="p">[</span><span class="p">{</span>                        <span class="c1">// A list of metadata for each antenna of each gateway that received this message
+</span><span class="c1"></span>      <span class="s2">&#34;gateway_ids&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;gateway_id&#34;</span><span class="o">:</span> <span class="s2">&#34;gtw1&#34;</span><span class="p">,</span>                <span class="c1">// Gateway ID
+</span><span class="c1"></span>        <span class="s2">&#34;eui&#34;</span><span class="o">:</span> <span class="s2">&#34;9C5C8E00001A05C4&#34;</span>            <span class="c1">// Gateway EUI
+</span><span class="c1"></span>      <span class="p">}</span><span class="p">,</span>
+      <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2020-02-12T15:15:45.787Z&#34;</span><span class="p">,</span>    <span class="c1">// ISO 8601 UTC timestamp at which the uplink has been received by the gateway
+</span><span class="c1"></span>      <span class="s2">&#34;timestamp&#34;</span><span class="o">:</span> <span class="mi">2463457000</span><span class="p">,</span>               <span class="c1">// Timestamp of the gateway concentrator when the message has been received
+</span><span class="c1"></span>      <span class="s2">&#34;rssi&#34;</span><span class="o">:</span> <span class="o">-</span><span class="mi">35</span><span class="p">,</span>                           <span class="c1">// Received signal strength indicator (dBm)
+</span><span class="c1"></span>      <span class="s2">&#34;channel_rssi&#34;</span><span class="o">:</span> <span class="o">-</span><span class="mi">35</span><span class="p">,</span>                   <span class="c1">// Received signal strength indicator of the channel (dBm)
+</span><span class="c1"></span>      <span class="s2">&#34;snr&#34;</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span>                              <span class="c1">// Signal-to-noise ratio (dB)
+</span><span class="c1"></span>      <span class="s2">&#34;uplink_token&#34;</span><span class="o">:</span> <span class="s2">&#34;ChIKEA...&#34;</span><span class="p">,</span>           <span class="c1">// Uplink token injected by gateway, Gateway Server or fNS
+</span><span class="c1"></span>      <span class="s2">&#34;channel_index&#34;</span><span class="o">:</span> <span class="mi">2</span>                     <span class="c1">// Index of the gateway channel that received the message
+</span><span class="c1"></span>    <span class="p">}</span><span class="p">]</span><span class="p">,</span>
+    <span class="s2">&#34;settings&#34;</span><span class="o">:</span> <span class="p">{</span>                            <span class="c1">// Settings for the transmission
+</span><span class="c1"></span>      <span class="s2">&#34;data_rate&#34;</span><span class="o">:</span> <span class="p">{</span>                         <span class="c1">// Data rate settings
+</span><span class="c1"></span>        <span class="s2">&#34;lora&#34;</span><span class="o">:</span> <span class="p">{</span>                            <span class="c1">// LoRa modulation settings
+</span><span class="c1"></span>          <span class="s2">&#34;bandwidth&#34;</span><span class="o">:</span> <span class="mi">125000</span><span class="p">,</span>               <span class="c1">// Bandwidth (Hz)
+</span><span class="c1"></span>          <span class="s2">&#34;spreading_factor&#34;</span><span class="o">:</span> <span class="mi">7</span>              <span class="c1">// Spreading factor
+</span><span class="c1"></span>        <span class="p">}</span>
+      <span class="p">}</span><span class="p">,</span>
+      <span class="s2">&#34;data_rate_index&#34;</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span>                  <span class="c1">// LoRaWAN data rate index
+</span><span class="c1"></span>      <span class="s2">&#34;coding_rate&#34;</span><span class="o">:</span> <span class="s2">&#34;4/6&#34;</span><span class="p">,</span>                  <span class="c1">// LoRa coding rate
+</span><span class="c1"></span>      <span class="s2">&#34;frequency&#34;</span><span class="o">:</span> <span class="s2">&#34;868300000&#34;</span><span class="p">,</span>              <span class="c1">// Frequency (Hz)
+</span><span class="c1"></span>      <span class="s2">&#34;timestamp&#34;</span><span class="o">:</span> <span class="mi">2463457000</span><span class="p">,</span>               <span class="c1">// Timestamp of the gateway concentrator when the message has been received
+</span><span class="c1"></span>      <span class="s2">&#34;time&#34;</span><span class="o">:</span> <span class="s2">&#34;2020-02-12T15:15:45.787Z&#34;</span>     <span class="c1">// ISO 8601 UTC timestamp at which the uplink has been received by the gateway
+</span><span class="c1"></span>    <span class="p">}</span><span class="p">,</span>
+    <span class="s2">&#34;received_at&#34;</span><span class="o">:</span> <span class="s2">&#34;2020-02-12T15:15...&#34;</span>     <span class="c1">// ISO 8601 UTC timestamp at which the uplink has been received by the Network Server
+</span><span class="c1"></span>  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><details><summary>Example uplink message</summary>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;device_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;application_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;application_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;app1&#34;</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="nt">&#34;dev_eui&#34;</span> <span class="p">:</span> <span class="s2">&#34;0004A30B001C0530&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;join_eui&#34;</span> <span class="p">:</span> <span class="s2">&#34;800000000000000C&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;dev_addr&#34;</span> <span class="p">:</span> <span class="s2">&#34;00BCB929&#34;</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="nt">&#34;correlation_ids&#34;</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&#34;as:up:01E0WZGT6Y7657CPFPE5WEYDSQ&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:conn:01E0WDEC6T5T4XXBAX7S1VMFKE&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01E0WZGSZWT07NE5TS2APTV1Z9&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;ns:uplink:01E0WZGSZXZXZS8RFAWZX0F2FY&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E0WZGSZXGE1KS577PFBWRJEE&#34;</span>
+  <span class="p">]</span><span class="p">,</span>
+  <span class="nt">&#34;received_at&#34;</span> <span class="p">:</span> <span class="s2">&#34;2020-02-12T15:15:46.014773143Z&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;uplink_message&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;session_key_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;AXA50tHUGUucuzS/bCGMNw==&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;f_cnt&#34;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nt">&#34;frm_payload&#34;</span> <span class="p">:</span> <span class="s2">&#34;gkHe&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;decoded_payload&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;temperature&#34;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+      <span class="nt">&#34;luminosity&#34;</span><span class="p">:</span> <span class="mf">0.64</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="nt">&#34;rx_metadata&#34;</span> <span class="p">:</span> <span class="p">[</span> <span class="p">{</span>
+      <span class="nt">&#34;gateway_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&#34;gateway_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;gtw1&#34;</span><span class="p">,</span>
+        <span class="nt">&#34;eui&#34;</span> <span class="p">:</span> <span class="s2">&#34;9C5C8E00001A05C4&#34;</span>
+      <span class="p">}</span><span class="p">,</span>
+      <span class="nt">&#34;time&#34;</span> <span class="p">:</span> <span class="s2">&#34;2020-02-12T15:15:45.787Z&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;timestamp&#34;</span> <span class="p">:</span> <span class="mi">2463457000</span><span class="p">,</span>
+      <span class="nt">&#34;rssi&#34;</span> <span class="p">:</span> <span class="mi">-35</span><span class="p">,</span>
+      <span class="nt">&#34;channel_rssi&#34;</span> <span class="p">:</span> <span class="mi">-35</span><span class="p">,</span>
+      <span class="nt">&#34;snr&#34;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+      <span class="nt">&#34;uplink_token&#34;</span> <span class="p">:</span> <span class="s2">&#34;ChIKEAoEZ3R3MRIInFyOAAAaBcQQ6L3Vlgk=&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;channel_index&#34;</span> <span class="p">:</span> <span class="mi">2</span>
+    <span class="p">}</span> <span class="p">]</span><span class="p">,</span>
+    <span class="nt">&#34;settings&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;data_rate&#34;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&#34;lora&#34;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&#34;bandwidth&#34;</span> <span class="p">:</span> <span class="mi">125000</span><span class="p">,</span>
+          <span class="nt">&#34;spreading_factor&#34;</span> <span class="p">:</span> <span class="mi">7</span>
+        <span class="p">}</span>
+      <span class="p">}</span><span class="p">,</span>
+      <span class="nt">&#34;data_rate_index&#34;</span> <span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+      <span class="nt">&#34;coding_rate&#34;</span> <span class="p">:</span> <span class="s2">&#34;4/6&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;frequency&#34;</span> <span class="p">:</span> <span class="s2">&#34;868300000&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;timestamp&#34;</span> <span class="p">:</span> <span class="mi">2463457000</span><span class="p">,</span>
+      <span class="nt">&#34;time&#34;</span> <span class="p">:</span> <span class="s2">&#34;2020-02-12T15:15:45.787Z&#34;</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="nt">&#34;received_at&#34;</span> <span class="p">:</span> <span class="s2">&#34;2020-02-12T15:15:45.789585559Z&#34;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></details>
+<h3 id="downlink-events-messages">Downlink Events Messages</h3>
+<p>The JSON downlink <code>ack</code>, <code>nack</code>, <code>queued</code> and <code>sent</code> events messages use the following format:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="s2">&#34;end_device_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;device_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>                    <span class="c1">// Device ID
+</span><span class="c1"></span>    <span class="s2">&#34;application_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&#34;application_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;app1&#34;</span>              <span class="c1">// Application ID
+</span><span class="c1"></span>    <span class="p">}</span><span class="p">,</span>
+    <span class="s2">&#34;dev_eui&#34;</span> <span class="o">:</span> <span class="s2">&#34;0004A30B001C0530&#34;</span><span class="p">,</span>          <span class="c1">// DevEUI of the end device
+</span><span class="c1"></span>    <span class="s2">&#34;join_eui&#34;</span> <span class="o">:</span> <span class="s2">&#34;800000000000000C&#34;</span><span class="p">,</span>         <span class="c1">// JoinEUI of the end device (also known as AppEUI in LoRaWAN versions below 1.1)
+</span><span class="c1"></span>    <span class="s2">&#34;dev_addr&#34;</span> <span class="o">:</span> <span class="s2">&#34;00BCB929&#34;</span>                  <span class="c1">// Device address known by the Network Server
+</span><span class="c1"></span>  <span class="p">}</span><span class="p">,</span>
+  <span class="s2">&#34;correlation_ids&#34;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&#34;as:downlink:...&#34;</span> <span class="p">]</span><span class="p">,</span> <span class="c1">// Correlation identifiers of the message
+</span><span class="c1"></span>  <span class="s2">&#34;received_at&#34;</span> <span class="o">:</span> <span class="s2">&#34;2020-02-17T10:32:24...&#34;</span><span class="p">,</span>  <span class="c1">// ISO 8601 UTC timestamp at which the message has been received by the Network Server
+</span><span class="c1"></span>  <span class="s2">&#34;downlink_queued&#34;</span> <span class="o">:</span> <span class="p">{</span>                      <span class="c1">// Name of the event (ack, nack, queued or sent)
+</span><span class="c1"></span>    <span class="s2">&#34;session_key_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;AXBSH1Pk6Z0G166...&#34;</span><span class="p">,</span> <span class="c1">// Join Server issued identifier for the session keys
+</span><span class="c1"></span>    <span class="s2">&#34;f_port&#34;</span> <span class="o">:</span> <span class="mi">15</span><span class="p">,</span>                           <span class="c1">// Frame port
+</span><span class="c1"></span>    <span class="s2">&#34;f_cnt&#34;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>                             <span class="c1">// Frame counter
+</span><span class="c1"></span>    <span class="s2">&#34;frm_payload&#34;</span> <span class="o">:</span> <span class="s2">&#34;vu8=&#34;</span><span class="p">,</span>                  <span class="c1">// Frame payload (Base64)
+</span><span class="c1"></span>    <span class="s2">&#34;confirmed&#34;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>                      <span class="c1">// If the downlink expects a confirmation from the device or not
+</span><span class="c1"></span>    <span class="s2">&#34;priority&#34;</span> <span class="o">:</span> <span class="s2">&#34;NORMAL&#34;</span><span class="p">,</span>                   <span class="c1">// Priority of the message in the downlink queue
+</span><span class="c1"></span>    <span class="s2">&#34;correlation_ids&#34;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&#34;as:downlink...&#34;</span> <span class="p">]</span> <span class="c1">// Correlation identifiers of the message
+</span><span class="c1"></span>  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><details><summary>Example downlink event message</summary>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;device_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;application_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;application_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;app1&#34;</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="nt">&#34;dev_eui&#34;</span> <span class="p">:</span> <span class="s2">&#34;0004A30B001C0530&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;join_eui&#34;</span> <span class="p">:</span> <span class="s2">&#34;800000000000000C&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;dev_addr&#34;</span> <span class="p">:</span> <span class="s2">&#34;00C30DFA&#34;</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="nt">&#34;correlation_ids&#34;</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&#34;as:downlink:01E19B99501X84X6CV471TVSZ1&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;as:up:01E19B9J8ED6HZW5CC41KPGHVD&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:conn:01E191S6ZEWB630NTR45K5QN4Q&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;gs:uplink:01E19B9J17SRJWJ4GV3MCJHNWZ&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;ns:uplink:01E19B9J1CG3QNWS5M8G3DBMPN&#34;</span><span class="p">,</span>
+    <span class="s2">&#34;rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E19B9J17K85MJ1MXPHTW0410&#34;</span>
+  <span class="p">]</span><span class="p">,</span>
+  <span class="nt">&#34;received_at&#34;</span> <span class="p">:</span> <span class="s2">&#34;2020-02-17T10:32:24.590413417Z&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;downlink_ack&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;session_key_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;AXBSp8v2brG0jqkri+sIkw==&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;f_port&#34;</span> <span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="nt">&#34;f_cnt&#34;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nt">&#34;frm_payload&#34;</span> <span class="p">:</span> <span class="s2">&#34;vu8=&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;confirmed&#34;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;priority&#34;</span> <span class="p">:</span> <span class="s2">&#34;NORMAL&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;correlation_ids&#34;</span> <span class="p">:</span> <span class="p">[</span> <span class="s2">&#34;as:downlink:01E19B99501X84X6CV471TVSZ1&#34;</span> <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></details>
+<p>The JSON downlink <code>failed</code> event provides both the downlink and the error details, in the following format:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="s2">&#34;end_device_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;device_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>                    <span class="c1">// Device ID
+</span><span class="c1"></span>    <span class="s2">&#34;application_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&#34;application_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;app1&#34;</span>              <span class="c1">// Application ID
+</span><span class="c1"></span>    <span class="p">}</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="s2">&#34;correlation_ids&#34;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&#34;as:downlink:...&#34;</span> <span class="p">]</span><span class="p">,</span> <span class="c1">// Correlation identifiers of the message
+</span><span class="c1"></span>  <span class="s2">&#34;downlink_failed&#34;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;downlink&#34;</span> <span class="o">:</span> <span class="p">{</span>                           <span class="c1">// Downlink that which triggered the failure
+</span><span class="c1"></span>      <span class="s2">&#34;f_port&#34;</span> <span class="o">:</span> <span class="mi">15</span><span class="p">,</span>                         <span class="c1">// Frame port
+</span><span class="c1"></span>      <span class="s2">&#34;frm_payload&#34;</span> <span class="o">:</span> <span class="s2">&#34;YWFhYWFhY...&#34;</span><span class="p">,</span>        <span class="c1">// Frame payload (Base64)
+</span><span class="c1"></span>      <span class="s2">&#34;confirmed&#34;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>                    <span class="c1">// If the downlink expects a confirmation from the device or not
+</span><span class="c1"></span>      <span class="s2">&#34;priority&#34;</span> <span class="o">:</span> <span class="s2">&#34;NORMAL&#34;</span><span class="p">,</span>                 <span class="c1">// Priority of the message in the downlink queue
+</span><span class="c1"></span>      <span class="s2">&#34;correlation_ids&#34;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&#34;as:downli...&#34;</span> <span class="p">]</span> <span class="c1">// Correlation identifiers of the message
+</span><span class="c1"></span>    <span class="p">}</span><span class="p">,</span>
+    <span class="s2">&#34;error&#34;</span> <span class="o">:</span> <span class="p">{</span>                              <span class="c1">// Error that was encountered while sending the downlink
+</span><span class="c1"></span>      <span class="s2">&#34;namespace&#34;</span> <span class="o">:</span> <span class="s2">&#34;pkg/networkserver&#34;</span><span class="p">,</span>     <span class="c1">// Component in which the error occurred
+</span><span class="c1"></span>      <span class="s2">&#34;name&#34;</span> <span class="o">:</span> <span class="s2">&#34;application_downlink_to...&#34;</span><span class="p">,</span> <span class="c1">// Error ID
+</span><span class="c1"></span>      <span class="s2">&#34;message_format&#34;</span> <span class="o">:</span> <span class="s2">&#34;application ...&#34;</span><span class="p">,</span>  <span class="c1">// Error message
+</span><span class="c1"></span>      <span class="s2">&#34;correlation_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;2e7f786912e94...&#34;</span><span class="p">,</span> <span class="c1">// Correlation identifiers of the error
+</span><span class="c1"></span>      <span class="s2">&#34;code&#34;</span> <span class="o">:</span> <span class="mi">3</span>                             <span class="c1">// gRPC error code
+</span><span class="c1"></span>    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><details><summary>Example downlink failed event message</summary>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;device_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;application_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;application_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;app1&#34;</span>
+    <span class="p">}</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="nt">&#34;correlation_ids&#34;</span> <span class="p">:</span> <span class="p">[</span> <span class="s2">&#34;as:downlink:01E19Z5W3BZBG7CXSJE9C0A3CE&#34;</span> <span class="p">]</span><span class="p">,</span>
+  <span class="nt">&#34;downlink_failed&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;downlink&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;f_port&#34;</span> <span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+      <span class="nt">&#34;frm_payload&#34;</span> <span class="p">:</span> <span class="s2">&#34;vu8=&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;confirmed&#34;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nt">&#34;priority&#34;</span> <span class="p">:</span> <span class="s2">&#34;NORMAL&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;correlation_ids&#34;</span> <span class="p">:</span> <span class="p">[</span> <span class="s2">&#34;as:downlink:01E19Z5W3BZBG7CXSJE9C0A3CE&#34;</span> <span class="p">]</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="nt">&#34;error&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;namespace&#34;</span> <span class="p">:</span> <span class="s2">&#34;pkg/networkserver&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;name&#34;</span> <span class="p">:</span> <span class="s2">&#34;application_downlink_too_long&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;message_format&#34;</span> <span class="p">:</span> <span class="s2">&#34;application downlink payload is too long&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;correlation_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;2e7f786912e946e597894e381d0ad7b0&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;code&#34;</span> <span class="p">:</span> <span class="mi">3</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></details>
+<h3 id="downlink-messages">Downlink Messages</h3>
+<p>The JSON downlink messages use the following format:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="s2">&#34;end_device_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;device_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>                    <span class="c1">// Device ID
+</span><span class="c1"></span>    <span class="s2">&#34;application_ids&#34;</span> <span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&#34;application_id&#34;</span> <span class="o">:</span> <span class="s2">&#34;app1&#34;</span>              <span class="c1">// Application ID
+</span><span class="c1"></span>    <span class="p">}</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="s2">&#34;downlinks&#34;</span><span class="o">:</span> <span class="p">[</span><span class="p">{</span>
+    <span class="s2">&#34;f_port&#34;</span><span class="o">:</span> <span class="mi">15</span><span class="p">,</span>                            <span class="c1">// Frame port
+</span><span class="c1"></span>    <span class="s2">&#34;frm_payload&#34;</span><span class="o">:</span> <span class="s2">&#34;vu8=&#34;</span><span class="p">,</span>                   <span class="c1">// Frame payload (Base64)
+</span><span class="c1"></span>    <span class="s2">&#34;decoded_payload&#34;</span> <span class="o">:</span> <span class="p">{</span>                    <span class="c1">// Decoded payload object, to be encoded by the device payload formatter
+</span><span class="c1"></span>      <span class="s2">&#34;temperature&#34;</span><span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span>
+      <span class="s2">&#34;luminosity&#34;</span><span class="o">:</span> <span class="mf">0.64</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="s2">&#34;priority&#34;</span><span class="o">:</span> <span class="s2">&#34;NORMAL&#34;</span><span class="p">,</span>                    <span class="c1">// Priority of the message in the downlink queue
+</span><span class="c1"></span>    <span class="s2">&#34;confirmed&#34;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>                       <span class="c1">// If the downlink expects a confirmation from the device or not
+</span><span class="c1"></span>    <span class="s2">&#34;correlation_ids&#34;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&#34;custom-id&#34;</span> <span class="p">]</span>      <span class="c1">// Correlation identifiers of the message
+</span><span class="c1"></span>  <span class="p">}</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>Note: The end device identifiers need to be supplied only to frontends that do not derive it from other sources (such as the URL for webhooks or topic name for MQTT).</p>
+</blockquote>
+<details><summary>Example downlink message</summary>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;end_device_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;device_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;dev1&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;application_ids&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;application_id&#34;</span> <span class="p">:</span> <span class="s2">&#34;app1&#34;</span>
+    <span class="p">}</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="nt">&#34;downlinks&#34;</span><span class="p">:</span> <span class="p">[</span><span class="p">{</span>
+    <span class="nt">&#34;f_port&#34;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="nt">&#34;frm_payload&#34;</span><span class="p">:</span> <span class="s2">&#34;vu8=&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;decoded_payload&#34;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&#34;temperature&#34;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+      <span class="nt">&#34;luminosity&#34;</span><span class="p">:</span> <span class="mf">0.64</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="nt">&#34;priority&#34;</span><span class="p">:</span> <span class="s2">&#34;NORMAL&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;confirmed&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;correlation_ids&#34;</span> <span class="p">:</span> <span class="p">[</span> <span class="s2">&#34;custom-id&#34;</span> <span class="p">]</span>
+  <span class="p">}</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></details></div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.6.1/reference/application-server-data/mqtt/">← MQTT Server</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.6.1/guides/">Guides</a></p>
+        <p><a class="" href="/v3.6.1/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.6.1/components/">Components</a></p>
+        <p><a class="" href="/v3.6.1/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Adrian-Stefan Mares on 20 Feb 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/07c4bd6e940e98a9a60fdefdfa71d926477b7166">
+      fixup! doc: Add JSON format reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/application-server-data/data-formats/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.6.1/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

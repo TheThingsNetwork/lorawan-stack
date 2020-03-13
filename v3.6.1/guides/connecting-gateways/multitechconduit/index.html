@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>MultiTech Conduit AEP | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/multitechconduit/" />
+  <link rel="icon" type="image/png" href="/v3.6.1/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.6.1/css/theme.min.e246cfe68b58bf0354a0d23df366dac7d501931cd2629adf06cb5d98115de18b.css" integrity="sha256-4kbP5otYvwNUoNI982bax9UBkxzSYprfBstdmBFd4Ys=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="MultiTech Conduit AEP">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="MultiTech Conduit AEP">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/multitechconduit/">
+  <meta name="twitter:title" content="MultiTech Conduit AEP" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.6.1/">
+        <img src="/v3.6.1/img/TTS-logo.svg">
+        <p class="navbar-item is-size-7">v3.6.1</p>
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.6.1/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.6.1/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.6.1/components/">Components</a>
+        <a class="navbar-item" href="/v3.6.1/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.6.1/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Connecting Gateways</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/kerlinkwirnetistation/" class="">Kerlink Wirnet iStation</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/kerlinkwirnetstation/" class="">Kerlink Wirnet Station</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/nasysoutdoorgateway/" class="">NASys LoRaWAN Outdoor Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/tektelickonamicro/" class="">Tektelic Kona Micro IoT LoRaWAN Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/thethingskickstartergateway/" class="">The Things Kickstarter Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.1/guides/connecting-gateways/multitechconduit/" class="is-active">MultiTech Conduit AEP</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">MultiTech Conduit AEP</h1>
+
+<div class="content"><p>The <a href="http://www.multitech.net/developer/products/multiconnect-Conduit-platform/">MultiTech MultiConnect® Conduit™</a> is a configurable, scalable cellular communications gateway for industrial IoT applications. The technical specifications of this Conduit can be found in the software guide in the <a href="http://www.multitech.net/developer/products/multiconnect-conduit-platform/conduit/">official documentation</a> page.</p>
+<p>This guide will help you set up the Multitech Conduit gateway to communicate over The Things Stack.</p>
+<figure>
+    <img src="001_Multitech_Conduit_AEP.png"
+         alt="MultiTech MultiConnect Conduit AEP Gateway"/> 
+</figure>
+
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>User account on The Things Stack with rights to create Gateways.</li>
+<li>Multitech Conduit AEP Gateway connected to the internet and running the <a href="http://www.multitech.net/developer/downloads/">latest firmware</a>.</li>
+</ol>
+<blockquote>
+<p>This article addresses the minimum configuration required to connect your Multitech Conduit AEP model to The Things Stack.
+For the first-time hardware and software setup, you can refer to the appropriate configuration guide on the <a href="http://www.multitech.net/developer/products/multiconnect-conduit-platform/conduit/">Multitech documentation</a> page.</p>
+</blockquote>
+<h2 id="registration">Registration</h2>
+<p>Create a gateway by following the instructions for the <a href="https://thethingsstack.io/v3.6.1/guides/getting-started/console/#create-gateway">Console</a> or the <a href="https://thethingsstack.io/v3.6.1/guides/getting-started/cli/#create-gateway">CLI</a>.</p>
+<blockquote>
+<p>Note: The gateway EUI can be found at the bottom of the gateway under the field &quot;NODE LORA&quot;.</p>
+</blockquote>
+<h2 id="configuration-using-a-terminal">Configuration using a Terminal</h2>
+<p>Firstly, you will need to generate a <code>global_conf.json</code> file required to add a custom channel plan to your gateway. Follow the steps below to generate the required json file.</p>
+<blockquote>
+<p><strong>Warning:</strong> The manual configuration of the frequency plan - required to make it work on the The Things (Enterprise) Stack - may result in a mismatch for some of the frequency bands used for the Multitech Gateway.</p>
+</blockquote>
+<p>The Gateway Configuration Server can be used to generate a proper <code>global_conf.json</code> configuration file for your gateway. You will need a Gateway API key with the <code>View gateway information</code> right enabled. The instructions for the same can be found in the relevant sections of the <a href="https://thethingsstack.io/v3.6.1/guides/getting-started/console/#create-gateway">Console</a> or the <a href="https://thethingsstack.io/v3.6.1/guides/getting-started/cli/#create-gateway">CLI</a> getting started guides.</p>
+<p>Open the command prompt in Windows or any Linux terminal to run a curl command (as shown below) to generate the required <code>global_conf.json</code> file in your current working directory.</p>
+<p>Make sure you replace <code>thethings.example.com</code> with your server address:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ curl -XGET <span class="se">\
+</span><span class="se"></span>    <span class="s2">&#34;https://thethings.example.com/api/v3/gcs/gateways/{GATEWAY_ID}/semtechudp/global_conf.json&#34;</span> <span class="se">\
+</span><span class="se"></span>    -H <span class="s2">&#34;Authorization: Bearer {GTW_API_KEY}&#34;</span> &gt; ~/global_conf.json
+</code></pre></div><blockquote>
+<p>Note: Replace the required fields in the above command and run it.</p>
+</blockquote>
+<p>Once the <code>global_conf.json</code> file is generated, you will need to add this to your gateway. In a web browser, open the gateway’s configuration page by navigating to its IP Address obtained from the network it is connected to. Once logged in, you can configure the gateway to connect to The Things Stack by following the steps below:</p>
+<ul>
+<li>Click on <strong>LoRaWAN<sup>®</sup></strong> in the menu on the left. It opens the Gateway's configuration page.</li>
+</ul>
+<figure>
+    <img src="005_Gateway_Menu_LoRaWAN.png"
+         alt="MultiTech Conduit gateway home page"/> 
+</figure>
+
+<ul>
+<li>Under <strong>Network Settings</strong>, select the mode as &quot;Packet Forwarder&quot;.</li>
+</ul>
+<figure>
+    <img src="006_Packet_Forwarder_Gateway.png"
+         alt="MultiTech Conduit packet forwarder settings"/> 
+</figure>
+
+<ul>
+<li>On the right side of the &quot;LoRa Packet Forwarder Configuration&quot; section, you can find &quot;Manual Configuration &quot;. Click on it to setup the channel plan manually.</li>
+</ul>
+<figure>
+    <img src="001_Gateway_Frequency_plan_manual_config.png"
+         alt="Switch to manual configuration mode"/> 
+</figure>
+
+<ul>
+<li>The above step will lead you to the gateway configuration editor tagged as &quot;Config&quot;.</li>
+</ul>
+<figure>
+    <img src="002_Gateway_Frequency_plan_manual_config.png"
+         alt="edit the configuration"/> 
+</figure>
+
+<ul>
+<li>
+<p>Copy the contents of the <code>global_conf.json</code> file downloaded earlier and paste them in the gateway console configuration editor.</p>
+</li>
+<li>
+<p>Once pasted, modify the value of <code>clksrc</code> to set it to <code>0</code>.</p>
+</li>
+<li>
+<p>Click on <strong>Submit</strong> to save the configuration.</p>
+</li>
+<li>
+<p>Now, click on <strong>Save and Restart</strong> from the menu.</p>
+</li>
+</ul>
+<figure>
+    <img src="011_Gateway_Menu_Save-And-Restart.png"
+         alt="Saving the Network Interfaces Configuration"/> 
+</figure>
+
+<ul>
+<li>You will be prompted to confirm the restart. Choose <strong>OK</strong> to proceed.</li>
+</ul>
+<figure>
+    <img src="012_System_Confirmation_Prompt.png"
+         alt="Configuration restart prompt"/> 
+</figure>
+
+<p>This will apply the custom settings and reboot the gateway. If all the steps have been followed correctly, your gateway will now connect to The Things Stack.</p>
+<blockquote>
+<p>To know more about other features of the MultiTech Conduit gateway, you can refer to the <strong>mPower Edge AEP software guide</strong> on the <a href="http://www.multitech.net/developer/products/multiconnect-conduit-platform/conduit/">Multitech Website</a>.</p>
+</blockquote>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="packet-forwarder-logs">Packet Forwarder Logs</h3>
+<p>Packet forwarder logs contain the messages received from the devices and the network server. You can use the information to debug the issues.</p>
+<p>You can find the packet forwarder logs using the gateway's web console. Do the following to download the logs onto your device:</p>
+<ul>
+<li>Login to your gateway's web console and navigate to <strong>Administration -&gt; Debug Options</strong>.</li>
+<li>Click on the <strong>Download Logs</strong> button in the <strong>Logging</strong> section to download the logs.</li>
+</ul>
+<figure>
+    <img src="016_Packet_Forwarder.png"
+         alt="Packet forwarder"/> 
+</figure>
+
+<p>Now, in the downloaded logs, open the <em>lora-pkt-fwd-1.log</em> file to see the packet forwarder logs.</p>
+<h3 id="upgrading-the-firmware">Upgrading the Firmware</h3>
+<p>If you have an issue with the current firmware version, you can use following steps to upgrade the firmware.</p>
+<p>Refer to the top of your configuration software window to check your firmware version. You have to upgrade the device's firmware to the latest version.</p>
+<p>You can download the firmware upgrades from the downloads section of the <a href="http://www.multitech.net/developer/downloads/">MultiTech website</a>.</p>
+<p>Do the following to upgrade the firmware on your device:</p>
+<ul>
+<li>Before you upgrade your firmware, save your present configuration as a backup.</li>
+<li>Go to the MultiTech website, locate the firmware upgrade file you want for your device(MTCDT AEP x.x.x in the current case, where x.x.x is the latest version available on the website), and download this file to a known location.</li>
+<li>Navigate to <strong>Administration -&gt; Firmware Upgrade</strong>.</li>
+<li>Click on <strong>Choose Firmware Upgrade File</strong> button, and
+<ul>
+<li>Click on <strong>Browse</strong> to find where the firmware file resides that you want to apply.</li>
+<li>Select the file and click on <strong>Open</strong>. The file name appears next to the <strong>Choose Firmware Upgrade File</strong> button. Make sure you select the correct BIN file; otherwise, your device can become inoperable.</li>
+</ul>
+</li>
+<li>Click on <strong>Start Upgrade</strong>.</li>
+</ul>
+<figure>
+    <img src="017_Firmware_Upgrade.png"
+         alt="Gateway firmware upgrade window"/> 
+</figure>
+
+<ul>
+<li>A message about the time needed to upgrade appears. Click on <strong>OK</strong>.</li>
+<li>A progress bar appears indicating the status of the upgrade. When the upgrade is completed, your device reboots.</li>
+<li>After the firmware upgrade is completed, verify your configuration to ensure that it is same as what you expected.</li>
+</ul>
+<blockquote>
+<p>Note: The new firmware is written into flash memory. It may take up to 10 minutes to upgrade the firmware. Do not interrupt the devices' power or press the reset button during this time.</p>
+</blockquote></div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.6.1/guides/connecting-gateways/thethingskickstartergateway/">← The Things Kickstarter Gateway</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.6.1/guides/">Guides</a></p>
+        <p><a class="" href="/v3.6.1/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.6.1/components/">Components</a></p>
+        <p><a class="" href="/v3.6.1/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Aneesh on 28 Dec 2019.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/c6511f793680bc6901d1b91977c2e783536d0050">
+      doc: Added  MultiTech Conduit AEP gateway documentation
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/connecting-gateways/multitechconduit/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.6.1/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
