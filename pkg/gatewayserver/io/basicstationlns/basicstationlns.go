@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -248,6 +249,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		return err
 	}
 	defer ws.Close()
+	wsWriteMu := &sync.Mutex{}
 
 	defer func() {
 		conn.Disconnect(err)
@@ -262,6 +264,8 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	ws.SetPingHandler(func(data string) error {
 		logger.Debug("Received ping from gateway, send pong")
+		wsWriteMu.Lock()
+		defer wsWriteMu.Unlock()
 		if err := ws.WriteMessage(websocket.PongMessage, nil); err != nil {
 			logger.WithError(err).Warn("Failed to send pong")
 			return err
@@ -282,7 +286,10 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				ws.Close()
 				return
 			case <-pingTicker.C:
-				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
+				wsWriteMu.Lock()
+				err := ws.WriteMessage(websocket.PingMessage, nil)
+				wsWriteMu.Unlock()
+				if err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					conn.Disconnect(err)
 					ws.Close()
@@ -308,7 +315,10 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				}
 
 				logger.Info("Send downlink message")
-				if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
+				wsWriteMu.Lock()
+				err = ws.WriteMessage(websocket.TextMessage, msg)
+				wsWriteMu.Unlock()
+				if err != nil {
 					logger.WithError(err).Warn("Failed to send downlink message")
 					conn.Disconnect(err)
 					return
@@ -372,7 +382,10 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				logger.WithError(err).Warn("Failed to marshal response message")
 				return err
 			}
-			if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
+			wsWriteMu.Lock()
+			err = ws.WriteMessage(websocket.TextMessage, data)
+			wsWriteMu.Unlock()
+			if err != nil {
 				logger.WithError(err).Warn("Failed to send router configuration")
 				return err
 			}
