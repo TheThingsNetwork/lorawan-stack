@@ -40,7 +40,7 @@ import {
   selectDeviceFetching,
   selectDeviceError,
 } from '../../store/selectors/devices'
-import { selectJsConfig } from '../../../lib/selectors/env'
+import { selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 
 import { mayReadApplicationDeviceKeys } from '../../lib/feature-checks'
 import PropTypes from '../../../lib/prop-types'
@@ -142,7 +142,14 @@ export default class Device extends React.Component {
         params: { appId },
       },
       devId,
-      device: { name, description, join_server_address, supports_join, root_keys },
+      device: {
+        name,
+        description,
+        join_server_address,
+        supports_join,
+        root_keys,
+        application_server_address,
+      },
       env: { siteName },
     } = this.props
 
@@ -151,6 +158,10 @@ export default class Device extends React.Component {
       jsConfig.enabled &&
       join_server_address === getHostnameFromUrl(jsConfig.base_url) &&
       (supports_join && Boolean(root_keys))
+
+    const asConfig = selectAsConfig()
+    const hasAs =
+      asConfig.enabled && application_server_address === getHostnameFromUrl(asConfig.base_url)
 
     const basePath = `/applications/${appId}/devices/${devId}`
 
@@ -168,6 +179,7 @@ export default class Device extends React.Component {
         name: 'develop',
         link: payloadFormattersLink,
         exact: false,
+        disabled: !hasAs,
       },
       {
         title: sharedMessages.claiming,
@@ -194,7 +206,9 @@ export default class Device extends React.Component {
           <Route exact path={`${basePath}/data`} component={DeviceData} />
           <Route exact path={`${basePath}/location`} component={DeviceLocation} />
           <Route exact path={`${basePath}/general-settings`} component={DeviceGeneralSettings} />
-          <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
+          {hasAs && (
+            <Route path={`${basePath}/payload-formatters`} component={DevicePayloadFormatters} />
+          )}
           {hasJs && (
             <Route path={`${basePath}/claim-auth-code`} component={DeviceClaimAuthenticationCode} />
           )}
