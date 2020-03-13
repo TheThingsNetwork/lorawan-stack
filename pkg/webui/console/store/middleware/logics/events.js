@@ -29,7 +29,6 @@ import {
 import { createEventsStatusSelector } from '../../selectors/events'
 import { isUnauthenticatedError } from '../../../../lib/errors/utils'
 import { getCombinedDeviceId } from '../../../../lib/selectors/id'
-import user from './user'
 
 /**
  * Creates `redux-logic` logic from processing entity events.
@@ -92,7 +91,9 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
           channel.on('close', () => dispatch(stopEvents(id)))
         } catch (error) {
           if (isUnauthenticatedError(error)) {
-            dispatch(user.logoutSuccess())
+            // The user is no longer authenticated; reinitiate the auth flow
+            // by refreshing the page
+            window.location.reload()
           } else {
             dispatch(startEventsFailure(id, error))
           }
