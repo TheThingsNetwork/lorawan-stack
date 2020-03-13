@@ -496,6 +496,7 @@ Releasing a new version consists of the following steps:
 10. Pushing the version tag
 11. Pushing `master`
 12. Building the release and pushing to package managers (this is done by CI)
+13. Tagging the Docker `latest` tag if this is a latest stable release
 
 Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
 
@@ -531,6 +532,15 @@ $ git push origin master
 ```
 
 After pushing the tag, our CI system will start building the release. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases). After this is done, you'll need to edit the release notes. We typically copy-paste these from `CHANGELOG.md`.
+
+When the CI system pushed the Docker image, it gets tagged as the current minor and patch version. If this release is not a backport but a latest stable release, you should manually tag and push `latest`:
+
+```bash
+$ versionDockerTag=${version#"v"} # v3.6.1 -> 3.6.1
+$ docker pull TheThingsNetwork/lorawan-stack:${versionDockerTag}
+$ docker tag TheThingsNetwork/lorawan-stack:{versionDockerTag} TheThingsNetwork/lorawan-stack:latest
+$ docker push TheThingsNetwork/lorawan-stack:latest
+```
 
 ### Console Troubleshooting
 
