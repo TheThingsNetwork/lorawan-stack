@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
@@ -82,7 +82,7 @@ func TestHooks(t *testing.T) {
 	defer lis.Close()
 
 	config := &component.Config{
-		ServiceBase: config.ServiceBase{Cluster: config.Cluster{
+		ServiceBase: config.ServiceBase{Cluster: cluster.Config{
 			Name:          "test-cluster",
 			NetworkServer: lis.Addr().String(),
 			Keys:          []string{clusterKey},

@@ -17,20 +17,19 @@ package redis
 
 import (
 	"encoding/json"
-	"strings"
 
 	"github.com/go-redis/redis"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
 )
 
 // WrapPubSub wraps an existing PubSub and publishes all events received from Redis to that PubSub.
-func WrapPubSub(wrapped events.PubSub, conf config.Redis) (ps *PubSub) {
+func WrapPubSub(wrapped events.PubSub, conf ttnredis.Config) (ps *PubSub) {
+	ttnRedisClient := ttnredis.New(&conf)
 	ps = &PubSub{
 		PubSub:       wrapped,
-		client:       ttnredis.New(&ttnredis.Config{Redis: conf}).Client,
-		eventChannel: strings.Join(append(conf.Namespace, "events"), ":"),
+		client:       ttnRedisClient.Client,
+		eventChannel: ttnRedisClient.Key("events"),
 		closeWait:    make(chan struct{}),
 	}
 	ps.sub = ps.client.Subscribe(ps.eventChannel)
@@ -50,7 +49,7 @@ func WrapPubSub(wrapped events.PubSub, conf config.Redis) (ps *PubSub) {
 }
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(conf config.Redis) *PubSub {
+func NewPubSub(conf ttnredis.Config) *PubSub {
 	return WrapPubSub(events.NewPubSub(events.DefaultBufferSize), conf)
 }
 

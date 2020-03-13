@@ -26,13 +26,24 @@ const getEventDataType = function(type) {
   return entries[entries.length - 1]
 }
 
-const getEventComponentByName = function(name) {
+const isErrorEvent = function(data) {
+  if (!data) {
+    return false
+  }
+
+  const { '@type': t } = data
+  return getEventDataType(t) === 'ErrorDetails'
+}
+
+const getEventComponentByName = function(event) {
+  const { name, data } = event
   const action = getEventActionByName(name)
 
   let component = null
   let type = null
-
-  if (name.includes('.up.')) {
+  if (isErrorEvent(data)) {
+    component = Event.Error
+  } else if (name.includes('.up.')) {
     component = Event.Message
     type = 'uplink'
   } else if (name.includes('.down.')) {

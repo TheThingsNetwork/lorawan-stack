@@ -21,43 +21,40 @@ import Input from '../../../components/input'
 import Checkbox from '../../../components/checkbox'
 import Radio from '../../../components/radio-button'
 import Select from '../../../components/select'
-import toast from '../../../components/toast'
 import Message from '../../../lib/components/message'
 import SubmitBar from '../../../components/submit-bar'
-import ModalButton from '../../../components/button/modal-button'
 import { NsFrequencyPlansSelect } from '../../containers/freq-plans-select'
 import DevAddrInput from '../../containers/dev-addr-input'
 import JoinEUIPrefixesInput from '../../containers/join-eui-prefixes-input'
 
+import randomByteString from '../../lib/random-bytes'
 import sharedMessages from '../../../lib/shared-messages'
 import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
 import errorMessages from '../../../lib/errors/error-messages'
-import { getDeviceId } from '../../../lib/selectors/id'
 import PropTypes from '../../../lib/prop-types'
 import m from './messages'
 import validationSchema from './validation-schema'
 
+const random16BytesString = () => randomByteString(32)
+
 class DeviceDataForm extends Component {
-  constructor(props) {
-    super(props)
+  static propTypes = {
+    mayEditKeys: PropTypes.bool.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onSubmitSuccess: PropTypes.func,
+  }
 
-    const {
-      initialValues: { supports_join, update, root_keys = {} },
-    } = this.props
+  static defaultProps = {
+    onSubmitSuccess: () => null,
+  }
 
-    const external_js = !Boolean(Object.keys(root_keys).length)
-    let otaa = true
-    if (update) {
-      otaa = Boolean(supports_join)
-    }
-
-    this.state = {
-      otaa,
-      resets_join_nonces: false,
-      resets_f_cnt: false,
-      external_js,
-    }
-    this.formRef = React.createRef()
+  formRef = React.createRef()
+  state = {
+    otaa: true,
+    resets_join_nonces: false,
+    resets_f_cnt: false,
+    external_js: true,
+    lorawan_version: '',
   }
 
   @bind
@@ -81,6 +78,11 @@ class DeviceDataForm extends Component {
   }
 
   @bind
+  handleLorawanVersionChange(lorawan_version) {
+    this.setState({ lorawan_version })
+  }
+
+  @bind
   async handleExternalJoinServerChange(evt) {
     const external_js = evt.target.checked
     await this.setState(({ resets_join_nonces }) => ({
@@ -88,7 +90,6 @@ class DeviceDataForm extends Component {
       resets_join_nonces: external_js ? false : resets_join_nonces,
     }))
 
-    const { initialValues } = this.props
     const jsConfig = selectJsConfig()
     const { setValues, state } = this.formRef.current
 
@@ -103,10 +104,10 @@ class DeviceDataForm extends Component {
         },
         resets_join_nonces: false,
         join_server_address: undefined,
-        external_js,
+        _external_js: external_js,
       })
     } else {
-      let { join_server_address } = initialValues
+      let join_server_address = state.join_server_address
 
       // Reset `join_server_address` if is present after disabling external JS provisioning.
       if (jsConfig.enabled && !Boolean(join_server_address)) {
@@ -116,28 +117,24 @@ class DeviceDataForm extends Component {
       setValues({
         ...state.values,
         join_server_address,
-        external_js,
+        _external_js: external_js,
       })
     }
   }
 
   @bind
-  async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { onSubmit, onSubmitSuccess, initialValues, update } = this.props
-    const deviceId = getDeviceId(initialValues)
-    const { external_js, ...castedValues } = validationSchema.cast(values)
+  async handleSubmit(values, { setSubmitting }) {
+    const { onSubmit, onSubmitSuccess } = this.props
+    const {
+      _external_js,
+      _may_edit_keys,
+      _activation_mode,
+      ...castedValues
+    } = validationSchema.cast(values)
     await this.setState({ error: '' })
 
     try {
       const device = await onSubmit(castedValues)
-      if (update) {
-        resetForm(values)
-        toast({
-          title: deviceId,
-          message: m.updateSuccess,
-          type: toast.types.SUCCESS,
-        })
-      }
       await onSubmitSuccess(device)
     } catch (error) {
       setSubmitting(false)
@@ -146,29 +143,25 @@ class DeviceDataForm extends Component {
     }
   }
 
-  @bind
-  async handleDelete() {
-    const { onDelete, onDeleteSuccess, initialValues } = this.props
-    const deviceId = getDeviceId(initialValues)
-
-    try {
-      await onDelete()
-      toast({
-        title: deviceId,
-        message: m.deleteSuccess,
-        type: toast.types.SUCCESS,
-      })
-      onDeleteSuccess()
-    } catch (error) {
-      const err = error instanceof Error ? errorMessages.genericError : error
-      this.setState({ error: err })
-    }
-  }
-
   get ABPSection() {
-    const { resets_f_cnt } = this.state
+    const { resets_f_cnt, lorawan_version } = this.state
+
+    const lwVersion = Boolean(lorawan_version)
+      ? parseInt(lorawan_version.replace(/\D/g, '').padEnd(3, 0))
+      : 0
+
     return (
-      <React.Fragment>
+      <>
+        <Form.Field
+          title={sharedMessages.devEUI}
+          name="ids.dev_eui"
+          type="byte"
+          min={8}
+          max={8}
+          description={m.deviceEUIDescription}
+          required={lwVersion === 104}
+          component={Input}
+        />
         <DevAddrInput
           title={sharedMessages.devAddr}
           name="session.dev_addr"
@@ -182,29 +175,10 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={m.leaveBlankPlaceholder}
           description={m.nwkSKeyDescription}
-          component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.sNwkSIKey}
-          name="session.keys.s_nwk_s_int_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={m.leaveBlankPlaceholder}
-          description={m.sNwkSIKeyDescription}
-          component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.nwkSEncKey}
-          name="session.keys.nwk_s_enc_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={m.leaveBlankPlaceholder}
-          description={m.nwkSEncKeyDescription}
-          component={Input}
+          component={Input.Generate}
+          onGenerateValue={random16BytesString}
+          required
         />
         <Form.Field
           title={sharedMessages.appSKey}
@@ -212,10 +186,37 @@ class DeviceDataForm extends Component {
           type="byte"
           min={16}
           max={16}
-          placeholder={m.leaveBlankPlaceholder}
           description={m.appSKeyDescription}
-          component={Input}
+          component={Input.Generate}
+          onGenerateValue={random16BytesString}
+          required
         />
+        {lwVersion >= 110 && (
+          <>
+            <Form.Field
+              title={sharedMessages.sNwkSIKey}
+              name="session.keys.s_nwk_s_int_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              description={m.sNwkSIKeyDescription}
+              component={Input.Generate}
+              onGenerateValue={random16BytesString}
+              required
+            />
+            <Form.Field
+              title={sharedMessages.nwkSEncKey}
+              name="session.keys.nwk_s_enc_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              description={m.nwkSEncKeyDescription}
+              component={Input.Generate}
+              onGenerateValue={random16BytesString}
+              required
+            />
+          </>
+        )}
         <Form.Field
           title={m.resetsFCnt}
           onChange={this.handleResetsFrameCountersChange}
@@ -223,36 +224,22 @@ class DeviceDataForm extends Component {
           name="mac_settings.resets_f_cnt"
           component={Checkbox}
         />
-      </React.Fragment>
+      </>
     )
   }
 
   get OTAASection() {
+    const { mayEditKeys } = this.props
     const { resets_join_nonces, external_js } = this.state
-    const {
-      update,
-      initialValues: { root_keys },
-    } = this.props
-
-    const rootKeysNotExposed =
-      root_keys && root_keys.root_key_id && !root_keys.nwk_key && !root_keys.app_key
-
-    let rootKeyPlaceholder = m.leaveBlankPlaceholder
-    if (external_js) {
-      rootKeyPlaceholder = sharedMessages.provisionedOnExternalJoinServer
-    } else if (rootKeysNotExposed) {
-      rootKeyPlaceholder = m.unexposed
-    }
 
     return (
-      <React.Fragment>
+      <>
         <JoinEUIPrefixesInput
           title={sharedMessages.joinEUI}
           name="ids.join_eui"
           description={m.joinEUIDescription}
           required
-          disabled={update}
-          showPrefixes={!update}
+          showPrefixes
         />
         <Form.Field
           title={sharedMessages.devEUI}
@@ -262,13 +249,12 @@ class DeviceDataForm extends Component {
           max={8}
           description={m.deviceEUIDescription}
           required
-          disabled={update}
           component={Input}
         />
         <Form.Field
           title={m.externalJoinServer}
           description={m.externalJoinServerDescription}
-          name="external_js"
+          name="_external_js"
           onChange={this.handleExternalJoinServerChange}
           component={Checkbox}
         />
@@ -279,28 +265,36 @@ class DeviceDataForm extends Component {
           component={Input}
           disabled={external_js}
         />
-        <Form.Field
-          title={sharedMessages.appKey}
-          name="root_keys.app_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={rootKeyPlaceholder}
-          description={m.appKeyDescription}
-          component={Input}
-          disabled={external_js || rootKeysNotExposed}
-        />
-        <Form.Field
-          title={sharedMessages.nwkKey}
-          name="root_keys.nwk_key.key"
-          type="byte"
-          min={16}
-          max={16}
-          placeholder={rootKeyPlaceholder}
-          description={m.nwkKeyDescription}
-          component={Input}
-          disabled={external_js || rootKeysNotExposed}
-        />
+        {mayEditKeys && (
+          <>
+            <Form.Field
+              title={sharedMessages.appKey}
+              name="root_keys.app_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              description={m.appKeyDescription}
+              placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
+              component={Input.Generate}
+              disabled={external_js}
+              onGenerateValue={random16BytesString}
+              mayGenerateValue={!external_js && mayEditKeys}
+            />
+            <Form.Field
+              title={sharedMessages.nwkKey}
+              name="root_keys.nwk_key.key"
+              type="byte"
+              min={16}
+              max={16}
+              description={m.nwkKeyDescription}
+              placeholder={external_js ? sharedMessages.provisionedOnExternalJoinServer : undefined}
+              component={Input.Generate}
+              disabled={external_js}
+              onGenerateValue={random16BytesString}
+              mayGenerateValue={!external_js && mayEditKeys}
+            />
+          </>
+        )}
         <Form.Field
           title={m.resetsJoinNonces}
           onChange={this.handleResetsJoinNoncesChange}
@@ -344,21 +338,13 @@ class DeviceDataForm extends Component {
           component={Input}
           disabled={external_js}
         />
-      </React.Fragment>
+      </>
     )
   }
 
   render() {
+    const { mayEditKeys } = this.props
     const { otaa, error, external_js } = this.state
-    const { initialValues, update } = this.props
-
-    let deviceId
-    let deviceName
-
-    if (initialValues) {
-      deviceId = getDeviceId(initialValues)
-      deviceName = initialValues.name
-    }
 
     const emptyValues = {
       ids: {
@@ -366,7 +352,7 @@ class DeviceDataForm extends Component {
         join_eui: undefined,
         dev_eui: undefined,
       },
-      activation_mode: 'otaa',
+      _activation_mode: 'otaa',
       lorawan_version: undefined,
       lorawan_phy_version: undefined,
       frequency_plan_id: undefined,
@@ -379,10 +365,10 @@ class DeviceDataForm extends Component {
       session: {
         dev_addr: undefined,
         keys: {
-          f_nwk_s_int_key: {},
-          s_nwk_s_int_key: {},
-          nwk_s_enc_key: {},
-          app_s_key: {},
+          f_nwk_s_int_key: { key: undefined },
+          s_nwk_s_int_key: { key: undefined },
+          nwk_s_enc_key: { key: undefined },
+          app_s_key: { key: undefined },
         },
       },
       mac_settings: {
@@ -396,13 +382,13 @@ class DeviceDataForm extends Component {
     const joinServerAddress = jsConfig.enabled ? new URL(jsConfig.base_url).hostname : ''
 
     const formValues = {
+      ...emptyValues,
       network_server_address: nsConfig.enabled ? new URL(nsConfig.base_url).hostname : '',
       application_server_address: asConfig.enabled ? new URL(asConfig.base_url).hostname : '',
       join_server_address: external_js ? undefined : joinServerAddress,
-      ...emptyValues,
-      ...initialValues,
-      activation_mode: otaa ? 'otaa' : 'abp',
-      external_js,
+      _activation_mode: otaa ? 'otaa' : 'abp',
+      _external_js: external_js,
+      _may_edit_keys: mayEditKeys,
     }
 
     return (
@@ -421,7 +407,6 @@ class DeviceDataForm extends Component {
           placeholder={m.deviceIdPlaceholder}
           autoFocus
           required
-          disabled={update}
           component={Input}
         />
         <Form.Field
@@ -444,6 +429,7 @@ class DeviceDataForm extends Component {
           name="lorawan_version"
           component={Select}
           required
+          onChange={this.handleLorawanVersionChange}
           options={[
             { value: '1.0.0', label: 'MAC V1.0' },
             { value: '1.0.1', label: 'MAC V1.0.1' },
@@ -485,89 +471,20 @@ class DeviceDataForm extends Component {
         <Message component="h4" content={m.activationSettings} />
         <Form.Field
           title={m.activationMode}
-          disabled={update}
-          name="activation_mode"
+          name="_activation_mode"
           component={Radio.Group}
+          disabled={!mayEditKeys}
         >
           <Radio label={m.otaa} value="otaa" onChange={this.handleOTAASelect} />
           <Radio label={m.abp} value="abp" onChange={this.handleABPSelect} />
         </Form.Field>
         {otaa ? this.OTAASection : this.ABPSection}
         <SubmitBar>
-          <Form.Submit
-            component={SubmitButton}
-            message={update ? sharedMessages.saveChanges : m.createDevice}
-          />
-          {update && (
-            <ModalButton
-              type="button"
-              icon="delete"
-              message={m.deleteDevice}
-              modalData={{
-                message: { values: { deviceId: deviceName || deviceId }, ...m.deleteWarning },
-              }}
-              onApprove={this.handleDelete}
-              danger
-              naked
-            />
-          )}
+          <Form.Submit component={SubmitButton} message={m.createDevice} />
         </SubmitBar>
       </Form>
     )
   }
-}
-
-const keyPropType = PropTypes.shape({
-  key: PropTypes.string,
-})
-
-const initialValuesPropType = PropTypes.shape({
-  ids: PropTypes.shape({
-    device_id: PropTypes.string,
-    join_eui: PropTypes.string,
-    dev_eui: PropTypes.string,
-  }),
-  name: PropTypes.string,
-  activation_mode: PropTypes.string,
-  lorawan_version: PropTypes.string,
-  lorawan_phy_version: PropTypes.string,
-  frequency_plan_id: PropTypes.string,
-  supports_class_c: PropTypes.bool,
-  resets_join_nonces: PropTypes.bool,
-  root_keys: PropTypes.shape({
-    nwk_key: keyPropType,
-    app_key: keyPropType,
-    root_key_id: PropTypes.string,
-  }),
-  session: PropTypes.shape({
-    dev_addr: PropTypes.string,
-    keys: PropTypes.shape({
-      f_nwk_s_int_key: keyPropType,
-      s_nwk_s_int_key: keyPropType,
-      nwk_s_enc_key: keyPropType,
-      app_s_key: keyPropType,
-    }),
-  }),
-  mac_settings: PropTypes.shape({
-    resets_f_cnt: PropTypes.bool,
-  }),
-})
-
-DeviceDataForm.propTypes = {
-  initialValues: initialValuesPropType,
-  onDelete: PropTypes.func,
-  onDeleteSuccess: PropTypes.func,
-  onSubmit: PropTypes.func.isRequired,
-  onSubmitSuccess: PropTypes.func,
-  update: PropTypes.bool,
-}
-
-DeviceDataForm.defaultProps = {
-  onDelete: () => null,
-  onDeleteSuccess: () => null,
-  onSubmitSuccess: () => null,
-  initialValues: {},
-  update: false,
 }
 
 export default DeviceDataForm

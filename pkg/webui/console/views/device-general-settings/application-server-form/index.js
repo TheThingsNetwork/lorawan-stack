@@ -19,49 +19,44 @@ import SubmitButton from '../../../../components/submit-button'
 import SubmitBar from '../../../../components/submit-bar'
 import Input from '../../../../components/input'
 import Form from '../../../../components/form'
-import DevAddrInput from '../../../containers/dev-addr-input'
+import Notification from '../../../../components/notification'
 
 import diff from '../../../../lib/diff'
 import m from '../../../components/device-data-form/messages'
+import messages from '../messages'
 import randomByteString from '../../../lib/random-bytes'
 import PropTypes from '../../../../lib/prop-types'
 import sharedMessages from '../../../../lib/shared-messages'
 
 const random16BytesString = () => randomByteString(32)
-const toUndefined = value => (!Boolean(value) ? undefined : value)
 
 const validationSchema = Yup.object().shape({
   session: Yup.object().shape({
-    dev_addr: Yup.string()
-      .length(4 * 2, m.validate8) // 4 Byte hex
-      .required(sharedMessages.validateRequired),
     keys: Yup.object().shape({
       app_s_key: Yup.object().shape({
-        key: Yup.string()
-          .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-          .transform(toUndefined)
-          .default(random16BytesString),
+        key: Yup.string().emptyOrLength(16 * 2, m.validate32), // 16 Byte hex
       }),
     }),
   }),
 })
 
 const ApplicationServerForm = React.memo(props => {
-  const { device, onSubmit, onSubmitSuccess } = props
+  const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
 
   const [error, setError] = React.useState('')
 
   const initialValues = React.useMemo(() => {
-    const { session = {}, ids } = device
+    const { session = {} } = device
     const {
       keys = {
-        app_s_key: {},
+        app_s_key: {
+          key: '',
+        },
       },
     } = session
 
     return {
       session: {
-        dev_addr: session.dev_addr || ids.dev_addr,
         keys: {
           app_s_key: keys.app_s_key,
         },
@@ -87,6 +82,10 @@ const ApplicationServerForm = React.memo(props => {
     [initialValues, onSubmit, onSubmitSuccess],
   )
 
+  // Notify the user that the session keys might be there, but since there are no rights
+  // to read the keys we cannot display them.
+  const showResetNotification = !mayReadKeys && mayEditKeys && !Boolean(device.session)
+
   return (
     <Form
       validationSchema={validationSchema}
@@ -94,24 +93,19 @@ const ApplicationServerForm = React.memo(props => {
       onSubmit={onFormSubmit}
       error={error}
       enableReinitialize
+      disabled={!mayEditKeys}
     >
-      <DevAddrInput
-        title={sharedMessages.devAddr}
-        name="session.dev_addr"
-        placeholder={m.leaveBlankPlaceholder}
-        description={m.deviceAddrDescription}
-        disabled
-        required
-      />
+      {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
       <Form.Field
         title={sharedMessages.appSKey}
         name="session.keys.app_s_key.key"
         type="byte"
         min={16}
         max={16}
-        placeholder={m.leaveBlankPlaceholder}
         description={m.appSKeyDescription}
-        component={Input}
+        component={Input.Generate}
+        mayGenerateValue={mayEditKeys}
+        onGenerateValue={random16BytesString}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
@@ -122,6 +116,8 @@ const ApplicationServerForm = React.memo(props => {
 
 ApplicationServerForm.propTypes = {
   device: PropTypes.device.isRequired,
+  mayEditKeys: PropTypes.bool.isRequired,
+  mayReadKeys: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
 }

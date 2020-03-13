@@ -155,3 +155,61 @@ func RequireUser(ctx context.Context, id ttnpb.UserIdentifiers, required ...ttnp
 	}
 	return nil
 }
+
+// RequireAny checks that context contains any rights for each of
+// the given entity identifiers.
+func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
+	for _, entityIDs := range ids {
+		switch ids := entityIDs.Identifiers().(type) {
+		case *ttnpb.ApplicationIdentifiers:
+			list, err := ListApplication(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		case *ttnpb.ClientIdentifiers:
+			list, err := ListClient(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return ErrNoClientRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		case *ttnpb.EndDeviceIdentifiers:
+			list, err := ListApplication(ctx, ids.ApplicationIdentifiers)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.ApplicationIdentifiers))
+			}
+		case *ttnpb.GatewayIdentifiers:
+			list, err := ListGateway(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return ErrNoGatewayRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		case *ttnpb.OrganizationIdentifiers:
+			list, err := ListOrganization(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return ErrNoOrganizationRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		case *ttnpb.UserIdentifiers:
+			list, err := ListUser(ctx, *ids)
+			if err != nil {
+				return err
+			}
+			if len(list.GetRights()) == 0 {
+				return ErrNoUserRights.WithAttributes("uid", unique.ID(ctx, ids))
+			}
+		}
+	}
+	return nil
+}

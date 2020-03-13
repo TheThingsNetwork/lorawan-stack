@@ -665,6 +665,12 @@ func (m *OrganizationOrUserIdentifiers) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "ids":
+			if m.Ids == nil {
+				return OrganizationOrUserIdentifiersValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"organization_ids", "user_ids",
@@ -790,6 +796,12 @@ func (m *EntityIdentifiers) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "ids":
+			if m.Ids == nil {
+				return EntityIdentifiersValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
 			if len(subs) == 0 {
 				subs = []string{
 					"application_ids", "client_ids", "device_ids", "gateway_ids", "organization_ids", "user_ids",

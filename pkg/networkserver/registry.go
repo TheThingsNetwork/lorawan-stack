@@ -120,7 +120,7 @@ func (w deprecatedDeviceFieldRegistryWrapper) RangeByAddr(ctx context.Context, d
 
 func (w deprecatedDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	paths, deprecated := matchDeprecatedDeviceFields(paths, w.fields)
-	return w.registry.SetByID(ctx, appID, devID, paths, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, ctx, err := w.registry.SetByID(ctx, appID, devID, paths, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
 			for _, d := range deprecated {
 				d.GetTransform(dev)
@@ -135,6 +135,13 @@ func (w deprecatedDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appID
 		}
 		return dev, paths, nil
 	})
+	if err != nil || dev == nil {
+		return dev, ctx, err
+	}
+	for _, d := range deprecated {
+		d.GetTransform(dev)
+	}
+	return dev, ctx, nil
 }
 
 func wrapDeviceRegistryWithDeprecatedFields(r DeviceRegistry, fields ...deprecatedDeviceField) DeviceRegistry {
@@ -250,6 +257,57 @@ var deprecatedDeviceFields = []deprecatedDeviceField{
 			}
 			// Replicate old behavior for backwards-compatibility.
 			dev.MACState.DesiredParameters.PingSlotDataRateIndex = 0
+			return nil
+		},
+	},
+	{
+		Old: "queued_application_downlinks",
+		New: "session.queued_application_downlinks",
+		GetTransform: func(dev *ttnpb.EndDevice) {
+			switch {
+			case dev.QueuedApplicationDownlinks == nil && dev.GetSession().GetQueuedApplicationDownlinks() == nil:
+				return
+
+			case dev.QueuedApplicationDownlinks != nil:
+				if dev.Session == nil {
+					dev.Session = &ttnpb.Session{}
+				}
+				dev.Session.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks
+
+			default:
+				dev.QueuedApplicationDownlinks = dev.Session.QueuedApplicationDownlinks
+			}
+		},
+		SetTransform: func(dev *ttnpb.EndDevice, useOld, useNew bool) error {
+			switch {
+			case useOld && useNew:
+				oldValue := dev.QueuedApplicationDownlinks
+				newValue := dev.GetSession().GetQueuedApplicationDownlinks()
+				n := len(oldValue)
+				if n != len(newValue) {
+					return errInvalidFieldValue.WithAttributes("field", "queued_application_downlinks")
+				}
+				for i := 0; i < n; i++ {
+					if !oldValue[i].Equal(newValue[i]) {
+						return errInvalidFieldValue.WithAttributes("field", "queued_application_downlinks")
+					}
+				}
+
+			case useNew:
+				dev.QueuedApplicationDownlinks = nil
+
+			case dev.QueuedApplicationDownlinks == nil:
+				if dev.Session != nil {
+					dev.Session.QueuedApplicationDownlinks = nil
+				}
+
+			default:
+				if dev.Session == nil {
+					dev.Session = &ttnpb.Session{}
+				}
+				dev.Session.QueuedApplicationDownlinks = dev.QueuedApplicationDownlinks
+			}
+			dev.QueuedApplicationDownlinks = nil
 			return nil
 		},
 	},

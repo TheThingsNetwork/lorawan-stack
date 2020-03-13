@@ -71,18 +71,22 @@ type mockApplicationAccessServer struct {
 	ttnpb.ApplicationAccessServer
 	*mockFetcher
 }
+
 type mockClientAccessServer struct {
 	ttnpb.ClientAccessServer
 	*mockFetcher
 }
+
 type mockGatewayAccessServer struct {
 	ttnpb.GatewayAccessServer
 	*mockFetcher
 }
+
 type mockOrganizationAccessServer struct {
 	ttnpb.OrganizationAccessServer
 	*mockFetcher
 }
+
 type mockUserAccessServer struct {
 	ttnpb.UserAccessServer
 	*mockFetcher

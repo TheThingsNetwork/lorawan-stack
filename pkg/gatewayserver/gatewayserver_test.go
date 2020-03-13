@@ -26,7 +26,8 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	clusterauth "go.thethings.network/lorawan-stack/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -39,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/basicstationlns/messages"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/udp"
+	gsredis "go.thethings.network/lorawan-stack/pkg/gatewayserver/redis"
 	"go.thethings.network/lorawan-stack/pkg/gatewayserver/upstream/mock"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
@@ -77,13 +79,16 @@ func TestGatewayServer(t *testing.T) {
 				Listen:                      ":9187",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 				NetworkServer:  nsAddr,
 			},
 		},
 	})
 	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	statsRedisClient, statsFlush := test.NewRedis(t, "gatewayserver_test")
+	defer statsFlush()
+	defer statsRedisClient.Close()
 	config := &gatewayserver.Config{
 		RequireRegisteredGateways: false,
 		MQTT: config.MQTT{
@@ -105,6 +110,10 @@ func TestGatewayServer(t *testing.T) {
 		BasicStation: gatewayserver.BasicStationConfig{
 			Listen:         ":1887",
 			WSPingInterval: wsPingInterval,
+		},
+		UpdateConnectionStatsDebounceTime: 0,
+		Stats: &gsredis.GatewayConnectionStatsRegistry{
+			Redis: statsRedisClient,
 		},
 	}
 	gs, err := gatewayserver.New(c, config)
@@ -916,6 +925,10 @@ func TestGatewayServer(t *testing.T) {
 								time.Sleep(timeout)
 							}
 
+							conn, ok := gs.GetConnection(ctx, ids)
+							a.So(ok, should.BeTrue)
+							gs.UpdateConnectionStats(ctx, conn)
+
 							stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
@@ -933,7 +946,7 @@ func TestGatewayServer(t *testing.T) {
 				})
 
 				t.Run("Downstream", func(t *testing.T) {
-					ctx := cluster.NewContext(test.Context(), nil)
+					ctx := clusterauth.NewContext(test.Context(), nil)
 					downlinkCount := 0
 					for _, tc := range []struct {
 						Name                     string
@@ -1177,6 +1190,10 @@ func TestGatewayServer(t *testing.T) {
 							case <-time.After(timeout):
 								t.Fatal("Expected downlink timeout")
 							}
+
+							conn, ok := gs.GetConnection(ctx, ids)
+							a.So(ok, should.BeTrue)
+							gs.UpdateConnectionStats(ctx, conn)
 
 							stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 							if !a.So(err, should.BeNil) {

@@ -21,7 +21,9 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/pkg/auth"
+	"go.thethings.network/lorawan-stack/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/pkg/email"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -29,6 +31,7 @@ import (
 )
 
 func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.ContactInfoValidation, error) {
+	// NOTE: This does NOT check auth. Internal use only.
 	id, err := auth.GenerateID(ctx)
 	if err != nil {
 		return nil, err
@@ -42,7 +45,8 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 		return nil, err
 	}
 	now := time.Now()
-	emailValidationsExpireAt := now.Add(24 * time.Hour)
+	emailValidationsTTL := 48 * time.Hour
+	emailValidationsExpireAt := now.Add(emailValidationsTTL)
 	emailValidations := make(map[string]*ttnpb.ContactInfoValidation)
 	for _, info := range contactInfo {
 		if info.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && info.ValidatedAt == nil {
@@ -91,6 +95,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 					Data:  data,
 					ID:    validation.ID,
 					Token: validation.Token,
+					TTL:   emailValidationsTTL,
 				}
 			})
 			if err != nil {
@@ -123,7 +128,27 @@ type contactInfoRegistry struct {
 	*IdentityServer
 }
 
+var errNoContactInfoForEntity = errors.DefineInvalidArgument("no_contact_info", "no contact info for this entity type")
+
 func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.ContactInfoValidation, error) {
+	var err error
+	switch id := ids.Identifiers().(type) {
+	case *ttnpb.ApplicationIdentifiers:
+		err = rights.RequireApplication(ctx, *id, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
+	case *ttnpb.ClientIdentifiers:
+		err = rights.RequireClient(ctx, *id, ttnpb.RIGHT_CLIENT_ALL)
+	case *ttnpb.GatewayIdentifiers:
+		err = rights.RequireGateway(ctx, *id, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
+	case *ttnpb.OrganizationIdentifiers:
+		err = rights.RequireOrganization(ctx, *id, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC)
+	case *ttnpb.UserIdentifiers:
+		err = rights.RequireUser(ctx, *id, ttnpb.RIGHT_USER_SETTINGS_BASIC)
+	default:
+		return nil, errNoContactInfoForEntity
+	}
+	if err != nil {
+		return nil, err
+	}
 	return cir.requestContactInfoValidation(ctx, ids)
 }
 

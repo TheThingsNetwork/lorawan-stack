@@ -36,23 +36,31 @@ const messages = defineMessages({
 })
 
 const IdentityServerForm = React.memo(props => {
-  const { device, onSubmit, onSubmitSuccess, onDelete, onDeleteSuccess, onDeleteFailure } = props
+  const {
+    device,
+    onSubmit,
+    onSubmitSuccess,
+    onDelete,
+    onDeleteSuccess,
+    onDeleteFailure,
+    mayReadKeys,
+  } = props
   const { name, ids } = device
 
   const formRef = React.useRef(null)
   const [error, setError] = React.useState('')
-  const [externalJs, setExternaljs] = React.useState(hasExternalJs(device))
+  const [externalJs, setExternaljs] = React.useState(hasExternalJs(device) && mayReadKeys)
 
   const initialValues = React.useMemo(() => {
     const initialValues = {
       ...device,
-      _external_js: hasExternalJs(device),
+      _external_js: hasExternalJs(device) && mayReadKeys,
       _lorawan_version: device.lorawan_version,
       _supports_join: device.supports_join,
     }
 
     return validationSchema.cast(initialValues)
-  }, [device])
+  }, [device, mayReadKeys])
 
   const handleExternalJsChange = React.useCallback(evt => {
     const { checked: externalJsChecked } = evt.target
@@ -218,6 +226,7 @@ const IdentityServerForm = React.memo(props => {
 
 IdentityServerForm.propTypes = {
   device: PropTypes.device.isRequired,
+  mayReadKeys: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
   onDeleteFailure: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,

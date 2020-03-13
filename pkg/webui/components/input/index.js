@@ -23,10 +23,10 @@ import PropTypes from '../../lib/prop-types'
 import Button from '../button'
 import ByteInput from './byte'
 import Toggled from './toggled'
+import Generate from './generate'
 
 import style from './input.styl'
 
-@bind
 class Input extends React.Component {
   static propTypes = {
     action: PropTypes.shape({
@@ -194,6 +194,7 @@ class Input extends React.Component {
     )
   }
 
+  @bind
   onFocus(evt) {
     const { onFocus } = this.props
 
@@ -201,6 +202,7 @@ class Input extends React.Component {
     onFocus(evt)
   }
 
+  @bind
   onBlur(evt) {
     const { onBlur } = this.props
 
@@ -208,6 +210,7 @@ class Input extends React.Component {
     onBlur(evt)
   }
 
+  @bind
   onChange(evt) {
     const { onChange } = this.props
     const { value } = evt.target
@@ -215,6 +218,7 @@ class Input extends React.Component {
     onChange(value)
   }
 
+  @bind
   onKeyDown(evt) {
     if (evt.key === 'Enter') {
       this.props.onEnter(evt.target.value)
@@ -235,5 +239,6 @@ const Valid = function(props) {
 }
 
 Input.Toggled = Toggled
+Input.Generate = Generate
 
 export default injectIntl(Input, { forwardRef: true })

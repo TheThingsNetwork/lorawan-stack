@@ -114,7 +114,7 @@ var (
 )
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
-func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
+func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if ttnpb.HasAnyField(req.FieldMask.Paths, "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 	}
@@ -144,6 +144,11 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			if err != nil {
 				return nil, err
 			}
+			defer func(ke ttnpb.KeyEnvelope) {
+				if dev != nil {
+					dev.Session.AppSKey = &ke
+				}
+			}(*req.EndDevice.Session.AppSKey)
 			req.EndDevice.Session.AppSKey = &appSKey
 		} else if req.EndDevice.Session != nil {
 			req.EndDevice.Session.AppSKey = nil
@@ -155,7 +160,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	}
 
 	var evt events.Event
-	dev, err := r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, err = r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
 			evt = evtUpdateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.Paths)
 			if err := ttnpb.ProhibitFields(sets,

@@ -14,15 +14,11 @@
 
 import * as Yup from 'yup'
 
-import randomByteString from '../../../lib/random-bytes'
 import sharedMessages from '../../../../lib/shared-messages'
 
 import m from '../../../components/device-data-form/messages'
 
 import { parseLorawanMacVersion, ACTIVATION_MODES } from '../utils'
-
-const random16BytesString = () => randomByteString(32)
-const toUndefined = value => (!Boolean(value) ? undefined : value)
 
 const validationSchema = Yup.object()
   .shape({
@@ -32,43 +28,50 @@ const validationSchema = Yup.object()
       ACTIVATION_MODES.OTAA,
       ACTIVATION_MODES.MULTICAST,
     ]),
+    _may_edit_keys: Yup.boolean().default(false),
+    _may_read_keys: Yup.boolean().default(false),
+    _joined: Yup.boolean().default(false),
     lorawan_version: Yup.string().required(sharedMessages.validateRequired),
     lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
     frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
     supports_class_c: Yup.boolean().default(false),
     session: Yup.object().when(
-      ['_activation_mode', 'lorawan_version', '_joined'],
-      (mode, version, isJoined, schema) => {
+      ['_activation_mode', 'lorawan_version', '_joined', '_may_edit_keys', '_may_read_keys'],
+      (mode, version, isJoined, mayEditKeys, mayReadKeys, schema) => {
         if (mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.MULTICAST || isJoined) {
           const isNewVersion = parseLorawanMacVersion(version) >= 110
           return schema.shape({
-            dev_addr: Yup.string()
-              .length(4 * 2, m.validate8) // 4 Byte hex
-              .required(sharedMessages.validateRequired),
+            dev_addr: Yup.lazy(() => {
+              const schema = Yup.string().length(4 * 2, m.validate8) // 4 Byte hex
+
+              if (mayReadKeys && mayEditKeys) {
+                // Force the field to be required only if the user can see and edit the `dev_addr`,
+                // otherwise the user is not able to edit any other fields in the NS form without
+                // resetting the `dev_addr`.
+                return schema.required(sharedMessages.validateRequired)
+              }
+
+              return schema
+            }),
             keys: Yup.object().shape({
-              f_nwk_s_int_key: Yup.object().shape({
-                key: Yup.string()
-                  .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                  .transform(toUndefined)
-                  .default(random16BytesString),
-              }),
-              s_nwk_s_int_key: Yup.lazy(() =>
-                isNewVersion
+              f_nwk_s_int_key: Yup.lazy(value =>
+                Boolean(value) && Boolean(value.key)
                   ? Yup.object().shape({
-                      key: Yup.string()
-                        .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                        .transform(toUndefined)
-                        .default(random16BytesString),
+                      key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
                     })
                   : Yup.object().strip(),
               ),
-              nwk_s_enc_key: Yup.lazy(() =>
-                isNewVersion
+              s_nwk_s_int_key: Yup.lazy(value =>
+                isNewVersion && Boolean(value) && Boolean(value.key)
                   ? Yup.object().shape({
-                      key: Yup.string()
-                        .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                        .transform(toUndefined)
-                        .default(random16BytesString),
+                      key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+                    })
+                  : Yup.object().strip(),
+              ),
+              nwk_s_enc_key: Yup.lazy(value =>
+                isNewVersion && Boolean(value) && Boolean(value.key)
+                  ? Yup.object().shape({
+                      key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
                     })
                   : Yup.object().strip(),
               ),
@@ -87,45 +90,6 @@ const validationSchema = Yup.object()
 
       return schema.strip()
     }),
-    root_keys: Yup.object().when(
-      ['_external_js', 'lorawan_version', '_activation_mode'],
-      (externalJs, version, mode, schema) => {
-        if (mode === ACTIVATION_MODES.OTAA) {
-          const strippedSchema = Yup.object().strip()
-          const keySchema = Yup.lazy(() => {
-            return !externalJs
-              ? Yup.object().shape({
-                  key: Yup.string()
-                    .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                    .transform(toUndefined)
-                    .default(random16BytesString),
-                })
-              : strippedSchema
-          })
-
-          if (externalJs) {
-            return schema.shape({
-              nwk_key: strippedSchema,
-              app_key: strippedSchema,
-            })
-          }
-
-          if (parseLorawanMacVersion(version) < 110) {
-            return schema.shape({
-              nwk_key: strippedSchema,
-              app_key: keySchema,
-            })
-          }
-
-          return schema.shape({
-            nwk_key: keySchema,
-            app_key: keySchema,
-          })
-        }
-
-        return schema.strip()
-      },
-    ),
   })
   .noUnknown()
 

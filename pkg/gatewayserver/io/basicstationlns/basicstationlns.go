@@ -135,12 +135,14 @@ func (s *srv) handleDiscover(c echo.Context) error {
 	ids := ttnpb.GatewayIdentifiers{
 		EUI: &req.EUI.EUI64,
 	}
-	ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
+	filledCtx, ids, err := s.server.FillGatewayContext(ctx, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to fetch gateway")
 		writeDiscoverError(ctx, ws, fmt.Sprintf("Failed to fetch gateway: %s", err.Error()))
 		return err
 	}
+
+	ctx = filledCtx
 
 	scheme := "ws"
 	if c.IsTLS() || s.useTrafficTLSAddress {
@@ -297,7 +299,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.Warn("No clock synchronization")
 					continue
 				}
-				xTime := int64(sID)<<48 | int64(concentratorTime)/int64(time.Microsecond)
+				xTime := int64(sID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
 				dnmsg := messages.FromDownlinkMessage(ids, down.GetRawPayload(), scheduledMsg, int64(s.tokens.Next(down.CorrelationIDs, dlTime)), dlTime, xTime)
 				msg, err := dnmsg.MarshalJSON()
 				if err != nil {
@@ -325,7 +327,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				uint32(timestamp&0xFFFFFFFF),
 				server,
 				// The Basic Station epoch is the 48 LSB.
-				scheduling.ConcentratorTime(timestamp&0xFFFFFFFFFF),
+				scheduling.ConcentratorTime(time.Duration(timestamp&0xFFFFFFFFFF)*time.Microsecond),
 			)
 			syncedConcentratorTime = true
 		}

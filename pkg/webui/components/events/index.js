@@ -87,7 +87,7 @@ class Events extends React.Component {
   }
 
   renderEvent(event) {
-    const { component: Component, type } = getEventComponentByName(event.name)
+    const { component: Component, type } = getEventComponentByName(event)
 
     return (
       <List.Item className={style.listItem}>

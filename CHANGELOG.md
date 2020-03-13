@@ -19,6 +19,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [3.6.1] (2020-03-13)
+
+### Added
+
+- New `list` and `request-validation` subcommands for the CLI's `contact-info` commands.
+- Device Claim Authentication Code page in the Console.
+- Gateway Server rate limiting support for the UDP frontend, see (`--gs.udp.rate-limiting` options).
+- Uplink deduplication via Redis in Network Server.
+
+### Changed
+
+- Network and Application Servers now maintain application downlink queue per-session.
+- Gateway Server skips setting up an upstream if the DevAddr prefixes to forward are empty.
+- Gateway connection stats are now cached in Redis (see `--cache.service` and `--gs.update-connections-stats-debounce-time` options).
+
+### Fixed
+
+- Telemetry and events for gateway statuses.
+- Handling of downlink frame counters exceeding 65535.
+- Creating 1.0.4 ABP end devices via the Console.
+- ADR uplink handling.
+- Uplink retransmission handling.
+- Synchronizing Basic Station concentrator time after reconnect or initial connect after long inactivity.
+
+### Security
+
+- Changing username and password to be not required in pubsub integration.
+
 ## [3.6.0] (2020-02-27)
 
 ### Added
@@ -634,7 +662,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.1...HEAD
+[3.6.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.3...v3.6.0
 [3.5.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.2...v3.5.3
 [3.5.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.1...v3.5.2

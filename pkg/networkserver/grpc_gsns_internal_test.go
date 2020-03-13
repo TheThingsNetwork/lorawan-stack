@@ -23,6 +23,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/band"
+	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -170,7 +171,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 			Payload:        &msg,
 			RawPayload:     rawPayload,
 			ReceivedAt:     start,
-			RxMetadata:     MakeRxMetadataSlice(),
+			RxMetadata:     RxMetadata[:],
 			Settings:       sets,
 		}
 	}
@@ -320,7 +321,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					return false
 				}
 
-				linkCheckAns := MakeLinkCheckAns(MakeRxMetadataSlice()...)
+				linkCheckAns := MakeLinkCheckAns(RxMetadata[:]...)
 				expectedEvents := map[int][]events.DefinitionDataClosure{
 					0: makeLinkCheckEvents(linkCheckAns.GetLinkCheckAns()),
 				}
@@ -439,7 +440,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					return false
 				}
 
-				linkCheckAns := MakeLinkCheckAns(MakeRxMetadataSlice()...)
+				linkCheckAns := MakeLinkCheckAns(RxMetadata[:]...)
 				expectedEvents := map[int][]events.DefinitionDataClosure{
 					0: makeLinkCheckEvents(linkCheckAns.GetLinkCheckAns()),
 				}
@@ -549,7 +550,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					return false
 				}
 
-				linkCheckAns := MakeLinkCheckAns(MakeRxMetadataSlice()...)
+				linkCheckAns := MakeLinkCheckAns(RxMetadata[:]...)
 				expectedEvents := map[int][]events.DefinitionDataClosure{
 					0: makeLinkCheckEvents(linkCheckAns.GetLinkCheckAns()),
 				}
@@ -683,7 +684,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					return false
 				}
 
-				linkCheckAns := MakeLinkCheckAns(MakeRxMetadataSlice()...)
+				linkCheckAns := MakeLinkCheckAns(RxMetadata[:]...)
 				expectedEvents := map[int][]events.DefinitionDataClosure{
 					0: makeLinkCheckEvents(linkCheckAns.GetLinkCheckAns()),
 				}
@@ -706,7 +707,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			ns, ctx, env, stop := StartTest(t, Config{NetID: netID}, (1<<10)*test.Delay, true)
+			ns, ctx, env, stop := StartTest(t, component.Config{}, Config{NetID: netID}, (1<<10)*test.Delay)
 			defer stop()
 
 			<-env.DownlinkTasks.Pop

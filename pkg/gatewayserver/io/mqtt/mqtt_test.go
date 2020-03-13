@@ -24,6 +24,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gogo/protobuf/proto"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/config"
@@ -63,7 +64,7 @@ func TestAuthentication(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
 		},
@@ -78,7 +79,7 @@ func TestAuthentication(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	go Serve(ctx, gs, lis, Protobuf, "tcp")
+	go Serve(ctx, gs, lis, NewProtobuf(ctx), "tcp")
 
 	for _, tc := range []struct {
 		UID string
@@ -141,7 +142,7 @@ func TestTraffic(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: config.Cluster{
+			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
 		},
@@ -156,7 +157,7 @@ func TestTraffic(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	go Serve(ctx, gs, lis, Protobuf, "tcp")
+	go Serve(ctx, gs, lis, NewProtobuf(ctx), "tcp")
 
 	clientOpts := mqtt.NewClientOptions()
 	clientOpts.AddBroker(fmt.Sprintf("tcp://%v", lis.Addr()))

@@ -2519,6 +2519,24 @@
       "file": "bucket.go"
     }
   },
+  "error:pkg/cluster:cluster_key": {
+    "translations": {
+      "en": "invalid cluster key"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
+  "error:pkg/cluster:key_length": {
+    "translations": {
+      "en": "invalid key length %d, must be 16, 24 or 32 bytes"
+    },
+    "description": {
+      "package": "pkg/cluster",
+      "file": "cluster.go"
+    }
+  },
   "error:pkg/cluster:peer_connection": {
     "translations": {
       "en": "connection to peer `{name}` on `{address}` failed"
@@ -3464,6 +3482,15 @@
       "file": "firewall.go"
     }
   },
+  "error:pkg/gatewayserver/io/udp:rate_exceeded": {
+    "translations": {
+      "en": "gateway traffic exceeded allowed rate"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "firewall_ratelimit.go"
+    }
+  },
   "error:pkg/gatewayserver/io:buffer_full": {
     "translations": {
       "en": "buffer is full"
@@ -4191,6 +4218,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "organization_registry.go"
+    }
+  },
+  "error:pkg/identityserver:no_contact_info": {
+    "translations": {
+      "en": "no contact info for this entity type"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "contact_info_registry.go"
     }
   },
   "error:pkg/identityserver:no_invite_rights": {
@@ -5257,7 +5293,7 @@
   },
   "error:pkg/networkserver:application_downlink_too_long": {
     "translations": {
-      "en": "application downlink payload length '{length}' exceeds maximum '{max}'"
+      "en": "application downlink payload length `{length}` exceeds maximum '{max}'"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -5428,7 +5464,7 @@
   },
   "error:pkg/networkserver:f_cnt_too_low": {
     "translations": {
-      "en": "FCnt is too low"
+      "en": "FCnt `{f_cnt}` is lower than minimum of `{min_f_cnt}`"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -5552,6 +5588,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:rejoin_request": {
+    "translations": {
+      "en": "rejoin-request handling is not implemented"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:schedule": {
     "translations": {
       "en": "all downlink scheduling attempts failed"
@@ -5608,7 +5653,7 @@
   },
   "error:pkg/networkserver:unsupported_lorawan_version": {
     "translations": {
-      "en": "unsupported LoRaWAN version: {version}"
+      "en": "unsupported LoRaWAN version: `{version}`"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -5912,6 +5957,33 @@
       "file": "qrcodegenerator.go"
     }
   },
+  "error:pkg/redis:decode": {
+    "translations": {
+      "en": "failed to decode value"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/redis:encode": {
+    "translations": {
+      "en": "failed to encode value"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/redis:no_arguments": {
+    "translations": {
+      "en": "no arguments"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/redis:not_found": {
     "translations": {
       "en": "entity not found"
@@ -5924,6 +5996,15 @@
   "error:pkg/redis:store": {
     "translations": {
       "en": "store error"
+    },
+    "description": {
+      "package": "pkg/redis",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/redis:transaction_failed": {
+    "translations": {
+      "en": "transaction failed"
     },
     "description": {
       "package": "pkg/redis",

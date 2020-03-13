@@ -16,13 +16,10 @@ import * as Yup from 'yup'
 
 import sharedMessages from '../../../lib/shared-messages'
 import { id as deviceIdRegexp, address as addressRegexp } from '../../lib/regexp'
-import randomByteString from '../../lib/random-bytes'
 import m from './messages'
 
-const random16BytesString = () => randomByteString(32)
 const isABP = mode => mode === 'abp'
 const isOTAA = mode => mode === 'otaa'
-const toUndefined = value => (!Boolean(value) ? undefined : value)
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -38,41 +35,46 @@ const validationSchema = Yup.object({
     addressRegexp,
     sharedMessages.validateAddressFormat,
   ),
-  join_server_address: Yup.string().when('external_js', {
+  join_server_address: Yup.string().when('_external_js', {
     is: false,
     then: schema => schema.matches(addressRegexp, sharedMessages.validateAddressFormat),
     otherwise: schema => schema.default(''),
   }),
-  activation_mode: Yup.string().required(),
+  _activation_mode: Yup.string().required(),
   supports_join_nonces: Yup.boolean(),
+  ids: Yup.object()
+    .shape({
+      device_id: Yup.string()
+        .matches(deviceIdRegexp, sharedMessages.validateIdFormat)
+        .min(2, sharedMessages.validateTooShort)
+        .max(36, sharedMessages.validateTooLong)
+        .required(sharedMessages.validateRequired),
+    })
+    .when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
+      const isLw104 = Boolean(version) && parseInt(version.replace(/\D/g, '').padEnd(3, 0)) === 104
+      const isModeOTAA = isOTAA(mode)
+
+      return schema.shape({
+        join_eui: Yup.lazy(() =>
+          isModeOTAA
+            ? Yup.string()
+                .length(8 * 2, m.validate16) // 8 Byte hex
+                .required(sharedMessages.validateRequired)
+            : Yup.string().strip(),
+        ),
+        dev_eui: Yup.lazy(
+          () =>
+            isModeOTAA || isLw104
+              ? Yup.string()
+                  .length(8 * 2, m.validate16) // 8 Byte hex
+                  .required(sharedMessages.validateRequired)
+              : Yup.nullableString().emptyOrLength(8 * 2, m.validate16), // 8 Byte hex
+        ),
+      })
+    }),
 }) // OTAA related entries
   .shape({
-    ids: Yup.object()
-      .shape({
-        device_id: Yup.string()
-          .matches(deviceIdRegexp, sharedMessages.validateIdFormat)
-          .min(2, sharedMessages.validateTooShort)
-          .max(36, sharedMessages.validateTooLong)
-          .required(sharedMessages.validateRequired),
-      })
-      .when('activation_mode', {
-        is: isOTAA,
-        then: schema =>
-          schema.shape({
-            join_eui: Yup.string()
-              .length(8 * 2, m.validate16) // 8 Byte hex
-              .required(sharedMessages.validateRequired),
-            dev_eui: Yup.string()
-              .length(8 * 2, m.validate16) // 8 Byte hex
-              .required(sharedMessages.validateRequired),
-          }),
-        otherwise: schema =>
-          schema.shape({
-            join_eui: Yup.string().strip(),
-            dev_eui: Yup.string().strip(),
-          }),
-      }),
-    mac_settings: Yup.object().when('activation_mode', {
+    mac_settings: Yup.object().when('_activation_mode', {
       is: isABP,
       then: schema =>
         schema.shape({
@@ -80,60 +82,69 @@ const validationSchema = Yup.object({
         }),
       otherwise: schema => schema.strip(),
     }),
-    external_js: Yup.boolean(),
-    root_keys: Yup.object().when(['activation_mode', 'external_js'], {
-      is: (mode, externalJs) => isOTAA(mode) && !externalJs,
+    _external_js: Yup.boolean().default(true),
+    _may_edit_keys: Yup.boolean().default(false),
+    supports_join: Yup.boolean().when('_activation_mode', {
+      is: 'otaa',
+      then: schema => schema.default(true),
+      otherwise: schema => schema.default(false),
+    }),
+    root_keys: Yup.object().when(
+      ['_activation_mode', '_external_js', '_may_edit_keys'],
+      (mode, externalJs, mayEditKeys, schema) => {
+        if (isOTAA(mode) && !externalJs && mayEditKeys) {
+          return schema.shape({
+            nwk_key: Yup.lazy(value =>
+              Boolean(value) && Boolean(value.key)
+                ? Yup.object().shape({
+                    key: Yup.string().emptyOrLength(16 * 2, m.validate32), // 16 Byte hex
+                  })
+                : Yup.object().strip(),
+            ),
+            app_key: Yup.lazy(value =>
+              Boolean(value) && Boolean(value.key)
+                ? Yup.object().shape({
+                    key: Yup.string().emptyOrLength(16 * 2, m.validate32), // 16 Byte hex
+                  })
+                : Yup.object().strip(),
+            ),
+          })
+        }
+
+        return schema.strip()
+      },
+    ),
+    net_id: Yup.nullableString().when('_external_js', {
+      is: false,
       then: schema =>
-        schema.shape({
-          nwk_key: Yup.lazy(
-            value =>
-              value !== undefined
-                ? Yup.object().shape({
-                    key: Yup.string()
-                      .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                      .transform(toUndefined)
-                      .default(random16BytesString),
-                  })
-                : Yup.object().strip(), // Avoid generating when key is unexposed
-          ),
-          app_key: Yup.lazy(
-            value =>
-              value !== undefined
-                ? Yup.object().shape({
-                    key: Yup.string()
-                      .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                      .transform(toUndefined)
-                      .default(random16BytesString),
-                  })
-                : Yup.object().strip(), // Avoid generating when key is unexposed
-          ),
-        }),
-      net_id: Yup.nullableString()
-        .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
-        .default(''),
-      application_server_id: Yup.string()
-        .max(100, sharedMessages.validateTooLong)
-        .default(''),
-      application_server_kek_label: Yup.string()
-        .max(2048, sharedMessages.validateTooLong)
-        .default(''),
-      network_server_kek_label: Yup.string()
-        .max(2048, sharedMessages.validateTooLong)
-        .default(''),
-      otherwise: schema =>
-        schema.shape({
-          nwk_key: Yup.object().strip(),
-          app_key: Yup.object().strip(),
-        }),
+        schema
+          .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
+          .default(''),
+      otherwise: schema => schema.strip(),
+    }),
+    application_server_id: Yup.string().when('_external_js', {
+      is: false,
+      then: schema => schema.max(100, sharedMessages.validateTooLong).default(''),
+      otherwise: schema => schema.strip(),
+    }),
+    application_server_kek_label: Yup.string().when('_external_js', {
+      is: false,
+      then: schema => schema.max(2048, sharedMessages.validateTooLong).default(''),
+      otherwise: schema => schema.strip(),
+    }),
+    network_server_kek_label: Yup.string().when('_external_js', {
+      is: false,
+      then: schema => schema.max(2048, sharedMessages.validateTooLong).default(''),
+      otherwise: schema => schema.strip(),
     }),
   }) // ABP related entries
   .shape({
-    resets_join_nonces: Yup.boolean().when(['activation_mode', 'external_js'], {
+    resets_join_nonces: Yup.boolean().when(['_activation_mode', '_external_js'], {
       is: (mode, externalJs) => isOTAA(mode) && !externalJs,
       then: schema => schema,
       otherwise: schema => schema.strip(),
     }),
-    session: Yup.object().when(['activation_mode', 'lorawan_version'], (mode, version, schema) => {
+    session: Yup.object().when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
       if (isABP(mode)) {
         // Check if the version is 1.1.x or higher
         const isNewVersion =
@@ -146,17 +157,20 @@ const validationSchema = Yup.object({
           keys: Yup.object().shape({
             f_nwk_s_int_key: Yup.object().shape({
               key: Yup.string()
-                .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                .transform(toUndefined)
-                .default(random16BytesString),
+                .length(16 * 2, m.validate32) // 16 Byte hex
+                .required(sharedMessages.validateRequired),
+            }),
+            app_s_key: Yup.object().shape({
+              key: Yup.string()
+                .length(16 * 2, m.validate32) // 16 Byte hex
+                .required(sharedMessages.validateRequired),
             }),
             s_nwk_s_int_key: Yup.lazy(() =>
               isNewVersion
                 ? Yup.object().shape({
                     key: Yup.string()
-                      .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                      .transform(toUndefined)
-                      .default(random16BytesString),
+                      .length(16 * 2, m.validate32) // 16 Byte hex
+                      .required(sharedMessages.validateRequired),
                   })
                 : Yup.object().strip(),
             ),
@@ -164,18 +178,11 @@ const validationSchema = Yup.object({
               isNewVersion
                 ? Yup.object().shape({
                     key: Yup.string()
-                      .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                      .transform(toUndefined)
-                      .default(random16BytesString),
+                      .length(16 * 2, m.validate32) // 16 Byte hex
+                      .required(sharedMessages.validateRequired),
                   })
                 : Yup.object().strip(),
             ),
-            app_s_key: Yup.object().shape({
-              key: Yup.string()
-                .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
-                .transform(toUndefined)
-                .default(random16BytesString),
-            }),
           }),
         })
       }

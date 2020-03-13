@@ -24,9 +24,10 @@ import diff from '../../../lib/diff'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
 import IntlHelmet from '../../../lib/components/intl-helmet'
+import getHostnameFromUrl from '../../../lib/host-from-url'
 import PropTypes from '../../../lib/prop-types'
-import api from '../../api'
 import toast from '../../../components/toast'
+import api from '../../api'
 
 import { updateDevice } from '../../store/actions/devices'
 import { attachPromise } from '../../store/actions/lib'
@@ -38,7 +39,12 @@ import {
   selectJsConfig,
   selectNsConfig,
 } from '../../../lib/selectors/env'
-import { hasExternalJs, isDeviceOTAA, isDeviceJoined } from './utils'
+import {
+  mayEditApplicationDeviceKeys,
+  mayReadApplicationDeviceKeys,
+} from '../../lib/feature-checks'
+
+import { isDeviceOTAA, isDeviceJoined } from './utils'
 import m from './messages'
 
 import IdentityServerForm from './identity-server-form'
@@ -49,14 +55,6 @@ import Collapse from './collapse'
 
 import style from './device-general-settings.styl'
 
-const getComponentBaseUrl = config => {
-  try {
-    const { base_url } = config
-
-    return new URL(base_url).hostname
-  } catch (e) {}
-}
-
 @connect(
   state => ({
     device: selectSelectedDevice(state),
@@ -66,6 +64,12 @@ const getComponentBaseUrl = config => {
     asConfig: selectAsConfig(),
     jsConfig: selectJsConfig(),
     nsConfig: selectNsConfig(),
+    mayReadKeys: mayReadApplicationDeviceKeys.check(
+      mayReadApplicationDeviceKeys.rightsSelector(state),
+    ),
+    mayEditKeys: mayEditApplicationDeviceKeys.check(
+      mayEditApplicationDeviceKeys.rightsSelector(state),
+    ),
   }),
   dispatch => ({
     ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
@@ -94,6 +98,8 @@ export default class DeviceGeneralSettings extends React.Component {
     device: PropTypes.device.isRequired,
     isConfig: PropTypes.stackComponent.isRequired,
     jsConfig: PropTypes.stackComponent.isRequired,
+    mayEditKeys: PropTypes.bool.isRequired,
+    mayReadKeys: PropTypes.bool.isRequired,
     nsConfig: PropTypes.stackComponent.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     updateDevice: PropTypes.func.isRequired,
@@ -168,13 +174,13 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   render() {
-    const { device, isConfig, asConfig, jsConfig, nsConfig } = this.props
+    const { device, isConfig, asConfig, jsConfig, nsConfig, mayEditKeys, mayReadKeys } = this.props
 
     const isOTAA = isDeviceOTAA(device)
     const { enabled: isEnabled } = isConfig
-    const { enabled: asEnabled } = asConfig
-    const { enabled: jsEnabled } = jsConfig
-    const { enabled: nsEnabled } = nsConfig
+    const { enabled: asEnabled, base_url: stackAsUrl } = asConfig
+    const { enabled: jsEnabled, base_url: stackJsUrl } = jsConfig
+    const { enabled: nsEnabled, base_url: stackNsUrl } = nsConfig
 
     // 1. Disable the section if IS is not in cluster.
     const isDisabled = !isEnabled
@@ -187,7 +193,7 @@ export default class DeviceGeneralSettings extends React.Component {
     // 2. Disable the section if the device is OTAA and joined since no fields are stored in the AS.
     // 3. Disable the section if NS is not in cluster, since activation mode is unknown.
     // 4. Disable the seciton if `application_server_address` is not equal to the cluster AS address.
-    const sameAsAddress = getComponentBaseUrl(asConfig) === device.application_server_address
+    const sameAsAddress = getHostnameFromUrl(stackAsUrl) === device.application_server_address
     const isJoined = isDeviceJoined(device)
     const asDisabled = !asEnabled || (isOTAA && !isJoined) || !nsEnabled || !sameAsAddress
     let asDescription = m.asDescription
@@ -195,32 +201,30 @@ export default class DeviceGeneralSettings extends React.Component {
       asDescription = m.asDescriptionMissing
     } else if (!nsEnabled) {
       asDescription = m.activationModeUnknown
-    } else if (!sameAsAddress) {
-      asDescription = m.notInCluster
     } else if (isOTAA && !isJoined) {
       asDescription = m.asDescriptionOTAA
+    } else if (!sameAsAddress) {
+      asDescription = m.notInCluster
     }
 
     // 1. Disable the section if JS is not in cluster.
     // 2. Disable the section if the device is ABP/Multicast, since JS does not store ABP/Multicast
     // devices.
     // 3. Disable the seciton if `join_server_address` is not equal to the cluster JS address.
-    // 4. Disable the seciton if an external JS is used.
-    const sameJsAddress = getComponentBaseUrl(jsConfig) === device.join_server_address
-    const externalJs = hasExternalJs(device)
-    const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress || externalJs
+    const sameJsAddress = getHostnameFromUrl(stackJsUrl) === device.join_server_address
+    const jsDisabled = !jsEnabled || !isOTAA || !sameJsAddress
     let jsDescription = m.jsDescription
     if (!jsEnabled) {
       jsDescription = m.jsDescriptionMissing
-    } else if (!sameJsAddress || externalJs) {
-      jsDescription = m.notInCluster
     } else if (nsEnabled && !isOTAA) {
       jsDescription = m.jsDescriptionOTAA
+    } else if (!sameJsAddress) {
+      jsDescription = m.notInCluster
     }
 
     // 1. Disable the section if NS is not in cluster.
     // 2. Disable the seciton if `network_server_address` is not equal to the cluster NS address.
-    const sameNsAddress = getComponentBaseUrl(nsConfig) === device.network_server_address
+    const sameNsAddress = getHostnameFromUrl(stackNsUrl) === device.network_server_address
     const nsDisabled = !nsEnabled || !sameNsAddress
     let nsDescription = m.nsDescription
     if (!nsEnabled) {
@@ -248,6 +252,7 @@ export default class DeviceGeneralSettings extends React.Component {
                 onDeleteSuccess={this.handleDeleteSuccess}
                 onDeleteFailure={this.handleDeleteFailure}
                 jsConfig={jsConfig}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
             <Collapse title={m.nsTitle} description={nsDescription} disabled={nsDisabled}>
@@ -255,6 +260,8 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
             <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>
@@ -262,6 +269,8 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
             <Collapse title={m.jsTitle} description={jsDescription} disabled={jsDisabled}>
@@ -269,6 +278,8 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                mayEditKeys={mayEditKeys}
+                mayReadKeys={mayReadKeys}
               />
             </Collapse>
           </Col>

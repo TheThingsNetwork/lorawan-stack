@@ -104,6 +104,10 @@ export const mayReadApplicationDeviceKeys = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_DEVICES_READ_KEYS'),
 }
+export const mayEditApplicationDeviceKeys = {
+  rightsSelector: selectApplicationRights,
+  check: rights => rights.includes('RIGHT_APPLICATION_DEVICES_WRITE_KEYS'),
+}
 
 // Gateways
 export const mayViewGatewayInfo = {

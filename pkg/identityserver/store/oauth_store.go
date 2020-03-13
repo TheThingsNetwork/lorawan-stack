@@ -50,6 +50,7 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 	if err != nil {
 		return nil, err
 	}
+	setTotal(ctx, uint64(len(authModels)))
 	authProtos := make([]*ttnpb.OAuthClientAuthorization, len(authModels))
 	for i, authModel := range authModels {
 		authProto := authModel.toPB()
@@ -244,6 +245,7 @@ func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserId
 	if err != nil {
 		return nil, err
 	}
+	setTotal(ctx, uint64(len(tokenModels)))
 	tokenProtos := make([]*ttnpb.OAuthAccessToken, len(tokenModels))
 	for i, tokenModel := range tokenModels {
 		tokenProto := tokenModel.toPB()
