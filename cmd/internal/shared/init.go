@@ -21,7 +21,7 @@ import (
 )
 
 // Initialize global packages.
-func Initialize(ctx context.Context, config config.ServiceBase) error {
+func Initialize(ctx context.Context, config *config.ServiceBase) error {
 	// Fallback to the default Redis configuration for the cache system
 	if config.Cache.Redis.IsZero() {
 		config.Cache.Redis = config.Redis
@@ -31,7 +31,7 @@ func Initialize(ctx context.Context, config config.ServiceBase) error {
 		config.Events.Redis = config.Redis
 	}
 
-	if err := InitializeEvents(ctx, config); err != nil {
+	if err := InitializeEvents(ctx, *config); err != nil {
 		return err
 	}
 	return nil
