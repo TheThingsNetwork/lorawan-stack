@@ -77,7 +77,7 @@ stack:
   environment:
     TTN_LW_BLOB_LOCAL_DIRECTORY: '/srv/ttn-lorawan/public/blob'
     TTN_LW_REDIS_ADDRESS: 'redis:6379'
-    TTN_LW_IS_DATABASE_URL: 'postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable'
+    TTN_LW_IS_DATABASE_URI: 'postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable'
 
   # If using (self) signed certificates
   # secrets:
