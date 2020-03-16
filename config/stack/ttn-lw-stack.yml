@@ -1,8 +1,18 @@
 # Example ttn-lw-stack configuration file
 # Keep in sync with `doc/content/guides/getting-started/configuration.md`
 
+# Redis configuration
+redis:
+  address: 'redis:6379'
+
 # Identity Server configuration
-# is:
+is:
+  # If using CockroachDB
+  database-uri: 'postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable'
+
+  # If using PostgreSQL:
+  # database-uri: 'postgres://root@postgres:5432/ttn_lorawan?sslmode=disable'
+
   # Email configuration for "thethings.example.com"
   # email:
     # sender-name: 'The Things Stack'
