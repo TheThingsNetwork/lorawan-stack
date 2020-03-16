@@ -468,6 +468,10 @@ matchLoop:
 		if match.Pending {
 			session = match.Device.PendingSession
 
+			if match.Device.MACState.PendingJoinRequest == nil {
+				logger.Error("Pending join-request missing")
+				continue
+			}
 			match.Device.MACState.CurrentParameters.Rx1Delay = match.Device.MACState.PendingJoinRequest.RxDelay
 			match.Device.MACState.CurrentParameters.Rx1DataRateOffset = match.Device.MACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
 			match.Device.MACState.CurrentParameters.Rx2DataRateIndex = match.Device.MACState.PendingJoinRequest.DownlinkSettings.Rx2DR
