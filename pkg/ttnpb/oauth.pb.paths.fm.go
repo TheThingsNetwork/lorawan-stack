@@ -66,6 +66,7 @@ var OAuthAuthorizationCodeFieldPathsNested = []string{
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",
+	"user_session_id",
 }
 
 var OAuthAuthorizationCodeFieldPathsTopLevel = []string{
@@ -77,6 +78,7 @@ var OAuthAuthorizationCodeFieldPathsTopLevel = []string{
 	"rights",
 	"state",
 	"user_ids",
+	"user_session_id",
 }
 var OAuthAccessTokenIdentifiersFieldPathsNested = []string{
 	"client_ids",
@@ -104,6 +106,7 @@ var OAuthAccessTokenFieldPathsNested = []string{
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",
+	"user_session_id",
 }
 
 var OAuthAccessTokenFieldPathsTopLevel = []string{
@@ -115,6 +118,7 @@ var OAuthAccessTokenFieldPathsTopLevel = []string{
 	"refresh_token",
 	"rights",
 	"user_ids",
+	"user_session_id",
 }
 var OAuthAccessTokensFieldPathsNested = []string{
 	"tokens",

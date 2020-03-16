@@ -68,6 +68,10 @@ var (
 		RedirectURIs:      []string{"https://uri/callback", "http://uri/callback"},
 		Rights:            []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
 	}
+	mockAccessToken = &ttnpb.OAuthAccessToken{
+		UserIDs:       ttnpb.UserIdentifiers{UserID: "user"},
+		UserSessionID: "session_id",
+	}
 )
 
 func init() {
@@ -386,6 +390,7 @@ func TestOAuthFlow(t *testing.T) {
 				a.So(s.calls, should.Contain, "CreateAuthorizationCode")
 				a.So(s.req.authorizationCode.UserIDs, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.authorizationCode.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
+				a.So(s.req.authorizationCode.UserSessionID, should.Equal, mockSession.SessionID)
 				a.So(s.req.authorizationCode.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.authorizationCode.Code, should.NotBeEmpty)
 				a.So(s.req.authorizationCode.RedirectURI, should.Equal, "http://uri/callback")
@@ -538,14 +543,15 @@ func TestTokenExchange(t *testing.T) {
 			StoreSetup: func(s *mockStore) {
 				s.res.client = mockClient
 				s.res.authorizationCode = &ttnpb.OAuthAuthorizationCode{
-					UserIDs:     mockUser.UserIdentifiers,
-					ClientIDs:   mockClient.ClientIdentifiers,
-					Rights:      mockClient.Rights,
-					Code:        "the code",
-					RedirectURI: "http://uri/callback",
-					State:       "foo",
-					CreatedAt:   time.Now().Truncate(time.Second),
-					ExpiresAt:   time.Now().Truncate(time.Second).Add(time.Hour),
+					UserIDs:       mockUser.UserIdentifiers,
+					ClientIDs:     mockClient.ClientIdentifiers,
+					UserSessionID: mockSession.SessionID,
+					Rights:        mockClient.Rights,
+					Code:          "the code",
+					RedirectURI:   "http://uri/callback",
+					State:         "foo",
+					CreatedAt:     time.Now().Truncate(time.Second),
+					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
 				}
 			},
 			Method: "POST",
@@ -566,7 +572,9 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.calls, should.Contain, "CreateAccessToken")
 				a.So(s.req.token.UserIDs, should.Resemble, mockUser.UserIdentifiers)
 				a.So(s.req.token.ClientIDs, should.Resemble, mockClient.ClientIdentifiers)
+				a.So(s.req.token.UserSessionID, should.Equal, mockSession.SessionID)
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
+				a.So(s.req.token.AccessToken, should.NotBeEmpty)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
 				a.So(s.req.token.RefreshToken, should.NotBeEmpty)
 			},
@@ -576,13 +584,14 @@ func TestTokenExchange(t *testing.T) {
 			StoreSetup: func(s *mockStore) {
 				s.res.client = mockClient
 				s.res.accessToken = &ttnpb.OAuthAccessToken{
-					UserIDs:      mockUser.UserIdentifiers,
-					ClientIDs:    mockClient.ClientIdentifiers,
-					ID:           "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
-					RefreshToken: "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
-					Rights:       mockClient.Rights,
-					CreatedAt:    time.Now().Truncate(time.Second),
-					ExpiresAt:    time.Now().Truncate(time.Second).Add(time.Hour),
+					UserIDs:       mockUser.UserIdentifiers,
+					ClientIDs:     mockClient.ClientIdentifiers,
+					UserSessionID: mockSession.SessionID,
+					ID:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
+					RefreshToken:  "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
+					Rights:        mockClient.Rights,
+					CreatedAt:     time.Now().Truncate(time.Second),
+					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
 				}
 			},
 			Method: "POST",
@@ -605,6 +614,7 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.req.token.Rights, should.Resemble, mockClient.Rights)
 				a.So(s.req.token.AccessToken, should.NotBeEmpty)
 				a.So(s.req.token.RefreshToken, should.NotBeEmpty)
+				a.So(s.req.token.UserSessionID, should.Equal, mockSession.SessionID)
 				a.So(s.req.previousID, should.Equal, "IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A")
 			},
 		},

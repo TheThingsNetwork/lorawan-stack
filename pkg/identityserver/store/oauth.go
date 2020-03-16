@@ -58,6 +58,8 @@ type AuthorizationCode struct {
 	User   *User
 	UserID string `gorm:"type:UUID;index;not null"`
 
+	UserSessionID *string `gorm:"type:UUID;index"`
+
 	Rights Rights `gorm:"type:INT ARRAY"`
 
 	Code        string `gorm:"type:VARCHAR;unique_index:authorization_code_code_index;not null"`
@@ -81,6 +83,9 @@ func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 	if a.User != nil {
 		pb.UserIDs.UserID = a.User.Account.UID
 	}
+	if a.UserSessionID != nil {
+		pb.UserSessionID = *a.UserSessionID
+	}
 	return pb
 }
 
@@ -93,6 +98,8 @@ type AccessToken struct {
 
 	User   *User
 	UserID string `gorm:"type:UUID;index;not null"`
+
+	UserSessionID *string `gorm:"type:UUID;index"`
 
 	Rights Rights `gorm:"type:INT ARRAY"`
 
@@ -121,6 +128,9 @@ func (a AccessToken) toPB() *ttnpb.OAuthAccessToken {
 	}
 	if a.User != nil {
 		pb.UserIDs.UserID = a.User.Account.UID
+	}
+	if a.UserSessionID != nil {
+		pb.UserSessionID = *a.UserSessionID
 	}
 	return pb
 }

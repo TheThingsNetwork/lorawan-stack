@@ -77,7 +77,10 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		if ar == nil {
 			return s.output(c, resp)
 		}
-		ar.UserData = userData{UserIdentifiers: session.UserIdentifiers}
+		ar.UserData = userData{UserSessionIdentifiers: ttnpb.UserSessionIdentifiers{
+			UserIdentifiers: session.UserIdentifiers,
+			SessionID:       session.SessionID,
+		}}
 		client := ttnpb.Client(ar.Client.(osinClient))
 		if !clientHasGrant(&client, ttnpb.GRANT_AUTHORIZATION_CODE) {
 			resp.InternalError = errClientMissingGrant.WithAttributes("grant", "authorization_code")

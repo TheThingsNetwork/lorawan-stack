@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Gateway Server rate limiting support for the UDP frontend, see (`--gs.udp.rate-limiting` options).
 - Uplink deduplication via Redis in Network Server.
+- Access Tokens are now linked to User Sessions.
+  - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 
 ### Changed
 
