@@ -281,7 +281,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 
 		fCnt := pld.FCnt
 		switch {
-		case !supports32BitFCnt, fCnt >= dev.Session.LastFCntUp, fCnt == 0:
+		case !supports32BitFCnt, fCnt >= dev.Session.LastFCntUp, fCnt == 0 && dev.Session.LastFCntUp == 0:
 		case fCnt > dev.Session.LastFCntUp&0xffff:
 			fCnt |= dev.Session.LastFCntUp &^ 0xffff
 		case dev.Session.LastFCntUp < 0xffff0000:
