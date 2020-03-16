@@ -87,12 +87,19 @@ func resetsFCnt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 
 // transmissionNumber returns the number of the transmission up would represent if appended to ups
 // and the time of the last transmission of phyPayload in ups, if such is found.
-func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32, time.Time) {
+func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32, time.Time, error) {
+	if len(phyPayload) < 4 {
+		return 0, time.Time{}, errRawPayloadTooShort
+	}
+
 	nb := uint32(1)
 	var lastTrans time.Time
 	for i := len(ups) - 1; i >= 0; i-- {
 		up := ups[i]
-		if !bytes.Equal(phyPayload, up.RawPayload) {
+		if len(up.RawPayload) < 4 {
+			return 0, time.Time{}, errRawPayloadTooShort
+		}
+		if !bytes.Equal(phyPayload[:len(phyPayload)-4], up.RawPayload[:len(up.RawPayload)-4]) {
 			break
 		}
 		nb++
@@ -100,7 +107,7 @@ func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32,
 			lastTrans = up.ReceivedAt
 		}
 	}
-	return nb, lastTrans
+	return nb, lastTrans, nil
 }
 
 func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32) uint32 {
@@ -292,7 +299,11 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		ctx = log.NewContext(ctx, logger)
 
 		if fCnt == dev.Session.LastFCntUp && len(dev.MACState.RecentUplinks) > 0 {
-			nbTrans, lastAt := transmissionNumber(up.RawPayload, dev.MACState.RecentUplinks...)
+			nbTrans, lastAt, err := transmissionNumber(up.RawPayload, dev.MACState.RecentUplinks...)
+			if err != nil {
+				logger.WithError(err).Error("Failed to determine transmission number")
+				continue
+			}
 			logger = logger.WithFields(log.Fields(
 				"f_cnt_gap", 0,
 				"f_cnt_reset", false,
