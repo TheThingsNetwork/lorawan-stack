@@ -87,12 +87,19 @@ func resetsFCnt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 
 // transmissionNumber returns the number of the transmission up would represent if appended to ups
 // and the time of the last transmission of phyPayload in ups, if such is found.
-func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32, time.Time) {
+func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32, time.Time, error) {
+	if len(phyPayload) < 4 {
+		return 0, time.Time{}, errRawPayloadTooShort
+	}
+
 	nb := uint32(1)
 	var lastTrans time.Time
 	for i := len(ups) - 1; i >= 0; i-- {
 		up := ups[i]
-		if !bytes.Equal(phyPayload, up.RawPayload) {
+		if len(up.RawPayload) < 4 {
+			return 0, time.Time{}, errRawPayloadTooShort
+		}
+		if !bytes.Equal(phyPayload[:len(phyPayload)-4], up.RawPayload[:len(up.RawPayload)-4]) {
 			break
 		}
 		nb++
@@ -100,7 +107,7 @@ func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32,
 			lastTrans = up.ReceivedAt
 		}
 	}
-	return nb, lastTrans
+	return nb, lastTrans, nil
 }
 
 func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32) uint32 {
@@ -188,7 +195,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		if dev.Multicast {
 			continue
 		}
-
+		dev := dev
 		ctx := dev.Context
 
 		logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
@@ -274,7 +281,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 
 		fCnt := pld.FCnt
 		switch {
-		case !supports32BitFCnt, fCnt >= dev.Session.LastFCntUp, fCnt == 0:
+		case !supports32BitFCnt, fCnt >= dev.Session.LastFCntUp, fCnt == 0 && dev.Session.LastFCntUp == 0:
 		case fCnt > dev.Session.LastFCntUp&0xffff:
 			fCnt |= dev.Session.LastFCntUp &^ 0xffff
 		case dev.Session.LastFCntUp < 0xffff0000:
@@ -292,7 +299,11 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		ctx = log.NewContext(ctx, logger)
 
 		if fCnt == dev.Session.LastFCntUp && len(dev.MACState.RecentUplinks) > 0 {
-			nbTrans, lastAt := transmissionNumber(up.RawPayload, dev.MACState.RecentUplinks...)
+			nbTrans, lastAt, err := transmissionNumber(up.RawPayload, dev.MACState.RecentUplinks...)
+			if err != nil {
+				logger.WithError(err).Error("Failed to determine transmission number")
+				continue
+			}
 			logger = logger.WithFields(log.Fields(
 				"f_cnt_gap", 0,
 				"f_cnt_reset", false,
@@ -457,6 +468,10 @@ matchLoop:
 		if match.Pending {
 			session = match.Device.PendingSession
 
+			if match.Device.MACState.PendingJoinRequest == nil {
+				logger.Error("Pending join-request missing")
+				continue
+			}
 			match.Device.MACState.CurrentParameters.Rx1Delay = match.Device.MACState.PendingJoinRequest.RxDelay
 			match.Device.MACState.CurrentParameters.Rx1DataRateOffset = match.Device.MACState.PendingJoinRequest.DownlinkSettings.Rx1DROffset
 			match.Device.MACState.CurrentParameters.Rx2DataRateIndex = match.Device.MACState.PendingJoinRequest.DownlinkSettings.Rx2DR
