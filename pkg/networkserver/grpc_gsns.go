@@ -1209,7 +1209,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 				logger.Warn("Device deleted during join-request handling, drop")
 				return nil, nil, errOutdatedData
 			}
-			invalidatedQueue = append(stored.GetSession().GetQueuedApplicationDownlinks(), stored.GetPendingSession().GetQueuedApplicationDownlinks()...)
+			if stored.Session != nil {
+				invalidatedQueue = stored.Session.QueuedApplicationDownlinks
+			} else {
+				invalidatedQueue = stored.GetPendingSession().GetQueuedApplicationDownlinks()
+			}
 			stored.PendingMACState = macState
 			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
 			return stored, []string{
