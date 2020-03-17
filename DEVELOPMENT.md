@@ -464,7 +464,7 @@ This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcra
 
 Releasing a new version consists of the following steps:
 
-1. Creating a `release/<version>` branch(further, called "release branch") (e.g. `release/3.2.1`).
+1. Creating a `release/<version>` branch off `master` or `backport/<minor>` (further, called "release branch") (e.g. `release/v3.2.1` or `backport/v3.2`).
 2. Updating the `CHANGELOG.md` file:
   - Change the **Unreleased** section to the new version and add date obtained via `date +%Y-%m-%d` (e.g. `## [3.2.1] - 2019-10-11`)
   - Check if we didn't forget anything important
@@ -510,7 +510,15 @@ $ ./mage version:bumpRelease # bumps a pre-release to a release version (from 3.
 
 These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1). Apart from these bump commands, we have commands for writing version files (`version:files`), creating the bump commit (`version:commitBump`) and the version tag (`version:tag`).
 
-A typical release process is executed directly on the `master` branch and looks like this:
+A typical release process is executed on the `master` branch. However, if you are doing a backport to apply patches via cherry-picking to a previous version, create or checkout the minor's backport branch (i.e. `v3.6` as `<minor>`) with the latest released patch as start point (i.e. `v3.6.2` as `<patch>`):
+
+```bash
+$ git checkout -b "backport/<minor>" <patch>
+$ git cherry-pick <commit> # cherry-pick commits to patch
+$ git push origin "backport/<minor>"
+```
+
+When `HEAD` is what you want to release (either `master` or `backport/<minor>`):
 
 ```bash
 $ version=$(./mage version:bumpPatch version:current)
@@ -524,11 +532,11 @@ $ git push origin "release/${version}"
 After this, open a pull request from `release/${version}`. After it is approved:
 
 ```bash
-$ git checkout master
+$ git checkout <target> # master or backport/<minor>
 $ git merge --ff-only "release/${version}"
 $ ./mage version:bumpPatch version:tag
 $ git push origin ${version}
-$ git push origin master
+$ git push origin <target>
 ```
 
 After pushing the tag, our CI system will start building the release. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases). After this is done, you'll need to edit the release notes. We typically copy-paste these from `CHANGELOG.md`.
