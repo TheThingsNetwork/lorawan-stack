@@ -756,7 +756,7 @@ func TestProtoDeduplicator(t *testing.T) {
 		Encoding.EncodeToString([]byte("proto3")),
 	})
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
-	a.So(listTTL, should.BeLessThanOrEqualTo, lockTTL)
+	a.So(listTTL, should.BeLessThanOrEqualTo, ttl)
 
 	ss, err = cl.LRange(DeduplicationListKey(key2), 0, -1).Result()
 	if !a.So(err, should.BeNil) {
@@ -775,5 +775,5 @@ func TestProtoDeduplicator(t *testing.T) {
 		Encoding.EncodeToString([]byte("proto2")),
 	})
 	a.So(lockTTL, should.BeLessThanOrEqualTo, ttl)
-	a.So(listTTL, should.BeLessThanOrEqualTo, lockTTL)
+	a.So(listTTL, should.BeLessThanOrEqualTo, ttl)
 }
