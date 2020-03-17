@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network and Application Servers now maintain application downlink queue per-session.
 - Gateway Server skips setting up an upstream if the DevAddr prefixes to forward are empty.
 - Gateway connection stats are now cached in Redis (see `--cache.service` and `--gs.update-connections-stats-debounce-time` options).
+- Change the date format in the Console to be unambiguous (`17 Mar, 2020`).
 
 ### Deprecated
 
