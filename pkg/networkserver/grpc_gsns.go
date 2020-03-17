@@ -195,7 +195,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, dedup
 		if dev.Multicast {
 			continue
 		}
-
+		dev := dev
 		ctx := dev.Context
 
 		logger := log.FromContext(ctx).WithField("device_uid", unique.ID(ctx, dev.EndDeviceIdentifiers))
