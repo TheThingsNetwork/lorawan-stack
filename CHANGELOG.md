@@ -35,6 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Gateway connection stats are now cached in Redis (see `--cache.service` and `--gs.update-connections-stats-debounce-time` options).
 - Change the date format in the Console to be unambiguous (`17 Mar, 2020`).
 
+### Deprecated
+
+### Removed
+
 ### Fixed
 
 - Telemetry and events for gateway statuses.
