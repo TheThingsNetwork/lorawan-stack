@@ -110,10 +110,17 @@ export default class Gateway extends React.Component {
     gtwId: PropTypes.string.isRequired,
     match: PropTypes.match.isRequired,
     rights: PropTypes.rights.isRequired,
+    stopStream: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     env: undefined,
+  }
+
+  componentWillUnmount() {
+    const { stopStream, gtwId } = this.props
+
+    stopStream(gtwId)
   }
 
   render() {
