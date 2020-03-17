@@ -94,12 +94,12 @@ func TestHandleUplink(t *testing.T) {
 		FCnt  = 42
 	)
 
-	makeApplicationDownlink := func() *ttnpb.ApplicationDownlink {
+	makeApplicationDownlink := func(s string) *ttnpb.ApplicationDownlink {
 		return &ttnpb.ApplicationDownlink{
 			SessionKeyID: []byte("app-down-1-session-key-id"),
 			FPort:        FPort,
 			FCnt:         0x32,
-			FRMPayload:   []byte("app-down-1-frm-payload"),
+			FRMPayload:   []byte(s),
 			Confirmed:    true,
 			Priority:     ttnpb.TxSchedulePriority_HIGH,
 			CorrelationIDs: []string{
@@ -315,6 +315,11 @@ func TestHandleUplink(t *testing.T) {
 		return AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 			ids := *deepcopy.Copy(&setDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers)
 			ids.DevAddr = &setDevice.PendingMACState.QueuedJoinAccept.Request.DevAddr
+
+			queue := setDevice.GetPendingSession().GetQueuedApplicationDownlinks()
+			if setDevice.Session != nil {
+				queue = setDevice.Session.QueuedApplicationDownlinks
+			}
 			return AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
@@ -324,7 +329,7 @@ func TestHandleUplink(t *testing.T) {
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:              setDevice.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
-								InvalidatedDownlinks: setDevice.GetSession().GetQueuedApplicationDownlinks(),
+								InvalidatedDownlinks: queue,
 								ReceivedAt:           recvAt,
 								SessionKeyID:         setDevice.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
 							},
@@ -893,7 +898,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set fail on read"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set fail on read"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
@@ -903,7 +908,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.Session = &ttnpb.Session{
 							DevAddr: DevAddr,
 							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								makeApplicationDownlink(),
+								makeApplicationDownlink("test"),
 							},
 						}
 						getDevice.DevAddr = &getDevice.Session.DevAddr
@@ -939,7 +944,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Device deleted during handling"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Device deleted during handling"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
@@ -949,7 +954,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.Session = &ttnpb.Session{
 							DevAddr: DevAddr,
 							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								makeApplicationDownlink(),
+								makeApplicationDownlink("test"),
 							},
 						}
 						getDevice.DevAddr = &getDevice.Session.DevAddr
@@ -978,7 +983,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set fail on write"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set fail on write"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
@@ -988,7 +993,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.Session = &ttnpb.Session{
 							DevAddr: DevAddr,
 							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								makeApplicationDownlink(),
+								makeApplicationDownlink("test"),
 							},
 						}
 						getDevice.DevAddr = &getDevice.Session.DevAddr
@@ -1015,7 +1020,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set success", "Downlink add success", "AppSKey present", "Application uplink add success"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set success", "Downlink add success", "AppSKey present", "Application uplink add success"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
@@ -1025,7 +1030,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.Session = &ttnpb.Session{
 							DevAddr: DevAddr,
 							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								makeApplicationDownlink(),
+								makeApplicationDownlink("test"),
 							},
 						}
 						getDevice.DevAddr = &getDevice.Session.DevAddr
@@ -1054,13 +1059,19 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "No downlink queue", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add fail"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "Pending downlink queue", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add fail"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
 						decodedMsg := makeJoinRequest(true)
 						getDevice := makeJoinDevice(clock)
+						getDevice.PendingSession = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink("test"),
+							},
+						}
 						joinResp := makeJoinResponse(false)
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
@@ -1081,6 +1092,55 @@ func TestHandleUplink(t *testing.T) {
 							return a.So(AllTrue(
 								ok,
 								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
+								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, ErrTestInternal),
+								assertPublishMergeMetadata(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, RxMetadata[:]...),
+							), should.BeTrue)
+						}, nil), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "Both downlink queues", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add success"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.Session = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink("test"),
+							},
+						}
+						getDevice.DevAddr = &getDevice.Session.DevAddr
+						getDevice.PendingSession = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink("pending"),
+								makeApplicationDownlink("other"),
+								makeApplicationDownlink("foo"),
+							},
+						}
+						joinResp := makeJoinResponse(false)
+						joinReq := makeNsJsJoinRequest(nil)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, joinRespRecvAt, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), joinReq, joinResp, nil)
+							if !a.So(AllTrue(
+								ok,
+								assertPublishForwardJoinRequest(ctx, env, getCtx, getDevice.EndDeviceIdentifiers),
+							), should.BeTrue) {
+								return false
+							}
+							clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+							if !a.So(assertAccumulatedMetadata(ctx, env, getCtx, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), RxMetadata[:], nil), should.BeTrue) {
+								return true
+							}
+							decodedMsg.RxMetadata = RxMetadata[:]
+							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
+							setCtx, ok := assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, nil)
+							return a.So(AllTrue(
+								ok,
+								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, nil),
 								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, ErrTestInternal),
 								assertPublishMergeMetadata(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, RxMetadata[:]...),
 							), should.BeTrue)
