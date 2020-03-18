@@ -4392,6 +4392,16 @@
               "defaultValue": ""
             },
             {
+              "name": "logout_redirect_uris",
+              "description": "The allowed logout redirect URIs against which client initiated logout\nrequests are checked. If the authorization request does not pass a redirect\nURI, the first one from this list is taken.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
               "name": "state",
               "description": "The reviewing state of the client.\nThis field can only be modified by admins.",
               "label": "",
