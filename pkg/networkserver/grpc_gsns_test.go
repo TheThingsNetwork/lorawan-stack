@@ -80,6 +80,7 @@ func TestHandleUplink(t *testing.T) {
 		"session",
 		"supports_class_b",
 		"supports_class_c",
+		"supports_join",
 	}
 	dataRangeByAddrPaths := dataSetByIDGetPaths
 
