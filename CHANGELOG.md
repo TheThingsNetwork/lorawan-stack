@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handling of uplink frame counters exceeding 65535.
 - Gateway events subscription release in the Console.
 - Entity events subscription release in the Console (Firefox).
+- RekeyInd handling for LoRaWAN 1.1 devices.
 
 ### Security
 
