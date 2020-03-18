@@ -32,7 +32,6 @@ replace github.com/nicksnyder/go-i18n => github.com/nicksnyder/go-i18n v1.10.0
 require (
 	cloud.google.com/go v0.51.0 // indirect
 	cloud.google.com/go/storage v1.5.0 // indirect
-	code.gitea.io/sdk/gitea v0.0.0-20200109190415-4f17bb0fbc93 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/Azure/azure-pipeline-go v0.2.2 // indirect
 	github.com/Azure/azure-sdk-for-go v38.0.0+incompatible // indirect
@@ -61,10 +60,9 @@ require (
 	github.com/gohugoio/hugo v0.62.2
 	github.com/golang/gddo v0.0.0-20191216155521-fbfc0f5e7810
 	github.com/golang/protobuf v1.3.3
-	github.com/google/rpmpack v0.0.0-20191226140753-aa36bfddb3a0 // indirect
 	github.com/google/wire v0.4.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190328170749-bb2674552d8f // indirect
-	github.com/goreleaser/goreleaser v0.124.1
+	github.com/goreleaser/goreleaser v0.129.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.1
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
@@ -84,7 +82,6 @@ require (
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
 	github.com/jdkato/prose v1.1.1 // indirect
 	github.com/jinzhu/gorm v1.9.12
-	github.com/kamilsk/retry/v4 v4.4.1 // indirect
 	github.com/kr/pretty v0.2.0
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/labstack/gommon v0.3.0
@@ -106,7 +103,7 @@ require (
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.3.0
 	github.com/robertkrimen/otto v0.0.0-20181129100957-6ddbbb60554a
 	github.com/rogpeppe/go-internal v1.5.1 // indirect
@@ -125,7 +122,7 @@ require (
 	github.com/yuin/goldmark v1.1.20 // indirect
 	go.opencensus.io v0.22.2
 	go.thethings.network/lorawan-stack-legacy v0.0.0-20190118141410-68812c833a78
-	gocloud.dev v0.18.0
+	gocloud.dev v0.19.0
 	gocloud.dev/pubsub/natspubsub v0.18.0
 	golang.org/x/crypto v0.0.0-20200109152110-61a87790db17
 	golang.org/x/image v0.0.0-20191214001246-9130b4cfad52 // indirect
@@ -144,5 +141,5 @@ require (
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.1
-	gopkg.in/yaml.v2 v2.2.7
+	gopkg.in/yaml.v2 v2.2.8
 )
