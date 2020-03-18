@@ -838,6 +838,7 @@ var handleDataUplinkGetPaths = [...]string{
 	"session",
 	"supports_class_b",
 	"supports_class_c",
+	"supports_join",
 }
 
 func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
