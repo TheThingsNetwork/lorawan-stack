@@ -141,7 +141,7 @@ after_success:
     else
       GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot
       if [[ ! -z "$DOCKER_IMAGE_DEV" ]]; then
-        docker tag $DOCKER_IMAGE:${TRAVIS_TAG#"v"} $DOCKER_IMAGE_DEV:$TRAVIS_COMMIT
+        docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE_DEV:$TRAVIS_COMMIT
         docker push $DOCKER_IMAGE_DEV:$TRAVIS_COMMIT
       fi
     fi
