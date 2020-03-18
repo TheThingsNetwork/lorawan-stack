@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synchronizing Basic Station concentrator time after reconnect or initial connect after long inactivity.
 - Handling of uplink frame counters exceeding 65535.
 - Gateway events subscription release in the Console.
+- Entity events subscription release in the Console (Firefox).
 
 ### Security
 
