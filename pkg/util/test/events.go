@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
 
 type MockEventPubSub struct {
@@ -125,6 +126,17 @@ func EventEqual(a, b events.Event) bool {
 	ap.Time = time.Time{}
 	bp.Time = time.Time{}
 	return reflect.DeepEqual(ap, bp)
+}
+
+func EventDefinitionDataClosureEqual(a, b events.DefinitionDataClosure) bool {
+	ctx := Context()
+	ids := &ttnpb.EndDeviceIdentifiers{
+		DeviceID: "test-dev",
+		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationID: "test-app",
+		},
+	}
+	return EventEqual(a(ctx, ids), b(ctx, ids))
 }
 
 var (
