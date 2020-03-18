@@ -56,10 +56,11 @@ export default async function(payload, url) {
     Authorization = `Bearer ${token}`
   }
 
-  let reader = null
+  const abortController = new AbortController()
   const response = await fetch(url, {
     body: JSON.stringify(payload),
     method: 'POST',
+    signal: abortController.signal,
     headers: {
       Authorization,
     },
@@ -71,7 +72,7 @@ export default async function(payload, url) {
     throw 'error' in err ? err.error : err
   }
 
-  reader = response.body.getReader()
+  const reader = response.body.getReader()
   reader
     .read()
     .then(function(data) {
@@ -113,9 +114,9 @@ export default async function(payload, url) {
       return this
     },
     close() {
-      if (reader) {
-        reader.cancel()
-      }
+      reader.cancel().then(() => {
+        abortController.abort()
+      })
     },
   }
 }
