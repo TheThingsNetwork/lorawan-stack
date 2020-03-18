@@ -1,6 +1,6 @@
 module go.thethings.network/lorawan-stack
 
-go 1.13
+go 1.14
 
 // Use our fork of grpc-gateway.
 replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.13.0-gogo
@@ -63,7 +63,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.9.2
+	github.com/grpc-ecosystem/grpc-gateway v1.14.3
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115

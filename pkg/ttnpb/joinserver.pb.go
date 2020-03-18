@@ -850,7 +850,9 @@ func init() {
 	golang_proto.RegisterType((*JoinEUIPrefixes)(nil), "ttn.lorawan.v3.JoinEUIPrefixes")
 }
 
-func init() { proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_1b695d5f526759a7) }
+func init() {
+	proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_1b695d5f526759a7)
+}
 func init() {
 	golang_proto.RegisterFile("lorawan-stack/api/joinserver.proto", fileDescriptor_1b695d5f526759a7)
 }

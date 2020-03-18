@@ -2622,7 +2622,9 @@ func init() {
 	golang_proto.RegisterType((*ConvertEndDeviceTemplateRequest)(nil), "ttn.lorawan.v3.ConvertEndDeviceTemplateRequest")
 }
 
-func init() { proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_a656ee0551c94a80) }
+func init() {
+	proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_a656ee0551c94a80)
+}
 func init() {
 	golang_proto.RegisterFile("lorawan-stack/api/end_device.proto", fileDescriptor_a656ee0551c94a80)
 }
