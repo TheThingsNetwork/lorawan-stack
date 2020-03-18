@@ -35,6 +35,7 @@ import toast from '../../../components/toast'
 import SubmitBar from '../../../components/submit-bar'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 import Require from '../../lib/components/require'
+import KeyValueMap from '../../../components/key-value-map'
 
 import { mayEditBasicApplicationInfo, mayDeleteApplication } from '../../lib/feature-checks'
 import {
@@ -44,6 +45,8 @@ import {
 import { updateApplication, deleteApplication } from '../../store/actions/applications'
 import { attachPromise } from '../../store/actions/lib'
 import PropTypes from '../../../lib/prop-types'
+import { id as idRegexp } from '../../../lib/regexp'
+import { mapFormValuesToApplication, mapApplicationToFormValues } from './mapping'
 
 const m = defineMessages({
   basics: 'Basics',
@@ -51,13 +54,32 @@ const m = defineMessages({
   modalWarning:
     'Are you sure you want to delete "{appName}"? This action cannot be undone and it will not be possible to reuse the application ID!',
   updateSuccess: 'Successfully updated application',
+  attributesValidateRequired:
+    'All attribute entry values are required. Please remove empty entries.',
+  attributeKeyValidateTooShort:
+    'Attribute keys should have at least 3 characters and contain no special characters.',
 })
+
+const attributeValidCheck = attributes =>
+  attributes === undefined ||
+  (attributes instanceof Array &&
+    (attributes.length === 0 ||
+      attributes.every(attribute => attribute.key !== '' && attribute.value !== '')))
+
+const attributeTooShortCheck = attributes =>
+  attributes === undefined ||
+  (attributes instanceof Array &&
+    (attributes.length === 0 ||
+      attributes.every(attribute => RegExp(idRegexp).test(attribute.key))))
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong),
   description: Yup.string().max(150, sharedMessages.validateTooLong),
+  attributes: Yup.array()
+    .test('has no empty string values', m.attributesValidateRequired, attributeValidCheck)
+    .test('has key length longer than 2', m.attributeKeyValidateTooShort, attributeTooShortCheck),
 })
 
 @connect(
@@ -108,13 +130,20 @@ export default class ApplicationGeneralSettings extends React.Component {
 
     await this.setState({ error: '' })
 
-    const changed = diff(application, values)
+    const appValues = mapFormValuesToApplication(values)
+
+    const changed = diff(application, appValues)
+
+    // if there is a change in attributes, copy all attributes so they don't get overwritten
+    const update =
+      'attributes' in changed ? { ...changed, attributes: appValues.attributes } : changed
+
     const {
       ids: { application_id },
     } = application
 
     try {
-      await updateApplication(application_id, changed)
+      await updateApplication(application_id, update)
       resetForm(values)
       toast({
         title: application_id,
@@ -144,6 +173,8 @@ export default class ApplicationGeneralSettings extends React.Component {
   render() {
     const { application } = this.props
     const { error } = this.state
+    const initialValues = mapApplicationToFormValues(application)
+
     return (
       <Container>
         <PageTitle title={sharedMessages.generalSettings} />
@@ -153,7 +184,7 @@ export default class ApplicationGeneralSettings extends React.Component {
               error={error}
               horizontal
               onSubmit={this.handleSubmit}
-              initialValues={application}
+              initialValues={initialValues}
               validationSchema={validationSchema}
             >
               <Message component="h4" content={m.basics} />
@@ -170,6 +201,15 @@ export default class ApplicationGeneralSettings extends React.Component {
                 type="textarea"
                 name="description"
                 component={Input}
+              />
+              <Form.Field
+                name="attributes"
+                title={sharedMessages.attributes}
+                keyPlaceholder={sharedMessages.key}
+                valuePlaceholder={sharedMessages.value}
+                addMessage={sharedMessages.addAttributes}
+                component={KeyValueMap}
+                description={sharedMessages.attributeDescription}
               />
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
