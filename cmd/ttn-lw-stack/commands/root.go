@@ -84,7 +84,7 @@ var (
 			ctx = log.NewContext(ctx, logger)
 
 			// initialize shared packages
-			if err := shared.Initialize(ctx, config.ServiceBase); err != nil {
+			if err := shared.Initialize(ctx, &config.ServiceBase); err != nil {
 				return err
 			}
 
