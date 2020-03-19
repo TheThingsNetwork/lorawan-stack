@@ -249,3 +249,9 @@ func DefineUnauthenticated(name, messageFormat string, publicAttributes ...strin
 	def := define(uint32(codes.Unauthenticated), name, messageFormat, publicAttributes...)
 	return def
 }
+
+// New returns a new error from the definition. This is not required, but will
+// add a stack trace for improved debugging.
+func (d Definition) New() Error {
+	return build(d, 0) // Don't refactor this to build(...).WithCause(...)
+}
