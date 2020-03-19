@@ -18,5 +18,6 @@ var (
 		reflect.Int32:   reflect.ValueOf(runtime.Int32),
 		reflect.Uint64:  reflect.ValueOf(runtime.Uint64),
 		reflect.Uint32:  reflect.ValueOf(runtime.Uint32),
+		reflect.Slice:   reflect.ValueOf(runtime.Bytes),
 	}
 )
