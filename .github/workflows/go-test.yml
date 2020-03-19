@@ -13,10 +13,10 @@ jobs:
     name: Code Quality
     runs-on: ubuntu-18.04
     steps:
-    - name: Set up Go 1.13
+    - name: Set up Go 1.14
       uses: actions/setup-go@v1
       with:
-        go-version: '1.13'
+        go-version: '1.14'
     - name: Check out code
       uses: actions/checkout@v1
     - name: Make Mage
@@ -65,10 +65,10 @@ jobs:
       with:
         entrypoint: /usr/bin/createdb
         args: -h postgres -U root ttn_lorawan_is_store_test
-    - name: Set up Go 1.13
+    - name: Set up Go 1.14
       uses: actions/setup-go@v1
       with:
-        go-version: '1.13'
+        go-version: '1.14'
     - name: Check out code
       uses: actions/checkout@v1
     - name: Make Mage
