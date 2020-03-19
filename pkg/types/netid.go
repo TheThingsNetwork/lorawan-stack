@@ -145,14 +145,14 @@ var (
 // NewNetID returns new NetID.
 func NewNetID(typ byte, id []byte) (netID NetID, err error) {
 	if typ > 7 {
-		return NetID{}, errNetIDType
+		return NetID{}, errNetIDType.New()
 	}
 
 	if len(id) < 3 {
 		id = append(make([]byte, 3-len(id)), id...)
 	}
 	if id[0]&0xe0 > 0 {
-		return NetID{}, errNetIDBits
+		return NetID{}, errNetIDBits.New()
 	}
 	copy(netID[:], id)
 	netID[0] = netID[0]&0x1f | typ<<5

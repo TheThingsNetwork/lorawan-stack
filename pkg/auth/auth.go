@@ -71,13 +71,13 @@ var errInvalidToken = errors.DefineInvalidArgument("token", "invalid token")
 func SplitToken(token string) (tokenType TokenType, id, key string, err error) {
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
-		return "", "", "", errInvalidToken
+		return "", "", "", errInvalidToken.New()
 	}
 	switch TokenType(parts[0]) {
 	case APIKey, AccessToken, RefreshToken, AuthorizationCode:
 		return TokenType(parts[0]), parts[1], parts[2], nil
 	default:
-		return "", "", "", errInvalidToken
+		return "", "", "", errInvalidToken.New()
 	}
 }
 

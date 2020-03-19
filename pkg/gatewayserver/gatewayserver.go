@@ -318,7 +318,7 @@ var (
 func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
 	ctx = gs.FillContext(ctx)
 	if ids.IsZero() {
-		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers
+		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers.New()
 	}
 	if ids.GatewayID == "" {
 		registry, err := gs.getRegistry(ctx, nil)

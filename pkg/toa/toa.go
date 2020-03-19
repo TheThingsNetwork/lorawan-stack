@@ -45,10 +45,10 @@ var (
 
 func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandwidth uint32, codingRate string, crc bool) (time.Duration, error) {
 	if spreadingFactor < 5 || spreadingFactor > 12 {
-		return 0, errSpreadingFactor
+		return 0, errSpreadingFactor.New()
 	}
 	if bandwidth == 0 {
-		return 0, errBandwidth
+		return 0, errBandwidth.New()
 	}
 
 	switch {
@@ -65,7 +65,7 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 		case "4/8":
 			cr = 4
 		default:
-			return 0, errCodingRate
+			return 0, errCodingRate.New()
 		}
 		var de float64
 		if bandwidth == 125000 && (spreadingFactor == 11 || spreadingFactor == 12) {
@@ -81,7 +81,7 @@ func computeLoRa(payloadSize int, frequency uint64, spreadingFactor uint8, bandw
 		return time.Duration(timeOnAir), nil
 
 	default:
-		return 0, errFrequency
+		return 0, errFrequency.New()
 	}
 }
 
@@ -92,6 +92,6 @@ func computeFSK(payloadSize int, frequency uint64, bitRate uint32, crc bool) (ti
 		return time.Duration(timeOnAir), nil
 
 	default:
-		return 0, errFrequency
+		return 0, errFrequency.New()
 	}
 }

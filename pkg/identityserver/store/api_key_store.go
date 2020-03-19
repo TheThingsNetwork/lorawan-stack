@@ -84,7 +84,7 @@ func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (ttnpb.Identifie
 	var keyModel APIKey
 	if err := query.Where(APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, nil, errAPIKeyNotFound
+			return nil, nil, errAPIKeyNotFound.New()
 		}
 		return nil, nil, err
 	}
@@ -98,7 +98,7 @@ func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (ttnpb.Identifie
 	}
 	ids, ok := identifiers[k]
 	if !ok {
-		return nil, nil, errAPIKeyEntity
+		return nil, nil, errAPIKeyEntity.New()
 	}
 	return ids, keyModel.toPB(), nil
 }

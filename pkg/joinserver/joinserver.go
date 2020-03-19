@@ -293,7 +293,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dn, ok := auth.X509DNFromContext(ctx); ok {
 				if dev.NetID == nil {
-					return nil, nil, errNoNetID
+					return nil, nil, errNoNetID.New()
 				}
 				if !req.NetID.Equal(*dev.NetID) {
 					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetID)
@@ -311,10 +311,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			if req.SelectedMACVersion.IncrementDevNonce() {
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
-						return nil, nil, errDevNonceTooSmall
+						return nil, nil, errDevNonceTooSmall.New()
 					}
 					if dn == math.MaxUint32 {
-						return nil, nil, errDevNonceTooHigh
+						return nil, nil, errDevNonceTooHigh.New()
 					}
 				}
 				dev.LastDevNonce = dn
@@ -327,7 +327,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 					dev.UsedDevNonces[i] = dn
 					paths = append(paths, "used_dev_nonces")
 				} else if !dev.ResetsJoinNonces {
-					return nil, nil, errReuseDevNonce
+					return nil, nil, errReuseDevNonce.New()
 				}
 			}
 
@@ -346,7 +346,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			}
 
 			if dev.LastJoinNonce >= 1<<24-1 {
-				return nil, nil, errJoinNonceTooHigh
+				return nil, nil, errJoinNonceTooHigh.New()
 			}
 			dev.LastJoinNonce++
 			paths = append(paths, "last_join_nonce")
@@ -372,7 +372,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 			skID, err := ulid.New(ulid.Timestamp(time.Now()), js.entropy)
 			js.entropyMu.Unlock()
 			if err != nil {
-				return nil, nil, errGenerateSessionKeyID
+				return nil, nil, errGenerateSessionKeyID.New()
 			}
 
 			cc, err := js.GetPeerConn(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, dev.EndDeviceIdentifiers)
@@ -410,10 +410,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, js.KeyVault, js.WithClusterAuth())
 			}
 			if networkCryptoService == nil {
-				return nil, nil, errNoNwkKey
+				return nil, nil, errNoNwkKey.New()
 			}
 			if applicationCryptoService == nil {
-				return nil, nil, errNoAppKey
+				return nil, nil, errNoAppKey.New()
 			}
 
 			cryptoDev := &ttnpb.EndDevice{}
@@ -425,7 +425,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				return nil, nil, errComputeMIC.WithCause(err)
 			}
 			if !bytes.Equal(reqMIC[:], req.RawPayload[19:]) {
-				return nil, nil, errMICMismatch
+				return nil, nil, errMICMismatch.New()
 			}
 			resMIC, err := networkCryptoService.JoinAcceptMIC(ctx, cryptoDev, req.SelectedMACVersion, 0xff, pld.DevNonce, b)
 			if err != nil {
@@ -489,7 +489,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 				},
 				func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
 					if stored != nil {
-						return nil, nil, errDuplicateIdentifiers
+						return nil, nil, errDuplicateIdentifiers.New()
 					}
 					return &res.SessionKeys, []string{
 						"session_key_id",

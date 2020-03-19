@@ -355,7 +355,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				return nil, nil, err
 			}
 			if stored == nil && updated != nil && (updated.ApplicationIdentifiers != appID || updated.DeviceID != devID) {
-				return nil, nil, errInvalidIdentifiers
+				return nil, nil, errInvalidIdentifiers.New()
 			}
 			return updated, sets, nil
 		})

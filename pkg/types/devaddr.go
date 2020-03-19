@@ -192,7 +192,7 @@ func NewDevAddr(netID NetID, nwkAddr []byte) (addr DevAddr, err error) {
 		nwkAddr = append(make([]byte, 4-len(nwkAddr)), nwkAddr...)
 	}
 	if nwkAddr[0]&(0xfe<<((NwkAddrBits(netID)-1)%8)) > 0 {
-		return DevAddr{}, errNwkAddrLength
+		return DevAddr{}, errNwkAddrLength.New()
 	}
 	copy(addr[:], nwkAddr)
 

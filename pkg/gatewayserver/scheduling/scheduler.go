@@ -228,7 +228,7 @@ func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings, star
 			return NewEmission(starts, d), nil
 		}
 	}
-	return Emission{}, errDwellTime
+	return Emission{}, errDwellTime.New()
 }
 
 // SubBandCount returns the number of sub bands in the scheduler.
@@ -252,7 +252,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	if !s.clock.IsSynced() {
-		return Emission{}, errNoClockSync
+		return Emission{}, errNoClockSync.New()
 	}
 	minScheduleTime := ScheduleTimeShort
 	var medianRTT *time.Duration
@@ -271,11 +271,11 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 			if medianRTT != nil {
 				serverTime, ok := s.clock.FromServerTime(*settings.Time)
 				if !ok {
-					return Emission{}, errNoServerTime
+					return Emission{}, errNoServerTime.New()
 				}
 				starts = serverTime - ConcentratorTime(*medianRTT/2)
 			} else {
-				return Emission{}, errNoAbsoluteGatewayTime
+				return Emission{}, errNoAbsoluteGatewayTime.New()
 			}
 		}
 		// Assume that the absolute time is the time of arrival, not time of transmission.
@@ -302,7 +302,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, payloadSize int, settings tt
 	}
 	for _, other := range s.emissions {
 		if em.OverlapsWithOffAir(other, s.timeOffAir) {
-			return Emission{}, errConflict
+			return Emission{}, errConflict.New()
 		}
 	}
 	if err := sb.Schedule(em, priority); err != nil {
@@ -326,7 +326,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	if !s.clock.IsSynced() {
-		return Emission{}, errNoClockSync
+		return Emission{}, errNoClockSync.New()
 	}
 	minScheduleTime := ScheduleTimeShort
 	if rtts != nil {
@@ -337,7 +337,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, payloadSize int, settin
 	var starts ConcentratorTime
 	now, ok := s.clock.FromServerTime(s.timeSource.Now())
 	if !ok {
-		return Emission{}, errNoServerTime
+		return Emission{}, errNoServerTime.New()
 	}
 	if settings.Timestamp == 0 {
 		starts = now + ConcentratorTime(s.scheduleAnytimeDelay)

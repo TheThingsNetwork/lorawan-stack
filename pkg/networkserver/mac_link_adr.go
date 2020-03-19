@@ -66,7 +66,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
-		}, errCorruptedMACState
+		}, errCorruptedMACState.New()
 	}
 
 	currentChs := make([]bool, phy.MaxUplinkChannels)
@@ -89,7 +89,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		return macCommandEnqueueState{
 			MaxDownLen: maxDownLen,
 			MaxUpLen:   maxUpLen,
-		}, errCorruptedMACState
+		}, errCorruptedMACState.New()
 	}
 
 	drIdx := dev.MACState.DesiredParameters.ADRDataRateIndex

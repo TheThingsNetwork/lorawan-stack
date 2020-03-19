@@ -250,7 +250,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	dev, ctx, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceID, gets,
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
-				return nil, nil, errDeviceNotFound
+				return nil, nil, errDeviceNotFound.New()
 			}
 			if dev.Session != nil {
 				dev.Session.QueuedApplicationDownlinks = nil
@@ -311,7 +311,7 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 		},
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
-				return nil, nil, errDeviceNotFound
+				return nil, nil, errDeviceNotFound.New()
 			}
 			if err := matchQueuedApplicationDownlinks(ctx, dev, ns.FrequencyPlans, req.Downlinks...); err != nil {
 				return nil, nil, err

@@ -96,7 +96,7 @@ func marshalBinaryBytes(data []byte) ([]byte, error) {
 
 func marshalBinaryBytesTo(dst, src []byte) (int, error) {
 	if len(dst) < len(src) {
-		return 0, errInvalidLength
+		return 0, errInvalidLength.New()
 	}
 	return copy(dst, src), nil
 }

@@ -244,7 +244,7 @@ func (c *connection) Subscribe(info *auth.Info, requestedTopic string, requested
 	access := info.Metadata.(topicAccess)
 	acceptedTopicParts := c.format.DownlinkTopic(access.gtwUID)
 	if !topic.MatchPath(acceptedTopicParts, topic.Split(requestedTopic)) {
-		return "", 0, errNotAuthorized
+		return "", 0, errNotAuthorized.New()
 	}
 	acceptedTopic = topic.Join(acceptedTopicParts)
 	acceptedQoS = requestedQoS
