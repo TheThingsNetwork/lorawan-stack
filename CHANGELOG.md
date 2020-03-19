@@ -52,6 +52,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synchronizing Basic Station concentrator time after reconnect or initial connect after long inactivity.
 - Handling of uplink frame counters exceeding 65535.
 - Gateway events subscription release in the Console.
+- Entity events subscription release in the Console (Firefox).
+- RekeyInd handling for LoRaWAN 1.1 devices.
+- Panic when receiving a UDP `PUSH_DATA` frame from a gateway without payload.
 
 ### Security
 
