@@ -535,7 +535,7 @@ matchLoop:
 				logger.WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
 				continue
 			}
-			macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, pld.FCnt, macBuf)
+			macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, match.FCnt, macBuf)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to decrypt uplink, skip")
 				continue
@@ -837,6 +837,7 @@ var handleDataUplinkGetPaths = [...]string{
 	"session",
 	"supports_class_b",
 	"supports_class_c",
+	"supports_join",
 }
 
 func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {

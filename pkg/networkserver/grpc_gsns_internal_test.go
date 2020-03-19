@@ -164,7 +164,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				StartedAt:        time.Unix(0, 1),
 			}
 		}
-		makeIdentifiers := func() ttnpb.EndDeviceIdentifiers { return *MakeABPIdentifiers(macVersion == ttnpb.MAC_V1_0_4) }
+		makeIdentifiers := func() ttnpb.EndDeviceIdentifiers { return *MakeABPIdentifiers(macVersion.RequireDevEUIForABP()) }
 		makeNilEvents := func(bool) []events.DefinitionDataClosure { return nil }
 
 		type devConfig struct {
@@ -172,14 +172,13 @@ func TestMatchAndHandleUplink(t *testing.T) {
 			Device *ttnpb.EndDevice
 
 			Error                    error
-			ApplyDeviceDiff          func(*ttnpb.EndDevice) *ttnpb.EndDevice
-			DeferredMACHandlers      []macHandler
 			FCnt                     uint32
 			FCntReset                bool
 			NbTrans                  uint32
 			Pending                  bool
-			QueuedApplicationUplinks []*ttnpb.ApplicationUp
+			ApplyDeviceDiff          func(deduplicated bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice
 			MakeQueuedEvents         func(deduplicated bool) []events.DefinitionDataClosure
+			QueuedApplicationUplinks []*ttnpb.ApplicationUp
 			SetPaths                 []string
 		}
 		makeConditionalConfigFunc := func(cond func() bool) func(conf devConfig) devConfig {
@@ -200,7 +199,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		type macCommander interface {
 			MACCommand() *ttnpb.MACCommand
 		}
-		makeFOpts := func(cmds ...macCommander) []byte {
+		makeUplinkMACBuffer := func(cmds ...macCommander) []byte {
 			var b []byte
 			for _, cmd := range cmds {
 				b = test.Must(lorawan.DefaultMACCommands.AppendUplink(phy, b, *cmd.MACCommand())).([]byte)
@@ -212,6 +211,16 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				queue = append(queue, cmd.MACCommand())
 			}
 			return queue
+		}
+
+		makeApplicationDownlink := func(confirmed bool, fCnt uint16) *ttnpb.ApplicationDownlink {
+			return &ttnpb.ApplicationDownlink{
+				SessionKeyID: []byte("test-id"),
+				FPort:        0x42,
+				FCnt:         uint32(fCnt),
+				FRMPayload:   []byte("test-payload"),
+				Confirmed:    confirmed,
+			}
 		}
 
 		upRecvAt := time.Unix(0, 42)
@@ -244,7 +253,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.MACState.RxWindowsAvailable = true
 						return dev
 					},
@@ -273,7 +282,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.MACState = dev.PendingMACState
 						dev.MACState.RxWindowsAvailable = true
 						dev.MACState.CurrentParameters.Rx1DataRateOffset = 1
@@ -333,7 +342,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.MACState.PendingRequests = nil
 						dev.MACState.RxWindowsAvailable = true
 						return dev
@@ -368,7 +377,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						class := ttnpb.CLASS_A
 						if macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 							class = ttnpb.CLASS_C
@@ -382,6 +391,233 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 					MakeQueuedEvents: makeNilEvents,
 				},
+				{
+					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0xfef0", "NbTrans=1", "FCnt reset", "Pending application downlink"),
+					Device: func() *ttnpb.EndDevice {
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: makeIdentifiers(),
+							FrequencyPlanID:      test.EUFrequencyPlanID,
+							LoRaWANPHYVersion:    phyVersion,
+							LoRaWANVersion:       macVersion,
+							MACSettings: &ttnpb.MACSettings{
+								ResetsFCnt: &pbtypes.BoolValue{Value: true},
+							},
+							MACState: MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
+							Session:  makeSession(0xfef0, 0x02),
+						}
+						dev.MACState.DesiredParameters = MakeDefaultUS915FSB2DesiredMACParameters(phyVersion)
+						dev.MACState.PendingApplicationDownlink = makeApplicationDownlink(true, 0x02)
+						dev.Session.LastNFCntDown = 0x42
+						return dev
+					}(),
+					FCntReset: true,
+					NbTrans:   1,
+					SetPaths: []string{
+						"mac_state",
+						"pending_mac_state",
+						"pending_session",
+						"session",
+					},
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+						dev.MACState = MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion)
+						dev.MACState.RxWindowsAvailable = true
+						dev.Session = makeSession(0x00, 0x02)
+						dev.Session.LastNFCntDown = 0x42
+						dev.Session.StartedAt = upRecvAt
+						return dev
+					},
+					MakeQueuedEvents: makeNilEvents,
+					QueuedApplicationUplinks: []*ttnpb.ApplicationUp{
+						{
+							CorrelationIDs:       DataUplinkCorrelationIDs[:],
+							EndDeviceIdentifiers: makeIdentifiers(),
+							Up: &ttnpb.ApplicationUp_DownlinkNack{
+								DownlinkNack: makeApplicationDownlink(true, 0x02),
+							},
+						},
+					},
+				},
+			},
+			{
+				FCnt: 0x22,
+				FRMPayload: makeUplinkMACBuffer(
+					ttnpb.CID_LINK_CHECK,
+					ttnpb.CID_BEACON_TIMING,
+					&ttnpb.MACCommand_PingSlotInfoReq{
+						Period: ttnpb.PING_EVERY_2S,
+					},
+					ttnpb.CID_DEVICE_TIME,
+				),
+			}: {
+				{
+					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0", "NbTrans=1"),
+					Device: &ttnpb.EndDevice{
+						EndDeviceIdentifiers: makeIdentifiers(),
+						FrequencyPlanID:      test.EUFrequencyPlanID,
+						LoRaWANPHYVersion:    phyVersion,
+						LoRaWANVersion:       macVersion,
+						MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
+						Session:              makeSession(0, 0),
+					},
+					FCnt:    0x22,
+					NbTrans: 1,
+					SetPaths: []string{
+						"mac_state",
+						"pending_mac_state",
+						"pending_session",
+						"session",
+					},
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+						dev.Session.LastFCntUp = 0x22
+						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
+							Value: ttnpb.PING_EVERY_2S,
+						}
+						dev.MACState.QueuedResponses = appendMACCommands(dev.MACState.QueuedResponses,
+							ttnpb.CID_PING_SLOT_INFO,
+						)
+						dev.MACState.RxWindowsAvailable = true
+						return dev
+					},
+					MakeQueuedEvents: func(deduplicated bool) []events.DefinitionDataClosure {
+						if deduplicated {
+							return []events.DefinitionDataClosure{
+								evtReceiveLinkCheckRequest.BindData(nil),
+								evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+									Period: ttnpb.PING_EVERY_2S,
+								}),
+								evtEnqueuePingSlotInfoAnswer.BindData(nil),
+								evtReceiveDeviceTimeRequest.BindData(nil),
+							}
+						}
+						return []events.DefinitionDataClosure{
+							evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+								Period: ttnpb.PING_EVERY_2S,
+							}),
+							evtEnqueuePingSlotInfoAnswer.BindData(nil),
+						}
+					},
+				},
+				{
+					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0x30002", "NbTrans=1", "FCnt reset"),
+					Device: func() *ttnpb.EndDevice {
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: makeIdentifiers(),
+							FrequencyPlanID:      test.EUFrequencyPlanID,
+							LoRaWANPHYVersion:    phyVersion,
+							LoRaWANVersion:       macVersion,
+							MACSettings: &ttnpb.MACSettings{
+								ResetsFCnt: &pbtypes.BoolValue{Value: true},
+							},
+							MACState: MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
+							Session:  makeSession(0x30014, 0x02),
+						}
+						dev.MACState.DesiredParameters = MakeDefaultUS915FSB2DesiredMACParameters(phyVersion)
+						dev.Session.LastNFCntDown = 0x42
+						return dev
+					}(),
+					FCntReset: true,
+					FCnt:      0x22,
+					NbTrans:   1,
+					SetPaths: []string{
+						"mac_state",
+						"pending_mac_state",
+						"pending_session",
+						"session",
+					},
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+						dev.MACState = MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion)
+						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
+							Value: ttnpb.PING_EVERY_2S,
+						}
+						dev.MACState.QueuedResponses = appendMACCommands(dev.MACState.QueuedResponses,
+							ttnpb.CID_PING_SLOT_INFO,
+						)
+						dev.MACState.RxWindowsAvailable = true
+						dev.Session = makeSession(0x22, 0x02)
+						dev.Session.LastNFCntDown = 0x42
+						dev.Session.StartedAt = upRecvAt
+						return dev
+					},
+					MakeQueuedEvents: func(deduplicated bool) []events.DefinitionDataClosure {
+						if deduplicated {
+							return []events.DefinitionDataClosure{
+								evtReceiveLinkCheckRequest.BindData(nil),
+								evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+									Period: ttnpb.PING_EVERY_2S,
+								}),
+								evtEnqueuePingSlotInfoAnswer.BindData(nil),
+								evtReceiveDeviceTimeRequest.BindData(nil),
+							}
+						}
+						return []events.DefinitionDataClosure{
+							evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+								Period: ttnpb.PING_EVERY_2S,
+							}),
+							evtEnqueuePingSlotInfoAnswer.BindData(nil),
+						}
+					},
+				},
+				{
+					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0xff02", "NbTrans=1", "FCnt reset"),
+					Device: func() *ttnpb.EndDevice {
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: makeIdentifiers(),
+							FrequencyPlanID:      test.EUFrequencyPlanID,
+							LoRaWANPHYVersion:    phyVersion,
+							LoRaWANVersion:       macVersion,
+							MACSettings: &ttnpb.MACSettings{
+								ResetsFCnt:        &pbtypes.BoolValue{Value: true},
+								Supports32BitFCnt: &pbtypes.BoolValue{Value: false},
+							},
+							MACState: MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
+							Session:  makeSession(0xff02, 0x02),
+						}
+						dev.MACState.DesiredParameters = MakeDefaultUS915FSB2DesiredMACParameters(phyVersion)
+						dev.Session.LastNFCntDown = 0x42
+						return dev
+					}(),
+					FCntReset: true,
+					FCnt:      0x22,
+					NbTrans:   1,
+					SetPaths: []string{
+						"mac_state",
+						"pending_mac_state",
+						"pending_session",
+						"session",
+					},
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+						dev.MACState = MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion)
+						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
+							Value: ttnpb.PING_EVERY_2S,
+						}
+						dev.MACState.QueuedResponses = appendMACCommands(dev.MACState.QueuedResponses,
+							ttnpb.CID_PING_SLOT_INFO,
+						)
+						dev.MACState.RxWindowsAvailable = true
+						dev.Session = makeSession(0x22, 0x02)
+						dev.Session.LastNFCntDown = 0x42
+						dev.Session.StartedAt = upRecvAt
+						return dev
+					},
+					MakeQueuedEvents: func(deduplicated bool) []events.DefinitionDataClosure {
+						if deduplicated {
+							return []events.DefinitionDataClosure{
+								evtReceiveLinkCheckRequest.BindData(nil),
+								evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+									Period: ttnpb.PING_EVERY_2S,
+								}),
+								evtEnqueuePingSlotInfoAnswer.BindData(nil),
+								evtReceiveDeviceTimeRequest.BindData(nil),
+							}
+						}
+						return []events.DefinitionDataClosure{
+							evtReceivePingSlotInfoRequest.BindData(&ttnpb.MACCommand_PingSlotInfoReq{
+								Period: ttnpb.PING_EVERY_2S,
+							}),
+							evtEnqueuePingSlotInfoAnswer.BindData(nil),
+						}
+					},
+				},
 			},
 			{
 				FCnt:         0xff00,
@@ -389,7 +625,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				Ack:          true,
 				FPort:        0x01,
 				FRMPayload:   []byte("test-payload"),
-				FOpts: makeFOpts(
+				FOpts: makeUplinkMACBuffer(
 					&ttnpb.MACCommand_PingSlotInfoReq{
 						Period: ttnpb.PING_EVERY_2S,
 					},
@@ -433,7 +669,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.Session.LastFCntUp = 0xff00
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 							Value: ttnpb.PING_EVERY_2S,
@@ -454,7 +690,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 					},
 				}),
 				{
-					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0xfef0", "NbTrans=1"),
+					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0xfef0", "NbTrans=1", "Pending application downlink"),
 					Device: func() *ttnpb.EndDevice {
 						dev := &ttnpb.EndDevice{
 							EndDeviceIdentifiers: makeIdentifiers(),
@@ -465,6 +701,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							Session:              makeSession(0xfef0, 0x02),
 						}
 						dev.MACState.RecentDownlinks = []*ttnpb.DownlinkMessage{{}}
+						dev.MACState.PendingApplicationDownlink = makeApplicationDownlink(true, 0x02)
 						return dev
 					}(),
 					FCnt:    0xff00,
@@ -475,8 +712,9 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.Session.LastFCntUp = 0xff00
+						dev.MACState.PendingApplicationDownlink = nil
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 							Value: ttnpb.PING_EVERY_2S,
 						}
@@ -485,6 +723,15 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						)
 						dev.MACState.RxWindowsAvailable = true
 						return dev
+					},
+					QueuedApplicationUplinks: []*ttnpb.ApplicationUp{
+						{
+							CorrelationIDs:       DataUplinkCorrelationIDs[:],
+							EndDeviceIdentifiers: makeIdentifiers(),
+							Up: &ttnpb.ApplicationUp_DownlinkAck{
+								DownlinkAck: makeApplicationDownlink(true, 0x02),
+							},
+						},
 					},
 					MakeQueuedEvents: func(bool) []events.DefinitionDataClosure {
 						return []events.DefinitionDataClosure{
@@ -505,6 +752,75 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				FPort:        0x01,
 				FRMPayload:   []byte("test-payload"),
 			}: {
+				{
+					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0xfef0", "NbTrans=1", "Pending application downlink"),
+					Device: func() *ttnpb.EndDevice {
+						dev := &ttnpb.EndDevice{
+							EndDeviceIdentifiers: makeIdentifiers(),
+							FrequencyPlanID:      test.EUFrequencyPlanID,
+							LoRaWANPHYVersion:    phyVersion,
+							LoRaWANVersion:       macVersion,
+							MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
+							Session:              makeSession(0xfef0, 0x02),
+						}
+						dev.MACState.PendingRequests = []*ttnpb.MACCommand{{}, {}}
+						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
+							Value: ttnpb.PING_EVERY_2S,
+						}
+						dev.MACState.PendingApplicationDownlink = makeApplicationDownlink(true, 0x02)
+						return dev
+					}(),
+					FCnt:    0xff00,
+					NbTrans: 1,
+					SetPaths: []string{
+						"mac_state",
+						"pending_mac_state",
+						"pending_session",
+						"session",
+					},
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+						dev.Session.LastFCntUp = 0xff00
+						dev.MACState.PendingApplicationDownlink = nil
+						dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
+						dev.MACState.RxWindowsAvailable = true
+						return dev
+					},
+					MakeQueuedEvents: makeNilEvents,
+					QueuedApplicationUplinks: []*ttnpb.ApplicationUp{
+						{
+							CorrelationIDs:       DataUplinkCorrelationIDs[:],
+							EndDeviceIdentifiers: makeIdentifiers(),
+							Up: &ttnpb.ApplicationUp_DownlinkNack{
+								DownlinkNack: makeApplicationDownlink(true, 0x02),
+							},
+						},
+					},
+				},
+				{
+					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0xfef0", "NbTrans=1"),
+					Device: &ttnpb.EndDevice{
+						EndDeviceIdentifiers: makeIdentifiers(),
+						FrequencyPlanID:      test.EUFrequencyPlanID,
+						LoRaWANPHYVersion:    phyVersion,
+						LoRaWANVersion:       macVersion,
+						MACState:             MakeDefaultEU868MACState(ttnpb.CLASS_A, macVersion, phyVersion),
+						Session:              makeSession(0xfef0, 0x02),
+					},
+					FCnt:    0xff00,
+					NbTrans: 1,
+					SetPaths: []string{
+						"mac_state",
+						"pending_mac_state",
+						"pending_session",
+						"session",
+					},
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+						dev.Session.LastFCntUp = 0xff00
+						dev.MACState.RxWindowsAvailable = true
+						return dev
+					},
+					MakeQueuedEvents: makeNilEvents,
+				},
 				{
 					Name: MakeTestCaseName("Current session", "Class A", "LastFCntUp=0xfef0", "NbTrans=1", "Supports class B"),
 					Device: func() *ttnpb.EndDevice {
@@ -531,7 +847,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.Session.LastFCntUp = 0xff00
 						dev.MACState.PendingRequests = dev.MACState.PendingRequests[:0]
 						dev.MACState.DeviceClass = ttnpb.CLASS_B
@@ -578,7 +894,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.MACState.PendingRequests = nil
 						dev.MACState.RxWindowsAvailable = true
 						return dev
@@ -612,7 +928,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.Session.LastFCntUp = 0x10000
 						dev.MACState.RxWindowsAvailable = true
 						return dev
@@ -652,7 +968,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						"pending_session",
 						"session",
 					},
-					ApplyDeviceDiff: func(dev *ttnpb.EndDevice) *ttnpb.EndDevice {
+					ApplyDeviceDiff: func(_ bool, dev *ttnpb.EndDevice) *ttnpb.EndDevice {
 						dev.Session.LastFCntUp = 0x10000
 						dev.MACState.RxWindowsAvailable = true
 						return dev
@@ -796,15 +1112,14 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						}
 						matched.Context = nil     // Comparing context with should.Resemble results in infinite recursion.
 						matched.phy = band.Band{} // band.Band cannot be compared with neither should.Resemble, nor should.Equal.
-						return a.So(AllTrue(
-							a.So(matched.DeferredMACHandlers, should.BeNil), // TODO: Assert
+						if !a.So(AllTrue(
 							a.So(matched.SetPaths, should.HaveSameElementsDeep, devConf.SetPaths),
 							a.So(matched.QueuedEvents, should.ResembleEventDefinitionDataClosures, devConf.MakeQueuedEvents(deduplicated)),
 							a.So(matched, should.Resemble, &matchedDevice{
 								ChannelIndex:             chIdx,
 								DataRateIndex:            drIdx,
 								DeferredMACHandlers:      matched.DeferredMACHandlers,
-								Device:                   devConf.ApplyDeviceDiff(CopyEndDevice(devConf.Device)),
+								Device:                   devConf.ApplyDeviceDiff(deduplicated, CopyEndDevice(devConf.Device)),
 								FCnt:                     devConf.FCnt,
 								FCntReset:                devConf.FCntReset,
 								NbTrans:                  devConf.NbTrans,
@@ -813,7 +1128,25 @@ func TestMatchAndHandleUplink(t *testing.T) {
 								QueuedEvents:             matched.QueuedEvents,
 								SetPaths:                 matched.SetPaths,
 							}),
-						), should.BeTrue)
+						), should.BeTrue) {
+							return false
+						}
+
+						if deduplicated || len(matched.DeferredMACHandlers) == 0 {
+							return true
+						}
+						queuedEvents := matched.QueuedEvents
+						for _, f := range matched.DeferredMACHandlers {
+							evs, err := f(matched.Context, matched.Device, CopyUplinkMessage(up))
+							if !a.So(err, should.BeNil) {
+								return false
+							}
+							queuedEvents = append(queuedEvents, evs...)
+						}
+						return AllTrue(
+							a.So(queuedEvents, should.HaveSameElements, devConf.MakeQueuedEvents(true), test.EventDefinitionDataClosureEqual),
+							a.So(matched.Device, should.Resemble, devConf.ApplyDeviceDiff(true, CopyEndDevice(devConf.Device))),
+						)
 					}
 					tcs = append(tcs,
 						TestCase{

@@ -564,6 +564,10 @@ var DataUplinkCorrelationIDs = [...]string{
 }
 
 func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64, chIdx uint8, recvAt time.Time, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
+	if len(fOpts) > 0 && fPort == 0 {
+		panic("FOpts must not be set for FPort == 0")
+	}
+
 	mType := ttnpb.MType_UNCONFIRMED_UP
 	if confirmed {
 		mType = ttnpb.MType_CONFIRMED_UP
@@ -572,8 +576,11 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 		MType: mType,
 		Major: ttnpb.Major_LORAWAN_R1,
 	}
-	if macVersion.EncryptFOpts() {
-		fOpts = MustEncryptUplink(NwkSEncKey, DevAddr, fCnt, fOpts...)
+	key := *MakeSessionKeys(macVersion, false).NwkSEncKey.Key
+	if fPort == 0 {
+		frmPayload = MustEncryptUplink(key, DevAddr, fCnt, frmPayload...)
+	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
+		fOpts = MustEncryptUplink(key, DevAddr, fCnt, fOpts...)
 	}
 	fhdr := ttnpb.FHDR{
 		DevAddr: *DevAddr.Copy(&types.DevAddr{}),
