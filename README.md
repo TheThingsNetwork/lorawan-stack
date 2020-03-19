@@ -70,10 +70,12 @@ Are you new to LoRaWAN and The Things Network? See the general documentation at 
 
 Open source projects are great, but a stable and reliable open source ecosystem is even better. Therefore, we make the following commitments:
 
-1. We will not break the API towards gateways and applications within the major version. This includes how gateways communicate and how applications work with data
-2. We will upgrade storage from older versions within the major version. This means that you can migrate an older setup without losing data
-3. We will not break the public command-line interface and configuration within the major version. This means that you can safely build scripts and migrate configurations
-4. We will not break the API between components and events within minor versions. So at least the same minor versions of components are compatible with each other
+1. We will not break the API towards gateways and applications within the major version. This includes how gateways communicate (with Gateway Server) and how applications work with data (with Application Server)
+2. We will upgrade storage from older versions within the major version via migrations. This means that you can migrate an older setup without losing data.
+3. We will not require storage migrations within the minor version. This means that you can update patches without database migrations.
+4. We will not break the public command-line interface and configuration within the major version. This means that you can safely build scripts and migrate configuration.
+5. We will not break the API between components and events within minor versions. So at least the same minor versions of components are compatible with each other.
+6. We reserve the right to fix bugs in API, configuration and storage in patches and minor updates. This may break components, gateways and applications that rely on buggy behavior.
 
 As we are continuously adding functionality in minor versions and fixing issues in patch versions, we are also introducing new configurations and new defaults. We therefore recommend reading the release notes before upgrading to a new version.
 
