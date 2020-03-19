@@ -95,7 +95,7 @@ func (ns *mockNS) LinkApplication(stream ttnpb.AsNs_LinkApplicationServer) error
 		return err
 	}
 	if !ns.validateAuth(md) {
-		return errPermissionDenied
+		return errPermissionDenied.New()
 	}
 
 	select {
@@ -199,7 +199,7 @@ func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetApplicationRequest) (*t
 	uid := unique.ID(ctx, req.ApplicationIdentifiers)
 	app, ok := is.applications[uid]
 	if !ok {
-		return nil, errNotFound
+		return nil, errNotFound.New()
 	}
 	return app, nil
 }
@@ -258,7 +258,7 @@ func (js *mockJS) add(ctx context.Context, devEUI types.EUI64, sessionKeyID []by
 func (js *mockJS) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	key, ok := js.keys[fmt.Sprintf("%v:%v", req.DevEUI, req.SessionKeyID)]
 	if !ok {
-		return nil, errNotFound
+		return nil, errNotFound.New()
 	}
 	return &ttnpb.AppSKeyResponse{
 		AppSKey: key,

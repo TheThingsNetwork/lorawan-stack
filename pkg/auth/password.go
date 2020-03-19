@@ -86,7 +86,7 @@ func Validate(hashed, plain string) (bool, error) {
 	parts := strings.SplitN(hashed, "$", 2)
 
 	if len(parts) < 2 {
-		return false, errInvalidHash
+		return false, errInvalidHash.New()
 	}
 
 	typ := parts[0]

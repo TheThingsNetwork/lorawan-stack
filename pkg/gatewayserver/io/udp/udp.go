@@ -243,7 +243,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 		select {
 		case <-cs.ioWait:
 		default:
-			return nil, errConnectionNotReady
+			return nil, errConnectionNotReady.New()
 		}
 		if cs.ioErr != nil {
 			return nil, cs.ioErr
@@ -413,7 +413,7 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 				state.startHandleDownMu.Lock()
 				state.startHandleDown = &sync.Once{}
 				state.startHandleDownMu.Unlock()
-				return errDownlinkPathExpired
+				return errDownlinkPathExpired.New()
 			}
 		}
 	}

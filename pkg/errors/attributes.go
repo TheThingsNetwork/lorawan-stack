@@ -48,7 +48,7 @@ func supported(v interface{}) interface{} {
 
 func kvToMap(kv ...interface{}) (map[string]interface{}, error) {
 	if len(kv)%2 != 0 {
-		return nil, errOddKV
+		return nil, errOddKV.New()
 	}
 	m := make(map[string]interface{}, len(kv)/2)
 	var key string

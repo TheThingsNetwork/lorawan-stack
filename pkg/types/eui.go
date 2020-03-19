@@ -142,13 +142,13 @@ func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 	if len(data) != 20 && len(data) != 21 {
-		return errInvalidEUIPrefix
+		return errInvalidEUIPrefix.New()
 	}
 	if data[0] != '"' || data[len(data)-1] != '"' {
 		return errInvalidJSON.WithAttributes("json", string(data))
 	}
 	if data[17] != '/' {
-		return errInvalidEUIPrefix
+		return errInvalidEUIPrefix.New()
 	}
 	b := make([]byte, hex.DecodedLen(16))
 	n, err := hex.Decode(b, data[1:17])
@@ -156,7 +156,7 @@ func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if n != 8 || copy(prefix.EUI64[:], b) != 8 {
-		return errInvalidEUIPrefix
+		return errInvalidEUIPrefix.New()
 	}
 	length, err := strconv.Atoi(string(data[18 : len(data)-1]))
 	if err != nil {
@@ -178,7 +178,7 @@ func (prefix *EUI64Prefix) UnmarshalBinary(data []byte) error {
 		return nil
 	}
 	if len(data) != 9 {
-		return errInvalidEUIPrefix
+		return errInvalidEUIPrefix.New()
 	}
 	if err := prefix.EUI64.Unmarshal(data[:8]); err != nil {
 		return err
@@ -204,10 +204,10 @@ func (prefix *EUI64Prefix) UnmarshalText(data []byte) error {
 		return nil
 	}
 	if len(data) != 18 && len(data) != 19 {
-		return errInvalidEUIPrefix
+		return errInvalidEUIPrefix.New()
 	}
 	if data[16] != '/' {
-		return errInvalidEUIPrefix
+		return errInvalidEUIPrefix.New()
 	}
 	if err := prefix.EUI64.UnmarshalText(data[:16]); err != nil {
 		return err

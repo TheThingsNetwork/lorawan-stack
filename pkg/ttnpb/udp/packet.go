@@ -128,7 +128,7 @@ func (p *Packet) UnmarshalBinary(b []byte) (err error) {
 
 	if p.PacketType.HasGatewayEUI() {
 		if len(b) < i+8 {
-			return errNoEUI
+			return errNoEUI.New()
 		}
 
 		p.GatewayEUI = new(types.EUI64)

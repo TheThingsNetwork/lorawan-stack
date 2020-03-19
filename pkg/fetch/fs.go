@@ -28,7 +28,7 @@ type fsFetcher struct {
 
 func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
 	if len(pathElements) == 0 {
-		return nil, errFilenameNotSpecified
+		return nil, errFilenameNotSpecified.New()
 	}
 
 	start := time.Now()

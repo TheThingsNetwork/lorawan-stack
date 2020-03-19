@@ -252,10 +252,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
-		return nil, errNoJoinRequest
+		return nil, errNoJoinRequest.New()
 	}
 	if pld.DevEUI.IsZero() {
-		return nil, errNoDevEUI
+		return nil, errNoDevEUI.New()
 	}
 	logger = logger.WithFields(log.Fields(
 		"join_eui", pld.JoinEUI,
@@ -270,7 +270,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest) (r
 		}
 	}
 	if !match {
-		return nil, errUnknownJoinEUI
+		return nil, errUnknownJoinEUI.New()
 	}
 
 	var handled bool
@@ -562,13 +562,13 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	}
 
 	if ks.NwkSEncKey == nil {
-		return nil, errNoNwkSEncKey
+		return nil, errNoNwkSEncKey.New()
 	}
 	if ks.FNwkSIntKey == nil {
-		return nil, errNoFNwkSIntKey
+		return nil, errNoFNwkSIntKey.New()
 	}
 	if ks.SNwkSIntKey == nil {
-		return nil, errNoSNwkSIntKey
+		return nil, errNoSNwkSIntKey.New()
 	}
 
 	return &ttnpb.NwkSKeysResponse{
@@ -599,7 +599,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 				return nil, err
 			}
 		} else {
-			return nil, errNoApplicationServerID
+			return nil, errNoApplicationServerID.New()
 		}
 	} else if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
@@ -614,7 +614,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		return nil, errRegistryOperation.WithCause(err)
 	}
 	if ks.AppSKey == nil {
-		return nil, errNoAppSKey
+		return nil, errNoAppSKey.New()
 	}
 	return &ttnpb.AppSKeyResponse{
 		AppSKey: *ks.AppSKey,

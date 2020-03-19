@@ -115,7 +115,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 				return err
 			}
 			if accessToken.UserIDs.UserID != req.UserIDs.UserID || accessToken.ClientIDs.ClientID != req.ClientIDs.ClientID {
-				return errAccessTokenMismatch
+				return errAccessTokenMismatch.New()
 			}
 		}
 		return oauthStore.DeleteAccessToken(ctx, req.ID)

@@ -69,7 +69,7 @@ type protobufv2 struct {
 func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdentifiers) ([]byte, error) {
 	settings := down.GetScheduled()
 	if settings == nil {
-		return nil, errNotScheduled
+		return nil, errNotScheduled.New()
 	}
 	lorawan := &ttnpbv2.LoRaWANTxConfiguration{}
 	if pld, ok := down.GetPayload().GetPayload().(*ttnpb.Message_MACPayload); ok && pld != nil {
@@ -84,7 +84,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 		lorawan.Modulation = ttnpbv2.Modulation_FSK
 		lorawan.BitRate = dr.FSK.BitRate
 	default:
-		return nil, errModulation
+		return nil, errModulation.New()
 	}
 
 	v2downlink := &ttnpbv2.DownlinkMessage{
@@ -111,7 +111,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 	}
 
 	if v2uplink.ProtocolMetadata.LoRaWAN == nil {
-		return nil, errLoRaWANMetadata
+		return nil, errLoRaWANMetadata.New()
 	}
 	lorawanMetadata := v2uplink.ProtocolMetadata.LoRaWAN
 	gwMetadata := v2uplink.GatewayMetadata
@@ -254,7 +254,7 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 }
 
 func (protobufv2) ToTxAck(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.TxAcknowledgment, error) {
-	return nil, errNotSupported
+	return nil, errNotSupported.New()
 }
 
 // NewProtobufV2 returns a format that uses the legacy The Things Stack V2 Protocol Buffers marshaling and unmarshaling.

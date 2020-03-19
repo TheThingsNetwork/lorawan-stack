@@ -144,7 +144,7 @@ func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnp
 	case *ttnpb.UserIdentifiers:
 		err = rights.RequireUser(ctx, *id, ttnpb.RIGHT_USER_SETTINGS_BASIC)
 	default:
-		return nil, errNoContactInfoForEntity
+		return nil, errNoContactInfoForEntity.New()
 	}
 	if err != nil {
 		return nil, err

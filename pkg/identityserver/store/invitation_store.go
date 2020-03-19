@@ -45,7 +45,7 @@ func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnp
 	if err := s.createEntity(ctx, &model); err != nil {
 		err = convertError(err)
 		if errors.IsAlreadyExists(err) {
-			return nil, errInvitationAlreadySent
+			return nil, errInvitationAlreadySent.New()
 		}
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 	var invitationModel Invitation
 	if err := s.query(ctx, Invitation{}).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errInvitationNotFound
+			return nil, errInvitationNotFound.New()
 		}
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 	var invitationModel Invitation
 	if err := s.query(ctx, Invitation{}).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return errInvitationNotFound
+			return errInvitationNotFound.New()
 		}
 		return err
 	}
@@ -105,7 +105,7 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 		id := user.PrimaryKey()
 		invitationModel.AcceptedByID = &id
 	} else {
-		return errInvitationAlreadyAccepted
+		return errInvitationAlreadyAccepted.New()
 	}
 
 	acceptedAt := cleanTime(time.Now())
@@ -119,12 +119,12 @@ func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) er
 	var invitationModel Invitation
 	if err := s.query(ctx, Invitation{}).Where(Invitation{Email: email}).First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return errInvitationNotFound
+			return errInvitationNotFound.New()
 		}
 		return err
 	}
 	if invitationModel.AcceptedByID != nil {
-		return errInvitationAlreadyAccepted
+		return errInvitationAlreadyAccepted.New()
 	}
 	return s.query(ctx, Invitation{}).Delete(&invitationModel).Error
 }

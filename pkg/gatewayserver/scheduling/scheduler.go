@@ -91,7 +91,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 	var toa *frequencyplans.TimeOffAir
 	for _, fp := range fps {
 		if toa != nil && fp.TimeOffAir != *toa {
-			return nil, errFrequencyPlansTimeOffAir
+			return nil, errFrequencyPlansTimeOffAir.New()
 		}
 		toa = &fp.TimeOffAir
 	}
@@ -124,7 +124,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 							break
 						}
 						if subBand.HasOverlap(sb) {
-							return nil, errFrequencyPlansOverlapSubBand
+							return nil, errFrequencyPlansOverlapSubBand.New()
 						}
 					}
 					if !isIdentical {
@@ -150,7 +150,7 @@ func NewScheduler(ctx context.Context, fps map[string]*frequencyplans.FrequencyP
 							break
 						}
 						if subBand.HasOverlap(sb) {
-							return nil, errFrequencyPlansOverlapSubBand
+							return nil, errFrequencyPlansOverlapSubBand.New()
 						}
 					}
 					if !isIdentical {

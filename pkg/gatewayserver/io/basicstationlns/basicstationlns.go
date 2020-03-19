@@ -130,7 +130,7 @@ func (s *srv) handleDiscover(c echo.Context) error {
 
 	if req.EUI.IsZero() {
 		writeDiscoverError(ctx, ws, "Empty router EUI provided")
-		return errEmptyGatewayEUI
+		return errEmptyGatewayEUI.New()
 	}
 
 	ids := ttnpb.GatewayIdentifiers{

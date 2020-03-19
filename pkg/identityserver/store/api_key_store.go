@@ -118,7 +118,7 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID ttnpb.Identifie
 	}).First(&keyModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errAPIKeyNotFound
+			return nil, errAPIKeyNotFound.New()
 		}
 		return nil, err
 	}

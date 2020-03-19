@@ -276,7 +276,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				},
 			},
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
-				return nil, errDecodePayload
+				return nil, errDecodePayload.New()
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -320,7 +320,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				},
 			},
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
-				return nil, errMICMismatch
+				return nil, errMICMismatch.New()
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -364,7 +364,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				},
 			},
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
-				return nil, errReuseDevNonce
+				return nil, errReuseDevNonce.New()
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)

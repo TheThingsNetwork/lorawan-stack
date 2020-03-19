@@ -189,7 +189,7 @@ var errFieldSet = errors.DefineInvalidArgument("field_set", "field is set")
 // It uses IsZero, if v implements IsZeroer interface.
 func Empty(v interface{}) error {
 	if !isZero(v) {
-		return errFieldSet
+		return errFieldSet.New()
 	}
 	return nil
 }
@@ -213,7 +213,7 @@ func NotRequired(v interface{}) error {
 // It uses IsZero, if v implements IsZeroer interface.
 func Required(v interface{}) error {
 	if isZero(v) {
-		return errRequired
+		return errRequired.New()
 	}
 	return nil
 }

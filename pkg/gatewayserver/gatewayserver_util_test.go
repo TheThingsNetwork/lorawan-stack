@@ -93,7 +93,7 @@ func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb
 	uid := unique.ID(ctx, req.GatewayIdentifiers)
 	gtw, ok := is.gateways[uid]
 	if !ok {
-		return nil, errNotFound
+		return nil, errNotFound.New()
 	}
 	return gtw, nil
 }
@@ -102,7 +102,7 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 	uid := unique.ID(ctx, req.Gateway.GatewayIdentifiers)
 	gtw, ok := is.gateways[uid]
 	if !ok {
-		return nil, errNotFound
+		return nil, errNotFound.New()
 	}
 	// Just update antennas
 	gtw.Antennas = req.Antennas
@@ -116,7 +116,7 @@ func (is *mockIS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewa
 			EUI:       &registeredGatewayEUI,
 		}, nil
 	}
-	return nil, errNotFound
+	return nil, errNotFound.New()
 }
 
 func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (res *ttnpb.Rights, err error) {

@@ -211,7 +211,7 @@ func (c BlobConfig) Bucket(ctx context.Context, bucket string) (*blob.Bucket, er
 				return nil, err
 			}
 		} else {
-			return nil, errMissingBlobConfig
+			return nil, errMissingBlobConfig.New()
 		}
 		return ttnblob.GCP(ctx, bucket, jsonCreds)
 	default:

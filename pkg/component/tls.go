@@ -133,7 +133,7 @@ func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOpt
 	case "key-vault":
 		certificateGetter = func() (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
 			if conf.KeyVault.ID == "" {
-				return nil, errTLSKeyVaultID
+				return nil, errTLSKeyVaultID.New()
 			}
 			return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 				return c.KeyVault.ExportCertificate(ctx, conf.KeyVault.ID)
@@ -141,7 +141,7 @@ func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOpt
 		}
 	}
 	if certificateGetter == nil {
-		return nil, errEmptyTLSConfig
+		return nil, errEmptyTLSConfig.New()
 	}
 	fn, err := certificateGetter()
 	if err != nil {

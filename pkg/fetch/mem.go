@@ -28,7 +28,7 @@ type memFetcher struct {
 // File gets content from memory.
 func (f *memFetcher) File(pathElements ...string) ([]byte, error) {
 	if len(pathElements) == 0 {
-		return nil, errFilenameNotSpecified
+		return nil, errFilenameNotSpecified.New()
 	}
 
 	start := time.Now()

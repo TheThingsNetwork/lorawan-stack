@@ -104,7 +104,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 	if req.InvitationToken == "" && is.configFromContext(ctx).UserRegistration.Invitation.Required && !createdByAdmin {
-		return nil, errInvitationTokenRequired
+		return nil, errInvitationTokenRequired.New()
 	}
 
 	if err := validate.Email(req.User.PrimaryEmailAddress); err != nil {
@@ -172,7 +172,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 				return err
 			}
 			if !invitationToken.ExpiresAt.IsZero() && invitationToken.ExpiresAt.Before(time.Now()) {
-				return errInvitationTokenExpired
+				return errInvitationTokenExpired.New()
 			}
 		}
 
@@ -472,7 +472,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		} else {
 			if usr.TemporaryPassword == "" {
 				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
-				return errIncorrectPassword
+				return errIncorrectPassword.New()
 			}
 			region := trace.StartRegion(ctx, "validate temporary password")
 			valid, err = auth.Validate(usr.TemporaryPassword, req.Old)
@@ -482,10 +482,10 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				return err
 			case !valid:
 				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
-				return errIncorrectPassword
+				return errIncorrectPassword.New()
 			case usr.TemporaryPasswordExpiresAt.Before(time.Now()):
 				events.Publish(evtUpdateUserIncorrectPassword(ctx, req.UserIdentifiers, nil))
-				return errTemporaryPasswordExpired
+				return errTemporaryPasswordExpired.New()
 			}
 			usr.TemporaryPassword, usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = "", nil, nil
 			updateMask = temporaryPasswordFieldMask
@@ -556,7 +556,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 			return err
 		}
 		if usr.TemporaryPasswordExpiresAt != nil && usr.TemporaryPasswordExpiresAt.After(time.Now()) {
-			return errTemporaryPasswordStillValid
+			return errTemporaryPasswordStillValid.New()
 		}
 		usr.TemporaryPassword = hashedTemporaryPassword
 		expires := now.Add(time.Hour)

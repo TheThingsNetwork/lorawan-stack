@@ -168,7 +168,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		return err
 	}
 	if tokenType != auth.AccessToken {
-		return errNoAccessToken
+		return errNoAccessToken.New()
 	}
 	accessHash, err = auth.Hash(s.ctx, accessKey)
 	if err != nil {
@@ -180,7 +180,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 			return err
 		}
 		if tokenType != auth.RefreshToken {
-			return errNoRefreshToken
+			return errNoRefreshToken.New()
 		}
 		if refreshID != accessID {
 			return errTokenMismatch.WithAttributes("refresh_token_id", refreshID, "access_token_id", accessID)
@@ -252,7 +252,7 @@ func (s *storage) LoadAccess(token string) (*osin.AccessData, error) {
 func (s *storage) RemoveAccess(token string) error {
 	if tokenType, id, _, err := auth.SplitToken(token); err == nil {
 		if tokenType != auth.AccessToken {
-			return errNoAccessToken
+			return errNoAccessToken.New()
 		}
 		return s.oauth.DeleteAccessToken(s.ctx, id)
 	}
@@ -265,7 +265,7 @@ func (s *storage) LoadRefresh(token string) (*osin.AccessData, error) {
 		return nil, err
 	}
 	if tokenType != auth.RefreshToken {
-		return nil, errNoRefreshToken
+		return nil, errNoRefreshToken.New()
 	}
 	data, err := s.loadAccess(id)
 	if err != nil {
@@ -273,7 +273,7 @@ func (s *storage) LoadRefresh(token string) (*osin.AccessData, error) {
 	}
 	valid, err := auth.Validate(data.RefreshToken, tokenKey)
 	if !valid || err != nil {
-		return nil, errInvalidToken
+		return nil, errInvalidToken.New()
 	}
 	return data, nil
 }
@@ -281,7 +281,7 @@ func (s *storage) LoadRefresh(token string) (*osin.AccessData, error) {
 func (s *storage) RemoveRefresh(token string) error {
 	if tokenType, id, _, err := auth.SplitToken(token); err == nil {
 		if tokenType != auth.RefreshToken {
-			return errNoRefreshToken
+			return errNoRefreshToken.New()
 		}
 		return s.oauth.DeleteAccessToken(s.ctx, id)
 	}

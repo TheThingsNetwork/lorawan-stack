@@ -35,7 +35,7 @@ func Password(v interface{}) error {
 	}
 
 	if !passwordRegex.MatchString(password) {
-		return errPasswordLength
+		return errPasswordLength.New()
 	}
 
 	return nil

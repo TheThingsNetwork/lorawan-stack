@@ -116,7 +116,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 
 	if len(gateway.FrequencyPlanIDs) > 0 {
 		if gateway.FrequencyPlanIDs[0] != fp0ID {
-			return nil, errInconsistentFrequencyPlans
+			return nil, errInconsistentFrequencyPlans.New()
 		}
 		for i := 1; i < len(gateway.FrequencyPlanIDs); i++ {
 			fpn, err := fps.GetByID(gateway.FrequencyPlanIDs[i])
@@ -124,7 +124,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 				return nil, err
 			}
 			if fpn.BandID != fp0.BandID {
-				return nil, errFrequencyPlansNotFromSameBand
+				return nil, errFrequencyPlansNotFromSameBand.New()
 			}
 			gatewayFPs[gateway.FrequencyPlanIDs[i]] = fpn
 		}
@@ -227,7 +227,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		atomic.StoreInt64(&c.lastUplinkTime, up.ReceivedAt.UnixNano())
 		c.notifyStatsChanged()
 	default:
-		return errBufferFull
+		return errBufferFull.New()
 	}
 	return nil
 }
@@ -249,7 +249,7 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 			}
 		}
 	default:
-		return errBufferFull
+		return errBufferFull.New()
 	}
 	return nil
 }
@@ -262,7 +262,7 @@ func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
 	case c.txAckCh <- ack:
 		c.notifyStatsChanged()
 	default:
-		return errBufferFull
+		return errBufferFull.New()
 	}
 	return nil
 }
@@ -314,7 +314,7 @@ func (c *Connection) SendDown(msg *ttnpb.DownlinkMessage) error {
 		atomic.AddUint64(&c.downlinks, 1)
 		atomic.StoreInt64(&c.lastDownlinkTime, time.Now().UnixNano())
 	default:
-		return errBufferFull
+		return errBufferFull.New()
 	}
 	return nil
 }

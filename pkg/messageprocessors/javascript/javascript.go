@@ -85,7 +85,7 @@ func (h *host) Encode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 		return err
 	}
 	if value == nil || reflect.TypeOf(value).Kind() != reflect.Slice {
-		return errOutputType
+		return errOutputType.New()
 	}
 	slice := reflect.ValueOf(value)
 	frmPayload := make([]byte, slice.Len())
@@ -144,7 +144,7 @@ func (h *host) Decode(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, versi
 	}
 	m, ok := value.(map[string]interface{})
 	if !ok {
-		return errOutput
+		return errOutput.New()
 	}
 	s, err := gogoproto.Struct(m)
 	if err != nil {

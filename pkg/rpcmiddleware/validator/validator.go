@@ -106,7 +106,7 @@ func validateMessage(ctx context.Context, fullMethod string, msg interface{}) er
 		return nil
 
 	default:
-		return errNoValidator
+		return errNoValidator.New()
 	}
 }
 

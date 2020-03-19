@@ -85,7 +85,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		}, nil
 	}
 	if strings.ToLower(md.AuthType) != "bearer" {
-		return nil, errUnsupportedAuthorization
+		return nil, errUnsupportedAuthorization.New()
 	}
 
 	token := md.AuthValue
@@ -115,10 +115,10 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			valid, err := auth.Validate(apiKey.GetKey(), tokenKey)
 			region.End()
 			if err != nil {
-				return err
+				return errInvalidAuthorization.WithCause(err)
 			}
 			if !valid {
-				return errInvalidAuthorization
+				return errInvalidAuthorization.New()
 			}
 			apiKey.Key = ""
 			apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Implied().GetRights()
@@ -153,13 +153,13 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			valid, err := auth.Validate(accessToken.GetAccessToken(), tokenKey)
 			region.End()
 			if err != nil {
-				return err
+				return errInvalidAuthorization.WithCause(err)
 			}
 			if !valid {
-				return errInvalidAuthorization
+				return errInvalidAuthorization.New()
 			}
 			if accessToken.ExpiresAt.Before(time.Now()) {
-				return errTokenExpired
+				return errTokenExpired.New()
 			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""
 			accessToken.Rights = ttnpb.RightsFrom(accessToken.Rights...).Implied().GetRights()
@@ -186,11 +186,11 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			case ttnpb.STATE_APPROVED:
 				// Normal OAuth client.
 			case ttnpb.STATE_REJECTED:
-				return errOAuthClientRejected
+				return errOAuthClientRejected.New()
 			case ttnpb.STATE_FLAGGED:
 				// Innocent until proven guilty.
 			case ttnpb.STATE_SUSPENDED:
-				return errOAuthClientSuspended
+				return errOAuthClientSuspended.New()
 			default:
 				panic(fmt.Sprintf("Unhandled client state: %s", client.State.String()))
 			}
@@ -198,7 +198,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			return nil
 		}
 	default:
-		return nil, errUnsupportedAuthorization
+		return nil, errUnsupportedAuthorization.New()
 	}
 
 	if err = is.withDatabase(ctx, fetch); err != nil {
@@ -265,11 +265,11 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 				// Flagged users have the same authentication presence as approved users until proven guilty.
 				return nil
 			case ttnpb.STATE_REQUESTED:
-				return errUserRequested
+				return errUserRequested.New()
 			case ttnpb.STATE_REJECTED:
-				return errUserRejected
+				return errUserRejected.New()
 			case ttnpb.STATE_SUSPENDED:
-				return errUserSuspended
+				return errUserSuspended.New()
 			default:
 				panic(fmt.Sprintf("Unhandled user state: %s", user.State.String()))
 			}
@@ -286,7 +286,7 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	if len(authInfo.UniversalRights.GetRights()) > 0 {
 		return nil
 	}
-	return errUnauthenticated
+	return errUnauthenticated.New()
 }
 
 // UniversalRights returns the universal rights (that apply to any entity or
@@ -312,7 +312,7 @@ func (is *IdentityServer) IsAdmin(ctx context.Context) bool {
 // RequireAdmin returns an error when the caller is not an admin.
 func (is *IdentityServer) RequireAdmin(ctx context.Context) error {
 	if !is.IsAdmin(ctx) {
-		return errPermissionDenied
+		return errPermissionDenied.New()
 	}
 	return nil
 }

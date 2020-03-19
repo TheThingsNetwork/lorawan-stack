@@ -206,7 +206,7 @@ func (lsc *LoRaStandardChannel) ToConcentratorConfig(phy band.Band) (*ttnpb.Conc
 	}
 	dr, ok := phy.DataRates[ttnpb.DataRateIndex(lsc.DataRate)]
 	if !ok {
-		return nil, errInvalidDataRateIndex
+		return nil, errInvalidDataRateIndex.New()
 	}
 	lora := dr.Rate.GetLoRa()
 	return &ttnpb.ConcentratorConfig_LoRaStandardChannel{
@@ -428,7 +428,7 @@ func (fp FrequencyPlan) Validate() error {
 	}
 	fpdt := fp.DwellTime
 	if (fpdt.GetUplinks() || fpdt.GetDownlinks()) && fpdt.Duration == nil {
-		return errNoDwellTimeDuration
+		return errNoDwellTimeDuration.New()
 	}
 	for _, channels := range [][]Channel{fp.UplinkChannels, fp.DownlinkChannels} {
 		for i, channel := range channels {
@@ -687,7 +687,7 @@ func (s *Store) getByID(id string) (*FrequencyPlan, error) {
 // GetByID retrieves the frequency plan that has the given ID.
 func (s *Store) GetByID(id string) (*FrequencyPlan, error) {
 	if s == nil {
-		return nil, errNotConfigured
+		return nil, errNotConfigured.New()
 	}
 
 	if id == "" {
@@ -711,7 +711,7 @@ func (s *Store) GetByID(id string) (*FrequencyPlan, error) {
 // GetAllIDs returns the list of IDs of the available frequency plans.
 func (s *Store) GetAllIDs() ([]string, error) {
 	if s == nil {
-		return nil, errNotConfigured
+		return nil, errNotConfigured.New()
 	}
 
 	descriptions, err := s.descriptions()

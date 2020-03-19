@@ -74,7 +74,7 @@ func TestNewMACState(t *testing.T) {
 			},
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.Resemble, errClassAMulticast)
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errClassAMulticast)
 			},
 		},
 		{
@@ -155,7 +155,7 @@ func TestNewMACState(t *testing.T) {
 			},
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.Resemble, errClassAMulticast)
+				return assertions.New(t).So(err, should.HaveSameErrorDefinitionAs, errClassAMulticast)
 			},
 		},
 		{

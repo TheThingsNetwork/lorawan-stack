@@ -97,5 +97,5 @@ func (eui *EUI) UnmarshalJSON(data []byte) error {
 		}
 		return nil
 	}
-	return errFormat
+	return errFormat.New()
 }

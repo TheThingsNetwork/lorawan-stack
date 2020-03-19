@@ -54,7 +54,7 @@ func (s *server) getAuthCookie(c echo.Context) (cookie authCookie, err error) {
 		return cookie, err
 	}
 	if !ok {
-		return cookie, errAuthCookie
+		return cookie, errAuthCookie.New()
 	}
 	return cookie, nil
 }
@@ -97,7 +97,7 @@ func (s *server) getSession(c echo.Context) (*ttnpb.UserSession, error) {
 		return nil, err
 	}
 	if session.ExpiresAt != nil && session.ExpiresAt.Before(time.Now()) {
-		return nil, errSessionExpired
+		return nil, errSessionExpired.New()
 	}
 	c.Set(userSessionKey, session)
 	return session, nil
@@ -165,7 +165,7 @@ func (s *server) doLogin(ctx context.Context, userID, password string) error {
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return errIncorrectPasswordOrUserID
+			return errIncorrectPasswordOrUserID.New()
 		}
 		return err
 	}
@@ -174,7 +174,7 @@ func (s *server) doLogin(ctx context.Context, userID, password string) error {
 	region.End()
 	if err != nil || !ok {
 		events.Publish(evtUserLoginFailed(ctx, user.UserIdentifiers, nil))
-		return errIncorrectPasswordOrUserID
+		return errIncorrectPasswordOrUserID.New()
 	}
 	return nil
 }

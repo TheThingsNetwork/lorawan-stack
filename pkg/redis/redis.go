@@ -706,7 +706,7 @@ func DeduplicateProtos(ctx context.Context, r Scripter, k string, window time.Du
 	}
 	res, ok := v.(int64)
 	if !ok {
-		return false, errStore
+		return false, errStore.New()
 	}
 	return res == 1, nil
 }

@@ -84,13 +84,13 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 	logger := log.FromContext(ctx)
 	dev, err := srv.JS.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, gets)
 	if errors.IsNotFound(err) {
-		return nil, errDeviceNotFound
+		return nil, errDeviceNotFound.New()
 	}
 	if err != nil {
 		return nil, err
 	}
 	if !dev.ApplicationIdentifiers.Equal(req.ApplicationIdentifiers) {
-		return nil, errDeviceNotFound
+		return nil, errDeviceNotFound.New()
 	}
 	if ttnpb.HasAnyField(req.FieldMask.Paths,
 		"root_keys.app_key.key",
@@ -173,10 +173,10 @@ var (
 // Set implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if req.EndDevice.JoinEUI == nil {
-		return nil, errNoJoinEUI
+		return nil, errNoJoinEUI.New()
 	}
 	if req.EndDevice.DevEUI == nil || req.EndDevice.DevEUI.IsZero() {
-		return nil, errNoDevEUI
+		return nil, errNoDevEUI.New()
 	}
 
 	if err = rights.RequireApplication(ctx, req.EndDevice.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {

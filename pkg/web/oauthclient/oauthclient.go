@@ -67,7 +67,7 @@ func (oc *OAuthClient) getMountPath() string {
 // New returns a new OAuth client instance.
 func New(c *component.Component, config Config) (*OAuthClient, error) {
 	if config.isZero() {
-		return nil, errNoOAuthConfig
+		return nil, errNoOAuthConfig.New()
 	}
 
 	oc := &OAuthClient{

@@ -449,10 +449,10 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 			}
 		}
 		if session == nil {
-			return nil, errNoDeviceSession
+			return nil, errNoDeviceSession.New()
 		}
 		if session.AppSKey == nil {
-			return nil, errNoAppSKey
+			return nil, errNoAppSKey.New()
 		}
 		if !dev.SkipPayloadCrypto {
 			// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
@@ -735,7 +735,7 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 		return nil
 	}
 	if dev.Session == nil || !bytes.Equal(dev.Session.SessionKeyID, msg.SessionKeyID) || dev.Session.AppSKey == nil {
-		return errNoAppSKey
+		return errNoAppSKey.New()
 	}
 	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.AppSKey, as.KeyVault)
 	if err != nil {
@@ -761,7 +761,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		newSession = dev.PendingSession
 	}
 	if newSession == nil || newSession.AppSKey == nil {
-		return errNoAppSKey
+		return errNoAppSKey.New()
 	}
 	newSession.LastAFCntDown = nextAFCntDown - 1
 	if len(invalid) == 0 {
@@ -794,7 +794,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 		}
 	}()
 	if dev.SkipPayloadCrypto {
-		return errPayloadCryptoDisabled
+		return errPayloadCryptoDisabled.New()
 	}
 	logger.Debug("Recalculate downlink queue")
 	newAppSKey, err := cryptoutil.UnwrapAES128Key(ctx, *newSession.AppSKey, as.KeyVault)

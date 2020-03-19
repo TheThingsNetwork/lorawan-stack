@@ -384,9 +384,9 @@ func TestPopTask(t *testing.T) {
 		a.So(payload, should.Equal, "testPayload")
 		a.So(startAt, should.Equal, time.Unix(0, 41).UTC())
 		fCalls++
-		return errTest
+		return errTest.New()
 	}, cl.Key("testKey"))
-	a.So(err, should.Resemble, errTest)
+	a.So(err, should.HaveSameErrorDefinitionAs, errTest)
 
 	err = PopTask(cl, cl.Key("testGroup"), "testID", -1, func(k string, payload string, startAt time.Time) error {
 		a.So(fCalls, should.Equal, 3)
