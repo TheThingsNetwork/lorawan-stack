@@ -115,7 +115,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			valid, err := auth.Validate(apiKey.GetKey(), tokenKey)
 			region.End()
 			if err != nil {
-				return err
+				return errInvalidAuthorization.WithCause(err)
 			}
 			if !valid {
 				return errInvalidAuthorization
@@ -153,7 +153,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			valid, err := auth.Validate(accessToken.GetAccessToken(), tokenKey)
 			region.End()
 			if err != nil {
-				return err
+				return errInvalidAuthorization.WithCause(err)
 			}
 			if !valid {
 				return errInvalidAuthorization
