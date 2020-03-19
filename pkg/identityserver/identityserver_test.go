@@ -72,6 +72,10 @@ func init() {
 	defaultUser.PrimaryEmailAddressValidatedAt = &now
 	defaultUser.State = ttnpb.STATE_APPROVED
 
+	defaultUser.TemporaryPassword = ""
+	defaultUser.TemporaryPasswordCreatedAt = nil
+	defaultUser.TemporaryPasswordExpiresAt = nil
+
 	for id, apiKeys := range population.APIKeys {
 		if id.GetUserIDs().GetUserID() == defaultUser.GetUserID() {
 			population.APIKeys[id] = append(
