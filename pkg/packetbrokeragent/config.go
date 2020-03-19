@@ -79,6 +79,6 @@ func (c TLSConfig) loadCertificate(ctx context.Context, keyVault crypto.KeyVault
 		}
 		return *cert, nil
 	default:
-		return tls.Certificate{}, errNoTLSCertificate
+		return tls.Certificate{}, errNoTLSCertificate.New()
 	}
 }

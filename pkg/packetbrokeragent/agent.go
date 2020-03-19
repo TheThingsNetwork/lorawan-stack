@@ -423,7 +423,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, msg *packetbroker.Uplin
 
 	ids, err := lorawan.GetUplinkMessageIdentifiers(msg.PhyPayload.GetPlain())
 	if err != nil {
-		return errMessageIdentifiers
+		return errMessageIdentifiers.New()
 	}
 
 	if ids.JoinEUI != nil {

@@ -38,7 +38,7 @@ func (s *gsPbaServer) PublishUplink(ctx context.Context, up *ttnpb.GatewayUplink
 	}
 
 	if s.upstreamCh == nil {
-		return nil, errForwarderDisabled
+		return nil, errForwarderDisabled.New()
 	}
 
 	ctx = events.ContextWithCorrelationID(ctx, append(

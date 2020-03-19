@@ -26,7 +26,7 @@ var errNoPHYPayload = errors.DefineFailedPrecondition("no_phy_payload", "no PHYP
 func (a *Agent) encryptUplink(ctx context.Context, msg *packetbroker.UplinkMessage) error {
 	// TODO: Obtain KEK, encrypt PHYPayload and gateway metadata (https://github.com/TheThingsIndustries/lorawan-stack/issues/1919).
 	if msg.PhyPayload.GetPlain() == nil {
-		return errNoPHYPayload
+		return errNoPHYPayload.New()
 	}
 	return nil
 }
@@ -34,7 +34,7 @@ func (a *Agent) encryptUplink(ctx context.Context, msg *packetbroker.UplinkMessa
 func (a *Agent) decryptUplink(ctx context.Context, msg *packetbroker.UplinkMessage) error {
 	// TODO: Obtain KEK, decrypt PHYPayload and gateway metadata (https://github.com/TheThingsIndustries/lorawan-stack/issues/1919).
 	if msg.PhyPayload.GetPlain() == nil {
-		return errNoPHYPayload
+		return errNoPHYPayload.New()
 	}
 	return nil
 }
