@@ -68,10 +68,9 @@ func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.Uplink
 	}
 	if !ok {
 		log.FromContext(ctx).Debug("Dropped duplicate uplink")
-		registerReceiveUplinkDuplicate(ctx, up)
 		return false, nil
 	}
-	registerReceiveUplink(ctx, up)
+	registerReceiveUniqueUplink(ctx, up)
 	return true, nil
 }
 
@@ -841,6 +840,11 @@ var handleDataUplinkGetPaths = [...]string{
 }
 
 func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropDataUplink(ctx, up, err)
+		}
+	}()
 	pld := up.Payload.GetMACPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -871,7 +875,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	matched, err := ns.matchAndHandleDataUplink(up, false, addrMatches...)
 	if err != nil {
-		registerDropDataUplink(ctx, up, err)
 		logger.WithError(err).Debug("Failed to match device")
 		return err
 	}
@@ -881,7 +884,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	defer func() {
 		if err != nil {
 			events.Publish(evtDropDataUplink(ctx, matched.Device.EndDeviceIdentifiers, err))
-			registerDropDataUplink(ctx, up, err)
 		}
 	}()
 
@@ -1054,6 +1056,11 @@ func (ns *NetworkServer) deduplicationDone(ctx context.Context, up *ttnpb.Uplink
 }
 
 func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropJoinRequest(ctx, up, err)
+		}
+	}()
 	pld := up.Payload.GetJoinRequestPayload()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -1076,7 +1083,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	)
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to load device from registry by EUIs")
-		registerDropJoinRequest(ctx, up, err)
 		return err
 	}
 	ctx = matchedCtx
@@ -1084,7 +1090,6 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	defer func() {
 		if err != nil {
 			events.Publish(evtDropJoinRequest(ctx, matched.EndDeviceIdentifiers, err))
-			registerDropJoinRequest(ctx, up, err)
 		}
 	}()
 
@@ -1307,6 +1312,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	))
 	ctx = log.NewContext(ctx, logger)
 
+	registerReceiveUplink(ctx, up)
 	switch up.Payload.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		return ttnpb.Empty, ns.handleDataUplink(ctx, up)
