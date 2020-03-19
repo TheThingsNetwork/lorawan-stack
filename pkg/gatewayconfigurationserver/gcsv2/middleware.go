@@ -33,7 +33,7 @@ func (s *Server) normalizeAuthorization(next echo.HandlerFunc) echo.HandlerFunc 
 		}
 		authorizationParts := strings.SplitN(authorization, " ", 2)
 		if len(authorizationParts) != 2 {
-			return errUnauthenticated
+			return errUnauthenticated.New()
 		}
 		authType, authValue := strings.ToLower(authorizationParts[0]), authorizationParts[1]
 		switch authType {
@@ -45,7 +45,7 @@ func (s *Server) normalizeAuthorization(next echo.HandlerFunc) echo.HandlerFunc 
 				authType = "key"
 			}
 		default:
-			return errUnauthenticated
+			return errUnauthenticated.New()
 		}
 		md := metadata.New(map[string]string{
 			"authorization": fmt.Sprintf("%s %s", authType, authValue),

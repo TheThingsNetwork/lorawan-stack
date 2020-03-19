@@ -440,7 +440,7 @@ func boolsTo16BoolArray(vs ...bool) [16]bool {
 
 func generateChMask16(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	if len(currentChs) != 16 || len(desiredChs) != 16 {
-		return nil, errInvalidChannelCount
+		return nil, errInvalidChannelCount.New()
 	}
 	// NOTE: ChMaskCntl==6 never provides a more optimal ChMask sequence than ChMaskCntl==0.
 	return []ChMaskCntlPair{
@@ -466,7 +466,7 @@ func equalChMasks(a, b []bool) bool {
 func generateChMaskMatrix(pairs []ChMaskCntlPair, currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	n := len(currentChs)
 	if n%16 != 0 || len(desiredChs) != n {
-		return nil, errInvalidChannelCount
+		return nil, errInvalidChannelCount.New()
 	}
 	for i := 0; i < n/16; i++ {
 		for j := 0; j < 16; j++ {
@@ -494,7 +494,7 @@ func trueCount(vs ...bool) int {
 
 func generateChMask72Generic(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	if len(currentChs) != 72 || len(desiredChs) != 72 {
-		return nil, errInvalidChannelCount
+		return nil, errInvalidChannelCount.New()
 	}
 	if equalChMasks(currentChs, desiredChs) {
 		return []ChMaskCntlPair{
@@ -648,7 +648,7 @@ func makeGenerateChMask72(supportChMaskCntl5 bool) func([]bool, []bool) ([]ChMas
 
 func generateChMask96(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	if len(currentChs) != 96 || len(desiredChs) != 96 {
-		return nil, errInvalidChannelCount
+		return nil, errInvalidChannelCount.New()
 	}
 	if equalChMasks(currentChs, desiredChs) {
 		return []ChMaskCntlPair{

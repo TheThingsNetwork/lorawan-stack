@@ -73,7 +73,7 @@ func enqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 
 func handleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RxParamSetupAns) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return nil, errNoPayload
+		return nil, errNoPayload.New()
 	}
 
 	var err error

@@ -163,7 +163,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				a.So(paths, should.HaveSameElementsDeep, []string{
 					"formatters",
 				})
-				return nil, errNotFound
+				return nil, errNotFound.New()
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,

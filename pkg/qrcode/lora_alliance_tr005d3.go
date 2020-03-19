@@ -39,10 +39,10 @@ type LoRaAllianceTR005Draft3 struct {
 // Encode implements the Data interface.
 func (m *LoRaAllianceTR005Draft3) Encode(dev *ttnpb.EndDevice) error {
 	if dev.JoinEUI == nil {
-		return errNoJoinEUI
+		return errNoJoinEUI.New()
 	}
 	if dev.DevEUI == nil {
-		return errNoDevEUI
+		return errNoDevEUI.New()
 	}
 	*m = LoRaAllianceTR005Draft3{
 		JoinEUI:              *dev.JoinEUI,
@@ -103,11 +103,11 @@ func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
 		!bytes.Equal(parts[0], []byte("URN")) ||
 		!bytes.Equal(parts[1], []byte("DEV")) ||
 		!bytes.Equal(parts[2], []byte("LW")) {
-		return errFormat
+		return errFormat.New()
 	}
 	parts = bytes.SplitN(parts[3], []byte("_"), 4)
 	if len(parts) < 3 {
-		return errFormat
+		return errFormat.New()
 	}
 	*m = LoRaAllianceTR005Draft3{}
 	if err := m.JoinEUI.UnmarshalText(parts[0]); err != nil {
@@ -121,7 +121,7 @@ func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
 		copy(m.VendorID[:], prodID[:2])
 		copy(m.ModelID[:], prodID[2:])
 	} else if n != 4 {
-		return errFormat
+		return errFormat.New()
 	} else {
 		return err
 	}

@@ -211,13 +211,13 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	var payload ttnpb.Message
 	err := lorawan.UnmarshalMessage(up.RawPayload, &payload)
 	if err != nil {
-		return errUplinkMessage
+		return errUplinkMessage.New()
 	}
 	req.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
 	req.MIC = int32(binary.LittleEndian.Uint32(payload.MIC[:]))
 	jreqPayload := payload.GetJoinRequestPayload()
 	if jreqPayload == nil {
-		return errUplinkMessage
+		return errUplinkMessage.New()
 	}
 
 	req.DevEUI = basicstation.EUI{
@@ -272,7 +272,7 @@ func (updf *UplinkDataFrame) ToUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
 	if parsedMHDR.MType != ttnpb.MType_UNCONFIRMED_UP && parsedMHDR.MType != ttnpb.MType_CONFIRMED_UP {
-		return nil, errUplinkDataFrame
+		return nil, errUplinkDataFrame.New()
 	}
 
 	micBytes, err := getInt32AsByteSlice(updf.MIC)
@@ -382,13 +382,13 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	var payload ttnpb.Message
 	err := lorawan.UnmarshalMessage(up.RawPayload, &payload)
 	if err != nil {
-		return errUplinkMessage
+		return errUplinkMessage.New()
 	}
 	updf.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
 
 	macPayload := payload.GetMACPayload()
 	if macPayload == nil {
-		return errUplinkMessage
+		return errUplinkMessage.New()
 	}
 
 	updf.FPort = int(macPayload.GetFPort())

@@ -127,7 +127,7 @@ func (s *deviceStore) FindEndDevices(ctx context.Context, ids []*ttnpb.EndDevice
 	var applicationID string
 	for i, id := range ids {
 		if applicationID != "" && applicationID != id.GetApplicationID() {
-			return nil, errMultipleApplicationIDs
+			return nil, errMultipleApplicationIDs.New()
 		}
 		applicationID = id.GetApplicationID()
 		idStrings[i] = id.GetDeviceID()

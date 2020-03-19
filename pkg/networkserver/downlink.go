@@ -701,7 +701,7 @@ func nonRetryableFixedPathGatewayError(err error) bool {
 // scheduleDownlinkByPaths returns the scheduled downlink or error.
 func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb.TxRequest, b []byte, paths ...downlinkPath) (*scheduledDownlink, error) {
 	if len(paths) == 0 {
-		return nil, errNoPath
+		return nil, errNoPath.New()
 	}
 
 	logger := log.FromContext(ctx)
@@ -824,7 +824,7 @@ func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkM
 // txRequestFromUplink does not set the priority.
 func txRequestFromUplink(phy band.Band, macState *ttnpb.MACState, rx1, rx2 bool, rxDelay time.Duration, up *ttnpb.UplinkMessage) (*ttnpb.TxRequest, error) {
 	if !rx1 && !rx2 {
-		return nil, errNoPath
+		return nil, errNoPath.New()
 	}
 	req := &ttnpb.TxRequest{
 		Class:    ttnpb.CLASS_A,
@@ -832,7 +832,7 @@ func txRequestFromUplink(phy band.Band, macState *ttnpb.MACState, rx1, rx2 bool,
 	}
 	if rx1 {
 		if up.DeviceChannelIndex > math.MaxUint8 {
-			return nil, errInvalidChannelIndex
+			return nil, errInvalidChannelIndex.New()
 		}
 		rx1ChIdx, err := phy.Rx1Channel(uint8(up.DeviceChannelIndex))
 		if err != nil {
@@ -840,7 +840,7 @@ func txRequestFromUplink(phy band.Band, macState *ttnpb.MACState, rx1, rx2 bool,
 		}
 		if uint(rx1ChIdx) >= uint(len(macState.CurrentParameters.Channels)) ||
 			macState.CurrentParameters.Channels[int(rx1ChIdx)].GetDownlinkFrequency() == 0 {
-			return nil, errCorruptedMACState
+			return nil, errCorruptedMACState.New()
 		}
 		rx1DRIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())
 		if err != nil {

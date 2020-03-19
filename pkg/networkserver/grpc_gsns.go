@@ -138,7 +138,7 @@ func makeDeferredMACHandler(dev *ttnpb.EndDevice, f macHandler) macHandler {
 	return func(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage) ([]events.DefinitionDataClosure, error) {
 		switch n := len(dev.MACState.QueuedResponses); {
 		case n < queuedLength:
-			return nil, errCorruptedMACState
+			return nil, errCorruptedMACState.New()
 		case n == queuedLength:
 			return f(ctx, dev, up)
 		default:
@@ -180,7 +180,7 @@ type contextualEndDevice struct {
 // matchAndHandleDataUplink tries to match the data uplink message with a device and returns the matched device.
 func (ns *NetworkServer) matchAndHandleDataUplink(up *ttnpb.UplinkMessage, deduplicated bool, devs ...contextualEndDevice) (*matchedDevice, error) {
 	if len(up.RawPayload) < 4 {
-		return nil, errRawPayloadTooShort
+		return nil, errRawPayloadTooShort.New()
 	}
 	pld := up.Payload.GetMACPayload()
 
@@ -808,7 +808,7 @@ matchLoop:
 		)
 		return &match.matchedDevice, nil
 	}
-	return nil, errDeviceNotFound
+	return nil, errDeviceNotFound.New()
 }
 
 // MACHandler defines the behavior of a MAC command on a device.
@@ -1049,7 +1049,7 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 			return nil, err
 		}
 	}
-	return nil, errJoinServerNotFound
+	return nil, errJoinServerNotFound.New()
 }
 
 func (ns *NetworkServer) deduplicationDone(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
@@ -1106,7 +1106,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 	if !matched.SupportsJoin {
 		logger.Warn("ABP device sent a join-request, drop")
-		return errABPJoinRequest
+		return errABPJoinRequest.New()
 	}
 
 	ctx = log.NewContext(ctx, logger)
@@ -1174,7 +1174,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 	drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
 	if !ok {
-		return errDataRateNotFound
+		return errDataRateNotFound.New()
 	}
 	up.Settings.DataRateIndex = drIdx
 
@@ -1279,7 +1279,7 @@ func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.Upli
 		}
 	}()
 	// TODO: Implement https://github.com/TheThingsNetwork/lorawan-stack/issues/8
-	return errRejoinRequest
+	return errRejoinRequest.New()
 }
 
 // HandleUplink is called by the Gateway Server when an uplink message arrives.

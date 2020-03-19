@@ -298,7 +298,7 @@ func (s *Server) getTrust(address string) (*x509.Certificate, error) {
 		if s.trust != nil {
 			return s.trust, nil
 		}
-		return nil, errNoTrust
+		return nil, errNoTrust.New()
 	}
 	_, host, port, err := parseAddress("https", address)
 	if err != nil {
@@ -337,7 +337,7 @@ func (s *Server) getTrust(address string) (*x509.Certificate, error) {
 			return trust, nil
 		}
 
-		return nil, errNoTrust
+		return nil, errNoTrust.New()
 	})
 	if err != nil {
 		return nil, err

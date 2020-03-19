@@ -57,7 +57,7 @@ func UnwrapAES128Key(ctx context.Context, wrapped ttnpb.KeyEnvelope, v crypto.Ke
 	}
 	if wrapped.KEKLabel == "" {
 		if len(wrapped.EncryptedKey) != 16 {
-			return key, errInvalidLength
+			return key, errInvalidLength.New()
 		}
 		copy(key[:], wrapped.EncryptedKey)
 	} else {
@@ -66,7 +66,7 @@ func UnwrapAES128Key(ctx context.Context, wrapped ttnpb.KeyEnvelope, v crypto.Ke
 			return key, err
 		}
 		if len(keyBytes) != 16 {
-			return key, errInvalidLength
+			return key, errInvalidLength.New()
 		}
 		copy(key[:], keyBytes)
 	}

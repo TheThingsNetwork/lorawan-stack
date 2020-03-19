@@ -59,7 +59,7 @@ func handleMACResponse(cid ttnpb.MACCommandIdentifier, f func(*ttnpb.MACCommand)
 		}
 		return append(cmds[:i], cmds[i+1:]...), nil
 	}
-	return cmds, errMACRequestNotFound
+	return cmds, errMACRequestNotFound.New()
 }
 
 // handleMACResponse searches for first MAC command block in cmds with CID equal to cid and calls f for each found value as argument.
@@ -87,7 +87,7 @@ outer:
 	}
 
 	if first < 0 {
-		return cmds, errMACRequestNotFound
+		return cmds, errMACRequestNotFound.New()
 	}
 	return append(cmds[:first], cmds[last+1:]...), nil
 }

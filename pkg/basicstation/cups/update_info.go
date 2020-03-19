@@ -195,7 +195,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		}
 	} else if gtw.Attributes[cupsAuthHeaderAttribute] != "" {
 		if subtle.ConstantTimeCompare([]byte(getAuthHeader(ctx)), []byte(gtw.Attributes[cupsAuthHeaderAttribute])) != 1 {
-			return errInvalidToken
+			return errInvalidToken.New()
 		}
 		logger.Debug("Authorized with CUPS Auth Header")
 		md := rpcmetadata.FromIncomingContext(ctx)
@@ -203,7 +203,7 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		md.AllowInsecure = s.component.AllowInsecureForCredentials()
 		gatewayAuth = grpc.PerRPCCredentials(md)
 	} else {
-		return errUnauthenticated
+		return errUnauthenticated.New()
 	}
 
 	if gtw.Attributes == nil {

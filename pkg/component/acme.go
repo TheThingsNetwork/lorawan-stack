@@ -31,10 +31,10 @@ func (c *Component) initACME() error {
 		return nil
 	}
 	if c.config.TLS.ACME.Endpoint == "" {
-		return errMissingACMEEndpoint
+		return errMissingACMEEndpoint.New()
 	}
 	if c.config.TLS.ACME.Dir == "" {
-		return errMissingACMEDir
+		return errMissingACMEDir.New()
 	}
 	c.acme = &autocert.Manager{
 		Cache:      autocert.DirCache(c.config.TLS.ACME.Dir),

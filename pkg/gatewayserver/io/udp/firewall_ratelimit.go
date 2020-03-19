@@ -46,10 +46,10 @@ var (
 
 func (f *rateLimitingFirewall) Filter(packet encoding.Packet) error {
 	if packet.GatewayEUI == nil {
-		return errNoEUI
+		return errNoEUI.New()
 	}
 	if packet.GatewayAddr == nil {
-		return errNoAddress
+		return errNoAddress.New()
 	}
 	now := time.Now().UTC()
 	eui := *packet.GatewayEUI
@@ -64,7 +64,7 @@ func (f *rateLimitingFirewall) Filter(packet encoding.Packet) error {
 
 	oldestTimestamp := ts.Append(now)
 	if !oldestTimestamp.IsZero() && now.Sub(oldestTimestamp) < f.threshold {
-		return errRateExceeded
+		return errRateExceeded.New()
 	}
 
 	// Continue filtering

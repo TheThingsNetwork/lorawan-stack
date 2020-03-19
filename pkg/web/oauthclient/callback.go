@@ -41,12 +41,12 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 
 	state := c.QueryParam("state")
 	if state == "" {
-		return errNoStateParam
+		return errNoStateParam.New()
 	}
 
 	code := c.QueryParam("code")
 	if code == "" {
-		return errNoCodeParam
+		return errNoCodeParam.New()
 	}
 
 	stateCookie, err := oc.getStateCookie(c)
@@ -55,7 +55,7 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 	}
 
 	if stateCookie.Secret != state {
-		return errInvalidState
+		return errInvalidState.New()
 	}
 
 	// Exchange token.

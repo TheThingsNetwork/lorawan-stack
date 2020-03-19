@@ -83,7 +83,7 @@ func unmarshalTextBytes(dst, data []byte) error {
 		return err
 	}
 	if n != len(dst) || copy(dst, b) != len(dst) {
-		return errInvalidLength
+		return errInvalidLength.New()
 	}
 	return nil
 }
@@ -106,7 +106,7 @@ func unmarshalBinaryBytes(dst, data []byte) error {
 		return nil
 	}
 	if len(data) != len(dst) || copy(dst[:], data) != len(dst) {
-		return errInvalidLength
+		return errInvalidLength.New()
 	}
 	return nil
 }

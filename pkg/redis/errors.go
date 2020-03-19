@@ -39,9 +39,9 @@ func ConvertError(err error) error {
 	case nil:
 		return nil
 	case redis.Nil:
-		return errNotFound
+		return errNotFound.New()
 	case redis.TxFailedErr:
-		return errTransactionFailed
+		return errTransactionFailed.New()
 	}
 	return errStore.WithCause(err)
 }

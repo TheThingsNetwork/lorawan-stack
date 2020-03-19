@@ -141,7 +141,7 @@ func enqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 
 func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_LinkADRAns, dupCount uint, fps *frequencyplans.Store) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return nil, errNoPayload
+		return nil, errNoPayload.New()
 	}
 
 	handler := handleMACResponseBlock
@@ -150,7 +150,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 
 	if (dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
-		return nil, errInvalidPayload
+		return nil, errInvalidPayload.New()
 	}
 
 	evt := evtReceiveLinkADRAccept
@@ -168,7 +168,7 @@ func handleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	var req *ttnpb.MACCommand_LinkADRReq
 	dev.MACState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
 		if dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
-			return errInvalidPayload
+			return errInvalidPayload.New()
 		}
 		n++
 

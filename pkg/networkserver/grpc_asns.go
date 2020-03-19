@@ -118,7 +118,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 	case len(downs) == 0:
 		return unmatched, nil
 	case len(downs) > 0 && macState == nil:
-		return unmatched, errUnknownMACState
+		return unmatched, errUnknownMACState.New()
 	}
 
 	var minFCnt uint32
@@ -133,7 +133,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 			case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
 				macPayload := pld.GetMACPayload()
 				if macPayload == nil {
-					return unmatched, errInvalidPayload
+					return unmatched, errInvalidPayload.New()
 				}
 				if macPayload.FPort > 0 && macPayload.FCnt >= minFCnt {
 					// NOTE: In an unlikely case all len(recentDowns) downlinks are FPort==0 or something unmatched in the switch (e.g. a proprietary downlink) minFCnt will
@@ -161,16 +161,16 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 			return unmatched, errFCntTooLow.WithAttributes("f_cnt", down.FCnt, "min_f_cnt", minFCnt)
 
 		case !bytes.Equal(down.SessionKeyID, session.SessionKeyID):
-			return unmatched, errUnknownSession
+			return unmatched, errUnknownSession.New()
 
 		case multicast && down.Confirmed:
-			return unmatched, errConfirmedMulticastDownlink
+			return unmatched, errConfirmedMulticastDownlink.New()
 
 		case multicast && len(down.GetClassBC().GetGateways()) == 0:
-			return unmatched, errNoPath
+			return unmatched, errNoPath.New()
 
 		case down.GetClassBC().GetAbsoluteTime() != nil && down.GetClassBC().GetAbsoluteTime().Before(timeNow().Add(macState.CurrentParameters.Rx1Delay.Duration()/2)):
-			return unmatched, errExpiredDownlink
+			return unmatched, errExpiredDownlink.New()
 		}
 		minFCnt = down.FCnt + 1
 		session.QueuedApplicationDownlinks = append(session.QueuedApplicationDownlinks, down)
@@ -216,7 +216,7 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		return err
 	}
 	if len(unmatched) > 0 {
-		return errUnknownSession
+		return errUnknownSession.New()
 	}
 	return nil
 }

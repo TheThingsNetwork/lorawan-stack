@@ -29,7 +29,7 @@ var (
 
 func handlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_PingSlotInfoReq) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return nil, errNoPayload
+		return nil, errNoPayload.New()
 	}
 
 	evs := []events.DefinitionDataClosure{

@@ -42,7 +42,7 @@ func (rs *registrySearch) memberForSearch(ctx context.Context) (*ttnpb.Organizat
 	if member != nil {
 		return member, nil
 	}
-	return nil, errSearchForbidden
+	return nil, errSearchForbidden.New()
 }
 
 func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchEntitiesRequest) (*ttnpb.Applications, error) {
@@ -223,7 +223,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchEnti
 		return nil, err
 	}
 	if member != nil {
-		return nil, errSearchForbidden
+		return nil, errSearchForbidden.New()
 	}
 	req.FieldMask.Paths = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask.Paths, getPaths, nil)
 	ctx = store.WithOrder(ctx, req.Order)

@@ -121,7 +121,7 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 		return nil, errWebhooksTarget.WithAttributes("target", c.Target)
 	}
 	if c.Registry == nil {
-		return nil, errWebhooksRegistry
+		return nil, errWebhooksRegistry.New()
 	}
 	if c.QueueSize > 0 || c.Workers > 0 {
 		target = &web.QueuedSink{

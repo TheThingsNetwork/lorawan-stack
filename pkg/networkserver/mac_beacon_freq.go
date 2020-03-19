@@ -69,7 +69,7 @@ func enqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 
 func handleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_BeaconFreqAns) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return nil, errNoPayload
+		return nil, errNoPayload.New()
 	}
 
 	evt := evtReceiveBeaconFreqAccept

@@ -161,7 +161,7 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 		return errMicrochipData.WithCause(err)
 	}
 	if _, ok := delim.(json.Delim); !ok {
-		return errMicrochipData
+		return errMicrochipData.New()
 	}
 
 	for dec.More() {
@@ -244,7 +244,7 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 		return errMicrochipData.WithCause(err)
 	}
 	if _, ok := delim.(json.Delim); !ok {
-		return errMicrochipData
+		return errMicrochipData.New()
 	}
 
 	for dec.More() {

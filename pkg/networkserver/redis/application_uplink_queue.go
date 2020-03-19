@@ -121,11 +121,11 @@ func (q *ApplicationUplinkQueue) Subscribe(ctx context.Context, appID ttnpb.Appl
 			for _, msg := range ret.Messages {
 				v, ok := msg.Values[payloadKey]
 				if !ok {
-					return errMissingPayload
+					return errMissingPayload.New()
 				}
 				s, ok := v.(string)
 				if !ok {
-					return errInvalidPayload
+					return errInvalidPayload.New()
 				}
 				up := &ttnpb.ApplicationUp{}
 				if err = ttnredis.UnmarshalProto(s, up); err != nil {

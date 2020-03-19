@@ -28,7 +28,7 @@ var (
 
 func handleDeviceModeInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_DeviceModeInd) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
-		return nil, errNoPayload
+		return nil, errNoPayload.New()
 	}
 
 	evs := []events.DefinitionDataClosure{

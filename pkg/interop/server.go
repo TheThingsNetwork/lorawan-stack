@@ -70,15 +70,15 @@ type ApplicationServer interface {
 type noopServer struct{}
 
 func (noopServer) JoinRequest(context.Context, *JoinReq) (*JoinAns, error) {
-	return nil, errNotRegistered
+	return nil, errNotRegistered.New()
 }
 
 func (noopServer) AppSKeyRequest(context.Context, *AppSKeyReq) (*AppSKeyAns, error) {
-	return nil, errNotRegistered
+	return nil, errNotRegistered.New()
 }
 
 func (noopServer) HomeNSRequest(context.Context, *HomeNSReq) (*HomeNSAns, error) {
-	return nil, errNotRegistered
+	return nil, errNotRegistered.New()
 }
 
 // Server is the server.
@@ -277,7 +277,7 @@ func (s *Server) handleRequest(c echo.Context) error {
 	case *AppSKeyReq:
 		ans, err = s.js.AppSKeyRequest(ctx, req)
 	default:
-		return ErrMalformedMessage
+		return ErrMalformedMessage.New()
 	}
 	if err != nil {
 		return err

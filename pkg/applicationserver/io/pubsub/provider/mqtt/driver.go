@@ -47,7 +47,7 @@ func OpenTopic(client mqtt.Client, topicName string, timeout time.Duration, qos 
 
 func openDriverTopic(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Topic, error) {
 	if client == nil {
-		return nil, errNilClient
+		return nil, errNilClient.New()
 	}
 	dt := &topic{
 		client:  client,
@@ -63,7 +63,7 @@ var errPublishFailed = errors.Define("publish_failed", "publish to MQTT topic fa
 // SendBatch implements driver.Topic.
 func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 	if t == nil || t.client == nil {
-		return errNilClient
+		return errNilClient.New()
 	}
 	for _, msg := range msgs {
 		if ctx.Err() != nil {
@@ -177,7 +177,7 @@ var errSubscribeFailed = errors.Define("subscribe_failed", "subscribe to MQTT to
 
 func openDriverSubscription(client mqtt.Client, topicName string, timeout time.Duration, qos byte) (driver.Subscription, error) {
 	if client == nil {
-		return nil, errNilClient
+		return nil, errNilClient.New()
 	}
 	subCh := make(chan mqtt.Message, subscriptionQueueSize)
 	handler := func(_ mqtt.Client, msg mqtt.Message) {
@@ -201,7 +201,7 @@ func openDriverSubscription(client mqtt.Client, topicName string, timeout time.D
 // ReceiveBatch implements driver.Subscription.
 func (s *subscription) ReceiveBatch(ctx context.Context, maxMessages int) ([]*driver.Message, error) {
 	if s == nil || s.client == nil {
-		return nil, errNilClient
+		return nil, errNilClient.New()
 	}
 	var messages []*driver.Message
 outer:
@@ -275,7 +275,7 @@ func (s *subscription) Close() error {
 }
 
 func toErrorCode(err error) gcerrors.ErrorCode {
-	if d, ok := err.(errors.Definition); ok && d.FullName() == errNilClient.FullName() {
+	if errors.Resemble(err, errNilClient) {
 		return gcerrors.NotFound
 	}
 	switch err {

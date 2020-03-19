@@ -352,7 +352,7 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	payload := msg.GetRawPayload()
 	scheduled := msg.GetScheduled()
 	if scheduled == nil {
-		return nil, errNotScheduled
+		return nil, errNotScheduled.New()
 	}
 	tx := &TxPacket{
 		Freq: float64(scheduled.Frequency) / 1000000,

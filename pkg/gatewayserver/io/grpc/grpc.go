@@ -190,7 +190,7 @@ func getMQTTConnectionProvider(ctx context.Context, ids *ttnpb.GatewayIdentifier
 		return nil, err
 	}
 	if provider == nil {
-		return nil, errNoMQTTConfigProvider
+		return nil, errNoMQTTConfigProvider.New()
 	}
 	config, err := provider.GetMQTTConfig(ctx)
 	if err != nil {

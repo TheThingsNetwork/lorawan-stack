@@ -129,7 +129,7 @@ func (s *QueuedSink) Process(req *http.Request) error {
 	case s.Queue <- req:
 		return nil
 	default:
-		return errQueueFull
+		return errQueueFull.New()
 	}
 }
 
@@ -427,7 +427,7 @@ func (w *webhooks) handleDown(c echo.Context, op func(io.Server, context.Context
 		return err
 	}
 	if hook == nil {
-		return errWebhookNotFound
+		return errWebhookNotFound.New()
 	}
 	format, ok := formats[hook.Format]
 	if !ok {

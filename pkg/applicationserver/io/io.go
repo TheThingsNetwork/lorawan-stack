@@ -101,7 +101,7 @@ func (s *Subscription) SendUp(ctx context.Context, up *ttnpb.ApplicationUp) erro
 		ApplicationUp: up,
 	}:
 	default:
-		return errBufferFull
+		return errBufferFull.New()
 	}
 	return nil
 }

@@ -177,7 +177,7 @@ func adaptDataRate(dev *ttnpb.EndDevice, phy band.Band, defaults ttnpb.MACSettin
 		var ok bool
 		df, ok = demodulationFloor[dr.SpreadingFactor][dr.Bandwidth]
 		if !ok {
-			return errInvalidDataRate
+			return errInvalidDataRate.New()
 		}
 	}
 

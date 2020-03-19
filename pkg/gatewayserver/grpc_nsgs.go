@@ -45,7 +45,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 	}
 	request := down.GetRequest()
 	if request == nil {
-		return nil, errNotTxRequest
+		return nil, errNotTxRequest.New()
 	}
 
 	var pathErrs []errors.ErrorDetails
