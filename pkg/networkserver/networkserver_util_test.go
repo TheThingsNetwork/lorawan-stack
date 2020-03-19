@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/pkg/component/test"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
@@ -47,6 +48,9 @@ const (
 	RecentUplinkCount     = recentUplinkCount
 	RecentDownlinkCount   = recentDownlinkCount
 	OptimalADRUplinkCount = optimalADRUplinkCount
+
+	AppIDString = "handle-uplink-test-app-id"
+	DevID       = "handle-uplink-test-dev-id"
 )
 
 var (
@@ -82,6 +86,19 @@ var (
 
 	ErrTestInternal = errors.DefineInternal("test_internal", "test error")
 	ErrTestNotFound = errors.DefineNotFound("test_not_found", "test error")
+
+	FNwkSIntKey = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	NwkSEncKey  = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	SNwkSIntKey = types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	AppSKey     = types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
+	JoinEUI = types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+	DevEUI  = types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+	DevAddr = types.DevAddr{0x42, 0x00, 0x00, 0x00}
+
+	AppID = ttnpb.ApplicationIdentifiers{ApplicationID: AppIDString}
+
+	NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
 )
 
 var timeMu sync.RWMutex
@@ -176,20 +193,33 @@ func MustAppendLegacyDownlinkMIC(fNwkSIntKey types.AES128Key, devAddr types.DevA
 	return append(b, mic[:]...)
 }
 
-func MakeLinkCheckAns(mds ...*ttnpb.RxMetadata) *ttnpb.MACCommand {
-	maxSNR := mds[0].SNR
-	for _, md := range mds {
-		if md.SNR > maxSNR {
-			maxSNR = md.SNR
-		}
+func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
+	return []*ttnpb.MACParameters_Channel{
+		{
+			UplinkFrequency:   868100000,
+			DownlinkFrequency: 868100000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			EnableUplink:      true,
+		},
+		{
+			UplinkFrequency:   868300000,
+			DownlinkFrequency: 868300000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			EnableUplink:      true,
+		},
+		{
+			UplinkFrequency:   868500000,
+			DownlinkFrequency: 868500000,
+			MinDataRateIndex:  ttnpb.DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			EnableUplink:      true,
+		},
 	}
-	return (&ttnpb.MACCommand_LinkCheckAns{
-		Margin:       uint32(maxSNR + 15),
-		GatewayCount: uint32(len(mds)),
-	}).MACCommand()
 }
 
-func MakeDefaultEU868CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
+func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) ttnpb.MACParameters {
 	return ttnpb.MACParameters{
 		ADRAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
 		ADRAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
@@ -203,35 +233,12 @@ func MakeDefaultEU868CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParamet
 		Rx1Delay:                   ttnpb.RX_DELAY_1,
 		Rx2DataRateIndex:           ttnpb.DATA_RATE_0,
 		Rx2Frequency:               869525000,
-		Channels: []*ttnpb.MACParameters_Channel{
-			{
-				UplinkFrequency:   868100000,
-				DownlinkFrequency: 868100000,
-				MinDataRateIndex:  ttnpb.DATA_RATE_0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				EnableUplink:      true,
-			},
-			{
-				UplinkFrequency:   868300000,
-				DownlinkFrequency: 868300000,
-				MinDataRateIndex:  ttnpb.DATA_RATE_0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				EnableUplink:      true,
-			},
-			{
-				UplinkFrequency:   868500000,
-				DownlinkFrequency: 868500000,
-				MinDataRateIndex:  ttnpb.DATA_RATE_0,
-				MaxDataRateIndex:  ttnpb.DATA_RATE_5,
-				EnableUplink:      true,
-			},
-		},
+		Channels:                   MakeDefaultEU868CurrentChannels(),
 	}
 }
 
-func MakeDefaultEU868DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
-	params := MakeDefaultEU868CurrentMACParameters(ver)
-	params.Channels = append(params.Channels,
+func MakeDefaultEU868DesiredChannels() []*ttnpb.MACParameters_Channel {
+	return append(MakeDefaultEU868CurrentChannels(),
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867100000,
 			DownlinkFrequency: 867100000,
@@ -268,6 +275,11 @@ func MakeDefaultEU868DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParamet
 			EnableUplink:      true,
 		},
 	)
+}
+
+func MakeDefaultEU868DesiredMACParameters(phyVersion ttnpb.PHYVersion) ttnpb.MACParameters {
+	params := MakeDefaultEU868CurrentMACParameters(phyVersion)
+	params.Channels = MakeDefaultEU868DesiredChannels()
 	return params
 }
 
@@ -345,6 +357,59 @@ func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVersion ttnpb.MACVersion
 	}
 }
 
+func MakeOTAAIdentifiers(devAddr *types.DevAddr) *ttnpb.EndDeviceIdentifiers {
+	ids := &ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: AppID,
+		DeviceID:               DevID,
+
+		DevEUI:  DevEUI.Copy(&types.EUI64{}),
+		JoinEUI: JoinEUI.Copy(&types.EUI64{}),
+	}
+	if devAddr != nil {
+		ids.DevAddr = devAddr.Copy(&types.DevAddr{})
+	}
+	return ids
+}
+
+func MakeABPIdentifiers(withDevEUI bool) *ttnpb.EndDeviceIdentifiers {
+	ids := &ttnpb.EndDeviceIdentifiers{
+		ApplicationIdentifiers: AppID,
+		DeviceID:               DevID,
+		DevAddr:                DevAddr.Copy(&types.DevAddr{}),
+	}
+	if withDevEUI {
+		ids.DevEUI = DevEUI.Copy(&types.EUI64{})
+	}
+	return ids
+}
+
+func MakeSessionKeys(macVersion ttnpb.MACVersion, withAppSKey bool) *ttnpb.SessionKeys {
+	sk := &ttnpb.SessionKeys{
+		FNwkSIntKey: &ttnpb.KeyEnvelope{
+			Key: &FNwkSIntKey,
+		},
+		SessionKeyID: []byte("test-session-key-id"),
+	}
+	if withAppSKey {
+		sk.AppSKey = &ttnpb.KeyEnvelope{
+			Key: &AppSKey,
+		}
+	}
+	switch {
+	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
+		sk.NwkSEncKey = sk.FNwkSIntKey
+		sk.SNwkSIntKey = sk.FNwkSIntKey
+	default:
+		sk.NwkSEncKey = &ttnpb.KeyEnvelope{
+			Key: &NwkSEncKey,
+		}
+		sk.SNwkSIntKey = &ttnpb.KeyEnvelope{
+			Key: &SNwkSIntKey,
+		}
+	}
+	return CopySessionKeys(sk)
+}
+
 var RxMetadata = [...]*ttnpb.RxMetadata{
 	{
 		GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayID: "gateway-test-1"},
@@ -382,6 +447,201 @@ var RxMetadata = [...]*ttnpb.RxMetadata{
 		UplinkToken:            []byte("token-gtw-4"),
 		DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 	},
+}
+
+func MakeLinkCheckAns(mds ...*ttnpb.RxMetadata) *ttnpb.MACCommand {
+	maxSNR := mds[0].SNR
+	for _, md := range mds {
+		if md.SNR > maxSNR {
+			maxSNR = md.SNR
+		}
+	}
+	return (&ttnpb.MACCommand_LinkCheckAns{
+		Margin:       uint32(maxSNR + 15),
+		GatewayCount: uint32(len(mds)),
+	}).MACCommand()
+}
+
+func MakeUplinkSettings(dr ttnpb.DataRate, freq uint64) ttnpb.TxSettings {
+	return ttnpb.TxSettings{
+		DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
+		EnableCRC: true,
+		Frequency: freq,
+		Timestamp: 42,
+	}
+}
+
+func MakeJoinRequestDevNonce() types.DevNonce {
+	return types.DevNonce{0x00, 0x01}
+}
+
+func MakeJoinRequestMIC() [4]byte {
+	return [...]byte{0x03, 0x02, 0x01, 0x00}
+}
+
+func MakeJoinRequestPHYPayload() [23]byte {
+	devNonce := MakeJoinRequestDevNonce()
+	mic := MakeJoinRequestMIC()
+	return [...]byte{
+		/* MHDR */
+		0b000_000_00,
+		JoinEUI[7], JoinEUI[6], JoinEUI[5], JoinEUI[4], JoinEUI[3], JoinEUI[2], JoinEUI[1], JoinEUI[0],
+		DevEUI[7], DevEUI[6], DevEUI[5], DevEUI[4], DevEUI[3], DevEUI[2], DevEUI[1], DevEUI[0],
+		/* DevNonce */
+		devNonce[1], devNonce[0],
+		/* MIC */
+		mic[0], mic[1], mic[2], mic[3],
+	}
+}
+
+func MakeJoinRequestDecodedPayload() *ttnpb.Message {
+	mic := MakeJoinRequestMIC()
+	return &ttnpb.Message{
+		MHDR: ttnpb.MHDR{
+			MType: ttnpb.MType_JOIN_REQUEST,
+			Major: ttnpb.Major_LORAWAN_R1,
+		},
+		MIC: mic[:],
+		Payload: &ttnpb.Message_JoinRequestPayload{
+			JoinRequestPayload: &ttnpb.JoinRequestPayload{
+				JoinEUI:  *JoinEUI.Copy(&types.EUI64{}),
+				DevEUI:   *DevEUI.Copy(&types.EUI64{}),
+				DevNonce: MakeJoinRequestDevNonce(),
+			},
+		},
+	}
+}
+
+var JoinRequestCorrelationIDs = [...]string{
+	"join-request-correlation-id-1",
+	"join-request-correlation-id-2",
+	"join-request-correlation-id-3",
+}
+
+func MakeJoinRequest(decodePayload bool, dr ttnpb.DataRate, freq uint64, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
+	phyPayload := MakeJoinRequestPHYPayload()
+	msg := &ttnpb.UplinkMessage{
+		CorrelationIDs: append([]string{}, JoinRequestCorrelationIDs[:]...),
+		RawPayload:     phyPayload[:],
+		RxMetadata:     mds,
+		Settings:       MakeUplinkSettings(dr, freq),
+	}
+	if decodePayload {
+		msg.Payload = MakeJoinRequestDecodedPayload()
+	}
+	return msg
+}
+
+func MakeNsJsJoinRequest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fp *frequencyplans.FrequencyPlan, devAddr *types.DevAddr, rxDelay ttnpb.RxDelay, rx1DROffset uint8, rx2DR ttnpb.DataRateIndex, correlationIDs ...string) *ttnpb.JoinRequest {
+	phyPayload := MakeJoinRequestPHYPayload()
+	return &ttnpb.JoinRequest{
+		CFList:         frequencyplans.CFList(*fp, phyVersion),
+		CorrelationIDs: correlationIDs,
+		DevAddr: func() types.DevAddr {
+			if devAddr != nil {
+				return *devAddr.Copy(&types.DevAddr{})
+			} else {
+				return types.DevAddr{}
+			}
+		}(),
+		NetID:              *NetID.Copy(&types.NetID{}),
+		RawPayload:         phyPayload[:],
+		Payload:            MakeJoinRequestDecodedPayload(),
+		RxDelay:            rxDelay,
+		SelectedMACVersion: macVersion,
+		DownlinkSettings: ttnpb.DLSettings{
+			OptNeg:      macVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+			Rx1DROffset: uint32(rx1DROffset),
+			Rx2DR:       rx2DR,
+		},
+	}
+}
+
+var DataUplinkCorrelationIDs = [...]string{
+	"data-uplink-correlation-id-1",
+	"data-uplink-correlation-id-2",
+	"data-uplink-correlation-id-3",
+}
+
+func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64, chIdx uint8, recvAt time.Time, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
+	if len(fOpts) > 0 && fPort == 0 {
+		panic("FOpts must not be set for FPort == 0")
+	}
+
+	mType := ttnpb.MType_UNCONFIRMED_UP
+	if confirmed {
+		mType = ttnpb.MType_CONFIRMED_UP
+	}
+	mhdr := ttnpb.MHDR{
+		MType: mType,
+		Major: ttnpb.Major_LORAWAN_R1,
+	}
+	key := *MakeSessionKeys(macVersion, false).NwkSEncKey.Key
+	if fPort == 0 {
+		frmPayload = MustEncryptUplink(key, DevAddr, fCnt, frmPayload...)
+	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
+		fOpts = MustEncryptUplink(key, DevAddr, fCnt, fOpts...)
+	}
+	fhdr := ttnpb.FHDR{
+		DevAddr: *DevAddr.Copy(&types.DevAddr{}),
+		FCtrl:   fCtrl,
+		FCnt:    fCnt & 0xffff,
+		FOpts:   fOpts,
+	}
+	phyPayload := append(
+		append(
+			test.Must(lorawan.AppendFHDR(
+				test.Must(lorawan.AppendMHDR(nil, mhdr)).([]byte), fhdr, true),
+			).([]byte),
+			fPort),
+		frmPayload...)
+	switch {
+	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
+		phyPayload = MustAppendLegacyUplinkMIC(
+			FNwkSIntKey,
+			DevAddr,
+			fCnt,
+			phyPayload...,
+		)
+	default:
+		if !fCtrl.Ack {
+			confFCntDown = 0
+		}
+		phyPayload = MustAppendUplinkMIC(
+			SNwkSIntKey,
+			FNwkSIntKey,
+			confFCntDown,
+			uint8(drIdx),
+			chIdx,
+			DevAddr,
+			fCnt,
+			phyPayload...,
+		)
+	}
+	msg := &ttnpb.UplinkMessage{
+		CorrelationIDs: append([]string{}, DataUplinkCorrelationIDs[:]...),
+		RawPayload:     phyPayload,
+		ReceivedAt:     recvAt,
+		RxMetadata:     deepcopy.Copy(mds).([]*ttnpb.RxMetadata),
+		Settings:       MakeUplinkSettings(dr, freq),
+	}
+	if decodePayload {
+		if frmPayload == nil {
+			frmPayload = []byte{}
+		}
+		msg.Payload = &ttnpb.Message{
+			MHDR: mhdr,
+			MIC:  phyPayload[len(phyPayload)-4:],
+			Payload: &ttnpb.Message_MACPayload{
+				MACPayload: &ttnpb.MACPayload{
+					FHDR:       fhdr,
+					FPort:      uint32(fPort),
+					FRMPayload: frmPayload,
+				},
+			},
+		}
+	}
+	return msg
 }
 
 func NewISPeer(ctx context.Context, is interface {

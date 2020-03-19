@@ -19,6 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [3.6.2] (2020-03-19)
+
+### Fixed
+
+- Entity events subscription release in the Console (Firefox).
+- RekeyInd handling for LoRaWAN 1.1 devices.
+- Network server deduplication Redis configuration.
+- Change the date format in the Console to be unambiguous (`17 Mar, 2020`).
+- Handling of uplink frame counters exceeding 65535.
+- Gateway events subscription release in the Console.
+- Panic when receiving a UDP `PUSH_DATA` frame from a gateway without payload.
+
+### Security
+
+- Admin users that are suspended can no longer create, view or delete other users.
+
 ## [3.6.1] (2020-03-13)
 
 ### Added
@@ -662,7 +678,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.1...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.2...HEAD
+[3.6.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.1...v3.6.2
 [3.6.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.3...v3.6.0
 [3.5.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.2...v3.5.3

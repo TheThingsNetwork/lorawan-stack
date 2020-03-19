@@ -61,7 +61,7 @@ func handleDownlinkTaskQueueTest(t *testing.T, q DownlinkTaskQueue) {
 		errCh chan<- error
 	}
 
-	popCtx := context.WithValue(ctx, struct{}{}, nil)
+	popCtx := context.WithValue(ctx, &struct{}{}, "pop")
 	nextPop := make(chan struct{})
 	slotCh := make(chan slot)
 	errCh := make(chan error)

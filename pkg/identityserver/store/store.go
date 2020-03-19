@@ -173,12 +173,20 @@ var ErrTransactionRecovered = errors.DefineInternal("transaction_recovered", "In
 func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err error) {
 	defer trace.StartRegion(ctx, "database transaction").End()
 	tx := db.Begin()
+	if tx.Error != nil {
+		return convertError(tx.Error)
+	}
 	defer func() {
 		if p := recover(); p != nil {
 			fmt.Fprintln(os.Stderr, p)
 			os.Stderr.Write(debug.Stack())
 			if pErr, ok := p.(error); ok {
-				err = ErrTransactionRecovered.WithCause(pErr)
+				switch pErr {
+				case context.Canceled, context.DeadlineExceeded:
+					err = pErr
+				default:
+					err = ErrTransactionRecovered.WithCause(pErr)
+				}
 			} else {
 				err = ErrTransactionRecovered.WithAttributes("panic", p)
 			}

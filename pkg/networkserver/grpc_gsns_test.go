@@ -80,6 +80,7 @@ func TestHandleUplink(t *testing.T) {
 		"session",
 		"supports_class_b",
 		"supports_class_c",
+		"supports_join",
 	}
 	dataRangeByAddrPaths := dataSetByIDGetPaths
 
@@ -94,52 +95,17 @@ func TestHandleUplink(t *testing.T) {
 		FCnt  = 42
 	)
 
-	NetID := test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
-
-	const AppIDString = "handle-uplink-test-app-id"
-	AppID := ttnpb.ApplicationIdentifiers{ApplicationID: AppIDString}
-	const DevID = "handle-uplink-test-dev-id"
-
-	JoinEUI := types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	DevEUI := types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-
-	DevAddr := types.DevAddr{0x42, 0x00, 0x00, 0x00}
-
-	FNwkSIntKey := types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	NwkSEncKey := types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	SNwkSIntKey := types.AES128Key{0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	AppSKey := types.AES128Key{0x42, 0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-
-	makeOTAAIdentifiers := func(devAddr *types.DevAddr) *ttnpb.EndDeviceIdentifiers {
-		return &ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: AppID,
-			DeviceID:               DevID,
-
-			DevEUI:  DevEUI.Copy(&types.EUI64{}),
-			JoinEUI: JoinEUI.Copy(&types.EUI64{}),
-
-			DevAddr: DevAddr.Copy(&types.DevAddr{}),
-		}
-	}
-	makeApplicationDownlink := func() *ttnpb.ApplicationDownlink {
+	makeApplicationDownlink := func(s string) *ttnpb.ApplicationDownlink {
 		return &ttnpb.ApplicationDownlink{
 			SessionKeyID: []byte("app-down-1-session-key-id"),
 			FPort:        FPort,
 			FCnt:         0x32,
-			FRMPayload:   []byte("app-down-1-frm-payload"),
+			FRMPayload:   []byte(s),
 			Confirmed:    true,
 			Priority:     ttnpb.TxSchedulePriority_HIGH,
 			CorrelationIDs: []string{
 				"app-down-1-correlation-id-1",
 			},
-		}
-	}
-	makeUplinkSettings := func(dr ttnpb.DataRate, ch band.Channel) ttnpb.TxSettings {
-		return ttnpb.TxSettings{
-			DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
-			EnableCRC: true,
-			Frequency: ch.Frequency,
-			Timestamp: 42,
 		}
 	}
 
@@ -301,7 +267,7 @@ func TestHandleUplink(t *testing.T) {
 				if getDevice != nil {
 					getDevice = filterEndDevice(CopyEndDevice(getDevice), joinGetByEUIPaths[:]...)
 				}
-				getCtx = context.WithValue(getCtx, struct{}{}, "get")
+				getCtx = context.WithValue(getCtx, &struct{}{}, "get")
 				return DeviceRegistryGetByEUIResponse{
 					Device:  getDevice,
 					Context: getCtx,
@@ -335,7 +301,7 @@ func TestHandleUplink(t *testing.T) {
 				if setDevice != nil {
 					setDevice = filterEndDevice(CopyEndDevice(setDevice), joinSetByIDGetPaths[:]...)
 				}
-				setCtx = context.WithValue(setCtx, struct{}{}, "set")
+				setCtx = context.WithValue(setCtx, &struct{}{}, "set")
 				return DeviceRegistrySetByIDResponse{
 					Device:  setDevice,
 					Context: setCtx,
@@ -350,6 +316,11 @@ func TestHandleUplink(t *testing.T) {
 		return AssertApplicationUplinkQueueAddRequest(ctx, env.ApplicationUplinks.Add, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 			ids := *deepcopy.Copy(&setDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers)
 			ids.DevAddr = &setDevice.PendingMACState.QueuedJoinAccept.Request.DevAddr
+
+			queue := setDevice.GetPendingSession().GetQueuedApplicationDownlinks()
+			if setDevice.Session != nil {
+				queue = setDevice.Session.QueuedApplicationDownlinks
+			}
 			return AllTrue(
 				a.So(ctx, should.HaveParentContextOrEqual, expectedCtx),
 				a.So(ups, should.Resemble, []*ttnpb.ApplicationUp{
@@ -359,7 +330,7 @@ func TestHandleUplink(t *testing.T) {
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:              setDevice.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
-								InvalidatedDownlinks: setDevice.GetSession().GetQueuedApplicationDownlinks(),
+								InvalidatedDownlinks: queue,
 								ReceivedAt:           recvAt,
 								SessionKeyID:         setDevice.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
 							},
@@ -526,7 +497,7 @@ func TestHandleUplink(t *testing.T) {
 				if setDevice != nil {
 					setDevice = filterEndDevice(CopyEndDevice(setDevice), dataSetByIDGetPaths[:]...)
 				}
-				setCtx = context.WithValue(setCtx, struct{}{}, "set")
+				setCtx = context.WithValue(setCtx, &struct{}{}, "set")
 				return DeviceRegistrySetByIDResponse{
 					Device:  setDevice,
 					Context: setCtx,
@@ -598,32 +569,6 @@ func TestHandleUplink(t *testing.T) {
 	makeChDRName := func(chIdx int, drIdx ttnpb.DataRateIndex, parts ...string) string {
 		return MakeTestCaseName(append(parts, fmt.Sprintf("Channel:%d", chIdx), fmt.Sprintf("DR:%d", drIdx))...)
 	}
-	makeSessionKeys := func(macVersion ttnpb.MACVersion, withAppSKey bool) *ttnpb.SessionKeys {
-		sk := &ttnpb.SessionKeys{
-			FNwkSIntKey: &ttnpb.KeyEnvelope{
-				Key: &FNwkSIntKey,
-			},
-			SessionKeyID: []byte("handle-uplink-test-session-key-id"),
-		}
-		if withAppSKey {
-			sk.AppSKey = &ttnpb.KeyEnvelope{
-				Key: &AppSKey,
-			}
-		}
-		switch {
-		case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
-			sk.NwkSEncKey = sk.FNwkSIntKey
-			sk.SNwkSIntKey = sk.FNwkSIntKey
-		default:
-			sk.NwkSEncKey = &ttnpb.KeyEnvelope{
-				Key: &NwkSEncKey,
-			}
-			sk.SNwkSIntKey = &ttnpb.KeyEnvelope{
-				Key: &SNwkSIntKey,
-			}
-		}
-		return CopySessionKeys(sk)
-	}
 	withMatchedUplinkSettings := func(chIdx int, drIdx ttnpb.DataRateIndex, msg *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 		msg = CopyUplinkMessage(msg)
 		msg.Settings.DataRateIndex = drIdx
@@ -657,7 +602,7 @@ func TestHandleUplink(t *testing.T) {
 	for _, uplinkMDs := range [][]*ttnpb.RxMetadata{
 		nil,
 		RxMetadata[0:1],
-		append(RxMetadata[1:4]),
+		RxMetadata[1:4],
 	} {
 		uplinkMDs := uplinkMDs
 		makeMDName := func(parts ...string) string {
@@ -688,7 +633,7 @@ func TestHandleUplink(t *testing.T) {
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RxMetadata: uplinkMDs,
-							Settings:   makeUplinkSettings(dr, ch),
+							Settings:   MakeUplinkSettings(dr, ch.Frequency),
 						}), ErrDecodePayload.WithCause(lorawan.UnmarshalMessage(nil, nil))), should.BeTrue)
 					},
 				},
@@ -710,7 +655,7 @@ func TestHandleUplink(t *testing.T) {
 								0x03, 0x02, 0x01, 0x00,
 							},
 							RxMetadata: uplinkMDs,
-							Settings:   makeUplinkSettings(dr, ch),
+							Settings:   MakeUplinkSettings(dr, ch.Frequency),
 						}), ErrUnsupportedLoRaWANVersion.WithAttributes("version", uint32(1))), should.BeTrue)
 					},
 				},
@@ -720,7 +665,7 @@ func TestHandleUplink(t *testing.T) {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RawPayload: bytes.Repeat([]byte{0x20}, 33),
 							RxMetadata: uplinkMDs,
-							Settings:   makeUplinkSettings(dr, ch),
+							Settings:   MakeUplinkSettings(dr, ch.Frequency),
 						}), nil), should.BeTrue)
 					},
 				},
@@ -734,7 +679,7 @@ func TestHandleUplink(t *testing.T) {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
 							RawPayload: phyPayload,
 							RxMetadata: uplinkMDs,
-							Settings:   makeUplinkSettings(dr, ch),
+							Settings:   MakeUplinkSettings(dr, ch.Frequency),
 						}), ErrDecodePayload.WithCause(lorawan.UnmarshalMessage(phyPayload, &ttnpb.Message{}))), should.BeTrue)
 					},
 				},
@@ -769,12 +714,12 @@ func TestHandleUplink(t *testing.T) {
 			makeJoinResponse := func(withAppSKey bool) *ttnpb.JoinResponse {
 				return &ttnpb.JoinResponse{
 					RawPayload:  bytes.Repeat([]byte{0x42}, 17),
-					SessionKeys: *makeSessionKeys(macVersion, withAppSKey),
+					SessionKeys: *MakeSessionKeys(macVersion, withAppSKey),
 				}
 			}
 			makeJoinDevice := func(clock *test.MockClock) *ttnpb.EndDevice {
 				return &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(nil),
+					EndDeviceIdentifiers: *MakeOTAAIdentifiers(nil),
 					FrequencyPlanID:      fpID,
 					LoRaWANPHYVersion:    phyVersion,
 					LoRaWANVersion:       macVersion,
@@ -797,66 +742,8 @@ func TestHandleUplink(t *testing.T) {
 			drIdx := ch.MaxDataRate
 			dr := phy.DataRates[drIdx].Rate
 
-			makeJoinRequestDevNonce := func() types.DevNonce {
-				return types.DevNonce{0x00, 0x01}
-			}
-			makeJoinRequestMIC := func() [4]byte {
-				return [...]byte{0x03, 0x02, 0x01, 0x00}
-			}
-			makeJoinRequestPHYPayload := func() [23]byte {
-				devNonce := makeJoinRequestDevNonce()
-				mic := makeJoinRequestMIC()
-				return [...]byte{
-					/* MHDR */
-					0b000_000_00,
-					JoinEUI[7], JoinEUI[6], JoinEUI[5], JoinEUI[4], JoinEUI[3], JoinEUI[2], JoinEUI[1], JoinEUI[0],
-					DevEUI[7], DevEUI[6], DevEUI[5], DevEUI[4], DevEUI[3], DevEUI[2], DevEUI[1], DevEUI[0],
-					/* DevNonce */
-					devNonce[1], devNonce[0],
-					/* MIC */
-					mic[0], mic[1], mic[2], mic[3],
-				}
-			}
-			makeJoinRequestDecodedPayload := func() *ttnpb.Message {
-				mic := makeJoinRequestMIC()
-				devNonce := makeJoinRequestDevNonce()
-				return &ttnpb.Message{
-					MHDR: ttnpb.MHDR{
-						MType: ttnpb.MType_JOIN_REQUEST,
-						Major: ttnpb.Major_LORAWAN_R1,
-					},
-					MIC: mic[:],
-					Payload: &ttnpb.Message_JoinRequestPayload{
-						JoinRequestPayload: &ttnpb.JoinRequestPayload{
-							JoinEUI:  *JoinEUI.Copy(&types.EUI64{}),
-							DevEUI:   *DevEUI.Copy(&types.EUI64{}),
-							DevNonce: devNonce,
-						},
-					},
-				}
-			}
 			makeNsJsJoinRequest := func(devAddr *types.DevAddr, correlationIDs ...string) *ttnpb.JoinRequest {
-				phyPayload := makeJoinRequestPHYPayload()
-				return &ttnpb.JoinRequest{
-					CFList:         frequencyplans.CFList(*fp, phyVersion),
-					CorrelationIDs: correlationIDs,
-					DevAddr: func() types.DevAddr {
-						if devAddr != nil {
-							return *devAddr
-						} else {
-							return types.DevAddr{}
-						}
-					}(),
-					NetID:              *NetID.Copy(&types.NetID{}),
-					RawPayload:         phyPayload[:],
-					Payload:            makeJoinRequestDecodedPayload(),
-					RxDelay:            ttnpb.RX_DELAY_3,
-					SelectedMACVersion: macVersion,
-					DownlinkSettings: ttnpb.DLSettings{
-						OptNeg: macVersion.Compare(ttnpb.MAC_V1_1) >= 0,
-						Rx2DR:  ttnpb.DATA_RATE_2,
-					},
-				}
+				return MakeNsJsJoinRequest(macVersion, phyVersion, fp, devAddr, ttnpb.RX_DELAY_3, 0, ttnpb.DATA_RATE_2, correlationIDs...)
 			}
 			makeJoinSetDevice := func(getDevice *ttnpb.EndDevice, decodedMsg *ttnpb.UplinkMessage, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse) *ttnpb.EndDevice {
 				macState := test.Must(NewMACState(getDevice, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})).(*ttnpb.MACState)
@@ -873,21 +760,7 @@ func TestHandleUplink(t *testing.T) {
 			}
 
 			makeJoinRequest := func(decodePayload bool) *ttnpb.UplinkMessage {
-				phyPayload := makeJoinRequestPHYPayload()
-				msg := &ttnpb.UplinkMessage{
-					CorrelationIDs: []string{
-						"join-request-correlation-id-1",
-						"join-request-correlation-id-2",
-						"join-request-correlation-id-3",
-					},
-					RawPayload: phyPayload[:],
-					RxMetadata: uplinkMDs,
-					Settings:   makeUplinkSettings(dr, ch),
-				}
-				if decodePayload {
-					msg.Payload = makeJoinRequestDecodedPayload()
-				}
-				return msg
+				return MakeJoinRequest(decodePayload, dr, ch.Frequency, uplinkMDs...)
 			}
 
 			makeJoinName := func(parts ...string) string {
@@ -1026,7 +899,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set fail on read"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set fail on read"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
@@ -1036,7 +909,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.Session = &ttnpb.Session{
 							DevAddr: DevAddr,
 							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								makeApplicationDownlink(),
+								makeApplicationDownlink("test"),
 							},
 						}
 						getDevice.DevAddr = &getDevice.Session.DevAddr
@@ -1072,7 +945,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Device deleted during handling"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Device deleted during handling"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
@@ -1082,7 +955,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.Session = &ttnpb.Session{
 							DevAddr: DevAddr,
 							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								makeApplicationDownlink(),
+								makeApplicationDownlink("test"),
 							},
 						}
 						getDevice.DevAddr = &getDevice.Session.DevAddr
@@ -1111,7 +984,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set fail on write"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set fail on write"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
@@ -1121,7 +994,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.Session = &ttnpb.Session{
 							DevAddr: DevAddr,
 							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								makeApplicationDownlink(),
+								makeApplicationDownlink("test"),
 							},
 						}
 						getDevice.DevAddr = &getDevice.Session.DevAddr
@@ -1148,7 +1021,7 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Downlink queue present", "Set success", "Downlink add success", "AppSKey present", "Application uplink add success"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS does not contain device", "Interop JS accept", "Metadata merge fail", "Current downlink queue", "Set success", "Downlink add success", "AppSKey present", "Application uplink add success"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
@@ -1158,7 +1031,7 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.Session = &ttnpb.Session{
 							DevAddr: DevAddr,
 							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
-								makeApplicationDownlink(),
+								makeApplicationDownlink("test"),
 							},
 						}
 						getDevice.DevAddr = &getDevice.Session.DevAddr
@@ -1187,13 +1060,19 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
-					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "No downlink queue", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add fail"),
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "Pending downlink queue", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add fail"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						t := test.MustTFromContext(ctx)
 						a := assertions.New(t)
 						msg := makeJoinRequest(false)
 						decodedMsg := makeJoinRequest(true)
 						getDevice := makeJoinDevice(clock)
+						getDevice.PendingSession = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink("test"),
+							},
+						}
 						joinResp := makeJoinResponse(false)
 						joinReq := makeNsJsJoinRequest(nil)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
@@ -1214,6 +1093,55 @@ func TestHandleUplink(t *testing.T) {
 							return a.So(AllTrue(
 								ok,
 								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
+								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, ErrTestInternal),
+								assertPublishMergeMetadata(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, RxMetadata[:]...),
+							), should.BeTrue)
+						}, nil), should.BeTrue)
+					},
+				},
+				TestCase{
+					Name: makeJoinName("Get OTAA device", "First uplink", "Cluster-local JS accept", "Metadata merge success", "Both downlink queues", "Set success", "Downlink add fail", "No AppSKey", "Application uplink add success"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						t := test.MustTFromContext(ctx)
+						a := assertions.New(t)
+						msg := makeJoinRequest(false)
+						decodedMsg := makeJoinRequest(true)
+						getDevice := makeJoinDevice(clock)
+						getDevice.Session = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink("test"),
+							},
+						}
+						getDevice.DevAddr = &getDevice.Session.DevAddr
+						getDevice.PendingSession = &ttnpb.Session{
+							DevAddr: DevAddr,
+							QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
+								makeApplicationDownlink("pending"),
+								makeApplicationDownlink("other"),
+								makeApplicationDownlink("foo"),
+							},
+						}
+						joinResp := makeJoinResponse(false)
+						joinReq := makeNsJsJoinRequest(nil)
+						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
+							getCtx, joinRespRecvAt, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), joinReq, joinResp, nil)
+							if !a.So(AllTrue(
+								ok,
+								assertPublishForwardJoinRequest(ctx, env, getCtx, getDevice.EndDeviceIdentifiers),
+							), should.BeTrue) {
+								return false
+							}
+							clock.Set(decodedMsg.ReceivedAt.Add(DeduplicationWindow))
+							if !a.So(assertAccumulatedMetadata(ctx, env, getCtx, withMatchedUplinkSettings(chIdx, drIdx, decodedMsg), RxMetadata[:], nil), should.BeTrue) {
+								return true
+							}
+							decodedMsg.RxMetadata = RxMetadata[:]
+							setDevice := makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp)
+							setCtx, ok := assertJoinSetByID(ctx, env, getCtx, getDevice, setDevice, nil, nil)
+							return a.So(AllTrue(
+								ok,
+								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, nil),
 								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, ErrTestInternal),
 								assertPublishMergeMetadata(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, RxMetadata[:]...),
 							), should.BeTrue)
@@ -1301,7 +1229,7 @@ func TestHandleUplink(t *testing.T) {
 						},
 						RawPayload: phyPayload,
 						RxMetadata: uplinkMDs,
-						Settings:   makeUplinkSettings(dr, ch),
+						Settings:   MakeUplinkSettings(dr, ch.Frequency),
 					}
 					if decodePayload {
 						var pld *ttnpb.RejoinRequestPayload
@@ -1365,9 +1293,9 @@ func TestHandleUplink(t *testing.T) {
 			dr := phy.DataRates[drIdx].Rate
 
 			makeDataRangeDevice := func(clock *test.MockClock, useADR bool) *ttnpb.EndDevice {
-				sk := *makeSessionKeys(macVersion, false)
+				sk := *MakeSessionKeys(macVersion, false)
 				dev := &ttnpb.EndDevice{
-					EndDeviceIdentifiers: *makeOTAAIdentifiers(&DevAddr),
+					EndDeviceIdentifiers: *MakeOTAAIdentifiers(&DevAddr),
 					FrequencyPlanID:      fpID,
 					LoRaWANPHYVersion:    phyVersion,
 					LoRaWANVersion:       macVersion,
@@ -1423,80 +1351,7 @@ func TestHandleUplink(t *testing.T) {
 			for _, confirmed := range [2]bool{true, false} {
 				confirmed := confirmed
 				makeDataUplink := func(decodePayload bool, adr bool, frmPayload []byte) *ttnpb.UplinkMessage {
-					mType := ttnpb.MType_UNCONFIRMED_UP
-					if confirmed {
-						mType = ttnpb.MType_CONFIRMED_UP
-					}
-					mhdr := ttnpb.MHDR{
-						MType: mType,
-						Major: ttnpb.Major_LORAWAN_R1,
-					}
-					fOpts := []byte{0x02}
-					if macVersion.EncryptFOpts() {
-						fOpts = MustEncryptUplink(NwkSEncKey, DevAddr, FCnt, fOpts...)
-					}
-					fhdr := ttnpb.FHDR{
-						DevAddr: *DevAddr.Copy(&types.DevAddr{}),
-						FCtrl: ttnpb.FCtrl{
-							ADR: adr,
-						},
-						FCnt:  FCnt,
-						FOpts: fOpts,
-					}
-					phyPayload := append(
-						append(
-							test.Must(lorawan.AppendFHDR(
-								test.Must(lorawan.AppendMHDR(nil, mhdr)).([]byte), fhdr, true),
-							).([]byte),
-							FPort),
-						frmPayload...)
-					switch {
-					case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
-						phyPayload = MustAppendLegacyUplinkMIC(
-							FNwkSIntKey,
-							DevAddr,
-							FCnt,
-							phyPayload...,
-						)
-					default:
-						phyPayload = MustAppendUplinkMIC(
-							SNwkSIntKey,
-							FNwkSIntKey,
-							0,
-							uint8(drIdx),
-							uint8(chIdx),
-							DevAddr,
-							FCnt,
-							phyPayload...,
-						)
-					}
-					msg := &ttnpb.UplinkMessage{
-						CorrelationIDs: []string{
-							"data-uplink-correlation-id-1",
-							"data-uplink-correlation-id-2",
-							"data-uplink-correlation-id-3",
-						},
-						RawPayload: phyPayload,
-						RxMetadata: uplinkMDs,
-						Settings:   makeUplinkSettings(dr, ch),
-					}
-					if decodePayload {
-						if frmPayload == nil {
-							frmPayload = []byte{}
-						}
-						msg.Payload = &ttnpb.Message{
-							MHDR: mhdr,
-							MIC:  phyPayload[len(phyPayload)-4:],
-							Payload: &ttnpb.Message_MACPayload{
-								MACPayload: &ttnpb.MACPayload{
-									FHDR:       fhdr,
-									FPort:      FPort,
-									FRMPayload: frmPayload,
-								},
-							},
-						}
-					}
-					return msg
+					return MakeDataUplink(macVersion, decodePayload, confirmed, ttnpb.FCtrl{ADR: adr}, FCnt, 0, FPort, frmPayload, []byte{0x02}, dr, drIdx, ch.Frequency, uint8(chIdx), time.Time{}, uplinkMDs...)
 				}
 				dataSetByIDSetPaths := [...]string{
 					"mac_state",

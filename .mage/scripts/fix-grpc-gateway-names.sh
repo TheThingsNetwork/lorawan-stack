@@ -1,29 +1,27 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+IFS=$'\n\t'
 
 function usage {
   echo "Usage: $(basename "$0") <proto-dir>"
   exit 1
 }
-[[ ${1} = "" ]] && usage
-protoDir="${1}"
-basePackage="go.thethings.network/lorawan-stack"
+[[ $# -eq 0 ]] && usage
 
 # TODO figure out a way to traverse only files imported by protos using grpc-gateway (google.api.http option)
-protos=( ${protoDir}/*.proto )
-perlArgs=()
+protos=( )
+for d in ${@}; do
+  protos+=( ${d}/*.proto )
+done
+
 genPaths=()
-
-IFS_BAK=${IFS}
-IFS="
-"
-
+perlArgs=()
 for f in "${protos[@]}"; do
   if grep -q '(google.api.http)' "${f}"; then
     path=${f%".proto"}".pb.gw.go"
     if grep -q 'option go_package' "${f}"; then
       goPackage=$(grep 'option go_package' "${f}" | perl \
-        -pe 's![[:space:]]*option[[:space:]]+go_package[[:space:]]*=[[:space:]]*"'${basePackage}'/([[:alnum:]_.\-/]+)".*!\1!')
+        -pe 's![[:space:]]*option[[:space:]]+go_package[[:space:]]*=[[:space:]]*"go.thethings.network/lorawan-stack/([[:alnum:]_.\-/]+)".*!\1!')
       path=${goPackage}/$(basename "${path}")
     fi
     genPaths+=( "${path}" )
@@ -40,13 +38,12 @@ for f in "${protos[@]}"; do
         -pe 's!(^[[:alnum:]])([[:alnum:]]*)|_([[:alnum:]])([[:alnum:]]*)!\U\1\3\E\2\4!g;')
       to=$(echo "${l}" | perl \
         -pe 's!.*\(gogoproto.customname\)[[:space:]]*=[[:space:]]*"([[:alnum:]_]+)".*!\1!')
-      ! [ "${from}" = "${to}" ] && perlArgs+=("-pe s!([^[:alnum:]])${from}([^[:alnum:]])!\\1${to}\\2!g;")
+      ! [ "${from}" = "${to}" ]; perlArgs+=("-pe s!(^[[:space:]]*protoReq\.)${from}(, err =)!\\1${to}\\2!g;")
     done
   fi
 done
-IFS=${IFS_BAK}
 
-if [[ ${#perlArgs[@]} != 0 ]]; then
+if [[ ${#perlArgs[@]} -ne 0 ]]; then
   for f in "${genPaths[@]}"; do
     perl -i -p ${perlArgs[*]} "${f}"
   done

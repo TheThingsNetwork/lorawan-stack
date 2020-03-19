@@ -230,12 +230,11 @@ func uplinkMTypeLabel(msg *ttnpb.UplinkMessage) string {
 	return strings.ToLower(msg.Payload.MType.String())
 }
 
-func registerReceiveUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
+func registerReceiveUniqueUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	nsMetrics.uplinkUniqueReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
 }
 
-func registerReceiveUplinkDuplicate(ctx context.Context, msg *ttnpb.UplinkMessage) {
+func registerReceiveUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	nsMetrics.uplinkReceived.WithLabelValues(ctx, uplinkMTypeLabel(msg)).Inc()
 }
 

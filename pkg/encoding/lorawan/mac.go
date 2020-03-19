@@ -803,7 +803,7 @@ var DefaultMACCommands = MACCommandSpec{
 	},
 
 	ttnpb.CID_BEACON_TIMING: &MACCommandDescriptor{
-		InitiatedByDevice: false,
+		InitiatedByDevice: true,
 
 		UplinkLength: 0,
 		AppendUplink: func(phy band.Band, b []byte, _ ttnpb.MACCommand) ([]byte, error) {
