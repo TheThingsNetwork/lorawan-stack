@@ -29,6 +29,7 @@ import (
 type Config struct {
 	DataPlaneAddress  string            `name:"data-plane-address" description:"Address of the Packet Broker Data Plane"`
 	NetID             types.NetID       `name:"net-id" description:"LoRa Alliance NetID"`
+	TenantID          string            `name:"tenant-id" description:"Tenant ID within the NetID"`
 	HomeNetwork       HomeNetworkConfig `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
 	Forwarder         ForwarderConfig   `name:"forwarder" description:"Forwarder configuration for publishing uplink messages and subscribing to downlink messages"`
 	SubscriptionGroup string            `name:"subscription-group" description:"Group name uniquely identifying this environment"`

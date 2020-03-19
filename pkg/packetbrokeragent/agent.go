@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	packetbroker "go.packetbroker.org/api/v1"
+	packetbroker "go.packetbroker.org/api/v2"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -51,6 +51,7 @@ type Agent struct {
 
 	dataPlaneAddress  string
 	netID             types.NetID
+	tenantID          string
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
 	subscriptionGroup string
@@ -103,6 +104,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 
 		dataPlaneAddress:  conf.DataPlaneAddress,
 		netID:             conf.NetID,
+		tenantID:          conf.TenantID,
 		forwarderConfig:   conf.Forwarder,
 		homeNetworkConfig: conf.HomeNetwork,
 		subscriptionGroup: conf.SubscriptionGroup,
@@ -174,6 +176,7 @@ func (a *Agent) forwardUplink(ctx context.Context) error {
 		"namespace", "packetbroker/agent",
 		"forwarder_net_id", a.netID,
 		"forwarder_id", a.forwarderConfig.ID,
+		"forwarder_tenant_id", a.tenantID,
 	))
 
 	conn, err := a.dialContext(ctx, a.forwarderConfig.TLS, a.dataPlaneAddress)
@@ -242,9 +245,10 @@ func (a *Agent) runForwarder(ctx context.Context, conn *grpc.ClientConn, uplinkC
 				continue
 			}
 			req := &packetbroker.PublishUplinkMessageRequest{
-				ForwarderNetId: a.netID.MarshalNumber(),
-				ForwarderId:    a.forwarderConfig.ID,
-				Message:        msg,
+				ForwarderNetId:    a.netID.MarshalNumber(),
+				ForwarderId:       a.forwarderConfig.ID,
+				ForwarderTenantId: a.tenantID,
+				Message:           msg,
 			}
 			ctx, cancel := context.WithCancel(ctx)
 			progress, err := client.Publish(ctx, req)
@@ -269,9 +273,9 @@ func (a *Agent) runForwarder(ctx context.Context, conn *grpc.ClientConn, uplinkC
 }
 
 func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
-	devAddrPrefixes := make([]*packetbroker.RoutingFilter_MACPayload_DevAddrPrefix, len(a.devAddrPrefixes))
+	devAddrPrefixes := make([]*packetbroker.DevAddrPrefix, len(a.devAddrPrefixes))
 	for i, p := range a.devAddrPrefixes {
-		devAddrPrefixes[i] = &packetbroker.RoutingFilter_MACPayload_DevAddrPrefix{
+		devAddrPrefixes[i] = &packetbroker.DevAddrPrefix{
 			Value:  p.DevAddr.MarshalNumber(),
 			Length: uint32(p.Length),
 		}
@@ -316,6 +320,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbroker/agent",
 		"home_network_net_id", a.netID,
+		"home_network_tenant_id", a.tenantID,
 	))
 
 	conn, err := a.dialContext(ctx, a.homeNetworkConfig.TLS, a.dataPlaneAddress)
@@ -327,8 +332,9 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 
 	client := packetbroker.NewRouterHomeNetworkDataClient(conn)
 	stream, err := client.Subscribe(ctx, &packetbroker.SubscribeHomeNetworkRequest{
-		HomeNetworkNetId: a.netID.MarshalNumber(),
-		Filters:          a.getSubscriptionFilters(),
+		HomeNetworkNetId:    a.netID.MarshalNumber(),
+		HomeNetworkTenantId: a.tenantID,
+		Filters:             a.getSubscriptionFilters(),
 	})
 	if err != nil {
 		return err
@@ -394,6 +400,7 @@ func (a *Agent) handleUplink(ctx context.Context, uplinkCh <-chan *packetbroker.
 				"message_id", msg.Id,
 				"from_forwarder_net_id", forwarderNetID,
 				"from_forwarder_id", msg.ForwarderId,
+				"from_forwarder_tenant_id", msg.ForwarderTenantId,
 			))
 			if err := a.handleUplinkMessage(ctx, up); err != nil {
 				logger.WithError(err).Debug("Failed to handle incoming uplink message")

@@ -17,7 +17,7 @@ package packetbrokeragent
 import (
 	"context"
 
-	packetbroker "go.packetbroker.org/api/v1"
+	packetbroker "go.packetbroker.org/api/v2"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 )
 
