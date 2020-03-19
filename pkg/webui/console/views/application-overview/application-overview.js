@@ -74,7 +74,7 @@ class ApplicationOverview extends React.Component {
       mayViewDevices,
       mayViewApplicationLink,
       link,
-      application: { name, description, created_at, updated_at },
+      application: { name, description, created_at, updated_at, attributes },
     } = this.props
 
     const linkStatus = typeof link === 'boolean' ? (link ? 'good' : 'bad') : 'mediocre'
@@ -93,6 +93,18 @@ class ApplicationOverview extends React.Component {
           { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
           { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
         ],
+      },
+    ]
+
+    const attributeDataSheet = [
+      {
+        header: sharedMessages.attributes,
+        items: Object.keys(attributes).map(function(key, index) {
+          return {
+            key,
+            value: attributes[key],
+          }
+        }),
       },
     ]
 
@@ -145,6 +157,11 @@ class ApplicationOverview extends React.Component {
             </Col>
             <Col sm={12} lg={6}>
               <ApplicationEvents appId={appId} widget />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12} lg={6}>
+              <DataSheet data={attributeDataSheet} className={style.generalInformation} />
             </Col>
           </Row>
           <Row>
