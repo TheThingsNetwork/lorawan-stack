@@ -45,7 +45,7 @@ require (
 	github.com/client9/misspell v0.3.4
 	github.com/disintegration/imaging v1.6.2
 	github.com/eclipse/paho.mqtt.golang v1.2.0
-	github.com/envoyproxy/protoc-gen-validate v0.3.0
+	github.com/envoyproxy/protoc-gen-validate v0.3.0-java
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/getsentry/sentry-go v0.5.1
 	github.com/go-redis/redis v6.15.7+incompatible
