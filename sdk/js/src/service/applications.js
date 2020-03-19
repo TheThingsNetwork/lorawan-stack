@@ -118,7 +118,14 @@ class Applications {
 
   // Update
 
-  async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
+  async updateById(
+    id,
+    patch,
+    mask = Marshaler.fieldMaskFromPatch(
+      patch,
+      this._api.ApplicationRegistry.UpdateAllowedFieldMaskPaths,
+    ),
+  ) {
     const response = await this._api.ApplicationRegistry.Update(
       {
         routeParams: {

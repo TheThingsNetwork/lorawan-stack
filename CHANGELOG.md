@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Uplink deduplication via Redis in Network Server.
 - Access Tokens are now linked to User Sessions.
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- Edit application attributes in Application General Settings in the Console
 
 ### Changed
 
