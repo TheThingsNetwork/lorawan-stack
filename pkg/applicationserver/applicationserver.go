@@ -89,12 +89,7 @@ func (as *ApplicationServer) Context() context.Context {
 	return as.ctx
 }
 
-var (
-	errListenFrontend = errors.DefineFailedPrecondition(
-		"listen_frontend",
-		"failed to start frontend listener `{protocol}` on address `{address}`",
-	)
-)
+var errListenFrontend = errors.DefineFailedPrecondition("listen_frontend", "failed to start frontend listener `{protocol}` on address `{address}`")
 
 // New returns new *ApplicationServer.
 func New(c *component.Component, conf *Config) (as *ApplicationServer, err error) {
@@ -337,7 +332,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 				mask = append(mask, "pending_session.last_a_f_cnt_down")
 			}
 			if session == nil {
-				return nil, nil, errNoDeviceSession
+				return nil, nil, errNoDeviceSession.New()
 			}
 			var encryptedItems []*ttnpb.ApplicationDownlink
 			for _, item := range items {
@@ -652,7 +647,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					log.WithError(err).Warn("Failed to recalculate downlink queue")
 				}
 			} else if dev.Session.AppSKey == nil {
-				return nil, nil, errNoAppSKey
+				return nil, nil, errNoAppSKey.New()
 			}
 			return dev, mask, nil
 		},

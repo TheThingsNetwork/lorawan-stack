@@ -109,7 +109,7 @@ func (p Packet) BuildAck() (Packet, error) {
 	case PullData:
 		ack.PacketType = PullAck
 	default:
-		return Packet{}, errInvalidPacketType
+		return Packet{}, errInvalidPacketType.New()
 	}
 
 	return ack, nil

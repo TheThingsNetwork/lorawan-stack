@@ -87,7 +87,7 @@ func openOriginal(ctx context.Context, bucket *blob.Bucket, prefix string, pic *
 			original = pic.Sizes[maxSize]
 		}
 		if original == "" {
-			return nil, "", errMissingOriginal
+			return nil, "", errMissingOriginal.New()
 		}
 		if strings.Contains(original, "://") {
 			res, err := http.Get(original)
@@ -106,7 +106,7 @@ func openOriginal(ctx context.Context, bucket *blob.Bucket, prefix string, pic *
 		}
 	}
 	if originalData == nil {
-		return nil, "", errMissingOriginal
+		return nil, "", errMissingOriginal.New()
 	}
 	return image.Decode(originalData)
 }

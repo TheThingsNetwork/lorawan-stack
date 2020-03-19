@@ -141,10 +141,10 @@ func (ns *NetworkServer) updateDataDownlinkTask(ctx context.Context, dev *ttnpb.
 // Note, that generateDataDownlink assumes transmitAt is the earliest possible time a downlink can be transmitted to the device.
 func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band, class ttnpb.Class, transmitAt time.Time, maxDownLen, maxUpLen uint16) (*generatedDownlink, generateDownlinkState, error) {
 	if dev.MACState == nil {
-		return nil, generateDownlinkState{}, errUnknownMACState
+		return nil, generateDownlinkState{}, errUnknownMACState.New()
 	}
 	if dev.Session == nil {
-		return nil, generateDownlinkState{}, errEmptySession
+		return nil, generateDownlinkState{}, errEmptySession.New()
 	}
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -159,7 +159,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	// NOTE: len(FHDR) + len(FPort) = 7 + 1 = 8
 	if maxDownLen < 8 || maxUpLen < 8 {
 		log.FromContext(ctx).Error("Data rate MAC payload size limits too low for data downlink to be generated")
-		return nil, generateDownlinkState{}, errInvalidDataRate
+		return nil, generateDownlinkState{}, errInvalidDataRate.New()
 	}
 	maxDownLen, maxUpLen = maxDownLen-8, maxUpLen-8
 
@@ -428,7 +428,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		pld.FHDR.FCnt = dev.Session.LastNFCntDown + 1
 
 	default:
-		return nil, genState, errNoDownlink
+		return nil, genState, errNoDownlink.New()
 	}
 	if mType == ttnpb.MType_UNCONFIRMED_DOWN && len(dev.MACState.PendingRequests) > 0 &&
 		(dev.MACState.DeviceClass == ttnpb.CLASS_B ||
@@ -446,7 +446,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 
 	if len(cmdBuf) > 0 && (pld.FPort == 0 || dev.MACState.LoRaWANVersion.EncryptFOpts()) {
 		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
-			return nil, genState, errUnknownNwkSEncKey
+			return nil, genState, errUnknownNwkSEncKey.New()
 		}
 		key, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.NwkSEncKey, ns.KeyVault)
 		if err != nil {
@@ -499,7 +499,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		}
 		if confirmedAt.After(transmitAt) {
 			logger.WithField("confirmed_at", confirmedAt).Debug("Confirmed class B/C downlink attempt performed too soon")
-			return nil, genState, errConfirmedDownlinkTooSoon
+			return nil, genState, errConfirmedDownlinkTooSoon.New()
 		}
 	}
 
@@ -518,7 +518,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	// NOTE: It is assumed, that b does not contain MIC.
 
 	if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
-		return nil, genState, errUnknownSNwkSIntKey
+		return nil, genState, errUnknownSNwkSIntKey.New()
 	}
 	key, err := cryptoutil.UnwrapAES128Key(ctx, *dev.Session.SNwkSIntKey, ns.KeyVault)
 	if err != nil {
@@ -548,7 +548,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		)
 	}
 	if err != nil {
-		return nil, genState, errComputeMIC
+		return nil, genState, errComputeMIC.New()
 	}
 	b = append(b, mic[:]...)
 
@@ -874,7 +874,7 @@ loop:
 	}
 	dr, ok := phy.DataRates[maxUpDRIdx]
 	if !ok {
-		return 0, errDataRateNotFound
+		return 0, errDataRateNotFound.New()
 	}
 	return dr.MaxMACPayloadSize(fp.DwellTime.GetUplinks()), nil
 }

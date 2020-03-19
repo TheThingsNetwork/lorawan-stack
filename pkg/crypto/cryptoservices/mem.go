@@ -59,7 +59,7 @@ func (d *mem) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDevice, version 
 		return
 	}
 	if key == nil {
-		return [4]byte{}, errNoNwkKey
+		return [4]byte{}, errNoNwkKey.New()
 	}
 	return crypto.ComputeJoinRequestMIC(*key, payload)
 }
@@ -71,17 +71,17 @@ var (
 
 func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) ([4]byte, error) {
 	if dev.JoinEUI == nil {
-		return [4]byte{}, errNoJoinEUI
+		return [4]byte{}, errNoJoinEUI.New()
 	}
 	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
-		return [4]byte{}, errNoDevEUI
+		return [4]byte{}, errNoDevEUI.New()
 	}
 	key, err := d.getNwkKey(version)
 	if err != nil {
 		return [4]byte{}, err
 	}
 	if key == nil {
-		return [4]byte{}, errNoNwkKey
+		return [4]byte{}, errNoNwkKey.New()
 	}
 	switch {
 	case version.Compare(ttnpb.MAC_V1_1) >= 0:
@@ -122,15 +122,15 @@ func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, ver
 
 func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error) {
 	if dev.JoinEUI == nil {
-		return NwkSKeys{}, errNoJoinEUI
+		return NwkSKeys{}, errNoJoinEUI.New()
 	}
 	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
-		return NwkSKeys{}, errNoDevEUI
+		return NwkSKeys{}, errNoDevEUI.New()
 	}
 	switch {
 	case version.Compare(ttnpb.MAC_V1_1) >= 0:
 		if d.nwkKey == nil {
-			return NwkSKeys{}, errNoNwkKey
+			return NwkSKeys{}, errNoNwkKey.New()
 		}
 		return NwkSKeys{
 			FNwkSIntKey: crypto.DeriveFNwkSIntKey(*d.nwkKey, jn, *dev.JoinEUI, dn),
@@ -140,7 +140,7 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 
 	default:
 		if d.appKey == nil {
-			return NwkSKeys{}, errNoAppKey
+			return NwkSKeys{}, errNoAppKey.New()
 		}
 		return NwkSKeys{
 			FNwkSIntKey: crypto.DeriveLegacyNwkSKey(*d.appKey, jn, nid, dn),
@@ -159,13 +159,13 @@ var errNoAppKey = errors.DefineCorruption("no_app_key", "no AppKey specified")
 
 func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error) {
 	if dev.JoinEUI == nil {
-		return types.AES128Key{}, errNoJoinEUI
+		return types.AES128Key{}, errNoJoinEUI.New()
 	}
 	if dev.DevEUI == nil || dev.DevEUI.IsZero() {
-		return types.AES128Key{}, errNoDevEUI
+		return types.AES128Key{}, errNoDevEUI.New()
 	}
 	if d.appKey == nil {
-		return types.AES128Key{}, errNoAppKey
+		return types.AES128Key{}, errNoAppKey.New()
 	}
 
 	switch {

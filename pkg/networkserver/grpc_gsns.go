@@ -88,7 +88,7 @@ func resetsFCnt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 // and the time of the last transmission of phyPayload in ups, if such is found.
 func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32, time.Time, error) {
 	if len(phyPayload) < 4 {
-		return 0, time.Time{}, errRawPayloadTooShort
+		return 0, time.Time{}, errRawPayloadTooShort.New()
 	}
 
 	nb := uint32(1)
@@ -96,7 +96,7 @@ func transmissionNumber(phyPayload []byte, ups ...*ttnpb.UplinkMessage) (uint32,
 	for i := len(ups) - 1; i >= 0; i-- {
 		up := ups[i]
 		if len(up.RawPayload) < 4 {
-			return 0, time.Time{}, errRawPayloadTooShort
+			return 0, time.Time{}, errRawPayloadTooShort.New()
 		}
 		if !bytes.Equal(phyPayload[:len(phyPayload)-4], up.RawPayload[:len(up.RawPayload)-4]) {
 			break
@@ -929,7 +929,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during uplink handling, drop")
-				return nil, nil, errOutdatedData
+				return nil, nil, errOutdatedData.New()
 			}
 
 			if !stored.CreatedAt.Equal(matched.Device.CreatedAt) || !stored.UpdatedAt.Equal(matched.Device.UpdatedAt) {
@@ -1213,7 +1213,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				logger.Warn("Device deleted during join-request handling, drop")
-				return nil, nil, errOutdatedData
+				return nil, nil, errOutdatedData.New()
 			}
 			if stored.Session != nil {
 				invalidatedQueue = stored.Session.QueuedApplicationDownlinks

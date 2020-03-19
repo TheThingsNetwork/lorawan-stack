@@ -283,7 +283,7 @@ func (c *connection) Subscribe(info *auth.Info, requestedTopic string, requested
 	access := info.Metadata.(topicAccess)
 	accepted, ok := c.format.AcceptedTopic(access.appUID, topic.Split(requestedTopic))
 	if !ok {
-		return "", 0, errNotAuthorized
+		return "", 0, errNotAuthorized.New()
 	}
 	acceptedTopic = topic.Join(accepted)
 	acceptedQoS = requestedQoS

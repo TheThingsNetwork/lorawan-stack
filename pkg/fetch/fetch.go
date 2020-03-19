@@ -47,15 +47,15 @@ func realURLPath(rURL *url.URL, p string) (string, error) {
 	}
 	if rURL == nil {
 		if !pURL.IsAbs() {
-			return "", errSchemeNotSpecified
+			return "", errSchemeNotSpecified.New()
 		}
 		return p, nil
 	}
 	if pURL.IsAbs() {
-		return "", errSchemeSpecified
+		return "", errSchemeSpecified.New()
 	}
 	if !rURL.IsAbs() {
-		return "", errSchemeNotSpecified
+		return "", errSchemeNotSpecified.New()
 	}
 	return fmt.Sprintf("%s/%s", rURL, pURL.EscapedPath()), nil
 }
@@ -70,7 +70,7 @@ func realOSPath(r, p string) (string, error) {
 		return filepath.Join(r, p), nil
 	}
 	if filepath.VolumeName(p) != "" {
-		return "", errVolumeSpecified
+		return "", errVolumeSpecified.New()
 	}
 	return filepath.Join(r, p[1:]), nil
 }

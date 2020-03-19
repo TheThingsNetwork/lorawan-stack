@@ -37,7 +37,7 @@ func defaultPort(target string, port int) (string, error) {
 	if target[0] == '[' {
 		end := strings.IndexByte(target, ']')
 		if end < 0 || end+1 != i {
-			return "", errAddress
+			return "", errAddress.New()
 		}
 		return target, nil
 	}

@@ -76,7 +76,7 @@ func (conf RouterConfig) MarshalJSON() ([]byte, error) {
 func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time) (RouterConfig, error) {
 	for _, fp := range fps {
 		if err := fp.Validate(); err != nil {
-			return RouterConfig{}, errFrequencyPlan
+			return RouterConfig{}, errFrequencyPlan.New()
 		}
 	}
 	conf := RouterConfig{}
@@ -85,11 +85,11 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 
 	phy, err := band.GetByID(bandID)
 	if err != nil {
-		return RouterConfig{}, errFrequencyPlan
+		return RouterConfig{}, errFrequencyPlan.New()
 	}
 	s := strings.Split(phy.ID, "_")
 	if len(s) < 2 {
-		return RouterConfig{}, errFrequencyPlan
+		return RouterConfig{}, errFrequencyPlan.New()
 	}
 	conf.Region = fmt.Sprintf("%s%s", s[0], s[1])
 
@@ -103,7 +103,7 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 
 	drs, err := getDataRatesFromBandID(bandID)
 	if err != nil {
-		return RouterConfig{}, errFrequencyPlan
+		return RouterConfig{}, errFrequencyPlan.New()
 	}
 	conf.DataRates = drs
 
@@ -166,7 +166,7 @@ func getMinMaxFrequencies(fps map[string]*frequencyplans.FrequencyPlan) (uint64,
 	min = math.MaxUint64
 	for _, fp := range fps {
 		if len(fp.Radios) == 0 {
-			return 0, 0, errFrequencyPlan
+			return 0, 0, errFrequencyPlan.New()
 		}
 		if fp.Radios[0].TxConfiguration.MinFrequency < min {
 			min = fp.Radios[0].TxConfiguration.MinFrequency

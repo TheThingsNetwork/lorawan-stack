@@ -328,11 +328,11 @@ var (
 // This method returns an error if the downlink message is not a Tx request.
 func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (time.Duration, error) {
 	if c.gateway.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
-		return 0, errNotAllowed
+		return 0, errNotAllowed.New()
 	}
 	request := msg.GetRequest()
 	if request == nil {
-		return 0, errNotTxRequest
+		return 0, errNotTxRequest.New()
 	}
 	var delay time.Duration
 
@@ -354,13 +354,13 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 				return 0, errFrequencyPlanNotConfigured.WithCause(err).WithAttributes("id", request.FrequencyPlanID)
 			}
 			if fp.BandID != c.bandID {
-				return 0, errFrequencyPlansNotFromSameBand
+				return 0, errFrequencyPlansNotFromSameBand.New()
 			}
 		}
 	} else {
 		// Backwards compatibility. If there's no FrequencyPlanID in the TxRequest, then there must be only one Frequency Plan configured.
 		if len(c.gatewayFPs) != 1 {
-			return 0, errNoFrequencyPlanIDInTxRequest
+			return 0, errNoFrequencyPlanIDInTxRequest.New()
 		}
 		for _, v := range c.gatewayFPs {
 			fp = v
@@ -442,12 +442,12 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		case ttnpb.CLASS_A:
 			f = c.scheduler.ScheduleAt
 			if request.Rx1Delay == ttnpb.RX_DELAY_0 {
-				return 0, errNoRxDelay
+				return 0, errNoRxDelay.New()
 			}
 			settings.Timestamp = uplinkTimestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
 		case ttnpb.CLASS_B:
 			if request.AbsoluteTime == nil {
-				return 0, errNoAbsoluteTime
+				return 0, errNoAbsoluteTime.New()
 			}
 			if !c.scheduler.IsGatewayTimeSynced() {
 				rxErrs = append(rxErrs, errNoGPSSync)

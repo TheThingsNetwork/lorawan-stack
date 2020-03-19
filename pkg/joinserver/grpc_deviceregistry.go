@@ -287,7 +287,7 @@ func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndD
 	var evt events.Event
 	_, err := srv.JS.devices.SetByID(ctx, ids.ApplicationIdentifiers, ids.DeviceID, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil || !dev.ApplicationIdentifiers.Equal(ids.ApplicationIdentifiers) {
-			return nil, nil, errDeviceNotFound
+			return nil, nil, errDeviceNotFound.New()
 		}
 		evt = evtDeleteEndDevice(ctx, ids, nil)
 		return nil, nil, nil
