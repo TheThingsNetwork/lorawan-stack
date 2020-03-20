@@ -176,13 +176,24 @@ blobs:
 dockers:
   - goos: linux
     goarch: amd64
+    dockerfile: Dockerfile
     binaries:
       - ttn-lw-cli
       - ttn-lw-stack
     image_templates:
-      - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:latest'
       - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:{{ .Major }}.{{ .Minor }}'
       - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:{{ .Version }}'
     skip_push: auto
+    extra_files:
+      - public
+
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    binaries:
+      - ttn-lw-cli
+      - ttn-lw-stack
+    image_templates:
+      - '{{ or (index .Env "DOCKER_IMAGE_DEV") "lorawan-stack-dev" }}:{{ .FullCommit }}'
     extra_files:
       - public
