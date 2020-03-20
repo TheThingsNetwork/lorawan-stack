@@ -180,18 +180,9 @@ dockers:
       - ttn-lw-cli
       - ttn-lw-stack
     image_templates:
+      - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:latest'
       - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:{{ .Major }}.{{ .Minor }}'
       - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:{{ .Version }}'
     skip_push: auto
-    extra_files:
-      - public
-  - goos: linux
-    goarch: amd64
-    binaries:
-      - ttn-lw-cli
-      - ttn-lw-stack
-    image_templates:
-      - '{{ or (index .Env "DOCKER_IMAGE") "lorawan-stack" }}:latest'
-    skip_push: true
     extra_files:
       - public
