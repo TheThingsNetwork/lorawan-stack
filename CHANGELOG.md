@@ -9,26 +9,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- New `list` and `request-validation` subcommands for the CLI's `contact-info` commands.
-- Device Claim Authentication Code page in the Console.
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.7.0] (2020-03-19)
+
+### Added
+
 - Update gateway antenna location from incoming status message (see `update_location_from_status` gateway field and `--gs.update-gateway-location-debounce-time` option).
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
-- Gateway Server rate limiting support for the UDP frontend, see (`--gs.udp.rate-limiting` options).
-- Uplink deduplication via Redis in Network Server.
 - Access Tokens are now linked to User Sessions.
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Edit application attributes in Application General Settings in the Console
+
+## [3.6.2] (2020-03-19)
+
+### Fixed
+
+- Entity events subscription release in the Console (Firefox).
+- RekeyInd handling for LoRaWAN 1.1 devices.
+- Network server deduplication Redis configuration.
+- Change the date format in the Console to be unambiguous (`17 Mar, 2020`).
+- Handling of uplink frame counters exceeding 65535.
+- Gateway events subscription release in the Console.
+- Panic when receiving a UDP `PUSH_DATA` frame from a gateway without payload.
+
+### Security
+
+- Admin users that are suspended can no longer create, view or delete other users.
+
+## [3.6.1] (2020-03-13)
+
+### Added
+
+- New `list` and `request-validation` subcommands for the CLI's `contact-info` commands.
+- Device Claim Authentication Code page in the Console.
+- Gateway Server rate limiting support for the UDP frontend, see (`--gs.udp.rate-limiting` options).
+- Uplink deduplication via Redis in Network Server.
 
 ### Changed
 
 - Network and Application Servers now maintain application downlink queue per-session.
 - Gateway Server skips setting up an upstream if the DevAddr prefixes to forward are empty.
 - Gateway connection stats are now cached in Redis (see `--cache.service` and `--gs.update-connections-stats-debounce-time` options).
-- Change the date format in the Console to be unambiguous (`17 Mar, 2020`).
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
@@ -38,15 +68,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ADR uplink handling.
 - Uplink retransmission handling.
 - Synchronizing Basic Station concentrator time after reconnect or initial connect after long inactivity.
-- Handling of uplink frame counters exceeding 65535.
-- Gateway events subscription release in the Console.
-- Entity events subscription release in the Console (Firefox).
-- RekeyInd handling for LoRaWAN 1.1 devices.
-- Panic when receiving a UDP `PUSH_DATA` frame from a gateway without payload.
 
 ### Security
 
-- Admin users that are suspended can no longer create, view or delete other users.
+- Changing username and password to be not required in pubsub integration.
 
 ## [3.6.0] (2020-02-27)
 
@@ -233,8 +258,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix crashing of organization collaborator edit page.
 - Avoid validating existing queue on application downlink pushes.
-- Correct `AU_915_928` maximum EIRP value to 30 dBm in 915.0 – 928.0 MHz (was 16.15 dBm).
-- Correct `US_902_928` maximum EIRP value to 23.15 dBm in 902.3 – 914.9 MHz (was 32.15 dBm) and 28.15 dBm in 923.3 – 927.5 MHz (was 32.15 dBm). This aligns with US915 Hybrid Mode.
+- Correct `AU_915_928` maximum EIRP value to 30 dBm in 915.0 – 928.0 MHz (was 16.15 dBm).
+- Correct `US_902_928` maximum EIRP value to 23.15 dBm in 902.3 – 914.9 MHz (was 32.15 dBm) and 28.15 dBm in 923.3 – 927.5 MHz (was 32.15 dBm). This aligns with US915 Hybrid Mode.
 - Correct `AS_923` maximum EIRP value to 16 dBm in 923.0 – 923.5 MHz (was 16.15 dBm).
 
 ### Security
@@ -666,7 +691,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.0...HEAD
+[3.7.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.7.0
+[3.6.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.1...v3.6.2
+[3.6.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.3...v3.6.0
 [3.5.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.2...v3.5.3
 [3.5.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.1...v3.5.2
