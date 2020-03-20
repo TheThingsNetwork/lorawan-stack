@@ -62,7 +62,7 @@ before_install:
   fi
 - |
   if [[ "$RUNTYPE" == "release" ]]; then
-    openssl aes-256-cbc -K $encrypted_fe6eb417a432_key -iv $encrypted_fe6eb417a432_iv -in snapcraft.login.enc -out snapcraft.login -d
+    echo "$SNAPCRAFT_LOGIN_ENCRYPTION_PASS" | gpg --passphrase-fd 0 snapcraft.login.gpg
     nvm install 10.16.0
   fi
 - |
