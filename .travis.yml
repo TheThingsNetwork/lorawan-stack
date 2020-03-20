@@ -140,10 +140,7 @@ after_success:
       GO111MODULE=on go run github.com/goreleaser/goreleaser --release-notes <(printf "[Release notes](https://github.com/TheThingsNetwork/lorawan-stack/blob/${TRAVIS_TAG}/CHANGELOG.md#$(echo ${TRAVIS_TAG} | sed "s/v\([1-9]\+\)\.\([1-9]\+\)\.\([1-9]\+\)/\1\2\3---$(date +%Y-%m-%d)/"))")
     else
       GO111MODULE=on go run github.com/goreleaser/goreleaser --snapshot
-      if [[ ! -z "$DOCKER_IMAGE_DEV" ]]; then
-        docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE_DEV:$TRAVIS_COMMIT
-        docker push $DOCKER_IMAGE_DEV:$TRAVIS_COMMIT
-      fi
+      docker push $DOCKER_IMAGE_DEV:$TRAVIS_COMMIT
     fi
   fi
 deploy:
