@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix organization collaborator view not being accessible in the Console.
+
 ### Security
 
 ## [3.7.0] (2020-03-19)
