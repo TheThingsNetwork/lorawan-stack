@@ -28,11 +28,11 @@ import OrganizationCollaboratorAdd from '../organization-collaborator-add'
 import OrganizationCollaboratorEdit from '../organization-collaborator-edit'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 
-import { mayViewOrEditOrganizationApiKeys } from '../../lib/feature-checks'
+import { mayViewOrEditOrganizationCollaborators } from '../../lib/feature-checks'
 import { selectSelectedOrganizationId } from '../../store/selectors/organizations'
 
 @connect(state => ({ orgId: selectSelectedOrganizationId(state) }))
-@withFeatureRequirement(mayViewOrEditOrganizationApiKeys, {
+@withFeatureRequirement(mayViewOrEditOrganizationCollaborators, {
   redirect: ({ orgId }) => `/organizations/${orgId}`,
 })
 @withBreadcrumb('orgs.single.collaborators', function(props) {
