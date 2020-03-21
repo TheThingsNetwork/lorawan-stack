@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/types"
+	"gopkg.in/square/go-jose.v2"
 )
 
 // Config configures Packet Broker clients.
@@ -45,10 +46,12 @@ type HomeNetworkConfig struct {
 
 // ForwarderConfig defines configuration of the Forwarder role.
 type ForwarderConfig struct {
-	Enable     bool             `name:"enable" description:"Enable Forwarder role"`
-	TLS        TLSConfig        `name:"tls"`
-	ID         string           `name:"id" description:"ID of the Forwarder"`
-	WorkerPool WorkerPoolConfig `name:"worker-pool" description:"Workers pool configuration"`
+	Enable         bool             `name:"enable" description:"Enable Forwarder role"`
+	TLS            TLSConfig        `name:"tls"`
+	ID             string           `name:"id" description:"ID of the Forwarder"`
+	WorkerPool     WorkerPoolConfig `name:"worker-pool" description:"Workers pool configuration"`
+	TokenKey       []byte           `name:"token-key" description:"AES 128 or 256-bit key for encrypting tokens"`
+	TokenEncrypter jose.Encrypter   `name:"-"`
 }
 
 // TLSConfig contains TLS configuration for connecting to Packet Broker.

@@ -16,6 +16,7 @@ package packetbrokeragent
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -29,12 +30,14 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"gopkg.in/square/go-jose.v2"
 )
 
 const upstreamBufferSize = 64
@@ -78,10 +81,16 @@ func WithEndDeviceIdentifiersContextFiller(filler EndDeviceIdentifiersContextFil
 	}
 }
 
-var errNetID = errors.DefineFailedPrecondition("net_id", "invalid NetID `{net_id}`")
+var (
+	errNetID    = errors.DefineFailedPrecondition("net_id", "invalid NetID `{net_id}`")
+	errTokenKey = errors.DefineFailedPrecondition("token_key", "invalid token key", "length")
+)
 
 // New returns a new Packet Broker Agent.
 func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
+	ctx := log.NewContextWithField(c.Context(), "namespace", "packetbroker/agent")
+	logger := log.FromContext(ctx)
+
 	var devAddrPrefixes []types.DevAddrPrefix
 	if hn := conf.HomeNetwork; hn.Enable {
 		devAddrPrefixes = append(devAddrPrefixes, hn.DevAddrPrefixes...)
@@ -100,7 +109,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 
 	a := &Agent{
 		Component: c,
-		ctx:       log.NewContextWithField(c.Context(), "namespace", "packetbroker/agent"),
+		ctx:       ctx,
 
 		dataPlaneAddress:  conf.DataPlaneAddress,
 		netID:             conf.NetID,
@@ -112,6 +121,30 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	}
 	if a.forwarderConfig.Enable {
 		a.upstreamCh = make(chan *ttnpb.GatewayUplinkMessage, upstreamBufferSize)
+		if len(a.forwarderConfig.TokenKey) == 0 {
+			a.forwarderConfig.TokenKey = random.Bytes(16)
+			logger.WithField("token_key", hex.EncodeToString(a.forwarderConfig.TokenKey)).Warn("No token key configured, generated a random one")
+		}
+		var (
+			enc jose.ContentEncryption
+			alg jose.KeyAlgorithm
+		)
+		switch l := len(a.forwarderConfig.TokenKey); l {
+		case 16:
+			enc, alg = jose.A128GCM, jose.A128GCMKW
+		case 32:
+			enc, alg = jose.A256GCM, jose.A256GCMKW
+		default:
+			return nil, errTokenKey.WithAttributes("length", l).New()
+		}
+		var err error
+		a.forwarderConfig.TokenEncrypter, err = jose.NewEncrypter(enc, jose.Recipient{
+			Algorithm: alg,
+			Key:       a.forwarderConfig.TokenKey,
+		}, nil)
+		if err != nil {
+			return nil, errTokenKey.WithCause(err)
+		}
 	}
 	a.grpc.nsPba = &ttnpb.UnimplementedNsPbaServer{}
 	a.grpc.gsPba = &gsPbaServer{
