@@ -157,7 +157,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage) (*packetbr
 		)
 	}
 
-	hash := sha256.Sum256(msg.RawPayload)
+	hash := sha256.Sum256(msg.RawPayload[:len(msg.RawPayload)-4]) // The hash is without MIC to detect retransmissions.
 	up := &packetbroker.UplinkMessage{
 		PhyPayload: &packetbroker.UplinkMessage_PHYPayload{
 			Teaser: &packetbroker.PHYPayloadTeaser{
