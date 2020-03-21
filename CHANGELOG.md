@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix organization collaborator view not being accessible in the Console.
 - Error display on Data pages in the Console.
+- Fix too restrictive MQTT client validation in PubSub form in the Console.
 
 ### Security
 
