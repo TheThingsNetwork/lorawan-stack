@@ -95,7 +95,7 @@ func (m *simulateMetadataParams) setDefaults() error {
 		m.SpreadingFactor, m.Bandwidth = lora.SpreadingFactor, lora.Bandwidth
 	} else if m.DataRateIndex == 0 {
 		for i, dr := range phy.DataRates {
-			if dr.Rate.GetLoRa().SpreadingFactor == m.SpreadingFactor && dr.Rate.GetLoRa().Bandwidth == m.Bandwidth {
+			if lora := dr.Rate.GetLoRa(); lora != nil && lora.SpreadingFactor == m.SpreadingFactor && lora.Bandwidth == m.Bandwidth {
 				m.DataRateIndex = uint32(i)
 				break
 			}
