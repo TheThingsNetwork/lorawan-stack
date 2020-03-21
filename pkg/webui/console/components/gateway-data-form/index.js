@@ -60,6 +60,9 @@ const m = defineMessages({
   hours: 'hours',
   delayWarning:
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
+  updateLocationFromStatus: 'Update from status messages',
+  updateLocationFromStatusDescription:
+    'Update the location of this gateway based on incoming status messages',
 })
 
 const validationSchema = Yup.object().shape({
@@ -84,6 +87,7 @@ const validationSchema = Yup.object().shape({
   location_public: Yup.boolean().default(false),
   status_public: Yup.boolean().default(false),
   schedule_downlink_late: Yup.boolean().default(false),
+  update_location_from_status: Yup.boolean().default(false),
   auto_update: Yup.boolean().default(false),
   schedule_anytime_delay: Yup.string().matches(delayRegexp, sharedMessages.validateDelayFormat),
 })
@@ -210,6 +214,13 @@ class GatewayDataForm extends React.Component {
           component={Input}
         />
         <Form.Field
+          title={sharedMessages.gatewayStatus}
+          name="status_public"
+          component={Checkbox}
+          label={sharedMessages.public}
+          description={m.statusDescription}
+        />
+        <Form.Field
           title={sharedMessages.gatewayLocation}
           name="location_public"
           component={Checkbox}
@@ -217,11 +228,11 @@ class GatewayDataForm extends React.Component {
           description={m.locationDescription}
         />
         <Form.Field
-          title={sharedMessages.gatewayStatus}
-          name="status_public"
+          title={sharedMessages.gatewayLocation}
+          name="update_location_from_status"
           component={Checkbox}
-          label={sharedMessages.public}
-          description={m.statusDescription}
+          description={m.updateLocationFromStatusDescription}
+          label={m.updateLocationFromStatus}
         />
         <Message component="h4" content={sharedMessages.lorawanOptions} />
         <GsFrequencyPlansSelect name="frequency_plan_id" menuPlacement="top" required />

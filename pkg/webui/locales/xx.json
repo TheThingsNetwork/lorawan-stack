@@ -117,6 +117,8 @@
   "console.components.gateway-data-form.index.minutes": "xxxxxxx",
   "console.components.gateway-data-form.index.hours": "xxxxx",
   "console.components.gateway-data-form.index.delayWarning": "Xxxxx xxx xxxxx. Xxx xxxxx xxxxx ({minimumValue}xx) xxxx xx xxxx xx xxx Xxxxxxx Xxxxxx.",
+  "console.components.gateway-data-form.index.updateLocationFromStatus": "Xxxxxx xxxx xxxxxx xxxxxxxx",
+  "console.components.gateway-data-form.index.updateLocationFromStatusDescription": "Xxxxxx xxx xxxxxxxx xx xxxx xxxxxxx xxxxx xx xxxxxxxx xxxxxx xxxxxxxx",
   "console.components.location-form.index.deleteWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx xxxx xxxxxxxx xxxxx?",
   "console.components.location-form.index.deleteLocation": "Xxxxxx xxxxxxxx xxxxx",
   "console.components.location-form.index.noLocationSet": "Xxxxx xx xxxxxxxxx xx xxxxxxxx xxxxxxxxxxx xxx",

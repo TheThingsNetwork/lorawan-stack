@@ -117,6 +117,8 @@
   "console.components.gateway-data-form.index.minutes": "minutes",
   "console.components.gateway-data-form.index.hours": "hours",
   "console.components.gateway-data-form.index.delayWarning": "Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.",
+  "console.components.gateway-data-form.index.updateLocationFromStatus": "Update from status messages",
+  "console.components.gateway-data-form.index.updateLocationFromStatusDescription": "Update the location of this gateway based on incoming status messages",
   "console.components.location-form.index.deleteWarning": "Are you sure you want to delete this location entry?",
   "console.components.location-form.index.deleteLocation": "Remove location entry",
   "console.components.location-form.index.noLocationSet": "There is currently no location information set",
