@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"gopkg.in/square/go-jose.v2"
 )
 
 var fromPBRegion = map[packetbroker.Region]string{
@@ -138,15 +139,56 @@ func unwrapUplinkTokens(token []byte) (forwarder, gateway []byte, err error) {
 	return t.Forwarder, t.Gateway, nil
 }
 
+type gatewayUplinkToken struct {
+	GatewayID string `json:"id"`
+	Token     []byte `json:"t"`
+}
+
+func wrapGatewayUplinkToken(ids ttnpb.GatewayIdentifiers, ulToken []byte, encrypter jose.Encrypter) ([]byte, error) {
+	plaintext, err := json.Marshal(gatewayUplinkToken{
+		GatewayID: ids.GatewayID,
+		Token:     ulToken,
+	})
+	if err != nil {
+		return nil, err
+	}
+	obj, err := encrypter.Encrypt(plaintext)
+	if err != nil {
+		return nil, err
+	}
+	s, err := obj.CompactSerialize()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(s), nil
+}
+
+func unwrapGatewayUplinkToken(token, key []byte) (ttnpb.GatewayIdentifiers, []byte, error) {
+	obj, err := jose.ParseEncrypted(string(token))
+	if err != nil {
+		return ttnpb.GatewayIdentifiers{}, nil, err
+	}
+	plaintext, err := obj.Decrypt(key)
+	if err != nil {
+		return ttnpb.GatewayIdentifiers{}, nil, err
+	}
+	var t gatewayUplinkToken
+	if err := json.Unmarshal(plaintext, &t); err != nil {
+		return ttnpb.GatewayIdentifiers{}, nil, err
+	}
+	return ttnpb.GatewayIdentifiers{GatewayID: t.GatewayID}, t.Token, nil
+}
+
 var (
 	errDecodePayload             = errors.DefineInvalidArgument("decode_payload", "decode LoRaWAN payload")
 	errUnsupportedLoRaWANVersion = errors.DefineAborted("unsupported_lorawan_version", "unsupported LoRaWAN version `{version}`")
 	errUnknownBand               = errors.DefineFailedPrecondition("unknown_band", "unknown band `{band_id}`")
 	errUnknownDataRate           = errors.DefineFailedPrecondition("unknown_data_rate", "unknown data rate in region `{region}`")
 	errUnsupportedMType          = errors.DefineAborted("unsupported_m_type", "unsupported LoRaWAN MType `{m_type}`")
+	errWrapGatewayUplinkToken    = errors.DefineAborted("wrap_gateway_uplink_token", "wrap gateway uplink token")
 )
 
-func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage) (*packetbroker.UplinkMessage, error) {
+func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf ForwarderConfig) (*packetbroker.UplinkMessage, error) {
 	msg.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
@@ -203,7 +245,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage) (*packetbr
 	}
 
 	var gatewayReceiveTime *time.Time
-	var uplinkToken []byte
+	var gatewayUplinkToken []byte
 	if len(msg.RxMetadata) > 0 {
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
@@ -252,8 +294,12 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage) (*packetbr
 					gatewayReceiveTime = &t
 				}
 			}
-			if len(uplinkToken) == 0 {
-				uplinkToken = md.UplinkToken
+			if len(gatewayUplinkToken) == 0 {
+				var err error
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(md.GatewayIdentifiers, md.UplinkToken, conf.TokenEncrypter)
+				if err != nil {
+					return nil, errWrapGatewayUplinkToken.WithCause(err)
+				}
 			}
 		}
 
@@ -290,8 +336,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage) (*packetbr
 			up.GatewayReceiveTime = t
 		}
 	}
-	// TODO: Set uplink token when NsPba is implemented.
-	// up.ForwarderUplinkToken = uplinkToken
+	up.GatewayUplinkToken = gatewayUplinkToken
 
 	return up, nil
 }

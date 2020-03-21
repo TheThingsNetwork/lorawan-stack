@@ -269,7 +269,7 @@ func (a *Agent) runForwarder(ctx context.Context, conn *grpc.ClientConn, uplinkC
 		case <-time.After(a.forwarderConfig.WorkerPool.IdleTimeout):
 			return nil
 		case up := <-uplinkCh:
-			msg, err := toPBUplink(ctx, up)
+			msg, err := toPBUplink(ctx, up, a.forwarderConfig)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to convert outgoing uplink message")
 				continue
