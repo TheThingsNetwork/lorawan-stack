@@ -369,6 +369,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		HomeNetworkNetId:    a.netID.MarshalNumber(),
 		HomeNetworkTenantId: a.tenantID,
 		Filters:             a.getSubscriptionFilters(),
+		Group:               a.subscriptionGroup,
 	})
 	if err != nil {
 		return err
