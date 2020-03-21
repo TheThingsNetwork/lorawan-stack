@@ -157,7 +157,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if a.forwarderConfig.Enable {
 		c.RegisterTask(c.Context(), "pb_forward_uplink", a.forwardUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
 	}
-	if a.forwarderConfig.Enable {
+	if a.homeNetworkConfig.Enable {
 		c.RegisterTask(c.Context(), "pb_subscribe_uplink", a.subscribeUplink, component.TaskRestartOnFailure, component.TaskBackoffDial...)
 	}
 
@@ -251,7 +251,7 @@ func (a *Agent) forwardUplink(ctx context.Context) error {
 				}
 				select {
 				case uplinkCh <- msg:
-				case <-time.After(a.homeNetworkConfig.WorkerPool.BusyTimeout):
+				case <-time.After(a.forwarderConfig.WorkerPool.BusyTimeout):
 					logger.Warn("Forwarder busy, drop message")
 				}
 			}
