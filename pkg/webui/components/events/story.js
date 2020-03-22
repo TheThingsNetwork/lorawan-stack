@@ -632,6 +632,8 @@ class Example extends React.Component {
     }
   }
 
+  onRestart() {}
+
   onPause() {
     this.setState(prev => ({ paused: !prev.paused }))
   }
@@ -655,6 +657,7 @@ class Example extends React.Component {
         paused={paused}
         onClear={this.onClear}
         onPause={this.onPause}
+        onRestart={this.onRestart}
       />
     )
   }
@@ -679,6 +682,8 @@ class DynamicExample extends React.Component {
       }
     }, 2000)
   }
+
+  onRestart() {}
 
   onPause() {
     this.setState(prev => ({ paused: !prev.paused }))
@@ -706,6 +711,7 @@ class DynamicExample extends React.Component {
         paused={paused}
         onClear={this.onClear}
         onPause={this.onPause}
+        onRestart={this.onRestart}
       />
     )
   }
