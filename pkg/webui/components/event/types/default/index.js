@@ -50,6 +50,7 @@ class DefaultEvent extends React.PureComponent {
         content={content}
         emitter={entityId}
         widget={widget}
+        data={event.data}
       />
     )
   }

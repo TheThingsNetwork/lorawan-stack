@@ -70,6 +70,7 @@ class CRUDEvent extends React.PureComponent {
         emitter={entityId}
         content={content}
         widget={widget}
+        data={event.data}
       />
     )
   }
