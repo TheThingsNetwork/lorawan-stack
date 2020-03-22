@@ -64,8 +64,8 @@ import PropTypes from '../../../lib/prop-types'
     return {
       gtwId,
       gateway,
-      error: selectGatewayError(state) && selectGatewayRightsError(state),
-      fetching: selectGatewayFetching(state) && selectGatewayRightsFetching(state),
+      error: selectGatewayError(state) || selectGatewayRightsError(state),
+      fetching: selectGatewayFetching(state) || selectGatewayRightsFetching(state),
       rights: selectGatewayRights(state),
     }
   },
