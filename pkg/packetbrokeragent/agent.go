@@ -42,8 +42,8 @@ import (
 
 const upstreamBufferSize = 64
 
-// EndDeviceIdentifiersContextFiller fills the parent context based on the end device identifiers.
-type EndDeviceIdentifiersContextFiller func(parent context.Context, ids ttnpb.EndDeviceIdentifiers) (context.Context, error)
+// TenantContextFiller fills the parent context based on the tenant ID.
+type TenantContextFiller func(parent context.Context, tenantID string) (context.Context, error)
 
 // Agent implements the Packet Broker Agent component, acting as Home Network.
 //
@@ -60,7 +60,7 @@ type Agent struct {
 	subscriptionGroup string
 	devAddrPrefixes   []types.DevAddrPrefix
 
-	contextFillers []EndDeviceIdentifiersContextFiller
+	tenantContextFillers []TenantContextFiller
 
 	upstreamCh chan *ttnpb.GatewayUplinkMessage
 
@@ -73,11 +73,11 @@ type Agent struct {
 // Option configures Agent.
 type Option func(*Agent)
 
-// WithEndDeviceIdentifiersContextFiller returns an Option that appends the given filler to the end device identifiers
+// WithTenantContextFiller returns an Option that appends the given filler to the end device identifiers
 // context fillers.
-func WithEndDeviceIdentifiersContextFiller(filler EndDeviceIdentifiersContextFiller) Option {
+func WithTenantContextFiller(filler TenantContextFiller) Option {
 	return func(a *Agent) {
-		a.contextFillers = append(a.contextFillers, filler)
+		a.tenantContextFillers = append(a.tenantContextFillers, filler)
 	}
 }
 
@@ -423,19 +423,18 @@ func (a *Agent) handleUplink(ctx context.Context, uplinkCh <-chan *packetbroker.
 			return ctx.Err()
 		case <-time.After(a.homeNetworkConfig.WorkerPool.IdleTimeout):
 			return nil
-		case msg := <-uplinkCh:
-			up := msg.Message
-			if up == nil {
+		case up := <-uplinkCh:
+			if up.Message == nil {
 				continue
 			}
-			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:uplink:%s", msg.Id))
+			ctx := events.ContextWithCorrelationID(ctx, fmt.Sprintf("pba:uplink:%s", up.Id))
 			var forwarderNetID types.NetID
-			forwarderNetID.UnmarshalNumber(msg.ForwarderNetId)
+			forwarderNetID.UnmarshalNumber(up.ForwarderNetId)
 			ctx = log.NewContextWithFields(ctx, log.Fields(
-				"message_id", msg.Id,
+				"message_id", up.Id,
 				"from_forwarder_net_id", forwarderNetID,
-				"from_forwarder_id", msg.ForwarderId,
-				"from_forwarder_tenant_id", msg.ForwarderTenantId,
+				"from_forwarder_id", up.ForwarderId,
+				"from_forwarder_tenant_id", up.ForwarderTenantId,
 			))
 			if err := a.handleUplinkMessage(ctx, up); err != nil {
 				logger.WithError(err).Debug("Failed to handle incoming uplink message")
@@ -446,17 +445,17 @@ func (a *Agent) handleUplink(ctx context.Context, uplinkCh <-chan *packetbroker.
 
 var errMessageIdentifiers = errors.DefineFailedPrecondition("message_identifiers", "invalid message identifiers")
 
-func (a *Agent) handleUplinkMessage(ctx context.Context, msg *packetbroker.UplinkMessage) error {
+func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.RoutedUplinkMessage) error {
 	receivedAt := time.Now()
 	logger := log.FromContext(ctx)
 
-	if err := a.decryptUplink(ctx, msg); err != nil {
+	if err := a.decryptUplink(ctx, up.Message); err != nil {
 		logger.WithError(err).Warn("Failed to decrypt message")
 		return err
 	}
 	logger.Debug("Received uplink message")
 
-	ids, err := lorawan.GetUplinkMessageIdentifiers(msg.PhyPayload.GetPlain())
+	ids, err := lorawan.GetUplinkMessageIdentifiers(up.Message.PhyPayload.GetPlain())
 	if err != nil {
 		return errMessageIdentifiers.New()
 	}
@@ -471,16 +470,16 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, msg *packetbroker.Uplin
 		logger = logger.WithField("dev_addr", *ids.DevAddr)
 	}
 
-	up, err := fromPBUplink(ctx, msg, receivedAt)
+	msg, err := fromPBUplink(ctx, up.Message, receivedAt)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to convert incoming uplink message")
 		return err
 	}
 
-	for _, filler := range a.contextFillers {
+	for _, filler := range a.tenantContextFillers {
 		var err error
-		if ctx, err = filler(ctx, ids); err != nil {
-			logger.WithError(err).Warn("Failed to fill end device identifiers context for incoming uplink message")
+		if ctx, err = filler(ctx, up.HomeNetworkTenantId); err != nil {
+			logger.WithError(err).Warn("Failed to fill context for incoming uplink message")
 			return err
 		}
 	}
@@ -488,6 +487,6 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, msg *packetbroker.Uplin
 	if err != nil {
 		return err
 	}
-	_, err = ttnpb.NewGsNsClient(conn).HandleUplink(ctx, up, a.WithClusterAuth())
+	_, err = ttnpb.NewGsNsClient(conn).HandleUplink(ctx, msg, a.WithClusterAuth())
 	return err
 }
