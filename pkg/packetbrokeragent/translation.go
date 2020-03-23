@@ -32,31 +32,32 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
-var fromPBRegion = map[packetbroker.Region]string{
-	packetbroker.Region_EU_863_870: band.EU_863_870,
-	packetbroker.Region_US_902_928: band.US_902_928,
-	packetbroker.Region_CN_779_787: band.CN_779_787,
-	packetbroker.Region_EU_433:     band.EU_433,
-	packetbroker.Region_AU_915_928: band.AU_915_928,
-	packetbroker.Region_CN_470_510: band.CN_470_510,
-	packetbroker.Region_AS_923:     band.AS_923,
-	packetbroker.Region_KR_920_923: band.KR_920_923,
-	packetbroker.Region_IN_865_867: band.IN_865_867,
-	packetbroker.Region_RU_864_870: band.RU_864_870,
-}
-
-var toPBRegion = map[string]packetbroker.Region{
-	band.EU_863_870: packetbroker.Region_EU_863_870,
-	band.US_902_928: packetbroker.Region_US_902_928,
-	band.CN_779_787: packetbroker.Region_CN_779_787,
-	band.EU_433:     packetbroker.Region_EU_433,
-	band.AU_915_928: packetbroker.Region_AU_915_928,
-	band.CN_470_510: packetbroker.Region_CN_470_510,
-	band.AS_923:     packetbroker.Region_AS_923,
-	band.KR_920_923: packetbroker.Region_KR_920_923,
-	band.IN_865_867: packetbroker.Region_IN_865_867,
-	band.RU_864_870: packetbroker.Region_RU_864_870,
-}
+var (
+	fromPBRegion = map[packetbroker.Region]string{
+		packetbroker.Region_EU_863_870: band.EU_863_870,
+		packetbroker.Region_US_902_928: band.US_902_928,
+		packetbroker.Region_CN_779_787: band.CN_779_787,
+		packetbroker.Region_EU_433:     band.EU_433,
+		packetbroker.Region_AU_915_928: band.AU_915_928,
+		packetbroker.Region_CN_470_510: band.CN_470_510,
+		packetbroker.Region_AS_923:     band.AS_923,
+		packetbroker.Region_KR_920_923: band.KR_920_923,
+		packetbroker.Region_IN_865_867: band.IN_865_867,
+		packetbroker.Region_RU_864_870: band.RU_864_870,
+	}
+	toPBRegion = map[string]packetbroker.Region{
+		band.EU_863_870: packetbroker.Region_EU_863_870,
+		band.US_902_928: packetbroker.Region_US_902_928,
+		band.CN_779_787: packetbroker.Region_CN_779_787,
+		band.EU_433:     packetbroker.Region_EU_433,
+		band.AU_915_928: packetbroker.Region_AU_915_928,
+		band.CN_470_510: packetbroker.Region_CN_470_510,
+		band.AS_923:     packetbroker.Region_AS_923,
+		band.KR_920_923: packetbroker.Region_KR_920_923,
+		band.IN_865_867: packetbroker.Region_IN_865_867,
+		band.RU_864_870: packetbroker.Region_RU_864_870,
+	}
+)
 
 func fromPBDataRate(region packetbroker.Region, index int) (ttnpb.DataRate, bool) {
 	bandID, ok := fromPBRegion[region]
