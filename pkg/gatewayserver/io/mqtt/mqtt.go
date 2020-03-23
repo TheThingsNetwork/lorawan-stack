@@ -19,6 +19,8 @@ import (
 	"fmt"
 	stdio "io"
 	"net"
+	"os"
+	"runtime/debug"
 
 	"github.com/TheThingsIndustries/mystique/pkg/auth"
 	mqttlog "github.com/TheThingsIndustries/mystique/pkg/log"
@@ -43,6 +45,9 @@ type srv struct {
 	format Format
 	lis    mqttnet.Listener
 }
+
+// ErrMQTTFrontendRecovered is returned when a panic is caught from the MQTT frontend.
+var ErrMQTTFrontendRecovered = errors.DefineInternal("mqtt_frontend_recovered", "Internal Server Error")
 
 // Serve serves the MQTT frontend.
 func Serve(ctx context.Context, server io.Server, listener net.Listener, format Format, protocol string) error {
@@ -93,6 +98,7 @@ func (*connection) SupportsDownlinkClaim() bool { return false }
 
 func (c *connection) setup(ctx context.Context) error {
 	ctx = auth.NewContextWithInterface(ctx, c)
+	defer recoverMQTTFrontend(ctx)
 	c.session = session.New(ctx, c.mqtt, c.deliver)
 	if err := c.session.ReadConnect(); err != nil {
 		return err
@@ -105,6 +111,7 @@ func (c *connection) setup(ctx context.Context) error {
 
 	// Read control packets
 	go func() {
+		defer recoverMQTTFrontend(ctx)
 		for {
 			pkt, err := c.session.ReadPacket()
 			if err != nil {
@@ -123,6 +130,7 @@ func (c *connection) setup(ctx context.Context) error {
 
 	// Publish downlinks
 	go func() {
+		defer recoverMQTTFrontend(ctx)
 		for {
 			select {
 			case <-c.io.Context().Done():
@@ -150,6 +158,7 @@ func (c *connection) setup(ctx context.Context) error {
 
 	// Write packets
 	go func() {
+		defer recoverMQTTFrontend(ctx)
 		for {
 			var err error
 			select {
@@ -273,6 +282,7 @@ func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
 
 func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
+	defer recoverMQTTFrontend(c.io.Context())
 	switch {
 	case c.format.IsBirthTopic(pkt.TopicParts):
 	case c.format.IsLastWillTopic(pkt.TopicParts):
@@ -306,5 +316,19 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		}
 	default:
 		logger.Debug("Publish to invalid topic")
+	}
+}
+
+func recoverMQTTFrontend(ctx context.Context) {
+	if p := recover(); p != nil {
+		fmt.Fprintln(os.Stderr, p)
+		os.Stderr.Write(debug.Stack())
+		var err error
+		if pErr, ok := p.(error); ok {
+			err = ErrMQTTFrontendRecovered.WithCause(pErr)
+		} else {
+			err = ErrMQTTFrontendRecovered.WithAttributes("panic", p)
+		}
+		log.FromContext(ctx).WithError(err).Error("MQTT Frontend failed")
 	}
 }
