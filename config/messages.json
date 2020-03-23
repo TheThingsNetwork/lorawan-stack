@@ -3392,6 +3392,15 @@
       "file": "format_protobufv2.go"
     }
   },
+  "error:pkg/gatewayserver/io/mqtt:mqtt_frontend_recovered": {
+    "translations": {
+      "en": "Internal Server Error"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "mqtt.go"
+    }
+  },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
     "translations": {
       "en": "not authorized"
@@ -3489,6 +3498,15 @@
     "description": {
       "package": "pkg/gatewayserver/io/udp",
       "file": "firewall_ratelimit.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/udp:udp_frontend_recovered": {
+    "translations": {
+      "en": "Internal Server Error"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/udp",
+      "file": "udp.go"
     }
   },
   "error:pkg/gatewayserver/io:buffer_full": {

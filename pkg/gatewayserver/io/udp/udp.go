@@ -16,7 +16,10 @@ package udp
 
 import (
 	"context"
+	"fmt"
 	"net"
+	"os"
+	"runtime/debug"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -92,6 +95,9 @@ type srv struct {
 func (*srv) Protocol() string            { return "udp" }
 func (*srv) SupportsDownlinkClaim() bool { return true }
 
+// ErrUDPFrontendRecovered is returned when a panic is caught from the UDP frontend.
+var ErrUDPFrontendRecovered = errors.DefineInternal("udp_frontend_recovered", "Internal Server Error")
+
 // Serve serves the UDP frontend.
 func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) error {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/udp")
@@ -122,6 +128,7 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 }
 
 func (s *srv) read() error {
+	defer recoverUDPFrontend(s.ctx)
 	var buf [65507]byte
 	for {
 		n, addr, err := s.conn.ReadFromUDP(buf[:])
@@ -165,6 +172,7 @@ func (s *srv) read() error {
 }
 
 func (s *srv) handlePackets() {
+	defer recoverUDPFrontend(s.ctx)
 	for {
 		select {
 		case <-s.ctx.Done():
@@ -496,4 +504,18 @@ type state struct {
 	startHandleDownMu sync.RWMutex
 
 	tokens io.DownlinkTokens
+}
+
+func recoverUDPFrontend(ctx context.Context) {
+	if p := recover(); p != nil {
+		fmt.Fprintln(os.Stderr, p)
+		os.Stderr.Write(debug.Stack())
+		var err error
+		if pErr, ok := p.(error); ok {
+			err = ErrUDPFrontendRecovered.WithCause(pErr)
+		} else {
+			err = ErrUDPFrontendRecovered.WithAttributes("panic", p)
+		}
+		log.FromContext(ctx).WithError(err).Error("UDP Frontend failed")
+	}
 }
