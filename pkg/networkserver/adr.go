@@ -148,9 +148,7 @@ func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
 func uplinkMetadata(ups ...*ttnpb.UplinkMessage) []*ttnpb.RxMetadata {
 	mds := make([]*ttnpb.RxMetadata, 0, len(ups))
 	for _, up := range ups {
-		for _, md := range up.RxMetadata {
-			mds = append(mds, md)
-		}
+		mds = append(mds, up.RxMetadata...)
 	}
 	return mds
 }

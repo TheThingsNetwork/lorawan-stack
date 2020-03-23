@@ -54,12 +54,11 @@ const (
 )
 
 var (
-	AppendRecentDownlink = appendRecentDownlink
-	AppendRecentUplink   = appendRecentUplink
-	AdaptDataRate        = adaptDataRate
-	HandleLinkCheckReq   = handleLinkCheckReq
-	NewMACState          = newMACState
-	TimePtr              = timePtr
+	AppendRecentUplink = appendRecentUplink
+	AdaptDataRate      = adaptDataRate
+	HandleLinkCheckReq = handleLinkCheckReq
+	NewMACState        = newMACState
+	TimePtr            = timePtr
 
 	ErrABPJoinRequest            = errABPJoinRequest
 	ErrDecodePayload             = errDecodePayload
@@ -70,16 +69,13 @@ var (
 
 	EvtBeginApplicationLink    = evtBeginApplicationLink
 	EvtCreateEndDevice         = evtCreateEndDevice
-	EvtDeleteEndDevice         = evtDeleteEndDevice
 	EvtDropDataUplink          = evtDropDataUplink
 	EvtDropJoinRequest         = evtDropJoinRequest
 	EvtEndApplicationLink      = evtEndApplicationLink
 	EvtEnqueueDevStatusRequest = evtEnqueueDevStatusRequest
-	EvtEnqueueLinkCheckAnswer  = evtEnqueueLinkCheckAnswer
 	EvtForwardDataUplink       = evtForwardDataUplink
 	EvtForwardJoinRequest      = evtForwardJoinRequest
 	EvtMergeMetadata           = evtMergeMetadata
-	EvtReceiveLinkCheckRequest = evtReceiveLinkCheckRequest
 	EvtUpdateEndDevice         = evtUpdateEndDevice
 
 	Timeout = (1 << 10) * test.Delay
@@ -116,10 +112,6 @@ func SetMockClock(clock *test.MockClock) func() {
 	}
 }
 
-func TimeNow() time.Time {
-	return timeNow()
-}
-
 func NSScheduleWindow() time.Duration {
 	return nsScheduleWindow()
 }
@@ -129,11 +121,6 @@ const InfrastructureDelay = infrastructureDelay
 // CopyEndDevice returns a deep copy of ttnpb.EndDevice pb.
 func CopyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
 	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
-}
-
-// CopyEndDevices returns a deep copy of []*ttnpb.EndDevice pbs.
-func CopyEndDevices(pbs ...*ttnpb.EndDevice) []*ttnpb.EndDevice {
-	return deepcopy.Copy(pbs).([]*ttnpb.EndDevice)
 }
 
 // CopyUplinkMessage returns a deep copy of ttnpb.UplinkMessage pb.
@@ -154,11 +141,6 @@ func CopyDownlinkMessage(pb *ttnpb.DownlinkMessage) *ttnpb.DownlinkMessage {
 // CopyDownlinkMessages returns a deep copy of ...*ttnpb.DownlinkMessage pbs.
 func CopyDownlinkMessages(pbs ...*ttnpb.DownlinkMessage) []*ttnpb.DownlinkMessage {
 	return deepcopy.Copy(pbs).([]*ttnpb.DownlinkMessage)
-}
-
-// CopyMACParameters returns a deep copy of ttnpb.MACParameters pb.
-func CopyMACParameters(pb *ttnpb.MACParameters) *ttnpb.MACParameters {
-	return deepcopy.Copy(pb).(*ttnpb.MACParameters)
 }
 
 // CopySessionKeys returns a deep copy of ttnpb.SessionKeys pb.
@@ -449,19 +431,6 @@ var RxMetadata = [...]*ttnpb.RxMetadata{
 	},
 }
 
-func MakeLinkCheckAns(mds ...*ttnpb.RxMetadata) *ttnpb.MACCommand {
-	maxSNR := mds[0].SNR
-	for _, md := range mds {
-		if md.SNR > maxSNR {
-			maxSNR = md.SNR
-		}
-	}
-	return (&ttnpb.MACCommand_LinkCheckAns{
-		Margin:       uint32(maxSNR + 15),
-		GatewayCount: uint32(len(mds)),
-	}).MACCommand()
-}
-
 func MakeUplinkSettings(dr ttnpb.DataRate, freq uint64) ttnpb.TxSettings {
 	return ttnpb.TxSettings{
 		DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
@@ -722,12 +691,6 @@ func MakeApplicationUplinkQueueSubscribeChFunc(reqCh chan<- ApplicationUplinkQue
 		}
 		return <-respCh
 	}
-}
-
-// ApplicationUplinkSubscribeBlockFunc is ApplicationUplinks.Subscribe function, which blocks until ctx is done and returns nil.
-func ApplicationUplinkSubscribeBlockFunc(ctx context.Context, _ func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) error) error {
-	<-ctx.Done()
-	return ctx.Err()
 }
 
 var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}

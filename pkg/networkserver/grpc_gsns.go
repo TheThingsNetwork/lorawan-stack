@@ -41,9 +41,6 @@ const (
 	// recentUplinkCount is the maximum amount of recent uplinks stored per device.
 	recentUplinkCount = 20
 
-	// accumulationCapacity is the initial capacity of the accumulator.
-	accumulationCapacity = 20
-
 	// retransmissionWindow is the maximum delay between Rx2 end and an uplink retransmission.
 	retransmissionWindow = 10 * time.Second
 

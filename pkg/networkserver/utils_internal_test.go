@@ -296,7 +296,7 @@ func TestBeaconTimeBefore(t *testing.T) {
 			Expected: 10 * beaconPeriod,
 		},
 	} {
-		t.Run(fmt.Sprintf("%s", tc.Time), func(t *testing.T) {
+		t.Run(tc.Time.String(), func(t *testing.T) {
 			a := assertions.New(t)
 			ret := beaconTimeBefore(tc.Time)
 			a.So(ret, should.Equal, tc.Expected)

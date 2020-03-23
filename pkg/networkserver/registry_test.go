@@ -235,6 +235,7 @@ func handleRegistryTest(t *testing.T, reg DeviceRegistry) {
 			}, nil
 		},
 	)
+	a.So(devCtx, should.HaveParentContextOrEqual, ctx)
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 		t.Fatalf("Failed to create device: %s", err)
 	}

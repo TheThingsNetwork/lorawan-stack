@@ -1264,7 +1264,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 
 				tcs = append(tcs, TestCase{
-					Name: makeMDName(makeChDRName(chIdx, drIdx, makeLoopName(append([]string{fmt.Sprintf("Rejoin-request Type %d", typ)})...))),
+					Name: makeMDName(makeChDRName(chIdx, drIdx, makeLoopName(fmt.Sprintf("Rejoin-request Type %d", typ)))),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, makeRejoinRequest(false)), ErrRejoinRequest), should.BeTrue)
 					},
