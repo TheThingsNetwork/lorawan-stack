@@ -95,8 +95,7 @@ type srv struct {
 func (*srv) Protocol() string            { return "udp" }
 func (*srv) SupportsDownlinkClaim() bool { return true }
 
-// ErrUDPFrontendRecovered is returned when a panic is caught from the UDP frontend.
-var ErrUDPFrontendRecovered = errors.DefineInternal("udp_frontend_recovered", "Internal Server Error")
+var errUDPFrontendRecovered = errors.DefineInternal("udp_frontend_recovered", "internal server error")
 
 // Serve serves the UDP frontend.
 func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Config) error {
@@ -512,10 +511,10 @@ func recoverUDPFrontend(ctx context.Context) {
 		os.Stderr.Write(debug.Stack())
 		var err error
 		if pErr, ok := p.(error); ok {
-			err = ErrUDPFrontendRecovered.WithCause(pErr)
+			err = errUDPFrontendRecovered.WithCause(pErr)
 		} else {
-			err = ErrUDPFrontendRecovered.WithAttributes("panic", p)
+			err = errUDPFrontendRecovered.WithAttributes("panic", p)
 		}
-		log.FromContext(ctx).WithError(err).Error("UDP Frontend failed")
+		log.FromContext(ctx).WithError(err).Error("UDP frontend failed")
 	}
 }

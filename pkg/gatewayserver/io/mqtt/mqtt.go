@@ -46,8 +46,7 @@ type srv struct {
 	lis    mqttnet.Listener
 }
 
-// ErrMQTTFrontendRecovered is returned when a panic is caught from the MQTT frontend.
-var ErrMQTTFrontendRecovered = errors.DefineInternal("mqtt_frontend_recovered", "Internal Server Error")
+var errMQTTFrontendRecovered = errors.DefineInternal("mqtt_frontend_recovered", "internal server error")
 
 // Serve serves the MQTT frontend.
 func Serve(ctx context.Context, server io.Server, listener net.Listener, format Format, protocol string) error {
@@ -325,10 +324,10 @@ func recoverMQTTFrontend(ctx context.Context) {
 		os.Stderr.Write(debug.Stack())
 		var err error
 		if pErr, ok := p.(error); ok {
-			err = ErrMQTTFrontendRecovered.WithCause(pErr)
+			err = errMQTTFrontendRecovered.WithCause(pErr)
 		} else {
-			err = ErrMQTTFrontendRecovered.WithAttributes("panic", p)
+			err = errMQTTFrontendRecovered.WithAttributes("panic", p)
 		}
-		log.FromContext(ctx).WithError(err).Error("MQTT Frontend failed")
+		log.FromContext(ctx).WithError(err).Error("MQTT frontend failed")
 	}
 }
