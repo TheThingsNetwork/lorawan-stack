@@ -20,11 +20,9 @@ import Icon from '../../../icon'
 import PropTypes from '../../../../lib/prop-types'
 import { getEntityId } from '../../../../lib/selectors/id'
 import style from './error.styl'
-import { formatMessageData } from '..'
 
 const ErrorEvent = function({ className, event, expandedClassName, overviewClassName, widget }) {
   const entityId = getEntityId(event.identifiers[0])
-  const data = formatMessageData(event.data)
 
   const icon = <Icon icon="error" className={style.icon} />
   const content = <Message className={style.text} content={{ id: `event:${event.name}` }} />
@@ -39,7 +37,7 @@ const ErrorEvent = function({ className, event, expandedClassName, overviewClass
       emitter={entityId}
       content={content}
       widget={widget}
-      data={data}
+      data={event.data}
     />
   )
 }

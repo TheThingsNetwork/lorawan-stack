@@ -578,6 +578,41 @@ const events = [
       code: 5,
     },
   },
+  {
+    name: 'ns.mac.link_adr.answer.reject',
+    time: '2020-02-07T12:40:40.588851469Z',
+    identifiers: [
+      {
+        device_ids: {
+          device_id: 'the-things-node',
+          application_ids: {
+            application_id: 'tti-playground',
+          },
+          dev_eui: '0004A30B001BB0DF',
+          join_eui: '00B3D57ED0009D82',
+          dev_addr: '27000034',
+        },
+      },
+    ],
+    data: {
+      '@type': 'type.googleapis.com/ttn.lorawan.v3.MACCommand.LinkADRAns',
+      channel_mask_ack: true,
+      data_rate_index_ack: true,
+    },
+    correlation_ids: [
+      'gs:conn:01E3P0FWMBNNRE25RF9HKASEMT',
+      'gs:uplink:01E3S376KGMQ8AC88MMS97DXZP',
+      'ns:uplink:01E3S376KH3VPSSBENZEYHKA23',
+      'rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01E3S376KHKM4ZTP7TPSV7478C',
+    ],
+    origin: 'ip-10-0-6-188.eu-west-1.compute.internal',
+    context: {
+      'tenant-id': 'CgN0dGk=',
+    },
+    visibility: {
+      rights: ['RIGHT_APPLICATION_TRAFFIC_READ'],
+    },
+  },
 ]
 
 const getRandomEvent = function() {
@@ -596,6 +631,8 @@ class Example extends React.Component {
       paused: false,
     }
   }
+
+  onRestart() {}
 
   onPause() {
     this.setState(prev => ({ paused: !prev.paused }))
@@ -620,6 +657,7 @@ class Example extends React.Component {
         paused={paused}
         onClear={this.onClear}
         onPause={this.onPause}
+        onRestart={this.onRestart}
       />
     )
   }
@@ -644,6 +682,8 @@ class DynamicExample extends React.Component {
       }
     }, 2000)
   }
+
+  onRestart() {}
 
   onPause() {
     this.setState(prev => ({ paused: !prev.paused }))
@@ -671,6 +711,7 @@ class DynamicExample extends React.Component {
         paused={paused}
         onClear={this.onClear}
         onPause={this.onPause}
+        onRestart={this.onRestart}
       />
     )
   }

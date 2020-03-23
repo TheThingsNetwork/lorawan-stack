@@ -68,7 +68,7 @@ class Event extends React.PureComponent {
     overviewClassName: undefined,
     icon: 'event',
     widget: false,
-    data: null,
+    data: undefined,
   }
 
   state = {
