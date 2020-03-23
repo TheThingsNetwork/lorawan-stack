@@ -472,6 +472,16 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 				var zero uint32
 				dst.LastAFCntDown = zero
 			}
+		case "confirmed":
+			if len(subs) > 0 {
+				return fmt.Errorf("'confirmed' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Confirmed = src.Confirmed
+			} else {
+				var zero bool
+				dst.Confirmed = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

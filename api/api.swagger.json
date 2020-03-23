@@ -7870,6 +7870,12 @@
         "keys": {
           "$ref": "#/definitions/v3SessionKeys",
           "description": "Network session keys associated with the join."
+        },
+        "correlation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -8732,6 +8738,10 @@
           "type": "integer",
           "format": "int64",
           "description": "The last AFCntDown of the current session.\nThis field is only present if the skip_payload_crypto field of the EndDevice\nis true.\nCan be used with app_s_key to encrypt downlink payloads."
+        },
+        "confirmed": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

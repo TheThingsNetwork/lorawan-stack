@@ -8716,6 +8716,24 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "correlation_ids",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
             }
           ]
         },
@@ -19206,6 +19224,16 @@
               "type": "uint32",
               "longType": "uint32",
               "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": ""
+            },
+            {
+              "name": "confirmed",
+              "description": "next: 12",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "defaultValue": ""
             }

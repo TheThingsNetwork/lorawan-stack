@@ -2595,6 +2595,15 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 					dst.Keys = zero
 				}
 			}
+		case "correlation_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'correlation_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.CorrelationIDs = src.CorrelationIDs
+			} else {
+				dst.CorrelationIDs = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
