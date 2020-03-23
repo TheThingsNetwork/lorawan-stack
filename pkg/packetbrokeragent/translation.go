@@ -126,7 +126,7 @@ type compoundUplinkToken struct {
 }
 
 func wrapUplinkTokens(forwarder, gateway []byte) ([]byte, error) {
-	if forwarder == nil || gateway == nil {
+	if forwarder == nil && gateway == nil {
 		return nil, nil
 	}
 	return json.Marshal(compoundUplinkToken{forwarder, gateway})
@@ -382,6 +382,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, received
 					Time:                  receiveTime,
 					FineTimestamp:         ant.FineTimestamp.GetValue(),
 					RSSI:                  ant.SignalQuality.GetChannelRssi(),
+					ChannelRSSI:           ant.SignalQuality.GetChannelRssi(),
 					SignalRSSI:            ant.SignalQuality.GetSignalRssi(),
 					RSSIStandardDeviation: ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
 					SNR:                   ant.SignalQuality.GetSnr(),
