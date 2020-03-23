@@ -37,6 +37,15 @@ func (d Definition) BindData(data interface{}) DefinitionDataClosure {
 // DefinitionDataClosure is partially-applied Definition with data argument bound.
 type DefinitionDataClosure func(ctx context.Context, ids CombinedIdentifiers) Event
 
+// ApplyDefinitionDataClosures applies ...DefinitionDataClosure using context.Context and CombinedIdentifiers passed.
+func ApplyDefinitionDataClosures(ctx context.Context, ids CombinedIdentifiers, closures ...DefinitionDataClosure) []Event {
+	evts := make([]Event, 0, len(closures))
+	for _, f := range closures {
+		evts = append(evts, f(ctx, ids))
+	}
+	return evts
+}
+
 // Definitions of registered events.
 // Events that are defined in init() funcs will be collected for translation.
 var Definitions = make(map[string]string)
