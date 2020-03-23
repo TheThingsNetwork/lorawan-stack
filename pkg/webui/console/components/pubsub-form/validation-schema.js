@@ -20,6 +20,7 @@ import {
   address as addressRegexp,
   mqttUrl as mqttUrlRegexp,
   mqttPassword as mqttPasswordRegexp,
+  noSpaces as noSpacesRegexp,
 } from '../../lib/regexp'
 import { qosLevels } from './qos-options'
 
@@ -71,14 +72,14 @@ export default Yup.object().shape({
         .matches(mqttUrlRegexp, sharedMessages.validateUrl)
         .required(sharedMessages.validateRequired),
       client_id: Yup.string()
-        .matches(idRegexp, sharedMessages.validateIdFormat)
+        .matches(noSpacesRegexp, sharedMessages.validateNoSpaces)
         .min(2, sharedMessages.validateTooShort)
         .max(23, sharedMessages.validateTooLong)
         .required(sharedMessages.validateRequired),
       username: Yup.string().when('use_credentials', {
         is: true,
         then: Yup.string()
-          .matches(idRegexp, sharedMessages.validateIdFormat)
+          .matches(noSpacesRegexp, sharedMessages.validateNoSpaces)
           .min(2, sharedMessages.validateTooShort)
           .max(100, sharedMessages.validateTooLong)
           .required(sharedMessages.validateRequired),

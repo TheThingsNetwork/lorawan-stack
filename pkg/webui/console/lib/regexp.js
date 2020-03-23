@@ -14,6 +14,7 @@
 
 // alphanumeric, dashes, lowercase
 export const id = /^[a-z0-9]+(-[a-z0-9]+)*$/
+export const noSpaces = /^\S*$/
 export const apiKey = /^NNSXS.[A-Z0-9]{39}.[A-Z0-9]{52}$/
 export const address = new RegExp(
   '^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$',
