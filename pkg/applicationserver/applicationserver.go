@@ -321,7 +321,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			var sessions []*ttnpb.Session
+			sessions := make([]*ttnpb.Session, 0, 2)
 			if dev.Session != nil {
 				sessions = append(sessions, dev.Session)
 				mask = append(mask, "session.last_a_f_cnt_down")
@@ -343,7 +343,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndD
 					encryptedItem.FCnt = session.LastAFCntDown + 1
 					if !dev.SkipPayloadCrypto {
 						if err := as.encodeAndEncrypt(ctx, dev, session, &encryptedItem, link.DefaultFormatters); err != nil {
-							logger.WithError(err).Warn("Drop downlink message; encoding and encryption failed")
+							logger.WithError(err).Warn("Encoding and encryption of downlink message failed; dropping item")
 							return nil, nil, err
 						}
 					}
@@ -422,6 +422,10 @@ var errNoAppSKey = errors.DefineCorruption("no_app_s_key", "no AppSKey")
 
 // DownlinkQueueList lists the application downlink queue of the given end device.
 func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error) {
+	dev, err := as.deviceRegistry.Get(ctx, ids, []string{"session", "skip_payload_crypto", "pending_session"})
+	if err != nil {
+		return nil, err
+	}
 	link, err := as.getLink(ctx, ids.ApplicationIdentifiers)
 	if err != nil {
 		return nil, err
@@ -431,25 +435,18 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	// Avoid hitting the device registry if no downlinks are to be decrypted.
-	if len(res.Downlinks) == 0 {
-		return nil, nil
-	}
-	dev, err := as.deviceRegistry.Get(ctx, ids, []string{"session", "skip_payload_crypto", "pending_session"})
-	if err != nil {
-		return nil, err
-	}
 	if dev.SkipPayloadCrypto {
 		return res.Downlinks, nil
+	}
+	if len(res.Downlinks) == 0 {
+		return nil, nil
 	}
 	var queue []*ttnpb.ApplicationDownlink
 	var session *ttnpb.Session
 	switch {
 	case dev.Session != nil:
-		queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(dev.Session.SessionKeyID, res.Downlinks...)
 		session = dev.Session
 	case dev.PendingSession != nil:
-		queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(dev.PendingSession.SessionKeyID, res.Downlinks...)
 		session = dev.PendingSession
 	default:
 		return nil, errNoDeviceSession.New()
@@ -457,12 +454,13 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if session.AppSKey == nil {
 		return nil, errNoAppSKey.New()
 	}
+	queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyID, res.Downlinks...)
+	// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.AppSKey, as.KeyVault)
+	if err != nil {
+		return nil, err
+	}
 	for _, item := range queue {
-		// TODO: Cache unwrapped keys (https://github.com/TheThingsNetwork/lorawan-stack/issues/36)
-		appSKey, err := cryptoutil.UnwrapAES128Key(ctx, *session.AppSKey, as.KeyVault)
-		if err != nil {
-			return nil, err
-		}
 		item.FRMPayload, err = crypto.DecryptDownlink(appSKey, session.DevAddr, item.FCnt, item.FRMPayload, false)
 		if err != nil {
 			return nil, err
@@ -576,7 +574,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 				logger := logger.WithField("count", len(joinAccept.InvalidatedDownlinks))
 				logger.Debug("Recalculating downlink queue to restore downlink queue on join")
 				if err := as.recomputePendingQueue(ctx, dev, link, previousSession, joinAccept.InvalidatedDownlinks); err != nil {
-					logger.WithError(err).Warn("Failed to recalculate downlink queue, items lost")
+					logger.WithError(err).Warn("Failed to recalculate downlink queue; items lost")
 				}
 			}
 			return dev, mask, nil
@@ -600,13 +598,13 @@ func (as *ApplicationServer) changeDownlinkQueue(ctx context.Context, dev *ttnpb
 	if pendingSession != nil {
 		logger = logger.WithField("pending_session_key_id", pendingSession.SessionKeyID)
 	}
-	currentSession := dev.Session
-	if currentSession != nil {
-		logger = logger.WithField("current_session_key_id", currentSession.SessionKeyID)
+	session := dev.Session
+	if session != nil {
+		logger = logger.WithField("session_key_id", session.SessionKeyID)
 	}
 	ctx = log.NewContext(ctx, logger)
 	oldPendingLastAFCntDown := pendingSession.GetLastAFCntDown()
-	oldCurrentLastAFCntDown := currentSession.GetLastAFCntDown()
+	oldLastAFCntDown := session.GetLastAFCntDown()
 	defer func() {
 		// If something fails, clear the downlink queue as an empty downlink queue is better than a downlink queue
 		// with items that are encrypted with the wrong AppSKey.
@@ -614,10 +612,10 @@ func (as *ApplicationServer) changeDownlinkQueue(ctx context.Context, dev *ttnpb
 			if pendingSession != nil {
 				pendingSession.LastAFCntDown = oldPendingLastAFCntDown
 			}
-			if currentSession != nil {
-				currentSession.LastAFCntDown = oldCurrentLastAFCntDown
+			if session != nil {
+				session.LastAFCntDown = oldLastAFCntDown
 			}
-			logger.WithError(err).Warn("Recalculate downlink queue failed; clearing the downlink queue")
+			logger.WithError(err).Warn("Failed to recalculate downlink queue; clearing the downlink queue")
 			client := ttnpb.NewAsNsClient(link.conn)
 			req := &ttnpb.DownlinkQueueRequest{
 				EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
@@ -671,7 +669,7 @@ func (as *ApplicationServer) recomputePendingQueue(ctx context.Context, dev *ttn
 				"f_port", item.FPort,
 				"f_cnt", item.FCnt,
 				"session_key_id", item.SessionKeyID,
-			)).Warn("Drop downlink message; unknown session key ID")
+			)).Warn("Downlink message with unknown session key ID found; dropping item")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, item, errUnknownSession)
 		}
 
@@ -714,7 +712,7 @@ func (as *ApplicationServer) replaceDownlinkQueue(ctx context.Context, dev *ttnp
 				"f_port", item.FPort,
 				"f_cnt", item.FCnt,
 				"session_key_id", item.SessionKeyID,
-			)).Warn("Drop downlink message; unknown session key ID")
+			)).Warn("Downlink message with unknown session key ID found; dropping item")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, item, errUnknownSession)
 		}
 		if replacePending && dev.PendingSession != nil {
@@ -759,7 +757,7 @@ func (as *ApplicationServer) migrateDownlinkQueue(ctx context.Context, ids ttnpb
 		))
 		frmPayload, err := crypto.DecryptDownlink(oldAppSKey, oldSession.DevAddr, oldItem.FCnt, oldItem.FRMPayload)
 		if err != nil {
-			logger.WithError(err).Warn("Drop downlink message; failed to decrypt")
+			logger.WithError(err).Warn("Failed to decrypt downlink message; dropping item")
 			registerDropDownlink(ctx, ids, oldItem, err)
 			continue
 		}
@@ -774,7 +772,7 @@ func (as *ApplicationServer) migrateDownlinkQueue(ctx context.Context, ids ttnpb
 		}
 		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, newSession.DevAddr, newItem.FCnt, frmPayload)
 		if err != nil {
-			logger.WithError(err).Warn("Drop downlink message; failed to encrypt")
+			logger.WithError(err).Warn("Failed to encrypt downlink message; dropping item")
 			registerDropDownlink(ctx, ids, oldItem, err)
 			continue
 		}
@@ -842,7 +840,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 							events.Publish(evtLostQueueDataDown(ctx, ids, err))
 						}
 					} else if err := as.replaceDownlinkQueue(ctx, dev, link, previousSession, res.Downlinks, 1, false); err != nil {
-						logger.WithError(err).Warn("Failed to recalculate downlink queue")
+						logger.WithError(err).Warn("Failed to recalculate downlink queue; items lost")
 					}
 				}
 				dev.PendingSession = nil
