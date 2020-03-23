@@ -196,7 +196,8 @@ message ApplicationUplink {
   // Can be used with app_s_key to encrypt downlink payloads.
   uint32 last_a_f_cnt_down = 10;
 
-  // next: 11
+  bool confirmed = 11;
+  // next: 12
 }
 
 message ApplicationLocation {
