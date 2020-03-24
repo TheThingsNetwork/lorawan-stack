@@ -99,8 +99,17 @@ func (ns *NetworkServer) LinkApplication(link ttnpb.AsNs_LinkApplicationServer) 
 		if err := link.Send(up); err != nil {
 			return err
 		}
-		_, err := link.Recv()
-		return err
+		if _, err := link.Recv(); err != nil {
+			return err
+		}
+		switch pld := up.Up.(type) {
+		case *ttnpb.ApplicationUp_UplinkMessage:
+			registerForwardDataUplink(ctx, pld.UplinkMessage)
+			events.Publish(evtForwardDataUplink(ctx, up.EndDeviceIdentifiers, up))
+		case *ttnpb.ApplicationUp_JoinAccept:
+			events.Publish(evtForwardJoinAccept(ctx, up.EndDeviceIdentifiers, up))
+		}
+		return nil
 	})
 	logger.WithError(err).Debug("Close application link")
 	events.Publish(evtEndApplicationLink(ctx, ids, err))

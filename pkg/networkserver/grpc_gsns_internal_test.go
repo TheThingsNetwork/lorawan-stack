@@ -25,7 +25,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/component"
-	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -196,23 +195,6 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		ifNoFCntGap := makeConditionalConfigFunc(func() bool { return !macVersion.HasMaxFCntGap() })
 		ifPre1_1 := makeConditionalConfigFunc(func() bool { return macVersion.Compare(ttnpb.MAC_V1_1) < 0 })
 
-		type macCommander interface {
-			MACCommand() *ttnpb.MACCommand
-		}
-		makeUplinkMACBuffer := func(cmds ...macCommander) []byte {
-			var b []byte
-			for _, cmd := range cmds {
-				b = test.Must(lorawan.DefaultMACCommands.AppendUplink(phy, b, *cmd.MACCommand())).([]byte)
-			}
-			return b
-		}
-		appendMACCommands := func(queue []*ttnpb.MACCommand, cmds ...macCommander) []*ttnpb.MACCommand {
-			for _, cmd := range cmds {
-				queue = append(queue, cmd.MACCommand())
-			}
-			return queue
-		}
-
 		makeApplicationDownlink := func(confirmed bool, fCnt uint16) *ttnpb.ApplicationDownlink {
 			return &ttnpb.ApplicationDownlink{
 				SessionKeyID: []byte("test-id"),
@@ -310,7 +292,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							Session:              makeSession(0x00, 0x00),
 						}
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}
-						up := MakeDataUplink(macVersion, true, false, ttnpb.FCtrl{}, 0x00, 0x00, 0x00, nil, nil, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1, upRecvAt.Add(-time.Nanosecond))
+						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{}, 0x00, 0x00, 0x00, nil, nil, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
 						return dev
@@ -330,7 +313,8 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						}
 						dev.MACState.CurrentParameters.ADRNbTrans = 2
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{ttnpb.CID_DEV_STATUS.MACCommand()}
-						up := MakeDataUplink(macVersion, true, false, ttnpb.FCtrl{}, 0x00, 0x00, 0x00, nil, nil, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1, upRecvAt.Add(-time.Nanosecond))
+						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{}, 0x00, 0x00, 0x00, nil, nil, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
 						return dev
@@ -440,7 +424,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 			},
 			{
 				FCnt: 0x22,
-				FRMPayload: makeUplinkMACBuffer(
+				FRMPayload: MakeUplinkMACBuffer(phy,
 					ttnpb.CID_LINK_CHECK,
 					ttnpb.CID_BEACON_TIMING,
 					&ttnpb.MACCommand_PingSlotInfoReq{
@@ -472,7 +456,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 							Value: ttnpb.PING_EVERY_2S,
 						}
-						dev.MACState.QueuedResponses = appendMACCommands(dev.MACState.QueuedResponses,
+						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
 						)
 						dev.MACState.RxWindowsAvailable = true
@@ -529,7 +513,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 							Value: ttnpb.PING_EVERY_2S,
 						}
-						dev.MACState.QueuedResponses = appendMACCommands(dev.MACState.QueuedResponses,
+						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
 						)
 						dev.MACState.RxWindowsAvailable = true
@@ -590,7 +574,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 							Value: ttnpb.PING_EVERY_2S,
 						}
-						dev.MACState.QueuedResponses = appendMACCommands(dev.MACState.QueuedResponses,
+						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
 						)
 						dev.MACState.RxWindowsAvailable = true
@@ -625,7 +609,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 				Ack:          true,
 				FPort:        0x01,
 				FRMPayload:   []byte("test-payload"),
-				FOpts: makeUplinkMACBuffer(
+				FOpts: MakeUplinkMACBuffer(phy,
 					&ttnpb.MACCommand_PingSlotInfoReq{
 						Period: ttnpb.PING_EVERY_2S,
 					},
@@ -674,7 +658,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 							Value: ttnpb.PING_EVERY_2S,
 						}
-						dev.MACState.QueuedResponses = appendMACCommands(dev.MACState.QueuedResponses,
+						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
 						)
 						dev.MACState.RxWindowsAvailable = true
@@ -718,7 +702,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						dev.MACState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 							Value: ttnpb.PING_EVERY_2S,
 						}
-						dev.MACState.QueuedResponses = appendMACCommands(dev.MACState.QueuedResponses,
+						dev.MACState.QueuedResponses = AppendMACCommanders(dev.MACState.QueuedResponses,
 							ttnpb.CID_PING_SLOT_INFO,
 						)
 						dev.MACState.RxWindowsAvailable = true
@@ -877,11 +861,12 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						}
 						dev.MACState.CurrentParameters.ADRNbTrans = 3
 						dev.MACState.PendingRequests = []*ttnpb.MACCommand{{}, {}}
-						up := MakeDataUplink(macVersion, true, false, ttnpb.FCtrl{
+						up := MakeDataUplink(macVersion, true, false, DevAddr, ttnpb.FCtrl{
 							ADR:       true,
 							ADRAckReq: true,
 							ClassB:    true,
-						}, 0xff00, 0x02, 0x01, []byte("test-payload"), []byte{}, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1, upRecvAt.Add(-time.Nanosecond))
+						}, 0xff00, 0x02, 0x01, []byte("test-payload"), []byte{}, dr, drIdx, phy.UplinkChannels[chIdx-1].Frequency, chIdx-1)
+						up.ReceivedAt = upRecvAt.Add(-time.Nanosecond)
 						dev.MACState.RecentUplinks = appendRecentUplink(dev.MACState.RecentUplinks, up, recentUplinkCount)
 						dev.RecentUplinks = appendRecentUplink(dev.RecentUplinks, up, recentUplinkCount)
 						return dev
@@ -979,12 +964,13 @@ func TestMatchAndHandleUplink(t *testing.T) {
 		} {
 			upName := makeName(fmt.Sprintf("confirmed:%v,ack:%v,adr:%v,adr_ack_req:%v,class_b:%v,f_cnt:0x%x,conf_f_cnt_down:0x%x,f_port:%v,frm_payload:%v,fOpts:%v",
 				upConf.Confirmed, upConf.Ack, upConf.ADR, upConf.ADRAckReq, upConf.ClassB, upConf.FCnt, upConf.ConfFCntDown, upConf.FPort, hex.EncodeToString(upConf.FRMPayload), hex.EncodeToString(upConf.FOpts)))
-			up := MakeDataUplink(macVersion, true, upConf.Confirmed, ttnpb.FCtrl{
+			up := MakeDataUplink(macVersion, true, upConf.Confirmed, DevAddr, ttnpb.FCtrl{
 				Ack:       upConf.Ack,
 				ADR:       upConf.ADR,
 				ADRAckReq: upConf.ADRAckReq,
 				ClassB:    upConf.ClassB,
-			}, upConf.FCnt, upConf.ConfFCntDown, upConf.FPort, upConf.FRMPayload, upConf.FOpts, dr, drIdx, ch.Frequency, chIdx, upRecvAt)
+			}, upConf.FCnt, upConf.ConfFCntDown, upConf.FPort, upConf.FRMPayload, upConf.FOpts, dr, drIdx, ch.Frequency, chIdx)
+			up.ReceivedAt = upRecvAt
 			for _, deduplicated := range [2]bool{
 				true,
 				false,
@@ -1114,7 +1100,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						matched.phy = band.Band{} // band.Band cannot be compared with neither should.Resemble, nor should.Equal.
 						if !a.So(AllTrue(
 							a.So(matched.SetPaths, should.HaveSameElementsDeep, devConf.SetPaths),
-							a.So(matched.QueuedEvents, should.ResembleEventDefinitionDataClosures, devConf.MakeQueuedEvents(deduplicated)),
+							a.So(matched.QueuedEventClosures, should.ResembleEventDefinitionDataClosures, devConf.MakeQueuedEvents(deduplicated)),
 							a.So(matched, should.Resemble, &matchedDevice{
 								ChannelIndex:             chIdx,
 								DataRateIndex:            drIdx,
@@ -1125,7 +1111,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 								NbTrans:                  devConf.NbTrans,
 								Pending:                  devConf.Pending,
 								QueuedApplicationUplinks: devConf.QueuedApplicationUplinks,
-								QueuedEvents:             matched.QueuedEvents,
+								QueuedEventClosures:      matched.QueuedEventClosures,
 								SetPaths:                 matched.SetPaths,
 							}),
 						), should.BeTrue) {
@@ -1135,7 +1121,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 						if deduplicated || len(matched.DeferredMACHandlers) == 0 {
 							return true
 						}
-						queuedEvents := matched.QueuedEvents
+						queuedEvents := matched.QueuedEventClosures
 						for _, f := range matched.DeferredMACHandlers {
 							evs, err := f(matched.Context, matched.Device, CopyUplinkMessage(up))
 							if !a.So(err, should.BeNil) {

@@ -4351,6 +4351,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}:
 				}
 
+				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
+					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
+						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
+							ApplicationIdentifiers: appID,
+							DeviceID:               devID,
+							DevAddr:                &devAddr,
+						}) &&
+						a.So(replace, should.BeTrue) &&
+						a.So(startAt, should.Resemble, now.Add(downlinkRetryInterval))
+				},
+					nil,
+				) {
+					t.Error("Downlink task add assertion failed")
+					return false
+				}
+
 				select {
 				case <-ctx.Done():
 					t.Error("Timed out while waiting for ApplicationUplinks.Add to be called")
@@ -4370,22 +4386,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					})
 					close(req.Response)
-				}
-
-				if !AssertDownlinkTaskAddRequest(ctx, env.DownlinkTasks.Add, func(reqCtx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) bool {
-					return a.So(reqCtx, should.HaveParentContextOrEqual, ctx) &&
-						a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: appID,
-							DeviceID:               devID,
-							DevAddr:                &devAddr,
-						}) &&
-						a.So(replace, should.BeTrue) &&
-						a.So(startAt, should.Resemble, now.Add(downlinkRetryInterval))
-				},
-					nil,
-				) {
-					t.Error("Downlink task add assertion failed")
-					return false
 				}
 
 				select {
