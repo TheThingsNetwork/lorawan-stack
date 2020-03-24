@@ -46,10 +46,6 @@ func timeUntil(t time.Time) time.Duration {
 	return t.Sub(timeNow())
 }
 
-func timeSince(t time.Time) time.Duration {
-	return timeNow().Sub(t)
-}
-
 // copyEndDevice returns a deep copy of ttnpb.EndDevice pb.
 func copyEndDevice(pb *ttnpb.EndDevice) *ttnpb.EndDevice {
 	return deepcopy.Copy(pb).(*ttnpb.EndDevice)
@@ -164,10 +160,6 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 
 func lastUplink(ups ...*ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
 	return ups[len(ups)-1]
-}
-
-func lastDownlink(downs ...*ttnpb.DownlinkMessage) *ttnpb.DownlinkMessage {
-	return downs[len(downs)-1]
 }
 
 func needsClassADataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, t time.Time, phy band.Band, defaults ttnpb.MACSettings) bool {

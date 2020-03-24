@@ -41,9 +41,6 @@ const (
 	// recentUplinkCount is the maximum amount of recent uplinks stored per device.
 	recentUplinkCount = 20
 
-	// accumulationCapacity is the initial capacity of the accumulator.
-	accumulationCapacity = 20
-
 	// retransmissionWindow is the maximum delay between Rx2 end and an uplink retransmission.
 	retransmissionWindow = 10 * time.Second
 
@@ -945,6 +942,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			queuedEvents = append(queuedEvents, matched.QueuedEvents...)
 			queuedApplicationUplinks = append(queuedApplicationUplinks, matched.QueuedApplicationUplinks...)
 
+			pld.FCnt = matched.FCnt
 			up.DeviceChannelIndex = uint32(matched.ChannelIndex)
 			up.Settings.DataRateIndex = matched.DataRateIndex
 
@@ -987,15 +985,17 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
 			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
 			CorrelationIDs:       up.CorrelationIDs,
-			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{
-				FCnt:         pld.FCnt,
-				FPort:        pld.FPort,
-				FRMPayload:   pld.FRMPayload,
-				RxMetadata:   up.RxMetadata,
-				SessionKeyID: stored.Session.SessionKeyID,
-				Settings:     up.Settings,
-				ReceivedAt:   up.ReceivedAt,
-			}},
+			Up: &ttnpb.ApplicationUp_UplinkMessage{
+				UplinkMessage: &ttnpb.ApplicationUplink{
+					FCnt:         pld.FCnt,
+					FPort:        pld.FPort,
+					FRMPayload:   pld.FRMPayload,
+					RxMetadata:   up.RxMetadata,
+					SessionKeyID: stored.Session.SessionKeyID,
+					Settings:     up.Settings,
+					ReceivedAt:   up.ReceivedAt,
+				},
+			},
 		})
 	}
 	if n := len(queuedApplicationUplinks); n > 0 {
@@ -1250,12 +1250,14 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			DevAddr:                &devAddr,
 		},
 		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
-		Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{
-			AppSKey:              resp.SessionKeys.AppSKey,
-			InvalidatedDownlinks: invalidatedQueue,
-			SessionKeyID:         resp.SessionKeys.SessionKeyID,
-			ReceivedAt:           respRecvAt,
-		}},
+		Up: &ttnpb.ApplicationUp_JoinAccept{
+			JoinAccept: &ttnpb.ApplicationJoinAccept{
+				AppSKey:              resp.SessionKeys.AppSKey,
+				InvalidatedDownlinks: invalidatedQueue,
+				SessionKeyID:         resp.SessionKeys.SessionKeyID,
+				ReceivedAt:           respRecvAt,
+			},
+		},
 	}); err != nil {
 		logger.WithError(err).Warn("Failed to enqueue join-accept for sending to Application Server")
 	}
