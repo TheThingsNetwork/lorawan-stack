@@ -24,6 +24,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 func TestSameElements(t *testing.T) {
@@ -68,8 +69,13 @@ func TestSameElements(t *testing.T) {
 			false,
 		},
 		{
-			map[string]interface{}{"a": 42, "b": 77},
+			map[string]interface{}{"a": 42, "d": 77},
 			map[string]int{"a": 42, "b": 77},
+			true,
+		},
+		{
+			map[string]interface{}{"a": 42, "d": 77},
+			[]int{42, 77},
 			true,
 		},
 		{
@@ -185,10 +191,10 @@ func TestShouldHaveSameElements(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			a.So(ShouldHaveSameElementsFunc(tc.A, tc.B, reflect.DeepEqual), tc.ShouldFunc)
-			a.So(ShouldNotHaveSameElementsFunc(tc.A, tc.B, reflect.DeepEqual), tc.ShouldNotFunc)
-			a.So(ShouldHaveSameElementsFunc(tc.A, tc.B, diffEqual), tc.ShouldFunc)
-			a.So(ShouldNotHaveSameElementsFunc(tc.A, tc.B, diffEqual), tc.ShouldNotFunc)
+			a.So(ShouldHaveSameElementsFunc(tc.A, reflect.DeepEqual, tc.B), tc.ShouldFunc)
+			a.So(ShouldNotHaveSameElementsFunc(tc.A, reflect.DeepEqual, tc.B), tc.ShouldNotFunc)
+			a.So(ShouldHaveSameElementsFunc(tc.A, test.DiffEqual, tc.B), tc.ShouldFunc)
+			a.So(ShouldNotHaveSameElementsFunc(tc.A, test.DiffEqual, tc.B), tc.ShouldNotFunc)
 			a.So(ShouldHaveSameElementsDeep(tc.A, tc.B), tc.ShouldFunc)
 			a.So(ShouldNotHaveSameElementsDeep(tc.A, tc.B), tc.ShouldNotFunc)
 			a.So(ShouldHaveSameElementsDiff(tc.A, tc.B), tc.ShouldFunc)

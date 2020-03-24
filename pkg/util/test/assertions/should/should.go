@@ -148,10 +148,10 @@ var (
 	// StartWith receives exactly 2 string parameters and ensures that the first starts with the second.
 	StartWith = assertions.ShouldStartWith
 
-	// HaveSameElements asserts that the actual A and expected B elements are equal using an equality function with signature func(A, B) bool.
-	HaveSameElements = testassertions.ShouldHaveSameElementsFunc
-	// NotHaveSameElements asserts that the actual A and expected B elements are not equal using an equality function with signature func(A, B) bool.
-	NotHaveSameElements = testassertions.ShouldNotHaveSameElementsFunc
+	// HaveSameElementsFunc asserts that the actual A and expected B elements are equal using an equality function with signature func(A, B) bool.
+	HaveSameElementsFunc = testassertions.ShouldHaveSameElementsFunc
+	// NotHaveSameElementsFunc asserts that the actual A and expected B elements are not equal using an equality function with signature func(A, B) bool.
+	NotHaveSameElementsFunc = testassertions.ShouldNotHaveSameElementsFunc
 	// HaveSameElementsDeep asserts that the actual A and expected B elements are equal using reflect.Equal.
 	HaveSameElementsDeep = testassertions.ShouldHaveSameElementsDeep
 	// NotHaveSameElementsDeep asserts that the actual A and expected B elements are not equal using reflect.Equal.
@@ -160,6 +160,10 @@ var (
 	HaveSameElementsDiff = testassertions.ShouldHaveSameElementsDiff
 	// NotHaveSameElementsDiff asserts that the actual A and expected B elements are not equal using pretty.Diff.
 	NotHaveSameElementsDiff = testassertions.ShouldNotHaveSameElementsDiff
+	// HaveSameElementsEvent asserts that the actual A and expected B elements are equal using test.EventEqual.
+	HaveSameElementsEvent = testassertions.ShouldHaveSameElementsEvent
+	// NotHaveSameElementsEvent asserts that the actual A and expected B elements are not equal using test.EventEqual.
+	NotHaveSameElementsEvent = testassertions.ShouldNotHaveSameElementsEvent
 	// HaveParentContext asserts that the context.Context is a child of context.Context.
 	HaveParentContext = testassertions.ShouldHaveParentContext
 	// HaveParentContextOrEqual asserts that the context.Context is a child of context.Context or they're equal.

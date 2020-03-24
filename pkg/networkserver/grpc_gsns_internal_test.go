@@ -1144,7 +1144,7 @@ func TestMatchAndHandleUplink(t *testing.T) {
 							queuedEvents = append(queuedEvents, evs...)
 						}
 						return AllTrue(
-							a.So(queuedEvents, should.HaveSameElements, devConf.MakeQueuedEvents(true), test.EventDefinitionDataClosureEqual),
+							a.So(queuedEvents, should.HaveSameElementsFunc, test.EventDefinitionDataClosureEqual, devConf.MakeQueuedEvents(true)),
 							a.So(matched.Device, should.Resemble, devConf.ApplyDeviceDiff(true, CopyEndDevice(devConf.Device))),
 						)
 					}

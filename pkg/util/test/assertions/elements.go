@@ -19,6 +19,7 @@ import (
 	"reflect"
 
 	"github.com/kr/pretty"
+	"go.thethings.network/lorawan-stack/pkg/util/test"
 )
 
 const (
@@ -47,7 +48,7 @@ type indexRanger struct {
 
 func (rv indexRanger) Range(f func(k, v interface{}) bool) {
 	for i := 0; i < rv.Len(); i++ {
-		if !f(nil, rv.Index(i).Interface()) {
+		if !f(i, rv.Index(i).Interface()) {
 			return
 		}
 	}
@@ -88,6 +89,7 @@ func wrapRanger(v interface{}) (ranger, bool) {
 // It panics if either xs or ys is not one of:
 // 1. string, slice, array or map kind
 // 2. value, which implements ranger interface(e.g. sync.Map)
+// NOTE: Map key values are not taken into account.
 func sameElements(eq interface{}, xs, ys interface{}) bool {
 	if xs == nil || ys == nil {
 		return xs == ys
@@ -97,86 +99,63 @@ func sameElements(eq interface{}, xs, ys interface{}) bool {
 	if ev.Kind() != reflect.Func {
 		panic(fmt.Errorf("expected kind of eq to be a function, got: %s", ev.Kind()))
 	}
-
 	xr, ok := wrapRanger(xs)
 	if !ok {
 		panic(fmt.Errorf("cannot range over values of type %T", xs))
 	}
-
 	yr, ok := wrapRanger(ys)
 	if !ok {
 		panic(fmt.Errorf("cannot range over values of type %T", ys))
 	}
 
-	// NOTE: A hashmap cannot be used directly here, as []byte is unhashable.
 	type entry struct {
-		key    interface{}
-		values []reflect.Value
-		found  map[int]bool
+		value reflect.Value
+		found int
 	}
-	var entries []*entry
+	entries := map[*entry]struct{}{}
 
-	findEntry := func(k interface{}) *entry {
-		for _, e := range entries {
-			if reflect.DeepEqual(e.key, k) {
+	findEntry := func(v reflect.Value) *entry {
+		for e := range entries {
+			if ev.Call([]reflect.Value{e.value, v})[0].Bool() {
 				return e
 			}
 		}
 		return nil
 	}
 
-	xr.Range(func(k, v interface{}) bool {
-		e := findEntry(k)
+	xr.Range(func(_, v interface{}) bool {
+		rv := reflect.ValueOf(v)
+		e := findEntry(rv)
 		if e == nil {
-			e = &entry{
-				key:   k,
-				found: map[int]bool{},
-			}
-			entries = append(entries, e)
+			entries[&entry{
+				value: rv,
+				found: 1,
+			}] = struct{}{}
+		} else {
+			e.found++
 		}
-		e.values = append(e.values, reflect.ValueOf(v))
 		return true
 	})
 
 	ok = true
-	yr.Range(func(k, yv interface{}) bool {
-		e := findEntry(k)
+	yr.Range(func(_, v interface{}) bool {
+		rv := reflect.ValueOf(v)
+		e := findEntry(rv)
 		if e == nil {
 			ok = false
 			return false
 		}
-
-		for i, v := range e.values {
-			if e.found[i] {
-				continue
-			}
-
-			if ev.Call([]reflect.Value{v, reflect.ValueOf(yv)})[0].Bool() {
-				ok = true
-				e.found[i] = true
-				return true
-			}
+		if e.found == 1 {
+			delete(entries, e)
+		} else {
+			e.found--
 		}
-		ok = false
-		return false
+		return true
 	})
-
-	if !ok {
-		return false
-	}
-
-	for _, e := range entries {
-		for i := range e.values {
-			if !e.found[i] {
-				return false
-			}
-		}
-	}
-	return true
+	return ok && len(entries) == 0
 }
 
-// ShouldHaveSameElementsFunc takes as arguments the actual value, the expected value and a
-// comparison function.
+// ShouldHaveSameElementsFunc takes as arguments the actual value, a comparison function and the expected value.
 // If the actual value equals the expected value using the comparison function, this
 // function returns an empty string. Otherwise, it returns a string describing the error.
 func ShouldHaveSameElementsFunc(actual interface{}, expected ...interface{}) (message string) {
@@ -190,15 +169,14 @@ func ShouldHaveSameElementsFunc(actual interface{}, expected ...interface{}) (me
 		return
 	}
 
-	if !sameElements(expected[1], actual, expected[0]) {
-		return fmt.Sprintf(shouldHaveHadSameElements, expected[0], actual)
+	if !sameElements(expected[0], expected[1], actual) {
+		return fmt.Sprintf(shouldHaveHadSameElements, expected[1], actual)
 	}
 
 	return success
 }
 
-// ShouldNotHaveSameElementsFunc takes as arguments the actual value, the expected value and
-// a comparison function.
+// ShouldNotHaveSameElementsFunc takes as arguments the actual value, a comparison function and the expected value.
 // If the actual value does not equal the expected value using the comparison function,
 // this function returns an empty string. Otherwise, it returns a string describing the
 // error.
@@ -213,8 +191,8 @@ func ShouldNotHaveSameElementsFunc(actual interface{}, expected ...interface{}) 
 		return
 	}
 
-	if sameElements(expected[1], actual, expected[0]) {
-		return fmt.Sprintf(shouldNotHaveBeenEqual, expected[0], actual)
+	if sameElements(expected[0], expected[1], actual) {
+		return fmt.Sprintf(shouldNotHaveBeenEqual, expected[1], actual)
 	}
 
 	return success
@@ -227,7 +205,7 @@ func ShouldHaveSameElementsDeep(actual interface{}, expected ...interface{}) (me
 	if message = need(1, expected); message != success {
 		return
 	}
-	return ShouldHaveSameElementsFunc(actual, expected[0], reflect.DeepEqual)
+	return ShouldHaveSameElementsFunc(actual, reflect.DeepEqual, expected[0])
 }
 
 // ShouldNotHaveSameElementsDeep takes as arguments the actual value and the expected
@@ -238,7 +216,7 @@ func ShouldNotHaveSameElementsDeep(actual interface{}, expected ...interface{}) 
 	if message = need(1, expected); message != success {
 		return
 	}
-	return ShouldNotHaveSameElementsFunc(actual, expected[0], reflect.DeepEqual)
+	return ShouldNotHaveSameElementsFunc(actual, reflect.DeepEqual, expected[0])
 }
 
 // ShouldHaveSameElementsDiff takes as arguments the actual value and the expected value.
@@ -248,7 +226,7 @@ func ShouldHaveSameElementsDiff(actual interface{}, expected ...interface{}) (me
 	if message = need(1, expected); message != success {
 		return
 	}
-	return ShouldHaveSameElementsFunc(actual, expected[0], diffEqual)
+	return ShouldHaveSameElementsFunc(actual, diffEqual, expected[0])
 }
 
 // ShouldNotHaveSameElementsDiff takes as arguments the actual value and the expected
@@ -259,5 +237,26 @@ func ShouldNotHaveSameElementsDiff(actual interface{}, expected ...interface{}) 
 	if message = need(1, expected); message != success {
 		return
 	}
-	return ShouldNotHaveSameElementsFunc(actual, expected[0], diffEqual)
+	return ShouldNotHaveSameElementsFunc(actual, diffEqual, expected[0])
+}
+
+// ShouldHaveSameElementsEvent takes as arguments the actual value and the expected value.
+// If the actual value equals the expected value using test.EventEqual, this
+// function returns an empty string. Otherwise, it returns a string describing the error.
+func ShouldHaveSameElementsEvent(actual interface{}, expected ...interface{}) (message string) {
+	if message = need(1, expected); message != success {
+		return
+	}
+	return ShouldHaveSameElementsFunc(actual, test.EventEqual, expected[0])
+}
+
+// ShouldNotHaveSameElementsEvent takes as arguments the actual value and the expected
+// value.
+// If the actual value does not equal the expected value using reflect.EventEqual, this
+// function returns an empty string. Otherwise, it returns a string describing the error.
+func ShouldNotHaveSameElementsEvent(actual interface{}, expected ...interface{}) (message string) {
+	if message = need(1, expected); message != success {
+		return
+	}
+	return ShouldNotHaveSameElementsFunc(actual, test.EventEqual, expected[0])
 }
