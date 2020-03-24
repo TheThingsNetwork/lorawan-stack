@@ -403,6 +403,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, token *a
 					AntennaIndex:          ant.Index,
 					Time:                  receiveTime,
 					RSSI:                  ant.Value.GetChannelRssi(),
+					ChannelRSSI:           ant.Value.GetChannelRssi(),
 					SignalRSSI:            ant.Value.GetSignalRssi(),
 					RSSIStandardDeviation: ant.Value.GetRssiStandardDeviation().GetValue(),
 					SNR:                   ant.Value.GetSnr(),
@@ -414,4 +415,140 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, token *a
 	}
 
 	return up, nil
+}
+
+var (
+	fromPBClass = map[packetbroker.DownlinkMessageClass]ttnpb.Class{
+		packetbroker.DownlinkMessageClass_CLASS_A: ttnpb.CLASS_A,
+		packetbroker.DownlinkMessageClass_CLASS_B: ttnpb.CLASS_B,
+		packetbroker.DownlinkMessageClass_CLASS_C: ttnpb.CLASS_C,
+	}
+	toPBClass = map[ttnpb.Class]packetbroker.DownlinkMessageClass{
+		ttnpb.CLASS_A: packetbroker.DownlinkMessageClass_CLASS_A,
+		ttnpb.CLASS_B: packetbroker.DownlinkMessageClass_CLASS_B,
+		ttnpb.CLASS_C: packetbroker.DownlinkMessageClass_CLASS_C,
+	}
+	fromPBPriority = map[packetbroker.DownlinkMessagePriority]ttnpb.TxSchedulePriority{
+		packetbroker.DownlinkMessagePriority_LOWEST:  ttnpb.TxSchedulePriority_LOWEST,
+		packetbroker.DownlinkMessagePriority_LOW:     ttnpb.TxSchedulePriority_LOW,
+		packetbroker.DownlinkMessagePriority_NORMAL:  ttnpb.TxSchedulePriority_NORMAL,
+		packetbroker.DownlinkMessagePriority_HIGH:    ttnpb.TxSchedulePriority_HIGH,
+		packetbroker.DownlinkMessagePriority_HIGHEST: ttnpb.TxSchedulePriority_HIGHEST,
+	}
+	toPBPriority = map[ttnpb.TxSchedulePriority]packetbroker.DownlinkMessagePriority{
+		ttnpb.TxSchedulePriority_LOWEST:       packetbroker.DownlinkMessagePriority_LOWEST,
+		ttnpb.TxSchedulePriority_LOW:          packetbroker.DownlinkMessagePriority_LOW,
+		ttnpb.TxSchedulePriority_BELOW_NORMAL: packetbroker.DownlinkMessagePriority_LOW,
+		ttnpb.TxSchedulePriority_NORMAL:       packetbroker.DownlinkMessagePriority_NORMAL,
+		ttnpb.TxSchedulePriority_ABOVE_NORMAL: packetbroker.DownlinkMessagePriority_HIGH,
+		ttnpb.TxSchedulePriority_HIGH:         packetbroker.DownlinkMessagePriority_HIGH,
+		ttnpb.TxSchedulePriority_HIGHEST:      packetbroker.DownlinkMessagePriority_HIGHEST,
+	}
+)
+
+var (
+	errNoRequest           = errors.DefineFailedPrecondition("no_request", "downlink message is not a transmission request")
+	errUnknownClass        = errors.DefineInvalidArgument("unknown_class", "unknown class `{class}`")
+	errUnknownPriority     = errors.DefineInvalidArgument("unknown_priority", "unknown priority `{priority}`")
+	errNoDownlinkPaths     = errors.DefineFailedPrecondition("no_downlink_paths", "no downlink paths")
+	errInvalidDownlinkPath = errors.DefineFailedPrecondition("downlink_path", "invalid uplink token downlink path")
+)
+
+func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage) (*packetbroker.DownlinkMessage, *agentUplinkToken, error) {
+	req := msg.GetRequest()
+	if req == nil {
+		return nil, nil, errNoRequest.New()
+	}
+
+	down := &packetbroker.DownlinkMessage{
+		PhyPayload: msg.RawPayload,
+	}
+	if req.Rx1Frequency != 0 {
+		down.Rx1 = &packetbroker.DownlinkMessage_RXSettings{
+			DataRateIndex: uint32(req.Rx1DataRateIndex),
+			Frequency:     req.Rx1Frequency,
+		}
+		down.Rx1Delay = pbtypes.DurationProto(req.Rx1Delay.Duration())
+	}
+	if req.Rx2Frequency != 0 {
+		down.Rx2 = &packetbroker.DownlinkMessage_RXSettings{
+			DataRateIndex: uint32(req.Rx2DataRateIndex),
+			Frequency:     req.Rx2Frequency,
+		}
+	}
+	var ok bool
+	if down.Class, ok = toPBClass[req.Class]; !ok {
+		return nil, nil, errUnknownClass.WithAttributes("class", req.Class)
+	}
+	if down.Priority, ok = toPBPriority[req.Priority]; !ok {
+		return nil, nil, errUnknownPriority.WithAttributes("priority", req.Priority)
+	}
+	if len(req.DownlinkPaths) == 0 {
+		return nil, nil, errNoDownlinkPaths.New()
+	}
+	uplinkToken := req.DownlinkPaths[0].GetUplinkToken()
+	if len(uplinkToken) == 0 {
+		return nil, nil, errInvalidDownlinkPath.New()
+	}
+	var (
+		err   error
+		token *agentUplinkToken
+	)
+	down.GatewayUplinkToken, down.ForwarderUplinkToken, token, err = unwrapUplinkTokens(uplinkToken)
+	if err != nil {
+		return nil, nil, errInvalidDownlinkPath.WithCause(err)
+	}
+
+	return down, token, nil
+}
+
+var (
+	errUnwrapGatewayUplinkToken = errors.DefineAborted("unwrap_gateway_uplink_token", "unwrap gateway uplink token")
+	errInvalidRx1Delay          = errors.DefineInvalidArgument("invalid_rx1_delay", "invalid Rx1 delay")
+)
+
+func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, receivedAt time.Time, conf ForwarderConfig) (ttnpb.GatewayIdentifiers, *ttnpb.DownlinkMessage, error) {
+	ids, token, err := unwrapGatewayUplinkToken(msg.GatewayUplinkToken, conf.TokenKey)
+	if err != nil {
+		return ttnpb.GatewayIdentifiers{}, nil, errUnwrapGatewayUplinkToken.WithCause(err)
+	}
+
+	req := &ttnpb.TxRequest{
+		DownlinkPaths: []*ttnpb.DownlinkPath{
+			{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: token,
+				},
+			},
+		},
+	}
+	var ok bool
+	if req.Class, ok = fromPBClass[msg.Class]; !ok {
+		return ttnpb.GatewayIdentifiers{}, nil, errUnknownClass.WithAttributes("class", msg.Class)
+	}
+	if req.Priority, ok = fromPBPriority[msg.Priority]; !ok {
+		return ttnpb.GatewayIdentifiers{}, nil, errUnknownPriority.WithAttributes("priority", msg.Priority)
+	}
+	if msg.Rx1 != nil {
+		rx1Delay, err := pbtypes.DurationFromProto(msg.Rx1Delay)
+		if err != nil {
+			return ttnpb.GatewayIdentifiers{}, nil, errInvalidRx1Delay.WithCause(err)
+		}
+		req.Rx1Delay = ttnpb.RxDelay(rx1Delay / time.Second)
+		req.Rx1DataRateIndex = ttnpb.DataRateIndex(msg.Rx1.DataRateIndex)
+		req.Rx1Frequency = msg.Rx1.Frequency
+	}
+	if msg.Rx2 != nil {
+		req.Rx2DataRateIndex = ttnpb.DataRateIndex(msg.Rx2.DataRateIndex)
+		req.Rx2Frequency = msg.Rx2.Frequency
+	}
+
+	down := &ttnpb.DownlinkMessage{
+		RawPayload:     msg.PhyPayload,
+		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
+		Settings: &ttnpb.DownlinkMessage_Request{
+			Request: req,
+		},
+	}
+	return ids, down, nil
 }

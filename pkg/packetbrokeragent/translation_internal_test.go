@@ -24,6 +24,15 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
+type (
+	GatewayUplinkToken gatewayUplinkToken
+	AgentUplinkToken   agentUplinkToken
+)
+
+func WrapUplinkTokens(gateway, forwarder []byte, agent *AgentUplinkToken) ([]byte, error) {
+	return wrapUplinkTokens(gateway, forwarder, (*agentUplinkToken)(agent))
+}
+
 func TestWrapGatewayUplinkToken(t *testing.T) {
 	a := assertions.New(t)
 	key := bytes.Repeat([]byte{0x42}, 16)
