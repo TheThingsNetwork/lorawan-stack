@@ -91,6 +91,7 @@ import PropTypes from '../../../lib/prop-types'
       'auto_update',
       'schedule_downlink_late',
       'update_channel',
+      'schedule_anytime_delay',
     ]),
   ({ fetching, gateway }) => fetching || !Boolean(gateway),
 )

@@ -14,7 +14,7 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { defineMessages } from 'react-intl'
+import { defineMessages, FormattedMessage } from 'react-intl'
 import * as Yup from 'yup'
 
 import Form from '../../../components/form'
@@ -24,10 +24,17 @@ import SubmitBar from '../../../components/submit-bar'
 import Message from '../../../lib/components/message'
 import PropTypes from '../../../lib/prop-types'
 import { GsFrequencyPlansSelect } from '../../containers/freq-plans-select'
+import delay from '../../constants/delays'
 import sharedMessages from '../../../lib/shared-messages'
-import { id as gatewayIdRegexp, address as addressRegexp } from '../../lib/regexp'
+import {
+  id as gatewayIdRegexp,
+  address as addressRegexp,
+  unit as unitRegexp,
+  emptyDuration as emptyDurationRegexp,
+  delay as delayRegexp,
+} from '../../lib/regexp'
 import OwnersSelect from '../../containers/owners-select'
-
+import UnitInput from '../../../components/unit-input'
 const m = defineMessages({
   enforced: 'Enforced',
   dutyCycle: 'Duty Cycle',
@@ -44,6 +51,15 @@ const m = defineMessages({
   updateChannelDescription: 'Channel for gateway automatic updates',
   enforceDutyCycleDescription:
     'Recommended for all gateways in order to respect spectrum regulations',
+  scheduleAnyTimeDelay: 'Schedule Any Time Delay',
+  scheduleAnyTimeDescription:
+    'Configure Gateway Delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
+  miliseconds: 'miliseconds',
+  seconds: 'seconds',
+  minutes: 'minutes',
+  hours: 'hours',
+  delayWarning:
+    'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
 })
 
 const validationSchema = Yup.object().shape({
@@ -69,10 +85,42 @@ const validationSchema = Yup.object().shape({
   status_public: Yup.boolean().default(false),
   schedule_downlink_late: Yup.boolean().default(false),
   auto_update: Yup.boolean().default(false),
+  schedule_anytime_delay: Yup.string().matches(delayRegexp, sharedMessages.validateDelayFormat),
 })
 
-@bind
 class GatewayDataForm extends React.Component {
+  static propTypes = {
+    /** SubmitBar contents */
+    children: PropTypes.node.isRequired,
+    error: PropTypes.error,
+    /** React reference to be passed to the form */
+    formRef: PropTypes.shape({}),
+    initialValues: PropTypes.gateway,
+    onSubmit: PropTypes.func.isRequired,
+    update: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    formRef: undefined,
+    update: false,
+    error: '',
+    initialValues: validationSchema.cast({}),
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      shouldDisplayWarning: this.isNotValidDuration(props.initialValues.schedule_anytime_delay),
+    }
+  }
+
+  @bind
+  onScheduleAnytimeDelayChange(value) {
+    this.setState({ shouldDisplayWarning: this.isNotValidDuration(value) })
+  }
+
+  @bind
   onSubmit(values, helpers) {
     const { onSubmit } = this.props
     const castedValues = validationSchema.cast(values)
@@ -80,8 +128,38 @@ class GatewayDataForm extends React.Component {
     onSubmit(castedValues, helpers)
   }
 
+  decodeDelayValue(value) {
+    if (emptyDurationRegexp.test(value)) {
+      return {
+        duration: undefined,
+        unit: value,
+      }
+    }
+    const duration = value.split(unitRegexp)[0]
+    const unit = value.split(duration)[1]
+    return {
+      duration: duration ? Number(duration) : undefined,
+      unit,
+    }
+  }
+
+  isNotValidDuration(value) {
+    const { duration, unit } = this.decodeDelayValue(value)
+    switch (unit) {
+      case 'ms':
+        return duration < delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY
+      case 's':
+        return duration < delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY / 1000
+      case 'm':
+        return duration < delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY / 60000
+      case 'h':
+        return duration < delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY / 3600000
+    }
+  }
+
   render() {
     const { update, error, initialValues, formRef, children } = this.props
+    const { shouldDisplayWarning } = this.state
 
     return (
       <Form
@@ -160,6 +238,39 @@ class GatewayDataForm extends React.Component {
           label={m.enforced}
           description={m.enforceDutyCycleDescription}
         />
+        <Form.Field
+          title={m.scheduleAnyTimeDelay}
+          name="schedule_anytime_delay"
+          component={UnitInput}
+          description={
+            <FormattedMessage
+              {...m.scheduleAnyTimeDescription}
+              values={{
+                minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY,
+                defaultValue: delay.DEFAULT_GATEWAY_SCHEDULE_ANYTIME_DELAY,
+              }}
+            />
+          }
+          units={[
+            { label: m.miliseconds, value: 'ms' },
+            { label: m.seconds, value: 's' },
+            { label: m.minutes, value: 'm' },
+            { label: m.hours, value: 'h' },
+          ]}
+          onChange={this.onScheduleAnytimeDelayChange}
+          decode={this.decodeDelayValue}
+          warning={
+            shouldDisplayWarning ? (
+              <FormattedMessage
+                {...m.delayWarning}
+                values={{ minimumValue: `${delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY}` }}
+              />
+            ) : (
+              undefined
+            )
+          }
+          required
+        />
         <Message component="h4" content={sharedMessages.gatewayUpdateOptions} />
         <Form.Field
           title={sharedMessages.automaticUpdates}
@@ -178,24 +289,6 @@ class GatewayDataForm extends React.Component {
       </Form>
     )
   }
-}
-
-GatewayDataForm.propTypes = {
-  children: PropTypes.node.isRequired,
-  error: PropTypes.error,
-  formRef: PropTypes.shape({}),
-  initialValues: PropTypes.shape({}),
-  /** React reference to be passed to the form */
-  onSubmit: PropTypes.func.isRequired,
-  /** SubmitBar contents */
-  update: PropTypes.bool,
-}
-
-GatewayDataForm.defaultProps = {
-  formRef: undefined,
-  update: false,
-  error: '',
-  initialValues: {},
 }
 
 export default GatewayDataForm
