@@ -187,4 +187,14 @@ var (
 
 	// ResembleFields receives at least two SetFielder parameters and optional variadic field paths and does a deep equal check (see reflect.DeepEqual) on selected fields. If field paths are empty, it checks all fields similar to Resemble.
 	ResembleFields = testassertions.ShouldResembleFields
+
+	// ReceiveEventResembling receives <-chan events.Event or <-chan test.EventPubSubPublishRequest as first argument and events.Event as second one and does resemblance check on received event.
+	ReceiveEventResembling = testassertions.ShouldReceiveEventResembling
+	// ReceiveEventsResembling is like ReceiveEvent, but for multiple events.
+	ReceiveEventsResembling = testassertions.ShouldReceiveEventsResembling
+
+	// ReceiveEventFunc receives <-chan events.Event or <-chan test.EventPubSubPublishRequest as first argument, equality assertion func(events.Event) bool as second one and events.Event as third one and asserts equality under equality assertion specified.
+	ReceiveEventFunc = testassertions.ShouldReceiveEventFunc
+	// ReceiveEventsFunc is like ReceiveEvent, but for multiple events.
+	ReceiveEventsFunc = testassertions.ShouldReceiveEventsFunc
 )
