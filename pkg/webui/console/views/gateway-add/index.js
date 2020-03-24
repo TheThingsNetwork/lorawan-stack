@@ -97,6 +97,7 @@ export default class GatewayAdd extends React.Component {
       gateway_server_address: stack.gs.enabled ? new URL(stack.gs.base_url).hostname : '',
       frequency_plan_id: undefined,
       owner_id: userId,
+      schedule_anytime_delay: '530ms',
     }
 
     return (

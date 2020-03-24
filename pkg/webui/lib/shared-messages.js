@@ -235,6 +235,7 @@ export default defineMessages({
   users: 'Users',
   validateAddress: 'Wrong address format',
   validateAddressFormat: 'Wrong address format, should be host or host:port',
+  validateDelayFormat: 'Delay must be a valid, positive number',
   validateEmail: 'Invalid email address',
   validateFormat: 'Wrong format',
   validateIdFormat: 'This value may only contain lowercase letters, numbers and dashes (-)',

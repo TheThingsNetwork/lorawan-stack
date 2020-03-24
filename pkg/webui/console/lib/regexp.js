@@ -25,3 +25,6 @@ export const mqttPassword = /^(?![\s\S])|.{2,100}/
 export const latitude = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/
 export const longitude = /^\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/
 export const int32 = /^-?\d+$/
+export const unit = new RegExp('[a-zA-Z]{1,}')
+export const emptyDuration = /^[a-zA-z]+$/
+export const delay = new RegExp('^[0-9]{1,}[.]?([0-9]{1,})?[a-zA-Z]{1,2}$')
