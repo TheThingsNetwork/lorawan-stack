@@ -95,9 +95,14 @@ type connection struct {
 func (*connection) Protocol() string            { return "mqtt" }
 func (*connection) SupportsDownlinkClaim() bool { return false }
 
-func (c *connection) setup(ctx context.Context) error {
+func (c *connection) setup(ctx context.Context) (err error) {
 	ctx = auth.NewContextWithInterface(ctx, c)
-	defer recoverMQTTFrontend(ctx)
+	defer func() {
+		retrievedErr := recoverMQTTFrontend(ctx)
+		if retrievedErr != nil {
+			err = retrievedErr
+		}
+	}()
 	c.session = session.New(ctx, c.mqtt, c.deliver)
 	if err := c.session.ReadConnect(); err != nil {
 		return err
@@ -281,7 +286,6 @@ func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
 
 func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
-	defer recoverMQTTFrontend(c.io.Context())
 	switch {
 	case c.format.IsBirthTopic(pkt.TopicParts):
 	case c.format.IsLastWillTopic(pkt.TopicParts):
@@ -318,7 +322,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	}
 }
 
-func recoverMQTTFrontend(ctx context.Context) {
+func recoverMQTTFrontend(ctx context.Context) error {
 	if p := recover(); p != nil {
 		fmt.Fprintln(os.Stderr, p)
 		os.Stderr.Write(debug.Stack())
@@ -329,5 +333,7 @@ func recoverMQTTFrontend(ctx context.Context) {
 			err = errMQTTFrontendRecovered.WithAttributes("panic", p)
 		}
 		log.FromContext(ctx).WithError(err).Error("MQTT frontend failed")
+		return err
 	}
+	return nil
 }

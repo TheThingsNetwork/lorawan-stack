@@ -3394,7 +3394,7 @@
   },
   "error:pkg/gatewayserver/io/mqtt:mqtt_frontend_recovered": {
     "translations": {
-      "en": "Internal Server Error"
+      "en": "internal server error"
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
@@ -3502,7 +3502,7 @@
   },
   "error:pkg/gatewayserver/io/udp:udp_frontend_recovered": {
     "translations": {
-      "en": "Internal Server Error"
+      "en": "internal server error"
     },
     "description": {
       "package": "pkg/gatewayserver/io/udp",
