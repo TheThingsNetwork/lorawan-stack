@@ -77,14 +77,15 @@ PropTypes.events = PropTypes.arrayOf(PropTypes.event)
 PropTypes.gateway = PropTypes.shape({
   antennas: PropTypes.Array,
   ids: PropTypes.shape({
-    gateway_id: PropTypes.string.isRequired,
+    gateway_id: PropTypes.string,
   }).isRequired,
   name: PropTypes.string,
   description: PropTypes.string,
   created_at: PropTypes.string,
   updated_at: PropTypes.string,
-  frequency_plan_id: PropTypes.string.isRequired,
+  frequency_plan_id: PropTypes.string,
   gateway_server_address: PropTypes.string,
+  schedule_anytime_delay: PropTypes.string,
 })
 
 PropTypes.gatewayStats = PropTypes.shape({
