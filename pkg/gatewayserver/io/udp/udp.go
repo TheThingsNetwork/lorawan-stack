@@ -126,8 +126,13 @@ func Serve(ctx context.Context, server io.Server, conn *net.UDPConn, config Conf
 	return s.read()
 }
 
-func (s *srv) read() error {
-	defer recoverUDPFrontend(s.ctx)
+func (s *srv) read() (err error) {
+	defer func() {
+		retrievedErr := recoverUDPFrontend(s.ctx)
+		if retrievedErr != nil {
+			err = retrievedErr
+		}
+	}()
 	var buf [65507]byte
 	for {
 		n, addr, err := s.conn.ReadFromUDP(buf[:])
@@ -505,7 +510,7 @@ type state struct {
 	tokens io.DownlinkTokens
 }
 
-func recoverUDPFrontend(ctx context.Context) {
+func recoverUDPFrontend(ctx context.Context) error {
 	if p := recover(); p != nil {
 		fmt.Fprintln(os.Stderr, p)
 		os.Stderr.Write(debug.Stack())
@@ -516,5 +521,7 @@ func recoverUDPFrontend(ctx context.Context) {
 			err = errUDPFrontendRecovered.WithAttributes("panic", p)
 		}
 		log.FromContext(ctx).WithError(err).Error("UDP frontend failed")
+		return err
 	}
+	return nil
 }
