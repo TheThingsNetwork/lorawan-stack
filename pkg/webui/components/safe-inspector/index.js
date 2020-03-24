@@ -58,21 +58,21 @@ export class SafeInspector extends Component {
   static propTypes = {
     /** The classname to be applied **/
     className: PropTypes.string,
-    /** Whether to hide the copy popup click and just display checkmark */
-    data: PropTypes.string.isRequired,
     /** The data to be displayed */
-    disableResize: PropTypes.bool,
+    data: PropTypes.string.isRequired,
     /** Whether the component should resize when its data is truncated */
+    disableResize: PropTypes.bool,
     /** Whether the data can be hidden (like passwords) */
     hideable: PropTypes.bool,
-    initiallyVisible: PropTypes.bool,
     /** Whether the data is initially visible */
+    initiallyVisible: PropTypes.bool,
+    /** Utility functions passed via react-intl hoc **/
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
     }).isRequired,
-    /** Utility functions passed via react-intl hoc **/
     /** Whether the data is in byte format */
     isBytes: PropTypes.bool,
+    /** Whether to hide the copy popup click and just display checkmark */
     noCopyPopup: PropTypes.bool,
     /** Whether a smaller style should be rendered (useful for display in tables) */
     small: PropTypes.bool,
