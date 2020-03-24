@@ -23,7 +23,7 @@ import {
   createClearEventsActionType,
 } from '../actions/events'
 
-import { getDeviceId } from '../../../lib/selectors/id'
+import { getCombinedDeviceId } from '../../../lib/selectors/id'
 
 const defaultState = {
   events: [],
@@ -96,7 +96,7 @@ const createNamedEventsReducer = function(reducerName = '') {
       return state
     }
 
-    const id = typeof action.id === 'object' ? getDeviceId(action.id) : action.id
+    const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
 
     switch (action.type) {
       case START_EVENTS:

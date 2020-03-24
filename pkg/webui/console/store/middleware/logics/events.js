@@ -28,7 +28,7 @@ import {
 } from '../../actions/events'
 import { createEventsStatusSelector } from '../../selectors/events'
 import { isUnauthenticatedError } from '../../../../lib/errors/utils'
-import { getDeviceId } from '../../../../lib/selectors/id'
+import { getCombinedDeviceId } from '../../../../lib/selectors/id'
 import user from './user'
 
 /**
@@ -67,7 +67,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
           return
         }
 
-        const id = typeof action.id === 'object' ? getDeviceId(action.id) : action.id
+        const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
 
         // only proceed if not already connected
         const status = selectEntityEventsStatus(getState(), id)
@@ -107,7 +107,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
           return
         }
 
-        const id = typeof action.id === 'object' ? getDeviceId(action.id) : action.id
+        const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
 
         // only proceed if connected
         const status = selectEntityEventsStatus(getState(), id)
