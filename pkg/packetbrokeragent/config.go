@@ -38,10 +38,11 @@ type Config struct {
 
 // HomeNetworkConfig defines the configuration of the Home Network role.
 type HomeNetworkConfig struct {
-	Enable          bool                  `name:"enable" description:"Enable Home Network role"`
-	TLS             TLSConfig             `name:"tls"`
-	DevAddrPrefixes []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
-	WorkerPool      WorkerPoolConfig      `name:"worker-pool" description:"Workers pool configuration"`
+	Enable             bool                  `name:"enable" description:"Enable Home Network role"`
+	TLS                TLSConfig             `name:"tls"`
+	DevAddrPrefixes    []types.DevAddrPrefix `name:"dev-addr-prefixes" description:"DevAddr prefixes to subscribe to"`
+	WorkerPool         WorkerPoolConfig      `name:"worker-pool" description:"Workers pool configuration"`
+	BlacklistForwarder bool                  `name:"blacklist-forwarder" description:"Blacklist traffic from Forwarder to avoid traffic loop"`
 }
 
 // ForwarderConfig defines configuration of the Forwarder role.

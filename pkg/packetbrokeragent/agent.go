@@ -470,8 +470,8 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 			},
 		},
 	}
-	if a.forwarderConfig.Enable {
-		// Add self to blacklist to avoid looping traffic via Packet Broker.
+	if a.forwarderConfig.Enable && a.homeNetworkConfig.BlacklistForwarder {
+		// Blacklist Forwarder to avoid looping traffic via Packet Broker.
 		forwardersBlacklist := &packetbroker.RoutingFilter_ForwarderBlacklist{
 			ForwarderBlacklist: &packetbroker.ForwarderIdentifiers{
 				List: []*packetbroker.ForwarderIdentifier{

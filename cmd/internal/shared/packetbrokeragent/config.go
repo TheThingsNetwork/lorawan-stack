@@ -28,6 +28,7 @@ var DefaultPacketBrokerAgentConfig = packetbrokeragent.Config{
 			IdleTimeout:        (1 << 7) * time.Millisecond,
 			BusyTimeout:        (1 << 6) * time.Millisecond,
 		},
+		BlacklistForwarder: true,
 	},
 	Forwarder: packetbrokeragent.ForwarderConfig{
 		WorkerPool: packetbrokeragent.WorkerPoolConfig{
