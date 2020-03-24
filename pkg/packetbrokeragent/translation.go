@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -120,24 +121,28 @@ func toPBLocation(loc *ttnpb.Location) *packetbroker.Location {
 	}
 }
 
+type agentUplinkToken struct {
+	ForwarderNetID    types.NetID `json:"fnid"`
+	ForwarderID       string      `json:"fid,omitempty"`
+	ForwarderTenantID string      `json:"ftid,omitempty"`
+}
+
 type compoundUplinkToken struct {
-	Forwarder []byte `json:"f,omitempty"`
-	Gateway   []byte `json:"g,omitempty"`
+	Gateway   []byte            `json:"g,omitempty"`
+	Forwarder []byte            `json:"f,omitempty"`
+	Agent     *agentUplinkToken `json:"a,omitempty"`
 }
 
-func wrapUplinkTokens(forwarder, gateway []byte) ([]byte, error) {
-	if forwarder == nil && gateway == nil {
-		return nil, nil
-	}
-	return json.Marshal(compoundUplinkToken{forwarder, gateway})
+func wrapUplinkTokens(gateway, forwarder []byte, agent *agentUplinkToken) ([]byte, error) {
+	return json.Marshal(compoundUplinkToken{gateway, forwarder, agent})
 }
 
-func unwrapUplinkTokens(token []byte) (forwarder, gateway []byte, err error) {
+func unwrapUplinkTokens(token []byte) (gateway, forwarder []byte, agent *agentUplinkToken, err error) {
 	var t compoundUplinkToken
 	if err := json.Unmarshal(token, &t); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return t.Forwarder, t.Gateway, nil
+	return t.Gateway, t.Forwarder, t.Agent, nil
 }
 
 type gatewayUplinkToken struct {
@@ -344,7 +349,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf Forwa
 
 var errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
 
-func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
+func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, token *agentUplinkToken, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	dataRate, ok := fromPBDataRate(msg.GatewayRegion, int(msg.DataRateIndex))
 	if !ok {
 		return nil, errUnknownDataRate.WithAttributes(
@@ -353,7 +358,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, received
 		)
 	}
 
-	uplinkToken, err := wrapUplinkTokens(msg.ForwarderUplinkToken, msg.GatewayUplinkToken)
+	uplinkToken, err := wrapUplinkTokens(msg.GatewayUplinkToken, msg.ForwarderUplinkToken, token)
 	if err != nil {
 		return nil, errWrapUplinkTokens.WithCause(err)
 	}
