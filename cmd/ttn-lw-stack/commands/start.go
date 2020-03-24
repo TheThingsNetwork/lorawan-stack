@@ -276,7 +276,7 @@ var startCommand = &cobra.Command{
 			_ = qrg
 		}
 
-		if start.PacketBrokerAgent {
+		if start.PacketBrokerAgent || startDefault {
 			logger.Info("Setting up Packet Broker Agent")
 			pba, err := packetbrokeragent.New(c, &config.PBA)
 			if err != nil {
