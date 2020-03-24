@@ -176,9 +176,13 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		}
 
 		evt = evtCreateEndDevice(ctx, req.EndDevice.EndDeviceIdentifiers, nil)
-		if req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
-			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
+
+		if req.EndDevice.DevAddr != nil {
+			if !ttnpb.HasAnyField(sets, "session.dev_addr") || !req.EndDevice.DevAddr.Equal(req.EndDevice.Session.DevAddr) {
+				return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
+			}
 		}
+
 		sets = ttnpb.AddFields(sets,
 			"ids.application_ids",
 			"ids.device_id",
