@@ -5318,15 +5318,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:class_b_c_for_class_a": {
-    "translations": {
-      "en": "class B/C downlink queued for device in class A mode"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:compute_mic": {
     "translations": {
       "en": "failed to compute MIC"
