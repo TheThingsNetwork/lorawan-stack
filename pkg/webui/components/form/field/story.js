@@ -17,17 +17,28 @@ import * as Yup from 'yup'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
+import { unit as unitRegexp } from '../../../console/lib/regexp'
 
 import Input from '../../input'
 import Checkbox from '../../checkbox'
 import Radio from '../../radio-button'
 import Select from '../../select'
 import FileInput from '../../file-input'
+import UnitInput from '../../unit-input'
 import Form from '..'
 
 const handleSubmit = function(data, { resetForm }) {
   action('Submit')(data)
   setTimeout(() => resetForm(data), 1000)
+}
+
+const decode = function(value) {
+  const duration = value.split(unitRegexp)[0]
+  const unit = value.split(duration)[1]
+  return {
+    duration: duration ? Number(duration) : undefined,
+    unit,
+  }
 }
 
 const info = {
@@ -866,5 +877,135 @@ storiesOf('Fields/FileInput', module)
         warning="A file input field."
       />
       <Form.Field name="disabled" title="Disabled" component={FileInput} disabled />
+    </FieldsWrapperExample>
+  ))
+
+storiesOf('Fields/UnitInput', module)
+  .addDecorator((story, context) => withInfo(info)(story)(context))
+  .add('Horizontal', () => (
+    <FieldsWrapperExample
+      initialValues={{
+        default: '530ms',
+        description: '530ms',
+        warning: '530ms',
+        error: '530ms',
+        disabled: '530ms',
+      }}
+    >
+      <Form.Field
+        name="default"
+        title="Default"
+        decode={decode}
+        units={[
+          { label: 'miliseconds', value: 'ms' },
+          { label: 'seconds', value: 's' },
+          { label: 'minutes', value: 'm' },
+          { label: 'hours', value: 'h' },
+        ]}
+        component={UnitInput}
+      />
+      <Form.Field
+        name="description"
+        title="Description"
+        decode={decode}
+        units={[
+          { label: 'miliseconds', value: 'ms' },
+          { label: 'seconds', value: 's' },
+          { label: 'minutes', value: 'm' },
+          { label: 'hours', value: 'h' },
+        ]}
+        component={UnitInput}
+        description="The unit input"
+      />
+      <Form.Field
+        name="warning"
+        title="Warning"
+        decode={decode}
+        units={[
+          { label: 'miliseconds', value: 'ms' },
+          { label: 'seconds', value: 's' },
+          { label: 'minutes', value: 'm' },
+          { label: 'hours', value: 'h' },
+        ]}
+        component={UnitInput}
+        warning="The unit input"
+      />
+      <Form.Field
+        name="error"
+        title="Error"
+        decode={decode}
+        units={[
+          { label: 'miliseconds', value: 'ms' },
+          { label: 'seconds', value: 's' },
+          { label: 'minutes', value: 'm' },
+          { label: 'hours', value: 'h' },
+        ]}
+        component={UnitInput}
+        error="There was an error"
+      />
+    </FieldsWrapperExample>
+  ))
+  .add('Vertical', () => (
+    <FieldsWrapperExample
+      initialValues={{
+        default: '530ms',
+        description: '530ms',
+        warning: '530ms',
+        error: '530ms',
+        disabled: '530ms',
+      }}
+      horizontal={false}
+    >
+      <Form.Field
+        name="default"
+        title="Default"
+        decode={decode}
+        units={[
+          { label: 'miliseconds', value: 'ms' },
+          { label: 'seconds', value: 's' },
+          { label: 'minutes', value: 'm' },
+          { label: 'hours', value: 'h' },
+        ]}
+        component={UnitInput}
+      />
+      <Form.Field
+        name="description"
+        title="Description"
+        decode={decode}
+        units={[
+          { label: 'miliseconds', value: 'ms' },
+          { label: 'seconds', value: 's' },
+          { label: 'minutes', value: 'm' },
+          { label: 'hours', value: 'h' },
+        ]}
+        component={UnitInput}
+        description="The unit input"
+      />
+      <Form.Field
+        name="warning"
+        title="Warning"
+        decode={decode}
+        units={[
+          { label: 'miliseconds', value: 'ms' },
+          { label: 'seconds', value: 's' },
+          { label: 'minutes', value: 'm' },
+          { label: 'hours', value: 'h' },
+        ]}
+        component={UnitInput}
+        warning="The unit input"
+      />
+      <Form.Field
+        name="error"
+        title="Error"
+        decode={decode}
+        units={[
+          { label: 'miliseconds', value: 'ms' },
+          { label: 'seconds', value: 's' },
+          { label: 'minutes', value: 'm' },
+          { label: 'hours', value: 'h' },
+        ]}
+        component={UnitInput}
+        error="There was an error"
+      />
     </FieldsWrapperExample>
   ))
