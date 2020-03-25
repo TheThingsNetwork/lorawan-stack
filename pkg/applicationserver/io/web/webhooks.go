@@ -22,7 +22,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 	"sync"
 
@@ -377,15 +376,32 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if cfg == nil {
 		return nil, nil
 	}
-	url, err := url.Parse(hook.BaseURL)
+	baseURL, err := url.Parse(hook.BaseURL)
 	if err != nil {
 		return nil, err
 	}
-	url.Path = path.Join(url.Path, cfg.Path)
-	expandVariables(url, msg)
+	expandVariables(baseURL, msg)
+	pathURL, err := url.Parse(cfg.Path)
 	if err != nil {
 		return nil, err
 	}
+	expandVariables(pathURL, msg)
+	if strings.HasPrefix(pathURL.Path, "/") {
+		// Trim the leading slash, in order to ensure that the path is not
+		// interpreted as relative to the root of the URL.
+		pathURL.Path = strings.TrimLeft(pathURL.Path, "/")
+		// Add the "/" suffix here instead of the condition below in order
+		// to treat the case in which the pathURL.Path is "/".
+		if !strings.HasSuffix(baseURL.Path, "/") {
+			baseURL.Path += "/"
+		}
+	}
+	// If the path URL contains an actual path (i.e. is not only a query)
+	// ensure that it does not override the top level path.
+	if pathURL.Path != "" && !strings.HasSuffix(baseURL.Path, "/") {
+		baseURL.Path += "/"
+	}
+	finalURL := baseURL.ResolveReference(pathURL)
 	format, ok := formats[hook.Format]
 	if !ok {
 		return nil, errFormatNotFound.WithAttributes("format", hook.Format)
@@ -394,7 +410,7 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(http.MethodPost, url.String(), bytes.NewReader(buf))
+	req, err := http.NewRequest(http.MethodPost, finalURL.String(), bytes.NewReader(buf))
 	if err != nil {
 		return nil, err
 	}

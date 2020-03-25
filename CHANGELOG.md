@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error display on Data pages in the Console.
 - Fix too restrictive MQTT client validation in PubSub form in the Console.
 - Fix faulty display of device event stream data for end devices with the same ID in different applications.
+- Trailing slashes handling in webhook paths.
 
 ### Security
 
