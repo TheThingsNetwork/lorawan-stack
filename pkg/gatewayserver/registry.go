@@ -24,6 +24,6 @@ import (
 type GatewayConnectionStatsRegistry interface {
 	// Get returns connection stats for a gateway.
 	Get(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error)
-	// Set updates the connection stats for a gateway.
-	Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) error
+	// Set sets or clears the connection stats for a gateway.
+	Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, up, down, status bool) error
 }
