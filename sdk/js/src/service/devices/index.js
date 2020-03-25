@@ -360,21 +360,81 @@ class Devices {
     return this._proxy ? new Device(device, this._api) : device
   }
 
-  async create(applicationId, device, { otaa = false }) {
-    const dev = device
-
-    if (!otaa) {
-      dev.supports_join = false
-    } else {
-      if ('provisioner_id' in dev && dev.provisioner_id !== '') {
-        throw new Error('Setting a provisioner with end device keys is not allowed.')
-      }
-
-      dev.supports_join = true
+  /**
+   * Creates an end device under the `applicationId` application.
+   * This method will cause creating the end device in all available stack
+   * components (i.e. NS, AS, IS, JS) based on provided end device payload.
+   * @param {string} applicationId - Application ID
+   * @param {Object} device - The end device payload
+   * @returns {Object} - Created end device on successful creation, an error otherwise
+   */
+  async create(applicationId, device) {
+    if (!Boolean(applicationId)) {
+      throw new Error('Missing application ID for device')
     }
-    const response = await this._setDevice(applicationId, undefined, dev, true)
 
-    return this._responseTransform(response)
+    const { supports_join = false, ids = {} } = device
+
+    const deviceId = ids.device_id
+    if (!Boolean(deviceId)) {
+      throw new Error('Missing end device ID')
+    }
+
+    if (supports_join && 'provisioner_id' in device && device.provisioner_id !== '') {
+      throw new Error('Setting a provisioner with end device keys is not allowed.')
+    }
+
+    const requestTree = splitSetPaths(traverse(device).paths())
+
+    if (!supports_join || device.join_server_address !== this._stackConfig.jsHost) {
+      delete requestTree.js
+    }
+
+    if (device.network_server_address !== this._stackConfig.nsHost) {
+      delete requestTree.ns
+    }
+
+    if (device.application_server_address !== this._stackConfig.asHost) {
+      delete requestTree.as
+    }
+
+    const devicePayload = Marshaler.payload(device, 'end_device')
+    const routeParams = {
+      routeParams: {
+        'end_device.ids.application_ids.application_id': applicationId,
+      },
+    }
+    const setParts = await makeRequests(
+      this._api,
+      this._stackConfig,
+      this._ignoreDisabledComponents,
+      'create',
+      requestTree,
+      routeParams,
+      devicePayload,
+    )
+
+    // Filter out errored requests
+    const errors = setParts.filter(part => part.hasErrored)
+
+    // Handle possible errored requests
+    if (errors.length !== 0) {
+      // Roll back successfully created registry entries
+      const rollbackComponents = setParts.reduce((components, part) => {
+        if (part.hasAttempted && !part.hasErrored) {
+          components.push(part.component)
+        }
+
+        return components
+      }, [])
+
+      this._deleteDevice(applicationId, deviceId, rollbackComponents)
+
+      // Throw the first error
+      throw errors[0].error
+    }
+
+    return mergeDevice(setParts)
   }
 
   async deleteById(applicationId, deviceId) {
