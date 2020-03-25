@@ -487,8 +487,6 @@ var (
 	maxUpstreamHandlers = int32(1 << 5)
 	// upstreamHandlerIdleTimeout is the duration after which an idle upstream handler stops to save resources.
 	upstreamHandlerIdleTimeout = (1 << 7) * time.Millisecond
-	// upstreamHandlerBusyTimeout is the duration after traffic gets dropped if all upstream handlers are busy.
-	upstreamHandlerBusyTimeout = (1 << 6) * time.Millisecond
 )
 
 type upstreamHost struct {
@@ -587,7 +585,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			}
 			return false
 		}
-		hosts = append(hosts, &upstreamHost{
+		host := &upstreamHost{
 			name: name,
 			handler: func(ids *ttnpb.EndDeviceIdentifiers) upstream.Handler {
 				if ids != nil && ids.DevAddr != nil && !passDevAddr(handler.GetDevAddrPrefixes(), *ids.DevAddr) {
@@ -596,10 +594,8 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				return handler
 			},
 			handleCh: make(chan upstreamItem),
-		})
-	}
-
-	for _, host := range hosts {
+		}
+		hosts = append(hosts, host)
 		defer host.handleWg.Wait()
 	}
 
@@ -640,17 +636,17 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 					atomic.AddInt32(&host.handlers, 1)
 					host.handleWg.Add(1)
 					go handleFn(host)
+					go func(host *upstreamHost) {
+						host.handleCh <- item
+					}(host)
+					continue
 				}
-				select {
-				case host.handleCh <- item:
-				case <-time.After(upstreamHandlerBusyTimeout):
-					logger.WithField("name", host.name).Warn("Upstream handler busy, drop message")
-					switch msg := val.(type) {
-					case *ttnpb.UplinkMessage:
-						registerFailUplink(ctx, conn.Gateway(), msg, host.name)
-					case *ttnpb.GatewayStatus:
-						registerFailStatus(ctx, conn.Gateway(), msg, host.name)
-					}
+				logger.WithField("name", host.name).Warn("Upstream handler busy, drop message")
+				switch msg := val.(type) {
+				case *ttnpb.UplinkMessage:
+					registerFailUplink(ctx, conn.Gateway(), msg, host.name)
+				case *ttnpb.GatewayStatus:
+					registerFailStatus(ctx, conn.Gateway(), msg, host.name)
 				}
 			}
 		}
@@ -733,7 +729,6 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 						},
 					},
 				}, callOpt)
-
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to update antenna location")
 				}
