@@ -30,8 +30,8 @@ var (
 )
 
 const (
-	DefaultStatusCountPeriodicity uint32 = 20
-	DefaultStatusTimePeriodicity         = time.Hour
+	DefaultStatusCountPeriodicity uint32 = 200
+	DefaultStatusTimePeriodicity         = 24 * time.Hour
 )
 
 func deviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
