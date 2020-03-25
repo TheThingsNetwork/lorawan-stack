@@ -721,7 +721,7 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 				ForwarderId:         token.ForwarderID,
 				Message:             msg,
 			}
-			ctx, cancel := context.WithCancel(ctx)
+			ctx, cancel := context.WithTimeout(ctx, messageStateChangeTimeout)
 			progress, err := client.Publish(ctx, req)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to publish downlink message")
@@ -730,7 +730,11 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 			}
 			status, err := progress.Recv()
 			if err != nil {
-				logger.WithError(err).Warn("Failed to receive published downlink message status")
+				if errors.IsDeadlineExceeded(err) {
+					logger.Warn("Wait for message state change timed out")
+				} else {
+					logger.WithError(err).Warn("Failed to receive published downlink message status")
+				}
 				cancel()
 				continue
 			}
