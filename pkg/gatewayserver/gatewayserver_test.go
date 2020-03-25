@@ -556,17 +556,53 @@ func TestGatewayServer(t *testing.T) {
 					},
 				} {
 					t.Run(ctc.Name, func(t *testing.T) {
-						ctx, cancel := context.WithDeadline(ctx, time.Now().Add(timeout))
+						ctx, cancel := context.WithCancel(ctx)
 						upCh := make(chan *ttnpb.GatewayUp)
 						downCh := make(chan *ttnpb.GatewayDown)
-						err := ptc.Link(ctx, t, ctc.ID, ctc.Key, upCh, downCh)
-						cancel()
-						if errors.IsDeadlineExceeded(err) {
-							if !ptc.TimeoutOnInvalidAuth && !ptc.ValidAuth(ctx, ctc.ID, ctc.Key) {
-								t.Fatal("Expected link error due to invalid auth")
+
+						upEvents := map[string]events.Channel{}
+						for _, event := range []string{"gs.gateway.connect"} {
+							upEvents[event] = make(events.Channel, 5)
+						}
+						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
+							PublishFunc: func(ev events.Event) {
+								switch name := ev.Name(); name {
+								case "gs.gateway.connect":
+									go func() {
+										upEvents[name] <- ev
+									}()
+								default:
+									t.Logf("%s event published", name)
+								}
+							},
+						})()
+
+						connectedWithInvalidAuth := make(chan struct{}, 1)
+						expectedProperLink := make(chan struct{}, 1)
+						go func() {
+							select {
+							case <-upEvents["gs.gateway.connect"]:
+								if !ptc.ValidAuth(ctx, ctc.ID, ctc.Key) {
+									connectedWithInvalidAuth <- struct{}{}
+								}
+							case <-time.After(timeout):
+								if ptc.ValidAuth(ctx, ctc.ID, ctc.Key) {
+									expectedProperLink <- struct{}{}
+								}
 							}
-						} else if ptc.ValidAuth(ctx, ctc.ID, ctc.Key) {
-							t.Fatalf("Expected deadline exceeded with valid auth, but have %v", err)
+							time.Sleep(test.Delay)
+							cancel()
+						}()
+						err := ptc.Link(ctx, t, ctc.ID, ctc.Key, upCh, downCh)
+						if !errors.IsCanceled(err) && ptc.ValidAuth(ctx, ctc.ID, ctc.Key) {
+							t.Fatalf("Expect canceled context but have %v", err)
+						}
+						select {
+						case <-connectedWithInvalidAuth:
+							t.Fatal("Expected link error due to invalid auth")
+						case <-expectedProperLink:
+							t.Fatal("Expected proper link")
+						default:
 						}
 					})
 				}
@@ -599,7 +635,7 @@ func TestGatewayServer(t *testing.T) {
 				case <-time.After(timeout):
 				}
 
-				ctx2, cancel2 := context.WithDeadline(ctx, time.Now().Add(timeout))
+				ctx2, cancel2 := context.WithDeadline(ctx, time.Now().Add(2*timeout))
 				upCh := make(chan *ttnpb.GatewayUp)
 				downCh := make(chan *ttnpb.GatewayDown)
 				err := ptc.Link(ctx2, t, id, registeredGatewayKey, upCh, downCh)
@@ -610,13 +646,13 @@ func TestGatewayServer(t *testing.T) {
 				select {
 				case <-ctx1.Done():
 					t.Logf("First connection failed when second connected with %v", ctx1.Err())
-				case <-time.After(timeout):
+				case <-time.After(2 * timeout):
 					t.Fatalf("Expected link failure on first connection when second connected")
 				}
 			})
 
 			// Wait for gateway disconnection to be processed.
-			time.Sleep(timeout)
+			time.Sleep(3 * timeout)
 
 			t.Run(fmt.Sprintf("Traffic/%v", ptc.Protocol), func(t *testing.T) {
 				a := assertions.New(t)
@@ -968,13 +1004,13 @@ func TestGatewayServer(t *testing.T) {
 							a := assertions.New(t)
 
 							upEvents := map[string]events.Channel{}
-							for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive"} {
+							for _, event := range []string{"gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.status.forward"} {
 								upEvents[event] = make(events.Channel, 5)
 							}
 							defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
 								PublishFunc: func(ev events.Event) {
 									switch name := ev.Name(); name {
-									case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive":
+									case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.status.forward":
 										go func() {
 											upEvents[name] <- ev
 										}()
@@ -1054,8 +1090,11 @@ func TestGatewayServer(t *testing.T) {
 									t.Fatal("Expected gateway status event timeout")
 								}
 
-								// Wait for gateway status to be processed; no event available here.
-								time.Sleep(timeout)
+								select {
+								case <-upEvents["gs.status.forward"]:
+								case <-time.After(timeout):
+									t.Fatal("Expected gateway status forward event timeout")
+								}
 							}
 
 							conn, ok := gs.GetConnection(ctx, ids)
