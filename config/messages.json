@@ -1223,6 +1223,24 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:fail_write": {
+    "translations": {
+      "en": "failed to write `{file}`"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "use.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:file_exists": {
+    "translations": {
+      "en": "`{file}` exists"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "use.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:gateway_server_address_mismatch": {
     "translations": {
       "en": "gateway server address mismatch"
@@ -1410,6 +1428,15 @@
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
       "file": "gateways.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:no_host": {
+    "translations": {
+      "en": "no host set"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "use.go"
     }
   },
   "error:cmd/ttn-lw-cli/commands:no_ids": {
