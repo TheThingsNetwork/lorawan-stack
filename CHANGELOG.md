@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix too restrictive MQTT client validation in PubSub form in the Console.
 - Fix faulty display of device event stream data for end devices with the same ID in different applications.
 - Trailing slashes handling in webhook paths.
+- Limited throughput in upstream handlers in Gateway Server when one gateway's upstream handler is busy.
 
 ### Security
 

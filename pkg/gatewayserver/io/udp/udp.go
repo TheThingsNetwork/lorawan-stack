@@ -321,7 +321,7 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			logger.Debug("Received Tx acknowledgement, JIT queue supported")
 		}
 		var msg *ttnpb.GatewayUp
-		if packet.Data != nil {
+		if packet.Data.TxPacketAck != nil {
 			var err error
 			msg, err = encoding.ToGatewayUp(*packet.Data, md)
 			if err != nil {
