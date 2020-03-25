@@ -3788,6 +3788,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:handler_recovered": {
+    "translations": {
+      "en": "internal server error"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:host_handle": {
     "translations": {
       "en": "host `{host}` failed to handle message"

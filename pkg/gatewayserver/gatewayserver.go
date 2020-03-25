@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -516,6 +518,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 	}()
 
 	handleFn := func(host *upstreamHost) {
+		defer recoverHandler(ctx)
 		defer host.handleWg.Done()
 		defer atomic.AddInt32(&host.handlers, -1)
 		for {
@@ -815,4 +818,22 @@ func (gs *GatewayServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, error
 		return nil, err
 	}
 	return &config.MQTT, nil
+}
+
+var errHandlerRecovered = errors.DefineInternal("handler_recovered", "internal server error")
+
+func recoverHandler(ctx context.Context) error {
+	if p := recover(); p != nil {
+		fmt.Fprintln(os.Stderr, p)
+		os.Stderr.Write(debug.Stack())
+		var err error
+		if pErr, ok := p.(error); ok {
+			err = errHandlerRecovered.WithCause(pErr)
+		} else {
+			err = errHandlerRecovered.WithAttributes("panic", p)
+		}
+		log.FromContext(ctx).WithError(err).Error("Handler failed")
+		return err
+	}
+	return nil
 }
