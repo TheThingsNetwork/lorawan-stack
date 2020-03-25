@@ -44,6 +44,9 @@ import (
 const (
 	upstreamBufferSize   = 1 << 6
 	downstreamBufferSize = 1 << 5
+
+	// messageStateChangeTimeout defines the maximum time to wait for a message state change.
+	messageStateChangeTimeout = 2 * time.Second
 )
 
 // TenantContextFiller fills the parent context based on the tenant ID.
@@ -296,7 +299,7 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 				ForwarderTenantId: a.tenantID,
 				Message:           msg,
 			}
-			ctx, cancel := context.WithCancel(ctx)
+			ctx, cancel := context.WithTimeout(ctx, messageStateChangeTimeout)
 			progress, err := client.Publish(ctx, req)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to publish uplink message")
@@ -305,7 +308,11 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 			}
 			status, err := progress.Recv()
 			if err != nil {
-				logger.WithError(err).Warn("Failed to receive published uplink message status")
+				if errors.IsDeadlineExceeded(err) {
+					logger.Warn("Wait for message state change timed out")
+				} else {
+					logger.WithError(err).Warn("Failed to receive published uplink message status")
+				}
 				cancel()
 				continue
 			}
