@@ -345,16 +345,128 @@ class Devices {
     return this._proxy ? new Device(device, this._api) : device
   }
 
+  /**
+   * Updates the `deviceId` end device under the `applicationId` application.
+   * This method will cause updates of the end device in all available stack
+   * components (i.e. NS, AS, IS, JS) based on provided end device payload.
+   * @param {string} applicationId - Application ID
+   * @param {string} deviceId - Device ID
+   * @param {Object} patch - The end device payload
+   * @returns {Object} - Updated end device on successful update, an error otherwise
+   */
   async updateById(applicationId, deviceId, patch) {
-    const response = await this._setDevice(applicationId, deviceId, patch)
+    if (!Boolean(applicationId)) {
+      throw new Error('Missing application ID for device')
+    }
 
-    if ('root_keys' in patch) {
-      patch.supports_join = true
+    if (!Boolean(deviceId)) {
+      throw new Error('Missing end device ID')
+    }
+
+    const deviceMap = traverse(deviceEntityMap)
+    const paths = traverse(patch).reduce(function(acc) {
+      if (this.isLeaf) {
+        const path = this.path
+
+        const parentAdded = acc.some(e => path[0].startsWith(e.join()))
+
+        // Only consider adding, if a common parent has not been already added
+        if (!parentAdded) {
+          // Add only the deepest possible field mask of the patch
+          const commonPath = path.filter((_, index, array) => {
+            const arr = array.slice(0, index + 1)
+            return deviceMap.has(arr)
+          })
+
+          acc.push(commonPath)
+        }
+      }
+      return acc
+    }, [])
+
+    const requestTree = splitSetPaths(paths)
+
+    // Assemble paths for end device fields that need to be retrieved first to make the update request
+    const combinePaths = []
+    if ('as' in requestTree && !('application_server_address' in patch)) {
+      combinePaths.push(['application_server_address'])
+    }
+    if ('js' in requestTree && !('join_server_address' in patch)) {
+      combinePaths.push(['join_server_address'])
+      combinePaths.push(['supports_join'])
+
+      const { ids = {} } = patch
+      if (!('dev_eui' in ids) || !('join_eui' in 'ids')) {
+        combinePaths.push(['ids', 'dev_eui'])
+        combinePaths.push(['ids', 'join_eui'])
+      }
+    }
+    if ('ns' in requestTree && !('network_server_address' in patch)) {
+      combinePaths.push(['network_server_address'])
+    }
+
+    const assembledValues = await this._getDevice(applicationId, deviceId, combinePaths, true)
+
+    if (assembledValues.network_server_address !== this._stackConfig.nsHost) {
+      delete requestTree.ns
+    }
+
+    if (assembledValues.application_server_address !== this._stackConfig.asHost) {
+      delete requestTree.as
+    }
+
+    if (
+      !assembledValues.supports_join ||
+      assembledValues.join_server_address !== this._stackConfig.jsHost
+    ) {
+      delete requestTree.js
+    }
+
+    // Make sure to include `join_eui` and `dev_eui` for js request as those are required
+    if ('js' in requestTree) {
+      const { ids = {} } = patch
+      const {
+        ids: { join_eui, dev_eui },
+      } = assembledValues
+
+      patch.ids = {
+        ...ids,
+        join_eui,
+        dev_eui,
+      }
+    }
+
+    const routeParams = {
+      routeParams: {
+        'end_device.ids.application_ids.application_id': applicationId,
+        'end_device.ids.device_id': deviceId,
+      },
+    }
+
+    // Perform the requests
+    const devicePayload = Marshaler.payload(patch, 'end_device')
+    const setParts = await makeRequests(
+      this._api,
+      this._stackConfig,
+      this._ignoreDisabledComponents,
+      'set',
+      requestTree,
+      routeParams,
+      devicePayload,
+    )
+
+    // Filter out errored requests
+    const errors = setParts.filter(part => part.hasErrored)
+
+    // Handle possible errored requests
+    if (errors.length !== 0) {
+      // Throw the first error
+      throw errors[0].error
     }
 
     const device = this._emitDefaults(
       Marshaler.fieldMaskFromPatch(patch),
-      Marshaler.unwrapDevice(response),
+      Marshaler.unwrapDevice(mergeDevice(setParts)),
     )
 
     return this._proxy ? new Device(device, this._api) : device
