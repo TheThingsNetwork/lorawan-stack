@@ -487,6 +487,8 @@ var (
 	upstreamHandlerIdleTimeout = (1 << 7) * time.Millisecond
 	// upstreamHandlerBusyTimeout is the duration after traffic gets dropped if all upstream handlers are busy.
 	upstreamHandlerBusyTimeout = (1 << 6) * time.Millisecond
+	// handleUplinkTimeout is the duration after which the upstream handler call should stop.
+	handleUplinkTimeout = 3 * time.Second
 )
 
 type upstreamHost struct {
@@ -552,10 +554,13 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 					if handler == nil {
 						break
 					}
-					if err := handler.HandleUplink(ctx, conn.Gateway().GatewayIdentifiers, ids, msg); err != nil {
+					timeoutCtx, cancel := context.WithTimeout(ctx, handleUplinkTimeout)
+					if err := handler.HandleUplink(timeoutCtx, conn.Gateway().GatewayIdentifiers, ids, msg); err != nil {
+						cancel()
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
 						break
 					}
+					cancel()
 					registerForwardUplink(ctx, conn.Gateway(), msg.UplinkMessage, item.host.name)
 				case *ttnpb.GatewayStatus:
 					registerReceiveStatus(ctx, conn.Gateway(), msg)
