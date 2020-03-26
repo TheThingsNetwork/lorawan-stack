@@ -1367,5 +1367,4 @@ func TestPingPong(t *testing.T) {
 	case <-time.After(timeout):
 		t.Fatalf("Server pong timeout")
 	}
-
 }
