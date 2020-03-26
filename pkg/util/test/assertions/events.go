@@ -180,7 +180,7 @@ func eventSlice(vs ...interface{}) ([]events.Event, string) {
 			evs = append(evs, ev)
 			continue
 		}
-		r, ok := wrapRanger(v)
+		r, ok := test.WrapRanger(v)
 		if !ok {
 			return nil, fmt.Sprintf("Cannot range over values of type %T", v)
 		}
