@@ -257,11 +257,6 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf Forwa
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
 		for _, md := range msg.RxMetadata {
-			gtwIDs := md.GetGatewayIDs()
-			if gtwIDs == nil {
-				continue
-			}
-
 			var rssiStandardDeviation *pbtypes.FloatValue
 			if md.RSSIStandardDeviation > 0 {
 				rssiStandardDeviation = &pbtypes.FloatValue{
@@ -307,7 +302,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf Forwa
 			}
 			if len(gatewayUplinkToken) == 0 {
 				var err error
-				gatewayUplinkToken, err = wrapGatewayUplinkToken(*gtwIDs, md.UplinkToken, conf.TokenEncrypter)
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(md.GatewayIdentifiers, md.UplinkToken, conf.TokenEncrypter)
 				if err != nil {
 					return nil, errWrapGatewayUplinkToken.WithCause(err)
 				}
@@ -354,66 +349,112 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf Forwa
 
 var errWrapUplinkTokens = errors.DefineAborted("wrap_uplink_tokens", "wrap uplink tokens")
 
-func fromPBUplink(ctx context.Context, msg *packetbroker.UplinkMessage, token *agentUplinkToken, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
-	dataRate, ok := fromPBDataRate(msg.GatewayRegion, int(msg.DataRateIndex))
+func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
+	dataRate, ok := fromPBDataRate(msg.Message.GatewayRegion, int(msg.Message.DataRateIndex))
 	if !ok {
 		return nil, errUnknownDataRate.WithAttributes(
-			"index", msg.DataRateIndex,
-			"region", msg.GatewayRegion,
+			"index", msg.Message.DataRateIndex,
+			"region", msg.Message.GatewayRegion,
 		)
 	}
 
-	uplinkToken, err := wrapUplinkTokens(msg.GatewayUplinkToken, msg.ForwarderUplinkToken, token)
-	if err != nil {
-		return nil, errWrapUplinkTokens.WithCause(err)
+	var forwarderNetID, homeNetworkNetID types.NetID
+	if err := forwarderNetID.UnmarshalNumber(msg.ForwarderNetId); err != nil {
+		return nil, errNetID.WithCause(err).WithAttributes("net_id", msg.ForwarderNetId)
+	}
+	if err := homeNetworkNetID.UnmarshalNumber(msg.HomeNetworkNetId); err != nil {
+		return nil, errNetID.WithCause(err).WithAttributes("net_id", msg.HomeNetworkNetId)
+	}
+	var (
+		downlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER
+		uplinkToken            []byte
+	)
+	if len(msg.Message.GatewayUplinkToken) > 0 || len(msg.Message.ForwarderUplinkToken) > 0 {
+		downlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE
+		token := &agentUplinkToken{
+			ForwarderNetID:    forwarderNetID,
+			ForwarderID:       msg.ForwarderId,
+			ForwarderTenantID: msg.ForwarderTenantId,
+		}
+		var err error
+		uplinkToken, err = wrapUplinkTokens(msg.Message.GatewayUplinkToken, msg.Message.ForwarderUplinkToken, token)
+		if err != nil {
+			return nil, errWrapUplinkTokens.WithCause(err)
+		}
 	}
 
 	up := &ttnpb.UplinkMessage{
-		RawPayload: msg.PhyPayload.GetPlain(),
+		RawPayload: msg.Message.PhyPayload.GetPlain(),
 		Settings: ttnpb.TxSettings{
 			DataRate:      dataRate,
-			DataRateIndex: ttnpb.DataRateIndex(msg.DataRateIndex),
-			Frequency:     msg.Frequency,
+			DataRateIndex: ttnpb.DataRateIndex(msg.Message.DataRateIndex),
+			Frequency:     msg.Message.Frequency,
 		},
 		ReceivedAt:     receivedAt,
 		CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 	}
 
 	var receiveTime *time.Time
-	if t, err := pbtypes.TimestampFromProto(msg.GatewayReceiveTime); err == nil {
+	if t, err := pbtypes.TimestampFromProto(msg.Message.GatewayReceiveTime); err == nil {
 		receiveTime = &t
 	}
-	if gtwMd := msg.GatewayMetadata; gtwMd != nil {
+	if gtwMd := msg.Message.GatewayMetadata; gtwMd != nil {
+		pbMD := &ttnpb.PacketBrokerMetadata{
+			MessageID:           msg.Id,
+			ForwarderNetID:      forwarderNetID,
+			ForwarderTenantID:   msg.ForwarderTenantId,
+			ForwarderID:         msg.ForwarderId,
+			HomeNetworkNetID:    homeNetworkNetID,
+			HomeNetworkTenantID: msg.HomeNetworkTenantId,
+			Hops:                make([]*ttnpb.PacketBrokerRouteHop, 0, len(msg.Hops)),
+		}
+		for _, h := range msg.Hops {
+			receivedAt, err := pbtypes.TimestampFromProto(h.ReceivedAt)
+			if err != nil {
+				continue
+			}
+			pbMD.Hops = append(pbMD.Hops, &ttnpb.PacketBrokerRouteHop{
+				ReceivedAt:    receivedAt,
+				SenderName:    h.SenderName,
+				SenderAddress: h.SenderAddress,
+				ReceiverName:  h.ReceiverName,
+				ReceiverAgent: h.ReceiverAgent,
+			})
+		}
 		if md := gtwMd.GetPlainLocalization().GetTerrestrial(); md != nil {
 			for _, ant := range md.Antennas {
 				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIdentifiers:    cluster.PacketBrokerGatewayID,
-					AntennaIndex:          ant.Index,
-					Time:                  receiveTime,
-					FineTimestamp:         ant.FineTimestamp.GetValue(),
-					RSSI:                  ant.SignalQuality.GetChannelRssi(),
-					ChannelRSSI:           ant.SignalQuality.GetChannelRssi(),
-					SignalRSSI:            ant.SignalQuality.GetSignalRssi(),
-					RSSIStandardDeviation: ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
-					SNR:                   ant.SignalQuality.GetSnr(),
-					FrequencyOffset:       ant.SignalQuality.GetFrequencyOffset(),
-					Location:              fromPBLocation(ant.Location),
-					UplinkToken:           uplinkToken,
+					GatewayIdentifiers:     cluster.PacketBrokerGatewayID,
+					PacketBroker:           pbMD,
+					AntennaIndex:           ant.Index,
+					Time:                   receiveTime,
+					FineTimestamp:          ant.FineTimestamp.GetValue(),
+					RSSI:                   ant.SignalQuality.GetChannelRssi(),
+					ChannelRSSI:            ant.SignalQuality.GetChannelRssi(),
+					SignalRSSI:             ant.SignalQuality.GetSignalRssi(),
+					RSSIStandardDeviation:  ant.SignalQuality.GetRssiStandardDeviation().GetValue(),
+					SNR:                    ant.SignalQuality.GetSnr(),
+					FrequencyOffset:        ant.SignalQuality.GetFrequencyOffset(),
+					Location:               fromPBLocation(ant.Location),
+					DownlinkPathConstraint: downlinkPathConstraint,
+					UplinkToken:            uplinkToken,
 				})
 			}
 		} else if md := gtwMd.GetPlainSignalQuality().GetTerrestrial(); md != nil {
 			for _, ant := range md.Antennas {
 				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIdentifiers:    cluster.PacketBrokerGatewayID,
-					AntennaIndex:          ant.Index,
-					Time:                  receiveTime,
-					RSSI:                  ant.Value.GetChannelRssi(),
-					ChannelRSSI:           ant.Value.GetChannelRssi(),
-					SignalRSSI:            ant.Value.GetSignalRssi(),
-					RSSIStandardDeviation: ant.Value.GetRssiStandardDeviation().GetValue(),
-					SNR:                   ant.Value.GetSnr(),
-					FrequencyOffset:       ant.Value.GetFrequencyOffset(),
-					UplinkToken:           uplinkToken,
+					GatewayIdentifiers:     cluster.PacketBrokerGatewayID,
+					PacketBroker:           pbMD,
+					AntennaIndex:           ant.Index,
+					Time:                   receiveTime,
+					RSSI:                   ant.Value.GetChannelRssi(),
+					ChannelRSSI:            ant.Value.GetChannelRssi(),
+					SignalRSSI:             ant.Value.GetSignalRssi(),
+					RSSIStandardDeviation:  ant.Value.GetRssiStandardDeviation().GetValue(),
+					SNR:                    ant.Value.GetSnr(),
+					FrequencyOffset:        ant.Value.GetFrequencyOffset(),
+					DownlinkPathConstraint: downlinkPathConstraint,
+					UplinkToken:            uplinkToken,
 				})
 			}
 		}

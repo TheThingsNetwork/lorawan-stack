@@ -617,14 +617,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		logger = logger.WithField("dev_addr", *ids.DevAddr)
 	}
 
-	token := &agentUplinkToken{
-		ForwarderID:       up.ForwarderId,
-		ForwarderTenantID: up.ForwarderTenantId,
-	}
-	if err := token.ForwarderNetID.UnmarshalNumber(up.ForwarderNetId); err != nil {
-		return errNetID.WithCause(err).WithAttributes("net_id", up.ForwarderNetId)
-	}
-	msg, err := fromPBUplink(ctx, up.Message, token, receivedAt)
+	msg, err := fromPBUplink(ctx, up, receivedAt)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to convert incoming uplink message")
 		return err
