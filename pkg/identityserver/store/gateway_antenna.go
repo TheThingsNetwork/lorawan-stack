@@ -29,6 +29,8 @@ type GatewayAntenna struct {
 	Gain float32
 
 	Location
+
+	Source int32 `gorm:"default:3 not null"`
 }
 
 func init() {
@@ -36,6 +38,10 @@ func init() {
 }
 
 func (a GatewayAntenna) toPB() ttnpb.GatewayAntenna {
+	source := ttnpb.LocationSource(a.Source)
+	if source == ttnpb.SOURCE_UNKNOWN {
+		source = ttnpb.SOURCE_REGISTRY
+	}
 	return ttnpb.GatewayAntenna{
 		Gain: a.Gain,
 		Location: ttnpb.Location{
@@ -43,7 +49,7 @@ func (a GatewayAntenna) toPB() ttnpb.GatewayAntenna {
 			Longitude: a.Longitude,
 			Altitude:  a.Altitude,
 			Accuracy:  a.Accuracy,
-			Source:    ttnpb.SOURCE_REGISTRY,
+			Source:    source,
 		},
 		Attributes: attributes(a.Attributes).toMap(),
 	}
@@ -57,5 +63,6 @@ func (a *GatewayAntenna) fromPB(pb ttnpb.GatewayAntenna) {
 		Altitude:  pb.Location.Altitude,
 		Accuracy:  pb.Location.Accuracy,
 	}
+	a.Source = int32(pb.Location.Source)
 	a.Attributes = attributes(a.Attributes).updateFromMap(pb.Attributes)
 }

@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Gateway antenna locations are not ignored by the Identity Server.
+  - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+
 ### Security
 
 ## [3.7.0] (2020-03-19)
@@ -38,7 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix faulty display of device event stream data for end devices with the same ID in different applications.
 - Trailing slashes handling in webhook paths.
 - Limited throughput in upstream handlers in Gateway Server when one gateway's upstream handler is busy.
-
 
 ## [3.6.2] (2020-03-19)
 
