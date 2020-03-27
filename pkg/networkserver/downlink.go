@@ -1204,6 +1204,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 						return dev, nil, nil
 					}
 					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIDs...)
+					ctx = events.ContextWithCorrelationID(ctx, dev.PendingMACState.QueuedJoinAccept.CorrelationIDs...)
 
 					paths := downlinkPathsFromRecentUplinks(up)
 					if len(paths) == 0 {
