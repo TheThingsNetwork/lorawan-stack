@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { merge } from 'lodash'
+import { mergeWith } from 'lodash'
 
 import { getCombinedDeviceId, combineDeviceIds } from '../../../lib/selectors/id'
 import {
@@ -37,7 +37,12 @@ const devices = function(state = defaultState, { type, payload }) {
     case UPDATE_DEV_SUCCESS:
     case GET_DEV_SUCCESS:
       const id = getCombinedDeviceId(payload)
-      const mergedDevice = merge({}, state.entities[id], payload)
+      const mergedDevice = mergeWith({}, state.entities[id], payload, (_, __, key, ___, source) => {
+        // always set location from the payload
+        if (source === payload && key === 'locations') {
+          return source.locations
+        }
+      })
 
       return {
         ...state,
