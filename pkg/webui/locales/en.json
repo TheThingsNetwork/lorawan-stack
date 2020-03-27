@@ -304,6 +304,8 @@
   "console.views.device-general-settings.messages.notInCluster": "Not registered in this cluster",
   "console.views.device-general-settings.messages.updateSuccess": "The end device has been updated successfully",
   "console.views.device-general-settings.messages.keysResetWarning": "You're not authorized to view the end device keys. However, overwriting is allowed.",
+  "console.views.device-import.index.noTemplatesTitle": "No device templates found",
+  "console.views.device-import.index.noTemplates": "There are currently no device templates set up. Please set up a device template to make use of the bulk device import feature. For more information please refer to the documentation.",
   "console.views.device-location.index.setDeviceLocation": "Set Device Location",
   "console.views.device-overview.index.activationInfo": "Activation Information",
   "console.views.device-overview.index.rootKeyId": "Root Key ID",
