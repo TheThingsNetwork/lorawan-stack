@@ -2802,6 +2802,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						SessionKeys:   *sessionKeys,
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 							{
+								Confirmed:      true,
 								CorrelationIDs: []string{"correlation-app-down-1", "correlation-app-down-2"},
 								FCnt:           0x42,
 								FPort:          0x1,
@@ -2943,6 +2944,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				setDevice := CopyEndDevice(getDevice)
 				setDevice.MACState.LastConfirmedDownlinkAt = &downAt
 				setDevice.MACState.LastNetworkInitiatedDownlinkAt = &downAt
+				setDevice.MACState.PendingApplicationDownlink = setDevice.Session.QueuedApplicationDownlinks[0]
 				setDevice.MACState.PendingRequests = []*ttnpb.MACCommand{
 					{
 						CID: ttnpb.CID_DEV_STATUS,
@@ -2951,6 +2953,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				setDevice.MACState.RecentDownlinks = append(setDevice.MACState.RecentDownlinks, lastDown)
 				setDevice.RecentDownlinks = append(setDevice.RecentDownlinks, lastDown)
 				setDevice.Session.QueuedApplicationDownlinks = []*ttnpb.ApplicationDownlink{}
+				setDevice.Session.LastConfFCntDown = 0x42
 
 				select {
 				case <-ctx.Done():

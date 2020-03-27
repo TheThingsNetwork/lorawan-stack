@@ -430,12 +430,6 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	default:
 		return nil, genState, errNoDownlink.New()
 	}
-	if mType == ttnpb.MType_UNCONFIRMED_DOWN && len(dev.MACState.PendingRequests) > 0 &&
-		(dev.MACState.DeviceClass == ttnpb.CLASS_B ||
-			dev.MACState.DeviceClass == ttnpb.CLASS_C && dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0) {
-		logger.Debug("Use confirmed downlink to get immediate answer")
-		mType = ttnpb.MType_CONFIRMED_DOWN
-	}
 
 	logger = logger.WithFields(log.Fields(
 		"f_cnt", pld.FHDR.FCnt,
