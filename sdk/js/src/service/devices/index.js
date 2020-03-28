@@ -396,7 +396,7 @@ class Devices {
       combinePaths.push(['supports_join'])
 
       const { ids = {} } = patch
-      if (!('dev_eui' in ids) || !('join_eui' in 'ids')) {
+      if (!('dev_eui' in ids) || !('join_eui' in ids)) {
         combinePaths.push(['ids', 'dev_eui'])
         combinePaths.push(['ids', 'join_eui'])
       }
