@@ -17,7 +17,7 @@ import * as Yup from 'yup'
 import m from '../../../components/device-data-form/messages'
 import sharedMessages from '../../../../lib/shared-messages'
 
-import { parseLorawanMacVersion } from '../utils'
+import { parseLorawanMacVersion } from '../../../lib/device-utils'
 
 const validationSchema = Yup.object()
   .shape({

@@ -27,7 +27,7 @@ import m from '../../../components/device-data-form/messages'
 import PropTypes from '../../../../lib/prop-types'
 import sharedMessages from '../../../../lib/shared-messages'
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '../../../../lib/selectors/env'
-import { parseLorawanMacVersion, hasExternalJs, isDeviceOTAA } from '../utils'
+import { parseLorawanMacVersion, hasExternalJs, isDeviceOTAA } from '../../../lib/device-utils'
 import validationSchema from './validation-schema'
 
 const messages = defineMessages({

@@ -28,7 +28,7 @@ import PropTypes from '../../../../lib/prop-types'
 import sharedMessages from '../../../../lib/shared-messages'
 import randomByteString from '../../../lib/random-bytes'
 
-import { parseLorawanMacVersion, hasExternalJs } from '../utils'
+import { parseLorawanMacVersion, hasExternalJs } from '../../../lib/device-utils'
 import validationSchema from './validation-schema'
 
 const random16BytesString = () => randomByteString(32)

@@ -18,7 +18,7 @@ import sharedMessages from '../../../../lib/shared-messages'
 
 import m from '../../../components/device-data-form/messages'
 
-import { parseLorawanMacVersion, ACTIVATION_MODES } from '../utils'
+import { parseLorawanMacVersion, ACTIVATION_MODES } from '../../../lib/device-utils'
 
 const validationSchema = Yup.object()
   .shape({

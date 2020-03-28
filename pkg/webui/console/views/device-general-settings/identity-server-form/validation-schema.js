@@ -20,7 +20,7 @@ import { id as deviceIdRegexp, address as addressRegexp } from '../../../lib/reg
 import m from '../../../components/device-data-form/messages'
 import { selectJsConfig } from '../../../../lib/selectors/env'
 
-import { parseLorawanMacVersion } from '../utils'
+import { parseLorawanMacVersion } from '../../../lib/device-utils'
 
 const jsConfig = selectJsConfig()
 

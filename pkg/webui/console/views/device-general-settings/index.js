@@ -44,7 +44,7 @@ import {
   mayReadApplicationDeviceKeys,
 } from '../../lib/feature-checks'
 
-import { isDeviceOTAA, isDeviceJoined } from './utils'
+import { isDeviceOTAA, isDeviceJoined } from '../../lib/device-utils'
 import m from './messages'
 
 import IdentityServerForm from './identity-server-form'

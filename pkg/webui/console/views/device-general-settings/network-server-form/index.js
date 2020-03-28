@@ -40,7 +40,7 @@ import {
   hasExternalJs,
   isDeviceJoined,
   isDeviceOTAA,
-} from '../utils'
+} from '../../../lib/device-utils'
 import validationSchema from './validation-schema'
 
 const random16BytesString = () => randomByteString(32)
