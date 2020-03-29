@@ -74,9 +74,6 @@ const NetworkServerForm = React.memo(props => {
   const formRef = React.useRef(null)
 
   const [error, setError] = React.useState('')
-  const [resetsFCnt, setResetsFCnt] = React.useState(
-    (isABP && device.mac_settings && device.mac_settings.resets_f_cnt) || false,
-  )
   const [lorawanVersion, setLorawanVersion] = React.useState(
     parseLorawanMacVersion(device.lorawan_version),
   )
@@ -126,12 +123,6 @@ const NetworkServerForm = React.memo(props => {
     },
     [initialValues, onSubmit, onSubmitSuccess],
   )
-
-  const handleResetsFCntChange = React.useCallback(evt => {
-    const { checked } = evt.target
-
-    setResetsFCnt(checked)
-  }, [])
 
   const handleVersionChange = React.useCallback(
     version => {
@@ -223,15 +214,6 @@ const NetworkServerForm = React.memo(props => {
       </Form.Field>
       {(isABP || isMulticast || isJoinedOTAA) && (
         <>
-          {!isMulticast && !isJoinedOTAA && (
-            <Form.Field
-              title={m.resetsFCnt}
-              onChange={handleResetsFCntChange}
-              warning={resetsFCnt ? m.resetWarning : undefined}
-              name="mac_settings.resets_f_cnt"
-              component={Checkbox}
-            />
-          )}
           {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
           <DevAddrInput
             title={sharedMessages.devAddr}

@@ -81,15 +81,6 @@ const validationSchema = Yup.object()
         return schema.strip()
       },
     ),
-    mac_settings: Yup.object().when(['_activation_mode'], (mode, schema) => {
-      if (mode === ACTIVATION_MODES.ABP) {
-        return schema.shape({
-          resets_f_cnt: Yup.boolean(),
-        })
-      }
-
-      return schema.strip()
-    }),
   })
   .noUnknown()
 
