@@ -32,6 +32,7 @@ import DeviceGeneralSettings from '../device-general-settings'
 import DeviceLocation from '../device-location'
 import DevicePayloadFormatters from '../device-payload-formatters'
 import DeviceClaimAuthenticationCode from '../device-claim-authentication-code'
+import DeviceMacSettings from '../device-mac-settings'
 
 import { getDevice, stopDeviceEventsStream } from '../../store/actions/devices'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
@@ -40,7 +41,8 @@ import {
   selectDeviceFetching,
   selectDeviceError,
 } from '../../store/selectors/devices'
-import { selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
+import { selectJsConfig, selectAsConfig, selectNsConfig } from '../../../lib/selectors/env'
+import { isDeviceABP, isDeviceMulticast } from '../../lib/device-utils'
 
 import { mayReadApplicationDeviceKeys } from '../../lib/feature-checks'
 import PropTypes from '../../../lib/prop-types'
@@ -78,8 +80,9 @@ import style from './device.styl'
       'description',
       'version_ids',
       'frequency_plan_id',
-      'mac_settings.resets_f_cnt',
+      'mac_settings',
       'resets_join_nonces',
+      'supports_class_b',
       'supports_class_c',
       'supports_join',
       'lorawan_version',
@@ -142,16 +145,19 @@ export default class Device extends React.Component {
         params: { appId },
       },
       devId,
-      device: {
-        name,
-        description,
-        join_server_address,
-        supports_join,
-        root_keys,
-        application_server_address,
-      },
+      device,
       env: { siteName },
     } = this.props
+
+    const {
+      name,
+      description,
+      join_server_address,
+      supports_join,
+      root_keys,
+      application_server_address,
+      network_server_address,
+    } = device
 
     const jsConfig = selectJsConfig()
     const hasJs =
@@ -162,6 +168,13 @@ export default class Device extends React.Component {
     const asConfig = selectAsConfig()
     const hasAs =
       asConfig.enabled && application_server_address === getHostnameFromUrl(asConfig.base_url)
+
+    const nsConfig = selectNsConfig()
+    const isABP = isDeviceABP(device)
+    const isMulticast = isDeviceMulticast(device)
+    const hasNs =
+      nsConfig.enabled && network_server_address === getHostnameFromUrl(nsConfig.base_url)
+    const showMacSettings = (isABP || isMulticast) && hasNs
 
     const basePath = `/applications/${appId}/devices/${devId}`
 
@@ -188,6 +201,12 @@ export default class Device extends React.Component {
         disabled: !hasJs,
       },
       {
+        title: sharedMessages.macSettings,
+        name: 'mac-settings',
+        link: `${basePath}/mac-settings`,
+        disabled: !showMacSettings,
+      },
+      {
         title: sharedMessages.generalSettings,
         name: 'general-settings',
         link: `${basePath}/general-settings`,
@@ -211,6 +230,9 @@ export default class Device extends React.Component {
           )}
           {hasJs && (
             <Route path={`${basePath}/claim-auth-code`} component={DeviceClaimAuthenticationCode} />
+          )}
+          {showMacSettings && (
+            <Route path={`${basePath}/mac-settings`} component={DeviceMacSettings} />
           )}
           <NotFoundRoute />
         </Switch>

@@ -13,23 +13,102 @@
 // limitations under the License.
 
 import * as Yup from 'yup'
+import { defineMessages } from 'react-intl'
 
+import sharedMessages from '../../../lib/shared-messages'
 import { ACTIVATION_MODES } from '../../lib/device-utils'
 
+const m = defineMessages({
+  validateFreqNumberic: 'All frequency values must be positive integers',
+  validateFreqRequired: 'All requency values are required. Please remove empty entries.',
+})
+
+const factoryPresetFreqNumericTest = frequencies => {
+  return frequencies.every(freq => {
+    if (typeof freq !== 'undefined') {
+      return !isNaN(parseInt(freq))
+    }
+
+    return true
+  })
+}
+
+const factoryPresetFreqRequiredTest = frequencies => {
+  return frequencies.every(freq => typeof freq !== 'undefined' && freq !== '')
+}
+
 export default Yup.object({
-  _activation_mode: Yup.mixed().oneOf([
-    ACTIVATION_MODES.ABP,
-    ACTIVATION_MODES.OTAA,
-    ACTIVATION_MODES.MULTICAST,
-  ]),
   mac_settings: Yup.object({
-    rx2_data_rate_index: Yup.object({
-      value: Yup.number(),
+    rx2_data_rate_index: Yup.lazy(dataRate => {
+      if (!Boolean(dataRate) || typeof dataRate.value === 'undefined') {
+        return Yup.object().strip()
+      }
+
+      return Yup.object({
+        value: Yup.number(),
+      })
     }),
-    resets_f_cnt: Yup.boolean().when('activation_mode', {
+    rx2_frequency: Yup.number().min(100000, {
+      ...sharedMessages.validateNumberGte,
+      values: { value: 100000 },
+    }),
+    resets_f_cnt: Yup.boolean().when('$activation_mode', {
       is: mode => mode === ACTIVATION_MODES.ABP,
       then: schema => schema.default(false),
       otherwise: schema => schema.strip(),
     }),
+    rx1_delay: Yup.lazy(delay => {
+      if (!Boolean(delay) || typeof delay.value === 'undefined') {
+        return Yup.object().strip()
+      }
+
+      return Yup.object().when('$activation_mode', {
+        is: mode => mode === ACTIVATION_MODES.ABP,
+        then: schema =>
+          schema.shape({
+            value: Yup.number(),
+          }),
+        otherwise: schema => schema.strip(),
+      })
+    }),
+    rx1_data_rate_offset: Yup.number().when('$activation_mode', {
+      is: mode => mode === ACTIVATION_MODES.ABP,
+      then: schema =>
+        schema.min(0, { ...sharedMessages.validateNumberGte, values: { value: 0 } }).max(7, {
+          ...sharedMessages.validateNumberLte,
+          values: { value: 7 },
+        }),
+      otherwise: schema => schema.strip(),
+    }),
+    ping_slot_periodicity: Yup.lazy(periodicity => {
+      if (!Boolean(periodicity) || typeof periodicity.value === 'undefined') {
+        return Yup.object().strip()
+      }
+
+      return Yup.object().when('$class_b', {
+        is: true,
+        then: schema =>
+          schema.shape({
+            value: Yup.string(),
+          }),
+        otherwise: schema => schema.strip(),
+      })
+    }),
+    factory_preset_frequencies: Yup.lazy(frequencies => {
+      if (!Boolean(frequencies)) {
+        return Yup.array().strip()
+      }
+
+      return Yup.array()
+        .default([])
+        .test('is-valid-frequency', m.validateFreqNumberic, factoryPresetFreqNumericTest)
+        .test('is-empty-frequency', m.validateFreqRequired, factoryPresetFreqRequiredTest)
+        .when('$is_init', (isInit, schema) => {
+          if (isInit) {
+            return schema.transform(arr => arr.map((value, key) => ({ key, value })))
+          }
+          return schema.transform(arr => arr.map(({ value }) => value))
+        })
+    }),
   }),
-})
+}).noUnknown()
