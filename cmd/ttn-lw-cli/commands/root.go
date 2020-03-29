@@ -113,6 +113,9 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		if config.Insecure {
 			api.SetInsecure(true)
 		}
+		if config.DumpRequests {
+			api.SetDumpRequests(true)
+		}
 		if config.CA != "" {
 			pemBytes, err := ioutil.ReadFile(config.CA)
 			if err != nil {

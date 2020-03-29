@@ -49,6 +49,7 @@ type Config struct {
 	QRCodeGeneratorGRPCAddress         string `name:"qr-code-generator-grpc-address" yaml:"qr-code-generator-grpc-address" description:"QR Code Generator address"`
 	Insecure                           bool   `name:"insecure" yaml:"insecure" description:"Connect without TLS"`
 	CA                                 string `name:"ca" yaml:"ca" description:"CA certificate file"`
+	DumpRequests                       bool   `name:"dump-requests" yaml:"dump-requests" description:"When log level is set to debug, also dump request payload as JSON"`
 }
 
 func (c Config) getHosts() []string {

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- CLI can now dump JSON encoded `grpc_payload` field for unary requests (see `--dump-requests` flag).
+
 ### Changed
 
 ### Deprecated
