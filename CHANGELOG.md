@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - View/edit `update_location_from_status` gateway property using the Console.
+- MAC Settings page for end devices in the Console. Allow editing `rx1_delay`, `rx1_data_rate_offset`, 
+`rx2_data_rate_index`, `rx2_frequency` and `ping_slot_periodicity`.
 
 ### Changed
 
