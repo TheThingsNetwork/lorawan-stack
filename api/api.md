@@ -3715,7 +3715,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
-| `frequency` | <p>`uint64.gte`: `100000`</p> |
+| `frequency` | <p>`uint64.lte`: `0`</p><p>`uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.BeaconTimingAns">Message `MACCommand.BeaconTimingAns`</a>
 
@@ -3895,7 +3895,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 | Field | Validations |
 | ----- | ----------- |
 | `channel_index` | <p>`uint32.lte`: `255`</p> |
-| `frequency` | <p>`uint64.gte`: `100000`</p> |
+| `frequency` | <p>`uint64.lte`: `0`</p><p>`uint64.gte`: `100000`</p> |
 | `min_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `max_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 
@@ -3917,7 +3917,7 @@ Only the components for which the keys were meant, will have the key-encryption-
 
 | Field | Validations |
 | ----- | ----------- |
-| `frequency` | <p>`uint64.gte`: `100000`</p> |
+| `frequency` | <p>`uint64.lte`: `0`</p><p>`uint64.gte`: `100000`</p> |
 | `data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MACCommand.PingSlotInfoReq">Message `MACCommand.PingSlotInfoReq`</a>

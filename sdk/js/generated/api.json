@@ -16302,6 +16302,10 @@
               "options": {
                 "validate.rules": [
                   {
+                    "name": "uint64.lte",
+                    "value": 0
+                  },
+                  {
                     "name": "uint64.gte",
                     "value": 100000
                   }
@@ -16944,6 +16948,10 @@
               "options": {
                 "validate.rules": [
                   {
+                    "name": "uint64.lte",
+                    "value": 0
+                  },
+                  {
                     "name": "uint64.gte",
                     "value": 100000
                   }
@@ -17039,6 +17047,10 @@
               "defaultValue": "",
               "options": {
                 "validate.rules": [
+                  {
+                    "name": "uint64.lte",
+                    "value": 0
+                  },
                   {
                     "name": "uint64.gte",
                     "value": 100000

@@ -4175,10 +4175,10 @@ func (m *MACCommand_NewChannelReq) ValidateFields(paths ...string) error {
 
 		case "frequency":
 
-			if m.GetFrequency() < 100000 {
+			if val := m.GetFrequency(); val > 0 && val < 100000 {
 				return MACCommand_NewChannelReqValidationError{
 					field:  "frequency",
-					reason: "value must be greater than or equal to 100000",
+					reason: "value must be outside range (0, 100000)",
 				}
 			}
 
@@ -5497,10 +5497,10 @@ func (m *MACCommand_PingSlotChannelReq) ValidateFields(paths ...string) error {
 		switch name {
 		case "frequency":
 
-			if m.GetFrequency() < 100000 {
+			if val := m.GetFrequency(); val > 0 && val < 100000 {
 				return MACCommand_PingSlotChannelReqValidationError{
 					field:  "frequency",
-					reason: "value must be greater than or equal to 100000",
+					reason: "value must be outside range (0, 100000)",
 				}
 			}
 
@@ -5783,10 +5783,10 @@ func (m *MACCommand_BeaconFreqReq) ValidateFields(paths ...string) error {
 		switch name {
 		case "frequency":
 
-			if m.GetFrequency() < 100000 {
+			if val := m.GetFrequency(); val > 0 && val < 100000 {
 				return MACCommand_BeaconFreqReqValidationError{
 					field:  "frequency",
-					reason: "value must be greater than or equal to 100000",
+					reason: "value must be outside range (0, 100000)",
 				}
 			}
 
