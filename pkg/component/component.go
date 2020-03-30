@@ -329,12 +329,12 @@ func (c *Component) Close() {
 	c.tcpListenersMu.Lock()
 	defer c.tcpListenersMu.Unlock()
 	for _, l := range c.tcpListeners {
-		err := l.lis.Close()
+		err := l.Close()
 		if err != nil && c.ctx.Err() == nil {
-			c.logger.WithError(err).Errorf("Error while stopping to listen on %s", l.lis.Addr())
+			c.logger.WithError(err).Errorf("Error while stopping to listen on %s", l.Addr())
 			continue
 		}
-		c.logger.Debugf("Stopped listening on %s", l.lis.Addr())
+		c.logger.Debugf("Stopped listening on %s", l.Addr())
 	}
 
 	if c.grpc != nil {
