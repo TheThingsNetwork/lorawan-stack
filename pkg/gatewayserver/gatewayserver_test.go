@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -86,9 +87,7 @@ func TestGatewayServer(t *testing.T) {
 		},
 	})
 	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
-	statsRedisClient, statsFlush := test.NewRedis(t, "gatewayserver_test")
-	defer statsFlush()
-	defer statsRedisClient.Close()
+
 	config := &gatewayserver.Config{
 		RequireRegisteredGateways:         false,
 		UpdateGatewayLocationDebounceTime: 0,
@@ -113,10 +112,17 @@ func TestGatewayServer(t *testing.T) {
 			WSPingInterval: wsPingInterval,
 		},
 		UpdateConnectionStatsDebounceTime: 0,
-		Stats: &gsredis.GatewayConnectionStatsRegistry{
-			Redis: statsRedisClient,
-		},
 	}
+	if os.Getenv("TEST_REDIS") == "1" {
+		statsRedisClient, statsFlush := test.NewRedis(t, "gatewayserver_test")
+		defer statsFlush()
+		defer statsRedisClient.Close()
+		statsRegistry := &gsredis.GatewayConnectionStatsRegistry{
+			Redis: statsRedisClient,
+		}
+		config.Stats = statsRegistry
+	}
+
 	gs, err := gatewayserver.New(c, config)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1058,9 +1064,14 @@ func TestGatewayServer(t *testing.T) {
 								time.Sleep(timeout)
 							}
 
+							time.Sleep(2 * timeout)
+
 							conn, ok := gs.GetConnection(ctx, ids)
 							a.So(ok, should.BeTrue)
-							gs.UpdateConnectionStats(ctx, conn)
+							a.So(conn.Stats(), should.NotBeNil)
+							if config.Stats != nil {
+								a.So(gs.UpdateConnectionStats(conn, true, true, true), should.BeNil)
+							}
 
 							stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 							if !a.So(err, should.BeNil) {
@@ -1324,9 +1335,14 @@ func TestGatewayServer(t *testing.T) {
 								t.Fatal("Expected downlink timeout")
 							}
 
+							time.Sleep(2 * timeout)
+
 							conn, ok := gs.GetConnection(ctx, ids)
 							a.So(ok, should.BeTrue)
-							gs.UpdateConnectionStats(ctx, conn)
+							a.So(conn.Stats(), should.NotBeNil)
+							if config.Stats != nil {
+								a.So(gs.UpdateConnectionStats(conn, true, true, true), should.BeNil)
+							}
 
 							stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
 							if !a.So(err, should.BeNil) {

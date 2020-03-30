@@ -3689,6 +3689,24 @@
       "file": "io.go"
     }
   },
+  "error:pkg/gatewayserver/redis:invalid_stats": {
+    "translations": {
+      "en": "invalid `{type}` stats in store"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/gatewayserver/redis:stats_not_found": {
+    "translations": {
+      "en": "gateway stats not found"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/redis",
+      "file": "registry.go"
+    }
+  },
   "error:pkg/gatewayserver/scheduling:conflict": {
     "translations": {
       "en": "scheduling conflict"
