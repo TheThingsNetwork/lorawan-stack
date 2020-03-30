@@ -87,10 +87,10 @@ func TestReadMultiConfig(t *testing.T) {
 	err = mgr.Unmarshal(res)
 	a.So(err, should.BeNil)
 
-	a.So(res.Foo, should.Resemble, "20")
+	a.So(res.Foo, should.Resemble, "10")
 	a.So(res.Bar, should.Resemble, map[string]string{
 		"a": "baz",
-		"b": "hey",
+		"b": "quu",
 		"c": "yo!",
 	})
 }
