@@ -46,6 +46,7 @@ type TemplateData struct {
 	IconPrefix      string   `name:"icon-prefix" description:"The prefix to put before the page icons (favicon.ico, touch-icon.png, og-image.png)"`
 	CSSFiles        []string `name:"css-file" description:"The names of the CSS files"`
 	JSFiles         []string `name:"js-file" description:"The names of the JS files"`
+	SentryDSN       string   `name:"sentry-dsn" description:"The Sentry DSN"`
 }
 
 // MountPath derives the mount path from the canonical URL of the config.
@@ -92,7 +93,8 @@ const appHTML = `
       window.APP_CONFIG={{.AppConfig}};
       window.SITE_NAME={{.SiteName}};
       window.SITE_TITLE={{.Title}};
-      window.SITE_SUB_TITLE={{.SubTitle}};
+			window.SITE_SUB_TITLE={{.SubTitle}};
+			window.SENTRY_DSN={{.SentryDSN}};
       {{with .PageData}}window.PAGE_DATA={{.}};{{end}}
     </script>
     {{range .JSFiles}}<script type="text/javascript" src="{{$assetsBaseURL}}/{{.}}"></script>{{end}}
