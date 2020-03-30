@@ -88,6 +88,7 @@ func (c *Component) RegisterReadinessCheck(name string, check healthcheck.Check)
 func (c *Component) serveWeb(lis net.Listener) error {
 	srv := http.Server{
 		Handler:           c,
+		ReadTimeout:       120 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	go func() {
