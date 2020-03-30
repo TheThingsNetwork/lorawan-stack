@@ -462,24 +462,80 @@ This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcra
 > Note: The operating system and architecture represent the name of the directory in `dist` in which the binaries are placed.
 > For example, the binaries for Darwin x64 (macOS) will be located at `dist/darwin_amd64`.
 
+A new version can be released from the `master` branch or a `backport` branch. The necessary steps for each are detailed below.
+
 > Note: To get the target version, you can run `version=$(./mage version:bumpXXX version:current)`, where xxx is the type of new release (minor/patch/RC).
 
-Releasing a new version consists of the following steps:
+### Release From Master
 
-|No|Action|Release Off Master|Release Backport|
-|---|---|---|---|
-|1| Create a `release/<version>` branch off the base branch|`$ git checkout -b master`|`$ git checkout -b backport/<minor>`|
-|2| Cherry pick commits to patch |Not Applicable| Repeat `git cherry-pick <commit>` for the necessary commits|
-|3| Update the `CHANGELOG.md` file. |See [Changelog Update](#changelog-update)|Same|
-|4| Update the `SECURITY.md` file and stage it for commit.| Only when bumping to a new minor|Not necessary|
-|5| Bump version. | See [Version Bump](#version-bump) |same|
-|6| Create a pull request to the base branch |Target `master`|Target `backport/<minor>`|
-|7| Once approved and merged, checkout locally|latest `master` branch after merging the PR|latest `backport/<minor>` after merging the PR|
-|8| Create a version tag|See [Version Tag](#version-tag)|same|
-|9| Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).|`git push origin ${version}`|same|
-|10|Edit the release notes on the Github releases page.| We typically copy-paste these from `CHANGELOG.md`|same|
-|11| Tag the Docker latest tag |See [Docker Latest Tag](#docker-latest-tag)|Not applicable|
+1. Create a `release/${version}` branch off the `master` branch.
+```bash
+$ git checkout master
+$ git checkout -b release/${version}
+```
 
+2. Update the `CHANGELOG.md` file as explained in the [Changelog Update](#changelog-update) section.
+Once complete, you can add the file to staging
+```bash
+$ git add CHANGELOG.md
+```
+
+3. If releasing a new minor version, update the `SECURITY.md` file and stage it for commit.
+```bash
+$ git add SECURITY.md
+```
+
+4. Bump version as explained in the section [Version Bump](#version-bump).
+
+5. Create a pull request targeting `master`.
+
+6. Once this PR is approved and merged, checkout the latest  `master` branch locally.
+
+7. Create a version tag as explained in the section [Version Tag](#version-tag).
+
+8. Push the version tag.
+```bash
+$ git push origin ${version}
+```
+Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
+
+9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
+
+10. For non RC releases, tag the Docker latest tag as explained in the section [Docker Latest Tag](#docker-latest-tag).
+
+### Release Backports
+
+1. Create a `release/<version>` branch off the `backport/<minor>` branch.
+```bash
+$ git checkout backport/<minor>
+$ git checkout -b release/${version}
+```
+
+2. Cherry pick the necessary commits.
+```bash
+$ git cherrypick <commit>
+```
+
+3. Update the `CHANGELOG.md` file as explained in the section [Changelog Update](#changelog-update). Once complete, you can add the file to staging.
+```bash
+$ git add CHANGELOG.md
+```
+
+4. Bump version as explained in the section [Version Bump](#version-bump).
+
+5. Create a pull request targeting `backport/<minor>`.
+
+6. Once this PR is approved and merged, checkout the latest  `backport/<minor>` branch locally.
+
+7. Create a version tag as explained in the section [Version Tag](#version-tag).
+
+8. Push the version tag.
+```bash
+$ git push origin ${version}
+```
+Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
+
+9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
 
 ###  Changelog Update
 
@@ -504,11 +560,6 @@ Updating the `CHANGELOG.md` consists of the following steps:
 
     ### Security
     ```
-
-Once complete, you can add the file to staging
-```bash
-$ git add CHANGELOG.md
-```
 
 ### Version Bump
 
@@ -564,8 +615,6 @@ $ docker pull TheThingsNetwork/lorawan-stack:${versionDockerTag}
 $ docker tag TheThingsNetwork/lorawan-stack:{versionDockerTag} TheThingsNetwork/lorawan-stack:latest
 $ docker push TheThingsNetwork/lorawan-stack:latest
 ```
-
-> Note: This step is not applicable for RCs.
 
 ## Troubleshooting
 
