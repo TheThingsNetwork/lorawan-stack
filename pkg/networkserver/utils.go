@@ -67,7 +67,7 @@ func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 
 // DefaultClassBTimeout is the default time-out for the device to respond to class B downlink messages.
 // When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
-const DefaultClassBTimeout = time.Minute
+const DefaultClassBTimeout = 10 * time.Minute
 
 func deviceClassBTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
 	if dev.MACSettings != nil && dev.MACSettings.ClassBTimeout != nil {
@@ -81,7 +81,7 @@ func deviceClassBTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.
 
 // DefaultClassCTimeout is the default time-out for the device to respond to class C downlink messages.
 // When waiting for a response times out, the downlink message is considered lost, and the downlink task triggers again.
-const DefaultClassCTimeout = 15 * time.Second
+const DefaultClassCTimeout = 5 * time.Minute
 
 func deviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
 	if dev.MACSettings != nil && dev.MACSettings.ClassCTimeout != nil {
