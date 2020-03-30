@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>Create End Device | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.6.3/guides/getting-started/console/create-end-device/" />
+  <link rel="icon" type="image/png" href="/v3.6.3/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.6.3/css/theme.min.e246cfe68b58bf0354a0d23df366dac7d501931cd2629adf06cb5d98115de18b.css" integrity="sha256-4kbP5otYvwNUoNI982bax9UBkxzSYprfBstdmBFd4Ys=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Create End Device">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Create End Device">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.6.3/guides/getting-started/console/create-end-device/">
+  <meta name="twitter:title" content="Create End Device" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.6.3/">
+        <img src="/v3.6.3/img/TTS-logo.svg">
+        <p class="navbar-item is-size-7">v3.6.3</p>
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.6.3/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.6.3/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.6.3/components/">Components</a>
+        <a class="navbar-item" href="/v3.6.3/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.6.3/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Console</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.6.3/guides/getting-started/console/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.6.3/guides/getting-started/console/login/" class="">Login</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.3/guides/getting-started/console/create-gateway/" class="">Create Gateway</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.3/guides/getting-started/console/create-application/" class="">Create Application</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.3/guides/getting-started/console/create-end-device/" class="is-active">Create End Device</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Create End Device</h1>
+
+<div class="content"><p>Learn how to register an end device using the Console.</p>
+<h2 id="step-by-step">Step by step</h2>
+<p>Go to <strong>Devices</strong> in the left menu and click on <strong>+ Add Device</strong> to reach the end device registration page. Fill the device ID, the LoRaWAN MAC and PHY versions and the frequency plan used by the device.</p>
+<blockquote>
+<p>Note: The PHY version represent the revision of the LoRAWAN Regional Parameters that the device expects, and must be correlated with the MAC version.</p>
+</blockquote>
+<figure>
+    <img src="device-creation-1.png"
+         alt="Creating a new device"/> 
+</figure>
+
+<h3 id="over-the-air-activation-otaa-device">Over-The-Air-Activation (OTAA) Device</h3>
+<p>After filling the fields in the <strong>General Settings</strong> section, scroll to the lower part of the device registration page and make sure that &ldquo;Over The Air Activation (OTAA)&rdquo; is selected. Fill the JoinEUI (AppEUI in LoRaWAN versions before 1.1), the DevEUI and AppKey. The NwkKey is only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press <strong>Create Device</strong> to create the device.</p>
+<figure>
+    <img src="device-creation-otaa.png"
+         alt="Creating an OTAA device"/> 
+</figure>
+
+<p>You will now reach the device overview page for your device. The end device should now be able to join the private network.</p>
+<figure>
+    <img src="device-otaa-created.png"
+         alt="OTAA device overview"/> 
+</figure>
+
+<h3 id="activation-by-personalization-abp-device">Activation By Personalization (ABP) Device</h3>
+<p>After filling the fields in the &ldquo;General Settings&rdquo; section, scroll to the lower part of the device registration page and make sure that &ldquo;Activation By Personalization (ABP)&rdquo; is selected. Fill the Device Address, the FNwkSIntKey (NwkSKey in LoRaWAN versions before 1.1) and the AppSKey. The other key fields are only needed for LoRaWAN version 1.1 or later. All other fields on the page are optional. Press <strong>Create Device</strong> to create the device.</p>
+<figure>
+    <img src="device-creation-abp.png"
+         alt="Creating an ABP device"/> 
+</figure>
+
+<p>You will now reach the device overview page for your device. The end device should now be able to communicate with the private network.</p>
+<figure>
+    <img src="device-abp-created.png"
+         alt="ABP device overview"/> 
+</figure></div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.6.3/guides/getting-started/console/create-application/">← Create Application</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.6.3/guides/">Guides</a></p>
+        <p><a class="" href="/v3.6.3/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.6.3/components/">Components</a></p>
+        <p><a class="" href="/v3.6.3/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Adrian-Stefan Mares on 20 Feb 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/63099808daf93e70e75a5b1c955e22f8ee8a60fe">
+      doc: Extract Console setup guide into separate pages
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/guides/getting-started/console/create-end-device/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.6.3/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>

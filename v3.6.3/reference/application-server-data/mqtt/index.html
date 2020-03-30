@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.62.2" />
+  <title>MQTT Server | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.6.3/reference/application-server-data/mqtt/" />
+  <link rel="icon" type="image/png" href="/v3.6.3/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.6.3/css/theme.min.e246cfe68b58bf0354a0d23df366dac7d501931cd2629adf06cb5d98115de18b.css" integrity="sha256-4kbP5otYvwNUoNI982bax9UBkxzSYprfBstdmBFd4Ys=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="MQTT Server">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="MQTT Server">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.6.3/reference/application-server-data/mqtt/">
+  <meta name="twitter:title" content="MQTT Server" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.6.3/">
+        <img src="/v3.6.3/img/TTS-logo.svg">
+        <p class="navbar-item is-size-7">v3.6.3</p>
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.6.3/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.6.3/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.6.3/components/">Components</a>
+        <a class="navbar-item" href="/v3.6.3/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.6.3/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Application Server Data</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.6.3/reference/application-server-data/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.6.3/reference/application-server-data/webhooks/" class="">HTTP Webhooks</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.3/reference/application-server-data/mqtt/" class="is-active">MQTT Server</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.6.3/reference/application-server-data/data-formats/" class="">Data Formats</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">MQTT Server</h1>
+
+<div class="content"><p>The Application Server exposes a MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API key to authenticate.</p>
+<h2 id="creating-an-api-key">Creating an API Key</h2>
+<p>The Console provides the required connection information and can be used to create an API key for authentication. In your application select the <strong>MQTT</strong> submenu from the <strong>Integrations</strong> side menu.</p>
+<figure>
+    <img src="mqtt-integration.png"
+         alt="MQTT connection information"/> 
+</figure>
+
+<p>You can now click on the <strong>Generate new API key</strong> button in order to generate an API key which can be used to send and receive traffic from MQTT.</p>
+<figure>
+    <img src="mqtt-key-created.png"
+         alt="MQTT API key created"/> 
+</figure>
+
+<p>Make sure to copy your API key now, since it will no longer be visible after leaving the page for security reasons. You can now login using an MQTT client with the application ID <code>app1</code> as user name and the newly generated API key as password.</p>
+<h2 id="mqtt-clients">MQTT Clients</h2>
+<p>There are many MQTT clients available. Great clients are <code>mosquitto_pub</code> and <code>mosquitto_sub</code>, part of <a href="https://mosquitto.org">Mosquitto</a>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># Tip: when using `mosquitto_sub`, pass the `-d` flag to see the topics messages get published on.</span> 
+<span class="c1"># For example:</span>
+$ mosquitto_sub -h thethings.example.com -t <span class="s2">&#34;#&#34;</span> -u app1 -P <span class="s2">&#34;NNSXS.VEEBURF3KR77ZR..&#34;</span> -d
+</code></pre></div><h2 id="subscribing-to-upstream-traffic">Subscribing to Upstream Traffic</h2>
+<p>The Application Server publishes on the following topics:</p>
+<ul>
+<li><code>v3/{application id}/devices/{device id}/join</code></li>
+<li><code>v3/{application id}/devices/{device id}/up</code></li>
+<li><code>v3/{application id}/devices/{device id}/down/queued</code></li>
+<li><code>v3/{application id}/devices/{device id}/down/sent</code></li>
+<li><code>v3/{application id}/devices/{device id}/down/ack</code></li>
+<li><code>v3/{application id}/devices/{device id}/down/nack</code></li>
+<li><code>v3/{application id}/devices/{device id}/down/failed</code></li>
+</ul>
+<p>While you could subscribe to separate topics, for the tutorial subscribe to <code>#</code> to subscribe to all messages.</p>
+<p>With your MQTT client subscribed, when a device joins the network, a <code>join</code> message gets published. For example, for a device ID <code>dev1</code>, the message will be published on the topic <code>v3/app1/devices/dev1/join</code>.</p>
+<details><summary>Show example</summary>
+```json
+{
+  "end_device_ids": {
+    "device_id": "dev1",
+    "application_ids": {
+      "application_id": "app1"
+    },
+    "dev_eui": "4200000000000000",
+    "join_eui": "4200000000000000",
+    "dev_addr": "01DA1F15"
+  },
+  "correlation_ids": [
+    "gs:conn:01D2CSNX7FJVKQPCVG612QF1TX",
+    "gs:uplink:01D2CT834K2YD17ZWZ6357HC0Z",
+    "ns:uplink:01D2CT834KNYD7BT2NHK5R1WVA",
+    "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D2CT834KJ4AVSD1SJ637NAV6",
+    "as:up:01D2CT83AXQFQYQ35SR74CTWKH"
+  ],
+  "join_accept": {
+    "session_key_id": "AWiZpAyXrAfEkUNkBljRoA=="
+  }
+}
+```
+</details>
+<p>You can use the correlation IDs to follow messages as they pass through The Things Stack.</p>
+<p>When the device sends an uplink message, a message will be published to the topic <code>v3/{application id}/devices/{device id}/up</code>.</p>
+<details><summary>Show example</summary>
+```json
+{
+  "end_device_ids": {
+    "device_id": "dev1",
+    "application_ids": {
+      "application_id": "app1"
+    },
+    "dev_eui": "4200000000000000",
+    "join_eui": "4200000000000000",
+    "dev_addr": "01DA1F15"
+  },
+  "correlation_ids": [
+    "gs:conn:01D2CSNX7FJVKQPCVG612QF1TX",
+    "gs:uplink:01D2CV8HF62ME0D7MZWE38HHH8",
+    "ns:uplink:01D2CV8HF6FYJHKZ45YY1DB3MR",
+    "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01D2CV8HF6XR7ZFVK768PDG3J4",
+    "as:up:01D2CV8HNGJ57G25BW0FCZNY07"
+  ],
+  "uplink_message": {
+    "session_key_id": "AWiZpAyXrAfEkUNkBljRoA==",
+    "f_port": 15,
+    "frm_payload": "VGVtcGVyYXR1cmUgPSAwLjA=",
+    "rx_metadata": [{
+      "gateway_ids": {
+        "gateway_id": "eui-0242020000247803",
+        "eui": "0242020000247803"
+      },
+      "time": "2019-01-29T13:02:34.981Z",
+      "timestamp": 1283325000,
+      "rssi": -35,
+      "snr": 5,
+      "uplink_token": "CiIKIAoUZXVpLTAyNDIwMjAwMDAyNDc4MDMSCAJCAgAAJHgDEMj49+ME"
+    }],
+    "settings": {
+      "data_rate": {
+        "lora": {
+          "bandwidth": 125000,
+          "spreading_factor": 7
+        }
+      },
+      "data_rate_index": 5,
+      "coding_rate": "4/6",
+      "frequency": "868500000",
+      "gateway_channel_index": 2,
+      "device_channel_index": 2
+    }
+  }
+}
+```
+</details>
+<h2 id="publishing-downlink-traffic">Publishing Downlink Traffic</h2>
+<p>Downlinks can be scheduled by publishing the message to the topic <code>v3/{application id}/devices/{device id}/down/push</code>.</p>
+<p>For example, to send an unconfirmed downlink message to the device <code>dev1</code> in application <code>app1</code> with the hexadecimal payload <code>BE EF</code> on <code>FPort</code> 15 with normal priority, use the topic <code>v3/app1/devices/dev1/down/push</code> with the following contents:</p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;downlinks&#34;</span><span class="p">:</span> <span class="p">[</span><span class="p">{</span>
+    <span class="nt">&#34;f_port&#34;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="nt">&#34;frm_payload&#34;</span><span class="p">:</span> <span class="s2">&#34;vu8=&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;priority&#34;</span><span class="p">:</span> <span class="s2">&#34;NORMAL&#34;</span>
+  <span class="p">}</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div><blockquote>
+<p>Hint: Use <a href="https://v2.cryptii.com/hexadecimal/base64">this handy tool</a> to convert hexadecimal to base64.</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># If you use `mosquitto_pub`, use the following command:</span>
+$ mosquitto_pub -h thethings.example.com <span class="se">\
+</span><span class="se"></span>  -t <span class="s2">&#34;v3/app1/devices/dev1/down/push&#34;</span> <span class="se">\
+</span><span class="se"></span>  -u app1 -P <span class="s2">&#34;NNSXS.VEEBURF3KR77ZR..&#34;</span> <span class="se">\
+</span><span class="se"></span>  -m <span class="s1">&#39;{&#34;downlinks&#34;:[{&#34;f_port&#34;: 15,&#34;frm_payload&#34;:&#34;vu8=&#34;,&#34;priority&#34;: &#34;NORMAL&#34;}]}&#39;</span> <span class="se">\
+</span><span class="se"></span>  -d<span class="sb">`</span>
+</code></pre></div><p>It is also possible to send multiple downlink messages on a single push because <code>downlinks</code> is an array. Instead of <code>/push</code>, you can also use <code>/replace</code> to replace the downlink queue. Replacing with an empty array clears the downlink queue.</p>
+<blockquote>
+<p>Note: if you do not specify a priority, the default priority <code>LOWEST</code> is used. You can specify <code>LOWEST</code>, <code>LOW</code>, <code>BELOW_NORMAL</code>, <code>NORMAL</code>, <code>ABOVE_NORMAL</code>, <code>HIGH</code> and <code>HIGHEST</code>.</p>
+</blockquote>
+<p>The Things Stack supports some cool features, such as confirmed downlink with your own correlation IDs. For example, you can push this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;downlinks&#34;</span><span class="p">:</span> <span class="p">[</span><span class="p">{</span>
+    <span class="nt">&#34;f_port&#34;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="nt">&#34;frm_payload&#34;</span><span class="p">:</span> <span class="s2">&#34;vu8=&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;priority&#34;</span><span class="p">:</span> <span class="s2">&#34;HIGH&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;confirmed&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;correlation_ids&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-correlation-id&#34;</span><span class="p">]</span>
+  <span class="p">}</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div><p>Once the downlink gets acknowledged, a message is published to the topic <code>v3/{application id}/devices/{device id}/down/ack</code>.</p>
+<details><summary>Show example</summary>
+```json
+{
+  "end_device_ids": {
+    "device_id": "dev1",
+    "application_ids": {
+      "application_id": "app1"
+    },
+    "dev_eui": "4200000000000000",
+    "join_eui": "4200000000000000",
+    "dev_addr": "00E6F42A"
+  },
+  "correlation_ids": [
+    "my-correlation-id",
+    "..."
+  ],
+  "downlink_ack": {
+    "session_key_id": "AWnj0318qrtJ7kbudd8Vmw==",
+    "f_port": 15,
+    "f_cnt": 11,
+    "frm_payload": "vu8=",
+    "confirmed": true,
+    "priority": "NORMAL",
+    "correlation_ids": [
+      "my-correlation-id",
+      "..."
+    ]
+  }
+}
+```
+</details>
+<p>You see the correlation ID <code>my-correlation-id</code> of your downlink message. You can add multiple custom correlation IDs, for example to reference events or identifiers of your application.</p></div>
+
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.6.3/reference/application-server-data/webhooks/">← HTTP Webhooks</a>
+<a class="button is-pulled-right" href="/v3.6.3/reference/application-server-data/data-formats/">Data Formats →</a>
+</div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.6.3/guides/">Guides</a></p>
+        <p><a class="" href="/v3.6.3/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.6.3/components/">Components</a></p>
+        <p><a class="" href="/v3.6.3/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Adrian-Stefan Mares on 17 Feb 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/8fc7d42dccc58ecc4cba04de72af3d20b323d90c">
+      doc: Add JSON format reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/application-server-data/mqtt/_index.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.6.3/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
