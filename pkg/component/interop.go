@@ -32,6 +32,7 @@ func (c *Component) RegisterInterop(s interop.Registerer) {
 func (c *Component) serveInterop(lis net.Listener) error {
 	srv := http.Server{
 		Handler:           c.interop,
+		ReadTimeout:       120 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	go func() {

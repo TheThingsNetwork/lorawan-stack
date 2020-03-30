@@ -259,6 +259,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 				srv := http.Server{
 					Handler:           bsWebServer,
+					ReadTimeout:       120 * time.Second,
 					ReadHeaderTimeout: 5 * time.Second,
 				}
 				go func() {

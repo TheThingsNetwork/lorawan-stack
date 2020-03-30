@@ -18,7 +18,6 @@ import (
 	"crypto/tls"
 	"net"
 
-	"github.com/soheilhy/cmux"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 )
@@ -32,41 +31,49 @@ var (
 type Listener interface {
 	TLS(opts ...TLSConfigOption) (net.Listener, error)
 	TCP() (net.Listener, error)
+	Addr() net.Addr
 	Close() error
 }
 
 type listener struct {
-	c       *Component
-	lis     net.Listener
-	mux     cmux.CMux
+	c *Component
+
 	tcp     net.Listener
 	tcpUsed bool
 	tls     net.Listener
 	tlsUsed bool
 }
 
+func (l *listener) Addr() net.Addr {
+	return l.tcp.Addr()
+}
+
 func (l *listener) TLS(opts ...TLSConfigOption) (net.Listener, error) {
-	if l.tlsUsed {
-		return nil, errors.New("TLS listener already in use")
+	if l.tcpUsed || l.tlsUsed {
+		return nil, errors.New("listener already in use")
 	}
 	config, err := l.c.GetTLSServerConfig(l.c.Context(), opts...)
 	if err != nil {
 		return nil, err
 	}
+	l.tls = tls.NewListener(l.tcp, config)
 	l.tlsUsed = true
-	return tls.NewListener(l.tls, config), nil
+	return l.tls, nil
 }
 
 func (l *listener) TCP() (net.Listener, error) {
-	if l.tcpUsed {
-		return nil, errors.New("TCP listener already in use")
+	if l.tcpUsed || l.tlsUsed {
+		return nil, errors.New("listener already in use")
 	}
 	l.tcpUsed = true
 	return l.tcp, nil
 }
 
 func (l *listener) Close() error {
-	return l.lis.Close()
+	if l.tlsUsed {
+		return l.tls.Close()
+	}
+	return l.tcp.Close()
 }
 
 // ListenTCP listens on a TCP address and allows for TCP and TLS on the same port.
@@ -80,22 +87,11 @@ func (c *Component) ListenTCP(address string) (Listener, error) {
 		if err != nil {
 			return nil, err
 		}
-		mux := cmux.New(lis)
 		l = &listener{
 			c:   c,
-			lis: lis,
-			mux: mux,
-			tls: mux.Match(cmux.TLS()),
-			tcp: mux.Match(cmux.Any()),
+			tcp: lis,
 		}
 		c.tcpListeners[address] = l
-		go func() {
-			logger := c.logger.WithField("address", l.lis.Addr().String())
-			logger.Debug("Start serving")
-			if err := l.mux.Serve(); err != nil && c.ctx.Err() == nil {
-				logger.WithError(err).Errorf("Serve failed")
-			}
-		}()
 	}
 	return l, nil
 }
