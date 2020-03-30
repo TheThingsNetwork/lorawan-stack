@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [3.6.3] (2020-03-30)
+
+### Fixed
+
+-  Limited throughput in upstream handlers in Gateway Server when one gateway's upstream handler is busy.
+
 ## [3.6.2] (2020-03-19)
 
 ### Fixed
@@ -678,7 +684,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.2...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.3...HEAD
+[3.6.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.2...v3.6.3
 [3.6.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.1...v3.6.2
 [3.6.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.5.3...v3.6.0
