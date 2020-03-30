@@ -33,6 +33,7 @@ class UnitInput extends React.PureComponent {
     // eslint-disable-next-line react/no-unused-prop-types
     decode: PropTypes.func,
     encode: PropTypes.func,
+    error: PropTypes.bool,
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -62,6 +63,7 @@ class UnitInput extends React.PureComponent {
     },
     required: false,
     value: undefined,
+    error: false,
   }
 
   @bind
@@ -84,6 +86,7 @@ class UnitInput extends React.PureComponent {
       value: { duration, unit },
       onBlur,
       required,
+      error,
     } = this.props
 
     const selectTimeUnitComponent = (
@@ -109,6 +112,7 @@ class UnitInput extends React.PureComponent {
             value={duration}
             onChange={this.handleChange}
             required={required}
+            error={error}
           />
           {selectTimeUnitComponent}
         </div>
