@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 // nsScheduleWindow returns minimum time.Duration between downlink being added to the queue and it being sent to GS for transmission.
@@ -752,4 +753,23 @@ func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*
 	if err := ns.applicationUplinks.Add(ctx, ups...); err != nil {
 		logger.WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
 	}
+}
+
+func rxMetadataStats(ctx context.Context, mds []*ttnpb.RxMetadata) (gateways int, maxSNR float32) {
+	if len(mds) == 0 {
+		return 0, 0
+	}
+	gtws := make(map[string]struct{}, len(mds))
+	maxSNR = mds[0].SNR
+	for _, md := range mds {
+		if md.PacketBroker != nil {
+			gtws[fmt.Sprintf("%s@%s/%s", md.PacketBroker.ForwarderID, md.PacketBroker.ForwarderNetID, md.PacketBroker.ForwarderTenantID)] = struct{}{}
+		} else {
+			gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
+		}
+		if md.SNR > maxSNR {
+			maxSNR = md.SNR
+		}
+	}
+	return len(gtws), maxSNR
 }

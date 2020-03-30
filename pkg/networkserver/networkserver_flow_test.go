@@ -214,7 +214,7 @@ func (env FlowTestEnvironment) AssertScheduleDownlink(ctx context.Context, asser
 			if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx context.Context, role ttnpb.ClusterRole, ids ttnpb.Identifiers) bool {
 				return a.So(AllTrue(
 					a.So(role, should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER),
-					a.So(ids, should.Resemble, path.GatewayIdentifiers),
+					a.So(ids, should.Resemble, *path.GatewayIdentifiers),
 				), should.BeTrue)
 			},
 				test.ClusterGetPeerResponse{
