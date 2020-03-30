@@ -33,6 +33,7 @@ class Devices {
     if (!api) {
       throw new Error('Cannot initialize device service without api object.')
     }
+
     this._api = api
     this._stackConfig = stackConfig
     this._proxy = proxy
