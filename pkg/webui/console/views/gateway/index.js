@@ -90,6 +90,7 @@ import PropTypes from '../../../lib/prop-types'
       'status_public',
       'auto_update',
       'schedule_downlink_late',
+      'update_location_from_status',
       'update_channel',
       'schedule_anytime_delay',
     ]),

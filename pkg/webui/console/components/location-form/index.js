@@ -64,6 +64,10 @@ const hasLocationSet = location =>
 
 class LocationForm extends Component {
   static propTypes = {
+    /** Flag specifying whether the delete location button can be enabled */
+    allowDelete: PropTypes.bool,
+    /** Additional fields to be passed as children */
+    children: PropTypes.node,
     entityId: PropTypes.string.isRequired,
     /** The title message shown at the top of the form */
     formTitle: PropTypes.message.isRequired,
@@ -73,18 +77,26 @@ class LocationForm extends Component {
       longitude: PropTypes.number,
       altitude: PropTypes.number,
     }),
+    locationFieldsDisabled: PropTypes.bool,
     /** The handler for the delete function of the form */
     onDelete: PropTypes.func.isRequired,
     /** The handler for the submit function of the form */
     onSubmit: PropTypes.func.isRequired,
+    validationSchema: PropTypes.shape({
+      cast: PropTypes.func.isRequired,
+    }),
   }
 
   static defaultProps = {
+    children: null,
     initialValues: {
       latitude: undefined,
       longitude: undefined,
       altitude: undefined,
     },
+    validationSchema,
+    locationFieldsDisabled: false,
+    allowDelete: true,
   }
 
   constructor(props) {
@@ -99,7 +111,7 @@ class LocationForm extends Component {
 
   @bind
   async onSubmit(values, { resetForm, setSubmitting }) {
-    const { onSubmit, entityId } = this.props
+    const { onSubmit, entityId, validationSchema } = this.props
 
     this.setState({ error: '' })
 
@@ -135,7 +147,14 @@ class LocationForm extends Component {
   }
 
   render() {
-    const { initialValues, formTitle } = this.props
+    const {
+      initialValues,
+      formTitle,
+      validationSchema,
+      children,
+      locationFieldsDisabled,
+      allowDelete,
+    } = this.props
     const { error } = this.state
 
     const entryExists = hasLocationSet(initialValues)
@@ -153,6 +172,7 @@ class LocationForm extends Component {
           formikRef={this.form}
         >
           <Message component="h4" content={formTitle} />
+          {children}
           <Form.Field
             type="number"
             step="any"
@@ -160,7 +180,8 @@ class LocationForm extends Component {
             description={sharedMessages.latitudeDesc}
             name="latitude"
             component={Input}
-            required
+            required={!locationFieldsDisabled}
+            disabled={locationFieldsDisabled}
           />
           <Form.Field
             type="number"
@@ -169,7 +190,8 @@ class LocationForm extends Component {
             description={sharedMessages.longitudeDesc}
             name="longitude"
             component={Input}
-            required
+            required={!locationFieldsDisabled}
+            disabled={locationFieldsDisabled}
           />
           <Form.Field
             type="number"
@@ -178,7 +200,8 @@ class LocationForm extends Component {
             description={sharedMessages.altitudeDesc}
             name="altitude"
             component={Input}
-            required
+            required={!locationFieldsDisabled}
+            disabled={locationFieldsDisabled}
           />
           <SubmitBar>
             <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
@@ -190,7 +213,7 @@ class LocationForm extends Component {
                 message: m.deleteWarning,
               }}
               onApprove={this.onDelete}
-              disabled={!entryExists}
+              disabled={!entryExists || !allowDelete}
               danger
               naked
             />

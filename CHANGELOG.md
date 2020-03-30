@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- View/edit `update_location_from_status` gateway property using the Console.
+
 ### Changed
 
 - Default DevStatus periodicity is increased, which means that, by default, DevStatusReq will be scheduled less often.

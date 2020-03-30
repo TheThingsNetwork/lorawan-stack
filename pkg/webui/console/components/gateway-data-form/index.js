@@ -45,7 +45,6 @@ const m = defineMessages({
   gatewayDescDescription:
     'Optional gateway description; can also be used to save notes about the gateway',
   statusDescription: 'The status of this gateway may be publicly displayed',
-  locationDescription: 'The location of this gateway may be publicly displayed',
   scheduleDownlinkLateDescription: 'Enable server-side buffer of downlink messages',
   autoUpdateDescription: 'Gateway can be updated automatically',
   updateChannelDescription: 'Channel for gateway automatic updates',
@@ -84,6 +83,7 @@ const validationSchema = Yup.object().shape({
   location_public: Yup.boolean().default(false),
   status_public: Yup.boolean().default(false),
   schedule_downlink_late: Yup.boolean().default(false),
+  update_location_from_status: Yup.boolean().default(false),
   auto_update: Yup.boolean().default(false),
   schedule_anytime_delay: Yup.string().matches(delayRegexp, sharedMessages.validateDelayFormat),
 })
@@ -208,13 +208,6 @@ class GatewayDataForm extends React.Component {
           placeholder={sharedMessages.addressPlaceholder}
           name="gateway_server_address"
           component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.gatewayLocation}
-          name="location_public"
-          component={Checkbox}
-          label={sharedMessages.public}
-          description={m.locationDescription}
         />
         <Form.Field
           title={sharedMessages.gatewayStatus}
