@@ -470,7 +470,7 @@ message MACCommand {
     option (gogoproto.populate) = false;
 
     uint32 channel_index = 1 [(validate.rules).uint32.lte = 255];
-    uint64 frequency = 2 [(validate.rules).uint64.gte = 100000]; // Channel frequency (Hz).
+    uint64 frequency = 2 [(validate.rules).uint64 = { lte: 0, gte: 100000 }]; // Channel frequency (Hz).
     DataRateIndex min_data_rate_index = 3 [(validate.rules).enum.defined_only = true];
     DataRateIndex max_data_rate_index = 4 [(validate.rules).enum.defined_only = true];
   }
@@ -537,7 +537,7 @@ message MACCommand {
   message PingSlotChannelReq {
     option (gogoproto.populate) = false;
 
-    uint64 frequency = 1 [(validate.rules).uint64.gte = 100000]; // Ping slot channel frequency (Hz).
+    uint64 frequency = 1 [(validate.rules).uint64 = { lte: 0, gte: 100000 }]; // Ping slot channel frequency (Hz).
     DataRateIndex data_rate_index = 2 [(validate.rules).enum.defined_only = true];
   }
   message PingSlotChannelAns {
@@ -553,7 +553,7 @@ message MACCommand {
   message BeaconFreqReq {
     option (gogoproto.populate) = false;
 
-    uint64 frequency = 1 [(validate.rules).uint64.gte = 100000]; // Frequency of the Class B beacons (Hz).
+    uint64 frequency = 1 [(validate.rules).uint64 = { lte: 0, gte: 100000 }]; // Frequency of the Class B beacons (Hz).
   }
   message BeaconFreqAns {
     bool frequency_ack = 1;
