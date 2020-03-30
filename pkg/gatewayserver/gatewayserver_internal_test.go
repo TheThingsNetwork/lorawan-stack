@@ -14,10 +14,4 @@
 
 package gatewayserver
 
-var (
-	ErrSchedule = errSchedule
-)
-
-func init() {
-	maxUpstreamHandlers = 1
-}
+var ErrSchedule = errSchedule
