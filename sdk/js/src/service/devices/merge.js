@@ -49,12 +49,20 @@ export default function mergeDevice(
             // Ignore empty object values, as they might override legitimate values
             continue
           }
+
           traverse(val).forEach(function(e) {
+            if (Array.isArray(e) && e.length > 0) {
+              traverse(result).set(path, val)
+
+              return
+            }
+
             if (this.isLeaf) {
               if (typeof e === 'object' && Object.keys(e).length === 0) {
                 // Ignore empty object values
                 return
               }
+
               // Write the sub object leaf into the result
               traverse(result).set([...path, ...this.path], e)
             }
