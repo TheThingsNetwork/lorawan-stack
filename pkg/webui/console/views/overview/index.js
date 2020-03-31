@@ -29,9 +29,9 @@ import Spinner from '../../../components/spinner'
 import Link from '../../../components/link'
 import Animation from '../../../lib/components/animation'
 import { selectApplicationsTotalCount } from '../../store/selectors/applications'
-import { getApplicationsList, GET_APPS_LIST } from '../../store/actions/applications'
+import { getApplicationsList, GET_APPS_LIST_BASE } from '../../store/actions/applications'
 import { selectGatewaysTotalCount } from '../../store/selectors/gateways'
-import { getGatewaysList, GET_GTWS_LIST } from '../../store/actions/gateways'
+import { getGatewaysList, GET_GTWS_LIST_BASE } from '../../store/actions/gateways'
 import { createFetchingSelector } from '../../store/selectors/fetching'
 import { selectUserId, selectUserRights } from '../../store/selectors/user'
 
@@ -70,6 +70,8 @@ const componentMap = {
   js: sharedMessages.componentJoinServer,
 }
 
+const overviewFetchingSelector = createFetchingSelector([GET_APPS_LIST_BASE, GET_GTWS_LIST_BASE])
+
 @connect(
   function(state) {
     const rights = selectUserRights(state)
@@ -77,7 +79,7 @@ const componentMap = {
     return {
       applicationCount: selectApplicationsTotalCount(state),
       gatewayCount: selectGatewaysTotalCount(state),
-      fetching: createFetchingSelector([GET_APPS_LIST, GET_GTWS_LIST])(state),
+      fetching: overviewFetchingSelector(state),
       userId: selectUserId(state),
       mayCreateApplications: mayCreateApplications.check(rights),
       mayViewApplications: mayViewApplications.check(rights),
