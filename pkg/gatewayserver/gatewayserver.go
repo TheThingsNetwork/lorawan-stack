@@ -501,16 +501,17 @@ type upstreamHost struct {
 }
 
 type upstreamItem struct {
-	ctx  context.Context
-	val  interface{}
-	host *upstreamHost
+	ctx context.Context
+	val interface{}
 }
 
 func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
-	ctx := conn.Context()
-	gtw := conn.Gateway()
-	protocol := conn.Frontend().Protocol()
-	logger := log.FromContext(ctx)
+	var (
+		ctx      = conn.Context()
+		gtw      = conn.Gateway()
+		protocol = conn.Frontend().Protocol()
+		logger   = log.FromContext(ctx)
+	)
 	defer func() {
 		gs.connections.Delete(unique.ID(ctx, gtw.GatewayIdentifiers))
 		registerGatewayDisconnect(ctx, gtw.GatewayIdentifiers, protocol)
@@ -518,10 +519,8 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		close(conn.upstreamDone)
 	}()
 
-	handleFn := func(host *upstreamHost) {
+	handleFn := func(ctx context.Context, host *upstreamHost) {
 		defer recoverHandler(ctx)
-		defer host.handleWg.Done()
-		defer atomic.AddInt32(&host.handlers, -1)
 		for {
 			select {
 			case <-ctx.Done():
@@ -602,8 +601,10 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 	}
 
 	for {
-		ctx := ctx
-		var val interface{}
+		var (
+			ctx = ctx
+			val interface{}
+		)
 		select {
 		case <-ctx.Done():
 			return
@@ -627,22 +628,25 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			// TODO: Send Tx acknowledgement upstream (https://github.com/TheThingsNetwork/lorawan-stack/issues/76)
 			continue
 		}
+		item := upstreamItem{ctx, val}
 		for _, host := range hosts {
-			item := upstreamItem{
-				ctx:  ctx,
-				val:  val,
-				host: host,
-			}
+			host := host
 			select {
 			case host.handleCh <- item:
 			default:
 				if atomic.LoadInt32(&host.handlers) < maxUpstreamHandlers {
 					atomic.AddInt32(&host.handlers, 1)
 					host.handleWg.Add(1)
-					go handleFn(host)
-					go func(host *upstreamHost) {
+					registerUpstreamHandlerStart(ctx, host.name)
+					go func() {
+						defer host.handleWg.Done()
+						defer atomic.AddInt32(&host.handlers, -1)
+						defer registerUpstreamHandlerStop(ctx, host.name)
+						handleFn(ctx, host)
+					}()
+					go func() {
 						host.handleCh <- item
-					}(host)
+					}()
 					continue
 				}
 				logger.WithField("name", host.name).Warn("Upstream handler busy, fail message")

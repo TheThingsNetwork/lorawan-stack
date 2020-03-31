@@ -98,6 +98,14 @@ var gsMetrics = &messageMetrics{
 		},
 		[]string{protocol},
 	),
+	upstreamHandlers: metrics.NewContextualGaugeVec(
+		prometheus.GaugeOpts{
+			Subsystem: subsystem,
+			Name:      "upstream_handlers",
+			Help:      "Number of upstream handlers",
+		},
+		[]string{host},
+	),
 	statusReceived: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -194,6 +202,7 @@ func init() {
 
 type messageMetrics struct {
 	gatewaysConnected   *metrics.ContextualGaugeVec
+	upstreamHandlers    *metrics.ContextualGaugeVec
 	statusReceived      *metrics.ContextualCounterVec
 	statusForwarded     *metrics.ContextualCounterVec
 	statusDropped       *metrics.ContextualCounterVec
@@ -209,6 +218,7 @@ type messageMetrics struct {
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.gatewaysConnected.Describe(ch)
+	m.upstreamHandlers.Describe(ch)
 	m.statusReceived.Describe(ch)
 	m.statusForwarded.Describe(ch)
 	m.statusDropped.Describe(ch)
@@ -224,6 +234,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.gatewaysConnected.Collect(ch)
+	m.upstreamHandlers.Collect(ch)
 	m.statusReceived.Collect(ch)
 	m.statusForwarded.Collect(ch)
 	m.statusDropped.Collect(ch)
@@ -245,6 +256,14 @@ func registerGatewayConnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, p
 func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string) {
 	events.Publish(evtGatewayDisconnect(ctx, ids, nil))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
+}
+
+func registerUpstreamHandlerStart(ctx context.Context, host string) {
+	gsMetrics.upstreamHandlers.WithLabelValues(ctx, host).Inc()
+}
+
+func registerUpstreamHandlerStop(ctx context.Context, host string) {
+	gsMetrics.upstreamHandlers.WithLabelValues(ctx, host).Dec()
 }
 
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, protocol string) {
