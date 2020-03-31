@@ -254,7 +254,7 @@ func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnp
 
 func registerForwardStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string) {
 	events.Publish(evtForwardStatus(ctx, gtw, status))
-	gsMetrics.statusForwarded.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.statusForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
 func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string, err error) {
@@ -268,7 +268,7 @@ func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.G
 
 func registerFailStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string) {
 	events.Publish(evtFailStatus(ctx, gtw, status))
-	gsMetrics.statusFailed.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.statusFailed.WithLabelValues(ctx, ns).Inc()
 }
 
 func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
