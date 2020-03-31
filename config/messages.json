@@ -3896,6 +3896,15 @@
       "file": "gatewayserver.go"
     }
   },
+  "error:pkg/gatewayserver:no_route": {
+    "translations": {
+      "en": "no route for `{host}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "gatewayserver.go"
+    }
+  },
   "error:pkg/gatewayserver:not_connected": {
     "translations": {
       "en": "gateway `{gateway_uid}` not connected"

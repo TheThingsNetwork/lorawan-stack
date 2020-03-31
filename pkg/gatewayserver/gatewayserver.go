@@ -481,6 +481,7 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 var (
 	errNoNetworkServer = errors.DefineNotFound("no_network_server", "no Network Server found to handle message")
 	errHostHandle      = errors.Define("host_handle", "host `{host}` failed to handle message")
+	errNoRoute         = errors.DefineAborted("no_route", "no route for `{host}`")
 )
 
 var (
@@ -507,11 +508,12 @@ type upstreamItem struct {
 
 func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 	ctx := conn.Context()
+	gtw := conn.Gateway()
+	protocol := conn.Frontend().Protocol()
 	logger := log.FromContext(ctx)
 	defer func() {
-		ids := conn.Gateway().GatewayIdentifiers
-		gs.connections.Delete(unique.ID(ctx, ids))
-		registerGatewayDisconnect(ctx, ids, conn.Frontend().Protocol())
+		gs.connections.Delete(unique.ID(ctx, gtw.GatewayIdentifiers))
+		registerGatewayDisconnect(ctx, gtw.GatewayIdentifiers, protocol)
 		logger.Info("Disconnected")
 		close(conn.upstreamDone)
 	}()
@@ -542,32 +544,32 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 							logger = logger.WithField("dev_addr", *ids.DevAddr)
 						}
 						logger.Debug("Drop message")
-						registerDropUplink(ctx, conn.Gateway(), msg.UplinkMessage, host.name, err)
+						registerDropUplink(ctx, gtw, msg.UplinkMessage, host.name, err)
 					}
 					ids, err := lorawan.GetUplinkMessageIdentifiers(msg.RawPayload)
 					if err != nil {
 						drop(ttnpb.EndDeviceIdentifiers{}, err)
 						break
 					}
-					handler := item.host.handler(&ids)
+					handler := host.handler(&ids)
 					if handler == nil {
+						drop(ids, errNoRoute.WithAttributes("host", host.name))
 						break
 					}
-					if err := handler.HandleUplink(ctx, conn.Gateway().GatewayIdentifiers, ids, msg); err != nil {
-						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", item.host.name))
+					if err := handler.HandleUplink(ctx, gtw.GatewayIdentifiers, ids, msg); err != nil {
+						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", host.name))
 						break
 					}
-					registerForwardUplink(ctx, conn.Gateway(), msg.UplinkMessage, item.host.name)
+					registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
 				case *ttnpb.GatewayStatus:
-					registerReceiveStatus(ctx, conn.Gateway(), msg)
-					handler := item.host.handler(nil)
+					handler := host.handler(nil)
 					if handler == nil {
 						break
 					}
-					if err := handler.HandleStatus(ctx, conn.Gateway().GatewayIdentifiers, msg); err != nil {
-						registerDropStatus(ctx, conn.Gateway(), msg, item.host.name, err)
+					if err := handler.HandleStatus(ctx, gtw.GatewayIdentifiers, msg); err != nil {
+						registerDropStatus(ctx, gtw, msg, host.name, err)
 					} else {
-						registerForwardStatus(ctx, conn.Gateway(), msg, item.host.name)
+						registerForwardStatus(ctx, gtw, msg, host.name)
 					}
 				}
 			}
@@ -608,18 +610,19 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		case msg := <-conn.Up():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
-			registerReceiveUplink(ctx, conn.Gateway(), msg.UplinkMessage, conn.Frontend().Protocol())
 			val = msg
+			registerReceiveUplink(ctx, gtw, msg.UplinkMessage, protocol)
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 			val = msg
+			registerReceiveStatus(ctx, gtw, msg, protocol)
 		case msg := <-conn.TxAck():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
 			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
 			if msg.Result == ttnpb.TxAcknowledgment_SUCCESS {
-				registerSuccessDownlink(ctx, conn.Gateway())
+				registerSuccessDownlink(ctx, gtw, protocol)
 			} else {
-				registerFailDownlink(ctx, conn.Gateway(), msg)
+				registerFailDownlink(ctx, gtw, msg, protocol)
 			}
 			// TODO: Send Tx acknowledgement upstream (https://github.com/TheThingsNetwork/lorawan-stack/issues/76)
 			continue
@@ -642,12 +645,12 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 					}(host)
 					continue
 				}
-				logger.WithField("name", host.name).Warn("Upstream handler busy, drop message")
+				logger.WithField("name", host.name).Warn("Upstream handler busy, fail message")
 				switch msg := val.(type) {
 				case *ttnpb.UplinkMessage:
-					registerFailUplink(ctx, conn.Gateway(), msg, host.name)
+					registerFailUplink(ctx, gtw, msg, host.name)
 				case *ttnpb.GatewayStatus:
-					registerFailStatus(ctx, conn.Gateway(), msg, host.name)
+					registerFailStatus(ctx, gtw, msg, host.name)
 				}
 			}
 		}
