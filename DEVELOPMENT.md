@@ -464,7 +464,7 @@ This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcra
 
 A new version can be released from the `master` branch or a `backport` branch. The necessary steps for each are detailed below.
 
-> Note: To get the target version, you can run `version=$(./mage version:bumpXXX version:current)`, where xxx is the type of new release (minor/patch/RC).
+> Note: To get the target version, you can run `version=$(./mage version:bumpXXX version:current)`, where xxx is the type of new release (minor/patch/RC). Check the section [Version Bump](#version-bump) for more information.
 
 ### Release From Master
 
@@ -473,34 +473,24 @@ A new version can be released from the `master` branch or a `backport` branch. T
 $ git checkout master
 $ git checkout -b release/${version}
 ```
-
 2. Update the `CHANGELOG.md` file as explained in the [Changelog Update](#changelog-update) section.
 Once complete, you can add the file to staging
 ```bash
 $ git add CHANGELOG.md
 ```
-
 3. If releasing a new minor version, update the `SECURITY.md` file and stage it for commit.
 ```bash
 $ git add SECURITY.md
 ```
-
 4. Bump version as explained in the section [Version Bump](#version-bump).
-
 5. Create a pull request targeting `master`.
-
 6. Once this PR is approved and merged, checkout the latest  `master` branch locally.
-
 7. Create a version tag as explained in the section [Version Tag](#version-tag).
-
-8. Push the version tag.
+8. Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
 ```bash
 $ git push origin ${version}
 ```
-Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
-
 9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
-
 10. For non RC releases, tag the Docker latest tag as explained in the section [Docker Latest Tag](#docker-latest-tag).
 
 ### Release Backports
@@ -510,31 +500,22 @@ Once this is done, CI automatically starts building and pushing to package manag
 $ git checkout backport/<minor>
 $ git checkout -b release/${version}
 ```
-
 2. Cherry pick the necessary commits.
 ```bash
 $ git cherrypick <commit>
 ```
-
 3. Update the `CHANGELOG.md` file as explained in the section [Changelog Update](#changelog-update). Once complete, you can add the file to staging.
 ```bash
 $ git add CHANGELOG.md
 ```
-
 4. Bump version as explained in the section [Version Bump](#version-bump).
-
 5. Create a pull request targeting `backport/<minor>`.
-
 6. Once this PR is approved and merged, checkout the latest  `backport/<minor>` branch locally.
-
 7. Create a version tag as explained in the section [Version Tag](#version-tag).
-
-8. Push the version tag.
+8. Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
 ```bash
 $ git push origin ${version}
 ```
-Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
-
 9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
 
 ###  Changelog Update
@@ -576,19 +557,15 @@ $ ./mage version:bumpRC      # bumps a release candidate version (from 3.4.5-rc1
 $ ./mage version:bumpRelease # bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
 ```
 > Note: These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1).
-
 2. Write the version files
 
 There are a few files that need to contain the latest version. The new version can be written using
-
 ```bash
 $ ./mage version:files
 ```
-
 3. Commit the version bump
 
 A bump commit can be created by running
-
 ```bash
 $ ./mage version:commitBump
 ```
@@ -602,14 +579,13 @@ To tag a new version run
 $ ./mage version:bumpXXX version:tag
 ```
 
-For RCs, Make sure to use the same bumping combination (ex: `verion:bumpXXX version:bumpYYY`) as used in the bump step above.
-
+For RCs, make sure to use the same bumping combination (ex: `version:bumpXXX version:bumpYYY`) as used in the bump step above.
 
 ### Docker Latest Tag
 
-When the CI system pushed the Docker image, it gets tagged as the current minor and patch version. If this release is not a backport but a latest stable release, you should manually tag and push `latest`:
+When the CI system pushed the Docker image, it gets tagged as the current minor and patch version. If this release is not a backport but a latest stable one, you should manually tag and push `latest`:
 
-```
+```bash
 $ versionDockerTag=${version#"v"} # v3.6.1 -> 3.6.1
 $ docker pull TheThingsNetwork/lorawan-stack:${versionDockerTag}
 $ docker tag TheThingsNetwork/lorawan-stack:{versionDockerTag} TheThingsNetwork/lorawan-stack:latest
