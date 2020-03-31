@@ -462,10 +462,65 @@ This will compile binaries for all supported platforms, `deb`, `rpm` and Snapcra
 > Note: The operating system and architecture represent the name of the directory in `dist` in which the binaries are placed.
 > For example, the binaries for Darwin x64 (macOS) will be located at `dist/darwin_amd64`.
 
-Releasing a new version consists of the following steps:
+A new version can be released from the `master` branch or a `backport` branch. The necessary steps for each are detailed below.
 
-1. Creating a `release/<version>` branch off `master` or `backport/<minor>` (further, called "release branch") (e.g. `release/v3.2.1` or `backport/v3.2`).
-2. Updating the `CHANGELOG.md` file:
+> Note: To get the target version, you can run `version=$(./mage version:bumpXXX version:current)`, where xxx is the type of new release (minor/patch/RC). Check the section [Version Bump](#version-bump) for more information.
+
+### Release From Master
+
+1. Create a `release/${version}` branch off the `master` branch.
+```bash
+$ git checkout master
+$ git checkout -b release/${version}
+```
+2. Update the `CHANGELOG.md` file as explained in the [Changelog Update](#changelog-update) section.
+Once complete, you can add the file to staging
+```bash
+$ git add CHANGELOG.md
+```
+3. If releasing a new minor version, update the `SECURITY.md` file and stage it for commit.
+```bash
+$ git add SECURITY.md
+```
+4. Bump version as explained in the section [Version Bump](#version-bump).
+5. Create a pull request targeting `master`.
+6. Once this PR is approved and merged, checkout the latest  `master` branch locally.
+7. Create a version tag as explained in the section [Version Tag](#version-tag).
+8. Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
+```bash
+$ git push origin ${version}
+```
+9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
+10. For non RC releases, tag the Docker latest tag as explained in the section [Docker Latest Tag](#docker-latest-tag).
+
+### Release Backports
+
+1. Create a `release/<version>` branch off the `backport/<minor>` branch.
+```bash
+$ git checkout backport/<minor>
+$ git checkout -b release/${version}
+```
+2. Cherry pick the necessary commits.
+```bash
+$ git cherrypick <commit>
+```
+3. Update the `CHANGELOG.md` file as explained in the section [Changelog Update](#changelog-update). Once complete, you can add the file to staging.
+```bash
+$ git add CHANGELOG.md
+```
+4. Bump version as explained in the section [Version Bump](#version-bump).
+5. Create a pull request targeting `backport/<minor>`.
+6. Once this PR is approved and merged, checkout the latest  `backport/<minor>` branch locally.
+7. Create a version tag as explained in the section [Version Tag](#version-tag).
+8. Push the version tag. Once this is done, CI automatically starts building and pushing to package managers. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases).
+```bash
+$ git push origin ${version}
+```
+9. Edit the release notes on the Github releases page, which is typically copied from `CHANGELOG.md`.
+
+###  Changelog Update
+
+Updating the `CHANGELOG.md` consists of the following steps:
   - Change the **Unreleased** section to the new version and add date obtained via `date +%Y-%m-%d` (e.g. `## [3.2.1] - 2019-10-11`)
   - Check if we didn't forget anything important
   - Remove empty subsections
@@ -486,20 +541,14 @@ Releasing a new version consists of the following steps:
 
     ### Security
     ```
-3. Updating the `SECURITY.md` file with the supported versions
-4. Bumping the version
-5. Writing the version files
-6. Creating the version bump commit
-7. Creating a pull request from release branch containing all changes made so far to `master`
-8. Merging all commits from release branch to `master` locally via `git merge --ff-only release/<version>`
-9. Creating the version tag
-10. Pushing the version tag
-11. Pushing `master`
-12. Building the release and pushing to package managers (this is done by CI)
-13. Tagging the Docker `latest` tag if this is a latest stable release
+
+### Version Bump
+
+This involves the following three steps
+
+1. Bump
 
 Our development tooling helps with this process. The `mage` command has the following commands for version bumps:
-
 ```bash
 $ ./mage version:bumpMajor   # bumps a major version (from 3.4.5 -> 4.0.0).
 $ ./mage version:bumpMinor   # bumps a minor version (from 3.4.5 -> 3.5.0).
@@ -507,41 +556,34 @@ $ ./mage version:bumpPatch   # bumps a patch version (from 3.4.5 -> 3.4.6).
 $ ./mage version:bumpRC      # bumps a release candidate version (from 3.4.5-rc1 -> 3.4.5-rc2).
 $ ./mage version:bumpRelease # bumps a pre-release to a release version (from 3.4.5-rc1 -> 3.4.5).
 ```
+> Note: These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1).
+2. Write the version files
 
-These bumps can be combined (i.e. `version:bumpMinor version:bumpRC` bumps 3.4.5 -> 3.5.0-rc1). Apart from these bump commands, we have commands for writing version files (`version:files`), creating the bump commit (`version:commitBump`) and the version tag (`version:tag`).
-
-A typical release process is executed on the `master` branch. However, if you are doing a backport to apply patches via cherry-picking to a previous version, create or checkout the minor's backport branch (i.e. `v3.6` as `<minor>`) with the latest released patch as start point (i.e. `v3.6.2` as `<patch>`):
-
+There are a few files that need to contain the latest version. The new version can be written using
 ```bash
-$ git checkout -b "backport/<minor>" <patch>
-$ git cherry-pick <commit> # cherry-pick commits to patch
-$ git push origin "backport/<minor>"
+$ ./mage version:files
+```
+3. Commit the version bump
+
+A bump commit can be created by running
+```bash
+$ ./mage version:commitBump
 ```
 
-When `HEAD` is what you want to release (either `master` or `backport/<minor>`):
+> Note: The steps above can be combined to a single command (i.e., `$ ./mage version:bumpPatch version:files version:commitBump`).
 
+### Version Tag
+
+To tag a new version run
 ```bash
-$ version=$(./mage version:bumpPatch version:current)
-$ git checkout -b "release/${version}"
-$ ${EDITOR:-vim} CHANGELOG.md SECURITY.md # edit CHANGELOG.md and SECURITY.md
-$ git add CHANGELOG.md SECURITY.md
-$ ./mage version:bumpPatch version:files version:commitBump
-$ git push origin "release/${version}"
+$ ./mage version:bumpXXX version:tag
 ```
 
-After this, open a pull request from `release/${version}`. After it is approved:
+For RCs, make sure to use the same bumping combination (ex: `version:bumpXXX version:bumpYYY`) as used in the bump step above.
 
-```bash
-$ git checkout <target> # master or backport/<minor>
-$ git merge --ff-only "release/${version}"
-$ ./mage version:bumpPatch version:tag
-$ git push origin ${version}
-$ git push origin <target>
-```
+### Docker Latest Tag
 
-After pushing the tag, our CI system will start building the release. When this is done, you'll find a new release on the [releases page](https://github.com/TheThingsNetwork/lorawan-stack/releases). After this is done, you'll need to edit the release notes. We typically copy-paste these from `CHANGELOG.md`.
-
-When the CI system pushed the Docker image, it gets tagged as the current minor and patch version. If this release is not a backport but a latest stable release, you should manually tag and push `latest`:
+When the CI system pushed the Docker image, it gets tagged as the current minor and patch version. If this release is not a backport but a latest stable one, you should manually tag and push `latest`:
 
 ```bash
 $ versionDockerTag=${version#"v"} # v3.6.1 -> 3.6.1
@@ -550,7 +592,9 @@ $ docker tag TheThingsNetwork/lorawan-stack:{versionDockerTag} TheThingsNetwork/
 $ docker push TheThingsNetwork/lorawan-stack:latest
 ```
 
-### Console Troubleshooting
+## Troubleshooting
+
+### Console
 
 #### Problem: Assets are not found
 
