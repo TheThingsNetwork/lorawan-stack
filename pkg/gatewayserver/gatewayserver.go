@@ -530,7 +530,6 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				ctx := item.ctx
 				switch msg := item.val.(type) {
 				case *ttnpb.GatewayUplinkMessage:
-					registerReceiveUplink(ctx, conn.Gateway(), msg.UplinkMessage, host.name)
 					drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
 						logger := logger.WithError(err)
 						if ids.JoinEUI != nil {
@@ -609,6 +608,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 		case msg := <-conn.Up():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			msg.CorrelationIDs = append(msg.CorrelationIDs, events.CorrelationIDsFromContext(ctx)...)
+			registerReceiveUplink(ctx, conn.Gateway(), msg.UplinkMessage, conn.Frontend().Protocol())
 			val = msg
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
