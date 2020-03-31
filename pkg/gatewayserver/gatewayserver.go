@@ -493,8 +493,7 @@ var (
 
 type upstreamHost struct {
 	name     string
-	handler  func(ids *ttnpb.EndDeviceIdentifiers) upstream.Handler
-	callOpts []grpc.CallOption
+	handler  upstream.Handler
 	handlers int32
 	handleWg sync.WaitGroup
 	handleCh chan upstreamItem
@@ -550,22 +549,29 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 						drop(ttnpb.EndDeviceIdentifiers{}, err)
 						break
 					}
-					handler := host.handler(&ids)
-					if handler == nil {
+					var pass bool
+					switch {
+					case ids.DevAddr != nil:
+						for _, prefix := range host.handler.GetDevAddrPrefixes() {
+							if ids.DevAddr.HasPrefix(prefix) {
+								pass = true
+								break
+							}
+						}
+					default:
+						pass = true
+					}
+					if !pass {
 						drop(ids, errNoRoute.WithAttributes("host", host.name))
 						break
 					}
-					if err := handler.HandleUplink(ctx, gtw.GatewayIdentifiers, ids, msg); err != nil {
+					if err := host.handler.HandleUplink(ctx, gtw.GatewayIdentifiers, ids, msg); err != nil {
 						drop(ids, errHostHandle.WithCause(err).WithAttributes("host", host.name))
 						break
 					}
 					registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
 				case *ttnpb.GatewayStatus:
-					handler := host.handler(nil)
-					if handler == nil {
-						break
-					}
-					if err := handler.HandleStatus(ctx, gtw.GatewayIdentifiers, msg); err != nil {
+					if err := host.handler.HandleStatus(ctx, gtw.GatewayIdentifiers, msg); err != nil {
 						registerDropStatus(ctx, gtw, msg, host.name, err)
 					} else {
 						registerForwardStatus(ctx, gtw, msg, host.name)
@@ -577,23 +583,9 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
 	for name, handler := range gs.upstreamHandlers {
-		handler := handler
-		passDevAddr := func(prefixes []types.DevAddrPrefix, devAddr types.DevAddr) bool {
-			for _, prefix := range prefixes {
-				if devAddr.HasPrefix(prefix) {
-					return true
-				}
-			}
-			return false
-		}
 		host := &upstreamHost{
-			name: name,
-			handler: func(ids *ttnpb.EndDeviceIdentifiers) upstream.Handler {
-				if ids != nil && ids.DevAddr != nil && !passDevAddr(handler.GetDevAddrPrefixes(), *ids.DevAddr) {
-					return nil
-				}
-				return handler
-			},
+			name:     name,
+			handler:  handler,
 			handleCh: make(chan upstreamItem),
 		}
 		hosts = append(hosts, host)
