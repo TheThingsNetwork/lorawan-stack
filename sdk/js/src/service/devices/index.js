@@ -365,6 +365,13 @@ class Devices {
 
     const deviceMap = traverse(deviceEntityMap)
     const paths = traverse(patch).reduce(function(acc) {
+      // Only add the top level path for arrays, otherwise
+      // paths are generated for each item in the array.
+      if (Array.isArray(this.node)) {
+        acc.push(this.path)
+        this.update(this.node, true)
+      }
+
       if (this.isLeaf) {
         const path = this.path
 
