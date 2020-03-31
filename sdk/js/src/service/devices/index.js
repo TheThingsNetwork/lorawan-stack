@@ -275,6 +275,14 @@ class Devices {
   }
 
   async _deleteDevice(applicationId, deviceId, components = ['is', 'ns', 'as', 'js']) {
+    if (!Boolean(applicationId)) {
+      throw new Error('Missing application ID for device')
+    }
+
+    if (!Boolean(deviceId)) {
+      throw new Error('Missing end device ID')
+    }
+
     const params = {
       routeParams: {
         'application_ids.application_id': applicationId,
@@ -298,6 +306,7 @@ class Devices {
       undefined,
       true,
     )
+
     return deleteParts.every(e => Boolean(e.device) && Object.keys(e.device).length === 0)
       ? {}
       : deleteParts
@@ -557,7 +566,13 @@ class Devices {
   }
 
   async deleteById(applicationId, deviceId) {
-    const result = this._deleteDevice(applicationId, deviceId)
+    const result = await this._deleteDevice(applicationId, deviceId)
+
+    // Filter out errored requests
+    const errors = result.filter(part => part.hasErrored)
+    if (errors.length > 0) {
+      throw errors[0].error
+    }
 
     return result
   }
