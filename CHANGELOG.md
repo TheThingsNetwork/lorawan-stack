@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - End device location display bug when deleting the location entry in the Console.
 - GS could panic when gateway connection stats were updated while updating the registry.
 - Local CLI and stack config files now properly override global config.
+- Error display on failed end device deletion in the Console.
 
 ### Security
 
