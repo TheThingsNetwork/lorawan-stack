@@ -240,8 +240,8 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 	return ctx.Err()
 }
 
-func processDownlink(dev *ttnpb.EndDevice) func(lastUpMsg *ttnpb.UplinkMessage, downMsg *ttnpb.DownlinkMessage) error {
-	return func(lastUpMsg *ttnpb.UplinkMessage, downMsg *ttnpb.DownlinkMessage) (err error) {
+func processDownlink(dev *ttnpb.EndDevice) func(lastUpMsg *ttnpb.Message, downMsg *ttnpb.DownlinkMessage) error {
+	return func(lastUpMsg *ttnpb.Message, downMsg *ttnpb.DownlinkMessage) (err error) {
 		phy, err := band.GetByID(dev.FrequencyPlanID)
 		if err != nil {
 			return err
@@ -261,10 +261,10 @@ func processDownlink(dev *ttnpb.EndDevice) func(lastUpMsg *ttnpb.UplinkMessage, 
 
 			var devEUI, joinEUI types.EUI64
 			var devNonce types.DevNonce
-			if joinReq := lastUpMsg.GetPayload().GetJoinRequestPayload(); joinReq != nil {
+			if joinReq := lastUpMsg.GetJoinRequestPayload(); joinReq != nil {
 				devEUI, joinEUI = joinReq.DevEUI, joinReq.JoinEUI
 				devNonce = joinReq.DevNonce
-			} else if rejoinReq := lastUpMsg.GetPayload().GetRejoinRequestPayload(); rejoinReq != nil {
+			} else if rejoinReq := lastUpMsg.GetRejoinRequestPayload(); rejoinReq != nil {
 				devEUI, joinEUI = rejoinReq.DevEUI, rejoinReq.JoinEUI
 				devNonce = types.DevNonce{byte(rejoinReq.RejoinCnt), byte(rejoinReq.RejoinCnt >> 8)}
 			}
@@ -296,7 +296,7 @@ func processDownlink(dev *ttnpb.EndDevice) func(lastUpMsg *ttnpb.UplinkMessage, 
 					jsIntKey,
 					0xFF,
 					*dev.JoinEUI,
-					lastUpMsg.Payload.GetJoinRequestPayload().DevNonce,
+					lastUpMsg.GetJoinRequestPayload().DevNonce,
 					append([]byte{downMsg.RawPayload[0]}, joinAcceptBytes...),
 				)
 			} else {
@@ -353,7 +353,7 @@ func processDownlink(dev *ttnpb.EndDevice) func(lastUpMsg *ttnpb.UplinkMessage, 
 			} else {
 				var key types.AES128Key
 				key = *dev.Session.SessionKeys.GetSNwkSIntKey().Key
-				expectedMIC, err = crypto.ComputeDownlinkMIC(key, macPayload.DevAddr, lastUpMsg.GetPayload().GetMACPayload().FCnt, macPayload.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
+				expectedMIC, err = crypto.ComputeDownlinkMIC(key, macPayload.DevAddr, lastUpMsg.GetMACPayload().FCnt, macPayload.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
 			}
 			if err != nil {
 				return err
@@ -440,13 +440,10 @@ var (
 				Session: &ttnpb.Session{},
 			})
 
-			var joinRequest *ttnpb.UplinkMessage
-
+			var joinRequest *ttnpb.Message
 			return simulate(cmd,
 				func(upMsg *ttnpb.UplinkMessage) error {
-					joinRequest = upMsg
-
-					upMsg.Payload = &ttnpb.Message{
+					joinRequest = &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
 							MType: ttnpb.MType_JOIN_REQUEST,
 							Major: ttnpb.Major_LORAWAN_R1,
@@ -460,7 +457,7 @@ var (
 						},
 					}
 
-					buf, err := lorawan.MarshalMessage(*upMsg.Payload)
+					buf, err := lorawan.MarshalMessage(*joinRequest)
 					if err != nil {
 						return err
 					}
@@ -474,9 +471,8 @@ var (
 					if err != nil {
 						return err
 					}
-					upMsg.Payload.MIC = mic[:]
-					upMsg.RawPayload = append(buf, upMsg.Payload.MIC...)
-
+					joinRequest.MIC = mic[:]
+					upMsg.RawPayload = append(buf, joinRequest.MIC...)
 					return nil
 				},
 				func(downMsg *ttnpb.DownlinkMessage) error {
@@ -525,30 +521,18 @@ var (
 				},
 			})
 
-			var dataUplink *ttnpb.UplinkMessage
-
+			var dataUplink *ttnpb.Message
 			return simulate(cmd,
 				func(upMsg *ttnpb.UplinkMessage) error {
-					dataUplink = upMsg
-
-					macPayload := &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
-							DevAddr: dataUplinkParams.DevAddr,
-							FCtrl: ttnpb.FCtrl{
-								ADR:       dataUplinkParams.ADR,
-								ADRAckReq: dataUplinkParams.ADRAckReq,
-								Ack:       dataUplinkParams.Ack,
-							},
-							FCnt: dataUplinkParams.FCnt,
-						},
-						FPort: dataUplinkParams.FPort,
 					}
 
-					key := dataUplinkParams.AppSKey
+					var key types.AES128Key
 					if dataUplinkParams.FPort == 0 {
 						key = dataUplinkParams.NwkSEncKey
+					} else {
+						key = dataUplinkParams.AppSKey
 					}
-					buf, err := crypto.EncryptUplink(
+					frmPayload, err := crypto.EncryptUplink(
 						key,
 						dataUplinkParams.DevAddr,
 						dataUplinkParams.FCnt,
@@ -557,23 +541,37 @@ var (
 					if err != nil {
 						return err
 					}
-					macPayload.FRMPayload = buf
 
-					upMsg.Payload = &ttnpb.Message{
+					mType := ttnpb.MType_UNCONFIRMED_UP
+					if dataUplinkParams.Confirmed {
+						mType = ttnpb.MType_CONFIRMED_UP
+					}
+					dataUplink = &ttnpb.Message{
 						MHDR: ttnpb.MHDR{
-							MType: ttnpb.MType_UNCONFIRMED_UP,
+							MType: mType,
 							Major: ttnpb.Major_LORAWAN_R1,
 						},
-						Payload: &ttnpb.Message_MACPayload{MACPayload: macPayload},
+						Payload: &ttnpb.Message_MACPayload{
+							MACPayload: &ttnpb.MACPayload{
+								FHDR: ttnpb.FHDR{
+									DevAddr: dataUplinkParams.DevAddr,
+									FCtrl: ttnpb.FCtrl{
+										ADR:       dataUplinkParams.ADR,
+										ADRAckReq: dataUplinkParams.ADRAckReq,
+										Ack:       dataUplinkParams.Ack,
+									},
+									FCnt:  dataUplinkParams.FCnt,
+								},
+								FPort:      dataUplinkParams.FPort,
+								FRMPayload: frmPayload,
+							},
+						},
 					}
-					if dataUplinkParams.Confirmed {
-						upMsg.Payload.MType = ttnpb.MType_CONFIRMED_UP
-					}
-					buf, err = lorawan.MarshalMessage(*upMsg.Payload)
+
+					buf, err := lorawan.MarshalMessage(*dataUplink)
 					if err != nil {
 						return err
 					}
-
 					var mic [4]byte
 					if uplinkParams.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 						mic, err = crypto.ComputeUplinkMIC(
@@ -594,9 +592,8 @@ var (
 							buf,
 						)
 					}
-					upMsg.Payload.MIC = mic[:]
-					upMsg.RawPayload = append(buf, upMsg.Payload.MIC...)
-
+					dataUplink.MIC = mic[:]
+					upMsg.RawPayload = append(buf, dataUplink.MIC...)
 					return nil
 				},
 				func(downMsg *ttnpb.DownlinkMessage) error {
