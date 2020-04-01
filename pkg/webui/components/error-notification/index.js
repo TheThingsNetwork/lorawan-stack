@@ -16,11 +16,14 @@ import React from 'react'
 
 import Notification from '../notification'
 import { isBackend, toMessageProps } from '../../lib/errors/utils'
+import { error } from '../../lib/log'
 import PropTypes from '../../lib/prop-types'
 
 const ErrorNotification = function({ content, ...rest }) {
   const message = toMessageProps(content)
   let details = undefined
+
+  error(content) // Log the error if in development mode
 
   if (isBackend(content)) {
     details = content
