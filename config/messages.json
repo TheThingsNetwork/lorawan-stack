@@ -1223,6 +1223,15 @@
       "file": "end_devices.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:f_opts": {
+    "translations": {
+      "en": "invalid f_opts"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "simulate.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:fail_write": {
     "translations": {
       "en": "failed to write `{file}`"
