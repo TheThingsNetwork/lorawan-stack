@@ -121,3 +121,21 @@ func (c DownlinkPriorityConfig) Parse() (DownlinkPriorities, error) {
 	}
 	return p, nil
 }
+
+var DefaultConfig = Config{
+	DeduplicationWindow: 200 * time.Millisecond,
+	CooldownWindow:      time.Second,
+	DownlinkPriorities: DownlinkPriorityConfig{
+		JoinAccept:             "highest",
+		MACCommands:            "highest",
+		MaxApplicationDownlink: "high",
+	},
+	DefaultMACSettings: MACSettingConfig{
+		ADRMargin:              func(v float32) *float32 { return &v }(DefaultADRMargin),
+		DesiredRx1Delay:        func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_5),
+		ClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(time.Minute),
+		ClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(DefaultClassCTimeout),
+		StatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(DefaultStatusTimePeriodicity),
+		StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(DefaultStatusCountPeriodicity),
+	},
+}
