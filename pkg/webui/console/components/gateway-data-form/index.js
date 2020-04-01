@@ -14,7 +14,7 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { defineMessages, FormattedMessage } from 'react-intl'
+import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
 import Form from '../../../components/form'
@@ -235,15 +235,13 @@ class GatewayDataForm extends React.Component {
           title={m.scheduleAnyTimeDelay}
           name="schedule_anytime_delay"
           component={UnitInput}
-          description={
-            <FormattedMessage
-              {...m.scheduleAnyTimeDescription}
-              values={{
-                minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY,
-                defaultValue: delay.DEFAULT_GATEWAY_SCHEDULE_ANYTIME_DELAY,
-              }}
-            />
-          }
+          description={{
+            ...m.scheduleAnyTimeDescription,
+            values: {
+              minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY,
+              defaultValue: delay.DEFAULT_GATEWAY_SCHEDULE_ANYTIME_DELAY,
+            },
+          }}
           units={[
             { label: m.miliseconds, value: 'ms' },
             { label: m.seconds, value: 's' },
@@ -253,14 +251,12 @@ class GatewayDataForm extends React.Component {
           onChange={this.onScheduleAnytimeDelayChange}
           decode={this.decodeDelayValue}
           warning={
-            shouldDisplayWarning ? (
-              <FormattedMessage
-                {...m.delayWarning}
-                values={{ minimumValue: `${delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY}` }}
-              />
-            ) : (
-              undefined
-            )
+            shouldDisplayWarning
+              ? {
+                  ...m.delayWarning,
+                  values: { minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY },
+                }
+              : undefined
           }
           required
         />
