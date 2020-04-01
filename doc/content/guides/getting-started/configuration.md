@@ -192,6 +192,8 @@ console:
       base-url: 'https://thethings.example.com/api/v3'
 
   oauth:
+    authorize-url: 'https://thethings.example.com/oauth/authorize'
+    token-url: 'https://thethings.example.com/oauth/token'
     client-id: 'console'
     client-secret: 'console'          # choose or generate a secret (*)
 ```
