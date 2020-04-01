@@ -258,7 +258,10 @@ func (m *Manager) inCLIFlags(path string) bool {
 // The parsed config files will be merged into the config struct.
 func (m *Manager) ReadInConfig() error {
 	files := m.viper.GetStringSlice(m.configFlag)
-	for _, file := range files {
+	// read config files in reverse order, so config files listed first take precedence
+	for index := len(files) - 1; index >= 0; index-- {
+		file := files[index]
+
 		// ignore default config files that are missing or do not have read permissions
 		if m.isDefault(file) && !m.inCLIFlags(file) {
 			if _, err := os.Stat(file); os.IsNotExist(err) || os.IsPermission(err) {
