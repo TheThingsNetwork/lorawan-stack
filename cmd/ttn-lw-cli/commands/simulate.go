@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
+	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -128,6 +129,7 @@ type simulateDataUplinkParams struct {
 	ConfFCnt    uint32          `protobuf:"varint,13,opt,name=conf_f_cnt,json=confFCnt,proto3" json:"conf_f_cnt,omitempty"`
 	TxDRIdx     uint32          `protobuf:"varint,14,opt,name=tx_dr_idx,json=txDRIdx,proto3" json:"tx_dr_idx,omitempty"`
 	TxChIdx     uint32          `protobuf:"varint,15,opt,name=tx_ch_idx,json=txChIdx,proto3" json:"tx_ch_idx,omitempty"`
+	FOpts       []byte          `protobuf:"bytes,16,opt,name=f_opts,json=fOpts,proto3" json:"f_opts,omitempty"`
 }
 
 var (
@@ -485,6 +487,8 @@ var (
 			)
 		},
 	}
+
+	errInvalidFOpts           = errors.DefineInvalidArgument("f_opts", "invalid f_opts")
 	simulateDataUplinkCommand = &cobra.Command{
 		Use:   "uplink",
 		Short: "Simulate a data uplink (EXPERIMENTAL)",
@@ -524,6 +528,21 @@ var (
 			var dataUplink *ttnpb.Message
 			return simulate(cmd,
 				func(upMsg *ttnpb.UplinkMessage) error {
+					fOpts := dataUplinkParams.FOpts
+					if len(fOpts) > 0 && dataUplinkParams.FPort == 0 {
+						return errInvalidFOpts
+					}
+					if len(fOpts) > 0 && uplinkParams.LoRaWANVersion.EncryptFOpts() {
+						buf, err := crypto.EncryptUplink(
+							dataUplinkParams.NwkSEncKey,
+							dataUplinkParams.DevAddr,
+							dataUplinkParams.FCnt,
+							fOpts,
+						)
+						if err != nil {
+							return err
+						}
+						fOpts = buf
 					}
 
 					var key types.AES128Key
@@ -561,6 +580,7 @@ var (
 										Ack:       dataUplinkParams.Ack,
 									},
 									FCnt:  dataUplinkParams.FCnt,
+									FOpts: fOpts,
 								},
 								FPort:      dataUplinkParams.FPort,
 								FRMPayload: frmPayload,
