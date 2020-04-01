@@ -164,6 +164,10 @@ var (
 	HaveSameElementsEvent = testassertions.ShouldHaveSameElementsEvent
 	// NotHaveSameElementsEvent asserts that the actual A and expected B elements are not equal using test.EventEqual.
 	NotHaveSameElementsEvent = testassertions.ShouldNotHaveSameElementsEvent
+
+	// BeProperSupersetOfElementsFunc asserts that the actual A elements represents a proper superset of expected B elements using an equality function with signature func(A, B) bool.
+	BeProperSupersetOfElementsFunc = testassertions.ShouldBeProperSupersetOfElementsFunc
+
 	// HaveParentContext asserts that the context.Context is a child of context.Context.
 	HaveParentContext = testassertions.ShouldHaveParentContext
 	// HaveParentContextOrEqual asserts that the context.Context is a child of context.Context or they're equal.

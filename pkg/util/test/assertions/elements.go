@@ -27,6 +27,9 @@ const (
 
 	shouldNotHaveHadSameElements    = "Expected: '%v'\nActual:   '%v'\n(Should not have same elements)!"
 	shouldNotHaveHadSameElementsErr = "Expected: '%v'\nActual:   '%v'\n(Should not have same elements, but equality check errored with '%v')!"
+
+	shouldHaveBeenProperSubsetOfElements    = "Expected: '%v'\nActual:   '%v'\n(Should represent proper subset of elements)!"
+	shouldHaveBeenProperSubsetOfElementsErr = "Expected: '%v'\nActual:   '%v'\n(Should represent proper subset of elements, but equality check errored with '%v')!"
 )
 
 // ShouldHaveSameElementsFunc takes as arguments the actual value, a comparison function and the expected value.
@@ -127,4 +130,22 @@ func ShouldNotHaveSameElementsEvent(actual interface{}, expected ...interface{})
 		return
 	}
 	return ShouldNotHaveSameElementsFunc(actual, test.EventEqual, expected[0])
+}
+
+// ShouldBeProperSupersetOfElementsFunc takes as arguments the actual value, a comparison function and the expected value.
+// If the actual value represents a proper superset of expected value under equality given by the comparison function, this
+// function returns an empty string. Otherwise, it returns a string describing the error.
+func ShouldBeProperSupersetOfElementsFunc(actual interface{}, expected ...interface{}) (message string) {
+	defer func() {
+		if r := recover(); r != nil {
+			message = fmt.Sprintf(shouldHaveBeenProperSubsetOfElementsErr, expected[0], actual, r)
+		}
+	}()
+	if message = need(2, expected); message != success {
+		return message
+	}
+	if !test.IsProperSubsetOfElements(expected[0], expected[1], actual) {
+		return fmt.Sprintf(shouldHaveBeenProperSubsetOfElements, expected[1], actual)
+	}
+	return success
 }
