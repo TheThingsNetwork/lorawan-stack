@@ -163,9 +163,15 @@ func New(ctx context.Context, opts ...Option) *Server {
 	baseOptions := []grpc.ServerOption{
 		grpc.StatsHandler(rpcmiddleware.StatsHandlers{new(ocgrpc.ServerHandler), metrics.StatsHandler}),
 		grpc.MaxConcurrentStreams(math.MaxUint16),
+		grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+			MinTime:             1 * time.Minute,
+			PermitWithoutStream: true,
+		}),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 6 * time.Hour,
 			MaxConnectionAge:  24 * time.Hour,
+			Time:              1 * time.Minute,
+			Timeout:           20 * time.Second,
 		}),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
 			append(
