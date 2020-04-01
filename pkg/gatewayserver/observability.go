@@ -82,11 +82,11 @@ var (
 )
 
 const (
-	subsystem     = "gs"
-	unknown       = "unknown"
-	protocol      = "protocol"
-	gatewayID     = "gateway_id"
-	networkServer = "network_server"
+	subsystem = "gs"
+	unknown   = "unknown"
+	protocol  = "protocol"
+	gatewayID = "gateway_id"
+	host      = "host"
 )
 
 var gsMetrics = &messageMetrics{
@@ -98,13 +98,21 @@ var gsMetrics = &messageMetrics{
 		},
 		[]string{protocol},
 	),
+	upstreamHandlers: metrics.NewContextualGaugeVec(
+		prometheus.GaugeOpts{
+			Subsystem: subsystem,
+			Name:      "upstream_handlers",
+			Help:      "Number of upstream handlers",
+		},
+		[]string{host},
+	),
 	statusReceived: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "status_received_total",
 			Help:      "Total number of received gateway statuses",
 		},
-		[]string{gatewayID},
+		[]string{protocol},
 	),
 	statusForwarded: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -112,7 +120,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "status_forwarded_total",
 			Help:      "Total number of forwarded gateway statuses",
 		},
-		[]string{networkServer},
+		[]string{host},
 	),
 	statusDropped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -120,7 +128,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "status_dropped_total",
 			Help:      "Total number of dropped gateway statuses",
 		},
-		[]string{networkServer, "error"},
+		[]string{host, "error"},
 	),
 	statusFailed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -128,7 +136,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "status_failed_total",
 			Help:      "Total number of failed gateway statuses",
 		},
-		[]string{networkServer},
+		[]string{host},
 	),
 	uplinkReceived: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -136,7 +144,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "uplink_received_total",
 			Help:      "Total number of received uplinks",
 		},
-		[]string{networkServer, gatewayID},
+		[]string{protocol},
 	),
 	uplinkForwarded: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -144,7 +152,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "uplink_forwarded_total",
 			Help:      "Total number of forwarded uplinks",
 		},
-		[]string{networkServer},
+		[]string{host},
 	),
 	uplinkDropped: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -152,7 +160,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "uplink_dropped_total",
 			Help:      "Total number of dropped uplinks",
 		},
-		[]string{networkServer, "error"},
+		[]string{host, "error"},
 	),
 	uplinkFailed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -160,7 +168,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "uplink_failed_total",
 			Help:      "Total number of failed uplinks",
 		},
-		[]string{networkServer},
+		[]string{host},
 	),
 	downlinkSent: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -168,7 +176,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "downlink_sent_total",
 			Help:      "Total number of sent downlinks",
 		},
-		[]string{gatewayID},
+		[]string{protocol},
 	),
 	downlinkTxSucceeded: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -176,7 +184,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "downlink_tx_success_total",
 			Help:      "Total number of successfully emitted downlinks",
 		},
-		[]string{gatewayID},
+		[]string{protocol},
 	),
 	downlinkTxFailed: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -184,7 +192,7 @@ var gsMetrics = &messageMetrics{
 			Name:      "downlink_tx_failed_total",
 			Help:      "Total number of unsuccessfully emitted downlinks",
 		},
-		[]string{gatewayID},
+		[]string{protocol},
 	),
 }
 
@@ -194,6 +202,7 @@ func init() {
 
 type messageMetrics struct {
 	gatewaysConnected   *metrics.ContextualGaugeVec
+	upstreamHandlers    *metrics.ContextualGaugeVec
 	statusReceived      *metrics.ContextualCounterVec
 	statusForwarded     *metrics.ContextualCounterVec
 	statusDropped       *metrics.ContextualCounterVec
@@ -209,6 +218,7 @@ type messageMetrics struct {
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.gatewaysConnected.Describe(ch)
+	m.upstreamHandlers.Describe(ch)
 	m.statusReceived.Describe(ch)
 	m.statusForwarded.Describe(ch)
 	m.statusDropped.Describe(ch)
@@ -224,6 +234,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.gatewaysConnected.Collect(ch)
+	m.upstreamHandlers.Collect(ch)
 	m.statusReceived.Collect(ch)
 	m.statusForwarded.Collect(ch)
 	m.statusDropped.Collect(ch)
@@ -247,65 +258,73 @@ func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
 }
 
-func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus) {
+func registerUpstreamHandlerStart(ctx context.Context, host string) {
+	gsMetrics.upstreamHandlers.WithLabelValues(ctx, host).Inc()
+}
+
+func registerUpstreamHandlerStop(ctx context.Context, host string) {
+	gsMetrics.upstreamHandlers.WithLabelValues(ctx, host).Dec()
+}
+
+func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, protocol string) {
 	events.Publish(evtReceiveStatus(ctx, gtw, status))
-	gsMetrics.statusReceived.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.statusReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerForwardStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string) {
+func registerForwardStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string) {
 	events.Publish(evtForwardStatus(ctx, gtw, status))
-	gsMetrics.statusForwarded.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.statusForwarded.WithLabelValues(ctx, host).Inc()
 }
 
-func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string, err error) {
+func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string, err error) {
 	events.Publish(evtDropStatus(ctx, gtw, err))
 	if ttnErr, ok := errors.From(err); ok {
-		gsMetrics.statusDropped.WithLabelValues(ctx, ns, ttnErr.FullName()).Inc()
+		gsMetrics.statusDropped.WithLabelValues(ctx, host, ttnErr.FullName()).Inc()
 	} else {
-		gsMetrics.statusDropped.WithLabelValues(ctx, ns, unknown).Inc()
+		gsMetrics.statusDropped.WithLabelValues(ctx, host, unknown).Inc()
 	}
 }
 
-func registerFailStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, ns string) {
+func registerFailStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, host string) {
 	events.Publish(evtFailStatus(ctx, gtw, status))
-	gsMetrics.statusFailed.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.statusFailed.WithLabelValues(ctx, host).Inc()
 }
 
-func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
+func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, protocol string) {
 	events.Publish(evtReceiveUp(ctx, gtw, msg))
-	gsMetrics.uplinkReceived.WithLabelValues(ctx, ns, gtw.GatewayID).Inc()
+	gsMetrics.uplinkReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
+func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string) {
 	events.Publish(evtForwardUp(ctx, gtw, nil))
-	gsMetrics.uplinkForwarded.WithLabelValues(ctx, ns).Inc()
+	gsMetrics.uplinkForwarded.WithLabelValues(ctx, host).Inc()
 }
 
-func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string, err error) {
+func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string, err error) {
 	events.Publish(evtDropUp(ctx, gtw, err))
 	if ttnErr, ok := errors.From(err); ok {
-		gsMetrics.uplinkDropped.WithLabelValues(ctx, ns, ttnErr.FullName()).Inc()
+		gsMetrics.uplinkDropped.WithLabelValues(ctx, host, ttnErr.FullName()).Inc()
 	} else {
-		gsMetrics.uplinkDropped.WithLabelValues(ctx, ns, unknown).Inc()
+		gsMetrics.uplinkDropped.WithLabelValues(ctx, host, unknown).Inc()
 	}
 }
 
-func registerFailUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, ns string) {
+func registerFailUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string) {
 	events.Publish(evtFailUp(ctx, gtw, nil))
-	gsMetrics.uplinkFailed.WithLabelValues(ctx, ns).Inc()
+	gsMetrics.uplinkFailed.WithLabelValues(ctx, host).Inc()
 }
 
-func registerSendDownlink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.DownlinkMessage) {
+func registerSendDownlink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.DownlinkMessage, protocol string) {
 	events.Publish(evtSendDown(ctx, gtw, msg))
-	gsMetrics.downlinkSent.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.downlinkSent.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerSuccessDownlink(ctx context.Context, gtw *ttnpb.Gateway) {
+func registerSuccessDownlink(ctx context.Context, gtw *ttnpb.Gateway, protocol string) {
 	events.Publish(evtTxSuccessDown(ctx, gtw, nil))
-	gsMetrics.downlinkSent.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.downlinkSent.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerFailDownlink(ctx context.Context, gtw *ttnpb.Gateway, ack *ttnpb.TxAcknowledgment) {
+func registerFailDownlink(ctx context.Context, gtw *ttnpb.Gateway, ack *ttnpb.TxAcknowledgment, protocol string) {
 	events.Publish(evtTxFailureDown(ctx, gtw, ack.Result))
-	gsMetrics.downlinkTxFailed.WithLabelValues(ctx, gtw.GatewayID).Inc()
+	gsMetrics.downlinkTxFailed.WithLabelValues(ctx, protocol).Inc()
 }
