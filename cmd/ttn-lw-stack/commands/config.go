@@ -26,6 +26,7 @@ import (
 	shared_joinserver "go.thethings.network/lorawan-stack/cmd/internal/shared/joinserver"
 	shared_networkserver "go.thethings.network/lorawan-stack/cmd/internal/shared/networkserver"
 	shared_packetbrokeragent "go.thethings.network/lorawan-stack/cmd/internal/shared/packetbrokeragent"
+	shared_qrcodegenerator "go.thethings.network/lorawan-stack/cmd/internal/shared/qrcodegenerator"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/console"
@@ -65,6 +66,7 @@ var DefaultConfig = Config{
 	Console:     shared_console.DefaultConsoleConfig,
 	GCS:         shared_gatewayconfigurationserver.DefaultGatewayConfigurationServerConfig,
 	DTC:         shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
+	QRG:         shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
 	PBA:         shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
 }
 
