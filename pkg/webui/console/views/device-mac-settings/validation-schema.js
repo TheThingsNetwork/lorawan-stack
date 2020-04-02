@@ -72,7 +72,7 @@ export default Yup.object({
       })
     }),
     rx1_data_rate_offset: Yup.number().when('$activation_mode', {
-      is: mode => mode === ACTIVATION_MODES.ABP,
+      is: mode => mode === ACTIVATION_MODES.ABP || mode === ACTIVATION_MODES.OTAA,
       then: schema =>
         schema.min(0, { ...sharedMessages.validateNumberGte, values: { value: 0 } }).max(7, {
           ...sharedMessages.validateNumberLte,

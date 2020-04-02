@@ -30,7 +30,12 @@ import toast from '../../../components/toast'
 import diff from '../../../lib/diff'
 import sharedMessages from '../../../lib/shared-messages'
 import PropTypes from '../../../lib/prop-types'
-import { isDeviceABP, isDeviceMulticast, ACTIVATION_MODES } from '../../lib/device-utils'
+import {
+  isDeviceABP,
+  isDeviceMulticast,
+  isDeviceOTAA,
+  ACTIVATION_MODES,
+} from '../../lib/device-utils'
 
 import validationSchema from './validation-schema'
 
@@ -92,6 +97,7 @@ const DeviceMacSettings = props => {
 
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
+  const isOTAA = isDeviceOTAA(device)
   const isClassB = device.supports_class_b || false
   const activationMode = isMulticast ? ACTIVATION_MODES.MULTICAST : ACTIVATION_MODES.ABP
 
@@ -167,28 +173,34 @@ const DeviceMacSettings = props => {
             onSubmit={handleSubmit}
           >
             <Message component="h4" content={m.setMacSettings} />
-            {isABP && (
+            {!isMulticast && (
               <>
-                <Form.Field
-                  title={m.rx1DelayTitle}
-                  description={m.rx1DelayDescription}
-                  name="mac_settings.rx1_delay.value"
-                  component={Select}
-                  options={rx1DelayOptions}
-                />
-                <Form.Field
-                  title={m.rx1DataRateOffsetTitle}
-                  name="mac_settings.rx1_data_rate_offset"
-                  component={Select}
-                  options={dataRateOffsetOptions}
-                />
-                <Form.Field
-                  title={m.resetsFCnt}
-                  onChange={handleResetsFCntChange}
-                  warning={resetsFCnt ? m.resetWarning : undefined}
-                  name="mac_settings.resets_f_cnt"
-                  component={Checkbox}
-                />
+                {isABP && (
+                  <Form.Field
+                    title={m.rx1DelayTitle}
+                    description={m.rx1DelayDescription}
+                    name="mac_settings.rx1_delay.value"
+                    component={Select}
+                    options={rx1DelayOptions}
+                  />
+                )}
+                {(isABP || isOTAA) && (
+                  <Form.Field
+                    title={m.rx1DataRateOffsetTitle}
+                    name="mac_settings.rx1_data_rate_offset"
+                    component={Select}
+                    options={dataRateOffsetOptions}
+                  />
+                )}
+                {isABP && (
+                  <Form.Field
+                    title={m.resetsFCnt}
+                    onChange={handleResetsFCntChange}
+                    warning={resetsFCnt ? m.resetWarning : undefined}
+                    name="mac_settings.resets_f_cnt"
+                    component={Checkbox}
+                  />
+                )}
               </>
             )}
             <Form.Field
