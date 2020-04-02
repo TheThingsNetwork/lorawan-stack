@@ -82,8 +82,8 @@ class EventsWidget extends React.PureComponent {
         <div className={style.header}>
           <Message className={style.headerTitle} content={m.latestEvents} />
           {!error && (
-            <Link to={toAllUrl}>
-              <Message className={style.seeAllMessage} content={m.seeAllActivity} />→
+            <Link className={style.seeAllMessage} secondary to={toAllUrl}>
+              <Message content={m.seeAllActivity} /> →
             </Link>
           )}
         </div>

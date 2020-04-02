@@ -45,17 +45,24 @@ const Link = function(props) {
     showVisited,
     intl,
     onClick,
+    secondary,
+    primary,
   } = props
 
   const formattedTitle = formatTitle(title, titleValues, intl.formatMessage)
+  const classNames = classnames(style.link, className, {
+    [style.linkVisited]: showVisited,
+    [style.primary]: primary,
+    [style.secondary]: secondary,
+  })
+
+  if (disabled) {
+    return <span className={classnames(classNames, style.disabled)}>{children}</span>
+  }
 
   return (
     <RouterLink
-      className={
-        className
-          ? classnames(className, { [style.disabled]: disabled })
-          : classnames(style.link, { [style.linkVisited]: showVisited, [style.disabled]: disabled })
-      }
+      className={classNames}
       id={id}
       title={formattedTitle}
       replace={replace}
@@ -76,7 +83,10 @@ Link.propTypes = {
   intl: PropTypes.shape({
     formatMessage: PropTypes.func,
   }).isRequired,
+  onClick: PropTypes.func,
+  primary: PropTypes.bool,
   replace: PropTypes.bool,
+  secondary: PropTypes.bool,
   showVisited: PropTypes.bool,
   target: PropTypes.string,
   title: PropTypes.message,
@@ -97,8 +107,11 @@ Link.defaultProps = {
   className: undefined,
   disabled: false,
   id: undefined,
+  onClick: () => null,
+  primary: false,
   showVisited: false,
   replace: false,
+  secondary: false,
   target: undefined,
   title: undefined,
   titleValues: undefined,
@@ -116,15 +129,25 @@ const AnchorLink = function(props) {
     children,
     showVisited,
     intl,
+    secondary,
+    primary,
+    disabled,
   } = props
 
   const formattedTitle = formatTitle(title, titleValues, intl.formatMessage)
+  const classNames = classnames(style.link, className, {
+    [style.linkVisited]: showVisited,
+    [style.primary]: primary,
+    [style.secondary]: secondary,
+  })
+
+  if (disabled) {
+    return <span className={classnames(classNames, style.disabled)}>{children}</span>
+  }
 
   return (
     <a
-      className={
-        className ? className : classnames(style.link, { [style.linkVisited]: showVisited })
-      }
+      className={classNames}
       title={formattedTitle}
       id={id}
       href={href}
