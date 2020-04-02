@@ -317,6 +317,8 @@
   "console.views.device-mac-settings.device-mac-settings.pingSlotPeriodicityDescription": "Periodicity of the class B ping slot",
   "console.views.device-mac-settings.device-mac-settings.pingSlotPeriodicityTitle": "Ping Slot Periodicity",
   "console.views.device-mac-settings.device-mac-settings.pingSlotPeriodicityValue": "{count, plural, one {every second} other {every {count} seconds}}",
+  "console.views.device-mac-settings.device-mac-settings.pingSlotFrequencyTitle": "Ping Slot Frequency",
+  "console.views.device-mac-settings.device-mac-settings.pingSlotFrequencyDescription": "Frequency of the class B ping slot (Hz)",
   "console.views.device-mac-settings.device-mac-settings.resetsFCnt": "Resets Frame Counters",
   "console.views.device-mac-settings.device-mac-settings.resetWarning": "Reseting is insecure and makes your device susceptible for replay attacks",
   "console.views.device-mac-settings.device-mac-settings.rx1DelayTitle": "RX1 Delay",

@@ -317,6 +317,8 @@
   "console.views.device-mac-settings.device-mac-settings.pingSlotPeriodicityDescription": "Xxxxxxxxxxx xx xxx xxxxx X xxxx xxxx",
   "console.views.device-mac-settings.device-mac-settings.pingSlotPeriodicityTitle": "Xxxx Xxxx Xxxxxxxxxxx",
   "console.views.device-mac-settings.device-mac-settings.pingSlotPeriodicityValue": "{count, plural, =one {xxxxx xxxxxx} other {xxxxx {count} xxxxxxx}}",
+  "console.views.device-mac-settings.device-mac-settings.pingSlotFrequencyTitle": "Xxxx Xxxx Xxxxxxxxx",
+  "console.views.device-mac-settings.device-mac-settings.pingSlotFrequencyDescription": "Xxxxxxxxx xx xxx xxxxx X xxxx xxxx (Xx)",
   "console.views.device-mac-settings.device-mac-settings.resetsFCnt": "Xxxxxx Xxxxx Xxxxxxxx",
   "console.views.device-mac-settings.device-mac-settings.resetWarning": "Xxxxxxxx xx xxxxxxxx xxx xxxxx xxxx xxxxxx xxxxxxxxxxx xxx xxxxxx xxxxxxx",
   "console.views.device-mac-settings.device-mac-settings.rx1DelayTitle": "XXx Xxxxx",
