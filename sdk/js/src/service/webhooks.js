@@ -19,10 +19,14 @@ class Webhooks {
     this._api = registry
   }
 
-  async getAll(appId) {
-    const result = await this._api.List({
-      routeParams: { 'application_ids.application_id': appId },
-    })
+  async getAll(appId, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const result = await this._api.List(
+      {
+        routeParams: { 'application_ids.application_id': appId },
+      },
+      fieldMask,
+    )
 
     return Marshaler.payloadListResponse('webhooks', result)
   }
