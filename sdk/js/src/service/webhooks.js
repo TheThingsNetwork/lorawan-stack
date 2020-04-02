@@ -104,6 +104,27 @@ class Webhooks {
 
     return Marshaler.payloadSingleResponse(result)
   }
+
+  async listTemplates(selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const result = await this._api.ListTemplates(undefined, fieldMask)
+
+    return Marshaler.payloadListResponse('templates', result)
+  }
+
+  async getTemplate(templateId, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
+    const result = await this._api.GetTemplate(
+      {
+        routeParams: {
+          'ids.template_id': templateId,
+        },
+      },
+      fieldMask,
+    )
+
+    return Marshaler.payloadSingleResponse(result)
+  }
 }
 
 export default Webhooks
