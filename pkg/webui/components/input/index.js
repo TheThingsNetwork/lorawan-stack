@@ -140,12 +140,12 @@ class Input extends React.Component {
 
     let inputPlaceholder = placeholder
     if (typeof placeholder === 'object') {
-      inputPlaceholder = intl.formatMessage(placeholder)
+      inputPlaceholder = intl.formatMessage(placeholder, placeholder.values)
     }
 
     let inputTitle = title
     if (typeof title === 'object') {
-      inputTitle = intl.formatMessage(title)
+      inputTitle = intl.formatMessage(title, title.values)
     }
 
     const v = valid && (Component.validate ? Component.validate(value, this.props) : true)
