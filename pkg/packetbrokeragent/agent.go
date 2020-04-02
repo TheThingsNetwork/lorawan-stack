@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	packetbroker "go.packetbroker.org/api/v2"
+	packetbroker "go.packetbroker.org/api/v3"
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
@@ -45,8 +45,8 @@ const (
 	upstreamBufferSize   = 1 << 6
 	downstreamBufferSize = 1 << 5
 
-	// messageStateChangeTimeout defines the maximum time to wait for a message state change.
-	messageStateChangeTimeout = 2 * time.Second
+	// publishMessageTimeout defines the timeout for publishing messages.
+	publishMessageTimeout = 3 * time.Second
 )
 
 // TenantContextFiller fills the parent context based on the tenant ID.
@@ -299,27 +299,13 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 				ForwarderTenantId: a.tenantID,
 				Message:           msg,
 			}
-			ctx, cancel := context.WithTimeout(ctx, messageStateChangeTimeout)
-			progress, err := client.Publish(ctx, req)
+			ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
+			res, err := client.Publish(ctx, req)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to publish uplink message")
-				cancel()
-				continue
+			} else {
+				logger.WithField("message_id", res.Id).Debug("Published uplink message")
 			}
-			status, err := progress.Recv()
-			if err != nil {
-				if errors.IsDeadlineExceeded(err) {
-					logger.Warn("Wait for message state change timed out")
-				} else {
-					logger.WithError(err).Warn("Failed to receive published uplink message status")
-				}
-				cancel()
-				continue
-			}
-			logger.WithFields(log.Fields(
-				"message_id", status.Id,
-				"state", status.State,
-			)).Debug("Publish uplink message state changed")
 			cancel()
 		}
 	}
@@ -714,27 +700,13 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 				ForwarderId:         token.ForwarderID,
 				Message:             msg,
 			}
-			ctx, cancel := context.WithTimeout(ctx, messageStateChangeTimeout)
-			progress, err := client.Publish(ctx, req)
+			ctx, cancel := context.WithTimeout(ctx, publishMessageTimeout)
+			res, err := client.Publish(ctx, req)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to publish downlink message")
-				cancel()
-				continue
+			} else {
+				logger.WithField("message_id", res.Id).Debug("Published downlink message")
 			}
-			status, err := progress.Recv()
-			if err != nil {
-				if errors.IsDeadlineExceeded(err) {
-					logger.Warn("Wait for message state change timed out")
-				} else {
-					logger.WithError(err).Warn("Failed to receive published downlink message status")
-				}
-				cancel()
-				continue
-			}
-			logger.WithFields(log.Fields(
-				"message_id", status.Id,
-				"state", status.State,
-			)).Debug("Publish downlink message state changed")
 			cancel()
 		}
 	}

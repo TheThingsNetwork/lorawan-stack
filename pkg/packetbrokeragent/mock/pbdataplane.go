@@ -19,7 +19,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 
-	packetbroker "go.packetbroker.org/api/v2"
+	packetbroker "go.packetbroker.org/api/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
