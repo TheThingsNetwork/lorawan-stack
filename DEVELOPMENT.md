@@ -587,9 +587,9 @@ When the CI system pushed the Docker image, it gets tagged as the current minor 
 
 ```bash
 $ versionDockerTag=${version#"v"} # v3.6.1 -> 3.6.1
-$ docker pull TheThingsNetwork/lorawan-stack:${versionDockerTag}
-$ docker tag TheThingsNetwork/lorawan-stack:{versionDockerTag} TheThingsNetwork/lorawan-stack:latest
-$ docker push TheThingsNetwork/lorawan-stack:latest
+$ docker pull thethingsnetwork/lorawan-stack:${versionDockerTag}
+$ docker tag thethingsnetwork/lorawan-stack:{versionDockerTag} thethingsnetwork/lorawan-stack:latest
+$ docker push thethingsnetwork/lorawan-stack:latest
 ```
 
 ## Troubleshooting
