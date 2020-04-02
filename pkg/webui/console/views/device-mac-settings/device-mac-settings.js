@@ -66,7 +66,7 @@ const dataRateIndexOptions = Array.from({ length: 15 }, (_, index) => ({
 }))
 
 // 1...15
-const rx1DelayOptions = Array.from({ length: 14 }, (_, index) => ({
+const rx1DelayOptions = Array.from({ length: 15 }, (_, index) => ({
   value: index + 1,
   label: <Message content={m.delayValue} values={{ count: index + 1 }} />,
 }))
