@@ -94,6 +94,15 @@ export default Yup.object({
         otherwise: schema => schema.strip(),
       })
     }),
+    ping_slot_frequency: Yup.number().when('$class_b', {
+      is: true,
+      then: schema =>
+        schema.min(100000, {
+          ...sharedMessages.validateNumberGte,
+          values: { value: 100000 },
+        }),
+      otherwise: schema => schema.strip(),
+    }),
     factory_preset_frequencies: Yup.lazy(frequencies => {
       if (!Boolean(frequencies)) {
         return Yup.array().strip()

@@ -44,6 +44,8 @@ const m = defineMessages({
   pingSlotPeriodicityDescription: 'Periodicity of the class B ping slot',
   pingSlotPeriodicityTitle: 'Ping Slot Periodicity',
   pingSlotPeriodicityValue: '{count, plural, one {every second} other {every {count} seconds}}',
+  pingSlotFrequencyTitle: 'Ping Slot Frequency',
+  pingSlotFrequencyDescription: 'Frequency of the class B ping slot (Hz)',
   resetsFCnt: 'Resets Frame Counters',
   resetWarning: 'Reseting is insecure and makes your device susceptible for replay attacks',
   rx1DelayTitle: 'RX1 Delay',
@@ -230,13 +232,25 @@ const DeviceMacSettings = props => {
               valuePlaceholder={m.frequencyPlaceholder}
             />
             {isClassB && (
-              <Form.Field
-                title={m.pingSlotPeriodicityTitle}
-                description={m.pingSlotPeriodicityDescription}
-                name="mac_settings.ping_slot_periodicity.value"
-                component={Select}
-                options={pingSlotPeriodicityOptions}
-              />
+              <>
+                <Form.Field
+                  title={m.pingSlotPeriodicityTitle}
+                  description={m.pingSlotPeriodicityDescription}
+                  name="mac_settings.ping_slot_periodicity.value"
+                  component={Select}
+                  options={pingSlotPeriodicityOptions}
+                />
+                <Form.Field
+                  type="number"
+                  min={100000}
+                  step={1}
+                  title={m.pingSlotFrequencyTitle}
+                  description={m.pingSlotFrequencyDescription}
+                  placeholder={m.frequencyPlaceholder}
+                  name="mac_settings.ping_slot_frequency"
+                  component={Input}
+                />
+              </>
             )}
             <SubmitBar>
               <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
