@@ -220,6 +220,13 @@ func (a *Agent) dialContext(ctx context.Context, config TLSConfig, target string
 	return grpc.DialContext(ctx, target, opts...)
 }
 
+const (
+	// workerIdleTimeout is the duration after which an idle worker stops to save resources.
+	workerIdleTimeout = (1 << 7) * time.Millisecond
+	// workerBusyTimeout is the duration after which a message is dropped if all workers are busy.
+	workerBusyTimeout = (1 << 6) * time.Millisecond
+)
+
 func (a *Agent) publishUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbroker/agent",
@@ -253,7 +260,7 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 			select {
 			case uplinkCh <- msg:
 			default:
-				if atomic.LoadInt32(&workers) < a.forwarderConfig.WorkerPool.MaximumWorkerCount {
+				if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit {
 					wg.Add(1)
 					atomic.AddInt32(&workers, 1)
 					go func() {
@@ -266,7 +273,7 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 				}
 				select {
 				case uplinkCh <- msg:
-				case <-time.After(a.forwarderConfig.WorkerPool.BusyTimeout):
+				case <-time.After(workerBusyTimeout):
 					logger.Warn("Forwarder publisher busy, drop message")
 				}
 			}
@@ -281,7 +288,7 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-time.After(a.forwarderConfig.WorkerPool.IdleTimeout):
+		case <-time.After(workerIdleTimeout):
 			return nil
 		case up := <-uplinkCh:
 			msg, err := toPBUplink(ctx, up, a.forwarderConfig)
@@ -357,7 +364,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 		select {
 		case downlinkCh <- msg:
 		default:
-			if atomic.LoadInt32(&workers) < a.forwarderConfig.WorkerPool.MaximumWorkerCount {
+			if int(atomic.LoadInt32(&workers)) < a.forwarderConfig.WorkerPool.Limit {
 				wg.Add(1)
 				atomic.AddInt32(&workers, 1)
 				go func() {
@@ -370,7 +377,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 			}
 			select {
 			case downlinkCh <- msg:
-			case <-time.After(a.forwarderConfig.WorkerPool.BusyTimeout):
+			case <-time.After(workerBusyTimeout):
 				logger.Warn("Forwarder subscriber busy, drop message")
 			}
 		}
@@ -383,7 +390,7 @@ func (a *Agent) handleDownlink(ctx context.Context, downlinkCh <-chan *packetbro
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-time.After(a.forwarderConfig.WorkerPool.IdleTimeout):
+		case <-time.After(workerIdleTimeout):
 			return nil
 		case down := <-downlinkCh:
 			if down.Message == nil {
@@ -528,7 +535,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		select {
 		case uplinkCh <- msg:
 		default:
-			if atomic.LoadInt32(&workers) < a.homeNetworkConfig.WorkerPool.MaximumWorkerCount {
+			if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit {
 				wg.Add(1)
 				atomic.AddInt32(&workers, 1)
 				go func() {
@@ -541,7 +548,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 			}
 			select {
 			case uplinkCh <- msg:
-			case <-time.After(a.homeNetworkConfig.WorkerPool.BusyTimeout):
+			case <-time.After(workerBusyTimeout):
 				logger.Warn("Home Network subscriber busy, drop message")
 			}
 		}
@@ -554,7 +561,7 @@ func (a *Agent) handleUplink(ctx context.Context, uplinkCh <-chan *packetbroker.
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-time.After(a.homeNetworkConfig.WorkerPool.IdleTimeout):
+		case <-time.After(workerIdleTimeout):
 			return nil
 		case up := <-uplinkCh:
 			if up.Message == nil {
@@ -656,7 +663,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 			select {
 			case downlinkCh <- msg:
 			default:
-				if atomic.LoadInt32(&workers) < a.homeNetworkConfig.WorkerPool.MaximumWorkerCount {
+				if int(atomic.LoadInt32(&workers)) < a.homeNetworkConfig.WorkerPool.Limit {
 					wg.Add(1)
 					atomic.AddInt32(&workers, 1)
 					go func() {
@@ -669,7 +676,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 				}
 				select {
 				case downlinkCh <- msg:
-				case <-time.After(a.homeNetworkConfig.WorkerPool.BusyTimeout):
+				case <-time.After(workerBusyTimeout):
 					logger.Warn("Home Network publisher busy, drop message")
 				}
 			}
@@ -684,7 +691,7 @@ func (a *Agent) runHomeNetworkPublisher(ctx context.Context, conn *grpc.ClientCo
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-time.After(a.homeNetworkConfig.WorkerPool.IdleTimeout):
+		case <-time.After(workerIdleTimeout):
 			return nil
 		case down := <-downlinkCh:
 			msg, token, err := toPBDownlink(ctx, down)

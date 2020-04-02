@@ -17,7 +17,6 @@ package packetbrokeragent
 import (
 	"context"
 	"crypto/tls"
-	"time"
 
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
@@ -65,9 +64,7 @@ type TLSConfig struct {
 
 // WorkerPoolConfig contains the worker pool configuration for a Packet Broker role.
 type WorkerPoolConfig struct {
-	MaximumWorkerCount int32         `name:"maximum-worker-count" description:"The maximum amount of active workers"`
-	IdleTimeout        time.Duration `name:"idle-timeout" description:"The maximum amount of time workers stay idle before they stop"`
-	BusyTimeout        time.Duration `name:"busy-timeout" description:"The maximum amount of time a message can wait before it is dropped"`
+	Limit int `name:"limit" description:"Limit of active workers"`
 }
 
 var errNoTLSCertificate = errors.DefineFailedPrecondition("no_tls_certificate", "no TLS certificate configured")
