@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="has-navbar-fixed-top">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hugo 0.67.1" />
+  <title>Console Options | The Things Stack for LoRaWAN</title><link rel="canonical" href="https://thethingsstack.io/v3.7.0/reference/configuration/console/" />
+  <link rel="icon" type="image/png" href="/v3.7.0/favicon.png">
+  <link rel="stylesheet" href="https://thethingsstack.io/v3.7.0/css/theme.min.6d82500aff4493582b52df6d75dac6b05147bf4bb848e756ceb515cfa797525b.css" integrity="sha256-bYJQCv9Ek1grUt9tddrGsFFHv0u4SOdWzrUVz6eXUls=">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta itemprop="name" content="Console Options">
+  <meta itemprop="description" content="">
+  <meta itemprop="keywords" content="">
+  <meta property="og:title" content="Console Options">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://thethingsstack.io/v3.7.0/reference/configuration/console/">
+  <meta name="twitter:title" content="Console Options" />
+  <meta name="twitter:description" content="" />
+  <meta name="twitter:card" content="summary" />
+</head>
+
+
+<body>
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/v3.7.0/">
+        <img src="/v3.7.0/img/TTS-logo.svg">
+        <p class="navbar-item is-size-7">v3.7.0</p>
+      </a>
+      <span class="navbar-burger burger" data-target="topMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="topMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/v3.7.0/guides/">Guides</a>
+        <a class="navbar-item" href="/v3.7.0/concepts/">Concepts</a>
+        <a class="navbar-item" href="/v3.7.0/components/">Components</a>
+        <a class="navbar-item" href="/v3.7.0/reference/">Reference</a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a>
+        <a class="navbar-item" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a>
+        <div class="navbar-item">
+          <a class="button is-primary" href="/v3.7.0/download/">Get The Things Stack</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      
+      <div class="column is-one-third">
+
+
+<h2 class="title is-size-4">Configuration</h2>
+
+<ul class="menu-list">
+<a href="https://thethingsstack.io/v3.7.0/reference/configuration/" class="">Overview</a>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/the-things-stack/" class="">Generic Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/identity-server/" class="">Identity Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/gateway-server/" class="">Gateway Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/network-server/" class="">Network Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/application-server/" class="">Application Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/join-server/" class="">Join Server Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/console/" class="is-active">Console Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/cli/" class="">Command-Line Interface Options</a>
+</li>
+<li>
+  <a href="https://thethingsstack.io/v3.7.0/reference/configuration/gateway-configuration-server/" class="">Gateway Configuration Server Options</a>
+</li>
+</ul>
+
+
+
+
+
+      </div>
+      
+      <div class="column is-two-thirds">
+
+<h1 class="title is-size-2">Console Options</h1>
+
+<div class="content"><h2 id="console-mount">Console Mount</h2>
+<p>The Console can be served under any arbitrary path on your server</p>
+<ul>
+<li><code>console.mount</code>: Path on the server where the Console will be served</li>
+</ul>
+<h2 id="oauth-options">OAuth Options</h2>
+<p>The Console app uses the <a href="https://en.wikipedia.org/wiki/OAuth#OAuth_2.0_2">OAuth 2.0 authorization flow</a> to authorize actions in the backend. You can customize the authorization parameters if necessary:</p>
+<ul>
+<li><code>console.oauth.authorize-url</code>: The OAuth Authorize URL</li>
+<li><code>console.oauth.client-id</code>: The OAuth client ID</li>
+<li><code>console.oauth.client-secret</code>: The OAuth client secret</li>
+<li><code>console.oauth.token-url</code>: The OAuth Token Exchange URL</li>
+</ul>
+<h2 id="frontend-setup">Frontend Setup</h2>
+<p>You can change various values that will be passed to the JavaScript logic and HTML Head tags of the Web UI:</p>
+<h3 id="component-configuration">Component Configuration</h3>
+<p>The Console needs to know how the individual The Things Stack components are configured, so it can execute API calls correctly. Likewise, disabled components will cause possible respective options and menus in the Console frontend to be disabled.</p>
+<ul>
+<li><code>console.ui.as.base-url</code>: Base URL to the HTTP API</li>
+<li><code>console.ui.as.enabled</code>: Enable Application Server related functionality in the Console</li>
+<li><code>console.ui.gs.base-url</code>: Base URL to the HTTP API</li>
+<li><code>console.ui.gs.enabled</code>: Enable Gateway Server related functionality in the Console</li>
+<li><code>console.ui.edtc.base-url</code>: Base URL to the HTTP API</li>
+<li><code>console.ui.edtc.enabled</code>: Enable End Device Template Converter related functionality in the Console</li>
+<li><code>console.ui.is.base-url</code>: Base URL to the HTTP API</li>
+<li><code>console.ui.is.enabled</code>: Enable Identity Server related functionality in the Console</li>
+<li><code>console.ui.js.base-url</code>: Base URL to the HTTP API</li>
+<li><code>console.ui.js.enabled</code>: Enable Join Server related functionality in the Console</li>
+<li><code>console.ui.ns.base-url</code>: Base URL to the HTTP API</li>
+<li><code>console.ui.ns.enabled</code>: Enable Network Server related functionality in the Console</li>
+<li><code>console.ui.qrg.base-url</code>: Base URL to the HTTP API</li>
+<li><code>console.ui.qrg.enabled</code>: Enable QR Code Generator related functionality in the Console</li>
+</ul>
+<h3 id="file-includes">File Includes</h3>
+<p>You can control which CSS and JavaScript files are included into the rendered HTML of the Console. Note that these files must be present in the <code>/public</code> folder during runtime.</p>
+<ul>
+<li><code>console.ui.js-file</code>: The names of the JavaScript file</li>
+<li><code>console.ui.css-file</code>: The names of the CSS files</li>
+</ul>
+<h3 id="assets-and-custom-branding">Assets and Custom Branding</h3>
+<p>You can control the url of the assets folder that the Console frontend will use, e.g. if you plan on using a CDN to serve your assets. The branding base url will enable custom branding for logos, favicons and OpenGraph images. See the <a href="https://thethingsstack.io/v3.7.0/guides/branding/">custom branding guide</a> for detailed descriptions on this subject.</p>
+<ul>
+<li><code>console.ui.assets-base-url</code>: The base URL to the page assets</li>
+<li><code>console.ui.branding-base-url</code>: The base URL to the branding assets</li>
+<li><code>console.ui.icon-prefix</code>: The prefix to put before the page icons (favicon.ico, touch-icon.png, og-image.png)</li>
+<li><code>console.ui.canonical-url</code>: The page canonical URL</li>
+<li><code>console.ui.descriptions</code>: The page description</li>
+<li><code>console.ui.language</code>: The page language</li>
+<li><code>console.ui.site-name</code>: The site name</li>
+<li><code>console.ui.sub-title</code>: The page sub-title</li>
+<li><code>console.ui.support-link</code>: The URI that the support button will point to</li>
+<li><code>console.ui.theme-color</code>: The page theme color</li>
+<li><code>console.ui.title</code>: The page title</li>
+</ul>
+</div>
+
+<div class="is-clearfix">
+<a class="button is-pulled-left" href="/v3.7.0/reference/configuration/join-server/">← Join Server Options</a>
+<a class="button is-pulled-right" href="/v3.7.0/reference/configuration/cli/">Command-Line Interface Options →</a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer has-background-primary">
+  <div class="container">
+    <div class="columns">
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">The Things Stack</h3>
+        <p><a class="" href="/v3.7.0/guides/">Guides</a></p>
+        <p><a class="" href="/v3.7.0/concepts/">Concepts</a></p>
+        <p><a class="" href="/v3.7.0/components/">Components</a></p>
+        <p><a class="" href="/v3.7.0/reference/">Reference</a></p>
+      </nav>
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">Contributing</h3>
+        <p><a class="" href="https://github.com/TheThingsNetwork/lorawan-stack">GitHub</a></p>
+        <p><a class="" href="https://www.thethingsnetwork.org/forum/c/network-and-routing/v3">Forum</a></p>
+      </nav>
+      
+      <nav class="column is-one-quarter">
+        <h3 class="title is-6">About Us</h3>
+        <p><a class="" href="https://www.thethingsnetwork.org">The Things Network</a></p>
+        <p><a class="" href="https://www.thethingsindustries.com">The Things Industries</a></p>
+      </nav>
+      <div class="column is-one-quarter">
+        <h3 class="title is-6">About this page</h3>
+        <div class="content">
+<p class="has-text-light is-size-7">
+  Last changed by Kevin Schiffer on 26 Feb 2020.
+  <br>
+  <a href="https://github.com/TheThingsNetwork/lorawan-stack/commit/9e28d9667f62adcb01b06d0c0ec7b216c4f4cb89">
+      doc: Add console configuration reference
+    </a>
+</p>
+
+<a href="https://github.com/TheThingsNetwork/lorawan-stack/edit/master/doc/content/reference/configuration/console.md" class="button is-primary is-small is-inverted is-outlined">Edit on Github</a>
+</div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://thethingsstack.io/v3.7.0/js/theme.min.df15d52bc4d1307cdd17a69bb1c802fb4d36b2e7b3411817277dc80c16b97f3c.js" integrity="sha256-3xXVK8TRMHzdF6abscgC&#43;002suezQRgXJ33IDBa5fzw="></script>
+
+
+</body>
+
+</html>
