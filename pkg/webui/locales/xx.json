@@ -313,7 +313,6 @@
   "console.views.device-import.index.noTemplatesTitle": "Xx xxxxxx xxxxxxxxx xxxxx",
   "console.views.device-import.index.noTemplates": "Xxxxx xxx xxxxxxxxx xx xxxxxx xxxxxxxxx xxx xx. Xxxxxx xxx xx x xxxxxx xxxxxxxx xx xxxx xxx xx xxx xxxx xxxxxx xxxxxx xxxxxxx. Xxx xxxx xxxxxxxxxxx xxxxxx xxxxx xx xxx xxxxxxxxxxxxx.",
   "console.views.device-location.index.setDeviceLocation": "Xxx Xxxxxx Xxxxxxxx",
-  "console.views.device-mac-settings.device-mac-settings.dataRateValue": "Xxxx Xxxx {index}",
   "console.views.device-mac-settings.device-mac-settings.delayValue": "{count, plural, =one {{count} xxxxxx} other {{count} xxxxxxx}}",
   "console.views.device-mac-settings.device-mac-settings.pingSlotPeriodicityDescription": "Xxxxxxxxxxx xx xxx xxxxx X xxxx xxxx",
   "console.views.device-mac-settings.device-mac-settings.pingSlotPeriodicityTitle": "Xxxx Xxxx Xxxxxxxxxxx",
