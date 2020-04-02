@@ -68,7 +68,7 @@ const m = defineMessages({
 // 0...15
 const dataRateIndexOptions = Array.from({ length: 16 }, (_, index) => ({
   value: index,
-  label: index,
+  label: index.toString(),
 }))
 
 // 1...15
@@ -90,7 +90,7 @@ const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
 // 0...7
 const dataRateOffsetOptions = Array.from({ length: 8 }, (_, index) => ({
   value: index,
-  label: index,
+  label: index.toString(),
 }))
 
 const DeviceMacSettings = props => {
