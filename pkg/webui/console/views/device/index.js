@@ -42,7 +42,6 @@ import {
   selectDeviceError,
 } from '../../store/selectors/devices'
 import { selectJsConfig, selectAsConfig, selectNsConfig } from '../../../lib/selectors/env'
-import { isDeviceABP, isDeviceMulticast } from '../../lib/device-utils'
 
 import { mayReadApplicationDeviceKeys } from '../../lib/feature-checks'
 import PropTypes from '../../../lib/prop-types'
@@ -170,11 +169,8 @@ export default class Device extends React.Component {
       asConfig.enabled && application_server_address === getHostnameFromUrl(asConfig.base_url)
 
     const nsConfig = selectNsConfig()
-    const isABP = isDeviceABP(device)
-    const isMulticast = isDeviceMulticast(device)
     const hasNs =
       nsConfig.enabled && network_server_address === getHostnameFromUrl(nsConfig.base_url)
-    const showMacSettings = (isABP || isMulticast) && hasNs
 
     const basePath = `/applications/${appId}/devices/${devId}`
 
@@ -204,7 +200,7 @@ export default class Device extends React.Component {
         title: sharedMessages.macSettings,
         name: 'mac-settings',
         link: `${basePath}/mac-settings`,
-        disabled: !showMacSettings,
+        disabled: !hasNs,
       },
       {
         title: sharedMessages.generalSettings,
@@ -231,9 +227,7 @@ export default class Device extends React.Component {
           {hasJs && (
             <Route path={`${basePath}/claim-auth-code`} component={DeviceClaimAuthenticationCode} />
           )}
-          {showMacSettings && (
-            <Route path={`${basePath}/mac-settings`} component={DeviceMacSettings} />
-          )}
+          {hasNs && <Route path={`${basePath}/mac-settings`} component={DeviceMacSettings} />}
           <NotFoundRoute />
         </Switch>
       </React.Fragment>
