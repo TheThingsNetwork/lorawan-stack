@@ -257,6 +257,11 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf Forwa
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
 		for _, md := range msg.RxMetadata {
+			gtwIDs := md.GetGatewayIDs()
+			if gtwIDs == nil {
+				continue
+			}
+
 			var rssiStandardDeviation *pbtypes.FloatValue
 			if md.RSSIStandardDeviation > 0 {
 				rssiStandardDeviation = &pbtypes.FloatValue{
@@ -302,7 +307,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, conf Forwa
 			}
 			if len(gatewayUplinkToken) == 0 {
 				var err error
-				gatewayUplinkToken, err = wrapGatewayUplinkToken(md.GatewayIdentifiers, md.UplinkToken, conf.TokenEncrypter)
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(*gtwIDs, md.UplinkToken, conf.TokenEncrypter)
 				if err != nil {
 					return nil, errWrapGatewayUplinkToken.WithCause(err)
 				}

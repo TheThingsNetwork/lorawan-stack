@@ -22,6 +22,9 @@ func NewPopulatedRxMetadata(r randyMetadata, easy bool) *RxMetadata {
 	this := &RxMetadata{}
 	v1 := NewPopulatedGatewayIdentifiers(r, easy)
 	this.GatewayIdentifiers = *v1
+	if r.Intn(2) == 0 {
+		this.PacketBroker = NewPopulatedPacketBrokerMetadata(r, easy)
+	}
 	this.AntennaIndex = r.Uint32()
 	if r.Intn(10) != 0 {
 		this.Time = pbtypes.NewPopulatedStdTime(r, easy)
