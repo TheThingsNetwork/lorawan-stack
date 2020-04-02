@@ -35,7 +35,6 @@ import { isDeviceABP, isDeviceMulticast, ACTIVATION_MODES } from '../../lib/devi
 import validationSchema from './validation-schema'
 
 const m = defineMessages({
-  dataRateValue: 'Data Rate {index}',
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
   pingSlotPeriodicityDescription: 'Periodicity of the class B ping slot',
   pingSlotPeriodicityTitle: 'Ping Slot Periodicity',
@@ -60,9 +59,9 @@ const m = defineMessages({
 // Inconsistent mac_settings enum values see https://github.com/TheThingsNetwork/lorawan-stack/issues/2258
 
 // 0...15
-const dataRateIndexOptions = Array.from({ length: 15 }, (_, index) => ({
+const dataRateIndexOptions = Array.from({ length: 16 }, (_, index) => ({
   value: index,
-  label: <Message content={m.dataRateValue} values={{ index }} />,
+  label: index,
 }))
 
 // 1...15
