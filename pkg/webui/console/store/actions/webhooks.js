@@ -32,7 +32,11 @@ export const [
     failure: GET_WEBHOOKS_LIST_FAILURE,
   },
   { request: getWebhooksList, success: getWebhooksListSuccess, failure: getWebhooksListFailure },
-] = createRequestActions(GET_WEBHOOKS_LIST_BASE, appId => ({ appId }))
+] = createRequestActions(
+  GET_WEBHOOKS_LIST_BASE,
+  appId => ({ appId }),
+  (appId, selector) => ({ selector }),
+)
 
 export const UPDATE_WEBHOOK_BASE = 'UPDATE_WEBHOOK'
 export const [
