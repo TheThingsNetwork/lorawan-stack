@@ -1,7 +1,6 @@
 ---
 title: "Gateway Server APIs"
 description: ""
-weight: 6
 ---
 
 ## <a name="Gs">The `Gs` service</a>

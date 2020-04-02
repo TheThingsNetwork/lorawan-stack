@@ -1,7 +1,6 @@
 ---
 title: "Application Server APIs"
 description: ""
-weight: 2
 ---
 
 ## The `As` service

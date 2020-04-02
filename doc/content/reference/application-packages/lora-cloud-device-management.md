@@ -1,16 +1,15 @@
 ---
-title: "LoRa Cloud Device Management"
+title: "Semtech LoRa Cloud Device Management"
 description: ""
-weight: 2
 ---
 
-The LoRa Cloud Device Management v1 application package communicates the uplinks received from a compatible device to the LoRa Cloud Device Management Service, and schedules the downlinks received from the service back to the device.
+The Semtech LoRa Cloud Device Management v1 application package communicates the uplinks received from a compatible device to the Semtech LoRa Cloud Device Management Service, and schedules the downlinks received from the service back to the device.
 
-More information on the LoRa Cloud Device Management can be found in the [official documentation](https://www.loracloud.com/documentation/device_management?url=overview.html).
+More information on the Semtech LoRa Cloud Device Management can be found in the [official documentation](https://www.loracloud.com/documentation/device_management?url=overview.html).
 
 ## Creating a New Uplink Token
 
-In order to use the LoRa Cloud Device Management application package a new access token must be created in order to allow the Application Server to send the uplinks to the Device Management Service. The new token can be created in the LoRa Cloud Device Management portal, in the section **Token Management**.
+In order to use the Semtech LoRa Cloud Device Management application package a new access token must be created in order to allow the Application Server to send the uplinks to the Device Management Service. The new token can be created in the Semtech LoRa Cloud Device Management portal, in the section **Token Management**.
 
 {{< figure src="../lora-dms-token-creation.png" alt="Token creation" >}}
 
@@ -31,7 +30,7 @@ $ echo '{ "token": "AQEAdqwV67..." }' > package-data.json
 $ ttn-lw-cli applications packages associations set app1 dev1 200 --package-name lora-cloud-device-management-v1 --data-local-file package-data.json
 ```
 
-This will enable the package on FPort `200` of the device `dev1` of application `app1`. You can now use the LoRa Cloud Device Management in order to manage your device !
+This will enable the package on FPort `200` of the device `dev1` of application `app1`. You can now use the Semtech LoRa Cloud Device Management in order to manage your device !
 
 <details><summary>Show output</summary>
 ```json

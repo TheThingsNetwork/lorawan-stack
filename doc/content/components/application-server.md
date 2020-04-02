@@ -1,7 +1,6 @@
 ---
 title: "Application Server"
 description: ""
-weight: 4
 ---
 
 The Application Server handles the LoRaWAN application layer, including uplink data decryption and decoding, downlink queuing and downlink data encoding and encryption.

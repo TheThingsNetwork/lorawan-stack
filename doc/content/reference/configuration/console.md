@@ -1,7 +1,6 @@
 ---
 title: "Console Options"
 description: ""
-weight: 7
 ---
 
 ## Console Mount

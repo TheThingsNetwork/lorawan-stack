@@ -1,7 +1,6 @@
 ---
 title: "Data Formats"
 description: ""
-weight: 10
 ---
 
 The streaming data integrations provide multiple formats for the delivery of application uplink messages and downlink queue operations. This section will delve into the common formats used by them.
