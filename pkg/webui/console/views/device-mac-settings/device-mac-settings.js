@@ -80,6 +80,12 @@ const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
   }
 })
 
+// 0...7
+const dataRateOffsetOptions = Array.from({ length: 8 }, (_, index) => ({
+  value: index,
+  label: index,
+}))
+
 const DeviceMacSettings = props => {
   const { updateDevice, device, appId, devId } = props
   const { mac_settings = {} } = device
@@ -171,13 +177,10 @@ const DeviceMacSettings = props => {
                   options={rx1DelayOptions}
                 />
                 <Form.Field
-                  type="number"
-                  min={0}
-                  max={7}
-                  step={1}
                   title={m.rx1DataRateOffsetTitle}
                   name="mac_settings.rx1_data_rate_offset"
-                  component={Input}
+                  component={Select}
+                  options={dataRateOffsetOptions}
                 />
                 <Form.Field
                   title={m.resetsFCnt}
