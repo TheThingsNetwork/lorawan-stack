@@ -77,8 +77,8 @@ const DeviceClaimAuthenticationCode = props => {
       // Convert ISO 8601 date time representation to just yyyy-MM-dd required by the
       // date input. So, we pick only the data part from YYYY-MM-DDTHH:mm:ss.sssZ which is
       // known to be fixed.
-      const validFrom = new Date(valid_from).toISOString().slice(0, 10)
-      const validTo = new Date(valid_to).toISOString().slice(0, 10)
+      const validFrom = valid_from ? new Date(valid_from).toISOString().slice(0, 10) : undefined
+      const validTo = valid_from ? new Date(valid_to).toISOString().slice(0, 10) : undefined
 
       return {
         claim_authentication_code: {
