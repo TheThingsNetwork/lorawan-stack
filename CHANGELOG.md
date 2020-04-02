@@ -9,24 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- View/edit `update_location_from_status` gateway property using the Console.
-
 ### Changed
-
-- Default DevStatus periodicity is increased, which means that, by default, DevStatusReq will be scheduled less often.
-- Default class B and C timeouts are increased, which means that, by default, if the Network Server expects an uplink from the device after a downlink, it will wait longer before rescheduling the downlink.
-- In case downlink frame carries MAC requests, Network Server will not force the downlink to be sent confirmed in class B and C.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
-
-- End device location display bug when deleting the location entry in the Console.
-- GS could panic when gateway connection stats were updated while updating the registry.
-- Local CLI and stack config files now properly override global config.
-- Error display on failed end device deletion in the Console.
 
 ### Security
 
@@ -40,6 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 - Edit application attributes in Application General Settings in the Console
 - New `use` CLI command to automatically generate CLI configuration files.
+- View/edit `update_location_from_status` gateway property using the Console.
+
+### Changed
+
+- Default DevStatus periodicity is increased, which means that, by default, DevStatusReq will be scheduled less often.
+- Default class B and C timeouts are increased, which means that, by default, if the Network Server expects an uplink from the device after a downlink, it will wait longer before rescheduling the downlink.
+- In case downlink frame carries MAC requests, Network Server will not force the downlink to be sent confirmed in class B and C.
 
 ### Fixed
 
@@ -48,6 +44,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix too restrictive MQTT client validation in PubSub form in the Console.
 - Fix faulty display of device event stream data for end devices with the same ID in different applications.
 - Trailing slashes handling in webhook paths.
+- End device location display bug when deleting the location entry in the Console.
+- GS could panic when gateway connection stats were updated while updating the registry.
+- Local CLI and stack config files now properly override global config.
+- Error display on failed end device deletion in the Console.
 
 ## [3.6.3] (2020-03-30)
 
