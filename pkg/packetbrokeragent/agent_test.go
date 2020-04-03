@@ -76,21 +76,19 @@ func TestForwarder(t *testing.T) {
 		Key:       tokenKey,
 	}, nil)).(jose.Encrypter)
 	test.Must(New(c, &Config{
-		DataPlaneAddress:  fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
-		NetID:             types.NetID{0x0, 0x0, 0x13},
-		SubscriptionGroup: "test",
-		TenantID:          "test",
+		DataPlaneAddress: fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
+		NetID:            types.NetID{0x0, 0x0, 0x13},
+		TenantID:         "test",
+		ClusterID:        "test",
+		TLS: TLSConfig{
+			Source:      "file",
+			Certificate: "testdata/clientcert.pem",
+			Key:         "testdata/clientkey.pem",
+		},
 		Forwarder: ForwarderConfig{
 			Enable: true,
-			ID:     "test",
-			TLS: TLSConfig{
-				Source:      "file",
-				Certificate: "testdata/clientcert.pem",
-				Key:         "testdata/clientkey.pem",
-			},
 			WorkerPool: WorkerPoolConfig{
-				MaximumWorkerCount: 1,
-				BusyTimeout:        timeout,
+				Limit: 1,
 			},
 			TokenKey:       tokenKey,
 			TokenEncrypter: tokenEncrypter,
@@ -397,20 +395,19 @@ func TestHomeNetwork(t *testing.T) {
 
 	ns := test.Must(mock.NewNetworkServer(c)).(*mock.NetworkServer)
 	test.Must(New(c, &Config{
-		DataPlaneAddress:  fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
-		NetID:             types.NetID{0x0, 0x0, 0x13},
-		SubscriptionGroup: "test",
-		TenantID:          "test",
+		DataPlaneAddress: fmt.Sprintf("localhost:%d", addr.(*net.TCPAddr).Port),
+		NetID:            types.NetID{0x0, 0x0, 0x13},
+		TenantID:         "test",
+		ClusterID:        "test",
+		TLS: TLSConfig{
+			Source:      "file",
+			Certificate: "testdata/clientcert.pem",
+			Key:         "testdata/clientkey.pem",
+		},
 		HomeNetwork: HomeNetworkConfig{
 			Enable: true,
-			TLS: TLSConfig{
-				Source:      "file",
-				Certificate: "testdata/clientcert.pem",
-				Key:         "testdata/clientkey.pem",
-			},
 			WorkerPool: WorkerPoolConfig{
-				MaximumWorkerCount: 1,
-				BusyTimeout:        timeout,
+				Limit: 1,
 			},
 		},
 	}))

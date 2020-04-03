@@ -59,9 +59,11 @@ type Agent struct {
 	*component.Component
 	ctx context.Context
 
-	dataPlaneAddress  string
-	netID             types.NetID
-	tenantID          string
+	dataPlaneAddress string
+	netID            types.NetID
+	tenantID,
+	clusterID string
+	tlsConfig         TLSConfig
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
 	subscriptionGroup string
@@ -122,9 +124,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		dataPlaneAddress:  conf.DataPlaneAddress,
 		netID:             conf.NetID,
 		tenantID:          conf.TenantID,
+		clusterID:         conf.ClusterID,
+		tlsConfig:         conf.TLS,
 		forwarderConfig:   conf.Forwarder,
 		homeNetworkConfig: conf.HomeNetwork,
-		subscriptionGroup: conf.SubscriptionGroup,
 		devAddrPrefixes:   devAddrPrefixes,
 	}
 	if a.forwarderConfig.Enable {
@@ -231,11 +234,11 @@ func (a *Agent) publishUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbroker/agent",
 		"forwarder_net_id", a.netID,
-		"forwarder_id", a.forwarderConfig.ID,
+		"forwarder_id", a.clusterID,
 		"forwarder_tenant_id", a.tenantID,
 	))
 
-	conn, err := a.dialContext(ctx, a.forwarderConfig.TLS, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
@@ -302,7 +305,7 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 			}
 			req := &packetbroker.PublishUplinkMessageRequest{
 				ForwarderNetId:    a.netID.MarshalNumber(),
-				ForwarderId:       a.forwarderConfig.ID,
+				ForwarderId:       a.clusterID,
 				ForwarderTenantId: a.tenantID,
 				Message:           msg,
 			}
@@ -322,11 +325,11 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "packetbroker/agent",
 		"forwarder_net_id", a.netID,
-		"forwarder_id", a.forwarderConfig.ID,
+		"forwarder_id", a.clusterID,
 		"forwarder_tenant_id", a.tenantID,
 	))
 
-	conn, err := a.dialContext(ctx, a.forwarderConfig.TLS, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
@@ -336,7 +339,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	client := packetbroker.NewRouterForwarderDataClient(conn)
 	stream, err := client.Subscribe(ctx, &packetbroker.SubscribeForwarderRequest{
 		ForwarderNetId:    a.netID.MarshalNumber(),
-		ForwarderId:       a.forwarderConfig.ID,
+		ForwarderId:       a.clusterID,
 		ForwarderTenantId: a.tenantID,
 		Group:             a.subscriptionGroup,
 	})
@@ -477,7 +480,7 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 				List: []*packetbroker.ForwarderIdentifier{
 					{
 						NetId:       a.netID.MarshalNumber(),
-						ForwarderId: a.forwarderConfig.ID,
+						ForwarderId: a.clusterID,
 					},
 				},
 			},
@@ -497,7 +500,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 		"home_network_tenant_id", a.tenantID,
 	))
 
-	conn, err := a.dialContext(ctx, a.homeNetworkConfig.TLS, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
@@ -638,7 +641,7 @@ func (a *Agent) publishDownlink(ctx context.Context) error {
 		"home_network_tenant_id", a.tenantID,
 	))
 
-	conn, err := a.dialContext(ctx, a.homeNetworkConfig.TLS, a.dataPlaneAddress)
+	conn, err := a.dialContext(ctx, a.tlsConfig, a.dataPlaneAddress)
 	if err != nil {
 		return err
 	}
