@@ -425,7 +425,11 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		}
 
 	case len(cmdBuf) > 0, needsDownlink:
-		pld.FHDR.FCnt = dev.Session.LastNFCntDown + 1
+		var fCnt uint32
+		if dev.Session.LastNFCntDown > 0 || len(dev.MACState.RecentDownlinks) > 0 {
+			fCnt = dev.Session.LastNFCntDown + 1
+		}
+		pld.FHDR.FCnt = fCnt
 
 	default:
 		return nil, genState, errNoDownlink.New()
