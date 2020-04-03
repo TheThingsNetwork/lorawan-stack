@@ -16,6 +16,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
+import PropTypes from '../../../lib/prop-types'
 import sharedMessages from '../../../lib/shared-messages'
 import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '../../../components/breadcrumbs/context'
@@ -25,15 +26,45 @@ import ApplicationWebhooksList from '../application-integrations-webhooks-list'
 import ApplicationWebhookAdd from '../application-integrations-webhook-add'
 import ApplicationWebhookEdit from '../application-integrations-webhook-edit'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-
+import withRequest from '../../../lib/components/with-request'
 import { mayViewApplicationEvents } from '../../lib/feature-checks'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import PropTypes from '../../../lib/prop-types'
+import { listWebhookTemplates } from '../../store/actions/webhook-templates'
+import {
+  selectWebhookTemplates,
+  selectWebhookTemplatesFetching,
+} from '../../store/selectors/webhook-templates'
 
-@connect(state => ({ appId: selectSelectedApplicationId(state) }))
+const selector = [
+  'description',
+  'logo_url',
+  'info_url',
+  'documentation_url',
+  'fields',
+  'format',
+  'headers',
+  'create_downlink_api_key',
+  'base_url',
+  'uplink_message',
+]
+
+@connect(
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    webhookTemplates: selectWebhookTemplates(state),
+    fetching: selectWebhookTemplatesFetching(state),
+  }),
+  {
+    listWebhookTemplates,
+  },
+)
 @withFeatureRequirement(mayViewApplicationEvents, {
   redirect: ({ appId }) => `/applications/${appId}`,
 })
+@withRequest(
+  ({ listWebhookTemplates }) => listWebhookTemplates(selector),
+  ({ webhookTemplates, fetching }) => fetching || !Boolean(webhookTemplates),
+)
 @withBreadcrumb('apps.single.integrations.webhooks', ({ appId }) => (
   <Breadcrumb
     path={`/applications/${appId}/integrations/webhooks`}
