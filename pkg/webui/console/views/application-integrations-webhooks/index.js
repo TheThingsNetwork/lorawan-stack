@@ -25,6 +25,7 @@ import SubViewError from '../error/sub-view'
 import ApplicationWebhooksList from '../application-integrations-webhooks-list'
 import ApplicationWebhookAdd from '../application-integrations-webhook-add'
 import ApplicationWebhookEdit from '../application-integrations-webhook-edit'
+import ApplicationWebhookChoose from '../application-integrations-webhook-add-choose'
 import withFeatureRequirement from '../../lib/components/with-feature-requirement'
 import withRequest from '../../../lib/components/with-request'
 import { mayViewApplicationEvents } from '../../lib/feature-checks'
@@ -33,6 +34,7 @@ import { listWebhookTemplates } from '../../store/actions/webhook-templates'
 import {
   selectWebhookTemplates,
   selectWebhookTemplatesFetching,
+  selectWebhookTemplatesError,
 } from '../../store/selectors/webhook-templates'
 
 const selector = [
@@ -53,6 +55,7 @@ const selector = [
     appId: selectSelectedApplicationId(state),
     webhookTemplates: selectWebhookTemplates(state),
     fetching: selectWebhookTemplatesFetching(state),
+    error: selectWebhookTemplatesError(state),
   }),
   {
     listWebhookTemplates,
@@ -84,7 +87,8 @@ export default class ApplicationWebhooks extends React.Component {
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationWebhooksList} />
           <Route exact path={`${match.path}/add`} component={ApplicationWebhookAdd} />
-          <Route path={`${match.path}/:webhookId`} component={ApplicationWebhookEdit} />
+          <Route exact path={`${match.path}/:webhookId`} component={ApplicationWebhookEdit} />
+          <Route path={`${match.path}/add/template`} component={ApplicationWebhookChoose} />
         </Switch>
       </ErrorView>
     )

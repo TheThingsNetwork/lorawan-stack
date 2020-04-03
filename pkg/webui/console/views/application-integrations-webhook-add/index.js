@@ -13,70 +13,35 @@
 // limitations under the License.
 
 import React, { Component } from 'react'
-import { Container, Col, Row } from 'react-grid-system'
-import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { Redirect } from 'react-router'
 
-import PageTitle from '../../../components/page-title'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import WebhookForm from '../../components/webhook-form'
-
-import sharedMessages from '../../../lib/shared-messages'
-
+import ApplicationWebhookAddForm from '../application-integrations-webhook-add-form'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
-
-import api from '../../api'
+import { selectWebhookTemplates } from '../../store/selectors/webhook-templates'
 import PropTypes from '../../../lib/prop-types'
 
-@connect(
-  state => ({
-    appId: selectSelectedApplicationId(state),
-  }),
-  dispatch => ({
-    navigateToList: appId => dispatch(push(`/applications/${appId}/integrations/webhooks`)),
-  }),
-)
-@withBreadcrumb('apps.single.integrations.add', function(props) {
-  const { appId } = props
-  return (
-    <Breadcrumb path={`/applications/${appId}/integrations/add`} content={sharedMessages.add} />
-  )
-})
-@bind
+@connect(state => ({
+  appId: selectSelectedApplicationId(state),
+  hasTemplates: selectWebhookTemplates(state).length !== 0,
+}))
 export default class ApplicationWebhookAdd extends Component {
   static propTypes = {
-    appId: PropTypes.string.isRequired,
-    navigateToList: PropTypes.func.isRequired,
+    hasTemplates: PropTypes.bool.isRequired,
+    match: PropTypes.match.isRequired,
   }
-
-  async handleSubmit(webhook) {
-    const { appId } = this.props
-
-    await api.application.webhooks.create(appId, webhook)
-  }
-
-  handleSubmitSuccess() {
-    const { navigateToList, appId } = this.props
-
-    navigateToList(appId)
-  }
-
   render() {
-    return (
-      <Container>
-        <PageTitle title={sharedMessages.addWebhook} />
-        <Row>
-          <Col lg={8} md={12}>
-            <WebhookForm
-              update={false}
-              onSubmit={this.handleSubmit}
-              onSubmitSuccess={this.handleSubmitSuccess}
-            />
-          </Col>
-        </Row>
-      </Container>
-    )
+    const {
+      match,
+      match: { url: path },
+      hasTemplates,
+    } = this.props
+
+    // Forward to the template chooser, when templates have been configured
+    if (hasTemplates) {
+      return <Redirect to={`${path}/template`} />
+    }
+
+    return <ApplicationWebhookAddForm match={match} />
   }
 }
