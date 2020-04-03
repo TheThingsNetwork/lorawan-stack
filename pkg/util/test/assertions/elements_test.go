@@ -15,11 +15,8 @@
 package assertions
 
 import (
-	"fmt"
-	"io"
 	"reflect"
 	"strconv"
-	"sync"
 	"testing"
 
 	"github.com/smartystreets/assertions"

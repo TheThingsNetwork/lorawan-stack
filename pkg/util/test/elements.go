@@ -177,4 +177,3 @@ func IsProperSubsetOfElements(eq interface{}, sub, super interface{}) bool {
 func SameElements(eq interface{}, xs, ys interface{}) bool {
 	return IsSubsetOfElements(eq, xs, ys) && IsSubsetOfElements(eq, ys, xs)
 }
-

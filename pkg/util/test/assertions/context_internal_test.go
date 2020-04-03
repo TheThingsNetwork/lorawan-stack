@@ -150,7 +150,7 @@ func TestContextParent(t *testing.T) {
 }
 
 func TestContextRoot(t *testing.T) {
-	var root = context.Background()
+	root := context.Background()
 
 	for _, tc := range []struct {
 		Name    string
