@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import * as pubsubs from '../../actions/pubsubs'
+import * as pubsubFormats from '../../actions/pubsub-formats'
 
 import api from '../../../api'
 import createRequestLogic from './lib'
@@ -46,4 +47,12 @@ const updatePubsubsLogic = createRequestLogic({
   },
 })
 
-export default [getPubsubLogic, getPubsubsLogic, updatePubsubsLogic]
+const getPubsubFormatsLogic = createRequestLogic({
+  type: pubsubFormats.GET_PUBSUB_FORMATS,
+  async process() {
+    const { formats } = await api.application.pubsubs.getFormats()
+    return formats
+  },
+})
+
+export default [getPubsubLogic, getPubsubsLogic, updatePubsubsLogic, getPubsubFormatsLogic]
