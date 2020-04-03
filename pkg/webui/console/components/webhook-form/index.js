@@ -17,6 +17,7 @@ import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 import bind from 'autobind-decorator'
 
+import WebhookTemplateInfo from '../../components/webhook-template-info'
 import Form from '../../../components/form'
 import Input from '../../../components/input'
 import SubmitBar from '../../../components/submit-bar'
@@ -49,6 +50,7 @@ const m = defineMessages({
   downlinkAPIKey: 'Downlink API Key',
   downlinkAPIKeyDesc:
     'The API Key will be provided to the endpoint using the X-Downlink-Apikey header',
+  templateInformation: 'Template information',
 })
 
 const headerCheck = headers =>
@@ -70,7 +72,6 @@ const validationSchema = Yup.object().shape({
   downlink_api_key: Yup.string().matches(webhookAPIKeyRegexp, sharedMessages.validateFormat),
 })
 
-@bind
 export default class WebhookForm extends Component {
   static propTypes = {
     appId: PropTypes.string,
@@ -86,6 +87,7 @@ export default class WebhookForm extends Component {
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func.isRequired,
     update: PropTypes.bool.isRequired,
+    webhookTemplate: PropTypes.webhookTemplate,
   }
 
   static defaultProps = {
@@ -95,18 +97,16 @@ export default class WebhookForm extends Component {
     onDeleteFailure: () => null,
     onDeleteSuccess: () => null,
     onDelete: () => null,
+    webhookTemplate: undefined,
   }
 
-  constructor(props) {
-    super(props)
-
-    this.form = React.createRef()
-  }
+  form = React.createRef()
 
   state = {
     error: '',
   }
 
+  @bind
   async handleSubmit(values, { setSubmitting, resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
     const webhook = mapFormValuesToWebhook(values, appId)
@@ -126,6 +126,7 @@ export default class WebhookForm extends Component {
     }
   }
 
+  @bind
   async handleDelete() {
     const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
     try {
@@ -139,7 +140,7 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const { update, initialWebhookValue } = this.props
+    const { update, initialWebhookValue, webhookTemplate } = this.props
     const { error } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
@@ -147,127 +148,130 @@ export default class WebhookForm extends Component {
     }
 
     return (
-      <Form
-        onSubmit={this.handleSubmit}
-        validationSchema={validationSchema}
-        initialValues={initialValues}
-        error={error}
-        formikRef={this.form}
-      >
-        <Message component="h4" content={sharedMessages.generalInformation} />
-        <Form.Field
-          name="webhook_id"
-          title={sharedMessages.webhookId}
-          placeholder={m.idPlaceholder}
-          component={Input}
-          required
-          autoFocus
-          disabled={update}
-        />
-        <WebhookFormatSelector horizontal name="format" required />
-        <Form.Field
-          name="headers"
-          title={m.headers}
-          keyPlaceholder={m.headersKeyPlaceholder}
-          valuePlaceholder={m.headersValuePlaceholder}
-          addMessage={m.headersAdd}
-          component={KeyValueMap}
-        />
-        <Form.Field
-          name="base_url"
-          title={sharedMessages.webhookBaseUrl}
-          placeholder="http://example.com/webhooks"
-          component={Input}
-          required
-        />
-        <Form.Field
-          name="downlink_api_key"
-          title={m.downlinkAPIKey}
-          component={Input}
-          description={m.downlinkAPIKeyDesc}
-          code
-        />
-        <Message component="h4" content={sharedMessages.messageTypes} />
-        <Notification info content={m.messageInfo} small />
-        <Form.Field
-          name="uplink_message"
-          type="toggled-input"
-          title={sharedMessages.uplinkMessage}
-          placeholder={pathPlaceholder}
-          component={Input.Toggled}
-        />
-        <Form.Field
-          name="join_accept"
-          type="toggled-input"
-          title={sharedMessages.joinAccept}
-          placeholder={pathPlaceholder}
-          component={Input.Toggled}
-        />
-        <Form.Field
-          name="downlink_ack"
-          type="toggled-input"
-          title={sharedMessages.downlinkAck}
-          placeholder={pathPlaceholder}
-          component={Input.Toggled}
-        />
-        <Form.Field
-          name="downlink_nack"
-          type="toggled-input"
-          title={sharedMessages.downlinkNack}
-          placeholder={pathPlaceholder}
-          component={Input.Toggled}
-        />
-        <Form.Field
-          name="downlink_sent"
-          type="toggled-input"
-          title={sharedMessages.downlinkSent}
-          placeholder={pathPlaceholder}
-          component={Input.Toggled}
-        />
-        <Form.Field
-          name="downlink_failed"
-          type="toggled-input"
-          title={sharedMessages.downlinkFailed}
-          placeholder={pathPlaceholder}
-          component={Input.Toggled}
-        />
-        <Form.Field
-          name="downlink_queued"
-          type="toggled-input"
-          title={sharedMessages.downlinkQueued}
-          placeholder={pathPlaceholder}
-          component={Input.Toggled}
-        />
-        <Form.Field
-          name="location_solved"
-          type="toggled-input"
-          title={sharedMessages.locationSolved}
-          placeholder={pathPlaceholder}
-          component={Input.Toggled}
-        />
-        <SubmitBar>
-          <Form.Submit
-            component={SubmitButton}
-            message={update ? sharedMessages.saveChanges : sharedMessages.addWebhook}
+      <>
+        {Boolean(webhookTemplate) && <WebhookTemplateInfo webhookTemplate={webhookTemplate} />}
+        <Form
+          onSubmit={this.handleSubmit}
+          validationSchema={validationSchema}
+          initialValues={initialValues}
+          error={error}
+          formikRef={this.form}
+        >
+          <Message component="h4" content={sharedMessages.generalSettings} />
+          <Form.Field
+            name="webhook_id"
+            title={sharedMessages.webhookId}
+            placeholder={m.idPlaceholder}
+            component={Input}
+            required
+            autoFocus
+            disabled={update}
           />
-          {update && (
-            <ModalButton
-              type="button"
-              icon="delete"
-              danger
-              naked
-              message={m.deleteWebhook}
-              modalData={{
-                message: {
-                  values: { webhookId: initialWebhookValue.ids.webhook_id },
-                  ...m.modalWarning,
-                },
-              }}
-              onApprove={this.handleDelete}
+          <WebhookFormatSelector horizontal name="format" required />
+          <Form.Field
+            name="headers"
+            title={m.headers}
+            keyPlaceholder={m.headersKeyPlaceholder}
+            valuePlaceholder={m.headersValuePlaceholder}
+            addMessage={m.headersAdd}
+            component={KeyValueMap}
+          />
+          <Form.Field
+            name="base_url"
+            title={sharedMessages.webhookBaseUrl}
+            placeholder="https://example.com/webhooks"
+            component={Input}
+            required
+          />
+          <Form.Field
+            name="downlink_api_key"
+            title={m.downlinkAPIKey}
+            component={Input}
+            description={m.downlinkAPIKeyDesc}
+            code
+          />
+          <Message component="h4" content={sharedMessages.messageTypes} />
+          <Notification info content={m.messageInfo} small />
+          <Form.Field
+            name="uplink_message"
+            type="toggled-input"
+            title={sharedMessages.uplinkMessage}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <Form.Field
+            name="join_accept"
+            type="toggled-input"
+            title={sharedMessages.joinAccept}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <Form.Field
+            name="downlink_ack"
+            type="toggled-input"
+            title={sharedMessages.downlinkAck}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <Form.Field
+            name="downlink_nack"
+            type="toggled-input"
+            title={sharedMessages.downlinkNack}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <Form.Field
+            name="downlink_sent"
+            type="toggled-input"
+            title={sharedMessages.downlinkSent}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <Form.Field
+            name="downlink_failed"
+            type="toggled-input"
+            title={sharedMessages.downlinkFailed}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <Form.Field
+            name="downlink_queued"
+            type="toggled-input"
+            title={sharedMessages.downlinkQueued}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <Form.Field
+            name="location_solved"
+            type="toggled-input"
+            title={sharedMessages.locationSolved}
+            placeholder={pathPlaceholder}
+            component={Input.Toggled}
+          />
+          <SubmitBar>
+            <Form.Submit
+              component={SubmitButton}
+              message={update ? sharedMessages.saveChanges : sharedMessages.addWebhook}
             />
-          )}
-        </SubmitBar>
-      </Form>
+            {update && (
+              <ModalButton
+                type="button"
+                icon="delete"
+                danger
+                naked
+                message={m.deleteWebhook}
+                modalData={{
+                  message: {
+                    values: { webhookId: initialWebhookValue.ids.webhook_id },
+                    ...m.modalWarning,
+                  },
+                }}
+                onApprove={this.handleDelete}
+              />
+            )}
+          </SubmitBar>
+        </Form>
+      </>
     )
   }
 }
