@@ -34,7 +34,7 @@ const m = defineMessages({
   deleteSuccess: 'Successfully deleted webhook',
 })
 
-@withBreadcrumb('apps.single.integrations.edit', function(props) {
+@withBreadcrumb('apps.single.integrations.webhooks.edit', function(props) {
   const {
     appId,
     match: {
@@ -55,6 +55,11 @@ export default class ApplicationWebhookEdit extends Component {
     navigateToList: PropTypes.func.isRequired,
     updateWebhook: PropTypes.func.isRequired,
     webhook: PropTypes.webhook.isRequired,
+    webhookTemplate: PropTypes.webhookTemplate,
+  }
+
+  static defaultProps = {
+    webhookTemplate: undefined,
   }
 
   @bind
@@ -105,7 +110,7 @@ export default class ApplicationWebhookEdit extends Component {
   }
 
   render() {
-    const { webhook, appId } = this.props
+    const { webhook, appId, webhookTemplate } = this.props
 
     return (
       <Container>
@@ -116,6 +121,7 @@ export default class ApplicationWebhookEdit extends Component {
               update
               appId={appId}
               initialWebhookValue={webhook}
+              webhookTemplate={webhookTemplate}
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
               onDelete={this.handleDelete}

@@ -23,8 +23,10 @@ import {
   selectWebhookError,
 } from '../../store/selectors/webhooks'
 import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import { selectWebhookTemplateById } from '../../store/selectors/webhook-templates'
 import { getWebhook, updateWebhook } from '../../store/actions/webhooks'
 import { attachPromise } from '../../store/actions/lib'
+import { getWebhookTemplateId } from '../../../lib/selectors/id'
 
 const webhookEntitySelector = [
   'base_url',
@@ -39,14 +41,23 @@ const webhookEntitySelector = [
   'downlink_failed',
   'downlink_queued',
   'location_solved',
+  'template_ids',
 ]
 
-const mapStateToProps = state => ({
-  appId: selectSelectedApplicationId(state),
-  webhook: selectSelectedWebhook(state),
-  fetching: selectWebhookFetching(state),
-  error: selectWebhookError(state),
-})
+const mapStateToProps = state => {
+  const webhook = selectSelectedWebhook(state)
+  const webhookTemplateId = getWebhookTemplateId(webhook)
+  const webhookTemplate = Boolean(webhookTemplateId)
+    ? selectWebhookTemplateById(state, webhookTemplateId)
+    : undefined
+  return {
+    appId: selectSelectedApplicationId(state),
+    webhook,
+    webhookTemplate,
+    fetching: selectWebhookFetching(state),
+    error: selectWebhookError(state),
+  }
+}
 
 const promisifiedUpdateWebhook = attachPromise(updateWebhook)
 const mapDispatchToProps = (dispatch, { match }) => {
