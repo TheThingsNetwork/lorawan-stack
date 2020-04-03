@@ -29,6 +29,8 @@ import {
   selectWebhooksFetching,
 } from '../../../console/store/selectors/webhooks'
 
+import style from './webhooks-table.styl'
+
 const m = defineMessages({
   templateId: 'Template ID',
   format: 'Format',
@@ -42,20 +44,20 @@ const headers = [
     width: 40,
   },
   {
+    name: 'base_url',
+    displayName: m.baseUrl,
+    width: 37,
+  },
+  {
     name: 'template_ids.template_id',
     displayName: m.templateId,
     width: 15,
-    render: value => value || <i>none</i>,
+    render: value => value || <Message className={style.none} content={sharedMessages.none} />,
   },
   {
     name: 'format',
     displayName: m.format,
-    width: 15,
-  },
-  {
-    name: 'base_url',
-    displayName: m.baseUrl,
-    width: 30,
+    width: 8,
   },
 ]
 
