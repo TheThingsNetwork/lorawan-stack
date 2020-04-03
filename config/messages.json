@@ -5507,6 +5507,15 @@
       "file": "config.go"
     }
   },
+  "error:pkg/networkserver:duplicate": {
+    "translations": {
+      "en": "uplink is a duplicate"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/networkserver:empty_session": {
     "translations": {
       "en": "session in empty"
@@ -7280,7 +7289,7 @@
       "file": "observability.go"
     }
   },
-  "event:ns.application.begin_link": {
+  "event:ns.application.link.begin": {
     "translations": {
       "en": "begin application link"
     },
@@ -7289,7 +7298,7 @@
       "file": "observability.go"
     }
   },
-  "event:ns.application.end_link": {
+  "event:ns.application.link.end": {
     "translations": {
       "en": "end application link"
     },
@@ -7319,6 +7328,60 @@
   "event:ns.class.switch.c": {
     "translations": {
       "en": "switched to class C"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.down.data.schedule.attempt": {
+    "translations": {
+      "en": "schedule data downlink for transmission on Gateway Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.down.data.schedule.fail": {
+    "translations": {
+      "en": "failed to schedule data downlink for transmission on Gateway Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.down.data.schedule.success": {
+    "translations": {
+      "en": "successfully scheduled data downlink for transmission on Gateway Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.down.join.schedule.attempt": {
+    "translations": {
+      "en": "schedule join-accept for transmission on Gateway Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.down.join.schedule.fail": {
+    "translations": {
+      "en": "failed to schedule join-accept for transmission on Gateway Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.down.join.schedule.success": {
+    "translations": {
+      "en": "successfully scheduled join-accept for transmission on Gateway Server"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -7615,7 +7678,7 @@
   },
   "event:ns.mac.proprietary.receive": {
     "translations": {
-      "en": "proprietary MAC command received"
+      "en": "receive proprietary MAC command"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -7750,7 +7813,61 @@
   },
   "event:ns.up.data.forward": {
     "translations": {
-      "en": "forward data message"
+      "en": "forward data message to Application Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.data.process": {
+    "translations": {
+      "en": "successfully processed data message"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.data.receive": {
+    "translations": {
+      "en": "receive data message"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.join.accept.forward": {
+    "translations": {
+      "en": "forward join-accept to Application Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.join.cluster.attempt": {
+    "translations": {
+      "en": "send join-request to cluster-local Join Server"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.join.cluster.fail": {
+    "translations": {
+      "en": "join-request to cluster-local Join Server failed"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "observability.go"
+    }
+  },
+  "event:ns.up.join.cluster.success": {
+    "translations": {
+      "en": "join-request to cluster-local Join Server succeeded"
     },
     "description": {
       "package": "pkg/networkserver",
@@ -7766,54 +7883,45 @@
       "file": "observability.go"
     }
   },
-  "event:ns.up.join.forward": {
+  "event:ns.up.join.interop.attempt": {
     "translations": {
-      "en": "forward join-request"
+      "en": "forward join-request to interoperability Join Server"
     },
     "description": {
       "package": "pkg/networkserver",
       "file": "observability.go"
     }
   },
-  "event:ns.up.merge_metadata": {
+  "event:ns.up.join.interop.fail": {
     "translations": {
-      "en": "merge uplink message metadata"
+      "en": "join-request to interoperability Join Server failed"
     },
     "description": {
       "package": "pkg/networkserver",
       "file": "observability.go"
     }
   },
-  "event:ns.up.receive": {
+  "event:ns.up.join.interop.success": {
     "translations": {
-      "en": "receive uplink message"
+      "en": "join-request to interoperability Join Server succeeded"
     },
     "description": {
       "package": "pkg/networkserver",
       "file": "observability.go"
     }
   },
-  "event:ns.up.receive_duplicate": {
+  "event:ns.up.join.process": {
     "translations": {
-      "en": "receive duplicate uplink message"
+      "en": "successfully processed join-request"
     },
     "description": {
       "package": "pkg/networkserver",
       "file": "observability.go"
     }
   },
-  "event:ns.up.rejoin.drop": {
+  "event:ns.up.join.receive": {
     "translations": {
-      "en": "drop rejoin-request"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "observability.go"
-    }
-  },
-  "event:ns.up.rejoin.forward": {
-    "translations": {
-      "en": "forward rejoin-request"
+      "en": "receive join-request"
     },
     "description": {
       "package": "pkg/networkserver",
