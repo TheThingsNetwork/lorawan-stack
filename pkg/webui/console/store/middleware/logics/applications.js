@@ -14,8 +14,6 @@
 
 import * as applications from '../../actions/applications'
 import * as link from '../../actions/link'
-import * as webhookFormats from '../../actions/webhook-formats'
-import * as pubsubFormats from '../../actions/pubsub-formats'
 
 import api from '../../../api'
 import { isNotFoundError } from '../../../../lib/errors/utils'
@@ -128,22 +126,6 @@ const getApplicationLinkLogic = createRequestLogic({
   },
 })
 
-const getWebhookFormatsLogic = createRequestLogic({
-  type: webhookFormats.GET_WEBHOOK_FORMATS,
-  async process() {
-    const { formats } = await api.application.webhooks.getFormats()
-    return formats
-  },
-})
-
-const getPubsubFormatsLogic = createRequestLogic({
-  type: pubsubFormats.GET_PUBSUB_FORMATS,
-  async process() {
-    const { formats } = await api.application.pubsubs.getFormats()
-    return formats
-  },
-})
-
 export default [
   getApplicationLogic,
   getApplicationDeviceCountLogic,
@@ -151,8 +133,6 @@ export default [
   deleteApplicationLogic,
   getApplicationsLogic,
   getApplicationsRightsLogic,
-  getWebhookFormatsLogic,
-  getPubsubFormatsLogic,
   getApplicationLinkLogic,
   ...createEventsConnectLogics(
     applications.SHARED_NAME,

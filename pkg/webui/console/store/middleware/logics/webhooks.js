@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import * as webhooks from '../../actions/webhooks'
+import * as webhookFormats from '../../actions/webhook-formats'
 
 import api from '../../../api'
 import createRequestLogic from './lib'
@@ -46,4 +47,12 @@ const updateWebhookLogic = createRequestLogic({
   },
 })
 
-export default [getWebhookLogic, getWebhooksLogic, updateWebhookLogic]
+const getWebhookFormatsLogic = createRequestLogic({
+  type: webhookFormats.GET_WEBHOOK_FORMATS,
+  async process() {
+    const { formats } = await api.application.webhooks.getFormats()
+    return formats
+  },
+})
+
+export default [getWebhookLogic, getWebhooksLogic, updateWebhookLogic, getWebhookFormatsLogic]
