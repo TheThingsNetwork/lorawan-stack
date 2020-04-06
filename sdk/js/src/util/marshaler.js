@@ -99,12 +99,12 @@ class Marshaler {
     return this.payloadSingleResponse(result)
   }
 
-  static unwrapGateways(result, transform) {
-    return this.payloadListResponse('gateways', result, transform)
+  static unwrapGateways(result) {
+    return this.payloadListResponse('gateways', result)
   }
 
-  static unwrapGateway(result, transform) {
-    return this.payloadSingleResponse(result, transform)
+  static unwrapGateway(result) {
+    return this.payloadSingleResponse(result)
   }
 
   static unwrapUser(result, transform) {
