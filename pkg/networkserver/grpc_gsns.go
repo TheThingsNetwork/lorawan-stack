@@ -1154,6 +1154,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
 
 	keys := resp.SessionKeys
+	keys.AppSKey = nil
 	if !req.DownlinkSettings.OptNeg {
 		keys.NwkSEncKey = keys.FNwkSIntKey
 		keys.SNwkSIntKey = keys.FNwkSIntKey
