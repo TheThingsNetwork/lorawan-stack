@@ -18,6 +18,7 @@ package gatewayserver
 import (
 	"context"
 	"fmt"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -708,6 +709,16 @@ func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
 	}
 }
 
+const (
+	allowedLocationDelta = 0.00001
+)
+
+func sameLocation(a, b ttnpb.Location) bool {
+	return a.Altitude == b.Altitude && a.Accuracy == b.Accuracy &&
+		math.Abs(a.Latitude-b.Latitude) <= allowedLocationDelta &&
+		math.Abs(a.Longitude-b.Longitude) <= allowedLocationDelta
+}
+
 func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 	ctx := conn.Context()
 
@@ -730,13 +741,17 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 			return
 		case <-conn.LocationChanged():
 			status, _, ok := conn.StatusStats()
-			locations := status.AntennaLocations
-			antennas := conn.Gateway().Antennas
-			if ok && len(locations) > 0 && len(antennas) > 0 {
-				// TODO: Handle multiple antenna locations (https://github.com/TheThingsNetwork/lorawan-stack/issues/2006).
-				locations[0].Source = ttnpb.SOURCE_GPS
-				antennas[0].Location = *locations[0]
-
+			// TODO: Handle multiple antenna locations (https://github.com/TheThingsNetwork/lorawan-stack/issues/2006).
+			if ok && len(status.AntennaLocations) > 0 {
+				if len(conn.Gateway().Antennas) == 0 {
+					// Add an antenna if none are present
+					conn.Gateway().Antennas = []ttnpb.GatewayAntenna{{}}
+				}
+				if sameLocation(conn.Gateway().Antennas[0].Location, *status.AntennaLocations[0]) {
+					break
+				}
+				status.AntennaLocations[0].Source = ttnpb.SOURCE_GPS
+				conn.Gateway().Antennas[0].Location = *status.AntennaLocations[0]
 				_, err := registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
 					Gateway: ttnpb.Gateway{
 						GatewayIdentifiers: conn.Gateway().GatewayIdentifiers,
