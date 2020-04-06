@@ -1158,13 +1158,14 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		keys.NwkSEncKey = keys.FNwkSIntKey
 		keys.SNwkSIntKey = keys.FNwkSIntKey
 	}
-
 	macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-		Keys:    keys,
-		Payload: resp.RawPayload,
-		Request: *req,
+		CorrelationIDs: resp.CorrelationIDs,
+		Keys:           keys,
+		Payload:        resp.RawPayload,
+		Request:        *req,
 	}
 	macState.RxWindowsAvailable = true
+	ctx = events.ContextWithCorrelationID(ctx, resp.CorrelationIDs...)
 
 	chIdx, err := searchUplinkChannel(up.Settings.Frequency, macState)
 	if err != nil {

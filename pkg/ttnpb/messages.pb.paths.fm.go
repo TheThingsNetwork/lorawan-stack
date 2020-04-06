@@ -265,6 +265,7 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"app_s_key.encrypted_key",
 	"app_s_key.kek_label",
 	"app_s_key.key",
+	"confirmed",
 	"decoded_payload",
 	"f_cnt",
 	"f_port",
@@ -295,6 +296,7 @@ var ApplicationUplinkFieldPathsNested = []string{
 
 var ApplicationUplinkFieldPathsTopLevel = []string{
 	"app_s_key",
+	"confirmed",
 	"decoded_payload",
 	"f_cnt",
 	"f_port",
@@ -525,6 +527,7 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.app_s_key.encrypted_key",
 	"up.uplink_message.app_s_key.kek_label",
 	"up.uplink_message.app_s_key.key",
+	"up.uplink_message.confirmed",
 	"up.uplink_message.decoded_payload",
 	"up.uplink_message.f_cnt",
 	"up.uplink_message.f_port",

@@ -493,7 +493,7 @@ func handleClassAOTAAEU868FlowTest1_0_2(ctx context.Context, conn *grpc.ClientCo
 			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
 				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
 					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
-					a.So(msg.CorrelationIDs, should.HaveLength, 5) &&
+					a.So(msg.CorrelationIDs, should.HaveLength, 7) &&
 					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 						RawPayload: bytes.Repeat([]byte{0x42}, 33),
 						Settings: &ttnpb.DownlinkMessage_Request{
@@ -1238,7 +1238,7 @@ func handleClassAOTAAUS915FlowTest1_0_3(ctx context.Context, conn *grpc.ClientCo
 			func(ctx context.Context, msg *ttnpb.DownlinkMessage) bool {
 				return a.So(msg.CorrelationIDs, should.Contain, "GsNs-1") &&
 					a.So(msg.CorrelationIDs, should.Contain, "GsNs-2") &&
-					a.So(msg.CorrelationIDs, should.HaveLength, 5) &&
+					a.So(msg.CorrelationIDs, should.HaveLength, 7) &&
 					a.So(msg, should.Resemble, &ttnpb.DownlinkMessage{
 						RawPayload: bytes.Repeat([]byte{0x42}, 33),
 						Settings: &ttnpb.DownlinkMessage_Request{

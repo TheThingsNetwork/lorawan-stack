@@ -20,6 +20,7 @@ var ProcessUplinkMessageRequestFieldPathsNested = []string{
 	"message.app_s_key.encrypted_key",
 	"message.app_s_key.kek_label",
 	"message.app_s_key.key",
+	"message.confirmed",
 	"message.decoded_payload",
 	"message.f_cnt",
 	"message.f_port",

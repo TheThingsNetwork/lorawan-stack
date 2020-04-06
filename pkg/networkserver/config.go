@@ -17,6 +17,7 @@ package networkserver
 import (
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
@@ -50,6 +51,34 @@ type MACSettingConfig struct {
 	ClassCTimeout              *time.Duration             `name:"class-c-timeout" description:"Deadline for a device in class C mode to respond to requests from the Network Server if not configured in device's MAC settings"`
 	StatusTimePeriodicity      *time.Duration             `name:"status-time-periodicity" description:"The interval after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
 	StatusCountPeriodicity     *uint32                    `name:"status-count-periodicity" description:"Number of uplink messages after which a DevStatusReq MACCommand shall be sent by Network Server if not configured in device's MAC settings"`
+}
+
+// Parse parses the configuration and returns ttnpb.MACSettings.
+func (c MACSettingConfig) Parse() ttnpb.MACSettings {
+	p := ttnpb.MACSettings{
+		ClassBTimeout:         c.ClassBTimeout,
+		ClassCTimeout:         c.ClassCTimeout,
+		StatusTimePeriodicity: c.StatusTimePeriodicity,
+	}
+	if c.ADRMargin != nil {
+		p.ADRMargin = &pbtypes.FloatValue{Value: *c.ADRMargin}
+	}
+	if c.DesiredRx1Delay != nil {
+		p.DesiredRx1Delay = &ttnpb.RxDelayValue{Value: *c.DesiredRx1Delay}
+	}
+	if c.DesiredMaxDutyCycle != nil {
+		p.DesiredMaxDutyCycle = &ttnpb.AggregatedDutyCycleValue{Value: *c.DesiredMaxDutyCycle}
+	}
+	if c.DesiredADRAckLimitExponent != nil {
+		p.DesiredADRAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: *c.DesiredADRAckLimitExponent}
+	}
+	if c.DesiredADRAckDelayExponent != nil {
+		p.DesiredADRAckDelayExponent = &ttnpb.ADRAckDelayExponentValue{Value: *c.DesiredADRAckDelayExponent}
+	}
+	if c.StatusCountPeriodicity != nil {
+		p.StatusCountPeriodicity = &pbtypes.UInt32Value{Value: *c.StatusCountPeriodicity}
+	}
+	return p
 }
 
 // DownlinkPriorityConfig defines priorities for downlink messages.
@@ -91,4 +120,22 @@ func (c DownlinkPriorityConfig) Parse() (DownlinkPriorities, error) {
 		return DownlinkPriorities{}, errDownlinkPriority.WithAttributes("value", c.MaxApplicationDownlink)
 	}
 	return p, nil
+}
+
+var DefaultConfig = Config{
+	DeduplicationWindow: 200 * time.Millisecond,
+	CooldownWindow:      time.Second,
+	DownlinkPriorities: DownlinkPriorityConfig{
+		JoinAccept:             "highest",
+		MACCommands:            "highest",
+		MaxApplicationDownlink: "high",
+	},
+	DefaultMACSettings: MACSettingConfig{
+		ADRMargin:              func(v float32) *float32 { return &v }(DefaultADRMargin),
+		DesiredRx1Delay:        func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_5),
+		ClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(time.Minute),
+		ClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(DefaultClassCTimeout),
+		StatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(DefaultStatusTimePeriodicity),
+		StatusCountPeriodicity: func(v uint32) *uint32 { return &v }(DefaultStatusCountPeriodicity),
+	},
 }

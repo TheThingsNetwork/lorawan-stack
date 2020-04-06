@@ -3650,6 +3650,20 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "correlation_ids":
+
+			for idx, item := range m.GetCorrelationIDs() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 100 {
+					return MACState_JoinAcceptValidationError{
+						field:  fmt.Sprintf("correlation_ids[%v]", idx),
+						reason: "value length must be at most 100 runes",
+					}
+				}
+
+			}
+
 		default:
 			return MACState_JoinAcceptValidationError{
 				field:  name,
