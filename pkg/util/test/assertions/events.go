@@ -112,7 +112,7 @@ func ShouldResembleEventDefinitionDataClosures(actual interface{}, expected ...i
 	return success
 }
 
-var eventTimeout = test.Delay << 5
+var eventTimeout = test.Delay << 7
 
 func receiveEvent(v interface{}) (events.Event, string) {
 	switch ch := v.(type) {
