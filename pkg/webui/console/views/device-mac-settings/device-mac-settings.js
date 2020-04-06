@@ -47,11 +47,12 @@ const m = defineMessages({
   pingSlotFrequencyTitle: 'Ping Slot Frequency',
   pingSlotFrequencyDescription: 'Frequency of the class B ping slot (Hz)',
   resetsFCnt: 'Resets Frame Counters',
-  resetWarning: 'Reseting is insecure and makes your device susceptible for replay attacks',
+  resetWarning: 'Resetting is insecure and makes your device susceptible for replay attacks',
   rx1DelayTitle: 'RX1 Delay',
   rx1DelayDescription: 'Class A RX1 delay. RX2 delay is RX1 delay + 1 second.',
   rx1DataRateOffsetTitle: 'RX1 Data Rate Offset',
-  rx2DataDateIndexDescription: 'The default RX2 data rate index value device uses after reset',
+  rx2DataDateIndexDescription:
+    'The default RX2 data rate index value the device uses after a reset',
   rx2DataRateIndexTitle: 'RX2 Data Rate Index',
   rx2FrequencyTitle: 'RX2 Frequency',
   rx2FrequencyDescription: 'Frequency for RX2 (Hz)',
@@ -59,7 +60,7 @@ const m = defineMessages({
   setMacSettings: 'Set End Device MAC Settings',
   updateSuccess: 'The MAC settings have been updated successfully',
   factoryPresetFreqTitle: 'Factory Preset Frequencies',
-  factoryPresetFreqDescription: 'List of factory-preset frequencies',
+  factoryPresetFreqDescription: 'List of factory-preset frequencies. Note: order is respected.',
   freqAdd: 'Add Frequency',
 })
 

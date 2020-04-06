@@ -15,6 +15,6 @@
 import DeviceMacSettings from './device-mac-settings'
 import connect from './connect'
 
-const ConnectedDeviceMacSettigns = connect(DeviceMacSettings)
+const ConnectedDeviceMacSettings = connect(DeviceMacSettings)
 
-export { ConnectedDeviceMacSettigns as default, DeviceMacSettings }
+export { ConnectedDeviceMacSettings as default, DeviceMacSettings }

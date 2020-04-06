@@ -20,7 +20,7 @@ import { ACTIVATION_MODES } from '../../lib/device-utils'
 
 const m = defineMessages({
   validateFreqNumberic: 'All frequency values must be positive integers',
-  validateFreqRequired: 'All requency values are required. Please remove empty entries.',
+  validateFreqRequired: 'All frequency values are required. Please remove empty entries.',
 })
 
 const factoryPresetFreqNumericTest = frequencies => {
