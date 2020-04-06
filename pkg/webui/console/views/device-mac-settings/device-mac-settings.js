@@ -49,7 +49,7 @@ const m = defineMessages({
   resetsFCnt: 'Resets Frame Counters',
   resetWarning: 'Resetting is insecure and makes your device susceptible for replay attacks',
   rx1DelayTitle: 'RX1 Delay',
-  rx1DelayDescription: 'Class A RX1 delay. RX2 delay is RX1 delay + 1 second.',
+  rx1DelayDescription: 'Class A RX1 delay in seconds. RX2 delay is RX1 delay + 1 second.',
   rx1DataRateOffsetTitle: 'RX1 Data Rate Offset',
   rx2DataDateIndexDescription:
     'The default RX2 data rate index value the device uses after a reset',
