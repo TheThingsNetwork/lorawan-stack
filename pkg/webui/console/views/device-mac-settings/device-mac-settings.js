@@ -169,7 +169,6 @@ const DeviceMacSettings = props => {
           <Form
             horizontal
             validateOnChange
-            enableReinitialize
             error={error}
             initialValues={initialValues}
             validationSchema={validationSchema}
