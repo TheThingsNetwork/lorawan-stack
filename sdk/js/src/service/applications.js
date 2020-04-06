@@ -96,7 +96,7 @@ class Applications {
       routeParams: { 'collaborator.organization_ids.organization_id': organizationId },
     })
 
-    return this._responseTransform(response)
+    return this._responseTransform(response, false)
   }
 
   async getByCollaborator(userId) {
