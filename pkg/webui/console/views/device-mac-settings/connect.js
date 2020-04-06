@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { updateDevice } from '../../store/actions/devices'
@@ -25,9 +24,9 @@ const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),
   device: selectSelectedDevice(state),
 })
-const mapDispatchToProps = dispatch => ({
-  ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
-})
+const mapDispatchToProps = {
+  updateDevice: attachPromise(updateDevice),
+}
 
 export default DeviceMacSettings =>
   connect(
