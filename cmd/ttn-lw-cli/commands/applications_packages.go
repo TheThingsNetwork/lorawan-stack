@@ -33,6 +33,8 @@ import (
 var (
 	selectApplicationPackageAssociationsFlags = util.FieldMaskFlags(&ttnpb.ApplicationPackageAssociation{})
 	setApplicationPackageAssociationsFlags    = util.FieldFlags(&ttnpb.ApplicationPackageAssociation{})
+
+	selectAllApplicationPackageAssociationsFlags = util.SelectAllFlagSet("application package association")
 )
 
 func applicationPackageAssociationIDFlags() *pflag.FlagSet {
@@ -138,6 +140,7 @@ var (
 					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationPackageRegistry/GetAssociation"])
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -170,6 +173,7 @@ var (
 					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationPackageRegistry/ListAssociations"])
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -264,10 +268,12 @@ func init() {
 	applicationsPackagesCommand.AddCommand(applicationsPackagesListCommand)
 	applicationsPackageAssociationGetCommand.Flags().AddFlagSet(applicationPackageAssociationIDFlags())
 	applicationsPackageAssociationGetCommand.Flags().AddFlagSet(selectApplicationPackageAssociationsFlags)
+	applicationsPackageAssociationGetCommand.Flags().AddFlagSet(selectAllApplicationPackageAssociationsFlags)
 	applicationsPackagesCommand.AddCommand(applicationsPackagesAssociationsCommand)
 	applicationsPackagesAssociationsCommand.AddCommand(applicationsPackageAssociationGetCommand)
 	applicationsPackageAssociationsListCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	applicationsPackageAssociationsListCommand.Flags().AddFlagSet(selectApplicationPackageAssociationsFlags)
+	applicationsPackageAssociationsListCommand.Flags().AddFlagSet(selectAllApplicationPackageAssociationsFlags)
 	applicationsPackageAssociationsListCommand.Flags().AddFlagSet(paginationFlags())
 	applicationsPackagesAssociationsCommand.AddCommand(applicationsPackageAssociationsListCommand)
 	applicationsPackageAssociationSetCommand.Flags().AddFlagSet(applicationPackageAssociationIDFlags())

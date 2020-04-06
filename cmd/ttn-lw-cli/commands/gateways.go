@@ -33,6 +33,8 @@ var (
 	selectGatewayFlags     = util.FieldMaskFlags(&ttnpb.Gateway{})
 	setGatewayFlags        = util.FieldFlags(&ttnpb.Gateway{})
 	setGatewayAntennaFlags = util.FieldFlags(&ttnpb.GatewayAntenna{}, "antenna")
+
+	selectAllGatewayFlags = util.SelectAllFlagSet("gateway")
 )
 
 func gatewayIDFlags() *pflag.FlagSet {
@@ -104,6 +106,7 @@ var (
 		Short:   "List gateways",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.GatewayRegistry/List"])
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -130,6 +133,7 @@ var (
 		Short: "Search for gateways",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EntityRegistrySearch/SearchGateways"])
 
 			req, opt, getTotal := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
@@ -157,6 +161,7 @@ var (
 				return err
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.GatewayRegistry/Get"])
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -410,12 +415,15 @@ func init() {
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysListCommand.Flags().AddFlagSet(paginationFlags())
 	gatewaysListCommand.Flags().AddFlagSet(orderFlags())
+	gatewaysListCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysListCommand)
 	gatewaysSearchCommand.Flags().AddFlagSet(searchFlags())
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)
+	gatewaysSearchCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysSearchCommand)
 	gatewaysGetCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysGetCommand.Flags().AddFlagSet(selectGatewayFlags)
+	gatewaysGetCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysGetCommand)
 	gatewaysCreateCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCreateCommand.Flags().AddFlagSet(collaboratorFlags())

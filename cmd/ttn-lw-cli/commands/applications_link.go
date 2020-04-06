@@ -31,6 +31,8 @@ import (
 var (
 	selectApplicationLinkFlags = util.FieldMaskFlags(&ttnpb.ApplicationLink{})
 	setApplicationLinkFlags    = util.FieldFlags(&ttnpb.ApplicationLink{})
+
+	selectAllApplicationLinkFlags = util.SelectAllFlagSet("application link")
 )
 
 var errNoApplicationLinkAPIKey = errors.DefineInvalidArgument("no_application_link_api_key", "no application link API key set")
@@ -56,6 +58,7 @@ var (
 					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.As/GetLink"])
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -133,6 +136,7 @@ var (
 func init() {
 	applicationsLinkGetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsLinkGetCommand.Flags().AddFlagSet(selectApplicationLinkFlags)
+	applicationsLinkGetCommand.Flags().AddFlagSet(selectAllApplicationLinkFlags)
 	applicationsLinkCommand.AddCommand(applicationsLinkGetCommand)
 	applicationsLinkSetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsLinkSetCommand.Flags().AddFlagSet(setApplicationLinkFlags)

@@ -34,6 +34,8 @@ var (
 	setApplicationPubSubFlags          = util.FieldFlags(&ttnpb.ApplicationPubSub{})
 	natsProviderApplicationPubSubFlags = util.FieldFlags(&ttnpb.ApplicationPubSub_NATSProvider{}, "nats")
 	mqttProviderApplicationPubSubFlags = util.FieldFlags(&ttnpb.ApplicationPubSub_MQTTProvider{}, "mqtt")
+
+	selectAllApplicationPubSubFlags = util.SelectAllFlagSet("application pubsub")
 )
 
 func applicationPubSubIDFlags() *pflag.FlagSet {
@@ -134,6 +136,7 @@ var (
 					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationPubSubRegistry/Get"])
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -167,6 +170,7 @@ var (
 					paths = append(paths, strings.Replace(flag.Name, "-", "_", -1))
 				})
 			}
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationPubSubRegistry/List"])
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
@@ -300,9 +304,11 @@ func init() {
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsGetFormatsCommand)
 	applicationsPubSubsGetCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
 	applicationsPubSubsGetCommand.Flags().AddFlagSet(selectApplicationPubSubFlags)
+	applicationsPubSubsGetCommand.Flags().AddFlagSet(selectAllApplicationPubSubFlags)
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsGetCommand)
 	applicationsPubSubsListCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsPubSubsListCommand.Flags().AddFlagSet(selectApplicationPubSubFlags)
+	applicationsPubSubsListCommand.Flags().AddFlagSet(selectAllApplicationPubSubFlags)
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsListCommand)
 	applicationsPubSubsSetCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
 	applicationsPubSubsSetCommand.Flags().AddFlagSet(setApplicationPubSubFlags)

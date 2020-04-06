@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CLI can now dump JSON encoded `grpc_payload` field for unary requests (see `--dump-requests` flag).
 - Template ID column in the webhook table in the Console.
+- Select all field mask paths in CLI get, list and search commands (see `--all` option).
 
 ### Changed
 
