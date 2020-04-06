@@ -79,8 +79,8 @@ class Marshaler {
     return transform ? transform(entity) : entity
   }
 
-  static unwrapRights(result, transform) {
-    return this.payloadListResponse('rights', result, transform)
+  static unwrapRights(result) {
+    return this.payloadListResponse('rights', result)
   }
 
   static unwrapApplications(result) {
