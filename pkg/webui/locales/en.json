@@ -270,7 +270,7 @@
   "console.views.application-integrations-webhook-add-choose.index.chooseTemplate": "Choose webhook template",
   "console.views.application-integrations-webhook-add-choose.index.customTileDescription": "Create a custom webhook without template",
   "console.views.application-integrations-webhook-add-form.index.addCustomWebhook": "Add custom webhook",
-  "console.views.application-integrations-webhook-add-form.index.addWebhookViaTemplate": "Add webhook from template",
+  "console.views.application-integrations-webhook-add-form.index.addWebhookViaTemplate": "Add {templateName} webhook",
   "console.views.application-integrations-webhook-add-form.index.customWebhook": "Custom webhook",
   "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.editWebhook": "Edit Webhook",
   "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.updateSuccess": "Successfully updated webhook",

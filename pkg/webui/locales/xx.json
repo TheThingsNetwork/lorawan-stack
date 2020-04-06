@@ -270,7 +270,7 @@
   "console.views.application-integrations-webhook-add-choose.index.chooseTemplate": "Xxxxxx xxxxxxx xxxxxxxx",
   "console.views.application-integrations-webhook-add-choose.index.customTileDescription": "Xxxxxx x xxxxxx xxxxxxx xxxxxxx xxxxxxxx",
   "console.views.application-integrations-webhook-add-form.index.addCustomWebhook": "Xxx xxxxxx xxxxxxx",
-  "console.views.application-integrations-webhook-add-form.index.addWebhookViaTemplate": "Xxx xxxxxxx xxxx xxxxxxxx",
+  "console.views.application-integrations-webhook-add-form.index.addWebhookViaTemplate": "Xxx {templateName} xxxxxxx",
   "console.views.application-integrations-webhook-add-form.index.customWebhook": "Xxxxxx xxxxxxx",
   "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.editWebhook": "Xxxx Xxxxxxx",
   "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.updateSuccess": "Xxxxxxxxxxxx xxxxxxx xxxxxxx",
