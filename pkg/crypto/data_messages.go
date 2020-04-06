@@ -116,31 +116,30 @@ func ComputeLegacyUplinkMIC(key types.AES128Key, addr types.DevAddr, fCnt uint32
 // - The payload contains MHDR | FHDR | FPort | FRMPayload
 // - If this uplink has the ACK bit set, confFCnt must be set to the FCnt of the last downlink.
 func ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {
-	m0, err := computeMIC(fNwkSIntKey, 0, 0, addr, fCnt, payload)
+	cmacF, err := computeMIC(fNwkSIntKey, 0, 0, addr, fCnt, payload)
+	if err != nil {
+		return [4]byte{}, err
+	}
+	sHash, _ := cmac.New(sNwkSIntKey[:])
+	var b1 [aes.BlockSize]byte
+	b1[0] = 0x49
+	binary.LittleEndian.PutUint16(b1[1:3], uint16(confFCnt))
+	b1[3] = txDRIdx
+	b1[4] = txChIdx
+	copy(b1[6:10], reverse(addr[:]))
+	binary.LittleEndian.PutUint32(b1[10:14], fCnt)
+	b1[15] = uint8(len(payload))
+	_, err = sHash.Write(b1[:])
+	if err != nil {
+		return [4]byte{}, err
+	}
+	_, err = sHash.Write(payload)
 	if err != nil {
 		return [4]byte{}, err
 	}
 	var mic [4]byte
-	copy(mic[2:], m0[:])
-	hash, _ := cmac.New(sNwkSIntKey[:])
-	var b0 [aes.BlockSize]byte
-	b0[0] = 0x49
-	binary.LittleEndian.PutUint16(b0[1:3], uint16(confFCnt))
-	b0[3] = txDRIdx
-	b0[4] = txChIdx
-	b0[5] = 0
-	copy(b0[6:10], reverse(addr[:]))
-	binary.LittleEndian.PutUint32(b0[10:14], fCnt)
-	b0[15] = uint8(len(payload))
-	_, err = hash.Write(b0[:])
-	if err != nil {
-		return [4]byte{}, err
-	}
-	_, err = hash.Write(payload)
-	if err != nil {
-		return [4]byte{}, err
-	}
-	copy(mic[:2], hash.Sum([]byte{}))
+	copy(mic[:2], sHash.Sum([]byte{}))
+	copy(mic[2:], cmacF[:])
 	return mic, nil
 }
 

@@ -880,7 +880,7 @@ var DefaultMACCommands = MACCommandSpec{
 	},
 
 	ttnpb.CID_DEVICE_MODE: &MACCommandDescriptor{
-		InitiatedByDevice: false,
+		InitiatedByDevice: true,
 
 		UplinkLength: 1,
 		AppendUplink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
