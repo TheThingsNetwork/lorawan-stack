@@ -51,16 +51,14 @@ const validationSchema = Yup.object({
     value: Yup.string()
       .matches(/^[A-Z0-9]{1,32}$/, m.validateCode)
       .required(sharedMessages.validateRequired),
-    valid_from: Yup.date().required(sharedMessages.validateRequired),
-    valid_to: Yup.date()
-      .required(sharedMessages.validateRequired)
-      .when('valid_from', (validFrom, schema) => {
-        if (validFrom) {
-          return schema.min(validFrom, m.validateToDate)
-        }
+    valid_from: Yup.date(),
+    valid_to: Yup.date().when('valid_from', (validFrom, schema) => {
+      if (validFrom) {
+        return schema.min(validFrom, m.validateToDate)
+      }
 
-        return schema
-      }),
+      return schema
+    }),
   }),
 })
 
@@ -77,8 +75,8 @@ const DeviceClaimAuthenticationCode = props => {
       // Convert ISO 8601 date time representation to just yyyy-MM-dd required by the
       // date input. So, we pick only the data part from YYYY-MM-DDTHH:mm:ss.sssZ which is
       // known to be fixed.
-      const validFrom = new Date(valid_from).toISOString().slice(0, 10)
-      const validTo = new Date(valid_to).toISOString().slice(0, 10)
+      const validFrom = valid_from ? new Date(valid_from).toISOString().slice(0, 10) : undefined
+      const validTo = valid_to ? new Date(valid_to).toISOString().slice(0, 10) : undefined
 
       return {
         claim_authentication_code: {
@@ -101,6 +99,11 @@ const DeviceClaimAuthenticationCode = props => {
   const handleSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       setError('')
+
+      // Convert any false value to undefined
+      for (const [key, value] of Object.entries(values.claim_authentication_code)) {
+        values.claim_authentication_code[key] = value ? value : undefined
+      }
 
       try {
         await updateDevice(appId, devId, validationSchema.cast(values))
@@ -166,14 +169,12 @@ const DeviceClaimAuthenticationCode = props => {
               name="claim_authentication_code.valid_from"
               component={Input}
               type="date"
-              required
             />
             <Form.Field
               title={sharedMessages.validTo}
               name="claim_authentication_code.valid_to"
               type="date"
               component={Input}
-              required
             />
             <SubmitBar>
               <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
