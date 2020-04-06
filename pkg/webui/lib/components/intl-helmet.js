@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
-
 import { Helmet } from 'react-helmet'
 import { injectIntl } from 'react-intl'
 
+import PropTypes from '../prop-types'
 import { warn } from '../log'
 
 /**
@@ -25,6 +25,19 @@ import { warn } from '../log'
  */
 @injectIntl
 export default class IntlHelmet extends React.Component {
+  static propTypes = {
+    children: PropTypes.node,
+    intl: PropTypes.shape({
+      formatMessage: PropTypes.func.isRequired,
+    }).isRequired,
+    values: PropTypes.shape({}),
+  }
+
+  static defaultProps = {
+    children: undefined,
+    values: undefined,
+  }
+
   componentDidMount() {
     if (this.props.children) {
       warn(`Children of <IntlHelmet /> will not be translated. If you tried to
@@ -39,7 +52,7 @@ instead.`)
     for (const key in rest) {
       let prop = rest[key]
       if (typeof prop === 'object' && prop.id && prop.defaultMessage) {
-        const messageValues = values || {}
+        const messageValues = values || prop.values || {}
         const translatedMessageValues = {}
 
         for (const entry in messageValues) {
