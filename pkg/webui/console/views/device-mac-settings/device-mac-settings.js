@@ -216,7 +216,7 @@ const DeviceMacSettings = props => {
             <Form.Field
               type="number"
               min={100000}
-              step={1}
+              step={100}
               title={m.rx2FrequencyTitle}
               description={m.rx2FrequencyDescription}
               placeholder={m.frequencyPlaceholder}
@@ -244,7 +244,7 @@ const DeviceMacSettings = props => {
                 <Form.Field
                   type="number"
                   min={100000}
-                  step={1}
+                  step={100}
                   title={m.pingSlotFrequencyTitle}
                   description={m.pingSlotFrequencyDescription}
                   placeholder={m.frequencyPlaceholder}
