@@ -49,7 +49,7 @@ class Marshaler {
     return res
   }
 
-  static payloadListResponse(entity, { data = {}, headers = {} }, transform) {
+  static payloadListResponse(entity, { data = {}, headers = {} }) {
     const list = data[entity]
 
     if (!list) {
@@ -62,12 +62,10 @@ class Marshaler {
       return { [entity]: list, totalCount: list.length }
     }
 
-    const transformedList = transform ? list.map(transform) : list
-
-    return { [entity]: transformedList, totalCount }
+    return { [entity]: list, totalCount }
   }
 
-  static payloadSingleResponse(response, transform) {
+  static payloadSingleResponse(response) {
     if (typeof response !== 'object') {
       throw new Error(`Invalid response type: ${typeof response}`)
     }
@@ -76,7 +74,8 @@ class Marshaler {
     }
 
     const entity = response.data || response
-    return transform ? transform(entity) : entity
+
+    return entity
   }
 
   static unwrapRights(result) {
