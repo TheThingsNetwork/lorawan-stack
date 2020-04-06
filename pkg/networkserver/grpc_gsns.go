@@ -844,6 +844,7 @@ func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMess
 	mds, err := ns.uplinkDeduplicator.AccumulatedMetadata(ctx, up)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to merge metadata")
+		return
 	}
 	up.RxMetadata = mds
 	log.FromContext(ctx).WithField("metadata_count", len(up.RxMetadata)).Debug("Merged metadata")
