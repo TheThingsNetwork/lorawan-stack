@@ -104,7 +104,7 @@ class Applications {
       routeParams: { 'collaborator.user_ids.user_id': userId },
     })
 
-    return this._responseTransform(response)
+    return this._responseTransform(response, false)
   }
 
   async search(params, selector) {
