@@ -32,8 +32,11 @@ const getWebhookLogic = createRequestLogic({
 const getWebhooksLogic = createRequestLogic({
   type: webhooks.GET_WEBHOOKS_LIST,
   async process({ action }) {
-    const { appId } = action.payload
-    const res = await api.application.webhooks.list(appId)
+    const {
+      payload: { appId },
+      meta: { selector },
+    } = action
+    const res = await api.application.webhooks.list(appId, selector)
     return { entities: res.webhooks, totalCount: res.totalCount }
   },
 })

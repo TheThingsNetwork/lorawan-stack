@@ -29,7 +29,10 @@ import {
   selectWebhooksFetching,
 } from '../../../console/store/selectors/webhooks'
 
+import style from './webhooks-table.styl'
+
 const m = defineMessages({
+  templateId: 'Template ID',
   format: 'Format',
   baseUrl: 'Base URL',
 })
@@ -38,17 +41,23 @@ const headers = [
   {
     name: 'ids.webhook_id',
     displayName: sharedMessages.id,
-    width: 35,
-  },
-  {
-    name: 'format',
-    displayName: m.format,
-    width: 20,
+    width: 40,
   },
   {
     name: 'base_url',
     displayName: m.baseUrl,
-    width: 25,
+    width: 37,
+  },
+  {
+    name: 'template_ids.template_id',
+    displayName: m.templateId,
+    width: 15,
+    render: value => value || <Message className={style.none} content={sharedMessages.none} />,
+  },
+  {
+    name: 'format',
+    displayName: m.format,
+    width: 8,
   },
 ]
 
@@ -62,7 +71,7 @@ export default class WebhooksTable extends React.Component {
     super(props)
 
     const { appId } = props
-    this.getWebhooksList = () => getWebhooksList(appId)
+    this.getWebhooksList = () => getWebhooksList(appId, ['template_ids'])
   }
 
   baseDataSelector(state) {

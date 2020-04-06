@@ -220,6 +220,7 @@
   "console.containers.pubsubs-table.index.host": "Xxxxxx Xxxx",
   "console.containers.webhook-formats-select.index.title": "Xxxxxxx Xxxxxx",
   "console.containers.webhook-formats-select.index.warning": "Xxxxx xxx xxxxxxxx xxx xxxx xx xxxxxxxxx xxxxxxx xxxxxxx",
+  "console.containers.webhooks-table.index.templateId": "Xxxxxxxx XX",
   "console.containers.webhooks-table.index.format": "Xxxxxx",
   "console.containers.webhooks-table.index.baseUrl": "Xxxx XXX",
   "console.store.middleware.logics.init.errTooFewRights": "Xxxx xxxxxxx xxxx xxx xxxxxxx xxxxxxxxxx xxxxxx xx xxx xxx xxxxxxx.",
