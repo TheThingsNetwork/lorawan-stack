@@ -60,7 +60,7 @@ type UplinkDeduplicator interface {
 func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage) (bool, error) {
 	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, ns.collectionWindow(ctx))
 	if err != nil {
-		log.FromContext(ctx).Error("Failed to deduplicate uplink")
+		log.FromContext(ctx).WithError(err).Error("Failed to deduplicate uplink")
 		return false, err
 	}
 	if !ok {
