@@ -107,8 +107,8 @@ class Marshaler {
     return this.payloadSingleResponse(result)
   }
 
-  static unwrapUser(result, transform) {
-    return this.payloadSingleResponse(result, transform)
+  static unwrapUser(result) {
+    return this.payloadSingleResponse(result)
   }
 
   static fieldMaskFromPatch(patch, whitelist, remaps) {
