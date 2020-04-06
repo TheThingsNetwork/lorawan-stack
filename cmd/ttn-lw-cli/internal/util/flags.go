@@ -61,6 +61,14 @@ func NormalizeFlags(f *pflag.FlagSet, name string) pflag.NormalizedName {
 }
 
 func SelectFieldMask(cmdFlags *pflag.FlagSet, fieldMaskFlags ...*pflag.FlagSet) (paths []string) {
+	if all, _ := cmdFlags.GetBool("all"); all {
+		for _, fieldMaskFlags := range fieldMaskFlags {
+			fieldMaskFlags.VisitAll(func(flag *pflag.Flag) {
+				paths = append(paths, toUnderscore.Replace(flag.Name))
+			})
+		}
+		return
+	}
 	cmdFlags.Visit(func(flag *pflag.Flag) {
 		flagName := toUnderscore.Replace(flag.Name)
 		for _, fieldMaskFlags := range fieldMaskFlags {
@@ -672,4 +680,11 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 		}
 	}
 	return fmt.Errorf("unknown field")
+}
+
+// SelectAllFlagSet returns a flagset with the --all flag
+func SelectAllFlagSet(what string) *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.Bool("all", false, fmt.Sprintf("select all %s fields", what))
+	return flagSet
 }
