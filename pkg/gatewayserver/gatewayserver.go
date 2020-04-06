@@ -747,6 +747,9 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 					// Add an antenna if none are present
 					conn.Gateway().Antennas = []ttnpb.GatewayAntenna{{}}
 				}
+				if sameLocation(conn.Gateway().Antennas[0].Location, *status.AntennaLocations[0]) {
+					break
+				}
 				status.AntennaLocations[0].Source = ttnpb.SOURCE_GPS
 				conn.Gateway().Antennas[0].Location = *status.AntennaLocations[0]
 				_, err := registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
