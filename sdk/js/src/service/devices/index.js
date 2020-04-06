@@ -17,7 +17,6 @@
 import traverse from 'traverse'
 import Marshaler from '../../util/marshaler'
 import combineStreams from '../../util/combine-streams'
-import Device from '../../entity/device'
 import { notify, EVENTS } from '../../api/stream/shared'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
@@ -29,21 +28,13 @@ import mergeDevice from './merge'
  * device data.
  */
 class Devices {
-  constructor(api, { proxy = true, ignoreDisabledComponents = true, stackConfig }) {
+  constructor(api, { ignoreDisabledComponents = true, stackConfig }) {
     if (!api) {
       throw new Error('Cannot initialize device service without api object.')
     }
     this._api = api
     this._stackConfig = stackConfig
-    this._proxy = proxy
     this._ignoreDisabledComponents = ignoreDisabledComponents
-  }
-
-  _responseTransform(response, single = true) {
-    return Marshaler[single ? 'unwrapDevice' : 'unwrapDevices'](
-      response,
-      this._proxy ? device => new Device(device, this._api) : undefined,
-    )
   }
 
   _emitDefaults(paths, device) {
@@ -323,7 +314,7 @@ class Devices {
       },
     )
 
-    return this._responseTransform(response, false)
+    return Marshaler.unwrapDevices(response)
   }
 
   async search(applicationId, params, selector) {
@@ -349,9 +340,8 @@ class Devices {
     )
 
     const { field_mask } = Marshaler.selectorToFieldMask(selector)
-    const device = this._emitDefaults(field_mask.paths, Marshaler.unwrapDevice(response))
 
-    return this._proxy ? new Device(device, this._api) : device
+    return this._emitDefaults(field_mask.paths, Marshaler.unwrapDevice(response))
   }
 
   /**
@@ -480,12 +470,10 @@ class Devices {
       throw errors[0].error
     }
 
-    const device = this._emitDefaults(
+    return this._emitDefaults(
       Marshaler.fieldMaskFromPatch(patch),
       Marshaler.unwrapDevice(mergeDevice(setParts)),
     )
-
-    return this._proxy ? new Device(device, this._api) : device
   }
 
   /**

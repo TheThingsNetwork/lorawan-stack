@@ -91,12 +91,12 @@ class Marshaler {
     return this.payloadSingleResponse(result, transform)
   }
 
-  static unwrapDevices(result, transform) {
-    return this.payloadListResponse('end_devices', result, transform)
+  static unwrapDevices(result) {
+    return this.payloadListResponse('end_devices', result)
   }
 
-  static unwrapDevice(result, transform) {
-    return this.payloadSingleResponse(result, transform)
+  static unwrapDevice(result) {
+    return this.payloadSingleResponse(result)
   }
 
   static unwrapGateways(result, transform) {

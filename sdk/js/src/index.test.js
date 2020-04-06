@@ -15,7 +15,6 @@
 import Applications from './service/applications'
 import Application from './entity/application'
 import Devices from './service/devices'
-import Device from './entity/device'
 import TTN from '.'
 
 const mockApplicationData = {
