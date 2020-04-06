@@ -25,8 +25,14 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
       small={false}
     />
     <Message
+      capitalize={false}
       className="message"
+      component="span"
       content="test-header-title"
+      firstToLower={false}
+      firstToUpper={false}
+      lowercase={false}
+      uppercase={false}
     />
   </div>
   <div
@@ -47,8 +53,14 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
           small={false}
         />
         <Message
+          capitalize={false}
           className="message"
+          component="span"
           content="test-header-title"
+          firstToLower={false}
+          firstToUpper={false}
+          lowercase={false}
+          uppercase={false}
         />
       </div>
       <ContextProvider
@@ -120,8 +132,14 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
       small={false}
     />
     <Message
+      capitalize={false}
       className="message"
+      component="span"
       content="test-header-title"
+      firstToLower={false}
+      firstToUpper={false}
+      lowercase={false}
+      uppercase={false}
     />
   </div>
   <div
@@ -142,8 +160,14 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
           small={false}
         />
         <Message
+          capitalize={false}
           className="message"
+          component="span"
           content="test-header-title"
+          firstToLower={false}
+          firstToUpper={false}
+          lowercase={false}
+          uppercase={false}
         />
       </div>
       <ContextProvider

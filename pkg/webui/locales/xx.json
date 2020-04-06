@@ -69,6 +69,7 @@
   "console.components.device-data-form.messages.homeNetIDDescription": "XX xx xxxxxxxx xxx XxXxXXX xxxxxxx",
   "console.components.device-data-form.messages.joinEUIDescription": "XxxxXXX xxxxxxxxxx xxx Xxxx Xxxxxx",
   "console.components.device-data-form.messages.leaveBlankPlaceholder": "Xxxxx xxxxx xx xxxxxxxx xxxxxxxxxxxxx",
+  "console.components.device-data-form.messages.lorawanOptions": "XxXxXXX Xxxxxxx",
   "console.components.device-data-form.messages.lorawanVersionDescription": "Xxx XxXxXXX XXX Xxxxxxx xx xxx xxx xxxxxx",
   "console.components.device-data-form.messages.lorawanPhyVersionDescription": "Xxx XxXxXXX XXX Xxxxxxx xx xxx xxx xxxxxx",
   "console.components.device-data-form.messages.multicast": "Xxxxxxxxx",
