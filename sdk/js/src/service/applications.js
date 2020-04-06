@@ -15,7 +15,6 @@
 import Marshaler from '../util/marshaler'
 import combineStreams from '../util/combine-streams'
 import Devices from '../service/devices'
-import Application from '../entity/application'
 import ApiKeys from './api-keys'
 import Link from './link'
 import Collaborators from './collaborators'
@@ -34,10 +33,9 @@ import PubSubs from './pubsubs'
  *  should be proxied with the wrapper objects.
  */
 class Applications {
-  constructor(api, { defaultUserId, stackConfig, proxy = true }) {
+  constructor(api, { defaultUserId, stackConfig }) {
     this._defaultUserId = defaultUserId
     this._api = api
-    this._proxy = proxy
     this._stackConfig = stackConfig
 
     this.ApiKeys = new ApiKeys(api.ApplicationAccess, {
@@ -49,7 +47,7 @@ class Applications {
       },
     })
     this.Link = new Link(api.As)
-    this.Devices = new Devices(api, { proxy, stackConfig })
+    this.Devices = new Devices(api, { stackConfig })
     this.Collaborators = new Collaborators(api.ApplicationAccess, {
       parentRoutes: {
         get: 'application_ids.application_id',
@@ -61,13 +59,6 @@ class Applications {
     this.PubSubs = new PubSubs(api.ApplicationPubSubRegistry)
   }
 
-  _responseTransform(response, single = true) {
-    return Marshaler[single ? 'unwrapApplication' : 'unwrapApplications'](
-      response,
-      this._proxy ? app => new Application(this, app, false) : undefined,
-    )
-  }
-
   // Retrieval
 
   async getAll(params, selector) {
@@ -76,7 +67,7 @@ class Applications {
       ...Marshaler.selectorToFieldMask(selector),
     })
 
-    return this._responseTransform(response, false)
+    return Marshaler.unwrapApplications(response)
   }
 
   async getById(id, selector) {
@@ -88,7 +79,7 @@ class Applications {
       fieldMask,
     )
 
-    return this._responseTransform(response)
+    return Marshaler.unwrapApplication(response)
   }
 
   async getByOrganization(organizationId) {
@@ -96,7 +87,7 @@ class Applications {
       routeParams: { 'collaborator.organization_ids.organization_id': organizationId },
     })
 
-    return this._responseTransform(response, false)
+    return Marshaler.unwrapApplications(response)
   }
 
   async getByCollaborator(userId) {
@@ -104,7 +95,7 @@ class Applications {
       routeParams: { 'collaborator.user_ids.user_id': userId },
     })
 
-    return this._responseTransform(response, false)
+    return Marshaler.unwrapApplications(response)
   }
 
   async search(params, selector) {
@@ -113,7 +104,7 @@ class Applications {
       ...Marshaler.selectorToFieldMask(selector),
     })
 
-    return this._responseTransform(response, false)
+    return Marshaler.unwrapApplications(response)
   }
 
   // Update
@@ -137,7 +128,7 @@ class Applications {
         field_mask: Marshaler.fieldMask(mask),
       },
     )
-    return Marshaler.unwrapApplication(response, this._applicationTransform)
+    return Marshaler.unwrapApplication(response)
   }
 
   // Create
@@ -152,7 +143,7 @@ class Applications {
       },
       { application },
     )
-    return this._responseTransform(response)
+    return Marshaler.unwrapApplication(response)
   }
 
   // Delete

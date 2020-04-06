@@ -83,12 +83,12 @@ class Marshaler {
     return this.payloadListResponse('rights', result, transform)
   }
 
-  static unwrapApplications(result, transform) {
-    return this.payloadListResponse('applications', result, transform)
+  static unwrapApplications(result) {
+    return this.payloadListResponse('applications', result)
   }
 
-  static unwrapApplication(result, transform) {
-    return this.payloadSingleResponse(result, transform)
+  static unwrapApplication(result) {
+    return this.payloadSingleResponse(result)
   }
 
   static unwrapDevices(result) {
