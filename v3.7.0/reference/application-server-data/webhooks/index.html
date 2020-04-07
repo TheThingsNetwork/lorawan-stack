@@ -120,8 +120,8 @@
 <p>Make sure to save your API key at this point, since it will no longer be retrievable after you leave the page. You can now pass the API key as bearer token on the <code>Authorization</code> header.</p>
 <p>The downlink queue operation paths are:</p>
 <ul>
-<li>For push: <code>/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push</code></li>
-<li>For replace: <code>/v3/api/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/replace</code></li>
+<li>For push: <code>/api/v3/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/push</code></li>
+<li>For replace: <code>/api/v3/as/applications/{application_id}/webhooks/{webhook_id}/devices/{device_id}/down/replace</code></li>
 </ul>
 <p>For example:</p>
 <pre><code>$ curl https://thethings.example.com/api/v3/as/applications/app1/webhooks/wh1/devices/dev1/down/push \
