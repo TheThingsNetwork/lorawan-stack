@@ -69,6 +69,7 @@
   "console.components.device-data-form.messages.homeNetIDDescription": "ID to identify the LoRaWAN network",
   "console.components.device-data-form.messages.joinEUIDescription": "JoinEUI identifies the Join Server",
   "console.components.device-data-form.messages.leaveBlankPlaceholder": "Leave blank to generate automatically",
+  "console.components.device-data-form.messages.lorawanOptions": "LoRaWAN Options",
   "console.components.device-data-form.messages.lorawanVersionDescription": "The LoRaWAN MAC Version of the end device",
   "console.components.device-data-form.messages.lorawanPhyVersionDescription": "The LoRaWAN PHY Version of the end device",
   "console.components.device-data-form.messages.multicast": "Multicast",

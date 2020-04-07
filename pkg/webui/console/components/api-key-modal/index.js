@@ -58,7 +58,7 @@ const ApiKeyModal = function(props) {
           {rights.map(right => (
             <li key={right}>
               <Icon icon="check" className={style.icon} />
-              <Message className={style.rightName} content={{ id: `enum:${right}` }} />
+              <Message className={style.rightName} content={{ id: `enum:${right}` }} firstToUpper />
             </li>
           ))}
         </ul>

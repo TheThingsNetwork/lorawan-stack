@@ -21,7 +21,13 @@ exports[`HeadCell should match snapshot 1`] = `
   small={false}
 >
   <Message
+    capitalize={false}
+    component="span"
     content="Head cell"
+    firstToLower={false}
+    firstToUpper={false}
+    lowercase={false}
+    uppercase={false}
   />
 </Cell>
 `;

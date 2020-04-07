@@ -65,8 +65,10 @@ class FormField extends React.Component {
       }),
     ]).isRequired,
     description: PropTypes.message,
+    disabled: PropTypes.bool,
     name: PropTypes.string.isRequired,
     onChange: PropTypes.func,
+    readOnly: PropTypes.bool,
     required: PropTypes.bool,
     title: PropTypes.message.isRequired,
     warning: PropTypes.message,
@@ -74,9 +76,11 @@ class FormField extends React.Component {
 
   static defaultProps = {
     className: undefined,
+    disabled: false,
     onChange: () => null,
     warning: '',
     description: '',
+    readOnly: false,
     required: false,
   }
 
@@ -161,11 +165,11 @@ class FormField extends React.Component {
 
     const fieldMessage = showError ? (
       <div className={style.messages}>
-        <Err error={fieldError} />
+        <Err content={fieldError} title={name} />
       </div>
     ) : showWarning ? (
       <div className={style.messages}>
-        <Err warning={warning} />
+        <Err content={warning} title={name} warning />
       </div>
     ) : showDescription ? (
       <Message className={style.description} content={description} />
@@ -212,14 +216,9 @@ class FormField extends React.Component {
   }
 }
 
-const Err = function(props) {
-  const { error, warning, name, className } = props
-
-  const content = error || warning || ''
-  const contentValues = content.values || {}
-
+const Err = ({ content, error, warning, title, className }) => {
   const icon = error ? 'error' : 'warning'
-
+  const contentValues = content.values || {}
   const classname = classnames(style.message, className, {
     [style.show]: content && content !== '',
     [style.hide]: !content || content === '',
@@ -227,18 +226,34 @@ const Err = function(props) {
     [style.warn]: warning,
   })
 
+  if (title) {
+    contentValues.field = <Message content={title} className={style.name} />
+  }
+
   return (
     <div className={classname}>
       <Icon icon={icon} className={style.icon} />
       <Message
         content={content.format || content.error_description || content.message || content}
-        values={{
-          ...contentValues,
-          name: <Message content={name} className={style.name} />,
-        }}
+        values={contentValues}
       />
     </div>
   )
+}
+
+Err.propTypes = {
+  className: PropTypes.string,
+  content: PropTypes.error.isRequired,
+  error: PropTypes.bool,
+  title: PropTypes.message,
+  warning: PropTypes.bool,
+}
+
+Err.defaultProps = {
+  className: undefined,
+  title: undefined,
+  warning: false,
+  error: true,
 }
 
 export default FormField
