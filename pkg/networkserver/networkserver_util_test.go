@@ -1464,10 +1464,10 @@ func AssertLinkApplication(ctx context.Context, conn *grpc.ClientConn, getPeerCh
 	}
 
 	if !a.So(test.AssertEventPubSubPublishRequests(ctx, eventsPublishCh, 1+len(replaceEvents), func(evs ...events.Event) bool {
-		return a.So(evs, should.HaveSameElements, append(
+		return a.So(evs, should.HaveSameElementsEvent, append(
 			[]events.Event{EvtBeginApplicationLink(events.ContextWithCorrelationID(test.Context(), reqCIDs...), appID, nil)},
 			replaceEvents...,
-		), test.EventEqual)
+		))
 	}), should.BeTrue) {
 		t.Error("AS link events assertion failed")
 		return nil, nil, false

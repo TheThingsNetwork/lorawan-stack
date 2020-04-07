@@ -148,10 +148,10 @@ var (
 	// StartWith receives exactly 2 string parameters and ensures that the first starts with the second.
 	StartWith = assertions.ShouldStartWith
 
-	// HaveSameElements asserts that the actual A and expected B elements are equal using an equality function with signature func(A, B) bool.
-	HaveSameElements = testassertions.ShouldHaveSameElementsFunc
-	// NotHaveSameElements asserts that the actual A and expected B elements are not equal using an equality function with signature func(A, B) bool.
-	NotHaveSameElements = testassertions.ShouldNotHaveSameElementsFunc
+	// HaveSameElementsFunc asserts that the actual A and expected B elements are equal using an equality function with signature func(A, B) bool.
+	HaveSameElementsFunc = testassertions.ShouldHaveSameElementsFunc
+	// NotHaveSameElementsFunc asserts that the actual A and expected B elements are not equal using an equality function with signature func(A, B) bool.
+	NotHaveSameElementsFunc = testassertions.ShouldNotHaveSameElementsFunc
 	// HaveSameElementsDeep asserts that the actual A and expected B elements are equal using reflect.Equal.
 	HaveSameElementsDeep = testassertions.ShouldHaveSameElementsDeep
 	// NotHaveSameElementsDeep asserts that the actual A and expected B elements are not equal using reflect.Equal.
@@ -160,6 +160,14 @@ var (
 	HaveSameElementsDiff = testassertions.ShouldHaveSameElementsDiff
 	// NotHaveSameElementsDiff asserts that the actual A and expected B elements are not equal using pretty.Diff.
 	NotHaveSameElementsDiff = testassertions.ShouldNotHaveSameElementsDiff
+	// HaveSameElementsEvent asserts that the actual A and expected B elements are equal using test.EventEqual.
+	HaveSameElementsEvent = testassertions.ShouldHaveSameElementsEvent
+	// NotHaveSameElementsEvent asserts that the actual A and expected B elements are not equal using test.EventEqual.
+	NotHaveSameElementsEvent = testassertions.ShouldNotHaveSameElementsEvent
+
+	// BeProperSupersetOfElementsFunc asserts that the actual A elements represents a proper superset of expected B elements using an equality function with signature func(A, B) bool.
+	BeProperSupersetOfElementsFunc = testassertions.ShouldBeProperSupersetOfElementsFunc
+
 	// HaveParentContext asserts that the context.Context is a child of context.Context.
 	HaveParentContext = testassertions.ShouldHaveParentContext
 	// HaveParentContextOrEqual asserts that the context.Context is a child of context.Context or they're equal.
@@ -187,4 +195,14 @@ var (
 
 	// ResembleFields receives at least two SetFielder parameters and optional variadic field paths and does a deep equal check (see reflect.DeepEqual) on selected fields. If field paths are empty, it checks all fields similar to Resemble.
 	ResembleFields = testassertions.ShouldResembleFields
+
+	// ReceiveEventResembling receives <-chan events.Event or <-chan test.EventPubSubPublishRequest as first argument and events.Event as second one and does resemblance check on received event.
+	ReceiveEventResembling = testassertions.ShouldReceiveEventResembling
+	// ReceiveEventsResembling is like ReceiveEvent, but for multiple events.
+	ReceiveEventsResembling = testassertions.ShouldReceiveEventsResembling
+
+	// ReceiveEventFunc receives <-chan events.Event or <-chan test.EventPubSubPublishRequest as first argument, equality assertion func(events.Event) bool as second one and events.Event as third one and asserts equality under equality assertion specified.
+	ReceiveEventFunc = testassertions.ShouldReceiveEventFunc
+	// ReceiveEventsFunc is like ReceiveEvent, but for multiple events.
+	ReceiveEventsFunc = testassertions.ShouldReceiveEventsFunc
 )

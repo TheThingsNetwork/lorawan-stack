@@ -250,10 +250,10 @@ func TestLinkApplication(t *testing.T) {
 	}
 
 	if !a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 2, func(evs ...events.Event) bool {
-		return a.So(evs, should.HaveSameElements, []events.Event{
+		return a.So(evs, should.HaveSameElementsEvent, []events.Event{
 			newLink1EndEventClosure(context.Canceled),
 			link2EndEventClosure(context.Canceled),
-		}, test.EventEqual)
+		})
 	}), should.BeTrue) {
 		t.Fatal("AS link end events assertion failed")
 	}
