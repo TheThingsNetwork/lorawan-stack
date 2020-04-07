@@ -61,6 +61,9 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
 		"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
 		"mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+		"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+		"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+		"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
 		"pending_session.keys.f_nwk_s_int_key.key",
 		"pending_session.keys.nwk_s_enc_key.key",
 		"pending_session.keys.s_nwk_s_int_key.key",
@@ -122,6 +125,31 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+		) {
+			gets = ttnpb.AddFields(gets,
+				"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.encrypted_key",
+				"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+		) {
+			gets = ttnpb.AddFields(gets,
+				"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.encrypted_key",
+				"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.kek_label",
+			)
+		}
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
+			"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+		) {
+			gets = ttnpb.AddFields(gets,
+				"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.encrypted_key",
+				"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.kek_label",
+			)
+		}
+
+		if ttnpb.HasAnyField(req.FieldMask.Paths,
 			"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
 		) {
 			gets = ttnpb.AddFields(gets,
@@ -176,6 +204,17 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		dev.Session.SessionKeys = sk
 	}
 
+	if dev.PendingMACState.GetQueuedJoinAccept() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
+		"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
+		"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
+		"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
+	) {
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, ns.KeyVault, dev.PendingMACState.QueuedJoinAccept.Keys, "pending_mac_state.queued_join_accept.keys", req.FieldMask.Paths...)
+		if err != nil {
+			return nil, err
+		}
+		dev.PendingMACState.QueuedJoinAccept.Keys = sk
+	}
 	if dev.MACState.GetQueuedJoinAccept() != nil && ttnpb.HasAnyField(req.FieldMask.Paths,
 		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
 		"mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
