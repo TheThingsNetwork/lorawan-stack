@@ -32,6 +32,8 @@ var (
 	selectUserFlags     = util.FieldMaskFlags(&ttnpb.User{})
 	setUserFlags        = util.FieldFlags(&ttnpb.User{})
 	profilePictureFlags = &pflag.FlagSet{}
+
+	selectAllUserFlags = util.SelectAllFlagSet("user")
 )
 
 func userIDFlags() *pflag.FlagSet {
@@ -72,6 +74,7 @@ var (
 		Short:   "List users",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.UserRegistry/List"])
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -97,6 +100,7 @@ var (
 		Short: "Search for users",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EntityRegistrySearch/SearchUsers"])
 
 			req, opt, getTotal := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
@@ -124,6 +128,7 @@ var (
 				return errNoUserID
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectUserFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.UserRegistry/Get"])
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -356,14 +361,17 @@ func init() {
 	profilePictureFlags.String("profile_picture", "", "upload the profile picture from this file")
 
 	usersListCommand.Flags().AddFlagSet(selectUserFlags)
+	usersListCommand.Flags().AddFlagSet(selectAllUserFlags)
 	usersListCommand.Flags().AddFlagSet(paginationFlags())
 	usersListCommand.Flags().AddFlagSet(orderFlags())
 	usersCommand.AddCommand(usersListCommand)
 	usersSearchCommand.Flags().AddFlagSet(searchFlags())
+	usersSearchCommand.Flags().AddFlagSet(selectAllUserFlags)
 	usersSearchCommand.Flags().AddFlagSet(selectUserFlags)
 	usersCommand.AddCommand(usersSearchCommand)
 	usersGetCommand.Flags().AddFlagSet(userIDFlags())
 	usersGetCommand.Flags().AddFlagSet(selectUserFlags)
+	usersGetCommand.Flags().AddFlagSet(selectAllUserFlags)
 	usersCommand.AddCommand(usersGetCommand)
 	usersCreateCommand.Flags().AddFlagSet(userIDFlags())
 	usersCreateCommand.Flags().AddFlagSet(setUserFlags)

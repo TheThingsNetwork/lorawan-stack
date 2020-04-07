@@ -30,6 +30,8 @@ import (
 var (
 	selectApplicationFlags = util.FieldMaskFlags(&ttnpb.Application{})
 	setApplicationFlags    = util.FieldFlags(&ttnpb.Application{})
+
+	selectAllApplicationFlags = util.SelectAllFlagSet("application")
 )
 
 func applicationIDFlags() *pflag.FlagSet {
@@ -68,6 +70,7 @@ var (
 		Short:   "List applications",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationRegistry/List"])
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -94,6 +97,7 @@ var (
 		Short: "Search for applications",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.EntityRegistrySearch/SearchApplications"])
 
 			req, opt, getTotal := getSearchEntitiesRequest(cmd.Flags())
 			req.FieldMask.Paths = paths
@@ -121,6 +125,7 @@ var (
 				return errNoApplicationID
 			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
+			paths = ttnpb.AllowedFields(paths, ttnpb.AllowedFieldMaskPathsForRPC["/ttn.lorawan.v3.ApplicationRegistry/Get"])
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -252,12 +257,15 @@ func init() {
 	applicationsListCommand.Flags().AddFlagSet(selectApplicationFlags)
 	applicationsListCommand.Flags().AddFlagSet(paginationFlags())
 	applicationsListCommand.Flags().AddFlagSet(orderFlags())
+	applicationsListCommand.Flags().AddFlagSet(selectAllApplicationFlags)
 	applicationsCommand.AddCommand(applicationsListCommand)
 	applicationsSearchCommand.Flags().AddFlagSet(searchFlags())
 	applicationsSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
+	applicationsSearchCommand.Flags().AddFlagSet(selectAllApplicationFlags)
 	applicationsCommand.AddCommand(applicationsSearchCommand)
 	applicationsGetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsGetCommand.Flags().AddFlagSet(selectApplicationFlags)
+	applicationsGetCommand.Flags().AddFlagSet(selectAllApplicationFlags)
 	applicationsCommand.AddCommand(applicationsGetCommand)
 	applicationsCreateCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsCreateCommand.Flags().AddFlagSet(collaboratorFlags())
