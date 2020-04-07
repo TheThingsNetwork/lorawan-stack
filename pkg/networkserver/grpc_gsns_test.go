@@ -309,7 +309,7 @@ func TestHandleUplink(t *testing.T) {
 				}
 			})
 	}
-	assertJoinApplicationUp := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, recvAt time.Time, err error) bool {
+	assertJoinApplicationUp := func(ctx context.Context, env TestEnvironment, expectedCtx context.Context, setDevice *ttnpb.EndDevice, joinResp *ttnpb.JoinResponse, recvAt time.Time, err error) bool {
 		t := test.MustTFromContext(ctx)
 		t.Helper()
 		a := assertions.New(t)
@@ -329,10 +329,10 @@ func TestHandleUplink(t *testing.T) {
 						EndDeviceIdentifiers: ids,
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
-								AppSKey:              setDevice.PendingMACState.QueuedJoinAccept.Keys.AppSKey,
+								AppSKey:              joinResp.AppSKey,
 								InvalidatedDownlinks: queue,
 								ReceivedAt:           recvAt,
-								SessionKeyID:         setDevice.PendingMACState.QueuedJoinAccept.Keys.SessionKeyID,
+								SessionKeyID:         joinResp.SessionKeyID,
 							},
 						},
 					},
@@ -746,10 +746,13 @@ func TestHandleUplink(t *testing.T) {
 				return MakeNsJsJoinRequest(macVersion, phyVersion, fp, devAddr, ttnpb.RX_DELAY_3, 0, ttnpb.DATA_RATE_2, correlationIDs...)
 			}
 			makeJoinSetDevice := func(getDevice *ttnpb.EndDevice, decodedMsg *ttnpb.UplinkMessage, joinReq *ttnpb.JoinRequest, joinResp *ttnpb.JoinResponse) *ttnpb.EndDevice {
+				keys := CopySessionKeys(&joinResp.SessionKeys)
+				keys.AppSKey = nil
+
 				macState := test.Must(NewMACState(getDevice, frequencyplans.NewStore(test.FrequencyPlansFetcher), ttnpb.MACSettings{})).(*ttnpb.MACState)
 				macState.RxWindowsAvailable = true
 				macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
-					Keys:    joinResp.SessionKeys,
+					Keys:    *keys,
 					Payload: joinResp.RawPayload,
 					Request: *joinReq,
 				}
@@ -793,10 +796,10 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.SupportsJoin = false
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), false, ErrTestInternal)
-							return AllTrue(
+							return a.So(AllTrue(
 								ok,
 								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
-							)
+							), should.BeTrue)
 						}, ErrTestInternal), should.BeTrue)
 					},
 				},
@@ -810,10 +813,10 @@ func TestHandleUplink(t *testing.T) {
 						getDevice := makeJoinDevice(clock)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), false, ErrTestInternal)
-							return AllTrue(
+							return a.So(AllTrue(
 								ok,
 								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
-							)
+							), should.BeTrue)
 						}, ErrTestInternal), should.BeTrue)
 					},
 				},
@@ -857,10 +860,10 @@ func TestHandleUplink(t *testing.T) {
 						getDevice.SupportsJoin = false
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, ok := assertJoinDeduplicateSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), true, nil)
-							return AllTrue(
+							return a.So(AllTrue(
 								ok,
 								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrABPJoinRequest),
-							)
+							), should.BeTrue)
 						}, ErrABPJoinRequest), should.BeTrue)
 					},
 				},
@@ -874,10 +877,10 @@ func TestHandleUplink(t *testing.T) {
 						getDevice := makeJoinDevice(clock)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, _, ok := assertJoinClusterLocalSequence(ctx, env, clock, decodedMsg, CopyEndDevice(getDevice), makeNsJsJoinRequest(nil), nil, ErrTestInternal)
-							return AllTrue(
+							return a.So(AllTrue(
 								ok,
 								assertPublishDropJoinRequestRPCError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
-							)
+							), should.BeTrue)
 						}, ErrTestInternal), should.BeTrue)
 					},
 				},
@@ -891,10 +894,10 @@ func TestHandleUplink(t *testing.T) {
 						getDevice := makeJoinDevice(clock)
 						return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 							getCtx, _, ok := assertJoinInteropSequence(ctx, env, clock, true, decodedMsg, CopyEndDevice(getDevice), makeNsJsJoinRequest(nil), nil, ErrTestInternal)
-							return AllTrue(
+							return a.So(AllTrue(
 								ok,
 								assertPublishDropJoinRequestRPCError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
-							)
+							), should.BeTrue)
 						}, ErrTestInternal), should.BeTrue)
 					},
 				},
@@ -976,10 +979,10 @@ func TestHandleUplink(t *testing.T) {
 								return true
 							}
 							_, ok = assertJoinSetByID(ctx, env, getCtx, nil, nil, innerErr, registryErr)
-							return AllTrue(
+							return a.So(AllTrue(
 								ok,
 								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, registryErr),
-							)
+							), should.BeTrue)
 						}, registryErr), should.BeTrue)
 					},
 				},
@@ -1013,10 +1016,10 @@ func TestHandleUplink(t *testing.T) {
 								return true
 							}
 							_, ok = assertJoinSetByID(ctx, env, getCtx, getDevice, makeJoinSetDevice(getDevice, decodedMsg, joinReq, joinResp), nil, ErrTestInternal)
-							return AllTrue(
+							return a.So(AllTrue(
 								ok,
 								assertPublishDropJoinRequestLocalError(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, ErrTestInternal),
-							)
+							), should.BeTrue)
 						}, ErrTestInternal), should.BeTrue)
 					},
 				},
@@ -1054,7 +1057,7 @@ func TestHandleUplink(t *testing.T) {
 							return AllTrue(
 								ok,
 								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, nil),
-								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, nil),
+								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinResp, joinRespRecvAt, nil),
 							)
 						}, nil), should.BeTrue)
 					},
@@ -1093,7 +1096,7 @@ func TestHandleUplink(t *testing.T) {
 							return a.So(AllTrue(
 								ok,
 								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
-								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, ErrTestInternal),
+								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinResp, joinRespRecvAt, ErrTestInternal),
 								assertPublishMergeMetadata(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, RxMetadata[:]...),
 							), should.BeTrue)
 						}, nil), should.BeTrue)
@@ -1142,7 +1145,7 @@ func TestHandleUplink(t *testing.T) {
 							return a.So(AllTrue(
 								ok,
 								assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+phy.JoinAcceptDelay1-joinReq.RxDelay.Duration()/2-NSScheduleWindow()), true, nil),
-								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinRespRecvAt, ErrTestInternal),
+								assertJoinApplicationUp(ctx, env, setCtx, setDevice, joinResp, joinRespRecvAt, ErrTestInternal),
 								assertPublishMergeMetadata(ctx, env, getCtx, getDevice.EndDeviceIdentifiers, RxMetadata[:]...),
 							), should.BeTrue)
 						}, nil), should.BeTrue)
