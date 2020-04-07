@@ -14,7 +14,6 @@
 
 import Applications from './service/applications'
 import Configuration from './service/configuration'
-import Application from './entity/application'
 import Api from './api'
 import Token from './util/token'
 import Gateways from './service/gateways'
@@ -27,7 +26,7 @@ import EventHandler from './util/events'
 import StackConfiguration from './util/stack-configuration'
 
 class TtnLw {
-  constructor(token, { stackConfig, connectionType, defaultUserId, proxy, axiosConfig }) {
+  constructor(token, { stackConfig, connectionType, defaultUserId, axiosConfig }) {
     const tokenInstance = new Token(token)
     const stackConfiguration = new StackConfiguration(stackConfig)
 
@@ -36,14 +35,11 @@ class TtnLw {
 
     this.Applications = new Applications(this.api, {
       defaultUserId,
-      proxy,
       stackConfig: stackConfiguration,
     })
-    this.Application = Application.bind(null, this.Applications)
     this.Configuration = new Configuration(this.api.Configuration)
     this.Gateways = new Gateways(this.api, {
       defaultUserId,
-      proxy,
       stackConfig: stackConfiguration,
     })
     this.Js = new Js(this.api.Js)

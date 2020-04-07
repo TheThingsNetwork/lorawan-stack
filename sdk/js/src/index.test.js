@@ -13,9 +13,6 @@
 // limitations under the License.
 
 import Applications from './service/applications'
-import Application from './entity/application'
-import Devices from './service/devices'
-import Device from './entity/device'
 import TTN from '.'
 
 const mockApplicationData = {
@@ -96,15 +93,5 @@ describe('SDK class', function() {
   test('retrieves application instance correctly', async function() {
     const app = await ttn.Applications.getById('test')
     expect(app).toBeDefined()
-    expect(app).toBeInstanceOf(Application)
-  })
-
-  test('retrieves device via app instance correctly', async function() {
-    const app = await ttn.Applications.getById('test')
-    const device = await app.Devices.getById('test', 'test-device')
-
-    expect(app.Devices).toBeInstanceOf(Devices)
-    expect(device).toBeDefined()
-    expect(device).toBeInstanceOf(Device)
   })
 })

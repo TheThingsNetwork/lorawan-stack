@@ -18,7 +18,7 @@ import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
 
 class Gateways {
-  constructor(api, { defaultUserId, stackConfig, proxy = true }) {
+  constructor(api, { defaultUserId, stackConfig }) {
     this._api = api
     this._defaultUserId = defaultUserId
     this._stackConfig = stackConfig
@@ -89,7 +89,7 @@ class Gateways {
       ...Marshaler.selectorToFieldMask(selector),
     })
 
-    return Marshaler.payloadListResponse('gateways', response)
+    return Marshaler.unwrapGateways(response)
   }
 
   // Update
