@@ -26,6 +26,7 @@ import style from './error-message.styl'
 const ErrorMessage = function({ content, className, ...rest }) {
   const props = {
     className: classnames(className, style.message),
+    firstToUpper: true,
     ...toMessageProps(content),
     ...rest,
   }

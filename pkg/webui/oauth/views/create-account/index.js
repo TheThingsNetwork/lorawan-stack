@@ -55,14 +55,13 @@ const validationSchema = Yup.object().shape({
     .min(3, sharedMessages.validateTooShort)
     .max(50, sharedMessages.validateTooLong),
   password: Yup.string()
-    .min(8)
+    .min(8, sharedMessages.validateTooShort)
     .required(sharedMessages.validateRequired),
   primary_email_address: Yup.string()
     .email(sharedMessages.validateEmail)
     .required(sharedMessages.validateRequired),
   password_confirm: Yup.string()
     .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch)
-    .min(8)
     .required(sharedMessages.validateRequired),
 })
 

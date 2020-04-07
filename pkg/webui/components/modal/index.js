@@ -105,8 +105,8 @@ class Modal extends React.PureComponent {
 
     const name = formName ? { name: formName } : {}
     const RootComponent = this.props.method ? 'form' : 'div'
-    const messageElement = <Message content={message} className={style.message} />
-    const bottomLineElement = <Message content={bottomLine} />
+    const messageElement = message && <Message content={message} className={style.message} />
+    const bottomLineElement = bottomLine && <Message content={bottomLine} />
 
     const approveButtonMessage =
       buttonMessage !== undefined
