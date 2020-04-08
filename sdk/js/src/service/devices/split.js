@@ -88,8 +88,6 @@ export function splitGetPaths(paths, base, components) {
  * other options
  * @param {Object} api - The Api object as passed to the service
  * @param {Object} stackConfig - The Things Stack config object
- * @param {boolean} ignoreDisabledComponents - A flag indicating whether queries
- * against disabled components should be ignored insread of throwing
  * @param {string} operation - The operation, an enum of 'create', 'set', 'get'
  * and 'delete'
  * @param {string} requestTree - The request tree, as returned by the splitPaths
@@ -104,7 +102,6 @@ export function splitGetPaths(paths, base, components) {
 export async function makeRequests(
   api,
   stackConfig,
-  ignoreDisabledComponents,
   operation,
   requestTree,
   params,
@@ -157,17 +154,6 @@ export async function makeRequests(
   }
 
   const requests = new Array(3)
-
-  // Check whether the request would query against disabled components
-  if (!ignoreDisabledComponents) {
-    for (const component of Object.keys(requestTree)) {
-      if (!stackConfig.isComponentAvailable(component)) {
-        throw new Error(
-          `Cannot run ${operation.toUpperCase()} end device request which (partially) depends on disabled component: "${component}".`,
-        )
-      }
-    }
-  }
 
   if (isSet && !('end_device.ids.device_id' in params.routeParams)) {
     // Ensure using the PUT method by setting the device id route param. This
