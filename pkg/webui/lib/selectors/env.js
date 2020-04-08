@@ -28,6 +28,8 @@ export const selectApplicationSiteTitle = () => configSelector().SITE_TITLE
 
 export const selectApplicationSiteSubTitle = () => configSelector().SITE_SUB_TITLE
 
+export const selectSentryDsnConfig = () => configSelector().SENTRY_DSN
+
 export const selectStackConfig = () => selectApplicationConfig().stack_config
 
 export const selectGsConfig = () => selectStackConfig().gs

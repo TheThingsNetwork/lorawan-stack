@@ -29,6 +29,7 @@ const env = {
     supportLink: envSelector.selectSupportLinkConfig(),
   },
   pageData: envSelector.selectPageData(),
+  sentryDsn: envSelector.selectSentryDsnConfig(),
   siteName: envSelector.selectApplicationSiteName(),
   siteTitle: envSelector.selectApplicationSiteTitle(),
   siteSubTitle: envSelector.selectApplicationSiteSubTitle(),

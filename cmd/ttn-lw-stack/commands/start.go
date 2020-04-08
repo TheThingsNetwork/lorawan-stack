@@ -129,6 +129,9 @@ var startCommand = &cobra.Command{
 
 		if start.IdentityServer || startDefault {
 			logger.Info("Setting up Identity Server")
+			if config.IS.OAuth.UI.TemplateData.SentryDSN == "" {
+				config.IS.OAuth.UI.TemplateData.SentryDSN = config.Sentry.DSN
+			}
 			is, err := identityserver.New(c, &config.IS)
 			if err != nil {
 				return shared.ErrInitializeIdentityServer.WithCause(err)
@@ -228,6 +231,9 @@ var startCommand = &cobra.Command{
 
 		if start.Console || startDefault {
 			logger.Info("Setting up Console")
+			if config.Console.UI.TemplateData.SentryDSN == "" {
+				config.Console.UI.TemplateData.SentryDSN = config.Sentry.DSN
+			}
 			console, err := console.New(c, config.Console)
 			if err != nil {
 				return shared.ErrInitializeConsole.WithCause(err)
