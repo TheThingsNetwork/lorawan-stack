@@ -21,8 +21,8 @@ const selectFetchingEntry = (state, id) => selectFetchingStore(state)[id] || fal
 /**
  * @example
  * const selectFetching = createFetchingSelector([
- * 'GET_ENTITY_LIST',
- * 'SEARCH_ENTITY_LIST'
+ * GET_ENTITY_LIST_BASE,
+ * SEARCH_ENTITY_LIST_BASE
  * ])
  * const selectEntityFetching = (state) => selectFetching(state)
  *
