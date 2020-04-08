@@ -28,13 +28,12 @@ import mergeDevice from './merge'
  * device data.
  */
 class Devices {
-  constructor(api, { ignoreDisabledComponents = true, stackConfig }) {
+  constructor(api, { stackConfig }) {
     if (!api) {
       throw new Error('Cannot initialize device service without api object.')
     }
     this._api = api
     this._stackConfig = stackConfig
-    this._ignoreDisabledComponents = ignoreDisabledComponents
   }
 
   _emitDefaults(paths, device) {
@@ -200,7 +199,6 @@ class Devices {
     const setParts = await makeRequests(
       this._api,
       this._stackConfig,
-      this._ignoreDisabledComponents,
       create ? 'create' : 'set',
       requestTree,
       params,
@@ -253,7 +251,6 @@ class Devices {
     const deviceParts = await makeRequests(
       this._api,
       this._stackConfig,
-      this._ignoreDisabledComponents,
       'get',
       requestTree,
       params,
@@ -290,7 +287,6 @@ class Devices {
     const deleteParts = await makeRequests(
       this._api,
       this._stackConfig,
-      this._ignoreDisabledComponents,
       'delete',
       requestTree,
       params,
@@ -454,7 +450,6 @@ class Devices {
     const setParts = await makeRequests(
       this._api,
       this._stackConfig,
-      this._ignoreDisabledComponents,
       'set',
       requestTree,
       routeParams,
@@ -523,7 +518,6 @@ class Devices {
     const setParts = await makeRequests(
       this._api,
       this._stackConfig,
-      this._ignoreDisabledComponents,
       'create',
       requestTree,
       routeParams,
