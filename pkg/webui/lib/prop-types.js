@@ -248,5 +248,11 @@ PropTypes.webhook = PropTypes.shape({
   updated_at: PropTypes.string,
 })
 PropTypes.webhooks = PropTypes.arrayOf(PropTypes.webhook)
+PropTypes.webhookTemplate = PropTypes.shape({
+  ids: PropTypes.shape({
+    template_id: PropTypes.string.isRequired,
+  }).isRequired,
+})
+PropTypes.webhookTemplates = PropTypes.arrayOf(PropTypes.webhookTemplate)
 
 export default PropTypes

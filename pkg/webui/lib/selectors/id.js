@@ -98,6 +98,13 @@ export const getWebhookId = function(webhook = {}) {
   return getByPath(webhook, 'ids.webhook_id')
 }
 
+export const getWebhookTemplateId = function(webhookTemplate = {}) {
+  return (
+    getByPath(webhookTemplate, 'ids.template_id') ||
+    getByPath(webhookTemplate, 'template_ids.template_id')
+  )
+}
+
 export const getPubsubId = function(pubsub = {}) {
   return getByPath(pubsub, 'ids.pub_sub_id')
 }

@@ -14,6 +14,7 @@
 
 import * as webhooks from '../../actions/webhooks'
 import * as webhookFormats from '../../actions/webhook-formats'
+import * as webhookTemplates from '../../actions/webhook-templates'
 
 import api from '../../../api'
 import createRequestLogic from './lib'
@@ -58,4 +59,32 @@ const getWebhookFormatsLogic = createRequestLogic({
   },
 })
 
-export default [getWebhookLogic, getWebhooksLogic, updateWebhookLogic, getWebhookFormatsLogic]
+const getWebhookTemplateLogic = createRequestLogic({
+  type: webhookTemplates.GET_WEBHOOK_TEMPLATE,
+  async process({ action }) {
+    const { id } = action.payload
+    const { selector } = action.meta
+    const template = await api.application.webhooks.getTemplate(id, selector)
+
+    return template
+  },
+})
+
+const getWebhookTemplatesLogic = createRequestLogic({
+  type: webhookTemplates.LIST_WEBHOOK_TEMPLATES,
+  async process({ action }) {
+    const { selector } = action.meta
+    const { templates } = await api.application.webhooks.listTemplates(selector)
+
+    return templates
+  },
+})
+
+export default [
+  getWebhookLogic,
+  getWebhooksLogic,
+  updateWebhookLogic,
+  getWebhookFormatsLogic,
+  getWebhookTemplateLogic,
+  getWebhookTemplatesLogic,
+]
