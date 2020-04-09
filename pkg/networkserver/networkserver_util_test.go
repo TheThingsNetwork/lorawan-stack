@@ -49,34 +49,59 @@ const (
 	RecentDownlinkCount   = recentDownlinkCount
 	OptimalADRUplinkCount = optimalADRUplinkCount
 
-	AppIDString = "handle-uplink-test-app-id"
-	DevID       = "handle-uplink-test-dev-id"
+	AppIDString = "test-app-id"
+	DevID       = "test-dev-id"
 )
 
 var (
-	AppendRecentUplink = appendRecentUplink
-	AdaptDataRate      = adaptDataRate
-	HandleLinkCheckReq = handleLinkCheckReq
-	NewMACState        = newMACState
-	TimePtr            = timePtr
+	AdaptDataRate                       = adaptDataRate
+	AppendRecentUplink                  = appendRecentUplink
+	DownlinkPathsFromMetadata           = downlinkPathsFromMetadata
+	FrequencyPlanChannels               = frequencyPlanChannels
+	HandleLinkCheckReq                  = handleLinkCheckReq
+	NewMACState                         = newMACState
+	TimePtr                             = timePtr
+	JoinResponseWithoutKeys             = joinResponseWithoutKeys
+	ApplicationJoinAcceptWithoutAppSKey = applicationJoinAcceptWithoutAppSKey
 
 	ErrABPJoinRequest            = errABPJoinRequest
+	ErrDuplicate                 = errDuplicate
 	ErrDecodePayload             = errDecodePayload
 	ErrDeviceNotFound            = errDeviceNotFound
 	ErrOutdatedData              = errOutdatedData
 	ErrRejoinRequest             = errRejoinRequest
 	ErrUnsupportedLoRaWANVersion = errUnsupportedLoRaWANVersion
 
-	EvtBeginApplicationLink    = evtBeginApplicationLink
-	EvtCreateEndDevice         = evtCreateEndDevice
-	EvtDropDataUplink          = evtDropDataUplink
-	EvtDropJoinRequest         = evtDropJoinRequest
-	EvtEndApplicationLink      = evtEndApplicationLink
-	EvtEnqueueDevStatusRequest = evtEnqueueDevStatusRequest
-	EvtForwardDataUplink       = evtForwardDataUplink
-	EvtForwardJoinRequest      = evtForwardJoinRequest
-	EvtMergeMetadata           = evtMergeMetadata
-	EvtUpdateEndDevice         = evtUpdateEndDevice
+	EvtBeginApplicationLink          = evtBeginApplicationLink
+	EvtClassCSwitch                  = evtClassCSwitch
+	EvtClusterJoinAttempt            = evtClusterJoinAttempt
+	EvtClusterJoinFail               = evtClusterJoinFail
+	EvtClusterJoinSuccess            = evtClusterJoinSuccess
+	EvtCreateEndDevice               = evtCreateEndDevice
+	EvtDropDataUplink                = evtDropDataUplink
+	EvtDropJoinRequest               = evtDropJoinRequest
+	EvtEndApplicationLink            = evtEndApplicationLink
+	EvtEnqueueDeviceModeConfirmation = evtEnqueueDeviceModeConfirmation
+	EvtEnqueueDevStatusRequest       = evtEnqueueDevStatusRequest
+	EvtEnqueueRekeyConfirmation      = evtEnqueueRekeyConfirmation
+	EvtForwardDataUplink             = evtForwardDataUplink
+	EvtForwardJoinAccept             = evtForwardJoinAccept
+	EvtInteropJoinAttempt            = evtInteropJoinAttempt
+	EvtInteropJoinFail               = evtInteropJoinFail
+	EvtInteropJoinSuccess            = evtInteropJoinSuccess
+	EvtProcessDataUplink             = evtProcessDataUplink
+	EvtProcessJoinRequest            = evtProcessJoinRequest
+	EvtReceiveDataUplink             = evtReceiveDataUplink
+	EvtReceiveDeviceModeIndication   = evtReceiveDeviceModeIndication
+	EvtReceiveJoinRequest            = evtReceiveJoinRequest
+	EvtReceiveRekeyIndication        = evtReceiveRekeyIndication
+	EvtScheduleDataDownlinkAttempt   = evtScheduleDataDownlinkAttempt
+	EvtScheduleDataDownlinkFail      = evtScheduleDataDownlinkFail
+	EvtScheduleDataDownlinkSuccess   = evtScheduleDataDownlinkSuccess
+	EvtScheduleJoinAcceptAttempt     = evtScheduleJoinAcceptAttempt
+	EvtScheduleJoinAcceptFail        = evtScheduleJoinAcceptFail
+	EvtScheduleJoinAcceptSuccess     = evtScheduleJoinAcceptSuccess
+	EvtUpdateEndDevice               = evtUpdateEndDevice
 
 	Timeout = (1 << 10) * test.Delay
 
@@ -96,6 +121,8 @@ var (
 
 	NetID = test.Must(types.NewNetID(2, []byte{1, 2, 3})).(types.NetID)
 )
+
+type DownlinkPath = downlinkPath
 
 var timeMu sync.RWMutex
 
@@ -156,23 +183,12 @@ func AES128KeyPtr(key types.AES128Key) *types.AES128Key {
 	return &key
 }
 
-func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) []byte {
-	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b)).([]byte)
+func FrequencyPlan(id string) *frequencyplans.FrequencyPlan {
+	return test.Must(frequencyplans.NewStore(test.FrequencyPlansFetcher).GetByID(id)).(*frequencyplans.FrequencyPlan)
 }
 
-func MustAppendLegacyUplinkMIC(fNwkSIntKey types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) []byte {
-	mic := test.Must(crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, devAddr, fCnt, b)).([4]byte)
-	return append(b, mic[:]...)
-}
-
-func MustAppendUplinkMIC(sNwkSIntKey, fNwkSIntKey types.AES128Key, confFCnt uint32, txDRIdx uint8, txChIdx uint8, addr types.DevAddr, fCnt uint32, b ...byte) []byte {
-	mic := test.Must(crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, confFCnt, txDRIdx, txChIdx, addr, fCnt, b)).([4]byte)
-	return append(b, mic[:]...)
-}
-
-func MustAppendLegacyDownlinkMIC(fNwkSIntKey types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) []byte {
-	mic := test.Must(crypto.ComputeLegacyDownlinkMIC(fNwkSIntKey, devAddr, fCnt, b)).([4]byte)
-	return append(b, mic[:]...)
+func Band(id string, phyVersion ttnpb.PHYVersion) band.Band {
+	return test.Must(test.Must(band.GetByID(id)).(band.Band).Version(phyVersion)).(band.Band)
 }
 
 func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
@@ -532,11 +548,42 @@ var DataUplinkCorrelationIDs = [...]string{
 	"data-uplink-correlation-id-3",
 }
 
-func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64, chIdx uint8, recvAt time.Time, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
+type MACCommander interface {
+	MACCommand() *ttnpb.MACCommand
+}
+
+func AppendMACCommanders(queue []*ttnpb.MACCommand, cmds ...MACCommander) []*ttnpb.MACCommand {
+	for _, cmd := range cmds {
+		queue = append(queue, cmd.MACCommand())
+	}
+	return queue
+}
+
+func MakeUplinkMACBuffer(phy band.Band, cmds ...MACCommander) []byte {
+	var b []byte
+	for _, cmd := range cmds {
+		b = test.Must(lorawan.DefaultMACCommands.AppendUplink(phy, b, *cmd.MACCommand())).([]byte)
+	}
+	return b
+}
+
+func MakeDownlinkMACBuffer(phy band.Band, cmds ...MACCommander) []byte {
+	var b []byte
+	for _, cmd := range cmds {
+		b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(phy, b, *cmd.MACCommand())).([]byte)
+	}
+	return b
+}
+
+func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) []byte {
+	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b)).([]byte)
+}
+
+func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64, chIdx uint8, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
 	if len(fOpts) > 0 && fPort == 0 {
 		panic("FOpts must not be set for FPort == 0")
 	}
-
+	devAddr = *devAddr.Copy(&types.DevAddr{})
 	mType := ttnpb.MType_UNCONFIRMED_UP
 	if confirmed {
 		mType = ttnpb.MType_CONFIRMED_UP
@@ -545,14 +592,14 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 		MType: mType,
 		Major: ttnpb.Major_LORAWAN_R1,
 	}
-	key := *MakeSessionKeys(macVersion, false).NwkSEncKey.Key
+	keys := MakeSessionKeys(macVersion, false)
 	if fPort == 0 {
-		frmPayload = MustEncryptUplink(key, DevAddr, fCnt, frmPayload...)
+		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, frmPayload...)
 	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
-		fOpts = MustEncryptUplink(key, DevAddr, fCnt, fOpts...)
+		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, fOpts...)
 	}
 	fhdr := ttnpb.FHDR{
-		DevAddr: *DevAddr.Copy(&types.DevAddr{}),
+		DevAddr: devAddr,
 		FCtrl:   fCtrl,
 		FCnt:    fCnt & 0xffff,
 		FOpts:   fOpts,
@@ -564,33 +611,20 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 			).([]byte),
 			fPort),
 		frmPayload...)
+	var mic [4]byte
 	switch {
 	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
-		phyPayload = MustAppendLegacyUplinkMIC(
-			FNwkSIntKey,
-			DevAddr,
-			fCnt,
-			phyPayload...,
-		)
+		mic = test.Must(crypto.ComputeLegacyUplinkMIC(*keys.FNwkSIntKey.Key, devAddr, fCnt, phyPayload)).([4]byte)
 	default:
 		if !fCtrl.Ack {
 			confFCntDown = 0
 		}
-		phyPayload = MustAppendUplinkMIC(
-			SNwkSIntKey,
-			FNwkSIntKey,
-			confFCntDown,
-			uint8(drIdx),
-			chIdx,
-			DevAddr,
-			fCnt,
-			phyPayload...,
-		)
+		mic = test.Must(crypto.ComputeUplinkMIC(*keys.SNwkSIntKey.Key, *keys.FNwkSIntKey.Key, confFCntDown, uint8(drIdx), chIdx, devAddr, fCnt, phyPayload)).([4]byte)
 	}
+	phyPayload = append(phyPayload, mic[:]...)
 	msg := &ttnpb.UplinkMessage{
 		CorrelationIDs: append([]string{}, DataUplinkCorrelationIDs[:]...),
 		RawPayload:     phyPayload,
-		ReceivedAt:     recvAt,
 		RxMetadata:     deepcopy.Copy(mds).([]*ttnpb.RxMetadata),
 		Settings:       MakeUplinkSettings(dr, freq),
 	}
@@ -611,6 +645,68 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 		}
 	}
 	return msg
+}
+
+func WithMatchedUplinkSettings(msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex) *ttnpb.UplinkMessage {
+	msg = CopyUplinkMessage(msg)
+	msg.Settings.DataRateIndex = drIdx
+	msg.DeviceChannelIndex = uint32(chIdx)
+	return msg
+}
+
+func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) []byte {
+	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b)).([]byte)
+}
+
+func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, txReq *ttnpb.TxRequest, cids ...string) *ttnpb.DownlinkMessage {
+	if len(fOpts) > 0 && fPort == 0 {
+		panic("FOpts must not be set for FPort == 0")
+	}
+	devAddr = *devAddr.Copy(&types.DevAddr{})
+	mType := ttnpb.MType_UNCONFIRMED_DOWN
+	if confirmed {
+		mType = ttnpb.MType_CONFIRMED_DOWN
+	}
+	mhdr := ttnpb.MHDR{
+		MType: mType,
+		Major: ttnpb.Major_LORAWAN_R1,
+	}
+	keys := MakeSessionKeys(macVersion, false)
+	if fPort == 0 {
+		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, frmPayload...)
+	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
+		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, fOpts...)
+	}
+	fhdr := ttnpb.FHDR{
+		DevAddr: devAddr,
+		FCtrl:   fCtrl,
+		FCnt:    fCnt & 0xffff,
+		FOpts:   fOpts,
+	}
+	phyPayload := append(
+		append(
+			test.Must(lorawan.AppendFHDR(
+				test.Must(lorawan.AppendMHDR(nil, mhdr)).([]byte), fhdr, false),
+			).([]byte),
+			fPort),
+		frmPayload...)
+	var mic [4]byte
+	switch {
+	case macVersion.Compare(ttnpb.MAC_V1_1) < 0:
+		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, fCnt, phyPayload)).([4]byte)
+	default:
+		if !fCtrl.Ack {
+			confFCntDown = 0
+		}
+		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, confFCntDown, fCnt, phyPayload)).([4]byte)
+	}
+	return &ttnpb.DownlinkMessage{
+		CorrelationIDs: append([]string{}, cids...),
+		RawPayload:     append(phyPayload, mic[:]...),
+		Settings: &ttnpb.DownlinkMessage_Request{
+			Request: txReq,
+		},
+	}
 }
 
 func NewISPeer(ctx context.Context, is interface {

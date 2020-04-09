@@ -25,6 +25,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"go.thethings.network/lorawan-stack/pkg/band"
 	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -44,6 +45,11 @@ var (
 
 func timeUntil(t time.Time) time.Duration {
 	return t.Sub(timeNow())
+}
+
+// copyUplinkMessage returns a deep copy of *ttnpb.UplinkMessage pb.
+func copyUplinkMessage(pb *ttnpb.UplinkMessage) *ttnpb.UplinkMessage {
+	return deepcopy.Copy(pb).(*ttnpb.UplinkMessage)
 }
 
 // copyEndDevice returns a deep copy of ttnpb.EndDevice pb.
@@ -436,6 +442,43 @@ func nextDataDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy band.Band
 	return t, class, true
 }
 
+func frequencyPlanChannels(phy band.Band, fpUpChs []frequencyplans.Channel, fpDownChs ...frequencyplans.Channel) []*ttnpb.MACParameters_Channel {
+	chs := make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fpUpChs))
+	for i, phyUpCh := range phy.UplinkChannels {
+		chs = append(chs, &ttnpb.MACParameters_Channel{
+			MinDataRateIndex:  phyUpCh.MinDataRate,
+			MaxDataRateIndex:  phyUpCh.MaxDataRate,
+			UplinkFrequency:   phyUpCh.Frequency,
+			DownlinkFrequency: phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency,
+		})
+	}
+
+outerUp:
+	for _, fpUpCh := range fpUpChs {
+		for _, ch := range chs {
+			if ch.UplinkFrequency == fpUpCh.Frequency {
+				ch.MinDataRateIndex = ttnpb.DataRateIndex(fpUpCh.MinDataRate)
+				ch.MaxDataRateIndex = ttnpb.DataRateIndex(fpUpCh.MaxDataRate)
+				ch.EnableUplink = true
+				continue outerUp
+			}
+		}
+		chs = append(chs, &ttnpb.MACParameters_Channel{
+			MinDataRateIndex:  ttnpb.DataRateIndex(fpUpCh.MinDataRate),
+			MaxDataRateIndex:  ttnpb.DataRateIndex(fpUpCh.MaxDataRate),
+			UplinkFrequency:   fpUpCh.Frequency,
+			DownlinkFrequency: phy.DownlinkChannels[len(chs)%len(phy.DownlinkChannels)].Frequency,
+			EnableUplink:      true,
+		})
+	}
+	if len(fpDownChs) > 0 {
+		for i, ch := range chs {
+			ch.DownlinkFrequency = fpDownChs[i%len(fpDownChs)].Frequency
+		}
+	}
+	return chs
+}
+
 func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (*ttnpb.MACState, error) {
 	fp, phy, err := getDeviceBandVersion(dev, fps)
 	if err != nil {
@@ -676,56 +719,37 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		}
 	} else {
 		macState.CurrentParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels))
-		for i, upCh := range phy.UplinkChannels {
-			channel := &ttnpb.MACParameters_Channel{
-				MinDataRateIndex: upCh.MinDataRate,
-				MaxDataRateIndex: upCh.MaxDataRate,
-				UplinkFrequency:  upCh.Frequency,
-				EnableUplink:     true,
-			}
-			channel.DownlinkFrequency = phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency
-			macState.CurrentParameters.Channels = append(macState.CurrentParameters.Channels, channel)
+		for i, phyUpCh := range phy.UplinkChannels {
+			macState.CurrentParameters.Channels = append(macState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
+				MinDataRateIndex:  phyUpCh.MinDataRate,
+				MaxDataRateIndex:  phyUpCh.MaxDataRate,
+				UplinkFrequency:   phyUpCh.Frequency,
+				DownlinkFrequency: phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency,
+				EnableUplink:      true,
+			})
 		}
 	}
-
-	macState.DesiredParameters.Channels = make([]*ttnpb.MACParameters_Channel, 0, len(phy.UplinkChannels)+len(fp.UplinkChannels))
-	for i, upCh := range phy.UplinkChannels {
-		channel := &ttnpb.MACParameters_Channel{
-			MinDataRateIndex: upCh.MinDataRate,
-			MaxDataRateIndex: upCh.MaxDataRate,
-			UplinkFrequency:  upCh.Frequency,
-		}
-		channel.DownlinkFrequency = phy.DownlinkChannels[i%len(phy.DownlinkChannels)].Frequency
-		macState.DesiredParameters.Channels = append(macState.DesiredParameters.Channels, channel)
-	}
-
-outerUp:
-	for _, upCh := range fp.UplinkChannels {
-		for _, ch := range macState.DesiredParameters.Channels {
-			if ch.UplinkFrequency == upCh.Frequency {
-				ch.MinDataRateIndex = ttnpb.DataRateIndex(upCh.MinDataRate)
-				ch.MaxDataRateIndex = ttnpb.DataRateIndex(upCh.MaxDataRate)
-				ch.EnableUplink = true
-				continue outerUp
-			}
-		}
-
-		macState.DesiredParameters.Channels = append(macState.DesiredParameters.Channels, &ttnpb.MACParameters_Channel{
-			MinDataRateIndex: ttnpb.DataRateIndex(upCh.MinDataRate),
-			MaxDataRateIndex: ttnpb.DataRateIndex(upCh.MaxDataRate),
-			UplinkFrequency:  upCh.Frequency,
-			EnableUplink:     true,
-		})
-	}
-
-	if len(fp.DownlinkChannels) > 0 {
-		for i, ch := range macState.DesiredParameters.Channels {
-			downCh := fp.DownlinkChannels[i%len(fp.DownlinkChannels)]
-			if downCh.Frequency != 0 {
-				ch.DownlinkFrequency = downCh.Frequency
-			}
-		}
-	}
-
+	macState.DesiredParameters.Channels = frequencyPlanChannels(phy, fp.UplinkChannels, fp.DownlinkChannels...)
 	return macState, nil
+}
+
+func publishEvents(ctx context.Context, evs ...events.Event) {
+	n := len(evs)
+	if n == 0 {
+		return
+	}
+	log.FromContext(ctx).WithField("event_count", n).Debug("Publish events")
+	events.Publish(evs...)
+}
+
+func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*ttnpb.ApplicationUp) {
+	n := len(ups)
+	if n == 0 {
+		return
+	}
+	logger := log.FromContext(ctx).WithField("uplink_count", n)
+	logger.Debug("Enqueue application uplinks for sending to Application Server")
+	if err := ns.applicationUplinks.Add(ctx, ups...); err != nil {
+		logger.WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
+	}
 }

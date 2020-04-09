@@ -13,15 +13,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Template ID column in the webhook table in the Console.
 - Select all field mask paths in CLI get, list and search commands (see `--all` option).
 - Create webhooks via webhook templates in the Console.
+- `ns.up.data.receive` and `ns.up.join.receive` events, which are triggered when respective uplink is received and matched to a device by Network Server.
+- `ns.up.data.forward` and `ns.up.join.accept.forward` events, which are triggered when respective message is forwarded from Network Server to Application Server.
+- `ns.up.join.cluster.attempt` and `ns.up.join.interop.attempt` events, which are triggered when the join-request is sent to respective Join Server by the Network Server.
+- `ns.up.join.cluster.success` and `ns.up.join.interop.success` events, which are triggered when Network Server's join-request is accepted by respective Join Server.
+- `ns.up.join.cluster.fail` and `ns.up.join.interop.fail` events, which are triggered when Network Server's join-request to respective Join Server fails.
+- `ns.up.data.process` and `ns.up.join.accept.process` events, which are triggered when respective message is successfully processed by Network Server.
+- `ns.down.data.schedule.attempt` and `ns.down.join.schedule.attempt` events, which are triggered when Network Server attempts to schedule a respective downlink on Gateway Server.
+- `ns.down.data.schedule.success` and `ns.down.join.schedule.success` events, which are triggered when Network Server successfully schedules a respective downlink on Gateway Server.
+- `ns.down.data.schedule.fail` and `ns.down.join.schedule.fail` events, which are triggered when Network Server fails to schedule a respective downlink on Gateway Server.
 
 ### Changed
 
 - Styling improvements to webhook and pubsub table in Console.
 - Gateway location is updated even if no antenna locations had been previously set.
+- Renamed `ns.application.begin_link` event to `ns.application.link.begin`.
+- Renamed `ns.application.end_link` event to `ns.application.link.end`.
+- `ns.up.data.drop` and `ns.up.join.drop` events are now triggered when respective uplink duplicate is dropped by Network Server.
 
 ### Deprecated
 
 ### Removed
+
+- `ns.up.merge_metadata` event.
+- `ns.up.receive_duplicate` event.
+- `ns.up.receive` event.
 
 ### Fixed
 

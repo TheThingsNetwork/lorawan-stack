@@ -425,7 +425,11 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		}
 
 	case len(cmdBuf) > 0, needsDownlink:
-		pld.FHDR.FCnt = dev.Session.LastNFCntDown + 1
+		var fCnt uint32
+		if dev.Session.LastNFCntDown > 0 || len(dev.MACState.RecentDownlinks) > 0 {
+			fCnt = dev.Session.LastNFCntDown + 1
+		}
+		pld.FHDR.FCnt = fCnt
 
 	default:
 		return nil, genState, errNoDownlink.New()
@@ -690,12 +694,32 @@ func nonRetryableFixedPathGatewayError(err error) bool {
 	return errors.IsNotFound(err) || errors.IsDataLoss(err) || errors.IsFailedPrecondition(err)
 }
 
+type scheduleRequest struct {
+	*ttnpb.TxRequest
+	ttnpb.EndDeviceIdentifiers
+	PHYPayload   []byte
+	AttemptEvent events.Definition
+	SuccessEvent events.Definition
+	FailEvent    events.Definition
+}
+
+func newDataDownlinkScheduleRequest(req *ttnpb.TxRequest, ids ttnpb.EndDeviceIdentifiers, b []byte) *scheduleRequest {
+	return &scheduleRequest{
+		TxRequest:            req,
+		EndDeviceIdentifiers: ids,
+		PHYPayload:           b,
+		AttemptEvent:         evtScheduleDataDownlinkAttempt,
+		SuccessEvent:         evtScheduleDataDownlinkSuccess,
+		FailEvent:            evtScheduleDataDownlinkFail,
+	}
+}
+
 // scheduleDownlinkByPaths attempts to schedule payload b using parameters in req using paths.
-// scheduleDownlinkByPaths discards req.DownlinkPaths and mutates it arbitrarily.
+// scheduleDownlinkByPaths discards req.TxRequest.DownlinkPaths and mutates it arbitrarily.
 // scheduleDownlinkByPaths returns the scheduled downlink or error.
-func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb.TxRequest, b []byte, paths ...downlinkPath) (*scheduledDownlink, error) {
+func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *scheduleRequest, paths ...downlinkPath) (*scheduledDownlink, []events.Event, error) {
 	if len(paths) == 0 {
-		return nil, errNoPath.New()
+		return nil, nil, errNoPath.New()
 	}
 
 	logger := log.FromContext(ctx)
@@ -709,11 +733,11 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 		return attempts[len(attempts)-1]
 	}
 
+	queuedEvents := make([]events.Event, 0, len(paths))
 	for _, path := range paths {
 		logger := logger.WithField(
 			"gateway_uid", unique.ID(ctx, path.GatewayIdentifiers),
 		)
-
 		p, err := ns.GetPeer(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, path.GatewayIdentifiers)
 		if err != nil {
 			logger.WithError(err).Debug("Could not get Gateway Server")
@@ -735,37 +759,36 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *ttnpb
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()))
 	errs := make([]error, 0, len(attempts))
 	for _, a := range attempts {
-		req.DownlinkPaths = a.paths
+		req.TxRequest.DownlinkPaths = a.paths
 		down := &ttnpb.DownlinkMessage{
-			RawPayload:     b,
+			RawPayload:     req.PHYPayload,
 			CorrelationIDs: events.CorrelationIDsFromContext(ctx),
 			Settings: &ttnpb.DownlinkMessage_Request{
-				Request: req,
+				Request: req.TxRequest,
 			},
 		}
+		queuedEvents = append(queuedEvents, req.AttemptEvent(ctx, req.EndDeviceIdentifiers, down))
 
 		logger.WithField("path_count", len(req.DownlinkPaths)).Debug("Schedule downlink")
 		cc, err := a.peer.Conn()
 		if err != nil {
+			queuedEvents = append(queuedEvents, req.FailEvent(ctx, req.EndDeviceIdentifiers, err))
 			errs = append(errs, err)
 			continue
 		}
 		res, err := ttnpb.NewNsGsClient(cc).ScheduleDownlink(ctx, down, ns.WithClusterAuth())
 		if err != nil {
+			queuedEvents = append(queuedEvents, req.FailEvent(ctx, req.EndDeviceIdentifiers, err))
 			errs = append(errs, err)
 			continue
 		}
-		transmitAt := timeNow().Add(res.Delay)
-		logger.WithFields(log.Fields(
-			"transmission_delay", res.Delay,
-			"transmit_at", transmitAt,
-		)).Debug("Scheduled downlink")
+		logger.WithField("transmit_delay", res.Delay).Debug("Scheduled downlink")
 		return &scheduledDownlink{
 			Message:    down,
-			TransmitAt: transmitAt,
-		}, nil
+			TransmitAt: timeNow().Add(res.Delay),
+		}, append(queuedEvents, req.SuccessEvent(ctx, req.EndDeviceIdentifiers, res)), nil
 	}
-	return nil, downlinkSchedulingError(errs)
+	return nil, queuedEvents, downlinkSchedulingError(errs)
 }
 
 func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, rx2 bool) log.Interface {
@@ -1096,12 +1119,12 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	req.FrequencyPlanID = dev.FrequencyPlanID
 	req.Priority = genDown.Priority
 
-	down, err := ns.scheduleDownlinkByPaths(
+	down, downEvs, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(logger, req, attemptRx1, attemptRx2).WithField("rx1_delay", req.Rx1Delay)),
-		req,
-		genDown.Payload,
+		newDataDownlinkScheduleRequest(req, dev.EndDeviceIdentifiers, genDown.Payload),
 		paths...,
 	)
+	queuedEvents := append(genState.Events, downEvs...)
 	if err != nil {
 		if schedErr, ok := err.(downlinkSchedulingError); ok {
 			logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
@@ -1119,6 +1142,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 				"mac_state.queued_responses",
 				"mac_state.rx_windows_available",
 			),
+			QueuedEvents:          queuedEvents,
 			applicationUpAppender: genState.appendApplicationUplinks,
 		}
 	}
@@ -1137,10 +1161,10 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 			"recent_downlinks",
 			"session",
 		),
-		applicationUpAppender: genState.appendApplicationUplinks,
+		QueuedEvents:          queuedEvents,
 		TransmitAt:            down.TransmitAt,
-		QueuedEvents:          genState.Events,
 		Scheduled:             true,
+		applicationUpAppender: genState.appendApplicationUplinks,
 	}
 }
 
@@ -1157,8 +1181,12 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 		ctx = log.NewContext(ctx, logger)
 		logger.WithField("start_at", t).Debug("Process downlink task")
 
-		var queuedApplicationUplinks []*ttnpb.ApplicationUp
 		var queuedEvents []events.Event
+		defer func() { publishEvents(ctx, queuedEvents...) }()
+
+		var queuedApplicationUplinks []*ttnpb.ApplicationUp
+		defer func() { ns.enqueueApplicationUplinks(ctx, queuedApplicationUplinks...) }()
+
 		var retryTask bool
 		dev, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceID,
 			[]string{
@@ -1235,12 +1263,19 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					req.Priority = ns.downlinkPriorities.JoinAccept
 					req.FrequencyPlanID = dev.FrequencyPlanID
 
-					down, err := ns.scheduleDownlinkByPaths(
+					down, downEvs, err := ns.scheduleDownlinkByPaths(
 						log.NewContext(ctx, loggerWithTxRequestFields(logger, req, attemptRx1, attemptRx2).WithField("rx1_delay", req.Rx1Delay)),
-						req,
-						dev.PendingMACState.QueuedJoinAccept.Payload,
+						&scheduleRequest{
+							TxRequest:            req,
+							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+							PHYPayload:           dev.PendingMACState.QueuedJoinAccept.Payload,
+							AttemptEvent:         evtScheduleJoinAcceptAttempt,
+							SuccessEvent:         evtScheduleJoinAcceptSuccess,
+							FailEvent:            evtScheduleJoinAcceptFail,
+						},
 						paths...,
 					)
+					queuedEvents = append(queuedEvents, downEvs...)
 					if err != nil {
 						if schedErr, ok := err.(downlinkSchedulingError); ok {
 							logger = loggerWithDownlinkSchedulingErrorFields(logger, schedErr)
@@ -1420,12 +1455,12 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 					req.AbsoluteTime = &transmitAt
 				}
 
-				down, err := ns.scheduleDownlinkByPaths(
+				down, downEvs, err := ns.scheduleDownlinkByPaths(
 					log.NewContext(ctx, loggerWithTxRequestFields(logger, req, false, true)),
-					req,
-					genDown.Payload,
+					newDataDownlinkScheduleRequest(req, dev.EndDeviceIdentifiers, genDown.Payload),
 					paths...,
 				)
+				queuedEvents = append(queuedEvents, downEvs...)
 				if err != nil {
 					retryTask = true
 					schedErr, ok := err.(downlinkSchedulingError)
@@ -1505,16 +1540,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context) error {
 				), nil
 			},
 		)
-		if len(queuedApplicationUplinks) > 0 {
-			if err := ns.applicationUplinks.Add(ctx, queuedApplicationUplinks...); err != nil {
-				logger.WithError(err).Warn("Failed to queue application uplinks for sending to Application Server")
-			}
-		}
-		if len(queuedEvents) > 0 {
-			for _, ev := range queuedEvents {
-				events.Publish(ev)
-			}
-		}
 		if err != nil {
 			setErr = true
 			logger.WithError(err).Error("Failed to update device in registry")
