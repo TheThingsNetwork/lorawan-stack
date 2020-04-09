@@ -60,6 +60,12 @@ export default class DeviceBulkCreateForm extends Component {
       format_id: PropTypes.string,
       data: PropTypes.string,
       set_claim_auth_code: PropTypes.bool,
+      components: PropTypes.shape({
+        is: PropTypes.bool,
+        ns: PropTypes.bool,
+        js: PropTypes.bool,
+        as: PropTypes.bool,
+      }),
     }).isRequired,
     onSubmit: PropTypes.func.isRequired,
   }
