@@ -163,11 +163,11 @@ export default class DeviceImporter extends Component {
           field_mask.paths.push('join_server_address')
         }
         if (!device.application_server_address && asConfig.enabled) {
-          device.network_server_address = new URL(nsConfig.base_url).hostname
+          device.application_server_address = new URL(asConfig.base_url).hostname
           field_mask.paths.push('application_server_address')
         }
         if (!device.network_server_address && nsConfig.enabled) {
-          device.application_server_address = new URL(asConfig.base_url).hostname
+          device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask.paths.push('network_server_address')
         }
       }
