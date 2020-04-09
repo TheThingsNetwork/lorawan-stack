@@ -44,7 +44,7 @@ import style from './application-payload-formatters.styl'
 
 const m = defineMessages({
   infoText:
-    'These payload formatters are executed on downlink messages to all devices in this application. If payload formatters are also set for a specific device, only those will be executed for downlinks to that device.',
+    'These payload formatters are executed on downlink messages to all end devices in this application. Note: end device level payload formatters have precedence.',
 })
 @connect(
   function(state) {

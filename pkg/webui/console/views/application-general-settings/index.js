@@ -58,12 +58,12 @@ const m = defineMessages({
   basics: 'Basics',
   deleteApp: 'Delete application',
   modalWarning:
-    'Are you sure you want to delete "{appName}"? This action cannot be undone and it will not be possible to reuse the application ID!',
-  updateSuccess: 'Successfully updated application',
+    'Are you sure you want to delete "{appName}"? This action cannot be undone and it will not be possible to reuse the application ID.',
+  updateSuccess: 'Application updated',
   attributesValidateRequired:
     'All attribute entry values are required. Please remove empty entries.',
   attributeKeyValidateTooShort:
-    'Attribute keys should have at least 3 characters and contain no special characters.',
+    'Attribute keys must have at least 3 characters and contain no special characters',
 })
 
 const attributeValidCheck = attributes =>

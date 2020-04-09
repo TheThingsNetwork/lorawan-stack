@@ -38,10 +38,10 @@ import { attachPromise } from '@console/store/actions/lib'
 import { selectSelectedUser } from '@console/store/selectors/users'
 
 const m = defineMessages({
-  updateSuccess: 'User updated successfully',
-  updateFailure: 'There was a problem updating the user',
-  deleteFailure: 'There was a problem deleting the user',
-  deleteSuccess: 'User deleted successfully',
+  updateSuccess: 'User updated',
+  updateFailure: 'There was an error and the user could not be updated',
+  deleteFailure: 'There was an error and the user could not be deleted',
+  deleteSuccess: 'User deleted',
 })
 
 @connect(

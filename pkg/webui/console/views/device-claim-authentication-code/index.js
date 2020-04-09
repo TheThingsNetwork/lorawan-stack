@@ -41,11 +41,11 @@ const m = defineMessages({
   deleteCode: 'Delete claim authentication code',
   deleteWarning: 'Are you sure you want to delete this claim authentication code?',
   noCodeSet: 'There is currently no claim authentication code set',
-  validateToDate: 'Invalid code expiration date',
-  deleteFailure: 'There was a problem deleting the claim authentication code',
-  deleteSuccess: 'The claim authentication code has been deleted successfully',
-  updateSuccess: 'The claim authentication code has been updated successfully',
-  validateCode: 'Only uppercase letters and numbers are allowed',
+  validateToDate: 'Expiration date must be after the validity date',
+  deleteFailure: 'There was an error and the claim authentication code could not be deleted',
+  deleteSuccess: 'Claim authentication deleted',
+  updateSuccess: 'Claim authentication updated',
+  validateCode: 'Claim authentication code must consist only of numbers and letters',
 })
 
 const validationSchema = Yup.object({

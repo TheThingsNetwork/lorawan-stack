@@ -68,23 +68,23 @@ const m = defineMessages({
   linkSettings: 'Link settings',
   linkStatistics: 'Statistics',
   linkStatus: 'Link status',
-  linkStatusLinked: 'The application is linked successfully',
+  linkStatusLinked: 'The application is linked',
   linkStatusUnLinked: 'The application is currently not linked to a Network Server',
-  linkSuccess: 'Successfully linked',
-  linkedSince: 'Linked Since',
-  nsAddress: 'Network Server Address',
+  linkSuccess: 'Application linked',
+  linkedSince: 'Linked since',
+  nsAddress: 'Network Server address',
   nsCluster: 'Network Server is within a cluster',
   statistics: 'Statistics',
   unlink: 'Unlink',
-  unlinkSuccess: 'Successfully unlinked',
+  unlinkSuccess: 'Application unlinked',
   tls: 'TLS',
 })
 
 const validationSchema = Yup.object().shape({
   api_key: Yup.string()
-    .matches(apiKey, sharedMessages.validateFormat)
+    .matches(apiKey, sharedMessages.validateApiKey)
     .required(sharedMessages.validateRequired),
-  network_server_address: Yup.string().matches(address, sharedMessages.validateFormat),
+  network_server_address: Yup.string().matches(address, sharedMessages.validateAddressFormat),
   tls: Yup.bool(),
 })
 

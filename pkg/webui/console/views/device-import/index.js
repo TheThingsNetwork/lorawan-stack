@@ -37,9 +37,9 @@ import {
 import style from './device-import.styl'
 
 const m = defineMessages({
-  noTemplatesTitle: 'No device templates found',
+  noTemplatesTitle: 'No end device templates found',
   noTemplates:
-    'There are currently no device templates set up. Please set up a device template to make use of the bulk device import feature. For more information please refer to the documentation.',
+    'There are currently no end device templates set up. Please set up an end device template to make use of the bulk device import feature. For more information please refer to the documentation.',
 })
 
 @connect(state => ({

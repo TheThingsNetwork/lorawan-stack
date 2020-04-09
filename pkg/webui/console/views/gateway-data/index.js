@@ -35,7 +35,7 @@ import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
 import style from './gateway-data.styl'
 
 const m = defineMessages({
-  gtwData: 'Gateway Data',
+  gtwData: 'Gateway data',
 })
 
 @connect(state => ({ gtwId: selectSelectedGatewayId(state) }))

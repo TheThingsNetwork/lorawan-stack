@@ -35,7 +35,7 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 const m = defineMessages({
-  setDeviceLocation: 'Set Device Location',
+  setDeviceLocation: 'Set end device location',
 })
 
 const getRegistryLocation = function(locations) {

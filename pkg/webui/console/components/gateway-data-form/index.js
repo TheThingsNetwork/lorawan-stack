@@ -30,9 +30,6 @@ import Message from '@ttn-lw/lib/components/message'
 import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import OwnersSelect from '@console/containers/owners-select'
 
-import PropTypes from '@ttn-lw/lib/prop-types'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-
 import {
   id as gatewayIdRegexp,
   address as addressRegexp,
@@ -40,12 +37,14 @@ import {
   emptyDuration as emptyDurationRegexp,
   delay as delayRegexp,
 } from '@console/lib/regexp'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
   enforced: 'Enforced',
-  dutyCycle: 'Duty Cycle',
+  dutyCycle: 'Duty cycle',
   gatewayIdPlaceholder: 'my-new-gateway',
-  gatewayNamePlaceholder: 'My New Gateway',
+  gatewayNamePlaceholder: 'My new gateway',
   gsServerAddressDescription: 'The address of the Gateway Server to connect to',
   gatewayDescPlaceholder: 'Description for my new gateway',
   gatewayDescDescription:
@@ -56,9 +55,9 @@ const m = defineMessages({
   updateChannelDescription: 'Channel for gateway automatic updates',
   enforceDutyCycleDescription:
     'Recommended for all gateways in order to respect spectrum regulations',
-  scheduleAnyTimeDelay: 'Schedule Any Time Delay',
+  scheduleAnyTimeDelay: 'Schedule any time delay',
   scheduleAnyTimeDescription:
-    'Configure Gateway Delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
+    'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
   miliseconds: 'miliseconds',
   seconds: 'seconds',
   minutes: 'minutes',

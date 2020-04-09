@@ -43,14 +43,14 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import style from './application-integrations-mqtt.styl'
 
 const m = defineMessages({
-  publicAddress: 'Public Address',
-  publicTlsAddress: 'Public TLS Address',
-  generateApiKey: 'Generate new API Key',
-  viewApiKeys: 'View API Keys',
+  publicAddress: 'Public address',
+  publicTlsAddress: 'Public TLS address',
+  generateApiKey: 'Generate new API key',
+  viewApiKeys: 'View API keys',
   mqttInfoText:
-    'The Application Server exposes an MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API Key, which will function as connection password. You can also use an existing API Key, as long as it has the necessary rights granted. Use the connection information below to connect.',
-  connectionCredentials: 'Connection Credentials',
-  mqttIntegrations: 'MQTT Integrations',
+    'The Application Server exposes an MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API key, which will function as connection password. You can also use an existing API key, as long as it has the necessary rights granted. Use the connection information below to connect.',
+  connectionCredentials: 'Connection credentials',
+  mqttIntegrations: 'MQTT integrations',
 })
 
 @connect(state => ({

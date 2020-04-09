@@ -42,20 +42,20 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 const m = defineMessages({
   newPassword: 'New Password',
   oldPassword: 'Old Password',
-  passwordChanged: 'Password changed successfully',
+  passwordChanged: 'Password changed',
   revokeAccess: 'Revoke Access',
-  logoutAllDevices: 'Log out from all devices',
+  logoutAllDevices: 'Log out from all end devices',
   revokeWarning: 'This will revoke access from all logged in devices',
-  sessionRevoked: 'Your session is revoked',
+  sessionRevoked: 'Session revoked',
 })
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
-    .min(8)
+    .min(8, Yup.passValues(sharedMessages.validateTooShort))
     .required(sharedMessages.validateRequired),
   confirm: Yup.string()
     .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch)
-    .min(8)
+    .min(8, Yup.passValues(sharedMessages.validateTooShort))
     .required(sharedMessages.validateRequired),
 })
 

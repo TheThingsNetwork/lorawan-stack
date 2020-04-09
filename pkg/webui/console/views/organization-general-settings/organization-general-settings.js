@@ -43,8 +43,8 @@ import {
 const m = defineMessages({
   deleteOrg: 'Delete organization',
   modalWarning:
-    'Are you sure you want to delete "{orgName}"? This action cannot be undone and it will not be possible to reuse the organization ID!',
-  updateSuccess: 'Successfully updated organization',
+    'Are you sure you want to delete "{orgName}"? This action cannot be undone and it will not be possible to reuse the organization ID.',
+  updateSuccess: 'Organization updated',
 })
 
 @withFeatureRequirement(mayEditBasicOrganizationInformation, {

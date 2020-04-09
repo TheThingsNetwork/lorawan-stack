@@ -44,18 +44,18 @@ const pathPlaceholder = '/path/to/webhook'
 const m = defineMessages({
   idPlaceholder: 'my-new-webhook',
   messageInfo:
-    'For each enabled message type, you can set an optional path that will be appended to the base URL.',
+    'For each enabled message type, an optional path can be defined which will be appended to the base URL',
   deleteWebhook: 'Delete Webhook',
   modalWarning:
-    'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone!',
+    'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone.',
   headers: 'Headers',
   headersKeyPlaceholder: 'Authorization',
   headersValuePlaceholder: 'Bearer my-auth-token',
   headersAdd: 'Add header entry',
   headersValidateRequired: 'All header entry values are required. Please remove empty entries.',
-  downlinkAPIKey: 'Downlink API Key',
+  downlinkAPIKey: 'Downlink API key',
   downlinkAPIKeyDesc:
-    'The API Key will be provided to the endpoint using the X-Downlink-Apikey header',
+    'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
   templateInformation: 'Template information',
 })
 
@@ -75,7 +75,7 @@ const validationSchema = Yup.object().shape({
   base_url: Yup.string()
     .matches(urlRegexp, sharedMessages.validateUrl)
     .required(sharedMessages.validateRequired),
-  downlink_api_key: Yup.string().matches(webhookAPIKeyRegexp, sharedMessages.validateFormat),
+  downlink_api_key: Yup.string().matches(webhookAPIKeyRegexp, sharedMessages.validateApiKey),
 })
 
 export default class WebhookForm extends Component {

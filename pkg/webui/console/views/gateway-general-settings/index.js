@@ -45,10 +45,10 @@ import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
 import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
-  updateSuccess: 'Successfully updated gateway',
-  deleteGateway: 'Delete Gateway',
+  updateSuccess: 'Gateway updated',
+  deleteGateway: 'Delete gateway',
   modalWarning:
-    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID!',
+    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID.',
 })
 
 @connect(

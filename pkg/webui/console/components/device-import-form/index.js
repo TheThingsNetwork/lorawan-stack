@@ -35,14 +35,14 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './device-import-form.styl'
 
 const m = defineMessages({
-  fileImport: 'File Import',
+  fileImport: 'File import',
   file: 'File',
-  formatInfo: 'Format Information',
-  createDevices: 'Create Devices',
+  formatInfo: 'Format information',
+  createDevices: 'Create end devices',
   selectAFile: 'Please select a template file',
   fileInfoPlaceholder: 'Please select a template format',
   claimAuthCode: 'Set claim authentication code',
-  targetedComponents: 'Targeted Components',
+  targetedComponents: 'Targeted components',
 })
 
 const validationSchema = Yup.object({

@@ -41,7 +41,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import style from './create-account.styl'
 
 const m = defineMessages({
-  createAccount: 'Create a new {siteName} Account',
+  createAccount: 'Create a new {siteName} account',
   register: 'Register',
   registrationApproved: 'You have successfully registered and can login now',
   registrationPending:

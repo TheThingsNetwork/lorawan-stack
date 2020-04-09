@@ -23,7 +23,7 @@ import connect from './connect'
 import JoinEUIPrefixesInput from './join-eui-prefixes-input'
 
 const m = defineMessages({
-  prefixesFetchingFailure: 'Could not retrieve the list of available prefixes',
+  prefixesFetchingFailure: 'Prefixes unavailable',
 })
 
 const JoinEUIPrefixesField = function({

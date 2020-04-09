@@ -35,11 +35,11 @@ import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
 
 const m = defineMessages({
-  deleteKey: 'Delete Key',
+  deleteKey: 'Delete key',
   modalWarning:
-    'Are you sure you want to delete the {keyName} API Key? Deleting an API Key cannot be undone!',
-  updateSuccess: 'Successfully updated API Key',
-  deleteSuccess: 'Successfully deleted API Key',
+    'Are you sure you want to delete the {keyName} API key? Deleting an API key cannot be undone.',
+  updateSuccess: 'API key updated',
+  deleteSuccess: 'API key deleted',
 })
 
 @bind

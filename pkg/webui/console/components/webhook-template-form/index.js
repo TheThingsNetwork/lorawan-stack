@@ -88,7 +88,7 @@ export default class WebhookTemplateForm extends Component {
 
     if (template.create_downlink_api_key) {
       const key = {
-        name: `${webhook_id} downlink API Key`,
+        name: `${webhook_id} downlink API key`,
         rights: ['RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
       }
       const { key: downlink_api_key } = await api.application.apiKeys.create(appId, key)

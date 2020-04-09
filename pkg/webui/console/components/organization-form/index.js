@@ -44,7 +44,7 @@ const m = defineMessages({
   orgDescDescription:
     'Optional organization description; can also be used to save notes about the organization',
   orgIdPlaceholder: 'my-new-organization',
-  orgNamePlaceholder: 'My New Organization',
+  orgNamePlaceholder: 'My new organization',
 })
 
 class OrganizationForm extends React.Component {

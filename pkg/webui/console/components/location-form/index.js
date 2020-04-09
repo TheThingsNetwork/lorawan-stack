@@ -36,19 +36,19 @@ const m = defineMessages({
   deleteWarning: 'Are you sure you want to delete this location entry?',
   deleteLocation: 'Remove location entry',
   noLocationSet: 'There is currently no location information set',
-  updateSuccess: 'The location has been updated successfully',
-  deleteFailure: 'There was a problem removing the location',
-  deleteSuccess: 'The location has been removed successfully',
+  updateSuccess: 'Location updated',
+  deleteFailure: 'An error occurred and the location could not be deleted',
+  deleteSuccess: 'Location deleted',
 })
 
 const validationSchema = Yup.object().shape({
   latitude: Yup.number()
-    .test('is-valid-latitude', sharedMessages.validateLatLong, value =>
+    .test('is-valid-latitude', sharedMessages.validateLat, value =>
       latitudeRegexp.test(String(value)),
     )
     .required(sharedMessages.validateRequired),
   longitude: Yup.number()
-    .test('is-valid-longitude', sharedMessages.validateLatLong, value =>
+    .test('is-valid-longitude', sharedMessages.validateLong, value =>
       longitudeRegexp.test(String(value)),
     )
     .required(sharedMessages.validateRequired),

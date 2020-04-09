@@ -29,7 +29,7 @@ import style from './footer.styl'
 
 const m = defineMessages({
   footer: "You are the network. Let's build this thing together.",
-  getSupport: 'Get Support',
+  getSupport: 'Get support',
 })
 
 const Footer = function({ className, links, supportLink }) {
