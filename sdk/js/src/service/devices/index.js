@@ -278,25 +278,49 @@ class Devices {
       },
     }
 
-    // Compose a request tree
-    const requestTree = components.reduce(function(acc, val) {
-      acc[val] = undefined
-      return acc
-    }, {})
+    const requests = []
+    if (this._stackConfig.isComponentAvailable('as') && components.includes('as')) {
+      requests.push(this._api.AsEndDeviceRegistry.Delete(params))
+    }
+    if (this._stackConfig.isComponentAvailable('js') && components.includes('js')) {
+      requests.push(this._api.JsEndDeviceRegistry.Delete(params))
+    }
+    if (this._stackConfig.isComponentAvailable('ns') && components.includes('ns')) {
+      requests.push(this._api.NsEndDeviceRegistry.Delete(params))
+    }
 
-    const deleteParts = await makeRequests(
-      this._api,
-      this._stackConfig,
-      'delete',
-      requestTree,
-      params,
-      undefined,
-      true,
+    const responses = await Promise.all(
+      // Simulate behavior of allSettled
+      requests.map(promise =>
+        promise.then(
+          value => ({
+            status: 'fulfilled',
+            value,
+          }),
+          reason => ({ status: 'rejected', reason }),
+        ),
+      ),
     )
 
-    return deleteParts.every(e => Boolean(e.device) && Object.keys(e.device).length === 0)
-      ? {}
-      : deleteParts
+    // Check for errors and filter out 404 errors, since we cannot consistently return
+    // not found errors.
+    // TODO: Check for 404 errors, see https://github.com/TheThingsNetwork/lorawan-stack/issues/2323
+    const errors = responses.filter(
+      ({ status, reason }) => status === 'rejected' && reason.code !== 5,
+    )
+
+    // Only proceed deleting the device from IS (so it is not accessible anymore) if there are no errors
+    if (errors.length > 0) {
+      throw errors[0].reason
+    }
+
+    if (this._stackConfig.isComponentAvailable('is') && components.includes('is')) {
+      const response = await this._api.EndDeviceRegistry.Delete(params)
+
+      return Marshaler.payloadSingleResponse(response)
+    }
+
+    return {}
   }
 
   async getAll(applicationId, params, selector) {
@@ -547,16 +571,16 @@ class Devices {
     return mergeDevice(setParts)
   }
 
+  /**
+   * Deletes the `deviceId` end device under the `applicationId` application.
+   * This method will cause deletion of the end device in all available stack
+   * components (i.e. NS, AS, IS, JS).
+   * @param {string} applicationId - Application ID
+   * @param {string} deviceId - Device ID
+   * @returns {Object} - Empty object on successful update, an error otherwise
+   */
   async deleteById(applicationId, deviceId) {
-    const result = await this._deleteDevice(applicationId, deviceId)
-
-    // Filter out errored requests
-    const errors = result.filter(part => part.hasErrored)
-    if (errors.length > 0) {
-      throw errors[0].error
-    }
-
-    return result
+    return this._deleteDevice(applicationId, deviceId)
   }
 
   // End Device Template Converter
