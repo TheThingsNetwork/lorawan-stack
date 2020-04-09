@@ -168,11 +168,11 @@ class FormField extends React.Component {
 
     const fieldMessage = showError ? (
       <div className={style.messages}>
-        <Err content={fieldError} title={name} />
+        <Err content={fieldError} title={title} />
       </div>
     ) : showWarning ? (
       <div className={style.messages}>
-        <Err content={warning} title={name} warning />
+        <Err content={warning} title={title} warning />
       </div>
     ) : showDescription ? (
       <Message className={style.description} content={description} />
@@ -230,23 +230,26 @@ const Err = ({ content, error, warning, title, className }) => {
   })
 
   if (title) {
-    contentValues.field = <Message content={title} className={style.name} />
+    contentValues.field = <Message content={title} className={style.name} key={title.id || title} />
   }
 
   return (
     <div className={classname}>
       <Icon icon={icon} className={style.icon} />
-      <Message
-        content={content.format || content.error_description || content.message || content}
-        values={contentValues}
-      />
+      <Message content={content.message || content} values={contentValues} />
     </div>
   )
 }
 
 Err.propTypes = {
   className: PropTypes.string,
-  content: PropTypes.error.isRequired,
+  content: PropTypes.oneOfType([
+    PropTypes.error,
+    PropTypes.shape({
+      message: PropTypes.error.isRequired,
+      values: PropTypes.shape({}).isRequired,
+    }),
+  ]).isRequired,
   error: PropTypes.bool,
   title: PropTypes.message,
   warning: PropTypes.bool,
