@@ -20,9 +20,9 @@ import Icon from '../../../components/icon'
 import Message from '../../../lib/components/message'
 import ErrorMessage from '../../../lib/components/error-message'
 import PropTypes from '../../../lib/prop-types'
-
-import { isBackend, isNotFoundError } from '../../../lib/errors/utils'
+import { isBackend, isNotFoundError, httpStatusCode } from '../../../lib/errors/utils'
 import errorMessages from '../../../lib/errors/error-messages'
+import statusCodeMessages from '../../../lib/errors/status-code-messages'
 import sharedMessages from '../../../lib/shared-messages'
 
 import style from './sub-view.styl'
@@ -30,16 +30,27 @@ import style from './sub-view.styl'
 const reload = () => location.reload()
 
 const SubViewError = function({ error }) {
+  const isNotFound = isNotFoundError(error)
+  const statusCode = httpStatusCode(error)
+  let errorExplanation = errorMessages.subviewErrorExplanation
+  let errorTitleMessage = errorMessages.subviewErrorTitle
+  if (isNotFound) {
+    errorExplanation = errorMessages.genericNotFound
+  }
+  if (statusCode) {
+    errorTitleMessage = statusCodeMessages[statusCode]
+  }
+
   return (
     <Container>
       <Row>
         <Col>
           <div className={style.title}>
             <Icon icon="error_outline" large />
-            <Message component="h2" content={errorMessages.subviewErrorTitle} />
+            <Message component="h2" content={errorTitleMessage} />
           </div>
           <p>
-            <Message component="span" content={errorMessages.subviewErrorExplanation} />
+            <Message component="span" content={errorExplanation} />
             <br />
             <Message component="span" content={errorMessages.contactAdministrator} />
           </p>
