@@ -140,20 +140,28 @@ var (
 		"ns.up.join.process", "successfully processed join-request",
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 	)
-	evtForwardJoinRequestCluster = events.Define(
-		"ns.up.join.forward.cluster", "forward join-request to cluster-local Join Server",
+	evtClusterJoinAttempt = events.Define(
+		"ns.up.join.cluster.attempt", "send join-request to cluster-local Join Server",
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 	)
-	evtForwardJoinRequestInterop = events.Define(
-		"ns.up.join.forward.interop", "forward join-request to interoperability Join Server",
+	evtClusterJoinSuccess = events.Define(
+		"ns.up.join.cluster.success", "join-request to cluster-local Join Server succeeded",
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 	)
-	evtReceiveJoinResponseCluster = events.Define(
-		"ns.up.join.response.receive.cluster", "receive join response from cluster-local Join Server",
+	evtClusterJoinFail = events.Define(
+		"ns.up.join.cluster.fail", "join-request to cluster-local Join Server failed",
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 	)
-	evtReceiveJoinResponseInterop = events.Define(
-		"ns.up.join.response.receive.interop", "receive join response from interoperability Join Server",
+	evtInteropJoinAttempt = events.Define(
+		"ns.up.join.interop.attempt", "forward join-request to interoperability Join Server",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtInteropJoinSuccess = events.Define(
+		"ns.up.join.interop.success", "join-request to interoperability Join Server succeeded",
+		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+	)
+	evtInteropJoinFail = events.Define(
+		"ns.up.join.interop.fail", "join-request to interoperability Join Server failed",
 		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
 	)
 	evtForwardJoinAccept = events.Define(

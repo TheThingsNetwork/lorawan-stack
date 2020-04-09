@@ -445,8 +445,8 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 			EvtReceiveJoinRequest(events.ContextWithCorrelationID(test.Context(), ups[0].CorrelationIDs...), ids, firstUp),
 		)
 		a.So(env.Events, should.ReceiveEventsResembling,
-			EvtForwardJoinRequestCluster(getPeerCtx, ids, joinReq),
-			EvtReceiveJoinResponseCluster(getPeerCtx, ids, &ttnpb.JoinResponse{
+			EvtClusterJoinAttempt(getPeerCtx, ids, joinReq),
+			EvtClusterJoinSuccess(getPeerCtx, ids, &ttnpb.JoinResponse{
 				RawPayload: joinResp.RawPayload,
 				SessionKeys: ttnpb.SessionKeys{
 					SessionKeyID: joinResp.SessionKeys.SessionKeyID,

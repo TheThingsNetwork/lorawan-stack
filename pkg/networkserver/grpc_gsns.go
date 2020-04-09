@@ -1045,29 +1045,29 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 			logger.WithError(err).Error("Join Server peer connection lookup failed")
 		}
 	} else {
-		queuedEvents = append(queuedEvents, evtForwardJoinRequestCluster(ctx, ids, req))
+		queuedEvents = append(queuedEvents, evtClusterJoinAttempt(ctx, ids, req))
 		resp, err := ttnpb.NewNsJsClient(cc).HandleJoin(ctx, req, ns.WithClusterAuth())
 		if err == nil {
 			logger.Debug("Join-request accepted by cluster-local Join Server")
-			queuedEvents = append(queuedEvents, evtReceiveJoinResponseCluster(ctx, ids, joinResponseWithoutKeys(resp)))
+			queuedEvents = append(queuedEvents, evtClusterJoinSuccess(ctx, ids, joinResponseWithoutKeys(resp)))
 			return resp, queuedEvents, nil
 		}
 		logger.WithError(err).Info("Cluster-local Join Server did not accept join-request")
-		queuedEvents = append(queuedEvents, evtReceiveJoinResponseCluster(ctx, ids, err))
+		queuedEvents = append(queuedEvents, evtClusterJoinFail(ctx, ids, err))
 		if !errors.IsNotFound(err) {
 			return nil, queuedEvents, err
 		}
 	}
 	if ns.interopClient != nil {
-		queuedEvents = append(queuedEvents, evtForwardJoinRequestInterop(ctx, ids, req))
+		queuedEvents = append(queuedEvents, evtInteropJoinAttempt(ctx, ids, req))
 		resp, err := ns.interopClient.HandleJoinRequest(ctx, ns.netID, req)
 		if err == nil {
 			logger.Debug("Join-request accepted by interop Join Server")
-			queuedEvents = append(queuedEvents, evtReceiveJoinResponseInterop(ctx, ids, joinResponseWithoutKeys(resp)))
+			queuedEvents = append(queuedEvents, evtInteropJoinSuccess(ctx, ids, joinResponseWithoutKeys(resp)))
 			return resp, queuedEvents, nil
 		}
 		logger.WithError(err).Warn("Interop Join Server did not accept join-request")
-		queuedEvents = append(queuedEvents, evtReceiveJoinResponseInterop(ctx, ids, err))
+		queuedEvents = append(queuedEvents, evtInteropJoinFail(ctx, ids, err))
 		if !errors.IsNotFound(err) {
 			return nil, queuedEvents, err
 		}

@@ -73,8 +73,11 @@ var (
 	ErrUnsupportedLoRaWANVersion = errUnsupportedLoRaWANVersion
 
 	EvtBeginApplicationLink          = evtBeginApplicationLink
-	EvtCreateEndDevice               = evtCreateEndDevice
 	EvtClassCSwitch                  = evtClassCSwitch
+	EvtClusterJoinAttempt            = evtClusterJoinAttempt
+	EvtClusterJoinFail               = evtClusterJoinFail
+	EvtClusterJoinSuccess            = evtClusterJoinSuccess
+	EvtCreateEndDevice               = evtCreateEndDevice
 	EvtDropDataUplink                = evtDropDataUplink
 	EvtDropJoinRequest               = evtDropJoinRequest
 	EvtEndApplicationLink            = evtEndApplicationLink
@@ -83,15 +86,14 @@ var (
 	EvtEnqueueRekeyConfirmation      = evtEnqueueRekeyConfirmation
 	EvtForwardDataUplink             = evtForwardDataUplink
 	EvtForwardJoinAccept             = evtForwardJoinAccept
-	EvtForwardJoinRequestCluster     = evtForwardJoinRequestCluster
-	EvtForwardJoinRequestInterop     = evtForwardJoinRequestInterop
+	EvtInteropJoinAttempt            = evtInteropJoinAttempt
+	EvtInteropJoinFail               = evtInteropJoinFail
+	EvtInteropJoinSuccess            = evtInteropJoinSuccess
 	EvtProcessDataUplink             = evtProcessDataUplink
 	EvtProcessJoinRequest            = evtProcessJoinRequest
 	EvtReceiveDataUplink             = evtReceiveDataUplink
 	EvtReceiveDeviceModeIndication   = evtReceiveDeviceModeIndication
 	EvtReceiveJoinRequest            = evtReceiveJoinRequest
-	EvtReceiveJoinResponseCluster    = evtReceiveJoinResponseCluster
-	EvtReceiveJoinResponseInterop    = evtReceiveJoinResponseInterop
 	EvtReceiveRekeyIndication        = evtReceiveRekeyIndication
 	EvtScheduleDataDownlinkAttempt   = evtScheduleDataDownlinkAttempt
 	EvtScheduleDataDownlinkFail      = evtScheduleDataDownlinkFail
