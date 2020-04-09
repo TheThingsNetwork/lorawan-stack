@@ -16,23 +16,31 @@ import React from 'react'
 import { FormattedMessage } from 'react-intl'
 import classnames from 'classnames'
 
-import { warn } from '../../log'
 import PropTypes from '../../prop-types'
 
 import style from './message.styl'
 
-const warned = {}
-const warning = function(message) {
-  if (!warned[message]) {
-    warned[message] = true
-    warn(`Message is not translated: "${message}"`)
+const renderContent = (content, component, props) => {
+  let Component = component
+  if (!Boolean(component)) {
+    if (Boolean(props.className)) {
+      Component = 'span'
+    } else {
+      Component = React.Fragment
+    }
   }
+
+  if (Boolean(component) || Boolean(props.className)) {
+    return <Component {...props}>{content}</Component>
+  }
+
+  return content
 }
 
 const Message = function({
   content,
   values = {},
-  component: Component,
+  component,
   lowercase,
   uppercase,
   firstToUpper,
@@ -41,24 +49,6 @@ const Message = function({
   className,
   ...rest
 }) {
-  if (React.isValidElement(content)) {
-    return content
-  }
-
-  if (typeof content === 'string' || typeof content === 'number') {
-    warning(content)
-    return (
-      <Component className={className} {...rest}>
-        {content}
-      </Component>
-    )
-  }
-
-  let vals = values
-  if (content.values && Object.keys(values).length === 0) {
-    vals = content.values
-  }
-
   const cls = classnames(className, {
     [style.lowercase]: lowercase,
     [style.uppercase]: uppercase,
@@ -67,19 +57,24 @@ const Message = function({
     [style.capitalize]: capitalize,
   })
 
-  if (content.id) {
-    return (
-      <FormattedMessage {...content} values={vals}>
-        {(...children) => (
-          <Component className={cls} {...rest}>
-            {children}
-          </Component>
-        )}
-      </FormattedMessage>
-    )
+  if (cls) {
+    rest.className = cls
   }
 
-  return null
+  let vals = values
+  if (content.values && Object.keys(values).length === 0) {
+    vals = content.values
+  }
+
+  if (typeof content === 'string' || typeof content === 'number') {
+    return renderContent(content, component, rest)
+  }
+
+  return (
+    <FormattedMessage {...content} values={vals}>
+      {(...children) => renderContent(children, component, rest)}
+    </FormattedMessage>
+  )
 }
 
 Message.propTypes = {
@@ -126,7 +121,7 @@ Message.propTypes = {
 Message.defaultProps = {
   capitalize: false,
   className: undefined,
-  component: 'span',
+  component: undefined,
   firstToLower: false,
   firstToUpper: false,
   lowercase: false,
