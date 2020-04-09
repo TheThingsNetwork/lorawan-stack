@@ -419,6 +419,7 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 		joinResp := &ttnpb.JoinResponse{
 			RawPayload:     bytes.Repeat([]byte{0x42}, 33),
 			SessionKeys:    *MakeSessionKeys(macVersion, true),
+			Lifetime:       time.Hour,
 			CorrelationIDs: []string{"NsJs-1", "NsJs-2"},
 		}
 		if !a.So(AssertAuthNsJsHandleJoinRequest(ctx, env.Cluster.Auth, handleJoinCh, func(ctx context.Context, req *ttnpb.JoinRequest) bool {
@@ -445,7 +446,14 @@ func (env FlowTestEnvironment) AssertJoin(ctx context.Context, link ttnpb.AsNs_L
 		)
 		a.So(env.Events, should.ReceiveEventsResembling,
 			EvtForwardJoinRequestCluster(getPeerCtx, ids, joinReq),
-			EvtReceiveJoinResponseCluster(getPeerCtx, ids, joinResp),
+			EvtReceiveJoinResponseCluster(getPeerCtx, ids, &ttnpb.JoinResponse{
+				RawPayload: joinResp.RawPayload,
+				SessionKeys: ttnpb.SessionKeys{
+					SessionKeyID: joinResp.SessionKeys.SessionKeyID,
+				},
+				Lifetime:       joinResp.Lifetime,
+				CorrelationIDs: joinResp.CorrelationIDs,
+			}),
 		)
 		a.So(env.Events, should.ReceiveEventFunc, makeAssertFlowTestEventEqual(t),
 			EvtProcessJoinRequest(getPeerCtx, ids, makeUplink(true, RxMetadata[:]...)),

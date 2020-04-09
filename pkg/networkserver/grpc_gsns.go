@@ -1023,6 +1023,17 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	return nil
 }
 
+func joinResponseWithoutKeys(resp *ttnpb.JoinResponse) *ttnpb.JoinResponse {
+	return &ttnpb.JoinResponse{
+		RawPayload: resp.RawPayload,
+		SessionKeys: ttnpb.SessionKeys{
+			SessionKeyID: resp.SessionKeys.SessionKeyID,
+		},
+		Lifetime:       resp.Lifetime,
+		CorrelationIDs: resp.CorrelationIDs,
+	}
+}
+
 func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, []events.Event, error) {
 	var queuedEvents []events.Event
 	logger := log.FromContext(ctx)
@@ -1038,7 +1049,7 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 		resp, err := ttnpb.NewNsJsClient(cc).HandleJoin(ctx, req, ns.WithClusterAuth())
 		if err == nil {
 			logger.Debug("Join-request accepted by cluster-local Join Server")
-			queuedEvents = append(queuedEvents, evtReceiveJoinResponseCluster(ctx, ids, resp))
+			queuedEvents = append(queuedEvents, evtReceiveJoinResponseCluster(ctx, ids, joinResponseWithoutKeys(resp)))
 			return resp, queuedEvents, nil
 		}
 		logger.WithError(err).Info("Cluster-local Join Server did not accept join-request")
@@ -1052,7 +1063,7 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 		resp, err := ns.interopClient.HandleJoinRequest(ctx, ns.netID, req)
 		if err == nil {
 			logger.Debug("Join-request accepted by interop Join Server")
-			queuedEvents = append(queuedEvents, evtReceiveJoinResponseInterop(ctx, ids, resp))
+			queuedEvents = append(queuedEvents, evtReceiveJoinResponseInterop(ctx, ids, joinResponseWithoutKeys(resp)))
 			return resp, queuedEvents, nil
 		}
 		logger.WithError(err).Warn("Interop Join Server did not accept join-request")

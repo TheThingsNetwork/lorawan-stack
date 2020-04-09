@@ -54,13 +54,15 @@ const (
 )
 
 var (
-	AdaptDataRate             = adaptDataRate
-	AppendRecentUplink        = appendRecentUplink
-	DownlinkPathsFromMetadata = downlinkPathsFromMetadata
-	FrequencyPlanChannels     = frequencyPlanChannels
-	HandleLinkCheckReq        = handleLinkCheckReq
-	NewMACState               = newMACState
-	TimePtr                   = timePtr
+	AdaptDataRate                       = adaptDataRate
+	AppendRecentUplink                  = appendRecentUplink
+	DownlinkPathsFromMetadata           = downlinkPathsFromMetadata
+	FrequencyPlanChannels               = frequencyPlanChannels
+	HandleLinkCheckReq                  = handleLinkCheckReq
+	NewMACState                         = newMACState
+	TimePtr                             = timePtr
+	JoinResponseWithoutKeys             = joinResponseWithoutKeys
+	ApplicationJoinAcceptWithoutAppSKey = applicationJoinAcceptWithoutAppSKey
 
 	ErrABPJoinRequest            = errABPJoinRequest
 	ErrDuplicate                 = errDuplicate
