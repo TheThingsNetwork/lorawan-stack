@@ -25,7 +25,7 @@ import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/sel
 import DeviceImportForm from '../../components/device-import-form'
 import SubmitBar from '../../../components/submit-bar'
 import Button from '../../../components/button'
-import Notification from '../../../components/notification'
+import ErrorNotification from '../../../components/error-notification'
 import api from '../../api'
 import PropTypes from '../../../lib/prop-types'
 import Message from '../../../lib/components/message'
@@ -210,6 +210,7 @@ export default class DeviceImporter extends Component {
     } else if (status === 'finished') {
       statusMessage = m.operationFinished
     }
+
     return (
       <div>
         <Message className={style.title} component="h4" content={operationMessage} />
@@ -229,7 +230,7 @@ export default class DeviceImporter extends Component {
             />
           </React.Fragment>
         ) : (
-          <Notification small error={error} title={m.errorTitle} />
+          <ErrorNotification small content={error} title={m.errorTitle} />
         )}
         <CodeEditor
           className={style.logOutput}
