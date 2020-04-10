@@ -109,6 +109,10 @@ export const mayEditApplicationDeviceKeys = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_DEVICES_WRITE_KEYS'),
 }
+export const mayScheduleDownlinks = {
+  rightsSelector: selectApplicationRights,
+  check: rights => rights.includes('RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE') && asEnabled,
+}
 
 // Gateway related feature checks.
 export const mayViewGatewayInfo = {
