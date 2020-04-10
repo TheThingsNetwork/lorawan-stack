@@ -351,10 +351,6 @@ class Devices {
       throw new Error('Missing end device ID')
     }
 
-    if (supports_join && 'provisioner_id' in device && device.provisioner_id !== '') {
-      throw new Error('Setting a provisioner with end device keys is not allowed.')
-    }
-
     const requestTree = splitSetPaths(Marshaler.selectorToPaths(mask))
 
     if (!supports_join || device.join_server_address !== this._stackConfig.jsHost) {
