@@ -73,7 +73,7 @@ export default class ByteInput extends React.Component {
   static defaultProps = {
     className: undefined,
     min: 0,
-    max: 256,
+    max: undefined,
     placeholder: undefined,
     showPerChar: false,
     onBlur: () => null,
@@ -100,13 +100,16 @@ export default class ByteInput extends React.Component {
       ...rest
     } = this.props
 
+    const valueLength = clean(value).length || 0
+    const calculatedMax = max || Math.max(Math.floor(valueLength / 2) + 1, 1)
+
     return (
       <MaskedInput
         ref={this.input}
         key="input"
         className={classnames(className, style.byte)}
         value={value}
-        mask={mask(min, max, showPerChar)}
+        mask={mask(min, calculatedMax, showPerChar)}
         placeholderChar={PLACEHOLDER_CHAR}
         keepCharPositions={false}
         pipe={upper}
