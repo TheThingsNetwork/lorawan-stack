@@ -187,7 +187,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 		FPort:      fPort,
 		FRMPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FCnt, pld.FRMPayload)
+	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FCnt, pld.FRMPayload, false)
 	if err != nil {
 		panic(err)
 	}
@@ -228,7 +228,7 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 		FPort:      fPort,
 		FRMPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptDownlink(appSKey, devAddr, pld.FCnt, pld.FRMPayload)
+	buf, err := crypto.EncryptDownlink(appSKey, devAddr, pld.FCnt, pld.FRMPayload, false)
 	if err != nil {
 		panic(err)
 	}

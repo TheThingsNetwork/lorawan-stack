@@ -531,7 +531,7 @@ matchLoop:
 				logger.WithField("kek_label", session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey, skip")
 				continue
 			}
-			macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, match.FCnt, macBuf)
+			macBuf, err = crypto.DecryptUplink(key, pld.DevAddr, match.FCnt, macBuf, false)
 			if err != nil {
 				logger.WithError(err).Warn("Failed to decrypt uplink, skip")
 				continue

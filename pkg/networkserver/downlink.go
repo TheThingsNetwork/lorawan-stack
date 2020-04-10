@@ -451,12 +451,13 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			logger.WithField("kek_label", dev.Session.NwkSEncKey.KEKLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, genState, err
 		}
-
+		var isFOpts bool
 		fCnt := pld.FHDR.FCnt
 		if pld.FPort != 0 {
 			fCnt = dev.Session.LastNFCntDown
+			isFOpts = true
 		}
-		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, fCnt, cmdBuf)
+		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, fCnt, cmdBuf, isFOpts)
 		if err != nil {
 			return nil, genState, errEncryptMAC.WithCause(err)
 		}

@@ -371,7 +371,7 @@ func processDownlink(dev *ttnpb.EndDevice) func(lastUpMsg *ttnpb.Message, downMs
 				key = *dev.Session.SessionKeys.GetAppSKey().Key
 			}
 
-			macPayload.FRMPayload, err = crypto.DecryptDownlink(key, macPayload.DevAddr, macPayload.FCnt, macPayload.FRMPayload)
+			macPayload.FRMPayload, err = crypto.DecryptDownlink(key, macPayload.DevAddr, macPayload.FCnt, macPayload.FRMPayload, false)
 			if err != nil {
 				return err
 			}
@@ -538,6 +538,7 @@ var (
 							dataUplinkParams.DevAddr,
 							dataUplinkParams.FCnt,
 							fOpts,
+							true,
 						)
 						if err != nil {
 							return err
@@ -556,6 +557,7 @@ var (
 						dataUplinkParams.DevAddr,
 						dataUplinkParams.FCnt,
 						dataUplinkParams.FRMPayload,
+						false,
 					)
 					if err != nil {
 						return err

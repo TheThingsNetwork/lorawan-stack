@@ -1752,6 +1752,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -2022,6 +2023,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -2317,6 +2319,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							false,
 						)).([]byte)...)
 
 						/* MIC */
@@ -2600,6 +2603,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -2893,6 +2897,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -3196,6 +3201,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -3525,6 +3531,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -3603,6 +3610,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -4163,6 +4171,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							false,
 						)).([]byte)...)
 
 						/* MIC */
@@ -4257,6 +4266,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -4574,6 +4584,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							false,
 						)).([]byte)...)
 
 						/* MIC */
@@ -4668,6 +4679,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
+							true,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -5490,7 +5502,7 @@ func TestGenerateDownlink(t *testing.T) {
 			}
 
 			var err error
-			mac.FRMPayload, err = crypto.EncryptDownlink(key, mac.DevAddr, mac.FCnt, mac.FRMPayload)
+			mac.FRMPayload, err = crypto.EncryptDownlink(key, mac.DevAddr, mac.FCnt, mac.FRMPayload, false)
 			if err != nil {
 				t.Fatal("Failed to encrypt downlink FRMPayload")
 			}
