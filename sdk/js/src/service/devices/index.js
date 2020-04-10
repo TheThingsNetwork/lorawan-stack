@@ -602,7 +602,7 @@ class Devices {
     })
   }
 
-  bulkCreate(applicationId, deviceOrDevices, components = ['is', 'ns', 'as', 'js']) {
+  bulkCreate(applicationId, deviceOrDevices) {
     const devices = !(deviceOrDevices instanceof Array) ? [deviceOrDevices] : deviceOrDevices
     let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
     let finishedCount = 0
@@ -622,15 +622,8 @@ class Devices {
             end_device,
           } = device
 
-          const requestTree = splitSetPaths(Marshaler.selectorToPaths(paths), undefined, components)
+          const result = await this.create(applicationId, end_device, paths)
 
-          const result = await this._setDevice(
-            applicationId,
-            undefined,
-            end_device,
-            true,
-            requestTree,
-          )
           notify(listeners[EVENTS.CHUNK], result)
           finishedCount++
           if (finishedCount === devices.length) {
