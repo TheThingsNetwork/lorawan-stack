@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - End device claim display bug when claim dates not set.
 - DeviceModeInd handling for LoRaWAN 1.1 devices.
 - Do not perform unnecessary gateway location updates.
+- Error display on failed end device import in the Console.
 
 ### Security
 
