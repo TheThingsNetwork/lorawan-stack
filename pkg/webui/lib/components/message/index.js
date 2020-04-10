@@ -47,7 +47,11 @@ const Message = function({
 
   if (typeof content === 'string' || typeof content === 'number') {
     warning(content)
-    return <Component {...rest}>{content}</Component>
+    return (
+      <Component className={className} {...rest}>
+        {content}
+      </Component>
+    )
   }
 
   let vals = values
