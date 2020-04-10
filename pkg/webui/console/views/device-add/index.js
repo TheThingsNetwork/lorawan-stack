@@ -55,9 +55,7 @@ export default class DeviceAdd extends Component {
   async handleSubmit(device) {
     const { appId } = this.props
 
-    return api.device.create(appId, device, {
-      otaa: device.supports_join,
-    })
+    return api.device.create(appId, device)
   }
 
   @bind

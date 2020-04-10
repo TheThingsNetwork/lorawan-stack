@@ -498,12 +498,14 @@ class Devices {
   /**
    * Creates an end device under the `applicationId` application.
    * This method will cause creating the end device in all available stack
-   * components (i.e. NS, AS, IS, JS) based on provided end device payload.
+   * components (i.e. NS, AS, IS, JS) based on provided end device payload (`device`) or
+   * on field mask paths (`mask`).
    * @param {string} applicationId - Application ID
    * @param {Object} device - The end device payload
+   * @param {Array} mask -The field mask paths (by default is generated from `device` payload)
    * @returns {Object} - Created end device on successful creation, an error otherwise
    */
-  async create(applicationId, device) {
+  async create(applicationId, device, mask = Marshaler.fieldMaskFromPatch(device)) {
     if (!Boolean(applicationId)) {
       throw new Error('Missing application ID for device')
     }
@@ -519,7 +521,7 @@ class Devices {
       throw new Error('Setting a provisioner with end device keys is not allowed.')
     }
 
-    const requestTree = splitSetPaths(traverse(device).paths())
+    const requestTree = splitSetPaths(Marshaler.selectorToPaths(mask))
 
     if (!supports_join || device.join_server_address !== this._stackConfig.jsHost) {
       delete requestTree.js
