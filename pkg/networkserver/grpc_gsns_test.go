@@ -640,6 +640,35 @@ func TestHandleUplink(t *testing.T) {
 					},
 				},
 				TestCase{
+					Name: makeName("FOpts non-empty for FPort 0 uplink"),
+					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
+						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
+							RawPayload: []byte{
+								/* MHDR */
+								0b010_000_00,
+								/* MACPayload */
+								/** FHDR **/
+								/*** DevAddr ***/
+								0xff, 0xff, 0xff, 0x42,
+								/*** FCtrl ***/
+								0xb2,
+								/*** FCnt ***/
+								0x42, 0xff,
+								/*** FOpts ***/
+								0xfe, 0xff,
+								/** FPort **/
+								0x0,
+								/** FRMPayload **/
+								0xfe, 0xff,
+								/* MIC */
+								0x03, 0x02, 0x01, 0x00,
+							},
+							RxMetadata: uplinkMDs,
+							Settings:   MakeUplinkSettings(dr, ch.Frequency),
+						}), ErrInvalidPayload), should.BeTrue)
+					},
+				},
+				TestCase{
 					Name: makeName("Invalid MType"),
 					Handler: func(ctx context.Context, env TestEnvironment, clock *test.MockClock, handle func(context.Context, *ttnpb.UplinkMessage) <-chan error) bool {
 						return assertions.New(test.MustTFromContext(ctx)).So(assertHandleUplinkResponse(ctx, handle(ctx, &ttnpb.UplinkMessage{
