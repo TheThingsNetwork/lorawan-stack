@@ -61,7 +61,7 @@ const statusMap = {
 }
 
 @connect(
-  function(state) {
+  state => {
     const asConfig = selectAsConfig()
     const nsConfig = selectNsConfig()
     const jsConfig = selectJsConfig()
@@ -135,21 +135,16 @@ export default class DeviceImporter extends Component {
       this.setState({ step: 'conversion', status: 'processing' })
       this.appendToLog('Converting device templates…')
       const templateStream = await api.deviceTemplates.convert(format_id, data)
-      const devices = await new Promise(
-        function(resolve, reject) {
-          const chunks = []
+      const devices = await new Promise((resolve, reject) => {
+        const chunks = []
 
-          templateStream.on(
-            'chunk',
-            function(message) {
-              this.appendToLog(message)
-              chunks.push(message)
-            }.bind(this),
-          )
-          templateStream.on('error', reject)
-          templateStream.on('close', () => resolve(chunks))
-        }.bind(this),
-      )
+        templateStream.on('chunk', message => {
+          this.appendToLog(message)
+          chunks.push(message)
+        })
+        templateStream.on('error', reject)
+        templateStream.on('close', () => resolve(chunks))
+      })
 
       // Apply default values
       for (const deviceAndFieldMask of devices) {
@@ -163,11 +158,11 @@ export default class DeviceImporter extends Component {
           field_mask.paths.push('join_server_address')
         }
         if (!device.application_server_address && asConfig.enabled) {
-          device.network_server_address = new URL(nsConfig.base_url).hostname
+          device.application_server_address = new URL(asConfig.base_url).hostname
           field_mask.paths.push('application_server_address')
         }
         if (!device.network_server_address && nsConfig.enabled) {
-          device.application_server_address = new URL(asConfig.base_url).hostname
+          device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask.paths.push('network_server_address')
         }
       }
@@ -180,13 +175,11 @@ export default class DeviceImporter extends Component {
       this.appendToLog('Creating devices…')
       const createStream = api.device.bulkCreate(appId, devices, componentArray)
 
-      await new Promise(
-        function(resolve, reject) {
-          createStream.on('chunk', this.handleCreationProgress)
-          createStream.on('error', reject)
-          createStream.on('close', resolve)
-        }.bind(this),
-      )
+      await new Promise((resolve, reject) => {
+        createStream.on('chunk', this.handleCreationProgress)
+        createStream.on('error', reject)
+        createStream.on('close', resolve)
+      })
 
       this.setState({ status: 'finished' })
     } catch (error) {
