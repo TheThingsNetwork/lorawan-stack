@@ -649,7 +649,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a := assertions.New(t)
 				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
 				dev, sets, err := f(nil)
-				a.So(err, should.BeNil)
+				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
 				return nil, nil
