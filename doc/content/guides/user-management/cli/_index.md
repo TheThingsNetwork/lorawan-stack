@@ -15,7 +15,8 @@ $ ttn-lw-cli users list --name --state --admin
 > **TIP:** Use the pagination flags `--limit` and `--page` when there are many users.
 
 <details><summary>Show output</summary>
-```
+
+```json
 [{
   "ids": {
     "user_id": "new-user"
@@ -46,7 +47,8 @@ $ ttn-lw-cli users search --id-contains new --name
 > **TIP:** Use the pagination flags `--limit` and `--page` when there are many users.
 
 <details><summary>Show output</summary>
-```
+
+```json
 [{
   "ids": {
     "user_id": "new-user"
@@ -69,9 +71,12 @@ $ ttn-lw-cli users create colleague \
 ```
 
 <details><summary>Show output</summary>
-```
+
+```bash
 Please enter password:***************
 Please confirm password:***************
+```
+```json
 {
   "ids": {
     "user_id": "colleague"
@@ -107,7 +112,8 @@ After you do this, you'll be able to list the invitations you've sent:
 ```
 
 <details><summary>Show output</summary>
-```
+
+```json
 [{
   "email": "colleague@thethings.network",
   "token": "MW7INQWYOE46GLP3AEFQEHR5XIKRYPSRAXFF3CUCLIQPPQ3BNBLQ",
@@ -116,8 +122,9 @@ After you do this, you'll be able to list the invitations you've sent:
   "updated_at": "2019-12-19T11:41:29.486Z"
 }]
 ```
-</details>
 
+</details>
+<br>
 And delete an invitation if you want to revoke it:
 
 ```bash
@@ -133,7 +140,8 @@ $ ttn-lw-cli users update new-user --state APPROVED --admin true
 ```
 
 <details><summary>Show output</summary>
-```
+
+```json
 {
   "ids": {
     "user_id": "new-user"

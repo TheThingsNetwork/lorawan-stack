@@ -38,10 +38,11 @@ $ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-f
 ```
 
 <details><summary>Show output</summary>
-```json
+
+```javascript
 {
   "end_device": {
-    ...
+    // ...
     "provisioner_id": "microchip",
     "provisioning_data": {
         "distributor": {
@@ -54,7 +55,7 @@ $ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-f
               "organizationalUnitName": "Secure Products Group"
             },
         "model": "ATECC608A",
-        ...
+        // ...
       }
   },
   "field_mask": {
@@ -67,5 +68,6 @@ $ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-f
 }
 ```
 </details>
+<br>
 
 In this example, only the `provisioner_id` and `provisioning_data` fields are set with the `mapping_key` set to the serial number. Device makers can use the template to assign the `JoinEUI` and `DevEUI`s (see [Assigning EUIs]({{< relref "assigning-euis.md" >}})) as well as other device fields (see [Creating]({{< relref "creating.md" >}}) and [Mapping Templates]({{< relref "mapping.md" >}})).

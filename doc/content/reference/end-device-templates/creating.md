@@ -24,8 +24,8 @@ $ ttn-lw-cli device get test-app test-dev \
   --lorawan-phy-version \
   | ttn-lw-cli end-device template create > template.json
 ```
-
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {
@@ -60,6 +60,7 @@ $ cat template.json \
 ```
 
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {
@@ -86,6 +87,7 @@ $ cat template.json \
 }
 ```
 </details>
+<br>
 
 See `$ ttn-lw-cli end-device template extend --help` for all the fields that can be set.
 
@@ -103,6 +105,7 @@ $ ttn-lw-cli end-device template extend \
 ```
 
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {

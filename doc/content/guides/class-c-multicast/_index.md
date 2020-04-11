@@ -41,6 +41,7 @@ It is also possible to create a multicast group to send a Class C downlink messa
 When creating a device, you can specify in the Console and CLI whether it's a multicast group.
 
 <details><summary>Show CLI example</summary>
+
 ```bash
 $ ttn-lw-cli end-devices create app1 mc1 \
   --frequency-plan-id EU_863_870 \
@@ -52,7 +53,9 @@ $ ttn-lw-cli end-devices create app1 mc1 \
   --multicast \
   --supports-class-c
 ```
+
 </details>
+<br>
 
 >Note: A multicast group cannot be converted to a normal unicast device or the other way around.
 

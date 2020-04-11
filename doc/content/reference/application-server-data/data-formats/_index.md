@@ -251,6 +251,7 @@ The JSON downlink `ack`, `nack`, `queued` and `sent` events messages use the fol
 ```
 
 </details>
+<br>
 
 The JSON downlink `failed` event provides both the downlink and the error details, in the following format:
 

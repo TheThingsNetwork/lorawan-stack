@@ -25,7 +25,7 @@ Make sure to copy your API key now, since it will no longer be visible after lea
 There are many MQTT clients available. Great clients are `mosquitto_pub` and `mosquitto_sub`, part of [Mosquitto](https://mosquitto.org).
 
 ```bash
-# Tip: when using `mosquitto_sub`, pass the `-d` flag to see the topics messages get published on. 
+# Tip: when using `mosquitto_sub`, pass the `-d` flag to see the topics messages get published on.
 # For example:
 $ mosquitto_sub -h thethings.example.com -t "#" -u app1 -P "NNSXS.VEEBURF3KR77ZR.." -d
 ```
@@ -47,6 +47,7 @@ While you could subscribe to separate topics, for the tutorial subscribe to `#` 
 With your MQTT client subscribed, when a device joins the network, a `join` message gets published. For example, for a device ID `dev1`, the message will be published on the topic `v3/app1/devices/dev1/join`.
 
 <details><summary>Show example</summary>
+
 ```json
 {
   "end_device_ids": {
@@ -72,11 +73,14 @@ With your MQTT client subscribed, when a device joins the network, a `join` mess
 ```
 </details>
 
+<br>
+
 You can use the correlation IDs to follow messages as they pass through {{% tts %}}.
 
 When the device sends an uplink message, a message will be published to the topic `v3/{application id}/devices/{device id}/up`.
 
 <details><summary>Show example</summary>
+
 ```json
 {
   "end_device_ids": {
@@ -176,6 +180,7 @@ It is also possible to send multiple downlink messages on a single push because 
 Once the downlink gets acknowledged, a message is published to the topic `v3/{application id}/devices/{device id}/down/ack`.
 
 <details><summary>Show example</summary>
+
 ```json
 {
   "end_device_ids": {
@@ -206,5 +211,6 @@ Once the downlink gets acknowledged, a message is published to the topic `v3/{ap
 }
 ```
 </details>
+<br>
 
 You see the correlation ID `my-correlation-id` of your downlink message. You can add multiple custom correlation IDs, for example to reference events or identifiers of your application.

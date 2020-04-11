@@ -39,6 +39,7 @@ $ cat profile.json \
 ```
 
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {
@@ -197,6 +198,7 @@ $ cat profile.json \
 }
 ```
 </details>
+<br>
 
 Finally, you can create these devices in your {{% tts %}} application `test-app`, see [Executing Templates]({{< relref "executing.md" >}}).
 
