@@ -16,9 +16,11 @@ package web
 
 import (
 	"context"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	echo "github.com/labstack/echo/v4"
@@ -29,6 +31,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/web/cookie"
 	"go.thethings.network/lorawan-stack/pkg/web/middleware"
+	"go.thethings.network/lorawan-stack/pkg/webui"
+	"gopkg.in/yaml.v2"
 )
 
 // Registerer allows components to register their services to the web server.
@@ -168,16 +172,35 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		server: server,
 	}
 
-	var staticDir http.Dir
+	var staticPath string
 	for _, path := range options.staticSearchPaths {
 		if s, err := os.Stat(path); err == nil && s.IsDir() {
-			staticDir = http.Dir(path)
+			staticPath = path
 			break
 		}
 	}
-	if staticDir != "" {
-		logger.WithFields(log.Fields("path", staticDir, "mount", options.staticMount)).Debug("Serving static assets")
+	if staticPath != "" {
+		staticDir := http.Dir(staticPath)
+		logger := logger.WithFields(log.Fields("path", staticDir, "mount", options.staticMount))
 		s.Static(options.staticMount, staticDir, middleware.Immutable)
+
+		// register hashed filenames
+		manifest, err := ioutil.ReadFile(filepath.Join(staticPath, "manifest.yaml"))
+		if err != nil {
+			logger.WithError(err).Warn("Failed to load manifest.yaml")
+			return s, nil
+		}
+		hashedFiles := make(map[string]string)
+		err = yaml.Unmarshal(manifest, &hashedFiles)
+		if err != nil {
+			logger.WithError(err).Warn("Corrupted manifest.yaml")
+			return s, nil
+		}
+		for original, hashed := range hashedFiles {
+			webui.RegisterHashedFile(original, hashed)
+		}
+		logger.Debug("Loaded manifest.yaml")
+		logger.Debug("Serving static assets")
 	} else {
 		logger.WithField("search_paths", options.staticSearchPaths).Warn("No static assets found in any search path")
 	}

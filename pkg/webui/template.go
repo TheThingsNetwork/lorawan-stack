@@ -128,7 +128,8 @@ func NewAppTemplate(t *template.Template) *AppTemplate {
 
 var hashedFiles = map[string]string{}
 
-func registerHashedFile(original, hashed string) {
+// RegisterHashedFile maps filenames to webpack generated hashed filenames
+func RegisterHashedFile(original, hashed string) {
 	hashedFiles[original] = hashed
 }
 
