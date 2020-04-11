@@ -69,6 +69,7 @@ export default class WebhookTemplateForm extends Component {
       template_ids: template.ids,
       format: template.format,
       headers,
+      template_fields: fields,
       base_url: urlTemplate.parse(template.base_url).expand(fields),
       uplink_message: pathExpand(template.uplink_message, fields),
       join_accept: pathExpand(template.join_accept, fields),
