@@ -565,9 +565,10 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 	}
 	var evt events.Event
 	_, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceID, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if dev != nil {
-			evt = evtDeleteEndDevice(ctx, req, nil)
+		if dev == nil {
+			return nil, nil, errDeviceNotFound.New()
 		}
+		evt = evtDeleteEndDevice(ctx, req, nil)
 		return nil, nil, nil
 	})
 	if err != nil {

@@ -1605,7 +1605,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a.So(gets, should.BeNil)
 
 				dev, sets, err := f(ctx, nil)
-				if !a.So(err, should.BeNil) {
+				if !a.So(errors.IsNotFound(err), should.BeTrue) {
 					return nil, ctx, err
 				}
 				a.So(sets, should.BeNil)

@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update password view not being accessible
 - FOpts encryption and decryption for LoRaWAN 1.1 devices.
 - Application Server returns an error when trying to delete a device that does not exist.
+- Network Server returns an error when trying to delete a device that does not exist.
 - Retrieve LNS Trust without LNS Credentials attribute.
 
 ### Security
