@@ -93,8 +93,15 @@ func (ts *TemplateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTempla
 	return nil
 }
 
+var (
+	errTemplateNotFound = errors.DefineNotFound("template_not_found", "template `{template_id}` not found")
+)
+
 // GetTemplate returns the template with the given identifiers.
 func (ts *TemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
+	if ts == nil {
+		return nil, errTemplateNotFound.WithAttributes("template_id", req.TemplateID)
+	}
 	template, err := ts.getTemplate(req.ApplicationWebhookTemplateIdentifiers)
 	if err != nil {
 		return nil, err
@@ -112,6 +119,9 @@ func (ts *TemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicat
 
 // ListTemplates returns the available templates.
 func (ts *TemplateStore) ListTemplates(ctx context.Context, req *ttnpb.ListApplicationWebhookTemplatesRequest) (*ttnpb.ApplicationWebhookTemplates, error) {
+	if ts == nil {
+		return &ttnpb.ApplicationWebhookTemplates{}, nil
+	}
 	ids, err := ts.getAllTemplateIDs()
 	if err != nil {
 		return nil, err
