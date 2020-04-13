@@ -73,8 +73,6 @@ With your MQTT client subscribed, when a device joins the network, a `join` mess
 ```
 </details>
 
-<br>
-
 You can use the correlation IDs to follow messages as they pass through {{% tts %}}.
 
 When the device sends an uplink message, a message will be published to the topic `v3/{application id}/devices/{device id}/up`.
@@ -211,6 +209,5 @@ Once the downlink gets acknowledged, a message is published to the topic `v3/{ap
 }
 ```
 </details>
-<br>
 
 You see the correlation ID `my-correlation-id` of your downlink message. You can add multiple custom correlation IDs, for example to reference events or identifiers of your application.

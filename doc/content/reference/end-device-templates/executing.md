@@ -39,7 +39,6 @@ $ cat example.json | ttn-lw-cli end-device template execute
 }
 ```
 </details>
-<br>
 
 The `end-device template execute` command **does not create** the end device. You can, however, easily pipe the output of `end-device template execute` to create the device. But first, you need to personalize the devices by assigning EUIs since this is a generic device template, see [Assigning EUIs]({{< relref "assigning-euis.md" >}}).
 

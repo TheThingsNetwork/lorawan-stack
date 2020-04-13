@@ -69,7 +69,6 @@ The mapping file `profile.json` contains the following entries (omitting empty f
 }
 ```
 </details>
-<br>
 
 Second, convert the provisioning data to a device templates file to `provisioningdata.json`.
 
@@ -199,7 +198,6 @@ This returns the device templates with provisioning data and device profile comb
 }
 ```
 </details>
-<br>
 
 Fourth, you can personalize these devices by assigning the `JoinEUI` and `DevEUI` to `devices.json`, see [Assigning EUIs]({{< relref "assigning-euis.md" >}}):
 
@@ -331,7 +329,6 @@ $ cat templates.json \
 }
 ```
 </details>
-<br>
 
 Finally, you can create these devices in your {{% tts %}} application `test-app`, see [Executing Templates]({{< relref "executing.md" >}}).
 

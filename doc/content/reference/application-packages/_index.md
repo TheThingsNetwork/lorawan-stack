@@ -65,7 +65,6 @@ This will associate FPort `25` of device `dev1` of application `app1` with the a
 }
 ```
 </details>
-<br>
 
 Some application packages are stateful, and as such their state can be updated using the `data-*` parameters:
 

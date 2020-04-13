@@ -217,4 +217,12 @@ html.has-navbar-fixed-top {
   }
 }
 
+details + p {
+  margin-top: 1em;
+}
+
+details + blockquote {
+  margin-top: 1em;
+}
+
 @import "highlight.scss";

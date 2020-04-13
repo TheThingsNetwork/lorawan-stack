@@ -55,7 +55,6 @@ $ ttn-lw-cli end-devices create app1 mc1 \
 ```
 
 </details>
-<br>
 
 >Note: A multicast group cannot be converted to a normal unicast device or the other way around.
 
