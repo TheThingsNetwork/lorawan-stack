@@ -1,6 +1,7 @@
 extends:
   - ttn
   - plugin:jest/recommended
+  - plugin:jsdoc/recommended
   - plugin:import/recommended
   - prettier
   - prettier/react
@@ -8,6 +9,7 @@ extends:
 parser: babel-eslint
 
 plugins:
+  - jsdoc
   - prettier
   - import
 
@@ -99,7 +101,6 @@ rules:
       - pattern: "./*.styl"
         group: sibling
         position: after
-      newlines-between: always
 
   # Prevent superfluous path traversions in import statements
   import/no-useless-path-segments:
@@ -144,13 +145,13 @@ rules:
   no-console:
     - warn
 
-  # Warn on missing JsDoc definitions
-  valid-jsdoc:
+  # Enforce capitalized comments.
+  capitalized-comments:
     - warn
-    - prefer:
-        return: returns
-        arg: param
-        argument: param
-        class: constructor
-        virtual: abstract
-      requireReturn: false
+    - always
+    - ignoreConsecutiveComments: true
+
+  jsdoc/require-jsdoc: off
+  jsdoc/require-hyphen-before-param-description: warn
+  jsdoc/check-indentation: warn
+  jsdoc/require-description-complete-sentence: warn
