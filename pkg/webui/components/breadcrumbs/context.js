@@ -36,7 +36,7 @@ class BreadcrumbsProvider extends React.Component {
         return { breadcrumbs: [...prev.breadcrumbs, { id, breadcrumb }] }
       }
 
-      // replace breadcrumb with existing id
+      // Replace breadcrumb with existing id.
       return {
         breadcrumbs: [
           ...prev.breadcrumbs.slice(0, index),

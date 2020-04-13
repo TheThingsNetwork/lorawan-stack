@@ -25,7 +25,7 @@ const ENTITY = 'users'
 
 const selectUserStore = state => state.users
 
-// User
+// User.
 export const selectUserEntitiesStore = state => selectUserStore(state).entities
 export const selectUserById = (state, id) => selectUserEntitiesStore(state)[id]
 export const selectSelectedUserId = state => selectUserStore(state).selectedUser
@@ -33,7 +33,7 @@ export const selectSelectedUser = state => selectUserById(state, selectSelectedU
 export const selectUserFetching = createFetchingSelector(GET_USER_BASE)
 export const selectUserError = createErrorSelector(GET_USER_BASE)
 
-// Users
+// Users.
 const selectUsrsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectUsrsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 const selectUsrsFetching = createFetchingSelector(GET_USERS_LIST_BASE)

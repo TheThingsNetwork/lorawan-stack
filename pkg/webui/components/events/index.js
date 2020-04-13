@@ -77,12 +77,12 @@ class Events extends React.Component {
     const newEvents = events !== nextProps.events
     const clearedEvents = newEvents && nextProps.events.length === 0
 
-    // rerender component if cleared events when in the `paused` state
+    // Rerender component if cleared events when in the `paused` state.
     if (clearedEvents && paused) {
       return true
     }
 
-    // do not rerender component on new events when in the `paused` state
+    // Do not rerender component on new events when in the `paused` state.
     if (newEvents && paused) {
       return false
     }

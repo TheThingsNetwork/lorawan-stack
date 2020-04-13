@@ -134,41 +134,45 @@ Button.AnchorLink = function(props) {
 Button.AnchorLink.displayName = 'Button.AnchorLink'
 
 const commonPropTypes = {
-  /** The message to be displayed within the button */
+  /** The message to be displayed within the button. */
   message: PropTypes.message,
   /**
-   * A flag specifying whether the `danger` styling should applied to the button
+   * A flag specifying whether the `danger` styling should applied to the
+   * button.
    */
   danger: PropTypes.bool,
   /**
-   * A flag specifying whether the `warning` styling should applied to the button
+   * A flag specifying whether the `warning` styling should applied to the
+   * button.
    */
   warning: PropTypes.bool,
   /**
-   * A flag specifying whether the `secodnary` styling should applied to the button
+   * A flag specifying whether the `secodnary` styling should applied to the
+   * button.
    */
   secondary: PropTypes.bool,
   /**
-   * A flag specifying whether the `naked` styling should applied to the button
+   * A flag specifying whether the `naked` styling should applied to the
+   * button.
    */
   naked: PropTypes.bool,
   /**
-   * A flag specifying whether the `raw` styling should applied to the button
+   * A flag specifying whether the `raw` styling should applied to the button.
    */
   raw: PropTypes.bool,
   /**
-   * A flag specifying whether the `large` styling should applied to the button
+   * A flag specifying whether the `large` styling should applied to the button.
    */
   large: PropTypes.bool,
   /**
-   * A flag specifying whether the `error` styling should applied to the button
+   * A flag specifying whether the `error` styling should applied to the button.
    */
   error: PropTypes.bool,
-  /** The name of an icon to be displayed within the button*/
+  /** The name of an icon to be displayed within the button. */
   icon: PropTypes.string,
   /**
-   * A flag specifying whether the button in the `busy` state and the appropriate
-   * styling should be applied.
+   * A flag specifying whether the button in the `busy` state and the
+   * appropriate styling should be applied.
    */
   busy: PropTypes.bool,
   /**
@@ -177,22 +181,22 @@ const commonPropTypes = {
    * to the button element.
    */
   disabled: PropTypes.bool,
-  /** The html `name` prop passed to the <button /> element */
+  /** The html `name` prop passed to the <button /> element. */
   name: PropTypes.string,
-  /** The html `type` prop passed to the <button /> element */
+  /** The html `type` prop passed to the <button /> element. */
   type: PropTypes.string,
-  /** The html `value` prop passed to the <button /> element */
+  /** The html `value` prop passed to the <button /> element. */
   value: PropTypes.string,
-  /** The html `autofocus` prop passed to the <button /> element */
+  /** The html `autofocus` prop passed to the <button /> element. */
   autoFocus: PropTypes.bool,
-  /** A message to be evaluated and passed to the <button /> element */
+  /** A message to be evaluated and passed to the <button /> element. */
   title: PropTypes.message,
 }
 
 buttonChildren.propTypes = {
   /**
    * Possible children components of the button:
-   * Spinner, Icon, and/or Message
+   * Spinner, Icon, and/or Message.
    */
   busy: commonPropTypes.busy,
   icon: commonPropTypes.icon,

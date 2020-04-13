@@ -181,8 +181,8 @@ const NetworkServerForm = React.memo(props => {
     [initialValues],
   )
 
-  // Notify the user that the session keys might be there, but since there are no rights
-  // to read the keys we cannot display them.
+  // Notify the user that the session keys might be there, but since there are
+  // no rights to read the keys we cannot display them.
   const showResetNotification = !mayReadKeys && mayEditKeys && !Boolean(device.session)
 
   return (

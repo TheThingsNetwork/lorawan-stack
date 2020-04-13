@@ -23,20 +23,20 @@ import style from './tab.styl'
 @bind
 class Tab extends React.PureComponent {
   static propTypes = {
-    /** A flag specifying whether the tab is active */
+    /** A flag specifying whether the tab is active. */
     active: PropTypes.bool,
     children: PropTypes.node,
     className: PropTypes.string,
-    /** A flag specifying whether the tab is disabled */
+    /** A flag specifying whether the tab is disabled. */
     disabled: PropTypes.bool,
     exact: PropTypes.bool,
     link: PropTypes.string,
-    /** The name of the tab */
+    /** The name of the tab. */
     name: PropTypes.string.isRequired,
     narrow: PropTypes.bool,
     /**
-     * A click handler to be called when the selected tab changes. Passes
-     * the name of the new active tab as an argument.
+     * A click handler to be called when the selected tab changes. Passes the
+     * name of the new active tab as an argument.
      */
     onClick: PropTypes.func,
   }
@@ -81,8 +81,9 @@ class Tab extends React.PureComponent {
       [style.tabItemDisabled]: disabled,
     })
 
-    // There is no support for disabled on anchors in html and hence in `react-router`. So, do
-    // not render the link component if the tab is disabled, but render regular tab item instead.
+    // There is no support for disabled on anchors in html and hence in
+    // `react-router`. So, do not render the link component if the tab is
+    // disabled, but render regular tab item instead.
     const canRenderLink = link && !disabled
 
     const Component = canRenderLink ? NavLink : 'span'

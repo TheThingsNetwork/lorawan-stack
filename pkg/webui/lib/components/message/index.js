@@ -78,13 +78,13 @@ const Message = function({
 }
 
 Message.propTypes = {
-  /** Flag specifying whether the message should be capitalized */
+  /** Flag specifying whether the message should be capitalized. */
   capitalize: PropTypes.bool,
-  /** The className to be attached to the container */
+  /** The className to be attached to the container. */
   className: PropTypes.string,
   /**
-   * The wrapping element component can also be set explicitly
-   * (defaults to span). This can be useful to avoid unnecessary wrapping.
+   * The wrapping element component can also be set explicitly (defaults to
+   * span). This can be useful to avoid unnecessary wrapping.
    */
   component: PropTypes.node,
   /**
@@ -96,25 +96,25 @@ Message.propTypes = {
    */
   content: PropTypes.message.isRequired,
   /** Flag specifying whether the first letter of the message should be
-   * transformed to lowercase
+   * transformed to lowercase.
    */
   firstToLower: PropTypes.bool,
   /**
    * Flag specifying whether the first letter of the message should be
-   * transformed to uppercase
+   * transformed to uppercase.
    */
   firstToUpper: PropTypes.bool,
   /**
    * Flag specifying whether the the message should be transformed to
-   * lowercase
+   * lowercase.
    */
   lowercase: PropTypes.bool,
   /**
    * Flag specifying whether the the message should be transformed to
-   * uppercase
+   * uppercase.
    */
   uppercase: PropTypes.bool,
-  /** Values can also be given as a separate property (will have precedence) */
+  /** Values can also be given as a separate property (will have precedence). */
   values: PropTypes.shape({}),
 }
 

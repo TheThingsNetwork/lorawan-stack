@@ -33,7 +33,7 @@ const Section = function({ className, component: Component, children, ...rest })
 Section.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
-  /** The html name of the section component */
+  /** The HTML name of the section component. */
   component: PropTypes.oneOf(['thead', 'tbody', 'tfoot']).isRequired,
 }
 

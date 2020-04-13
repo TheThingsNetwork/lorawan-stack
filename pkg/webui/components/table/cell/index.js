@@ -46,17 +46,17 @@ const Cell = function({
 }
 
 Cell.propTypes = {
-  /** A flag indicating whether the data in the cell should be centered */
+  /** A flag indicating whether the data in the cell should be centered. */
   centered: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
-  /** The number of columns that the cell should occupy */
+  /** The number of columns that the cell should occupy. */
   colSpan: PropTypes.number,
-  /** The html name of the wrapping component */
+  /** The html name of the wrapping component. */
   component: PropTypes.string.isRequired,
-  /** A flag indicating whether the row take less height */
+  /** A flag indicating whether the row take less height. */
   small: PropTypes.bool,
-  /** The width of the cell in percentages */
+  /** The width of the cell in percentages. */
   width: PropTypes.number,
 }
 
@@ -79,7 +79,7 @@ const HeadCell = ({ className, content, children, ...rest }) => (
 HeadCell.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
-  /** The title of the head cell */
+  /** The title of the head cell. */
   content: PropTypes.message,
 }
 

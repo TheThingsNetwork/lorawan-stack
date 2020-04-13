@@ -65,7 +65,7 @@ PropTypes.link = PropTypes.shape({
   hidden: PropTypes.bool,
 })
 
-// Entities and entity-related prop-types
+// Entities and entity-related prop-types.
 
 PropTypes.event = PropTypes.shape({
   name: PropTypes.string.isRequired,

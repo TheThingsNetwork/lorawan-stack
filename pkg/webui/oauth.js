@@ -28,7 +28,7 @@ import createStore from './oauth/store'
 const appRoot = selectApplicationRootPath()
 const history = createBrowserHistory({ basename: `${appRoot}/` })
 const store = createStore(history)
-// Initialize sentry before rendering root element
+// Initialize sentry before rendering root element.
 if (env.sentryDsn) Sentry.init({ dsn: env.sentryDsn })
 const rootElement = document.getElementById('app')
 

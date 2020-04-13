@@ -77,24 +77,24 @@ const DataSheet = function({ className, data }) {
 
 DataSheet.propTypes = {
   className: PropTypes.string,
-  /** A list of entries for the sheet */
+  /** A list of entries for the sheet. */
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      /** The title of the item group */
+      /** The title of the item group. */
       header: PropTypes.message.isRequired,
-      /** A list of items for the group */
+      /** A list of items for the group. */
       items: PropTypes.arrayOf(
         PropTypes.shape({
-          /** The key of the item */
+          /** The key of the item. */
           key: PropTypes.message,
-          /** The value of the item */
+          /** The value of the item. */
           value: PropTypes.message,
-          /** The type of the item, 'code', 'byte' or 'text' (default) */
+          /** The type of the item, 'code', 'byte' or 'text' (default). */
           type: PropTypes.string,
-          /** Whether this 'code' or 'byte' item should be hidden by default */
+          /** Whether this 'code' or 'byte' item should be hidden by default. */
           sensitive: PropTypes.bool,
           /** Optional subitems of this item (same shape as item, but no deeper
-           * hierarchies) */
+           * hierarchies). */
           subItems: PropTypes.arrayOf(PropTypes.object),
         }),
       ),
@@ -137,16 +137,16 @@ const DataSheetRow = function({ item, sub }) {
 
 DataSheetRow.propTypes = {
   item: PropTypes.shape({
-    /** The key of the item */
+    /** The key of the item. */
     key: PropTypes.message,
-    /** The value of the item */
+    /** The value of the item. */
     value: PropTypes.message,
-    /** The type of the item, 'code', 'byte' or 'text' (default) */
+    /** The type of the item, 'code', 'byte' or 'text' (default). */
     type: PropTypes.string,
-    /** Whether this 'code' or 'byte' item should be hidden by default */
+    /** Whether this 'code' or 'byte' item should be hidden by default. */
     sensitive: PropTypes.bool,
     /** Optional subitems of this item (same shape as item, but no deeper
-     * hierarchies) */
+     * hierarchies). */
     subItems: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
   sub: PropTypes.bool,

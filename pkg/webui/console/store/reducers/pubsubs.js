@@ -67,15 +67,18 @@ const pubsubs = function(state = defaultState, { type, payload }) {
             state.entities[pubsubId],
             payload,
             (_, __, key, object, source) => {
-              // Handle switching between nats and pubsub. We do not want keep both entries, since
-              // there can be only one provider of a pubsub integration.
+              // Handle switching between nats and pubsub. We do not want keep
+              // both entries, since  there can be only one provider of a pubsub
+              // integration.
 
-              // If the payload has the `mqtt` field, then remove the `nats` field from the stored object.
+              // If the payload has the `mqtt` field, then remove the `nats`
+              // field from the stored object.
               if (source === payload && key === 'mqtt' && object.nats) {
                 delete object.nats
               }
 
-              // If the payload has the `nats` field, then remove the `mqtt` field from the stored object.
+              // If the payload has the `nats` field, then remove the `mqtt`
+              // field from the stored object.
               if (source === payload && key === 'nats' && object.mqtt) {
                 delete object.mqtt
               }

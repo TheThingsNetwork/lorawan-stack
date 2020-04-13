@@ -29,9 +29,10 @@ export default class MapWidget extends React.Component {
   static propTypes = {
     // Id is a string used to give the map a unique ID.
     id: PropTypes.string.isRequired,
-    // Markers is an array of objects containing a specific properties
+    // Markers is an array of objects containing a specific properties.
     markers: PropTypes.arrayOf(
-      // Position is a object containing two properties latitude and longitude which are both numbers.
+      // Position is a object containing two properties latitude and longitude
+      // which are both numbers.
       PropTypes.shape({
         position: PropTypes.objectOf(PropTypes.number),
       }),

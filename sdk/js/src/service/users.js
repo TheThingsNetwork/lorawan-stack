@@ -21,7 +21,7 @@ class Users {
 
   _addState(fieldMask, user) {
     // Ensure to set STATE_REQUESTED if needed, which gets stripped as null
-    // value from the backend response
+    // value from the backend response.
     if (fieldMask && fieldMask.field_mask.paths.includes('state') && !('state' in user)) {
       user.state = 'STATE_REQUESTED'
     }

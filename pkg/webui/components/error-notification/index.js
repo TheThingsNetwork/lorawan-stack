@@ -24,7 +24,7 @@ const ErrorNotification = function({ content, ...rest }) {
   const message = toMessageProps(content)
   let details = undefined
 
-  error(content) // Log the error if in development mode
+  error(content) // Log the error if in development mode.
 
   if (isBackend(content)) {
     details = content

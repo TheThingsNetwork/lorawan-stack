@@ -55,8 +55,9 @@ const handleEventUpdate = (state, event) => {
 const defaultState = { lastSeen: undefined }
 
 /**
- * The `gatewayStatus` reducer contains connection status information of the current gateway.
- * The connection status is deducted from gateway stats and gateway status events.
+ * The `gatewayStatus` reducer contains connection status information of the
+ * current gateway. The connection status is deducted from gateway stats and
+ * gateway status events.
  */
 const gatewayStatus = handleActions(
   {

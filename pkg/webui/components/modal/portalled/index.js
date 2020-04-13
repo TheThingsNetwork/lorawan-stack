@@ -24,7 +24,7 @@ import Modal from '..'
  * top of the DOM hierarchy, regardless of its position in the component
  * hierarchy.
  *
- * @returns {Object} - The modal rendered into a portal.
+ * @returns {object} - The modal rendered into a portal.
  */
 const PortalledModal = function({ dispatch, modal, visible, ...rest }) {
   if (!modal) {

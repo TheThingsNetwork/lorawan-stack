@@ -33,13 +33,13 @@ globals:
 
 parserOptions:
   ecmaFeatures:
-    # Remove after migration
+    # Remove after migration.
     legacyDecorators: true
 
 rules:
   prettier/prettier: error
 
-  # Enforce import order
+  # Enforce import order.
   import/order:
     - warn
     - groups:
@@ -102,7 +102,7 @@ rules:
         group: sibling
         position: after
 
-  # Prevent superfluous path traversions in import statements
+  # Prevent superfluous path traversions in import statements.
   import/no-useless-path-segments:
     - error
     - noUselessIndex: true
@@ -119,19 +119,19 @@ rules:
   # Change to `error` after https://github.com/TheThingsNetwork/lorawan-stack/issues/1086
   # is resolved.
 
-  # Prevent extraneous defaultProps on components
+  # Prevent extraneous defaultProps on components.
   react/default-props-match-prop-types: warn
-  # Enforce a defaultProps definition for every prop that is not a required prop
+  # Enforce a defaultProps definition for every prop that is not a required prop.
   react/require-default-props: warn
-  # Prevent definitions of unused prop types
+  # Prevent definitions of unused prop types.
   react/no-unused-prop-types: warn
-  # Prevent missing props validation in a React component definition
+  # Prevent missing props validation in a React component definition.
   react/prop-types: warn
-  # Enforce propTypes declarations alphabetical sorting
+  # Enforce propTypes declarations alphabetical sorting.
   react/sort-prop-types: warn
-  # Prevent undefined components
+  # Prevent undefined components.
   react/jsx-no-undef: warn
-  # Prevent vague prop types
+  # Prevent vague prop types.
   react/forbid-prop-types:
     - warn
     - forbid:

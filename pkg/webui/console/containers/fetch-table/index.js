@@ -228,7 +228,7 @@ class FetchTable extends Component {
 
     let itemIndex = index
     if (handlesPagination) {
-      const pageNr = page - 1 // switch to 0-based pagination
+      const pageNr = page - 1 // Switch to 0-based pagination.
       itemIndex += pageSize * pageNr
     }
 
@@ -265,7 +265,7 @@ class FetchTable extends Component {
     const { page, query, tab, order } = this.state
     let orderDirection, orderBy
 
-    // Parse order string
+    // Parse order string.
     if (typeof order === 'string') {
       orderDirection = typeof order === 'string' && order[0] === '-' ? 'desc' : 'asc'
       orderBy = typeof order === 'string' && order[0] === '-' ? order.substr(1) : order

@@ -97,8 +97,8 @@ class DeviceDataForm extends Component {
     const jsConfig = selectJsConfig()
     const { setValues, state } = this.formRef.current
 
-    // Reset Join Server related entries if the device is provisined by
-    // an external JS.
+    // Reset Join Server related entries if the device is provisined by an
+    // external JS.
     if (external_js) {
       setValues({
         ...state.values,
@@ -113,7 +113,8 @@ class DeviceDataForm extends Component {
     } else {
       let join_server_address = state.join_server_address
 
-      // Reset `join_server_address` if is present after disabling external JS provisioning.
+      // Reset `join_server_address` if is present after disabling external JS
+      // provisioning.
       if (jsConfig.enabled && !Boolean(join_server_address)) {
         join_server_address = new URL(jsConfig.base_url).hostname
       }

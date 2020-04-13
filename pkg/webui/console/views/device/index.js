@@ -169,7 +169,7 @@ export default class Device extends React.Component {
 
     const basePath = `/applications/${appId}/devices/${devId}`
 
-    // Prevent default redirect to uplink when tab is already open
+    // Prevent default redirect to uplink when tab is already open.
     const payloadFormattersLink = pathname.startsWith(`${basePath}/payload-formatters`)
       ? pathname
       : `${basePath}/payload-formatters`

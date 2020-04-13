@@ -41,7 +41,8 @@ class Gateways {
   }
 
   _emitDefaults(paths, gateway) {
-    // Handle zero coordinates that are swallowed by the grpc-gateway for gateway antennas.
+    // Handle zero coordinates that are swallowed by the grpc-gateway for
+    // gateway antennas.
     if (paths.includes('antennas') && Boolean(gateway.antennas)) {
       const { antennas } = gateway
 
@@ -61,7 +62,7 @@ class Gateways {
     return gateway
   }
 
-  // Retrieval
+  // Retrieval.
 
   async getAll(params, selector) {
     const response = await this._api.GatewayRegistry.List(undefined, {
@@ -93,7 +94,7 @@ class Gateways {
     return Marshaler.unwrapGateways(response)
   }
 
-  // Update
+  // Update.
 
   async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
     const response = await this._api.GatewayRegistry.Update(
@@ -109,7 +110,7 @@ class Gateways {
     return this._emitDefaults(mask, Marshaler.unwrapGateway(response))
   }
 
-  // Create
+  // Creation.
 
   async create(ownerId = this._defaultUserId, gateway, isUserOwner = true) {
     const routeParams = isUserOwner
@@ -125,7 +126,7 @@ class Gateways {
     return Marshaler.unwrapGateway(response)
   }
 
-  // Delete
+  // Deletion.
 
   async deleteById(id) {
     const response = await this._api.GatewayRegistry.Delete({
@@ -134,6 +135,8 @@ class Gateways {
 
     return Marshaler.payloadSingleResponse(response)
   }
+
+  // Miscellaneous.
 
   async getStatisticsById(id) {
     const response = await this._api.Gs.GetGatewayConnectionStats({

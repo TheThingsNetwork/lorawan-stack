@@ -66,23 +66,23 @@ const hasLocationSet = location =>
 
 class LocationForm extends Component {
   static propTypes = {
-    /** Flag specifying whether the delete location button can be enabled */
+    /** Flag specifying whether the delete location button can be enabled. */
     allowDelete: PropTypes.bool,
-    /** Additional fields to be passed as children */
+    /** Additional fields to be passed as children. */
     children: PropTypes.node,
     entityId: PropTypes.string.isRequired,
-    /** The title message shown at the top of the form */
+    /** The title message shown at the top of the form. */
     formTitle: PropTypes.message.isRequired,
-    /** The initial values of the form */
+    /** The initial values of the form. */
     initialValues: PropTypes.shape({
       latitude: PropTypes.number,
       longitude: PropTypes.number,
       altitude: PropTypes.number,
     }),
     locationFieldsDisabled: PropTypes.bool,
-    /** The handler for the delete function of the form */
+    /** The handler for the delete function of the form. */
     onDelete: PropTypes.func.isRequired,
-    /** The handler for the submit function of the form */
+    /** The handler for the submit function of the form. */
     onSubmit: PropTypes.func.isRequired,
     validationSchema: PropTypes.shape({
       cast: PropTypes.func.isRequired,

@@ -56,7 +56,7 @@ export default class FileInput extends Component {
     disabled: false,
     message: m.selectAFile,
     dataTransform,
-    maxSize: 10 * 1024 * 1024, // 10 MB
+    maxSize: 10 * 1024 * 1024, // Equals 10 MB.
     providedMessage: m.fileProvided,
     value: undefined,
   }

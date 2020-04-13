@@ -45,9 +45,10 @@ const validationSchema = Yup.object()
               const schema = Yup.string().length(4 * 2, m.validate8) // 4 Byte hex
 
               if (mayReadKeys && mayEditKeys) {
-                // Force the field to be required only if the user can see and edit the `dev_addr`,
-                // otherwise the user is not able to edit any other fields in the NS form without
-                // resetting the `dev_addr`.
+                // Force the field to be required only if the user can see and
+                // edit the `dev_addr`, otherwise the user is not able to edit
+                // any other fields in the NS form without resetting the
+                // `dev_addr`.
                 return schema.required(sharedMessages.validateRequired)
               }
 
@@ -57,21 +58,21 @@ const validationSchema = Yup.object()
               f_nwk_s_int_key: Yup.lazy(value =>
                 Boolean(value) && Boolean(value.key)
                   ? Yup.object().shape({
-                      key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+                      key: Yup.string().length(16 * 2, m.validate32), // A 16 Byte hex.
                     })
                   : Yup.object().strip(),
               ),
               s_nwk_s_int_key: Yup.lazy(value =>
                 isNewVersion && Boolean(value) && Boolean(value.key)
                   ? Yup.object().shape({
-                      key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+                      key: Yup.string().length(16 * 2, m.validate32), // A 16 Byte hex.
                     })
                   : Yup.object().strip(),
               ),
               nwk_s_enc_key: Yup.lazy(value =>
                 isNewVersion && Boolean(value) && Boolean(value.key)
                   ? Yup.object().shape({
-                      key: Yup.string().length(16 * 2, m.validate32), // 16 Byte hex
+                      key: Yup.string().length(16 * 2, m.validate32), // A 16 Byte hex.
                     })
                   : Yup.object().strip(),
               ),

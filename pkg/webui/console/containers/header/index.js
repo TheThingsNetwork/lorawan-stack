@@ -56,19 +56,19 @@ import { selectUser } from '@console/store/selectors/user'
 @bind
 class Header extends Component {
   static propTypes = {
-    /** A handler for when the user clicks the logout button */
+    /** A handler for when the user clicks the logout button. */
     handleLogout: PropTypes.func.isRequired,
-    /** A handler for when the user used the search input */
+    /** A handler for when the user used the search input. */
     handleSearchRequest: PropTypes.func,
     mayManageUsers: PropTypes.bool,
     mayViewApplications: PropTypes.bool,
     mayViewGateways: PropTypes.bool,
     mayViewOrganizations: PropTypes.bool,
-    /** A flag identifying whether the header should display the search input */
+    /** A flag identifying whether the header should display the search input. */
     searchable: PropTypes.bool,
     /**
      * The User object, retrieved from the API. If it is `undefined`, then the
-     * guest header is rendered
+     * guest header is rendered.
      */
     user: PropTypes.user,
   }

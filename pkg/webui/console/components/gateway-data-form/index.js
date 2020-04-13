@@ -96,10 +96,10 @@ const validationSchema = Yup.object().shape({
 
 class GatewayDataForm extends React.Component {
   static propTypes = {
-    /** SubmitBar contents */
+    /** The SubmitBar content. */
     children: PropTypes.node.isRequired,
     error: PropTypes.error,
-    /** React reference to be passed to the form */
+    /** React reference to be passed to the form. */
     formRef: PropTypes.shape({}),
     initialValues: PropTypes.gateway,
     onSubmit: PropTypes.func.isRequired,

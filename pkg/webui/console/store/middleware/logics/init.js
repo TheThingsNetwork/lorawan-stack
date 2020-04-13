@@ -32,7 +32,7 @@ const m = defineMessages({
 })
 
 // Define a minimum set of rights, without which it makes no sense to use the
-// console
+// console.
 const minimumRights = ['RIGHT_APPLICATION', 'RIGHT_GATEWAY', 'RIGHT_ORGANIZATION']
 
 const consoleAppLogic = createRequestLogic({
@@ -43,9 +43,9 @@ const consoleAppLogic = createRequestLogic({
     let info, rights
 
     try {
-      // there is no way to retrieve the current user directly
-      // within the console app, so first get the authentication info
-      // and only afterwards fetch the user
+      // There is no way to retrieve the current user directly within the
+      // console app, so first get the authentication info and only afterwards
+      // fetch the user.
       info = await api.users.authInfo()
       rights = info.oauth_access_token.rights
       dispatch(user.getUserRightsSuccess(rights))
@@ -67,9 +67,9 @@ const consoleAppLogic = createRequestLogic({
         dispatch(user.getUserMeSuccess(userResult))
 
         // Check whether the user account has sufficient rights to use the
-        // console
+        // console.
         if (!info.is_admin && !rights.some(r => minimumRights.some(mr => r.startsWith(mr)))) {
-          // Provide relevant error messages if possible
+          // Provide relevant error messages if possible.
           if (userResult.state === 'STATE_REQUESTED') {
             throw m.errStateRequested
           } else if (userResult.state === 'STATE_REJECTED') {

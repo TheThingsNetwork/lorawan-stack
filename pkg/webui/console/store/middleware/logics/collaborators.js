@@ -23,7 +23,7 @@ const validParentTypes = ['application', 'gateway', 'organization']
 const parentTypeValidator = function({ action }, allow) {
   if (!validParentTypes.includes(action.payload.parentType)) {
     // Do not reject the action but throw an error, as this is an implementation
-    // error
+    // error.
     throw new Error(`Invalid parent entity type ${action.payload.parentType}`)
   }
   allow(action)

@@ -18,6 +18,7 @@ const CHAR_BYTES = 4
 
 /**
  * Computes the join EUI prefix given `joinEUI` and its `length`.
+ *
  * @param {string} joinEUI - The join EUI.
  * @param {number} length - The length of the prefix.
  * @returns {Array} - A list of join EUI prefixes.

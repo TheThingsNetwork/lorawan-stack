@@ -37,7 +37,7 @@ const validationSchema = Yup.object().shape({
   session: Yup.object().shape({
     keys: Yup.object().shape({
       app_s_key: Yup.object().shape({
-        key: Yup.string().emptyOrLength(16 * 2, m.validate32), // 16 Byte hex
+        key: Yup.string().emptyOrLength(16 * 2, m.validate32), // A 16 Byte hex.
       }),
     }),
   }),
@@ -85,8 +85,8 @@ const ApplicationServerForm = React.memo(props => {
     [initialValues, onSubmit, onSubmitSuccess],
   )
 
-  // Notify the user that the session keys might be there, but since there are no rights
-  // to read the keys we cannot display them.
+  // Notify the user that the session keys might be there, but since there are
+  // no rights to read the keys we cannot display them.
   const showResetNotification = !mayReadKeys && mayEditKeys && !Boolean(device.session)
 
   return (

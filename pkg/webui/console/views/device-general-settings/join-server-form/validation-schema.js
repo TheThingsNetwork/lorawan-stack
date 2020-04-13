@@ -23,7 +23,7 @@ import { parseLorawanMacVersion } from '../utils'
 const validationSchema = Yup.object()
   .shape({
     net_id: Yup.nullableString()
-      .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
+      .emptyOrLength(3 * 2, m.validate6) // A 3 Byte hex.
       .default(''),
     root_keys: Yup.object().when(
       ['_external_js', '_lorawan_version', '_may_edit_keys', '_may_read_keys'],
@@ -32,7 +32,7 @@ const validationSchema = Yup.object()
         const keySchema = Yup.lazy(value => {
           return !externalJs && Boolean(value) && Boolean(value.key)
             ? Yup.object().shape({
-                key: Yup.string().emptyOrLength(16 * 2, m.validate32), // 16 Byte hex
+                key: Yup.string().emptyOrLength(16 * 2, m.validate32), // A 16 Byte hex.
               })
             : Yup.object().strip()
         })

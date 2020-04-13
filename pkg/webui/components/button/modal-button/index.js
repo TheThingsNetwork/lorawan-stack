@@ -24,7 +24,7 @@ import Button from '..'
 /**
  * ModalButton is a button which needs a modal confirmation to complete the
  * action. It can be used as an easy way to get the users explicit confirmation
- * before doing an action, e.g. deleting a resource.
+ * before doing an action, e.g. Deleting a resource.
  */
 @bind
 class ModalButton extends React.Component {

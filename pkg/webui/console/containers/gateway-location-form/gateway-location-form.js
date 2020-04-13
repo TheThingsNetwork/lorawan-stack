@@ -99,14 +99,14 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
       if (!values.update_location_from_status) {
         const registryLocation = getRegistryLocation(gateway.antennas)
         if (registryLocation) {
-          // Update old location value
+          // Update old location value.
           patch.antennas = [...gateway.antennas]
           patch.antennas[registryLocation.key].location = {
             ...registryLocation.antenna.location,
             ...values,
           }
         } else {
-          // Create new location value
+          // Create new location value.
           patch.antennas = [
             {
               gain: 0,

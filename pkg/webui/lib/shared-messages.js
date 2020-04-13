@@ -15,7 +15,7 @@
 import { defineMessages } from 'react-intl'
 
 export default defineMessages({
-  // Keep these sorted alphabetically
+  // Keep these sorted alphabetically.
   add: 'Add',
   addApiKey: 'Add API Key',
   addApplication: 'Add Application',

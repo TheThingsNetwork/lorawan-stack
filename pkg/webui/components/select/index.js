@@ -99,7 +99,7 @@ class Select extends React.PureComponent {
     const { onBlur, name } = this.props
 
     // https://github.com/JedWatson/react-select/issues/3523
-    // make sure the input name is always present in the event object
+    // Make sure the input name is always present in the event object.
     event.target.name = name
 
     if (typeof value !== 'undefined') {

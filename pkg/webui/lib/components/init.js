@@ -29,8 +29,7 @@ const m = defineMessages({
   initializing: 'Initializing…',
 })
 
-// React grid configuration
-// Keep these in line with styles/variables.less
+// React grid configuration. Keep these in line with `styles/variables.less`.
 setConfiguration({
   breakpoints: [480, 768, 1080, 1280],
   containerWidths: [768, 1000, 1140, 1140],

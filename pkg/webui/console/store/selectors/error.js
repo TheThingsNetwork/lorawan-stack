@@ -29,7 +29,7 @@ const getErrorStoreEntrySelector = (state, baseActionType) =>
  *
  * Creates the error selector for a set of base action types.
  * @param {Array} actions - A list of base action types or a single base action type.
- * @returns {Object} The error object matching one of the base action types.
+ * @returns {object} The error object matching one of the base action types.
  */
 export const createErrorSelector = actions =>
   function(state) {

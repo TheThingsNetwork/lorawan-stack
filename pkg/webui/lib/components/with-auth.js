@@ -21,10 +21,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import { withEnv } from './env'
 
 /**
- * Auth is a component that wraps a tree that requires the user
- * to be authenticated.
- *
- * If no user is authenticated, it renders the login view.
+ * Auth is a component that wraps a tree that requires the user to be
+ * authenticated. If no user is authenticated, it renders the login view.
  */
 @withEnv
 @withRouter

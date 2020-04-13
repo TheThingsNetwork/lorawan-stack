@@ -35,26 +35,24 @@ import validationSchema from './validation-schema'
 @bind
 class CreateForm extends React.Component {
   static propTypes = {
-    /**
-     * Called on form submission.
-     * Receives the key object as an argument.
-     */
+    /** Called on form submission. Receives the key object as an argument. */
     onCreate: PropTypes.func.isRequired,
     /**
-     * Called after unsuccessful creation of the API key.
-     * Receives the error object as an argument.
+     * Called after unsuccessful creation of the API key. Receives the error
+     * object as an argument.
      */
     onCreateFailure: PropTypes.func,
     /**
-     * Called after successful creation of the API key.
-     * Receives the key object as an argument.
+     * Called after successful creation of the API key. Receives the key object
+     * as an argument.
      */
     onCreateSuccess: PropTypes.func.isRequired,
     /**
-     * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL'
+     * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL',
+     * 'RIGHT_ALL'.
      */
     pseudoRights: PropTypes.rights,
-    /** The list of rights */
+    /** The list of rights. */
     rights: PropTypes.rights,
   }
 

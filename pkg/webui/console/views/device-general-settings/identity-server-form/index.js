@@ -120,7 +120,8 @@ const IdentityServerForm = React.memo(props => {
   const hasJoinEUI = Boolean(device.ids.join_eui)
   const hasDevEUI = Boolean(device.ids.dev_eui)
 
-  // We do not want to show the external JS option if the user is on JS only deployment.
+  // We do not want to show the external JS option if the user is on JS only
+  // deployment.
   // See https://github.com/TheThingsNetwork/lorawan-stack/issues/2119#issuecomment-597736420
   const hideExternalJs = !isOTAA || (jsEnabled && !asEnabled && !nsEnabled)
 

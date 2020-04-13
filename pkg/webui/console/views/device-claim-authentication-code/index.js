@@ -102,7 +102,7 @@ const DeviceClaimAuthenticationCode = props => {
     async (values, { resetForm, setSubmitting }) => {
       setError('')
 
-      // Convert any false value to undefined
+      // Convert any false value to undefined.
       for (const [key, value] of Object.entries(values.claim_authentication_code)) {
         values.claim_authentication_code[key] = value ? value : undefined
       }

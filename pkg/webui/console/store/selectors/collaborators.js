@@ -26,7 +26,7 @@ import {
 
 const ENTITY = 'collaborators'
 
-// Collaborator
+// Collaborator.
 export const selectCollaboratorsStore = state => state.collaborators || {}
 export const selectCollaboratorsEntitiesStore = state => selectCollaboratorsStore(state).entities
 export const selectCollaboratorById = (state, id) => selectCollaboratorsEntitiesStore(state)[id]
@@ -51,7 +51,7 @@ export const selectOrganizationCollaborator = function(state) {
   }
 }
 
-// Collaborators
+// Collaborators.
 const createSelectCollaboratorsIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
 const createSelectCollaboratorsTotalCountSelector = createPaginationTotalCountSelectorByEntity(
   ENTITY,

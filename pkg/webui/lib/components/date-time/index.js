@@ -68,19 +68,19 @@ class DateTime extends React.PureComponent {
 DateTime.Relative = RelativeTime
 
 DateTime.propTypes = {
-  /** The time to be displayed */
+  /** The time to be displayed. */
   date: PropTypes.bool,
-  // see https://github.com/yahoo/react-intl/wiki/Components#date-formatting-components
+  // See https://github.com/yahoo/react-intl/wiki/Components#date-formatting-components
   dateFormat: PropTypes.string,
   dateFormatOptions: PropTypes.object,
   time: PropTypes.bool,
   timeFormat: PropTypes.string,
-  /** Whether to show the date */
+  /** Whether to show the date. */
   timeFormatOptions: PropTypes.object,
-  /** Whether to show the time */
+  /** Whether to show the time. */
   value: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.number, // support timestamps
+    PropTypes.number, // Support timestamps.
     PropTypes.instanceOf(Date),
   ]).isRequired,
 }

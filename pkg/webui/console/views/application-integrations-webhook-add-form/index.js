@@ -120,7 +120,7 @@ export default class ApplicationWebhookAddForm extends Component {
       }
     }
 
-    // Render Not Found error, when the template was not found
+    // Render Not Found error when the template was not found.
     if (!isCustom && templateId && !webhookTemplate) {
       return <NotFoundRoute />
     }

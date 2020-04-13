@@ -45,43 +45,44 @@ const m = defineMessages({
 @bind
 class EditForm extends React.Component {
   static propTypes = {
-    /** The API key to be edited */
+    /** The API key to be edited. */
     apiKey: PropTypes.apiKey,
     /**
-     * Called on key deletion.
-     * Receives the identifier of the API key as an argument.
+     * Called on key deletion. Receives the identifier of the API key as an
+     * argument.
      */
     onDelete: PropTypes.func.isRequired,
     /**
-     * Called after unsuccessful deletion of the API key.
-     * Receives the error object as an argument.
+     * Called after unsuccessful deletion of the API key. Receives the error
+     * object as an argument.
      */
     onDeleteFailure: PropTypes.func,
     /**
-     * Called after successful deletion of the API key.
-     * Receives the identifier of the API key as an argument.
+     * Called after successful deletion of the API key. Receives the identifier
+     * of the API key as an argument.
      */
     onDeleteSuccess: PropTypes.func.isRequired,
     /**
-     * Called on form submission.
-     * Receives the updated key object as an argument.
+     * Called on form submission. Receives the updated key object as an
+     * argument.
      */
     onEdit: PropTypes.func.isRequired,
     /**
-     * Called after unsuccessful update of the API key.
-     * Receives the error object as an argument.
+     * Called after unsuccessful update of the API key. Receives the error
+     * object as an argument.
      */
     onEditFailure: PropTypes.func,
     /**
-     * Called after successful update of the API key.
-     * Receives the key object as an argument.
+     * Called after successful update of the API key. Receives the key object as
+     * an argument.
      */
     onEditSuccess: PropTypes.func,
     /**
-     * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL', 'RIGHT_ALL'
+     * The rights that imply all other rights, e.g. 'RIGHT_APPLICATION_ALL',
+     * 'RIGHT_ALL'.
      */
     pseudoRights: PropTypes.arrayOf(PropTypes.string),
-    /** The list of rights */
+    /** The list of rights. */
     rights: PropTypes.arrayOf(PropTypes.string),
   }
 

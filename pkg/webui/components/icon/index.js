@@ -68,15 +68,15 @@ const Icon = function({ icon, className, nudgeUp, nudgeDown, small, large, ...re
 
 Icon.propTypes = {
   className: PropTypes.string,
-  /** Which icon to display, using google material icon set */
+  /** Which icon to display, using google material icon set. */
   icon: PropTypes.string.isRequired,
-  /** Renders a bigger icon */
+  /** Renders a bigger icon. */
   large: PropTypes.bool,
-  /** Nudges the icon down by one pixel using position: relative */
+  /** Nudges the icon down by one pixel using position: relative. */
   nudgeDown: PropTypes.bool,
-  /** Nudges the icon up by one pixel using position: relative */
+  /** Nudges the icon up by one pixel using position: relative. */
   nudgeUp: PropTypes.bool,
-  /** Renders a smaller icon */
+  /** Renders a smaller icon. */
   small: PropTypes.bool,
 }
 

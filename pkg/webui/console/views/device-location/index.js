@@ -88,13 +88,13 @@ export default class DeviceGeneralSettings extends React.Component {
 
     const registryLocation = getRegistryLocation(device.locations)
     if (registryLocation) {
-      // Update old location value
+      // Update old location value.
       patch.locations[registryLocation.key] = {
         ...registryLocation.location,
         ...values,
       }
     } else {
-      // Create new location value
+      // Create new location value.
       patch.locations.user = {
         ...values,
         accuracy: 0,

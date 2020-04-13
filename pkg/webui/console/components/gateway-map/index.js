@@ -20,7 +20,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 export default class GatewayMap extends React.Component {
   static propTypes = {
-    // Gateway is an object.
     gateway: PropTypes.gateway.isRequired,
   }
 

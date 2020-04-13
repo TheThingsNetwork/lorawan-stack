@@ -86,12 +86,12 @@ export default class ProfileDropdown extends React.PureComponent {
 
 ProfileDropdown.propTypes = {
   /**
-   * A list of items for the dropdown component
-   * See `<Dropdown />`'s `items` proptypes for details
+   * A list of items for the dropdown component. See `<Dropdown />`'s `items`
+   * proptypes for details.
    */
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
-  /** The id of the current user */
+  /** The id of the current user. */
   userId: PropTypes.string.isRequired,
 }
 

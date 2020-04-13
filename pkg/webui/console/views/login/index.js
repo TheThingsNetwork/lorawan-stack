@@ -75,7 +75,7 @@ export default class Login extends React.PureComponent {
       )
     ) : null
 
-    // dont show the login page if the user is already logged in
+    // Dont show the login page if the user is already logged in.
     if (Boolean(user)) {
       return <Redirect to="/" />
     }

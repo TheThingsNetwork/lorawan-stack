@@ -18,7 +18,7 @@
 import traverse from 'traverse'
 import queryString from 'query-string'
 
-/** Class used to marshal data shapes. Currently a stub. */
+/** Class used to marshal data shapes. */
 class Marshaler {
   static options(options) {
     if (Object.keys(options).length === 0) {
@@ -151,9 +151,11 @@ class Marshaler {
     return paths
   }
 
-  /** This function will convert a paths object to a proper field mask.
-   * @param {Object} paths - The raw field mask as array and/or string.
-   * @returns {Object} The field mask object ready to be attached to a request.
+  /**
+   * This function will convert a paths object to a proper field mask.
+   *
+   * @param {object} paths - The raw field mask as array and/or string.
+   * @returns {object} The field mask object ready to be attached to a request.
    */
   static pathsToFieldMask(paths) {
     if (!paths) {
@@ -162,10 +164,12 @@ class Marshaler {
     return { field_mask: { paths: paths.map(e => e.join('.')) } }
   }
 
-  /** This function will convert a selector parameter and convert it to a
+  /**
+   * This function will convert a selector parameter and convert it to a
    * streamlined array of paths.
-   * @param {Object} selector - The raw selector passed by the user
-   * @returns {Object} The field mask object ready to be attached to a request.
+   *
+   * @param {object} selector - The raw selector passed by the user.
+   * @returns {object} The field mask object ready to be attached to a request.
    */
   static selectorToPaths(selector) {
     if (typeof selector === 'string') {
@@ -177,10 +181,12 @@ class Marshaler {
     return selector
   }
 
-  /** This function will convert a selector parameter and convert it to a
+  /**
+   * This function will convert a selector parameter and convert it to a
    * proper field mask object, ready to be passed to the API.
-   * @param {Object} selector - The raw selector passed by the user
-   * @returns {Object} The field mask object ready to be attached to a request.
+   *
+   * @param {object} selector - The raw selector passed by the user.
+   * @returns {object} The field mask object ready to be attached to a request.
    */
   static selectorToFieldMask(selector) {
     return this.pathsToFieldMask(this.selectorToPaths(selector))

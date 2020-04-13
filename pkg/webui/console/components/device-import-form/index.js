@@ -111,8 +111,8 @@ export default class DeviceBulkCreateForm extends Component {
         if (state.values.set_claim_auth_code) {
           const { setFieldValue } = this.formRef.current
 
-          // `claim_authentication_code` is stored in JS, so if JS option is not selected
-          // we dont want to include it in the paylaod
+          // `claim_authentication_code` is stored in JS, so if the JS option is
+          // not selected we dont want to include it in the payload.
           setFieldValue('set_claim_auth_code', false)
         }
       })

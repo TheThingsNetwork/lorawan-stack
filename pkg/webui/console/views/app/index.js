@@ -86,7 +86,7 @@ class ConsoleApp extends React.Component {
                 <div className={style.content}>
                   <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                   <Switch>
-                    {/* routes for registration, privacy policy, other public pages */}
+                    {/* Routes for registration, privacy policy, other public pages */}
                     <Route path="/login" component={Login} />
                     <Route path="/" component={Landing} />
                   </Switch>

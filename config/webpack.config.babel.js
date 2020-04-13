@@ -56,7 +56,7 @@ const modules = [path.resolve(context, 'node_modules')]
 
 const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
-// Export the style config for usage in the storybook config
+// Export the style config for usage in the storybook config.
 export const styleConfig = {
   test: /\.(styl|css)$/,
   include,
@@ -261,8 +261,8 @@ function filterLocales(context, request, callback) {
   callback()
 }
 
-// env selects and merges the environments for the passed object based on NODE_ENV, which
-// can have the all, development and production keys.
+// Env selects and merges the environments for the passed object based on
+// `NODE_ENV`, which can have the all, development and production keys.
 function env(obj = {}) {
   if (!obj) {
     return obj

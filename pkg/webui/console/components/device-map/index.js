@@ -20,7 +20,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 export default class DeviceMap extends React.Component {
   static propTypes = {
-    // Device is an object.
     device: PropTypes.device.isRequired,
   }
 

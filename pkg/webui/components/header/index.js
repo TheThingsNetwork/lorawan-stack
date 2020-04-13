@@ -91,24 +91,24 @@ const Header = function({
 }
 
 Header.propTypes = {
-  /** The classname applied to the component */
+  /** The classname applied to the component. */
   className: PropTypes.string,
-  /** The child node of the dropdown component */
+  /** The child node of the dropdown component. */
   dropdownItems: ProfileDropdown.propTypes.children,
   logo: PropTypes.node,
-  /** The child node of the mobile dropdown */
+  /** The child node of the mobile dropdown. */
   mobileDropdownItems: PropTypes.node.isRequired,
-  /** The Child node of the navigation bar */
+  /** The Child node of the navigation bar. */
   navigationEntries: NavigationBar.propTypes.children,
-  /** A handler for when the user used the search input */
+  /** A handler for when the user used the search input. */
   onLogout: PropTypes.func.isRequired,
-  /** Handler of the search function */
+  /** Handler of the search function. */
   onSearchRequest: PropTypes.func,
-  /* A flag indicating whether the header has a search input */
+  /* A flag indicating whether the header has a search input. */
   searchable: PropTypes.bool,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
-   * guest header is rendered
+   * guest header is rendered.
    */
   user: PropTypes.user,
 }

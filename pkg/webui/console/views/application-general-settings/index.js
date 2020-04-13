@@ -140,7 +140,8 @@ export default class ApplicationGeneralSettings extends React.Component {
 
     const changed = diff(application, appValues)
 
-    // if there is a change in attributes, copy all attributes so they don't get overwritten
+    // If there is a change in attributes, copy all attributes so they don't get
+    // overwritten.
     const update =
       'attributes' in changed ? { ...changed, attributes: appValues.attributes } : changed
 

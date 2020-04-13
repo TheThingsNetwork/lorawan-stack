@@ -25,7 +25,7 @@ const fieldMasks = require('../generated/device-field-masks.json')
 const result = {}
 
 for (const component in fieldMasks) {
-  // Write get components
+  // Write get components.
   for (const fieldMask of fieldMasks[component].get) {
     const path = [...fieldMask.split('.'), '_root']
     const val = traverse(result).get(path)
@@ -40,7 +40,7 @@ for (const component in fieldMasks) {
     }
   }
 
-  // Write set components
+  // Write set components.
   for (const fieldMask of fieldMasks[component].set) {
     const path = [...fieldMask.split('.'), '_root']
     const val = traverse(result).get(path)
@@ -59,7 +59,7 @@ for (const component in fieldMasks) {
   }
 }
 
-// Rewrite single `_root` entries as plain array leaf
+// Rewrite single `_root` entries as plain array leaf.
 traverse(result).forEach(function() {
   if (Object.keys(this.node).length === 1 && this.node._root) {
     this.update(this.node._root)

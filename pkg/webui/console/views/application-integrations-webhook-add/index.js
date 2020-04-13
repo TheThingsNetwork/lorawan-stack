@@ -39,7 +39,7 @@ export default class ApplicationWebhookAdd extends Component {
       hasTemplates,
     } = this.props
 
-    // Forward to the template chooser, when templates have been configured
+    // Forward to the template chooser, when templates have been configured.
     if (hasTemplates) {
       return <Redirect to={`${path}/template`} />
     }

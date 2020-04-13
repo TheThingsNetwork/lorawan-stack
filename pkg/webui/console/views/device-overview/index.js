@@ -63,7 +63,7 @@ class DeviceOverview extends React.Component {
       supports_join,
     } = this.props.device
 
-    // Get session keys
+    // Get session keys.
     const { keys: sessionKeys = {} } = session
 
     const {
@@ -87,7 +87,7 @@ class DeviceOverview extends React.Component {
       },
     ]
 
-    // Add version info, if it is available
+    // Add version info, if it is available.
     if (Object.keys(version_ids).length > 0) {
       sheetData.push({
         header: sharedMessages.hardware,
@@ -100,7 +100,7 @@ class DeviceOverview extends React.Component {
       })
     }
 
-    // Add activation info, if available
+    // Add activation info, if available.
     const activationInfoData = {
       header: m.activationInfo,
       items: [],
@@ -112,7 +112,7 @@ class DeviceOverview extends React.Component {
         { key: sharedMessages.devEUI, value: ids.dev_eui, type: 'byte', sensitive: false },
       )
 
-      // Add root keys, if available
+      // Add root keys, if available.
       if (Object.keys(root_keys).length > 0) {
         const infoEntry = {
           key: m.rootKeyId,
@@ -158,7 +158,7 @@ class DeviceOverview extends React.Component {
 
     sheetData.push(activationInfoData)
 
-    // Add session info, if available
+    // Add session info, if available.
 
     const sessionInfoData = {
       header: m.sessionInfo,

@@ -44,11 +44,11 @@ const Breadcrumb = function({ className, path, content, isLast }) {
 
 Breadcrumb.propTypes = {
   className: PropTypes.string,
-  /** The content of the breadcrumb */
+  /** The content of the breadcrumb. */
   content: PropTypes.message.isRequired,
-  /** The flag for rendering last breadcrumb as plain text */
+  /** The flag for rendering last breadcrumb as plain text. */
   isLast: PropTypes.bool,
-  /** The path for a breadcrumb */
+  /** The path for a breadcrumb. */
   path: PropTypes.string.isRequired,
 }
 

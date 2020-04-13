@@ -49,11 +49,11 @@ class Event extends React.PureComponent {
     data: PropTypes.shape({}),
     /** The entity identifier of the event. */
     emitter: PropTypes.string.isRequired,
-    /** Additional styling for the event expanded view */
+    /** Additional styling for the event expanded view. */
     expandedClassName: PropTypes.string,
     /** The icon of the event. */
     icon: PropTypes.node,
-    /** Additional styling for the event overview */
+    /** Additional styling for the event overview. */
     overviewClassName: PropTypes.string,
     /** The time of the event. */
     time: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)])

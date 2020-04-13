@@ -59,13 +59,13 @@ class InnerForm extends React.PureComponent {
     const { formError, isSubmitting, isValid } = this.props
     const { isSubmitting: prevIsSubmitting, formError: prevFormError } = prevProps
 
-    // Scroll form notification into view if needed
+    // Scroll form notification into view if needed.
     if (formError && !prevFormError) {
       scrollIntoView(this.notificationRef.current, { behavior: 'smooth' })
       this.notificationRef.current.focus({ preventScroll: true })
     }
 
-    // Scroll invalid fields into view if needed and focus them
+    // Scroll invalid fields into view if needed and focus them.
     if (prevIsSubmitting && !isSubmitting && !isValid) {
       const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
       if (firstErrorNode) {

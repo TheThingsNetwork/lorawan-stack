@@ -39,7 +39,7 @@ const devices = function(state = defaultState, { type, payload }) {
     case GET_DEV_SUCCESS:
       const id = getCombinedDeviceId(payload)
       const mergedDevice = mergeWith({}, state.entities[id], payload, (_, __, key, ___, source) => {
-        // always set location from the payload
+        // Always set location from the payload.
         if (source === payload && key === 'locations') {
           return source.locations
         }

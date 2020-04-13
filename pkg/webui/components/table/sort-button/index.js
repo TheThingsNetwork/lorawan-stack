@@ -55,16 +55,16 @@ class SortButton extends React.PureComponent {
 }
 
 SortButton.propTypes = {
-  /** A flag identifying whether the button is active */
+  /** A flag identifying whether the button is active. */
   active: PropTypes.bool.isRequired,
   className: PropTypes.string,
-  /** The current ordering (ascending/descending/none) */
+  /** The current ordering (ascending/descending/none). */
   direction: PropTypes.string,
-  /** The name of the column that the sort button represents */
+  /** The name of the column that the sort button represents. */
   name: PropTypes.string.isRequired,
-  /** Function to be called when the button is pressed */
+  /** Function to be called when the button is pressed. */
   onSort: PropTypes.func.isRequired,
-  /** The text of the button */
+  /** The text of the button. */
   title: PropTypes.message.isRequired,
 }
 

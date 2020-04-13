@@ -178,7 +178,7 @@ Link.Anchor = injectIntl(AnchorLink)
 const BaseAnchorLink = function({ env, href, ...rest }) {
   const { appRoot } = env
 
-  // Prevent prefixing proper URLs
+  // Prevent prefixing proper URLs.
   const path = href.match(urlPattern) ? href : appRoot + href
 
   return <Link.Anchor href={path} {...rest} />

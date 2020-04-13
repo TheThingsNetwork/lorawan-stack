@@ -19,7 +19,7 @@ import { createErrorSelector } from './error'
 
 const selectPubsubStore = state => state.pubsubs
 
-// Pubsub
+// Pubsub.
 export const selectPubsubEntityStore = state => selectPubsubStore(state).entities
 export const selectSelectedPubsubId = state => selectPubsubStore(state).selectedPubsub
 export const selectSelectedPubsub = state =>
@@ -27,7 +27,7 @@ export const selectSelectedPubsub = state =>
 export const selectPubsubError = createErrorSelector(GET_PUBSUB_BASE)
 export const selectPubsubFetching = createFetchingSelector(GET_PUBSUB_BASE)
 
-// Pubsubs
+// Pubsubs.
 export const selectPubsubs = state => Object.values(selectPubsubEntityStore(state))
 export const selectPubsubsTotalCount = state => selectPubsubStore(state).totalCount
 export const selectPubsubsFetching = createFetchingSelector(GET_PUBSUBS_LIST_BASE)

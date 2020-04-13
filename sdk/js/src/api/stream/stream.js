@@ -33,14 +33,14 @@ import 'web-streams-polyfill/dist/polyfill'
  *      '/api/v3/events',
  *    )
  *
- *    // add listeners to the stream
+ *    // Add listeners to the stream.
  *    stream
  *      .on('start', () => console.log('conn opened'));
  *      .on('chunk', chunk => console.log('received chunk', chunk));
  *      .on('error', error => console.log(error));
  *      .on('close', () => console.log('conn closed'))
  *
- *    // close the stream after 20 s
+ *    // Close the stream after 20 s.
  *    setTimeout(() => stream.close(), 20000)
  * })()
  *

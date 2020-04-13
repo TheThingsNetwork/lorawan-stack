@@ -19,7 +19,7 @@ import { createErrorSelector } from './error'
 
 const selectWebhookStore = state => state.webhooks
 
-// Webhook
+// Webhook.
 export const selectWebhookEntityStore = state => selectWebhookStore(state).entities
 export const selectSelectedWebhookId = state => selectWebhookStore(state).selectedWebhook
 export const selectSelectedWebhook = state =>
@@ -27,7 +27,7 @@ export const selectSelectedWebhook = state =>
 export const selectWebhookError = createErrorSelector(GET_WEBHOOK_BASE)
 export const selectWebhookFetching = createFetchingSelector(GET_WEBHOOK_BASE)
 
-// Webhooks
+// Webhooks.
 export const selectWebhooks = state => Object.values(selectWebhookEntityStore(state))
 export const selectWebhooksTotalCount = state => selectWebhookStore(state).totalCount
 export const selectWebhooksFetching = createFetchingSelector(GET_WEBHOOKS_LIST_BASE)

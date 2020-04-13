@@ -50,17 +50,17 @@ const Tabs = function({ className, active, tabs, onTabChange, divider, narrow })
 }
 
 Tabs.propTypes = {
-  /** The name of the active tab */
+  /** The name of the active tab. */
   active: PropTypes.string,
   className: PropTypes.string,
-  /** Flag specifying whether the tab should render a bottom divider */
+  /** Flag specifying whether the tab should render a bottom divider. */
   divider: PropTypes.bool,
   /**
    * A click handler to be called when the selected tab changes. Passes
    * the name of the new active tab as an argument.
    */
   narrow: PropTypes.bool,
-  /** A list of tabs */
+  /** A list of tabs. */
   onTabChange: PropTypes.func,
   tabs: PropTypes.arrayOf(
     PropTypes.shape({

@@ -128,7 +128,7 @@ class ClickableExample extends React.Component {
 
   onRowClick(rowIndex) {
     action('onRowClick')({ index: rowIndex, id: this.props.data[rowIndex].appId })
-    // push to history if link functionality required
+    // Push to history if link functionality required
     this.setState({ clicked: this.props.data[rowIndex].appId })
   }
 
@@ -168,7 +168,7 @@ class SortableExample extends React.Component {
   }
 
   onSort(order, orderBy) {
-    // this.setState({ order, orderBy })
+    // This.setState({ order, orderBy })
     const data = this.props.data
     const asc = this.asc
     action('onSort')({ order, orderBy })

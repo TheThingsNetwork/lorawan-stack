@@ -27,7 +27,7 @@ import { HeadCell, DataCell } from '../cell'
 
 import style from './table.styl'
 
-/* Empty message to render when no entries provided */
+/* Empty message to render when no entries provided. */
 const Empty = ({ className, colSpan, message }) => (
   <Row className={classnames(className, style.emptyMessageRow)} clickable={false}>
     <DataCell colSpan={colSpan}>

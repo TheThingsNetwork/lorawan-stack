@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// alphanumeric, dashes, lowercase
 export const id = /^[a-z0-9]+(-[a-z0-9]+)*$/
 export const noSpaces = /^\S*$/
 export const apiKey = /^NNSXS.[A-Z0-9]{39}.[A-Z0-9]{52}$/

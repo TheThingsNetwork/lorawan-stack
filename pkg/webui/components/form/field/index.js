@@ -117,7 +117,7 @@ class FormField extends React.Component {
     const { name, onChange } = this.props
     const { setFieldValue, setFieldTouched } = this.context
 
-    // check if the value is react's synthetic event
+    // Check if the value is react's synthetic event.
     const newValue = this.extractValue(value)
 
     setFieldValue(name, newValue)

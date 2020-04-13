@@ -92,7 +92,7 @@ const validationSchema = Yup.object()
           return !externalJs
             ? Yup.object().shape({
                 key: Yup.string()
-                  .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                  .emptyOrLength(16 * 2, m.validate32) // A 16 Byte hex.
                   .transform(toUndefined)
                   .default(random16BytesString),
               })

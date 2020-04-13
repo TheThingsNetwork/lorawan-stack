@@ -36,16 +36,16 @@ export class SideNavigationItem extends React.PureComponent {
     children: PropTypes.node,
     className: PropTypes.string,
     depth: PropTypes.number,
-    /** A flag specifying whether the path of the linkable item should be matched exactly or not */
+    /** A flag specifying whether the path of the linkable item should be matched exactly or not. */
     exact: PropTypes.bool,
-    /** The name of the icon for the side navigation item */
+    /** The name of the icon for the side navigation item. */
     icon: PropTypes.string,
-    /** A flag specifying whether the side navigation item is active or not */
+    /** A flag specifying whether the side navigation item is active or not. */
     isActive: PropTypes.bool,
     location: PropTypes.location.isRequired,
-    /** The path of the linkable side navigation item */
+    /** The path of the linkable side navigation item. */
     path: PropTypes.string,
-    /** The title of the side navigation item */
+    /** The title of the side navigation item. */
     title: PropTypes.message.isRequired,
   }
 

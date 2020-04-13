@@ -44,10 +44,10 @@ Overlay.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   /**
-   * A flag specifying whether the overlay should display the loading spinner
+   * A flag specifying whether the overlay should display the loading spinner.
    */
   loading: PropTypes.bool,
-  /** A flag specifying whether the overlay is visible or not */
+  /** A flag specifying whether the overlay is visible or not. */
   visible: PropTypes.bool.isRequired,
 }
 

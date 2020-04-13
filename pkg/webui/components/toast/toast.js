@@ -63,7 +63,7 @@ const createToast = function() {
   }
 
   const toast = function(options) {
-    // Prevent flooding of identical messages (if wished)
+    // Prevent flooding of identical messages (if wished).
     if (
       options.preventConsecutive &&
       lastMessage &&
