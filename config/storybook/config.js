@@ -23,7 +23,6 @@ import createHistory from 'history/createMemoryHistory'
 import '../../pkg/webui/styles/main.styl'
 import 'focus-visible/dist/focus-visible'
 import createStore from './store'
-
 import Center from './center'
 
 const history = createHistory()

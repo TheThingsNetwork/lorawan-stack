@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import errorMessages from '../errors/error-messages'
+import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
 
 /**

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import reducer from '../gateways'
-
 import {
   getGateway,
   getGatewaySuccess,

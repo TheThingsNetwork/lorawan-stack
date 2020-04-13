@@ -16,8 +16,10 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import Message from '../../lib/components/message'
-import PropTypes from '../../lib/prop-types'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import { RadioGroupContext } from './group'
 
 import style from './radio-button.styl'

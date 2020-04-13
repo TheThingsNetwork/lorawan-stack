@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as user from '../../actions/user'
-import api from '../../../api'
-import * as accessToken from '../../../lib/access-token'
-import { isUnauthenticatedError } from '../../../../lib/errors/utils'
+import api from '@console/api'
+
+import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
+
+import * as accessToken from '@console/lib/access-token'
+
+import * as user from '@console/store/actions/user'
+
 import createRequestLogic from './lib'
 
 export default [

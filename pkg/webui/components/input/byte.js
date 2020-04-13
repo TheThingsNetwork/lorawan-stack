@@ -17,7 +17,7 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import MaskedInput from 'react-text-mask'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './input.styl'
 

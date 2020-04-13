@@ -15,16 +15,17 @@
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
+import api from '@console/api'
+
+import { getOrganizationsRightsList } from '@console/store/actions/organizations'
+
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
   selectOrganizationPseudoRights,
   selectOrganizationRightsFetching,
   selectOrganizationRightsError,
-} from '../../store/selectors/organizations'
-import { getOrganizationsRightsList } from '../../store/actions/organizations'
-
-import api from '../../api'
+} from '@console/store/selectors/organizations'
 
 export default OrganizationCollaboratorAdd =>
   connect(

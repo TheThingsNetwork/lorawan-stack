@@ -18,17 +18,18 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import PageTitle from '../../../components/page-title'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import PubsubForm from '../../components/pubsub-form'
+import api from '@console/api'
 
-import sharedMessages from '../../../lib/shared-messages'
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import PubsubForm from '@console/components/pubsub-form'
 
-import api from '../../api'
-import PropTypes from '../../../lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 @connect(
   state => ({

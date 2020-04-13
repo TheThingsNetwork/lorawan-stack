@@ -17,11 +17,13 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import { injectIntl } from 'react-intl'
 
-import Link from '../link'
-import PropTypes from '../../lib/prop-types'
-import Spinner from '../spinner'
-import Message from '../../lib/components/message'
-import Icon from '../icon'
+import Link from '@ttn-lw/components/link'
+import Spinner from '@ttn-lw/components/spinner'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './button.styl'
 

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_WEBHOOK_BASE, GET_WEBHOOKS_LIST_BASE } from '../actions/webhooks'
+import { GET_WEBHOOK_BASE, GET_WEBHOOKS_LIST_BASE } from '@console/store/actions/webhooks'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 

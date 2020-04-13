@@ -16,11 +16,12 @@ import React from 'react'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
-import SafeInspector from '../safe-inspector'
-import Message from '../../lib/components/message'
+import SafeInspector from '@ttn-lw/components/safe-inspector'
 
-import PropTypes from '../../lib/prop-types'
-import sharedMessages from '../../lib/shared-messages'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './data-sheet.styl'
 

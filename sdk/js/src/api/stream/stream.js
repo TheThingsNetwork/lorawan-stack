@@ -13,15 +13,17 @@
 // limitations under the License.
 
 import ArrayBufferToString from 'arraybuffer-to-string'
+
 import Token from '../../util/token'
+
 import { notify, EVENTS } from './shared'
-import 'web-streams-polyfill/dist/polyfill.js'
+import 'web-streams-polyfill/dist/polyfill'
 
 /**
  * Opens a new stream.
  *
  * @async
- * @param {Object} payload  - The body of the initial request.
+ * @param {object} payload -  - The body of the initial request.
  * @param {string} url - The stream endpoint.
  *
  * @example
@@ -42,7 +44,7 @@ import 'web-streams-polyfill/dist/polyfill.js'
  *    setTimeout(() => stream.close(), 20000)
  * })()
  *
- * @returns {Object} The stream subscription object with the `on` function for
+ * @returns {object} The stream subscription object with the `on` function for
  * attaching listeners and the `close` function to close the stream.
  */
 export default async function(payload, url) {

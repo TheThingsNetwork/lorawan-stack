@@ -17,20 +17,25 @@ import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 import bind from 'autobind-decorator'
 
-import WebhookTemplateInfo from '../../components/webhook-template-info'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import Notification from '../../../components/notification'
-import Message from '../../../lib/components/message'
-import KeyValueMap from '../../../components/key-value-map'
-import ModalButton from '../../../components/button/modal-button'
-import WebhookFormatSelector from '../../containers/webhook-formats-select'
-import sharedMessages from '../../../lib/shared-messages'
-import { id as webhookIdRegexp, apiKey as webhookAPIKeyRegexp } from '../../lib/regexp'
-import { url as urlRegexp } from '../../../lib/regexp'
-import PropTypes from '../../../lib/prop-types'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Notification from '@ttn-lw/components/notification'
+import KeyValueMap from '@ttn-lw/components/key-value-map'
+import ModalButton from '@ttn-lw/components/button/modal-button'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import WebhookTemplateInfo from '@console/components/webhook-template-info'
+
+import WebhookFormatSelector from '@console/containers/webhook-formats-select'
+
+import { url as urlRegexp } from '@ttn-lw/lib/regexp'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { id as webhookIdRegexp, apiKey as webhookAPIKeyRegexp } from '@console/lib/regexp'
 
 import { mapWebhookToFormValues, mapFormValuesToWebhook, blankValues } from './mapping'
 

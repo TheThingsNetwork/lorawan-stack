@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getApplicationId } from '../../../lib/selectors/id'
+import { getApplicationId } from '@ttn-lw/lib/selectors/id'
+
 import {
   GET_APP,
   GET_APP_SUCCESS,
@@ -20,7 +21,7 @@ import {
   GET_APPS_LIST_SUCCESS,
   UPDATE_APP_SUCCESS,
   DELETE_APP_SUCCESS,
-} from '../actions/applications'
+} from '@console/store/actions/applications'
 
 const application = function(state = {}, application) {
   return {

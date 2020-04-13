@@ -15,8 +15,9 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 
-import PropTypes from '../../lib/prop-types'
-import RelativeDateTime from '../../lib/components/date-time/relative'
+import RelativeDateTime from '@ttn-lw/lib/components/date-time/relative'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './progress-bar.styl'
 

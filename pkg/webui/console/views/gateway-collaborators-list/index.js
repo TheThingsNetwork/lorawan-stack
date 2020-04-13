@@ -17,20 +17,23 @@ import { Container, Row, Col } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import CollaboratorsTable from '../../containers/collaborators-table'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import PAGE_SIZES from '@console/constants/page-sizes'
 
-import { getCollaboratorsList } from '../../store/actions/collaborators'
-import { selectSelectedGatewayId } from '../../store/selectors/gateways'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import CollaboratorsTable from '@console/containers/collaborators-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { getCollaboratorsList } from '@console/store/actions/collaborators'
+
+import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
-} from '../../store/selectors/collaborators'
-
-import PAGE_SIZES from '../../constants/page-sizes'
+} from '@console/store/selectors/collaborators'
 
 @connect(state => ({
   gtwId: selectSelectedGatewayId(state),

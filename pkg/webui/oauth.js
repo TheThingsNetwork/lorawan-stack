@@ -19,11 +19,10 @@ import { createBrowserHistory } from 'history'
 import * as Sentry from '@sentry/browser'
 
 import WithLocale from './lib/components/with-locale'
-import env from './lib/env'
-import { selectApplicationRootPath } from './lib/selectors/env'
 import { EnvProvider } from './lib/components/env'
 import Init from './lib/components/init'
-
+import env from './lib/env'
+import { selectApplicationRootPath } from './lib/selectors/env'
 import createStore from './oauth/store'
 
 const appRoot = selectApplicationRootPath()

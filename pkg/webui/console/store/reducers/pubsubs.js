@@ -14,13 +14,14 @@
 
 import { mergeWith } from 'lodash'
 
+import { getPubsubId } from '@ttn-lw/lib/selectors/id'
+
 import {
   GET_PUBSUB,
   GET_PUBSUB_SUCCESS,
   GET_PUBSUBS_LIST_SUCCESS,
   UPDATE_PUBSUB_SUCCESS,
-} from '../actions/pubsubs'
-import { getPubsubId } from '../../../lib/selectors/id'
+} from '@console/store/actions/pubsubs'
 
 const defaultState = {
   selectedPubsub: null,

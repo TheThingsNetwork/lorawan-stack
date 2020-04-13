@@ -17,21 +17,24 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import HeaderComponent from '../../../components/header'
-import NavigationBar from '../../../components/navigation/bar'
-import Dropdown from '../../../components/dropdown'
+import HeaderComponent from '@ttn-lw/components/header'
+import NavigationBar from '@ttn-lw/components/navigation/bar'
+import Dropdown from '@ttn-lw/components/dropdown'
 
-import { logout } from '../../store/actions/user'
-import { selectUser } from '../../store/selectors/user'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   checkFromState,
   mayViewApplications,
   mayViewGateways,
   mayViewOrganizationsOfUser,
   mayManageUsers,
-} from '../../lib/feature-checks'
+} from '@console/lib/feature-checks'
+
+import { logout } from '@console/store/actions/user'
+
+import { selectUser } from '@console/store/selectors/user'
 
 @withRouter
 @connect(

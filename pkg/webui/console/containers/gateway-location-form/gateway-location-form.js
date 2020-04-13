@@ -16,13 +16,15 @@ import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
-import LocationForm from '../../components/location-form'
-import Checkbox from '../../../components/checkbox'
-import Form from '../../../components/form'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Form from '@ttn-lw/components/form'
 
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '../../lib/regexp'
+import LocationForm from '@console/components/location-form'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '@console/lib/regexp'
 
 const m = defineMessages({
   locationDescription: 'The location of this gateway may be publicly displayed',

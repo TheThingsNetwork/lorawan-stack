@@ -15,16 +15,20 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import ApiKeyModal from '../api-key-modal'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import SubmitBar from '../../../components/submit-bar'
-import FormField from '../../../components/form/field'
-import FormSubmit from '../../../components/form/submit'
-import SubmitButton from '../../../components/submit-button'
-import Input from '../../../components/input'
-import Message from '../../../lib/components/message'
-import RightsGroup from '../../../console/components/rights-group'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import FormField from '@ttn-lw/components/form/field'
+import FormSubmit from '@ttn-lw/components/form/submit'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Input from '@ttn-lw/components/input'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import ApiKeyModal from '@console/components/api-key-modal'
+import RightsGroup from '@console/components/rights-group'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
 

@@ -14,7 +14,7 @@
 
 /* eslint-disable no-console */
 
-import TTN from '../.'
+import TTN from '..'
 
 const token = 'access-token-or-api-key'
 const ttn = new TTN(token, {

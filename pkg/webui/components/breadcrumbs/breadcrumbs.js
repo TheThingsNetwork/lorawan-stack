@@ -17,7 +17,7 @@ import ReactDom from 'react-dom'
 import classnames from 'classnames'
 import { Container } from 'react-grid-system'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './breadcrumbs.styl'
 

@@ -17,7 +17,9 @@
 /* eslint-disable no-invalid-this */
 
 const fs = require('fs')
+
 const traverse = require('traverse')
+
 const fieldMasks = require('../generated/device-field-masks.json')
 
 const result = {}

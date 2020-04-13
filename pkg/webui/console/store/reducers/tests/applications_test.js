@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import reducer from '../applications'
-
 import {
   getApplication,
   getApplicationSuccess,

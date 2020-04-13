@@ -14,8 +14,10 @@
 
 import * as Yup from 'yup'
 
-import sharedMessages from '../../../lib/shared-messages'
-import { id as deviceIdRegexp, address as addressRegexp } from '../../lib/regexp'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
+
 import m from './messages'
 
 const isABP = mode => mode === 'abp'

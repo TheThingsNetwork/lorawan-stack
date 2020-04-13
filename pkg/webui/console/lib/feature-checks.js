@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { selectStackConfig } from '../../lib/selectors/env'
-import { selectApplicationRights } from '../store/selectors/applications'
-import { selectGatewayRights } from '../store/selectors/gateways'
-import { selectOrganizationRights } from '../store/selectors/organizations'
-import { selectUserRights, selectUserIsAdmin } from '../store/selectors/user'
+import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
+
+import { selectApplicationRights } from '@console/store/selectors/applications'
+import { selectGatewayRights } from '@console/store/selectors/gateways'
+import { selectOrganizationRights } from '@console/store/selectors/organizations'
+import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/user'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled

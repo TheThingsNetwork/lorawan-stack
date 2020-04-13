@@ -16,9 +16,10 @@ import React from 'react'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
-import Button from '../../button'
+import Button from '@ttn-lw/components/button'
 
-import PropTypes from '../../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import style from './details.styl'
 
 const m = defineMessages({

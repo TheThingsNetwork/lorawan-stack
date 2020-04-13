@@ -18,19 +18,25 @@ import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import CodeEditor from '../../../components/code-editor'
-import ProgressBar from '../../../components/progress-bar'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
-import DeviceImportForm from '../../components/device-import-form'
-import SubmitBar from '../../../components/submit-bar'
-import Button from '../../../components/button'
-import ErrorNotification from '../../../components/error-notification'
-import api from '../../api'
-import PropTypes from '../../../lib/prop-types'
-import Message from '../../../lib/components/message'
-import Status from '../../../components/status'
-import randomByteString from '../../lib/random-bytes'
+import api from '@console/api'
+
+import CodeEditor from '@ttn-lw/components/code-editor'
+import ProgressBar from '@ttn-lw/components/progress-bar'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import Button from '@ttn-lw/components/button'
+import ErrorNotification from '@ttn-lw/components/error-notification'
+import Status from '@ttn-lw/components/status'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import DeviceImportForm from '@console/components/device-import-form'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectNsConfig, selectJsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
+
+import randomByteString from '@console/lib/random-bytes'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import style from './device-importer.styl'
 

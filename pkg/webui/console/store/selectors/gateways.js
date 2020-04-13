@@ -18,7 +18,7 @@ import {
   UPDATE_GTW_STATS_BASE,
   GET_GTWS_RIGHTS_LIST_BASE,
   START_GTW_STATS_BASE,
-} from '../actions/gateways'
+} from '@console/store/actions/gateways'
 
 import {
   createEventsSelector,

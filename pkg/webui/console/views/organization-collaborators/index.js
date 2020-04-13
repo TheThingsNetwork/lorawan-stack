@@ -16,20 +16,25 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import sharedMessages from '../../../lib/shared-messages'
-import ErrorView from '../../../lib/components/error-view'
-import NotFoundRoute from '../../../lib/components/not-found-route'
-import PropTypes from '../../../lib/prop-types'
-import SubViewError from '../error/sub-view'
-import OrganizationCollaboratorsList from '../organization-collaborators-list'
-import OrganizationCollaboratorAdd from '../organization-collaborator-add'
-import OrganizationCollaboratorEdit from '../organization-collaborator-edit'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import { mayViewOrEditOrganizationCollaborators } from '../../lib/feature-checks'
-import { selectSelectedOrganizationId } from '../../store/selectors/organizations'
+import ErrorView from '@ttn-lw/lib/components/error-view'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import SubViewError from '@console/views/error/sub-view'
+import OrganizationCollaboratorsList from '@console/views/organization-collaborators-list'
+import OrganizationCollaboratorAdd from '@console/views/organization-collaborator-add'
+import OrganizationCollaboratorEdit from '@console/views/organization-collaborator-edit'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayViewOrEditOrganizationCollaborators } from '@console/lib/feature-checks'
+
+import { selectSelectedOrganizationId } from '@console/store/selectors/organizations'
 
 @connect(state => ({ orgId: selectSelectedOrganizationId(state) }))
 @withFeatureRequirement(mayViewOrEditOrganizationCollaborators, {

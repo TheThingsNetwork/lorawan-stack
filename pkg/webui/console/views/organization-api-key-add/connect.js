@@ -15,15 +15,15 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
+import api from '@console/api'
+
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
   selectOrganizationPseudoRights,
   selectOrganizationRightsError,
   selectOrganizationRightsFetching,
-} from '../../store/selectors/organizations'
-
-import api from '../../api'
+} from '@console/store/selectors/organizations'
 
 export default OrganizationApiKeyAdd =>
   connect(

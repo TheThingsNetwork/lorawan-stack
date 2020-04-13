@@ -16,14 +16,16 @@ import React from 'react'
 import classnames from 'classnames'
 import { FormattedNumber } from 'react-intl'
 
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import Status from '../../../components/status'
-import Icon from '../../../components/icon'
-import DateTime from '../../../lib/components/date-time'
-import Message from '../../../lib/components/message'
-import Button from '../../../components/button'
-import { isNotFoundError, isTranslated } from '../../../lib/errors/utils'
+import Status from '@ttn-lw/components/status'
+import Icon from '@ttn-lw/components/icon'
+import Button from '@ttn-lw/components/button'
+
+import DateTime from '@ttn-lw/lib/components/date-time'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { isNotFoundError, isTranslated } from '@ttn-lw/lib/errors/utils'
 
 import style from './gateway-connection.styl'
 

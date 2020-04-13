@@ -19,7 +19,7 @@ import {
   LOGOUT,
   LOGOUT_SUCCESS,
   LOGOUT_FAILURE,
-} from '../actions/user'
+} from '@oauth/store/actions/user'
 
 const defaultState = {
   fetching: false,

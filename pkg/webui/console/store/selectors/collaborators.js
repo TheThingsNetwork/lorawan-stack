@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_COLLABORATOR_BASE, GET_COLLABORATORS_LIST_BASE } from '../actions/collaborators'
+import {
+  GET_COLLABORATOR_BASE,
+  GET_COLLABORATORS_LIST_BASE,
+} from '@console/store/actions/collaborators'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 import {

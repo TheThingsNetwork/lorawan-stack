@@ -16,9 +16,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
-
 import Paginate from 'react-paginate'
-import Icon from '../icon'
+
+import Icon from '@ttn-lw/components/icon'
 
 import style from './pagination.styl'
 

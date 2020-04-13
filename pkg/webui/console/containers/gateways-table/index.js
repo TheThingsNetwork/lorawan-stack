@@ -15,19 +15,24 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import FetchTable from '../fetch-table'
-import Status from '../../../components/status'
+import Status from '@ttn-lw/components/status'
 
-import { getGatewaysList } from '../../../console/store/actions/gateways'
+import Message from '@ttn-lw/lib/components/message'
+
+import FetchTable from '@console/containers/fetch-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { checkFromState, mayCreateGateways } from '@console/lib/feature-checks'
+
+import { getGatewaysList } from '@console/store/actions/gateways'
+
 import {
   selectGateways,
   selectGatewaysTotalCount,
   selectGatewaysFetching,
   selectGatewaysError,
-} from '../../store/selectors/gateways'
-import { checkFromState, mayCreateGateways } from '../../lib/feature-checks'
+} from '@console/store/selectors/gateways'
 
 const headers = [
   {

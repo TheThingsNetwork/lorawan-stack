@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import Applications from './service/applications'
+
 import TTN from '.'
 
 const mockApplicationData = {

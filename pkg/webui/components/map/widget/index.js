@@ -14,11 +14,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import sharedMessages from '../../../lib/shared-messages'
 
-import Message from '../../../lib/components/message'
-import Link from '../../../components/link'
-import Map from '../../map'
+import Link from '@ttn-lw/components/link'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import Map from '..'
 
 import style from './widget.styl'
 

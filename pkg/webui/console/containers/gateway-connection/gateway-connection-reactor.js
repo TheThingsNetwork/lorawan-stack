@@ -18,8 +18,8 @@ import {
   isGsStatusReceiveEvent,
   isGsDownlinkSendEvent,
   isGsUplinkReceiveEvent,
-} from '../../../lib/selectors/event'
-import PropTypes from '../../../lib/prop-types'
+} from '@ttn-lw/lib/selectors/event'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 /**
  * `withConnectionReactor` is a HOC that handles gateway connection statistics updates based on

@@ -16,11 +16,13 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 
-import Dropdown from '../dropdown'
-import NavigationBar from '../navigation/bar'
-import Logo from '../logo'
-import TtsLogo from '../../assets/static/logo.svg'
-import ExampleLogo from '../logo/story-logo.svg'
+import TtsLogo from '@assets/static/logo.svg'
+
+import Dropdown from '@ttn-lw/components/dropdown'
+import NavigationBar from '@ttn-lw/components/navigation/bar'
+import Logo from '@ttn-lw/components/logo'
+import ExampleLogo from '@ttn-lw/components/logo/story-logo.svg'
+
 import Header from '.'
 
 const user = {

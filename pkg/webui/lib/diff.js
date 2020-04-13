@@ -14,9 +14,8 @@
 
 import { observableDiff, applyChange } from 'deep-diff'
 
-/**
- * Computes the structural differences (deep) between `original` and `updated` objects
- * by applying any differences (add/remove/update).
+/** Computes the structural differences (deep) between `original` and `updated`
+ * objects by applying any differences (add/remove/update).
  * @param {Object} original - The original object.
  * @param {Object} updated - The updated version of the `original` object.
  * @param {Array} exclude - A list of field names that should not be included in the

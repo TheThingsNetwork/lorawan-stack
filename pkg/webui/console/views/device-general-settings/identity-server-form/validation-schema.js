@@ -14,11 +14,13 @@
 
 import * as Yup from 'yup'
 
-import randomByteString from '../../../lib/random-bytes'
-import sharedMessages from '../../../../lib/shared-messages'
-import { id as deviceIdRegexp, address as addressRegexp } from '../../../lib/regexp'
-import m from '../../../components/device-data-form/messages'
-import { selectJsConfig } from '../../../../lib/selectors/env'
+import m from '@console/components/device-data-form/messages'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
+
+import randomByteString from '@console/lib/random-bytes'
+import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
 
 import { parseLorawanMacVersion } from '../utils'
 

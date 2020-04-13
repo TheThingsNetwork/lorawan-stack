@@ -15,7 +15,7 @@
 import {
   GET_NS_FREQUENCY_PLANS_SUCCESS,
   GET_GS_FREQUENCY_PLANS_SUCCESS,
-} from '../actions/configuration'
+} from '@console/store/actions/configuration'
 
 const defaultState = {
   nsFrequencyPlans: undefined,

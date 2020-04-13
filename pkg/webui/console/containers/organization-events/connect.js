@@ -14,13 +14,13 @@
 
 import { connect } from 'react-redux'
 
-import { clearOrganizationEventsStream } from '../../store/actions/organizations'
+import { clearOrganizationEventsStream } from '@console/store/actions/organizations'
 
 import {
   selectOrganizationEvents,
   selectOrganizationEventsStatus,
   selectOrganizationEventsError,
-} from '../../store/selectors/organizations'
+} from '@console/store/selectors/organizations'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   onClear: () => dispatch(clearOrganizationEventsStream(ownProps.orgId)),

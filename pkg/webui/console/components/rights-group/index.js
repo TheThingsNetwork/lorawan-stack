@@ -17,13 +17,15 @@ import bind from 'autobind-decorator'
 import { defineMessages, injectIntl } from 'react-intl'
 import classnames from 'classnames'
 
-import PropTypes from '../../../lib/prop-types'
-import { RIGHT_ALL } from '../../lib/rights'
-import withComputedProps from '../../../lib/components/with-computed-props'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Notification from '@ttn-lw/components/notification'
+import Radio from '@ttn-lw/components/radio-button'
 
-import Checkbox from '../../../components/checkbox'
-import Notification from '../../../components/notification'
-import Radio from '../../../components/radio-button'
+import withComputedProps from '@ttn-lw/lib/components/with-computed-props'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { RIGHT_ALL } from '@console/lib/rights'
 
 import style from './rights-group.styl'
 

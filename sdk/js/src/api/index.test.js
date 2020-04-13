@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import StackConfiguration from '../util/stack-configuration'
+
 import Api from '.'
 
 jest.mock('../../generated/api-definition.json', () => ({

@@ -17,7 +17,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Leaflet from 'leaflet'
 
-import MarkerIcon from '../../assets/auxiliary-icons/location_pin.svg'
+import MarkerIcon from '@assets/auxiliary-icons/location_pin.svg'
 
 import style from './map.styl'
 
@@ -31,6 +31,7 @@ Leaflet.Icon.Default.mergeOptions({
   iconAnchor: [13, 36],
   shadowAnchor: [8, 37],
   popupAnchor: [0, -40],
+  // eslint-disable-next-line import/no-commonjs
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 })
 

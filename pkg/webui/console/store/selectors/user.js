@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { GET_USER_ME_BASE, LOGOUT_BASE } from '../actions/user'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 

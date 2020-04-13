@@ -14,12 +14,12 @@
 
 import React from 'react'
 import classnames from 'classnames'
-
 import { NavLink } from 'react-router-dom'
 
-import Link from '../../link'
+import Link from '@ttn-lw/components/link'
 
-import PropTypes from '../../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import style from './link.styl'
 
 const NavigationLink = function({

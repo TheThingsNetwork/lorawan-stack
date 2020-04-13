@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_API_KEYS_LIST_SUCCESS, GET_API_KEY_SUCCESS, GET_API_KEY } from '../actions/api-keys'
-import { getApiKeyId } from '../../../lib/selectors/id'
+import { getApiKeyId } from '@ttn-lw/lib/selectors/id'
+
+import {
+  GET_API_KEYS_LIST_SUCCESS,
+  GET_API_KEY_SUCCESS,
+  GET_API_KEY,
+} from '@console/store/actions/api-keys'
 
 const defaultState = {
   entities: {},

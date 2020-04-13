@@ -17,14 +17,17 @@ import bind from 'autobind-decorator'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
-import Button from '../button'
-import ErrorNotification from '../error-notification'
-import Message from '../../lib/components/message'
-import List from '../list'
-import Icon from '../icon'
-import getEventComponentByName from '../event/types'
-import sharedMessages from '../../lib/shared-messages'
-import PropTypes from '../../lib/prop-types'
+import Button from '@ttn-lw/components/button'
+import ErrorNotification from '@ttn-lw/components/error-notification'
+import List from '@ttn-lw/components/list'
+import Icon from '@ttn-lw/components/icon'
+import getEventComponentByName from '@ttn-lw/components/event/types'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import EventsWidget from './widget'
 
 import style from './events.styl'

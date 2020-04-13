@@ -16,11 +16,12 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import PropTypes from '../../lib/prop-types'
-import getByPath from '../../lib/get-by-path'
+import Overlay from '@ttn-lw/components/overlay'
+import Pagination from '@ttn-lw/components/pagination'
 
-import Overlay from '../overlay'
-import Pagination from '../pagination'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import getByPath from '@ttn-lw/lib/get-by-path'
+
 import Table from './table'
 
 import style from './tabular.styl'

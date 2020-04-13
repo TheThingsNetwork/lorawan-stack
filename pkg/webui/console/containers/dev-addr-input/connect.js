@@ -15,7 +15,7 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import api from '../../api'
+import api from '@console/api'
 
 export default function(Component) {
   @bind

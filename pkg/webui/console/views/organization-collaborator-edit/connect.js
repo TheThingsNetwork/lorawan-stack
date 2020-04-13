@@ -15,24 +15,25 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import withRequest from '../../../lib/components/with-request'
+import api from '@console/api'
 
-import { getCollaborator } from '../../store/actions/collaborators'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import { getCollaborator } from '@console/store/actions/collaborators'
+
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
   selectOrganizationPseudoRights,
   selectOrganizationRightsFetching,
   selectOrganizationRightsError,
-} from '../../store/selectors/organizations'
+} from '@console/store/selectors/organizations'
 import {
   selectUserCollaborator,
   selectOrganizationCollaborator,
   selectCollaboratorFetching,
   selectCollaboratorError,
-} from '../../store/selectors/collaborators'
-
-import api from '../../api'
+} from '@console/store/selectors/collaborators'
 
 export default OrganizationCollaboratorEdit =>
   connect(

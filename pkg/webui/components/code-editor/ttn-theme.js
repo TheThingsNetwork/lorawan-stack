@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable no-undef*/
+// eslint-disable-next-line no-undef
 ace.define('ace/theme/ttn', ['require', 'exports', 'module', 'ace/lib/dom'], function(
   acequire,
   exports,

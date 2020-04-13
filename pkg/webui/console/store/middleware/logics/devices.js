@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '../../../api'
-import * as devices from '../../actions/devices'
-import * as deviceTemplateFormats from '../../actions/device-template-formats'
+import api from '@console/api'
+
+import * as devices from '@console/store/actions/devices'
+import * as deviceTemplateFormats from '@console/store/actions/device-template-formats'
+
 import createEventsConnectLogics from './events'
 import createRequestLogic from './lib'
 

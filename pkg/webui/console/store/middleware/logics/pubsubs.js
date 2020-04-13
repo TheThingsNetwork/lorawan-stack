@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as pubsubs from '../../actions/pubsubs'
-import * as pubsubFormats from '../../actions/pubsub-formats'
+import api from '@console/api'
 
-import api from '../../../api'
+import * as pubsubs from '@console/store/actions/pubsubs'
+import * as pubsubFormats from '@console/store/actions/pubsub-formats'
+
 import createRequestLogic from './lib'
 
 const getPubsubLogic = createRequestLogic({

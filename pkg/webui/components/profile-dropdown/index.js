@@ -16,9 +16,10 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import Icon from '../icon'
-import Dropdown from '../dropdown'
-import PropTypes from '../../lib/prop-types'
+import Icon from '@ttn-lw/components/icon'
+import Dropdown from '@ttn-lw/components/dropdown'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import styles from './profile-dropdown.styl'
 

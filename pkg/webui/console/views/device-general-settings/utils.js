@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { selectJsConfig } from '../../../lib/selectors/env'
-import getHostnameFromUrl from '../../../lib/host-from-url'
+import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 const lwRegexp = /^[1-9].[0-9].[0-9]$/
 const lwCache = {}

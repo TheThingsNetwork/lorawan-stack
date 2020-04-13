@@ -14,20 +14,23 @@
 
 import React, { Component } from 'react'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
+import Message from '@ttn-lw/lib/components/message'
 
-import FetchTable from '../fetch-table'
+import FetchTable from '@console/containers/fetch-table'
 
-import { getOrganizationsList } from '../../../console/store/actions/organizations'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { checkFromState, mayCreateOrganizations } from '@console/lib/feature-checks'
+
+import { getOrganizationsList } from '@console/store/actions/organizations'
+
 import {
   selectOrganizations,
   selectOrganizationsTotalCount,
   selectOrganizationsFetching,
   selectOrganizationsError,
-} from '../../store/selectors/organizations'
-import { checkFromState, mayCreateOrganizations } from '../../lib/feature-checks'
+} from '@console/store/selectors/organizations'
 
 const headers = [
   {

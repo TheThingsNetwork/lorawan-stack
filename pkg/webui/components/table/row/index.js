@@ -15,7 +15,8 @@
 import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
-import PropTypes from '../../../lib/prop-types'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './row.styl'
 

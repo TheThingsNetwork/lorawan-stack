@@ -15,18 +15,21 @@
 import React from 'react'
 import * as Yup from 'yup'
 
-import SubmitButton from '../../../../components/submit-button'
-import SubmitBar from '../../../../components/submit-bar'
-import Input from '../../../../components/input'
-import Form from '../../../../components/form'
-import Notification from '../../../../components/notification'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import Input from '@ttn-lw/components/input'
+import Form from '@ttn-lw/components/form'
+import Notification from '@ttn-lw/components/notification'
 
-import diff from '../../../../lib/diff'
-import m from '../../../components/device-data-form/messages'
+import m from '@console/components/device-data-form/messages'
+
+import diff from '@ttn-lw/lib/diff'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import randomByteString from '@console/lib/random-bytes'
+
 import messages from '../messages'
-import randomByteString from '../../../lib/random-bytes'
-import PropTypes from '../../../../lib/prop-types'
-import sharedMessages from '../../../../lib/shared-messages'
 
 const random16BytesString = () => randomByteString(32)
 

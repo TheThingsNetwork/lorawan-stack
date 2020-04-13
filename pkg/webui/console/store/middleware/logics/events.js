@@ -14,7 +14,13 @@
 
 import { createLogic } from 'redux-logic'
 
-import CONNECTION_STATUS from '../../../constants/connection-status'
+import CONNECTION_STATUS from '@console/constants/connection-status'
+
+import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
+import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
+
+import { createEventsStatusSelector } from '@console/store/selectors/events'
+
 import {
   createStartEventsStreamActionType,
   createStopEventsStreamActionType,
@@ -26,9 +32,6 @@ import {
   startEventsStreamSuccess,
   stopEventsStream,
 } from '../../actions/events'
-import { createEventsStatusSelector } from '../../selectors/events'
-import { isUnauthenticatedError } from '../../../../lib/errors/utils'
-import { getCombinedDeviceId } from '../../../../lib/selectors/id'
 
 /**
  * Creates `redux-logic` logic from processing entity events.

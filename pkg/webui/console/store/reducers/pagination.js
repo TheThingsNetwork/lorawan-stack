@@ -17,7 +17,7 @@ import {
   createPaginationRequestActions,
   createPaginationDeleteActions,
   createPaginationByIdDeleteActions,
-} from '../actions/pagination'
+} from '@console/store/actions/pagination'
 
 const defaultState = {
   ids: [],

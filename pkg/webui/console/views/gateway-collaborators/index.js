@@ -16,20 +16,25 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import ErrorView from '../../../lib/components/error-view'
-import SubViewError from '../error/sub-view'
-import NotFoundRoute from '../../../lib/components/not-found-route'
-import GatewayCollaboratorsList from '../gateway-collaborators-list'
-import GatewayCollaboratorAdd from '../gateway-collaborator-add'
-import GatewayCollaboratorEdit from '../gateway-collaborator-edit'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-import { mayViewOrEditGatewayCollaborators } from '../../lib/feature-checks'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import { selectSelectedGatewayId } from '../../store/selectors/gateways'
-import PropTypes from '../../../lib/prop-types'
+import ErrorView from '@ttn-lw/lib/components/error-view'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import GatewayCollaboratorEdit from '@console/views/gateway-collaborator-edit'
+import GatewayCollaboratorAdd from '@console/views/gateway-collaborator-add'
+import GatewayCollaboratorsList from '@console/views/gateway-collaborators-list'
+import SubViewError from '@console/views/error/sub-view'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewOrEditGatewayCollaborators } from '@console/lib/feature-checks'
+
+import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 @connect(state => ({ gtwId: selectSelectedGatewayId(state) }))
 @withFeatureRequirement(mayViewOrEditGatewayCollaborators, {

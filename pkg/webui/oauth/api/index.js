@@ -14,8 +14,8 @@
 
 import axios from 'axios'
 
-import getCookieValue from '../../lib/cookie'
-import { selectApplicationRootPath, selectStackConfig } from '../../lib/selectors/env'
+import getCookieValue from '@ttn-lw/lib/cookie'
+import { selectApplicationRootPath, selectStackConfig } from '@ttn-lw/lib/selectors/env'
 
 const appRoot = selectApplicationRootPath()
 const stackConfig = selectStackConfig()

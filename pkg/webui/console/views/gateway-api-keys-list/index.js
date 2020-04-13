@@ -16,19 +16,22 @@ import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import bind from 'autobind-decorator'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import ApiKeysTable from '../../containers/api-keys-table'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import PAGE_SIZES from '@console/constants/page-sizes'
 
-import { getApiKeysList } from '../../store/actions/api-keys'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import ApiKeysTable from '@console/containers/api-keys-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { getApiKeysList } from '@console/store/actions/api-keys'
+
 import {
   selectApiKeys,
   selectApiKeysTotalCount,
   selectApiKeysFetching,
-} from '../../store/selectors/api-keys'
-
-import PAGE_SIZES from '../../constants/page-sizes'
+} from '@console/store/selectors/api-keys'
 
 export default class GatewayApiKeys extends React.Component {
   static propTypes = {

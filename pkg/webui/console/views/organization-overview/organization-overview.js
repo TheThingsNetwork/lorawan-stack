@@ -15,20 +15,25 @@
 import React from 'react'
 import { Col, Row, Container } from 'react-grid-system'
 
-import sharedMessages from '../../../lib/shared-messages'
-import DateTime from '../../../lib/components/date-time'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import PropTypes from '../../../lib/prop-types'
-import OrganizationEvents from '../../containers/organization-events'
-import DataSheet from '../../../components/data-sheet'
-import EntityTitleSection from '../../components/entity-title-section'
-import KeyValueTag from '../../components/key-value-tag'
-import Spinner from '../../../components/spinner'
-import Message from '../../../lib/components/message'
-import withRequest from '../../../lib/components/with-request'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import DataSheet from '@ttn-lw/components/data-sheet'
+import Spinner from '@ttn-lw/components/spinner'
 
-import { mayViewOrganizationInformation } from '../../lib/feature-checks'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import DateTime from '@ttn-lw/lib/components/date-time'
+import Message from '@ttn-lw/lib/components/message'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import KeyValueTag from '@console/components/key-value-tag'
+import EntityTitleSection from '@console/components/entity-title-section'
+
+import OrganizationEvents from '@console/containers/organization-events'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewOrganizationInformation } from '@console/lib/feature-checks'
 
 @withFeatureRequirement(mayViewOrganizationInformation, {
   redirect: '/',

@@ -15,7 +15,7 @@
 import React from 'react'
 import DOM from 'react-dom'
 
-import Modal from '../'
+import Modal from '..'
 
 /**
  * PortalledModal is a wrapper around the modal component that renders it into

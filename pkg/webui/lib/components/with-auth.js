@@ -15,9 +15,10 @@
 import React from 'react'
 import { withRouter, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
-import PropTypes from '../prop-types'
 
-import { withEnv } from '../../lib/components/env'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { withEnv } from './env'
 
 /**
  * Auth is a component that wraps a tree that requires the user
@@ -62,8 +63,8 @@ class Auth extends React.PureComponent {
 }
 
 Auth.propTypes = {
-  user: PropTypes.object,
   fetching: PropTypes.bool,
+  user: PropTypes.object,
 }
 
 export default Auth

@@ -15,7 +15,7 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const { Provider, Consumer } = React.createContext()
 

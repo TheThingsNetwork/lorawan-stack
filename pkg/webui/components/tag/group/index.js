@@ -16,8 +16,9 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import PropTypes from '../../../lib/prop-types'
-import Tag from '../.'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import Tag from '..'
 
 import style from './group.styl'
 

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_PUBSUB_BASE, GET_PUBSUBS_LIST_BASE } from '../actions/pubsubs'
+import { GET_PUBSUB_BASE, GET_PUBSUBS_LIST_BASE } from '@console/store/actions/pubsubs'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 

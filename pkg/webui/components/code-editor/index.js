@@ -17,7 +17,7 @@ import ReactAce from 'react-ace'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import 'brace/mode/javascript'
 import 'brace/mode/json'

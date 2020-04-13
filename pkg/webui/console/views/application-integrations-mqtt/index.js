@@ -18,21 +18,27 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import PageTitle from '../../../components/page-title'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import ErrorView from '../../../lib/components/error-view'
-import SubViewError from '../error/sub-view'
-import Message from '../../../lib/components/message'
-import DataSheet from '../../../components/data-sheet'
-import Button from '../../../components/button'
-import api from '../../api'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import api from '@console/api'
 
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { mayViewMqttConnectionInfo } from '../../lib/feature-checks'
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import DataSheet from '@ttn-lw/components/data-sheet'
+import Button from '@ttn-lw/components/button'
+
+import Message from '@ttn-lw/lib/components/message'
+import ErrorView from '@ttn-lw/lib/components/error-view'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import SubViewError from '@console/views/error/sub-view'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewMqttConnectionInfo } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import style from './application-integrations-mqtt.styl'
 

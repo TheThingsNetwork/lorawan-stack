@@ -18,6 +18,7 @@ import { withInfo } from '@storybook/addon-info'
 import { IntlProvider } from 'react-intl'
 
 import doc from './message.md'
+
 import Message from '.'
 
 const exampleMessage = {

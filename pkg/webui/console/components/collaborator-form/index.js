@@ -16,20 +16,23 @@ import React, { Component } from 'react'
 import * as Yup from 'yup'
 import bind from 'autobind-decorator'
 
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import { getCollaboratorId } from '../../../lib/selectors/id'
-import { id as collaboratorIdRegexp } from '../../lib/regexp'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import Radio from '@ttn-lw/components/radio-button'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import toast from '@ttn-lw/components/toast'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Radio from '../../../components/radio-button'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import Message from '../../../lib/components/message'
-import toast from '../../../components/toast'
-import ModalButton from '../../../components/button/modal-button'
-import RightsGroup from '../../components/rights-group'
+import Message from '@ttn-lw/lib/components/message'
+
+import RightsGroup from '@console/components/rights-group'
+
+import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { id as collaboratorIdRegexp } from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()

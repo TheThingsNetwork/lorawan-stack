@@ -16,20 +16,25 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import ErrorView from '../../../lib/components/error-view'
-import SubViewError from '../error/sub-view'
-import NotFoundRoute from '../../../lib/components/not-found-route'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-import ApplicationCollaboratorsList from '../application-collaborators-list'
-import ApplicationCollaboratorAdd from '../application-collaborator-add'
-import ApplicationCollaboratorEdit from '../application-collaborator-edit'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import { mayViewOrEditApplicationCollaborators } from '../../lib/feature-checks'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import PropTypes from '../../../lib/prop-types'
+import ErrorView from '@ttn-lw/lib/components/error-view'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import ApplicationCollaboratorsList from '@console/views/application-collaborators-list'
+import ApplicationCollaboratorEdit from '@console/views/application-collaborator-edit'
+import SubViewError from '@console/views/error/sub-view'
+import ApplicationCollaboratorAdd from '@console/views/application-collaborator-add'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewOrEditApplicationCollaborators } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))
 @withFeatureRequirement(mayViewOrEditApplicationCollaborators, {

@@ -16,10 +16,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
 
-import ApplicationWebhookAddForm from '../application-integrations-webhook-add-form'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectWebhookTemplates } from '../../store/selectors/webhook-templates'
-import PropTypes from '../../../lib/prop-types'
+import ApplicationWebhookAddForm from '@console/views/application-integrations-webhook-add-form'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectWebhookTemplates } from '@console/store/selectors/webhook-templates'
 
 @connect(state => ({
   appId: selectSelectedApplicationId(state),

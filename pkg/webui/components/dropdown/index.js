@@ -16,9 +16,11 @@ import React from 'react'
 import classnames from 'classnames'
 import { NavLink } from 'react-router-dom'
 
-import Icon from '../icon'
-import Message from '../../lib/components/message'
-import PropTypes from '../../lib/prop-types'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './dropdown.styl'
 

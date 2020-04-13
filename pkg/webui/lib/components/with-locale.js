@@ -20,9 +20,10 @@ import { connect } from 'react-redux'
 import { IntlProvider } from 'react-intl'
 import CancelablePromise from 'cancelable-promise'
 
-import Spinner from '../../components/spinner'
+import Spinner from '@ttn-lw/components/spinner'
 
-import log, { error } from '../log'
+import log, { error } from '@ttn-lw/lib/log'
+
 import { withEnv } from './env'
 
 const defaultLocale = process.predefined.DEFAULT_MESSAGES_LOCALE // Note: defined by webpack define plugin

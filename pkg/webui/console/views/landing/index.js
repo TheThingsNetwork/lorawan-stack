@@ -16,13 +16,14 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import WithAuth from '../../../lib/components/with-auth'
-import Overview from '../overview'
-import Applications from '../applications'
-import Gateways from '../gateways'
-import Organizations from '../organizations'
-import Admin from '../admin'
-import { FullViewErrorInner } from '../error'
+import WithAuth from '@ttn-lw/lib/components/with-auth'
+
+import Overview from '@console/views/overview'
+import Applications from '@console/views/applications'
+import Gateways from '@console/views/gateways'
+import Organizations from '@console/views/organizations'
+import Admin from '@console/views/admin'
+import { FullViewErrorInner } from '@console/views/error'
 
 import { selectUserError } from '../../store/selectors/user'
 

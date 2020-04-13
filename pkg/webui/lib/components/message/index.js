@@ -16,7 +16,7 @@ import React from 'react'
 import { FormattedMessage } from 'react-intl'
 import classnames from 'classnames'
 
-import PropTypes from '../../prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './message.styl'
 

@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as apiKeys from '../../actions/api-keys'
+import api from '@console/api'
 
-import api from '../../../api'
+import * as apiKeys from '@console/store/actions/api-keys'
+
 import createRequestLogic from './lib'
 
 const validParentTypes = ['application', 'gateway', 'organization']

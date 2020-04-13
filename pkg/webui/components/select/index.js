@@ -18,7 +18,7 @@ import { injectIntl } from 'react-intl'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './select.styl'
 

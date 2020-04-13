@@ -14,13 +14,14 @@
 
 import { connect } from 'react-redux'
 
-import { getOrganizationsList } from '../../store/actions/organizations'
+import { getOrganizationsList } from '@console/store/actions/organizations'
+
 import {
   selectOrganizationsFetching,
   selectOrganizationsError,
   selectOrganizations,
-} from '../../store/selectors/organizations'
-import { selectUser } from '../../store/selectors/user'
+} from '@console/store/selectors/organizations'
+import { selectUser } from '@console/store/selectors/user'
 
 export default OwnersSelect =>
   connect(

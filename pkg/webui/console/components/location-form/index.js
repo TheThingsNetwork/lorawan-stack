@@ -17,18 +17,20 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import * as Yup from 'yup'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Message from '../../../lib/components/message'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import Notification from '../../../components/notification'
-import ModalButton from '../../../components/button/modal-button'
-import toast from '../../../components/toast'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Notification from '@ttn-lw/components/notification'
+import ModalButton from '@ttn-lw/components/button/modal-button'
+import toast from '@ttn-lw/components/toast'
 
-import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '../../lib/regexp'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '@console/lib/regexp'
 
 const m = defineMessages({
   deleteWarning: 'Are you sure you want to delete this location entry?',

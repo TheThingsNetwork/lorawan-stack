@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import { omit } from 'lodash'
-import { natsUrl as natsUrlRegexp } from '../../lib/regexp'
+
+import { natsUrl as natsUrlRegexp } from '@console/lib/regexp'
 
 const natsBlankValues = {
   username: '',

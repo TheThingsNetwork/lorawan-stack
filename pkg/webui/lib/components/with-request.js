@@ -14,10 +14,11 @@
 
 import React from 'react'
 
-import Spinner from '../../components/spinner'
-import Message from '../../lib/components/message'
+import Spinner from '@ttn-lw/components/spinner'
 
-import sharedMessages from '../../lib/shared-messages'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import Message from './message'
 
 /**
  * `withRequest` is a HOC that handles:

@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { getWebhookTemplateId } from '@ttn-lw/lib/selectors/id'
+
 import {
   LIST_WEBHOOK_TEMPLATES_SUCCESS,
   GET_WEBHOOK_TEMPLATE_SUCCESS,
-} from '../actions/webhook-templates'
-import { getWebhookTemplateId } from '../../../lib/selectors/id'
+} from '@console/store/actions/webhook-templates'
 
 const defaultState = {
   entities: undefined,

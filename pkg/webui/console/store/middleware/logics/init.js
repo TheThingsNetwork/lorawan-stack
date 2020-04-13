@@ -14,9 +14,11 @@
 
 import { defineMessages } from 'react-intl'
 
-import * as user from '../../actions/user'
-import * as init from '../../actions/init'
-import api from '../../../api'
+import api from '@console/api'
+
+import * as user from '@console/store/actions/user'
+import * as init from '@console/store/actions/init'
+
 import createRequestLogic from './lib'
 
 const m = defineMessages({

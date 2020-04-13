@@ -14,7 +14,8 @@
 
 import Marshaler from '../util/marshaler'
 import combineStreams from '../util/combine-streams'
-import Devices from '../service/devices'
+
+import Devices from './devices'
 import ApiKeys from './api-keys'
 import Link from './link'
 import Collaborators from './collaborators'

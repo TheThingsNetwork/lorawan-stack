@@ -15,10 +15,12 @@
 /* eslint-disable no-invalid-this, no-await-in-loop */
 
 import traverse from 'traverse'
+
+import { notify, EVENTS } from '../../api/stream/shared'
 import Marshaler from '../../util/marshaler'
 import combineStreams from '../../util/combine-streams'
-import { notify, EVENTS } from '../../api/stream/shared'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
+
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
 

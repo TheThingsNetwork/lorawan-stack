@@ -21,31 +21,37 @@ import * as Yup from 'yup'
 import { replace } from 'connected-react-router'
 import { bindActionCreators } from 'redux'
 
-import PageTitle from '../../../components/page-title'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitButton from '../../../components/submit-button'
-import ModalButton from '../../../components/button/modal-button'
-import diff from '../../../lib/diff'
-import toast from '../../../components/toast'
-import SubmitBar from '../../../components/submit-bar'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-import Require from '../../lib/components/require'
-import KeyValueMap from '../../../components/key-value-map'
+import PageTitle from '@ttn-lw/components/page-title'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import ModalButton from '@ttn-lw/components/button/modal-button'
+import toast from '@ttn-lw/components/toast'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import KeyValueMap from '@ttn-lw/components/key-value-map'
 
-import { mayEditBasicApplicationInfo, mayDeleteApplication } from '../../lib/feature-checks'
+import Message from '@ttn-lw/lib/components/message'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
+
+import diff from '@ttn-lw/lib/diff'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { id as idRegexp } from '@ttn-lw/lib/regexp'
+
+import { mayEditBasicApplicationInfo, mayDeleteApplication } from '@console/lib/feature-checks'
+
+import { attachPromise } from '@console/store/actions/lib'
+import { updateApplication, deleteApplication } from '@console/store/actions/applications'
+
 import {
   selectSelectedApplication,
   selectSelectedApplicationId,
-} from '../../store/selectors/applications'
-import { updateApplication, deleteApplication } from '../../store/actions/applications'
-import { attachPromise } from '../../store/actions/lib'
-import PropTypes from '../../../lib/prop-types'
-import { id as idRegexp } from '../../../lib/regexp'
+} from '@console/store/selectors/applications'
+
 import { mapFormValuesToApplication, mapApplicationToFormValues } from './mapping'
 
 const m = defineMessages({

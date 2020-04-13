@@ -14,9 +14,9 @@
 
 import * as Yup from 'yup'
 
-import sharedMessages from '../../../../lib/shared-messages'
+import m from '@console/components/device-data-form/messages'
 
-import m from '../../../components/device-data-form/messages'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { parseLorawanMacVersion, ACTIVATION_MODES } from '../utils'
 

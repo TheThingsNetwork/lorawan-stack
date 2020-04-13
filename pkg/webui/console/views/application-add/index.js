@@ -20,24 +20,28 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
-import PageTitle from '../../../components/page-title'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Checkbox from '../../../components/checkbox'
-import SubmitButton from '../../../components/submit-button'
-import toast from '../../../components/toast'
-import SubmitBar from '../../../components/submit-bar'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import { id as applicationIdRegexp, address } from '../../lib/regexp'
-import { getApplicationId } from '../../../lib/selectors/id'
-import OwnersSelect from '../../containers/owners-select'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import api from '@console/api'
 
-import { selectUserId, selectUserRights } from '../../store/selectors/user'
-import { mayCreateApplications, mayLinkApplication } from '../../lib/feature-checks'
+import PageTitle from '@ttn-lw/components/page-title'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import Checkbox from '@ttn-lw/components/checkbox'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import toast from '@ttn-lw/components/toast'
+import SubmitBar from '@ttn-lw/components/submit-bar'
 
-import api from '../../api'
+import OwnersSelect from '@console/containers/owners-select'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { getApplicationId } from '@ttn-lw/lib/selectors/id'
+
+import { id as applicationIdRegexp, address } from '@console/lib/regexp'
+import { mayCreateApplications, mayLinkApplication } from '@console/lib/feature-checks'
+
+import { selectUserId, selectUserRights } from '@console/store/selectors/user'
 
 const m = defineMessages({
   applicationName: 'Application Name',

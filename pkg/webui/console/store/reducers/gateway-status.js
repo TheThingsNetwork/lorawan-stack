@@ -14,12 +14,13 @@
 
 import { handleActions } from 'redux-actions'
 
+import { isGsStatusReceiveEvent, isGsUplinkReceiveEvent } from '@ttn-lw/lib/selectors/event'
+
 import {
   GET_GTW,
   UPDATE_GTW_STATS_SUCCESS,
   GET_GTW_EVENT_MESSAGE_SUCCESS,
-} from '../actions/gateways'
-import { isGsStatusReceiveEvent, isGsUplinkReceiveEvent } from '../../../lib/selectors/event'
+} from '@console/store/actions/gateways'
 
 const handleStatsUpdate = (state, { stats = {} }) => {
   const status = stats && (stats.last_status_received_at || stats.last_uplink_received_at)

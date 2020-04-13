@@ -30,7 +30,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
-import DataSheet from './index'
+import DataSheet from '.'
 
 const testData = [
   {

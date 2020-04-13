@@ -15,10 +15,11 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import Button from '../'
-import PortalledModal from '../../../components/modal/portalled'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
 
-import PropTypes from '../../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import Button from '..'
 
 /**
  * ModalButton is a button which needs a modal confirmation to complete the
@@ -84,9 +85,9 @@ ModalButton.defaultProps = {
 }
 
 ModalButton.propTypes = {
+  modalData: PropTypes.object.isRequired,
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,
-  modalData: PropTypes.object.isRequired,
 }
 
 export default ModalButton

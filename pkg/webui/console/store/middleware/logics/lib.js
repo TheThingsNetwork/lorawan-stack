@@ -15,12 +15,8 @@
 import { createLogic } from 'redux-logic'
 import * as Sentry from '@sentry/browser'
 
-import { error } from '../../../../lib/log'
-import {
-  isUnauthenticatedError,
-  isInvalidArgumentError,
-  isUnknown,
-} from '../../../../lib/errors/utils'
+import { error } from '@ttn-lw/lib/log'
+import { isUnauthenticatedError, isInvalidArgumentError, isUnknown } from '@ttn-lw/lib/errors/utils'
 
 const getResultActionFromType = function(typeString, status) {
   if (typeString instanceof Array) {

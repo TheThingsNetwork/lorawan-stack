@@ -15,8 +15,9 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import Form from '../../../components/form'
-import PropTypes from '../../../lib/prop-types'
+import Form from '@ttn-lw/components/form'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 @bind
 class ApiKeyForm extends React.Component {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import traverse from 'traverse'
+
 import Marshaler from '../../util/marshaler'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 

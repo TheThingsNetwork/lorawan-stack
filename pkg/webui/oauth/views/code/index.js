@@ -18,8 +18,9 @@ import { Redirect } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 
-import Message from '../../../lib/components/message'
-import SafeInspector from '../../../components/safe-inspector'
+import SafeInspector from '@ttn-lw/components/safe-inspector'
+
+import Message from '@ttn-lw/lib/components/message'
 
 const m = defineMessages({
   code: 'Your Authorization Code',

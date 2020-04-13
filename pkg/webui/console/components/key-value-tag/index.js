@@ -14,10 +14,11 @@
 
 import React from 'react'
 
-import Icon from '../../../components/icon'
-import Message from '../../../lib/components/message'
+import Icon from '@ttn-lw/components/icon'
 
-import PropTypes from '../../../lib/prop-types'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './key-value-tag.styl'
 

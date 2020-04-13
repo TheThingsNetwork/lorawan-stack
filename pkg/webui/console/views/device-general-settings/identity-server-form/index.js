@@ -15,19 +15,22 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import SubmitButton from '../../../../components/submit-button'
-import SubmitBar from '../../../../components/submit-bar'
-import Input from '../../../../components/input'
-import Form from '../../../../components/form'
-import Checkbox from '../../../../components/checkbox'
-import ModalButton from '../../../../components/button/modal-button'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import Input from '@ttn-lw/components/input'
+import Form from '@ttn-lw/components/form'
+import Checkbox from '@ttn-lw/components/checkbox'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import diff from '../../../../lib/diff'
-import m from '../../../components/device-data-form/messages'
-import PropTypes from '../../../../lib/prop-types'
-import sharedMessages from '../../../../lib/shared-messages'
-import { selectAsConfig, selectJsConfig, selectNsConfig } from '../../../../lib/selectors/env'
+import m from '@console/components/device-data-form/messages'
+
+import diff from '@ttn-lw/lib/diff'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
+
 import { parseLorawanMacVersion, hasExternalJs, isDeviceOTAA } from '../utils'
+
 import validationSchema from './validation-schema'
 
 const messages = defineMessages({

@@ -18,22 +18,24 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import ModalButton from '../../../components/button/modal-button'
-import Notification from '../../../components/notification'
-import toast from '../../../components/toast'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import ModalButton from '@ttn-lw/components/button/modal-button'
+import Notification from '@ttn-lw/components/notification'
+import toast from '@ttn-lw/components/toast'
 
-import { updateDevice } from '../../store/actions/devices'
-import { attachPromise } from '../../store/actions/lib'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { updateDevice } from '@console/store/actions/devices'
+import { attachPromise } from '@console/store/actions/lib'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 const m = defineMessages({
   deleteCode: 'Delete claim authentication code',

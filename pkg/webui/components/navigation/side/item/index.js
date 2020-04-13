@@ -17,12 +17,14 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import { withRouter } from 'react-router-dom'
 
-import PropTypes from '../../../../lib/prop-types'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import SideNavigationList from '../list'
 import NavigationLink from '../../link'
-import Message from '../../../../lib/components/message'
-import Icon from '../../../icon'
 import SideNavigationContext from '../context'
 
 import style from './item.styl'

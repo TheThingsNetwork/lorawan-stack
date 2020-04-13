@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as collaborators from '../../actions/collaborators'
+import api from '@console/api'
 
-import api from '../../../api'
+import * as collaborators from '@console/store/actions/collaborators'
+
 import createRequestLogic from './lib'
 
 const validParentTypes = ['application', 'gateway', 'organization']

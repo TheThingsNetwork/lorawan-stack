@@ -16,8 +16,9 @@ import {
   GET_APPS_LIST_BASE,
   GET_APPS_RIGHTS_LIST_BASE,
   GET_APP_BASE,
-} from '../actions/applications'
-import { GET_APP_LINK_BASE } from '../actions/link'
+} from '@console/store/actions/applications'
+import { GET_APP_LINK_BASE } from '@console/store/actions/link'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,

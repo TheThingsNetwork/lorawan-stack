@@ -14,7 +14,7 @@
 
 import { connect } from 'react-redux'
 
-import { selectSelectedOrganizationId } from '../../store/selectors/organizations'
+import { selectSelectedOrganizationId } from '@console/store/selectors/organizations'
 
 const mapStateToProps = state => ({
   orgId: selectSelectedOrganizationId(state),

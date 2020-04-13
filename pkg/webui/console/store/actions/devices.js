@@ -24,9 +24,7 @@ import {
   clearEvents,
   createClearEventsActionType,
 } from './events'
-
 import { createRequestActions } from './lib'
-
 import { createPaginationByIdRequestActions, createPaginationBaseActionType } from './pagination'
 
 export const SHARED_NAME = 'DEVICE'

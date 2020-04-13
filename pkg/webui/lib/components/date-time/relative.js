@@ -15,7 +15,8 @@
 import React from 'react'
 import { FormattedRelativeTime } from 'react-intl'
 
-import PropTypes from '../../prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import DateTime from '.'
 
 function formatInSeconds(from, to) {

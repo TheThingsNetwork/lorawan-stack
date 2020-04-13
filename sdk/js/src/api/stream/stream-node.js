@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import axios from 'axios'
+
 import Token from '../../util/token'
+
 import { notify, EVENTS } from './shared'
 
 /**

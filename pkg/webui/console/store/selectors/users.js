@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_USERS_LIST_BASE, GET_USER_BASE } from '../actions/users'
+import { GET_USERS_LIST_BASE, GET_USER_BASE } from '@console/store/actions/users'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
-
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,

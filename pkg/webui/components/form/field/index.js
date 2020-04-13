@@ -17,11 +17,14 @@ import bind from 'autobind-decorator'
 import classnames from 'classnames'
 import { getIn } from 'formik'
 
-import from from '../../../lib/from'
-import Icon from '../../icon'
-import Message from '../../../lib/components/message'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import from from '@ttn-lw/lib/from'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import FormContext from '../context'
-import PropTypes from '../../../lib/prop-types'
 
 import style from './field.styl'
 

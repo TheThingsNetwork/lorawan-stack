@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import createReducer from '../events'
-
 import { getEventMessageSuccess } from '../../actions/events'
 
 describe('events reducer', () => {

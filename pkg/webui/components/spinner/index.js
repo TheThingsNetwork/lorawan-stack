@@ -17,7 +17,8 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import PropTypes from 'prop-types'
 
-import from from '../../lib/from'
+import from from '@ttn-lw/lib/from'
+
 import style from './spinner.styl'
 
 const id = () => `grad-${Math.round(Math.random() * 10000)}`

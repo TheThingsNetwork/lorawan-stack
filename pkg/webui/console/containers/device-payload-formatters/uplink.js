@@ -16,22 +16,27 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import PayloadFormattersForm from '../../components/payload-formatters-form'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
-import toast from '../../../components/toast'
+import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 
-import { updateDevice } from '../../store/actions/devices'
-import { attachPromise } from '../../store/actions/lib'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import toast from '@ttn-lw/components/toast'
+
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import PayloadFormattersForm from '@console/components/payload-formatters-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { updateDevice } from '@console/store/actions/devices'
+import { attachPromise } from '@console/store/actions/lib'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
   selectSelectedDeviceId,
   selectSelectedDeviceFormatters,
-} from '../../store/selectors/devices'
+} from '@console/store/selectors/devices'
 
 @connect(
   function(state) {

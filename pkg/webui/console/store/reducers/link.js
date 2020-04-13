@@ -17,7 +17,7 @@ import {
   GET_APP_LINK_FAILURE,
   UPDATE_APP_LINK_SUCCESS,
   DELETE_APP_LINK_SUCCESS,
-} from '../actions/link'
+} from '@console/store/actions/link'
 
 const defaultProps = {
   linked: undefined,

@@ -16,6 +16,7 @@ import axios from 'axios'
 
 import { URI_PREFIX_STACK_COMPONENT_MAP } from '../util/constants'
 import EventHandler from '../util/events'
+
 import stream from './stream/stream-node'
 
 /**

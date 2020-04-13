@@ -13,12 +13,15 @@
 // limitations under the License.
 
 import axios from 'axios'
+
 import TTN from 'ttn-lw'
 
-import token from '../lib/access-token'
-import getCookieValue from '../../lib/cookie'
-import { selectStackConfig, selectApplicationRootPath } from '../../lib/selectors/env'
-import toast from '../../components/toast'
+import toast from '@ttn-lw/components/toast'
+
+import getCookieValue from '@ttn-lw/lib/cookie'
+import { selectStackConfig, selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
+
+import token from '@console/lib/access-token'
 
 const stackConfig = selectStackConfig()
 const appRoot = selectApplicationRootPath()

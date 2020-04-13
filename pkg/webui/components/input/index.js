@@ -17,10 +17,12 @@ import { injectIntl } from 'react-intl'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
-import Icon from '../icon'
-import Spinner from '../spinner'
-import PropTypes from '../../lib/prop-types'
-import Button from '../button'
+import Icon from '@ttn-lw/components/icon'
+import Spinner from '@ttn-lw/components/spinner'
+import Button from '@ttn-lw/components/button'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import ByteInput from './byte'
 import Toggled from './toggled'
 import Generate from './generate'

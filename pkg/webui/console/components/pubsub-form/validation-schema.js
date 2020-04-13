@@ -14,14 +14,16 @@
 
 import * as Yup from 'yup'
 
-import sharedMessages from '../../../lib/shared-messages'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   id as idRegexp,
   address as addressRegexp,
   mqttUrl as mqttUrlRegexp,
   mqttPassword as mqttPasswordRegexp,
   noSpaces as noSpacesRegexp,
-} from '../../lib/regexp'
+} from '@console/lib/regexp'
+
 import { qosLevels } from './qos-options'
 
 export default Yup.object().shape({

@@ -17,11 +17,14 @@ import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
-import PropTypes from '../../../lib/prop-types'
 
-import Button from '../../button'
-import Icon from '../../icon'
-import Message from '../../../lib/components/message'
+import Button from '@ttn-lw/components/button'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import SideNavigationList from './list'
 import SideNavigationItem from './item'
 import SideNavigationContext from './context'

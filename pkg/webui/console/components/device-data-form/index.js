@@ -15,23 +15,27 @@
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 
-import Form from '../../../components/form'
-import SubmitButton from '../../../components/submit-button'
-import Input from '../../../components/input'
-import Checkbox from '../../../components/checkbox'
-import Radio from '../../../components/radio-button'
-import Select from '../../../components/select'
-import Message from '../../../lib/components/message'
-import SubmitBar from '../../../components/submit-bar'
-import { NsFrequencyPlansSelect } from '../../containers/freq-plans-select'
-import DevAddrInput from '../../containers/dev-addr-input'
-import JoinEUIPrefixesInput from '../../containers/join-eui-prefixes-input'
+import Form from '@ttn-lw/components/form'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Input from '@ttn-lw/components/input'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Radio from '@ttn-lw/components/radio-button'
+import Select from '@ttn-lw/components/select'
+import SubmitBar from '@ttn-lw/components/submit-bar'
 
-import randomByteString from '../../lib/random-bytes'
-import sharedMessages from '../../../lib/shared-messages'
-import { selectNsConfig, selectJsConfig, selectAsConfig } from '../../../lib/selectors/env'
-import errorMessages from '../../../lib/errors/error-messages'
-import PropTypes from '../../../lib/prop-types'
+import Message from '@ttn-lw/lib/components/message'
+
+import DevAddrInput from '@console/containers/dev-addr-input'
+import JoinEUIPrefixesInput from '@console/containers/join-eui-prefixes-input'
+import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectNsConfig, selectJsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
+import errorMessages from '@ttn-lw/lib/errors/error-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import randomByteString from '@console/lib/random-bytes'
+
 import m from './messages'
 import validationSchema from './validation-schema'
 

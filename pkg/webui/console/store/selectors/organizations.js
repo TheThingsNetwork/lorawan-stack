@@ -16,7 +16,8 @@ import {
   GET_ORGS_LIST_BASE,
   GET_ORG_BASE,
   GET_ORGS_RIGHTS_LIST_BASE,
-} from '../actions/organizations'
+} from '@console/store/actions/organizations'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,

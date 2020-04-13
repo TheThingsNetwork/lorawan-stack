@@ -20,17 +20,19 @@ import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
 
-import api from '../../api'
-import sharedMessages from '../../../lib/shared-messages'
+import api from '@oauth/api'
 
-import Button from '../../../components/button'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitButton from '../../../components/submit-button'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import { id as userRegexp } from '../../../lib/regexp'
+import Button from '@ttn-lw/components/button'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitButton from '@ttn-lw/components/submit-button'
+
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { id as userRegexp } from '@ttn-lw/lib/regexp'
 
 import style from './forgot-password.styl'
 

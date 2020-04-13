@@ -18,17 +18,20 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
-import sharedMessages from '../../../lib/shared-messages'
+import DataSheet from '@ttn-lw/components/data-sheet'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
-import DataSheet from '../../../components/data-sheet'
-import DateTime from '../../../lib/components/date-time'
-import DeviceEvents from '../../containers/device-events'
-import DeviceMap from '../../components/device-map'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import Message from '@ttn-lw/lib/components/message'
+import DateTime from '@ttn-lw/lib/components/date-time'
 
-import PropTypes from '../../../lib/prop-types'
-import { selectSelectedDevice } from '../../store/selectors/devices'
+import DeviceMap from '@console/components/device-map'
+
+import DeviceEvents from '@console/containers/device-events'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { selectSelectedDevice } from '@console/store/selectors/devices'
 
 import style from './device-overview.styl'
 
