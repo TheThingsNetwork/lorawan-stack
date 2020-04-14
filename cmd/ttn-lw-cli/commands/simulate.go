@@ -355,7 +355,11 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		if dev.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 			expectedMIC, err = crypto.ComputeLegacyDownlinkMIC(*dev.Session.SessionKeys.GetFNwkSIntKey().Key, macPayload.DevAddr, macPayload.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
 		} else {
-			expectedMIC, err = crypto.ComputeDownlinkMIC(*dev.Session.SessionKeys.GetSNwkSIntKey().Key, macPayload.DevAddr, lastUpMsg.GetMACPayload().FCnt, macPayload.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
+			var confFCnt uint32
+			if lastUpMsg.GetMType() == ttnpb.MType_CONFIRMED_UP {
+				confFCnt = lastUpMsg.GetMACPayload().FCnt
+			}
+			expectedMIC, err = crypto.ComputeDownlinkMIC(*dev.Session.SessionKeys.GetSNwkSIntKey().Key, macPayload.DevAddr, confFCnt, macPayload.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
 		}
 		if err != nil {
 			return err
@@ -608,7 +612,7 @@ var (
 					return nil
 				},
 				func(downMsg *ttnpb.DownlinkMessage) error {
-					lastNFCntDown, _ := cmd.Flags().GetUint32("last_n_f_cnt_down")
+					lastNFCntDown, _ := cmd.Flags().GetUint32("n_f_cnt_down")
 					if err := processDownlink(&ttnpb.EndDevice{
 						LoRaWANVersion:    uplinkParams.LoRaWANVersion,
 						LoRaWANPHYVersion: uplinkParams.LoRaWANPHYVersion,
