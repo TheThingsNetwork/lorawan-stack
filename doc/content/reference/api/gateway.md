@@ -1,7 +1,6 @@
 ---
 title: "Gateway APIs"
 description: ""
-weight: 5
 ---
 
 ## The `GatewayRegistry` service

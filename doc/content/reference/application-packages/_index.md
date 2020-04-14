@@ -1,7 +1,6 @@
 ---
 title: "Application Packages"
 description: ""
-weight: 4
 ---
 
 This is the reference to work with Application Server application packages.

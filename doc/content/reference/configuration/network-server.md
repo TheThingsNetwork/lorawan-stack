@@ -1,7 +1,6 @@
 ---
 title: "Network Server Options"
 description: ""
-weight: 4
 ---
 
 ## General Options

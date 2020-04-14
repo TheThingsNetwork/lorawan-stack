@@ -1,7 +1,6 @@
 ---
 title: "Application Webhook APIs"
 description: ""
-weight: 3
 ---
 
 ## The `ApplicationWebhookRegistry` service

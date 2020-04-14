@@ -1,7 +1,6 @@
 ---
 title: "Identity Server"
 description: ""
-weight: 1
 ---
 
 The Identity Server provides the registries that store entities such as applications with their end devices, gateways, users, organizations and OAuth clients. It also manages access control through memberships and API keys.

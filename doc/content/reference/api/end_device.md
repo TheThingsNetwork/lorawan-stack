@@ -1,7 +1,6 @@
 ---
 title: "End Device APIs"
 description: ""
-weight: 7
 ---
 
 End devices are registered in multiple registries. The Identity Server has a registry with end device metadata, the Network Server's registry contains the MAC configuration, MAC state and network session keys, the Application Server keeps payload formatters and application session keys, the Join Server keeps the root keys.

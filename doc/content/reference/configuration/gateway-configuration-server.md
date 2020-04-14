@@ -1,7 +1,6 @@
 ---
 title: "Gateway Configuration Server Options"
 description: ""
-weight: 9
 ---
 
 ## Security Options

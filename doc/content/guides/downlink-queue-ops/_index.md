@@ -1,7 +1,6 @@
 ---
 title: "Downlink Queue Operations"
 description: ""
-weight: 30
 ---
 
 {{% tts %}} keeps a queue of downlink messages per device. Applications can keep pushing downlink messages or replace the queue with a list of downlink messages.

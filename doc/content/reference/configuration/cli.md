@@ -1,7 +1,6 @@
 ---
 title: "Command-Line Interface Options"
 description: ""
-weight: 8
 ---
 
 ## Global Options

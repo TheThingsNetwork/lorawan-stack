@@ -1,7 +1,6 @@
 ---
 title: "Generate QR Code"
 description: ""
-weight: 50
 ---
 
 {{% tts %}} can generate QR codes for your devices. This helps identifying the devices and allows for claiming the device.

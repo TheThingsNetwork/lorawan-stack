@@ -1,7 +1,6 @@
 ---
 title: "QR Code Generator"
 description: ""
-weight: 7
 ---
 
 The QR Code Generator generates QR codes for devices in various formats. These QR codes can be used for various purposes, including identification and device claiming to transfer ownership.

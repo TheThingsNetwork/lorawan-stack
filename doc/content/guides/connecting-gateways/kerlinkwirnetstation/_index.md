@@ -1,7 +1,6 @@
 ---
 title: "Kerlink Wirnet Station"
 description: ""
-weight: 1
 ---
 
 Kerlink Wirnet Station is a LoRaWAN gateway, whose technical specifications can be found in [the official documentation](https://www.kerlink.com/product/wirnet-station/). This page guides you to connect it to {{% tts %}}.

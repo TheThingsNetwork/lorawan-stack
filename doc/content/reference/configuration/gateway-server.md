@@ -1,7 +1,6 @@
 ---
 title: "Gateway Server Options"
 description: ""
-weight: 3
 ---
 
 ## Forwarding Options

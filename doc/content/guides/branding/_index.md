@@ -1,7 +1,6 @@
 ---
 title: 'Web UI Branding'
 description: ''
-weight: 50
 ---
 
 This reference gives details on how to customize the branding of the login pages and the Console.

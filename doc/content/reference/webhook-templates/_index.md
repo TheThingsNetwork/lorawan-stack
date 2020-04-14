@@ -1,7 +1,6 @@
 ---
 title: "Webhook Templates"
 description: ""
-weight: 11
 ---
 
 This is the reference for [Webhook Templates]({{< ref "/concepts/webhook-templates" >}}).
