@@ -518,7 +518,7 @@ matchLoop:
 		}
 
 		macBuf := pld.FOpts
-		if len(macBuf) == 0 && pld.FPort == 0 {
+		if pld.FPort == 0 {
 			macBuf = pld.FRMPayload
 		}
 		if len(macBuf) > 0 && (len(pld.FOpts) == 0 || match.Device.MACState.LoRaWANVersion.EncryptFOpts()) {
@@ -626,7 +626,7 @@ matchLoop:
 							break
 						}
 						if *dup.GetLinkADRAns() != *pld {
-							err = errInvalidPayload
+							err = errInvalidPayload.New()
 							break
 						}
 						dupCount++
@@ -863,6 +863,11 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"f_port", pld.FPort,
 		"uplink_f_cnt", pld.FCnt,
 	))
+
+	if pld.FPort == 0 && len(pld.FOpts) > 0 {
+		log.FromContext(ctx).Warn("FOpts non-empty for FPort 0 uplink, drop")
+		return errInvalidPayload.New()
+	}
 
 	var addrMatches []contextualEndDevice
 	if err := ns.devices.RangeByAddr(ctx, pld.DevAddr, handleDataUplinkGetPaths[:],

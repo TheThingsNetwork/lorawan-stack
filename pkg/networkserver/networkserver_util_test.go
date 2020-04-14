@@ -56,18 +56,19 @@ const (
 var (
 	AdaptDataRate                       = adaptDataRate
 	AppendRecentUplink                  = appendRecentUplink
+	ApplicationJoinAcceptWithoutAppSKey = applicationJoinAcceptWithoutAppSKey
 	DownlinkPathsFromMetadata           = downlinkPathsFromMetadata
 	FrequencyPlanChannels               = frequencyPlanChannels
 	HandleLinkCheckReq                  = handleLinkCheckReq
+	JoinResponseWithoutKeys             = joinResponseWithoutKeys
 	NewMACState                         = newMACState
 	TimePtr                             = timePtr
-	JoinResponseWithoutKeys             = joinResponseWithoutKeys
-	ApplicationJoinAcceptWithoutAppSKey = applicationJoinAcceptWithoutAppSKey
 
 	ErrABPJoinRequest            = errABPJoinRequest
-	ErrDuplicate                 = errDuplicate
 	ErrDecodePayload             = errDecodePayload
 	ErrDeviceNotFound            = errDeviceNotFound
+	ErrDuplicate                 = errDuplicate
+	ErrInvalidPayload            = errInvalidPayload
 	ErrOutdatedData              = errOutdatedData
 	ErrRejoinRequest             = errRejoinRequest
 	ErrUnsupportedLoRaWANVersion = errUnsupportedLoRaWANVersion

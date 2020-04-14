@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed `ns.application.begin_link` event to `ns.application.link.begin`.
 - Renamed `ns.application.end_link` event to `ns.application.link.end`.
 - `ns.up.data.drop` and `ns.up.join.drop` events are now triggered when respective uplink duplicate is dropped by Network Server.
+- Network Server now drops FPort 0 data uplinks with non-empty FOpts.
 
 ### Deprecated
 
