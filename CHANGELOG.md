@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DeviceModeInd handling for LoRaWAN 1.1 devices.
 - Do not perform unnecessary gateway location updates.
 - Error display on failed end device import in the Console.
+- Update password view not being accessible
 
 ### Security
 

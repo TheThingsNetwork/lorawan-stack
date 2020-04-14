@@ -40,7 +40,8 @@ const m = defineMessages({
   newPassword: 'New Password',
   oldPassword: 'Old Password',
   passwordChanged: 'Password changed successfully',
-  revokeAllAccess: 'Log out from all devices',
+  revokeAccess: 'Revoke Access',
+  logoutAllDevices: 'Log out from all devices',
   revokeWarning: 'This will revoke access from all logged in devices',
   sessionRevoked: 'Your session is revoked',
 })
@@ -208,8 +209,9 @@ export default class UpdatePassword extends React.PureComponent {
               <Form.Field
                 onChange={this.handleRevokeAllAccess}
                 warning={revoke_all_access ? m.revokeWarning : undefined}
+                title={m.revokeAccess}
                 name="revoke_all_access"
-                label={m.revokeAllAccess}
+                label={m.logoutAllDevices}
                 component={Checkbox}
               />
               <Form.Submit component={SubmitButton} message={sharedMessages.changePassword} />
