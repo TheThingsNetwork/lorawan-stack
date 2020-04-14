@@ -54,7 +54,7 @@ func (as *ApplicationServer) encodeAndEncrypt(ctx context.Context, dev *ttnpb.En
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.EncryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FRMPayload)
+	frmPayload, err := crypto.EncryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FRMPayload, false)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (as *ApplicationServer) decryptAndDecode(ctx context.Context, dev *ttnpb.En
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.DecryptUplink(appSKey, dev.Session.DevAddr, uplink.FCnt, uplink.FRMPayload)
+	frmPayload, err := crypto.DecryptUplink(appSKey, dev.Session.DevAddr, uplink.FCnt, uplink.FRMPayload, false)
 	if err != nil {
 		return err
 	}

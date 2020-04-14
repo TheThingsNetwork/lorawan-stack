@@ -455,7 +455,7 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 			if err != nil {
 				return nil, err
 			}
-			item.FRMPayload, err = crypto.DecryptDownlink(appSKey, session.DevAddr, item.FCnt, item.FRMPayload)
+			item.FRMPayload, err = crypto.DecryptDownlink(appSKey, session.DevAddr, item.FCnt, item.FRMPayload, false)
 			if err != nil {
 				return nil, err
 			}
@@ -736,7 +736,7 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	if err != nil {
 		return err
 	}
-	msg.FRMPayload, err = crypto.DecryptDownlink(appSKey, dev.Session.DevAddr, msg.FCnt, msg.FRMPayload)
+	msg.FRMPayload, err = crypto.DecryptDownlink(appSKey, dev.Session.DevAddr, msg.FCnt, msg.FRMPayload, false)
 	if err != nil {
 		return err
 	}
@@ -822,7 +822,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
 			continue
 		}
-		frmPayload, err := crypto.DecryptDownlink(oldAppSKey, oldSession.DevAddr, oldItem.FCnt, oldItem.FRMPayload)
+		frmPayload, err := crypto.DecryptDownlink(oldAppSKey, oldSession.DevAddr, oldItem.FCnt, oldItem.FRMPayload, false)
 		if err != nil {
 			logger.WithError(err).Warn("Drop downlink message; failed to decrypt")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)
@@ -837,7 +837,7 @@ func (as *ApplicationServer) recalculateDownlinkQueue(ctx context.Context, dev *
 			Priority:       oldItem.Priority,
 			CorrelationIDs: oldItem.CorrelationIDs,
 		}
-		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, newSession.DevAddr, newItem.FCnt, frmPayload)
+		newItem.FRMPayload, err = crypto.EncryptDownlink(newAppSKey, newSession.DevAddr, newItem.FCnt, frmPayload, false)
 		if err != nil {
 			logger.WithError(err).Warn("Drop downlink message; failed to encrypt")
 			registerDropDownlink(ctx, dev.EndDeviceIdentifiers, oldItem, err)

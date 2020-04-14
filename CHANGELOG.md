@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Do not perform unnecessary gateway location updates.
 - Error display on failed end device import in the Console.
 - Update password view not being accessible
+- FOpts encryption and decryption for LoRaWAN 1.1 devices.
 
 ### Security
 

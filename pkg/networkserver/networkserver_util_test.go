@@ -576,8 +576,8 @@ func MakeDownlinkMACBuffer(phy band.Band, cmds ...MACCommander) []byte {
 	return b
 }
 
-func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) []byte {
-	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b)).([]byte)
+func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, isFOpts bool, b ...byte) []byte {
+	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b, isFOpts)).([]byte)
 }
 
 func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64, chIdx uint8, mds ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
@@ -595,9 +595,9 @@ func MakeDataUplink(macVersion ttnpb.MACVersion, decodePayload, confirmed bool, 
 	}
 	keys := MakeSessionKeys(macVersion, false)
 	if fPort == 0 {
-		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, frmPayload...)
+		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
 	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
-		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, fOpts...)
+		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
 	}
 	fhdr := ttnpb.FHDR{
 		DevAddr: devAddr,
@@ -655,8 +655,8 @@ func WithMatchedUplinkSettings(msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnp
 	return msg
 }
 
-func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) []byte {
-	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b)).([]byte)
+func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, isFOpts bool, b ...byte) []byte {
+	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b, isFOpts)).([]byte)
 }
 
 func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types.DevAddr, fCtrl ttnpb.FCtrl, fCnt, confFCntDown uint32, fPort uint8, frmPayload, fOpts []byte, txReq *ttnpb.TxRequest, cids ...string) *ttnpb.DownlinkMessage {
@@ -674,9 +674,9 @@ func MakeDataDownlink(macVersion ttnpb.MACVersion, confirmed bool, devAddr types
 	}
 	keys := MakeSessionKeys(macVersion, false)
 	if fPort == 0 {
-		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, frmPayload...)
+		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, false, frmPayload...)
 	} else if len(fOpts) > 0 && macVersion.EncryptFOpts() {
-		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, fOpts...)
+		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, fCnt, true, fOpts...)
 	}
 	fhdr := ttnpb.FHDR{
 		DevAddr: devAddr,

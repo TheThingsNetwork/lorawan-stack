@@ -31,14 +31,26 @@ func TestUplinkDownlinkEncryption(t *testing.T) {
 
 	var res []byte
 
-	res, _ = EncryptUplink(key, addr, 1, []byte{1, 2, 3, 4})
+	// FRM Payload
+	res, _ = EncryptUplink(key, addr, 1, []byte{1, 2, 3, 4}, false)
 	a.So(res, should.Resemble, []byte{0xCF, 0xF3, 0x0B, 0x4E})
-	res, _ = DecryptUplink(key, addr, 1, []byte{0xCF, 0xF3, 0x0B, 0x4E})
+	res, _ = DecryptUplink(key, addr, 1, []byte{0xCF, 0xF3, 0x0B, 0x4E}, false)
 	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
 
-	res, _ = EncryptDownlink(key, addr, 1, []byte{1, 2, 3, 4})
+	res, _ = EncryptDownlink(key, addr, 1, []byte{1, 2, 3, 4}, false)
 	a.So(res, should.Resemble, []byte{0x4E, 0x75, 0xF4, 0x40})
-	res, _ = DecryptDownlink(key, addr, 1, []byte{0x4E, 0x75, 0xF4, 0x40})
+	res, _ = DecryptDownlink(key, addr, 1, []byte{0x4E, 0x75, 0xF4, 0x40}, false)
+	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
+
+	// FOpts
+	res, _ = EncryptUplink(key, addr, 1, []byte{1, 2, 3, 4}, true)
+	a.So(res, should.Resemble, []byte{0x33, 0xC9, 0x26, 0x22})
+	res, _ = DecryptUplink(key, addr, 1, []byte{0x33, 0xC9, 0x26, 0x22}, true)
+	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
+
+	res, _ = EncryptDownlink(key, addr, 1, []byte{1, 2, 3, 4}, true)
+	a.So(res, should.Resemble, []byte{0xCA, 0x6F, 0xDA, 0xBA})
+	res, _ = DecryptDownlink(key, addr, 1, []byte{0xCA, 0x6F, 0xDA, 0xBA}, true)
 	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
 }
 
