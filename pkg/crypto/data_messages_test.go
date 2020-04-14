@@ -44,7 +44,7 @@ func TestUplinkDownlinkEncryption(t *testing.T) {
 
 	// FOpts
 	res, _ = EncryptUplink(key, addr, 1, []byte{1, 2, 3, 4}, true)
-	a.So(res, should.Resemble, []byte{0x33, 0xC9, 0x26, 0x22}) 
+	a.So(res, should.Resemble, []byte{0x33, 0xC9, 0x26, 0x22})
 	res, _ = DecryptUplink(key, addr, 1, []byte{0x33, 0xC9, 0x26, 0x22}, true)
 	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
 

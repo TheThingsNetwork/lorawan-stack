@@ -17,6 +17,8 @@ package crypto
 import (
 	"crypto/aes"
 	"encoding/binary"
+	"fmt"
+	"math"
 
 	"github.com/jacobsa/crypto/cmac"
 	"go.thethings.network/lorawan-stack/pkg/types"
@@ -26,6 +28,9 @@ func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uin
 	k := len(payload) / aes.BlockSize
 	if len(payload)%aes.BlockSize != 0 {
 		k++
+	}
+	if k > math.MaxUint8 {
+		panic(fmt.Sprintf("k value of %d overflows byte", k))
 	}
 	encrypted := make([]byte, 0, k*16)
 	cipher, err := aes.NewCipher(key[:])
@@ -39,13 +44,11 @@ func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uin
 	binary.LittleEndian.PutUint32(a[10:14], fCnt)
 	var s [aes.BlockSize]byte
 	var b [aes.BlockSize]byte
-	var f int
-	if isFOpts == false {
-		f = 1
-	}
-	for i := 0; i < k; i++ {
+	for i := uint8(0); i < uint8(k); i++ {
 		copy(b[:], payload[i*aes.BlockSize:])
-		a[15] = uint8(i + f)
+		if !isFOpts {
+			a[15] = i + 1
+		}
 		cipher.Encrypt(s[:], a[:])
 		for j := 0; j < aes.BlockSize; j++ {
 			b[j] = b[j] ^ s[j]
