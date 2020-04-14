@@ -54,6 +54,8 @@ If using a CA that is not already trusted by your system, use the `--fetch-ca` f
 
 > NOTE: If the file exists already, it is not overwritten and an error is printed instead. You can use `--overwrite` to overwrite the existing configuration file.
 
+> NOTE: You can also use the `--grpc-port` and `--oauth-server-address` flags to override the default values for the gRPC port and the OAuth server address. These are not needed for standard deployments.
+
 ### Manually creating configuration file
 
 Alternatively, you can create a file named `.ttn-lw-cli.yml` and paste the following contents:
