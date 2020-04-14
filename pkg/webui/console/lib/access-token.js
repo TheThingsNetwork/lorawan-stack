@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '../api'
-
 import * as cache from './cache'
 
-export default async function() {
+export default retrieveToken => async () => {
   const storedToken = cache.get('accessToken')
   let token
 
@@ -27,7 +25,7 @@ export default async function() {
     clear()
 
     // Retrieve new token and store it.
-    const response = await api.console.token()
+    const response = await retrieveToken()
     token = response.data
     cache.set('accessToken', token)
     return token
