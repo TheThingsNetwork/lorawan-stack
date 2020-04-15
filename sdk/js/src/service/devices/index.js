@@ -64,172 +64,6 @@ class Devices {
     return device
   }
 
-  async _setDevice(applicationId, deviceId, device, create = false, requestTreeOverwrite) {
-    const ids = device.ids
-    const devId = deviceId || ('device_id' in ids && ids.device_id)
-    const appId = applicationId || ('application_ids' in ids && ids.application_ids.application_id)
-
-    if (deviceId && ids && 'device_id' in ids && deviceId !== ids.device_id) {
-      throw new Error('Device ID mismatch.')
-    }
-
-    if (!create && !devId) {
-      throw new Error('Missing device_id for update operation.')
-    }
-
-    if (!appId) {
-      throw new Error('Missing application_id for device.')
-    }
-
-    // Ensure proper id object
-    if (!('ids' in device)) {
-      device.ids = { device_id: deviceId, application_ids: { application_id: applicationId } }
-    } else if (!device.ids.device_id) {
-      device.ids.device_id = deviceId
-    } else if (!device.ids.application_ids || !device.ids.application_ids.application_id) {
-      device.ids.application_ids = { application_id: applicationId }
-    }
-
-    const params = {
-      routeParams: {
-        'end_device.ids.application_ids.application_id': appId,
-      },
-    }
-
-    // Extract the paths from the patch
-    const deviceMap = traverse(deviceEntityMap)
-
-    const commonPathFilter = function(element, index, array) {
-      return deviceMap.has(array.slice(0, index + 1))
-    }
-    const paths = traverse(device).reduce(function(acc, node) {
-      if (this.isLeaf) {
-        const path = this.path
-
-        // Only consider adding, if a common parent has not been already added
-        if (
-          acc.every(
-            e =>
-              !path
-                .slice(-1)
-                .join()
-                .startsWith(e.join()),
-          )
-        ) {
-          // Add only the deepest possible field mask of the patch
-          const commonPath = path.filter(commonPathFilter)
-          acc.push(commonPath)
-        }
-      }
-      return acc
-    }, [])
-
-    const requestTree = requestTreeOverwrite ? requestTreeOverwrite : splitSetPaths(paths)
-
-    if (create) {
-      if (device.join_server_address !== this._stackConfig.jsHost) {
-        delete requestTree.js
-      }
-    } else {
-      // Retrieve join information if not present for update
-      const paths = [
-        ['application_server_address'],
-        ['network_server_address'],
-        ['join_server_address'],
-      ]
-
-      if (!('supports_join' in device)) {
-        paths.push(['supports_join'])
-      }
-
-      const res = await this._getDevice(appId, devId, paths, true)
-      if ('supports_join' in res && res.supports_join) {
-        // The NS registry entry exists
-        device.supports_join = true
-      } else if (res.join_server_address) {
-        // The NS registry entry does not exist, but a join_server_address
-        // setting suggests that join is supported, so we add the path
-        // to the request tree to ensure that it will be set on creation
-        device.supports_join = true
-        requestTree.ns.push(['supports_join'])
-      }
-
-      if (res.network_server_address !== this._stackConfig.nsHost) {
-        delete requestTree.ns
-      }
-
-      if (res.application_server_address !== this._stackConfig.asHost) {
-        delete requestTree.as
-      }
-
-      if (res.join_server_address !== this._stackConfig.jsHost) {
-        delete requestTree.js
-      }
-    }
-
-    // Do not query JS when the device is ABP
-    if (!device.supports_join) {
-      delete requestTree.js
-    }
-
-    // Retrieve necessary EUIs in case of a join server query being necessary
-    if ('js' in requestTree) {
-      if (!create && (!ids || !ids.join_eui || !ids.dev_eui)) {
-        const res = await this._getDevice(
-          appId,
-          devId,
-          [['ids', 'join_eui'], ['ids', 'dev_eui']],
-          true,
-        )
-        if (!res.ids || !res.ids.join_eui || !res.ids.dev_eui) {
-          throw new Error(
-            'Could not update Join Server data on a device without Join EUI or Dev EUI',
-          )
-        }
-        device.ids = {
-          ...device.ids,
-          join_eui: res.ids.join_eui,
-          dev_eui: res.ids.dev_eui,
-        }
-      }
-    }
-
-    // Perform the requests
-    const devicePayload = Marshaler.payload(device, 'end_device')
-    const setParts = await makeRequests(
-      this._api,
-      this._stackConfig,
-      create ? 'create' : 'set',
-      requestTree,
-      params,
-      devicePayload,
-    )
-
-    // Filter out errored requests
-    const errors = setParts.filter(part => part.hasErrored)
-
-    // Handle possible errored requests
-    if (errors.length !== 0) {
-      // Roll back successfully created registry entries
-      if (create) {
-        const rollbackComponents = setParts.reduce((components, part) => {
-          if (part.hasAttempted && !part.hasErrored) {
-            components.push(part.component)
-          }
-
-          return components
-        }, [])
-
-        this._deleteDevice(appId, devId, rollbackComponents)
-      }
-
-      // Throw the first error
-      throw errors[0].error
-    }
-
-    return mergeDevice(setParts)
-  }
-
   async _getDevice(applicationId, deviceId, paths, ignoreNotFound) {
     if (!applicationId) {
       throw new Error('Missing application_id for device.')
@@ -498,12 +332,14 @@ class Devices {
   /**
    * Creates an end device under the `applicationId` application.
    * This method will cause creating the end device in all available stack
-   * components (i.e. NS, AS, IS, JS) based on provided end device payload.
+   * components (i.e. NS, AS, IS, JS) based on provided end device payload (`device`) or
+   * on field mask paths (`mask`).
    * @param {string} applicationId - Application ID
    * @param {Object} device - The end device payload
+   * @param {Array} mask -The field mask paths (by default is generated from `device` payload)
    * @returns {Object} - Created end device on successful creation, an error otherwise
    */
-  async create(applicationId, device) {
+  async create(applicationId, device, mask = Marshaler.fieldMaskFromPatch(device)) {
     if (!Boolean(applicationId)) {
       throw new Error('Missing application ID for device')
     }
@@ -515,11 +351,7 @@ class Devices {
       throw new Error('Missing end device ID')
     }
 
-    if (supports_join && 'provisioner_id' in device && device.provisioner_id !== '') {
-      throw new Error('Setting a provisioner with end device keys is not allowed.')
-    }
-
-    const requestTree = splitSetPaths(traverse(device).paths())
+    const requestTree = splitSetPaths(Marshaler.selectorToPaths(mask))
 
     if (!supports_join || device.join_server_address !== this._stackConfig.jsHost) {
       delete requestTree.js
@@ -600,7 +432,7 @@ class Devices {
     })
   }
 
-  bulkCreate(applicationId, deviceOrDevices, components = ['is', 'ns', 'as', 'js']) {
+  bulkCreate(applicationId, deviceOrDevices) {
     const devices = !(deviceOrDevices instanceof Array) ? [deviceOrDevices] : deviceOrDevices
     let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
     let finishedCount = 0
@@ -620,15 +452,8 @@ class Devices {
             end_device,
           } = device
 
-          const requestTree = splitSetPaths(Marshaler.selectorToPaths(paths), undefined, components)
+          const result = await this.create(applicationId, end_device, paths)
 
-          const result = await this._setDevice(
-            applicationId,
-            undefined,
-            end_device,
-            true,
-            requestTree,
-          )
           notify(listeners[EVENTS.CHUNK], result)
           finishedCount++
           if (finishedCount === devices.length) {

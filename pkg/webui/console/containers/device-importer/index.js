@@ -127,8 +127,12 @@ export default class DeviceImporter extends Component {
   @bind
   async handleSubmit(values) {
     const { appId, jsConfig, nsConfig, asConfig } = this.props
-    const { format_id, data, set_claim_auth_code, components } = values
-    const componentArray = Object.keys(components).filter(c => components[c])
+    const {
+      format_id,
+      data,
+      set_claim_auth_code,
+      components: { js: jsSelected, as: asSelected, ns: nsSelected },
+    } = values
 
     try {
       // Start template conversion
@@ -149,19 +153,19 @@ export default class DeviceImporter extends Component {
       // Apply default values
       for (const deviceAndFieldMask of devices) {
         const { end_device: device, field_mask } = deviceAndFieldMask
-        if (set_claim_auth_code) {
+        if (set_claim_auth_code && jsSelected) {
           device.claim_authentication_code = { value: randomByteString(4 * 2) }
           field_mask.paths.push('claim_authentication_code')
         }
-        if (device.supports_join && !device.join_server_address && jsConfig.enabled) {
+        if (device.supports_join && !device.join_server_address && jsConfig.enabled && jsSelected) {
           device.join_server_address = new URL(jsConfig.base_url).hostname
           field_mask.paths.push('join_server_address')
         }
-        if (!device.application_server_address && asConfig.enabled) {
+        if (!device.application_server_address && asConfig.enabled && asSelected) {
           device.application_server_address = new URL(asConfig.base_url).hostname
           field_mask.paths.push('application_server_address')
         }
-        if (!device.network_server_address && nsConfig.enabled) {
+        if (!device.network_server_address && nsConfig.enabled && nsSelected) {
           device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask.paths.push('network_server_address')
         }
@@ -173,7 +177,7 @@ export default class DeviceImporter extends Component {
         totalDevices: devices.length,
       })
       this.appendToLog('Creating devices…')
-      const createStream = api.device.bulkCreate(appId, devices, componentArray)
+      const createStream = api.device.bulkCreate(appId, devices)
 
       await new Promise((resolve, reject) => {
         createStream.on('chunk', this.handleCreationProgress)
