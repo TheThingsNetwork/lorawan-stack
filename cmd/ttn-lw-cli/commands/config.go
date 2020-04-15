@@ -15,16 +15,18 @@
 package commands
 
 import (
-	"fmt"
-
 	"go.thethings.network/lorawan-stack/cmd/internal/commands"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/discover"
 )
 
 var (
-	defaultClusterHost = "localhost"
-	defaultInsecure    = false
+	defaultInsecure                  = false
+	defaultClusterHost               = "localhost"
+	defaultGRPCAddress, _            = discover.DefaultPort(defaultClusterHost, discover.DefaultPorts[!defaultInsecure])
+	defaultOAuthServerBaseAddress, _ = discover.DefaultURL(defaultClusterHost, discover.DefaultHTTPPorts[!defaultInsecure], !defaultInsecure)
+	defaultOAuthServerAddress        = defaultOAuthServerBaseAddress + "/oauth"
 )
 
 // Config for the ttn-lw-cli binary.
@@ -74,14 +76,7 @@ func (c Config) getHosts() []string {
 }
 
 // MakeDefaultConfig builds the default config for the ttn-lw-cli binary for a given host.
-func MakeDefaultConfig(clusterHost string, insecure bool) Config {
-	clusterGRPCAddress := fmt.Sprintf("%s:8884", clusterHost)
-	clusterHTTPAddress := fmt.Sprintf("https://%s:8885", clusterHost)
-	if insecure {
-		clusterGRPCAddress = fmt.Sprintf("%s:1884", clusterHost)
-		clusterHTTPAddress = fmt.Sprintf("http://%s:1885", clusterHost)
-	}
-
+func MakeDefaultConfig(clusterGRPCAddress string, oauthServerAddress string, insecure bool) Config {
 	return Config{
 		Base: conf.Base{
 			Log: conf.Log{
@@ -90,7 +85,7 @@ func MakeDefaultConfig(clusterHost string, insecure bool) Config {
 		},
 		InputFormat:                        "json",
 		OutputFormat:                       "json",
-		OAuthServerAddress:                 clusterHTTPAddress + "/oauth",
+		OAuthServerAddress:                 oauthServerAddress,
 		IdentityServerGRPCAddress:          clusterGRPCAddress,
 		GatewayServerEnabled:               true,
 		GatewayServerGRPCAddress:           clusterGRPCAddress,
@@ -108,7 +103,7 @@ func MakeDefaultConfig(clusterHost string, insecure bool) Config {
 }
 
 // DefaultConfig contains the default config for the ttn-lw-cli binary.
-var DefaultConfig = MakeDefaultConfig(defaultClusterHost, defaultInsecure)
+var DefaultConfig = MakeDefaultConfig(defaultGRPCAddress, defaultOAuthServerAddress, defaultInsecure)
 
 var configCommand = commands.Config(mgr)
 
