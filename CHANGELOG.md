@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Too strict webhook base URL validation in the Console.
 - Webhook and PubSub total count in the Console.
 - DevEUI is set when creating ABP devices via CLI.
+- CLI now shows all supported enum values for LoraWAN fields.
 
 ### Security
 
