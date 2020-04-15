@@ -257,12 +257,12 @@ func (s *Server) UpdateInfo(c echo.Context) error {
 		res.LNSURI = fmt.Sprintf("%s://%s", scheme, address)
 	}
 
+	logger.WithField("lns_uri", gtw.GatewayServerAddress).Debug("Getting trusted certificate for LNS...")
+	lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
+	if err != nil {
+		return err
+	}
 	if credentials := gtw.Attributes[lnsCredentialsAttribute]; credentials != "" {
-		logger.WithField("lns_uri", gtw.GatewayServerAddress).Debug("Getting trusted certificate for LNS...")
-		lnsTrust, err := s.getTrust(gtw.GatewayServerAddress)
-		if err != nil {
-			return err
-		}
 		lnsCredentials, err := TokenCredentials(lnsTrust, credentials)
 		if err != nil {
 			return err
