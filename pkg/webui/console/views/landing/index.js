@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import WithAuth from '../../../lib/components/with-auth'
 import Overview from '../overview'
@@ -23,12 +24,21 @@ import Organizations from '../organizations'
 import Admin from '../admin'
 import { FullViewErrorInner } from '../error'
 
+import { selectUserError } from '../../store/selectors/user'
+
 import style from './landing.styl'
 
 const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 
+@connect(state => ({ error: selectUserError(state) }))
 export default class Landing extends React.PureComponent {
   render() {
+    const { error } = this.props
+
+    if (error) {
+      throw error
+    }
+
     return (
       <div className={style.container}>
         <WithAuth>
