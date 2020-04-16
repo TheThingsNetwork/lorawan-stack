@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Frontend asset hashes are loaded dynamically from a manifest file instead of being built into the stack binary.
 - Removed `Cache-Control` header for static files.
 - Sort events by `time` in the Console.
+- Restructure doc folder
 
 ### Removed
 

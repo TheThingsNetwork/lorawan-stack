@@ -51,7 +51,7 @@ You can control which CSS and JavaScript files are included into the rendered HT
 
 ### Assets and Custom Branding
 
-You can control the url of the assets folder that the Console frontend will use, e.g. if you plan on using a CDN to serve your assets. The branding base url will enable custom branding for logos, favicons and OpenGraph images. See the [custom branding guide]({{< ref "/guides/branding" >}}) for detailed descriptions on this subject.
+You can control the url of the assets folder that the Console frontend will use, e.g. if you plan on using a CDN to serve your assets. The branding base url will enable custom branding for logos, favicons and OpenGraph images. See the [custom branding guide]({{< ref "/getting-started/branding" >}}) for detailed descriptions on this subject.
 
 - `console.ui.assets-base-url`: The base URL to the page assets
 - `console.ui.branding-base-url`: The base URL to the branding assets
