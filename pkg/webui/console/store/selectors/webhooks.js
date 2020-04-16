@@ -28,6 +28,6 @@ export const selectWebhookFetching = createFetchingSelector(GET_WEBHOOK_BASE)
 
 // Webhooks
 export const selectWebhooks = state => Object.values(selectWebhookEntityStore(state))
-export const selectWebhooksTotalCount = state => selectWebhookEntityStore(state).totalCount
+export const selectWebhooksTotalCount = state => selectWebhookStore(state).totalCount
 export const selectWebhooksFetching = createFetchingSelector(GET_WEBHOOKS_LIST_BASE)
 export const selectWebhooksError = createErrorSelector(GET_WEBHOOKS_LIST_BASE)
