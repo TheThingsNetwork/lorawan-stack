@@ -22,7 +22,6 @@ exports[`HeadCell should match snapshot 1`] = `
 >
   <Message
     capitalize={false}
-    component="span"
     content="Head cell"
     firstToLower={false}
     firstToUpper={false}
