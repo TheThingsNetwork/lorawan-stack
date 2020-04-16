@@ -50,15 +50,15 @@ const m = defineMessages({
 
 const validationSchema = Yup.object().shape({
   user_id: Yup.string()
-    .min(3, sharedMessages.validateTooShort)
-    .max(36, sharedMessages.validateTooLong)
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(36, Yup.passValues(sharedMessages.validateTooLong))
     .matches(userRegexp, sharedMessages.validateIdFormat)
     .required(sharedMessages.validateRequired),
   name: Yup.string()
-    .min(3, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   password: Yup.string()
-    .min(8, sharedMessages.validateTooShort)
+    .min(8, Yup.passValues(sharedMessages.validateTooShort))
     .required(sharedMessages.validateRequired),
   primary_email_address: Yup.string()
     .email(sharedMessages.validateEmail)

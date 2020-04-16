@@ -67,8 +67,8 @@ const headerCheck = headers =>
 const validationSchema = Yup.object().shape({
   webhook_id: Yup.string()
     .matches(webhookIdRegexp, sharedMessages.validateIdFormat)
-    .min(2, sharedMessages.validateTooShort)
-    .max(25, sharedMessages.validateTooLong)
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
   headers: Yup.array().test('has no empty string values', m.headersValidateRequired, headerCheck),

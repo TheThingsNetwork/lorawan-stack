@@ -25,9 +25,9 @@ const isOTAA = mode => mode === 'otaa'
 
 const validationSchema = Yup.object({
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  description: Yup.string().max(2000, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
+  description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
   lorawan_version: Yup.string().required(sharedMessages.validateRequired),
   lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
@@ -48,8 +48,8 @@ const validationSchema = Yup.object({
     .shape({
       device_id: Yup.string()
         .matches(deviceIdRegexp, sharedMessages.validateIdFormat)
-        .min(2, sharedMessages.validateTooShort)
-        .max(36, sharedMessages.validateTooLong)
+        .min(2, Yup.passValues(sharedMessages.validateTooShort))
+        .max(36, Yup.passValues(sharedMessages.validateTooLong))
         .required(sharedMessages.validateRequired),
     })
     .when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
@@ -126,17 +126,17 @@ const validationSchema = Yup.object({
     }),
     application_server_id: Yup.string().when('_external_js', {
       is: false,
-      then: schema => schema.max(100, sharedMessages.validateTooLong).default(''),
+      then: schema => schema.max(100, Yup.passValues(sharedMessages.validateTooLong)).default(''),
       otherwise: schema => schema.strip(),
     }),
     application_server_kek_label: Yup.string().when('_external_js', {
       is: false,
-      then: schema => schema.max(2048, sharedMessages.validateTooLong).default(''),
+      then: schema => schema.max(2048, Yup.passValues(sharedMessages.validateTooLong)).default(''),
       otherwise: schema => schema.strip(),
     }),
     network_server_kek_label: Yup.string().when('_external_js', {
       is: false,
-      then: schema => schema.max(2048, sharedMessages.validateTooLong).default(''),
+      then: schema => schema.max(2048, Yup.passValues(sharedMessages.validateTooLong)).default(''),
       otherwise: schema => schema.strip(),
     }),
   }) // ABP related entries.

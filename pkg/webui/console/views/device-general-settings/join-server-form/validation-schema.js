@@ -68,13 +68,13 @@ const validationSchema = Yup.object()
       otherwise: schema => schema.strip(),
     }),
     application_server_id: Yup.string()
-      .max(100, sharedMessages.validateTooLong)
+      .max(100, Yup.passValues(sharedMessages.validateTooLong))
       .default(''),
     application_server_kek_label: Yup.string()
-      .max(2048, sharedMessages.validateTooLong)
+      .max(2048, Yup.passValues(sharedMessages.validateTooLong))
       .default(''),
     network_server_kek_label: Yup.string()
-      .max(2048, sharedMessages.validateTooLong)
+      .max(2048, Yup.passValues(sharedMessages.validateTooLong))
       .default(''),
     _external_js: Yup.boolean().default(false),
     _lorawan_version: Yup.string().default('1.1.0'),

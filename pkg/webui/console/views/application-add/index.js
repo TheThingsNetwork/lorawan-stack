@@ -61,12 +61,12 @@ const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),
   application_id: Yup.string()
     .matches(applicationIdRegexp, sharedMessages.validateIdFormat)
-    .min(2, sharedMessages.validateTooShort)
-    .max(25, sharedMessages.validateTooLong)
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string(),
   network_server_address: Yup.string().when('link', {
     is: true,

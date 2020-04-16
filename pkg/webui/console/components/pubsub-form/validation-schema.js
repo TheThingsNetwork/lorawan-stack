@@ -29,8 +29,8 @@ import { qosLevels } from './qos-options'
 export default Yup.object().shape({
   pub_sub_id: Yup.string()
     .matches(idRegexp, sharedMessages.validateIdFormat)
-    .min(2, sharedMessages.validateTooShort)
-    .max(25, sharedMessages.validateTooLong)
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
   base_topic: Yup.string().required(sharedMessages.validateRequired),
@@ -42,16 +42,16 @@ export default Yup.object().shape({
         is: true,
         then: Yup.string()
           .matches(idRegexp, sharedMessages.validateIdFormat)
-          .min(2, sharedMessages.validateTooShort)
-          .max(100, sharedMessages.validateTooLong)
+          .min(2, Yup.passValues(sharedMessages.validateTooShort))
+          .max(100, Yup.passValues(sharedMessages.validateTooLong))
           .required(sharedMessages.validateRequired),
         otherwise: Yup.string().strip(),
       }),
       password: Yup.string().when('use_credentials', {
         is: true,
         then: Yup.string()
-          .min(2, sharedMessages.validateTooShort)
-          .max(100, sharedMessages.validateTooLong)
+          .min(2, Yup.passValues(sharedMessages.validateTooShort))
+          .max(100, Yup.passValues(sharedMessages.validateTooLong))
           .required(sharedMessages.validateRequired),
         otherwise: Yup.string().strip(),
       }),
@@ -75,15 +75,15 @@ export default Yup.object().shape({
         .required(sharedMessages.validateRequired),
       client_id: Yup.string()
         .matches(noSpacesRegexp, sharedMessages.validateNoSpaces)
-        .min(2, sharedMessages.validateTooShort)
-        .max(23, sharedMessages.validateTooLong)
+        .min(2, Yup.passValues(sharedMessages.validateTooShort))
+        .max(23, Yup.passValues(sharedMessages.validateTooLong))
         .required(sharedMessages.validateRequired),
       username: Yup.string().when('use_credentials', {
         is: true,
         then: Yup.string()
           .matches(noSpacesRegexp, sharedMessages.validateNoSpaces)
-          .min(2, sharedMessages.validateTooShort)
-          .max(100, sharedMessages.validateTooLong)
+          .min(2, Yup.passValues(sharedMessages.validateTooShort))
+          .max(100, Yup.passValues(sharedMessages.validateTooLong))
           .required(sharedMessages.validateRequired),
         otherwise: Yup.string().strip(),
       }),

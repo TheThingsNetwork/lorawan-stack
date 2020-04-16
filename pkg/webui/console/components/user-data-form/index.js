@@ -40,11 +40,11 @@ const approvalStates = [
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   primary_email_address: Yup.string().email(sharedMessages.validateEmail),
   state: Yup.string().oneOf(approvalStates),
-  description: Yup.string().max(2000, sharedMessages.validateTooLong),
+  description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
 })
 
 const m = defineMessages({

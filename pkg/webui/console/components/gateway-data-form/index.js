@@ -71,18 +71,18 @@ const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     gateway_id: Yup.string()
       .matches(gatewayIdRegexp, sharedMessages.validateIdFormat)
-      .min(2, sharedMessages.validateTooShort)
-      .max(36, sharedMessages.validateTooLong)
+      .min(2, Yup.passValues(sharedMessages.validateTooShort))
+      .max(36, Yup.passValues(sharedMessages.validateTooLong))
       .required(sharedMessages.validateRequired),
-    eui: Yup.nullableString().length(8 * 2, sharedMessages.validateTooShort),
+    eui: Yup.nullableString().length(8 * 2, Yup.passValues(sharedMessages.validateTooShort)),
   }),
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   update_channel: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  description: Yup.string().max(2000, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
+  description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
   gateway_server_address: Yup.string().matches(addressRegexp, sharedMessages.validateAddressFormat),
   location_public: Yup.boolean().default(false),
