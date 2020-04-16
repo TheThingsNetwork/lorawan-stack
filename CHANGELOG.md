@@ -52,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Application Server returns an error when trying to delete a device that does not exist.
 - Network Server returns an error when trying to delete a device that does not exist.
 - Retrieve LNS Trust without LNS Credentials attribute.
+- Too strict webhook base URL validation.
 
 ### Security
 
