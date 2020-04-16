@@ -93,7 +93,7 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
       icon="keyboard_arrow_left"
       message={
         Object {
-          "defaultMessage": "Hide Sidebar",
+          "defaultMessage": "Hide sidebar",
           "id": "components.navigation.side.index.hideSidebar",
         }
       }
@@ -215,7 +215,7 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
       icon="keyboard_arrow_left"
       message={
         Object {
-          "defaultMessage": "Hide Sidebar",
+          "defaultMessage": "Hide sidebar",
           "id": "components.navigation.side.index.hideSidebar",
         }
       }
