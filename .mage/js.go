@@ -251,9 +251,9 @@ func (js Js) Messages() error {
 
 // Translations builds the frontend locale files.
 func (js Js) Translations() error {
+	mg.Deps(js.Messages)
 	changed, err := target.Dir("./pkg/webui/locales/en.json", "./.cache/messages")
 	if os.IsNotExist(err) || (err == nil && changed) {
-		mg.Deps(js.Messages)
 		if mg.Verbose() {
 			fmt.Println("Building frontend locale files...")
 		}
