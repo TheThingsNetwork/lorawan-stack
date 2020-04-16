@@ -104,7 +104,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
 				FieldMask: pbtypes.FieldMask{
 					Paths: []string{"ids"},
-				}},
+				},
+			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
 				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -887,42 +888,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a := assertions.New(t)
 				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
 			},
-		},
-
-		{
-			Name: "Invalid application ID",
-			ContextFunc: func(ctx context.Context) context.Context {
-				return rights.NewContext(ctx, rights.Rights{
-					ApplicationRights: map[string]*ttnpb.Rights{
-						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationID: "bar-application"}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-						),
-					},
-				})
-			},
-			DeviceRequest: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
-					ApplicationID: "bar-application",
-				},
-				DeviceID: "bar-device",
-				JoinEUI:  registeredJoinEUI,
-				DevEUI:   registeredDevEUI,
-			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
-				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{
-					ApplicationID: "bar-application",
-				})
-				a.So(devID, should.Equal, "bar-device")
-				a.So(paths, should.BeNil)
-				dev, _, err := cb(CopyEndDevice(registeredDevice))
-				return dev, err
-			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				a := assertions.New(t)
-				return a.So(errors.IsNotFound(err), should.BeTrue)
-			},
-			SetByIDCalls: 1,
 		},
 
 		{
