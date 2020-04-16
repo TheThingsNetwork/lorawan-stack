@@ -166,7 +166,10 @@ export default class Overview extends React.Component {
                 className={style.chooser}
               >
                 <Animation ref={this.appAnimationRef} animationData={AppAnimation} />
-                <Message content={hasEntities ? m.gotoApplications : m.createApplication} />
+                <Message
+                  component="span"
+                  content={hasEntities ? m.gotoApplications : m.createApplication}
+                />
               </div>
             </Link>
           </Col>
@@ -180,7 +183,10 @@ export default class Overview extends React.Component {
                 className={style.chooser}
               >
                 <Animation ref={this.gatewayAnimationRef} animationData={GatewayAnimation} />
-                <Message content={hasEntities ? m.gotoGateways : m.createGateway} />
+                <Message
+                  component="span"
+                  content={hasEntities ? m.gotoGateways : m.createGateway}
+                />
               </div>
             </Link>
           </Col>
