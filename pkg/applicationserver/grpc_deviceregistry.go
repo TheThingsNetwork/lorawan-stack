@@ -23,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -215,9 +216,10 @@ func (r asEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 	}
 	var evt events.Event
 	_, err := r.AS.deviceRegistry.Set(ctx, *ids, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-		if dev != nil {
-			evt = evtDeleteEndDevice(ctx, ids, nil)
+		if dev == nil {
+			return nil, nil, errDeviceNotFound.New().WithAttributes("device_uid", unique.ID(ctx, ids))
 		}
+		evt = evtDeleteEndDevice(ctx, ids, nil)
 		return nil, nil, nil
 	})
 	if err != nil {
