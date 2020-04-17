@@ -29,6 +29,7 @@ import ModalButton from '../../../components/button/modal-button'
 import WebhookFormatSelector from '../../containers/webhook-formats-select'
 import sharedMessages from '../../../lib/shared-messages'
 import { id as webhookIdRegexp, apiKey as webhookAPIKeyRegexp } from '../../lib/regexp'
+import { url as urlRegexp } from '../../../lib/regexp'
 import PropTypes from '../../../lib/prop-types'
 
 import { mapWebhookToFormValues, mapFormValuesToWebhook, blankValues } from './mapping'
@@ -67,7 +68,7 @@ const validationSchema = Yup.object().shape({
   format: Yup.string().required(sharedMessages.validateRequired),
   headers: Yup.array().test('has no empty string values', m.headersValidateRequired, headerCheck),
   base_url: Yup.string()
-    .url(sharedMessages.validateUrl)
+    .matches(urlRegexp, sharedMessages.validateUrl)
     .required(sharedMessages.validateRequired),
   downlink_api_key: Yup.string().matches(webhookAPIKeyRegexp, sharedMessages.validateFormat),
 })
