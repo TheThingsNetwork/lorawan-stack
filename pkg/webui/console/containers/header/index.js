@@ -101,7 +101,7 @@ class Header extends Component {
         icon: 'overview',
         path: '/',
         exact: true,
-        hidden: false,
+        hidden: !mayViewApplications && !mayViewGateways,
       },
       {
         title: sharedMessages.applications,
