@@ -18,12 +18,13 @@ import (
 	"bufio"
 	"context"
 	"encoding/hex"
-	stdio "io"
 	"io/ioutil"
 	"mime"
 	"os"
 	"path"
 	"strings"
+
+	stdio "io"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -475,13 +476,11 @@ var (
 				if devID.ApplicationID != "" {
 					device.ApplicationID = devID.ApplicationID
 				}
-				if device.SupportsJoin {
-					if devID.JoinEUI != nil {
-						device.JoinEUI = devID.JoinEUI
-					}
-					if devID.DevEUI != nil {
-						device.DevEUI = devID.DevEUI
-					}
+				if device.SupportsJoin && devID.JoinEUI != nil {
+					device.JoinEUI = devID.JoinEUI
+				}
+				if devID.DevEUI != nil {
+					device.DevEUI = devID.DevEUI
 				}
 			}
 
