@@ -58,20 +58,37 @@ func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
 		var err error
 		fetcher, err = fetch.FromHTTP(c.URL, true)
 		if err != nil {
-			return nil, err
+			return &noopTemplateStore{}, err
 		}
 	default:
-		return nil, nil
+		return &noopTemplateStore{}, nil
 	}
 	baseURL, err := url.Parse(c.LogoBaseURL)
 	if err != nil {
-		return nil, err
+		return &noopTemplateStore{}, err
 	}
 	return &templateStore{
 		fetcher:   fetcher,
 		baseURL:   baseURL,
 		templates: make(map[string]queryResult),
 	}, nil
+}
+
+type noopTemplateStore struct {
+}
+
+var (
+	errTemplateNotFound = errors.DefineNotFound("template_not_found", "template `{template_id}` not found")
+)
+
+// GetTemplate implements TemplateStore.
+func (ts *noopTemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
+	return nil, errTemplateNotFound.New().WithAttributes("template_id", req.TemplateID)
+}
+
+// ListTemplates implements TemplateStore.
+func (ts *noopTemplateStore) ListTemplates(ctx context.Context, req *ttnpb.ListApplicationWebhookTemplatesRequest) (*ttnpb.ApplicationWebhookTemplates, error) {
+	return &ttnpb.ApplicationWebhookTemplates{}, nil
 }
 
 // templateStore implements TemplateStore using an underlying fetcher.
@@ -100,10 +117,6 @@ func (ts *templateStore) prependBaseURL(template *ttnpb.ApplicationWebhookTempla
 	template.LogoURL = ts.baseURL.ResolveReference(logoURL).String()
 	return nil
 }
-
-var (
-	errTemplateNotFound = errors.DefineNotFound("template_not_found", "template `{template_id}` not found")
-)
 
 // GetTemplate implements the TemplateStore interface.
 func (ts *templateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
