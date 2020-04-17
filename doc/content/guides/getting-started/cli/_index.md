@@ -50,7 +50,7 @@ $ ttn-lw-cli use thethings.example.com [--fetch-ca] [--user] [--overwrite]
 
 This will generate and save the required CLI config file. By default, the file is saved on the current directory, use the `--user` to save it under the user config directory.
 
-If using a CA that is not already trusted by your system, use the `--fetch-ca` flag to also connect to the server and retrieve the CA required for establishing secure communication.
+If the deployment is using a CA that is not already trusted by your system, use the `--fetch-ca` flag to also connect to the server and retrieve the CA required for establishing secure communication.
 
 > NOTE: If the file exists already, it is not overwritten and an error is printed instead. You can use `--overwrite` to overwrite the existing configuration file.
 
@@ -77,7 +77,7 @@ For advanced options, see the [Configuration Reference]({{< ref "/reference/conf
 
 ## Login
 
-The CLI needs to be logged on in order to create gateways, applications, devices and API keys. With {{% tts %}} running in one terminal session, login with the following command:
+The CLI needs to be logged on in order to create gateways, applications, devices and API keys. With {{% tts %}} running, login with the following command:
 
 ```bash
 $ ttn-lw-cli login

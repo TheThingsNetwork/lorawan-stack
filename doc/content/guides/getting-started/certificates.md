@@ -10,11 +10,11 @@ weight: 2
 
 ### Automatic Certificate Management (ACME)
 
-For automatic certificates, we're going to need an `acme` directory where {{% tts %}} can store the certificate data:
+{{% tts %}} can be configured to automatically retrieve and update Let's Encrypt certificates. This will be shown during the next step. For now, we are going to create an `acme` directory where {{% tts %}} can store the certificate data:
 
 ```bash
 $ mkdir ./acme
-$ chown 886:886 ./acme
+$ sudo chown 886:886 ./acme
 ```
 
 > `886` is the uid and the gid of the user that runs {{% tts %}} in the Docker container. If you don't set these permissions, you'll get an error saying something like `open /var/lib/acme/acme_account+key<...>: permission denied`.
@@ -24,7 +24,7 @@ $ chown 886:886 ./acme
 If you want to use the certificate (`cert.pem`) and key (`key.pem`) that you already have, you also need to set these permissions.
 
 ```bash
-$ chown 886:886 ./cert.pem ./key.pem
+$ sudo chown 886:886 ./cert.pem ./key.pem
 ```
 
 > If you don't set these permissions, you'll get an error saying something like `/run/secrets/key.pem: permission denied`.
