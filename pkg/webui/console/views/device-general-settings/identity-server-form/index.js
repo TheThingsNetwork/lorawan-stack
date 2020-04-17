@@ -226,6 +226,7 @@ const IdentityServerForm = React.memo(props => {
             message: { values: { deviceId: name || ids.device_id }, ...messages.deleteWarning },
           }}
           onApprove={onDeviceDelete}
+          naked
           danger
         />
       </SubmitBar>
