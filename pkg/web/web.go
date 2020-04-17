@@ -193,8 +193,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		hashedFiles := make(map[string]string)
 		err = yaml.Unmarshal(manifest, &hashedFiles)
 		if err != nil {
-			logger.WithError(err).Warn("Corrupted manifest.yaml")
-			return s, nil
+			return nil, errors.New("Corrupted manifest.yaml").WithCause(err)
 		}
 		for original, hashed := range hashedFiles {
 			webui.RegisterHashedFile(original, hashed)
