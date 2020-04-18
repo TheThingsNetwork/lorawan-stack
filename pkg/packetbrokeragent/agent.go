@@ -98,7 +98,7 @@ var (
 
 // New returns a new Packet Broker Agent.
 func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
-	ctx := log.NewContextWithField(c.Context(), "namespace", "packetbroker/agent")
+	ctx := log.NewContextWithField(c.Context(), "namespace", "packetbrokeragent")
 	logger := log.FromContext(ctx)
 
 	var devAddrPrefixes []types.DevAddrPrefix
