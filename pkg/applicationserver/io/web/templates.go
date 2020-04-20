@@ -82,7 +82,7 @@ var (
 
 // GetTemplate implements TemplateStore.
 func (ts *noopTemplateStore) GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error) {
-	return nil, errTemplateNotFound.New().WithAttributes("template_id", req.TemplateID)
+	return nil, errTemplateNotFound.WithAttributes("template_id", req.TemplateID)
 }
 
 // ListTemplates implements TemplateStore.
