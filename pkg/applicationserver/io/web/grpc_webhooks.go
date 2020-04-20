@@ -39,11 +39,11 @@ func appendImplicitWebhookGetPaths(paths ...string) []string {
 
 type webhookRegistryRPC struct {
 	webhooks  WebhookRegistry
-	templates *TemplateStore
+	templates TemplateStore
 }
 
 // NewWebhookRegistryRPC returns a new webhook registry gRPC server.
-func NewWebhookRegistryRPC(webhooks WebhookRegistry, templates *TemplateStore) ttnpb.ApplicationWebhookRegistryServer {
+func NewWebhookRegistryRPC(webhooks WebhookRegistry, templates TemplateStore) ttnpb.ApplicationWebhookRegistryServer {
 	return &webhookRegistryRPC{
 		webhooks:  webhooks,
 		templates: templates,

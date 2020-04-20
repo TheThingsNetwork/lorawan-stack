@@ -67,7 +67,7 @@ type ApplicationServer struct {
 	deviceRegistry   DeviceRegistry
 	formatter        payloadFormatter
 	webhooks         web.Webhooks
-	webhookTemplates *web.TemplateStore
+	webhookTemplates web.TemplateStore
 	pubsub           *pubsub.PubSub
 	appPackages      packages.Server
 

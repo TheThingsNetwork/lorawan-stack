@@ -1961,6 +1961,15 @@
       "file": "webhooks.go"
     }
   },
+  "error:pkg/applicationserver/io/web:template_not_found": {
+    "translations": {
+      "en": "template `{template_id}` not found"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "templates.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:webhook_not_found": {
     "translations": {
       "en": "webhook not found"
