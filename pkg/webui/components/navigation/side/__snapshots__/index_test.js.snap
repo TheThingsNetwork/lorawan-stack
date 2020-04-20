@@ -27,7 +27,6 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
     <Message
       capitalize={false}
       className="message"
-      component="span"
       content="test-header-title"
       firstToLower={false}
       firstToUpper={false}
@@ -55,7 +54,6 @@ exports[`SideNavigation is flat should match snapshot 1`] = `
         <Message
           capitalize={false}
           className="message"
-          component="span"
           content="test-header-title"
           firstToLower={false}
           firstToUpper={false}
@@ -134,7 +132,6 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
     <Message
       capitalize={false}
       className="message"
-      component="span"
       content="test-header-title"
       firstToLower={false}
       firstToUpper={false}
@@ -162,7 +159,6 @@ exports[`SideNavigation is nested should match snapshot 1`] = `
         <Message
           capitalize={false}
           className="message"
-          component="span"
           content="test-header-title"
           firstToLower={false}
           firstToUpper={false}
