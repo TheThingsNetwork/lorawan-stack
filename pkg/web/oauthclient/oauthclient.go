@@ -29,6 +29,7 @@ import (
 // Config is the configuration for the OAuth client.
 type Config struct {
 	AuthorizeURL string `name:"authorize-url" description:"The OAuth Authorize URL"`
+	LogoutURL    string `name:"logout-url" description:"The OAuth Logout URL"`
 	TokenURL     string `name:"token-url" description:"The OAuth Token Exchange URL"`
 	RootURL      string `name:"-"`
 

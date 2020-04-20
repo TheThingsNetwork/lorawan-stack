@@ -49,7 +49,6 @@ const consoleAppLogic = createRequestLogic({
       dispatch(user.getUserRightsSuccess(rights))
     } catch (error) {
       dispatch(user.getUserRightsFailure())
-      dispatch(user.logout())
       info = undefined
     }
 
@@ -83,7 +82,6 @@ const consoleAppLogic = createRequestLogic({
         }
       } catch (error) {
         dispatch(user.getUserMeFailure(error))
-        dispatch(user.logout())
       }
     }
 

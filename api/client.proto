@@ -56,6 +56,10 @@ message Client {
   // If the authorization request does not pass a redirect URI, the first one
   // from this list is taken.
   repeated string redirect_uris = 9 [(gogoproto.customname) = "RedirectURIs"];
+  // The allowed logout redirect URIs against which client initiated logout
+  // requests are checked. If the authorization request does not pass a redirect
+  // URI, the first one from this list is taken.
+  repeated string logout_redirect_uris = 15 [(gogoproto.customname) = "LogoutRedirectURIs"];
   // The reviewing state of the client.
   // This field can only be modified by admins.
   State state = 10 [(validate.rules).enum.defined_only = true];

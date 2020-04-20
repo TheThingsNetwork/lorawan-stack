@@ -41,11 +41,6 @@ const ttnClient = new TTN(token, {
   proxy: false,
 })
 
-const csrf = getCookieValue('_csrf')
-const instance = axios.create({
-  headers: { 'X-CSRF-Token': csrf },
-})
-
 // Forward header warnings to the toast message queue
 ttnClient.subscribe('warning', payload => {
   toast({
@@ -55,6 +50,8 @@ ttnClient.subscribe('warning', payload => {
     preventConsecutive: true,
   })
 })
+
+const instance = axios.create()
 
 instance.interceptors.response.use(
   response => {
@@ -73,8 +70,25 @@ export default {
     token() {
       return instance.get(`${appRoot}/api/auth/token`)
     },
-    logout() {
-      return instance.post(`${appRoot}/api/auth/logout`)
+    async logout() {
+      let csrf = getCookieValue('_console_csrf')
+
+      if (!csrf) {
+        // If the csrf token has been deleted, we likely have some outside
+        // manipulation of the cookies. We can try to regain the cookie by
+        // making an AJAX request to the current location.
+        await axios.get(window.location)
+        csrf = getCookieValue('_console_csrf')
+
+        if (!csrf) {
+          // If we still could not retrieve the cookie, throw an error.
+          throw new Error('Could not retrieve the csrf token')
+        }
+      }
+
+      return instance.post(`${appRoot}/api/auth/logout`, undefined, {
+        headers: { 'X-CSRF-Token': csrf },
+      })
     },
   },
   clients: {

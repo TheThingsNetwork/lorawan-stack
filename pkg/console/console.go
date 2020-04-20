@@ -136,21 +136,22 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 		web_errors.ErrorMiddleware(map[string]web_errors.ErrorRenderer{
 			"text/html": webui.Template,
 		}),
+		middleware.CSRFWithConfig(middleware.CSRFConfig{
+			CookieName: "_console_csrf",
+			CookiePath: console.config.Mount,
+		}),
 	)
 
-	api := group.Group("/api", middleware.CSRF())
-	api.GET("/auth/token", console.oc.HandleToken)
-	api.POST("/auth/logout", console.oc.HandleLogout)
+	api := group.Group("/api/auth")
+	api.GET("/token", console.oc.HandleToken)
+	api.POST("/logout", console.oc.HandleLogout)
 
-	page := group.Group("", middleware.CSRFWithConfig(middleware.CSRFConfig{
-		TokenLookup: "form:csrf",
-	}))
-	page.GET("/oauth/callback", console.oc.HandleCallback)
+	group.GET("/oauth/callback", console.oc.HandleCallback)
 
 	group.GET("/login/ttn-stack", console.oc.HandleLogin)
 
 	if console.config.Mount != "" && console.config.Mount != "/" {
-		group.GET("", webui.Template.Handler, middleware.CSRF())
+		group.GET("", webui.Template.Handler)
 	}
-	group.GET("/*", webui.Template.Handler, middleware.CSRF())
+	group.GET("/*", webui.Template.Handler)
 }

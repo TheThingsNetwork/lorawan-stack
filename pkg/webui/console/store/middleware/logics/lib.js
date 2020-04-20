@@ -14,7 +14,7 @@
 
 import { createLogic } from 'redux-logic'
 import * as Sentry from '@sentry/browser'
-import * as user from '../../actions/user'
+
 import { error } from '../../../../lib/log'
 import {
   isUnauthenticatedError,
@@ -82,8 +82,9 @@ const createRequestLogic = function(
         error(e) // Log the error if in development mode
 
         if (isUnauthenticatedError(e)) {
-          // If there was an unauthenticated error, log the user out
-          dispatch(user.logoutSuccess())
+          // If there was an unauthenticated error, the access token is not
+          // valid. Reloading will then initiate the auth flow.
+          window.location.reload()
         } else {
           // Otherwise, dispatch the fail action and report it to Sentry
           if (isUnknown(e) || isInvalidArgumentError(e)) {

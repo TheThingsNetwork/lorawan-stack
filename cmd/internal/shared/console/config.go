@@ -25,6 +25,7 @@ import (
 var DefaultConsoleConfig = console.Config{
 	OAuth: oauthclient.Config{
 		AuthorizeURL: shared.DefaultOAuthPublicURL + "/authorize",
+		LogoutURL:    shared.DefaultOAuthPublicURL + "/logout",
 		TokenURL:     shared.DefaultOAuthPublicURL + "/token",
 		ClientID:     "console",
 		ClientSecret: "console",

@@ -33,8 +33,9 @@ type Client struct {
 	Memberships []Membership `gorm:"polymorphic:Entity;polymorphic_value:client"`
 	// END common fields
 
-	ClientSecret string         `gorm:"type:VARCHAR"`
-	RedirectURIs pq.StringArray `gorm:"type:VARCHAR ARRAY;column:redirect_uris"`
+	ClientSecret       string         `gorm:"type:VARCHAR"`
+	RedirectURIs       pq.StringArray `gorm:"type:VARCHAR ARRAY;column:redirect_uris"`
+	LogoutRedirectURIs pq.StringArray `gorm:"type:VARCHAR ARRAY;column:logout_redirect_uris"`
 
 	State int `gorm:"not null"`
 
@@ -51,16 +52,17 @@ func init() {
 
 // functions to set fields from the client model into the client proto.
 var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
-	nameField:              func(pb *ttnpb.Client, cli *Client) { pb.Name = cli.Name },
-	descriptionField:       func(pb *ttnpb.Client, cli *Client) { pb.Description = cli.Description },
-	attributesField:        func(pb *ttnpb.Client, cli *Client) { pb.Attributes = attributes(cli.Attributes).toMap() },
-	secretField:            func(pb *ttnpb.Client, cli *Client) { pb.Secret = cli.ClientSecret },
-	redirectURIsField:      func(pb *ttnpb.Client, cli *Client) { pb.RedirectURIs = cli.RedirectURIs },
-	stateField:             func(pb *ttnpb.Client, cli *Client) { pb.State = ttnpb.State(cli.State) },
-	skipAuthorizationField: func(pb *ttnpb.Client, cli *Client) { pb.SkipAuthorization = cli.SkipAuthorization },
-	endorsedField:          func(pb *ttnpb.Client, cli *Client) { pb.Endorsed = cli.Endorsed },
-	grantsField:            func(pb *ttnpb.Client, cli *Client) { pb.Grants = cli.Grants },
-	rightsField:            func(pb *ttnpb.Client, cli *Client) { pb.Rights = cli.Rights.Rights },
+	nameField:               func(pb *ttnpb.Client, cli *Client) { pb.Name = cli.Name },
+	descriptionField:        func(pb *ttnpb.Client, cli *Client) { pb.Description = cli.Description },
+	attributesField:         func(pb *ttnpb.Client, cli *Client) { pb.Attributes = attributes(cli.Attributes).toMap() },
+	secretField:             func(pb *ttnpb.Client, cli *Client) { pb.Secret = cli.ClientSecret },
+	redirectURIsField:       func(pb *ttnpb.Client, cli *Client) { pb.RedirectURIs = cli.RedirectURIs },
+	logoutRedirectURIsField: func(pb *ttnpb.Client, cli *Client) { pb.LogoutRedirectURIs = cli.LogoutRedirectURIs },
+	stateField:              func(pb *ttnpb.Client, cli *Client) { pb.State = ttnpb.State(cli.State) },
+	skipAuthorizationField:  func(pb *ttnpb.Client, cli *Client) { pb.SkipAuthorization = cli.SkipAuthorization },
+	endorsedField:           func(pb *ttnpb.Client, cli *Client) { pb.Endorsed = cli.Endorsed },
+	grantsField:             func(pb *ttnpb.Client, cli *Client) { pb.Grants = cli.Grants },
+	rightsField:             func(pb *ttnpb.Client, cli *Client) { pb.Rights = cli.Rights.Rights },
 }
 
 // functions to set fields from the client proto into the client model.
@@ -70,13 +72,14 @@ var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
 	attributesField: func(cli *Client, pb *ttnpb.Client) {
 		cli.Attributes = attributes(cli.Attributes).updateFromMap(pb.Attributes)
 	},
-	secretField:            func(cli *Client, pb *ttnpb.Client) { cli.ClientSecret = pb.Secret },
-	redirectURIsField:      func(cli *Client, pb *ttnpb.Client) { cli.RedirectURIs = pq.StringArray(pb.RedirectURIs) },
-	stateField:             func(cli *Client, pb *ttnpb.Client) { cli.State = int(pb.State) },
-	skipAuthorizationField: func(cli *Client, pb *ttnpb.Client) { cli.SkipAuthorization = pb.SkipAuthorization },
-	endorsedField:          func(cli *Client, pb *ttnpb.Client) { cli.Endorsed = pb.Endorsed },
-	grantsField:            func(cli *Client, pb *ttnpb.Client) { cli.Grants = pb.Grants },
-	rightsField:            func(cli *Client, pb *ttnpb.Client) { cli.Rights = Rights{Rights: pb.Rights} },
+	secretField:             func(cli *Client, pb *ttnpb.Client) { cli.ClientSecret = pb.Secret },
+	redirectURIsField:       func(cli *Client, pb *ttnpb.Client) { cli.RedirectURIs = pq.StringArray(pb.RedirectURIs) },
+	logoutRedirectURIsField: func(cli *Client, pb *ttnpb.Client) { cli.LogoutRedirectURIs = pq.StringArray(pb.LogoutRedirectURIs) },
+	stateField:              func(cli *Client, pb *ttnpb.Client) { cli.State = int(pb.State) },
+	skipAuthorizationField:  func(cli *Client, pb *ttnpb.Client) { cli.SkipAuthorization = pb.SkipAuthorization },
+	endorsedField:           func(cli *Client, pb *ttnpb.Client) { cli.Endorsed = pb.Endorsed },
+	grantsField:             func(cli *Client, pb *ttnpb.Client) { cli.Grants = pb.Grants },
+	rightsField:             func(cli *Client, pb *ttnpb.Client) { cli.Rights = Rights{Rights: pb.Rights} },
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -94,17 +97,18 @@ func init() {
 
 // fieldmask path to column name in clients table.
 var clientColumnNames = map[string][]string{
-	attributesField:        {},
-	contactInfoField:       {},
-	nameField:              {nameField},
-	descriptionField:       {descriptionField},
-	secretField:            {"client_secret"},
-	redirectURIsField:      {redirectURIsField},
-	stateField:             {stateField},
-	skipAuthorizationField: {skipAuthorizationField},
-	endorsedField:          {endorsedField},
-	grantsField:            {grantsField},
-	rightsField:            {rightsField},
+	attributesField:         {},
+	contactInfoField:        {},
+	nameField:               {nameField},
+	descriptionField:        {descriptionField},
+	secretField:             {"client_secret"},
+	redirectURIsField:       {redirectURIsField},
+	logoutRedirectURIsField: {logoutRedirectURIsField},
+	stateField:              {stateField},
+	skipAuthorizationField:  {skipAuthorizationField},
+	endorsedField:           {endorsedField},
+	grantsField:             {grantsField},
+	rightsField:             {rightsField},
 }
 
 func (cli Client) toPB(pb *ttnpb.Client, fieldMask *types.FieldMask) {

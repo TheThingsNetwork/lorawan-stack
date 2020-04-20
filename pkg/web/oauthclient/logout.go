@@ -16,22 +16,63 @@ package oauthclient
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/pkg/auth"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
 
-// HandleLogout invalidates the user's authorization and removes the auth
-// cookie.
+func stripCommonRoot(URL string, rootURL string) string {
+	trimmedURL := strings.TrimSuffix(rootURL, "/")
+	if rootURL, err := url.Parse(rootURL); err == nil {
+		rootURLSchemeHost := (&url.URL{Scheme: rootURL.Scheme, Host: rootURL.Host}).String()
+		if strings.HasPrefix(URL, rootURLSchemeHost) {
+			return strings.TrimPrefix(trimmedURL, rootURLSchemeHost)
+		}
+	}
+	return trimmedURL
+}
+
+// HandleLogout invalidates the user's authorization, removes the auth
+// cookie and provides a URL to logout of the OAuth provider as well.
 func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 	token, err := oc.freshToken(c)
 	if err != nil {
 		return err
 	}
+	u, err := url.Parse(oc.config.LogoutURL)
+	if err != nil {
+		return err
+	}
+	logoutURL := oc.config.LogoutURL
 
+	// If a logout URL is configured, return a decorated logout URI so the client
+	// can decide to additionally logout of the OAuth server itself.
+	if logoutURL != "" {
+		_, tokenID, _, err := auth.SplitToken(token.AccessToken)
+		if err != nil {
+			return err
+		}
+		redirectURL := stripCommonRoot(logoutURL, oc.config.RootURL)
+		query := url.Values{
+			"access_token_id":          []string{tokenID},
+			"post_logout_redirect_uri": []string{redirectURL},
+		}
+		u.RawQuery = query.Encode()
+		oc.removeAuthCookie(c)
+		return c.JSON(http.StatusOK, struct {
+			OpLogoutURI string `json:"op_logout_uri"`
+		}{
+			OpLogoutURI: u.String(),
+		})
+	}
+
+	// Otherwise, delete the access token in the OAuth server.
 	creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "Bearer",
 		AuthValue:     token.AccessToken,
@@ -54,7 +95,6 @@ func (oc *OAuthClient) HandleLogout(c echo.Context) error {
 			}
 		}
 	}
-
 	oc.removeAuthCookie(c)
 	return c.NoContent(http.StatusNoContent)
 }

@@ -80,6 +80,10 @@ var (
 			if err != nil {
 				return err
 			}
+			logoutRedirectURIs, err := cmd.Flags().GetStringSlice("logout-redirect-uri")
+			if err != nil {
+				return err
+			}
 			authorized, err := cmd.Flags().GetBool("authorized")
 			if err != nil {
 				return err
@@ -93,6 +97,7 @@ var (
 				"name",
 				"secret",
 				"redirect_uris",
+				"logout_redirect_uris",
 				"state",
 				"skip_authorization",
 				"endorsed",
@@ -113,6 +118,7 @@ var (
 				cli.Name = name
 				cli.Secret = hashedSecret
 				cli.RedirectURIs = redirectURIs
+				cli.LogoutRedirectURIs = logoutRedirectURIs
 				cli.State = ttnpb.STATE_APPROVED
 				cli.SkipAuthorization = authorized
 				cli.Endorsed = endorsed
@@ -166,6 +172,7 @@ func init() {
 	createOAuthClient.Flags().String("secret", "", "Secret of the OAuth client")
 	createOAuthClient.Flags().Bool("no-secret", false, "Do not generate a secret for the OAuth client")
 	createOAuthClient.Flags().StringSlice("redirect-uri", []string{}, "Redirect URIs of the OAuth client")
+	createOAuthClient.Flags().StringSlice("logout-redirect-uri", []string{}, "Logout redirect URIs of the OAuth client")
 	createOAuthClient.Flags().Bool("authorized", true, "Mark OAuth client as pre-authorized")
 	createOAuthClient.Flags().Bool("endorsed", true, "Mark OAuth client as endorsed ")
 	isDBCommand.AddCommand(createOAuthClient)

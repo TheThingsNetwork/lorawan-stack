@@ -5840,6 +5840,15 @@
       "file": "server.go"
     }
   },
+  "error:pkg/oauth:invalid_logout_redirect_uri": {
+    "translations": {
+      "en": "the redirect URI did not match the one(s) defined in the client"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "user.go"
+    }
+  },
   "error:pkg/oauth:invalid_redirect_uri": {
     "translations": {
       "en": "invalid redirect URI"
@@ -5865,6 +5874,15 @@
     "description": {
       "package": "pkg/oauth",
       "file": "server.go"
+    }
+  },
+  "error:pkg/oauth:missing_param_access_token_id": {
+    "translations": {
+      "en": "access token ID was not provided"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "user.go"
     }
   },
   "error:pkg/oauth:no_access_token": {
