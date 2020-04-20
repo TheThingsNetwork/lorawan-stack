@@ -11217,6 +11217,26 @@
           "type": "string",
           "format": "uint64",
           "description": "The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "min_uplink_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Minimum uplink frequency usable by device."
+        },
+        "max_uplink_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Maximum uplink frequency usable by device."
+        },
+        "min_downlink_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Minimum downlink frequency usable by device."
+        },
+        "max_downlink_frequency": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Maximum downlink frequency usable by device."
         }
       }
     },
@@ -11302,6 +11322,35 @@
           "type": "string",
           "format": "date-time",
           "description": "Time when the last network-initiated downlink message was scheduled."
+        },
+        "rejected_adr_data_rate_indexes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3DataRateIndex"
+          },
+          "description": "ADR Data rate index values rejected by the device.\nReset each time `current_parameters.channels` change.\nElements are sorted in ascending order."
+        },
+        "rejected_adr_tx_power_indexes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "ADR TX output power index values rejected by the device.\nElements are sorted in ascending order."
+        },
+        "rejected_uplink_channel_frequencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        },
+        "rejected_downlink_channel_frequencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server and is read only."
