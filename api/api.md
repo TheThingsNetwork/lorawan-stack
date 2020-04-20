@@ -2187,10 +2187,6 @@ This is used internally by the Network Server.
 | `desired_ping_slot_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | The data rate index of the class B ping slot Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
 | `desired_ping_slot_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | The frequency of the class B ping slot (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `desired_beacon_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | The frequency of the class B beacon (Hz) Network Server should configure device to use via MAC commands. If unset, the default value from Network Server configuration will be used. |
-| `min_uplink_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | Minimum uplink frequency usable by device. |
-| `max_uplink_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | Maximum uplink frequency usable by device. |
-| `min_downlink_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | Minimum downlink frequency usable by device. |
-| `max_downlink_frequency` | [`google.protobuf.UInt64Value`](#google.protobuf.UInt64Value) |  | Maximum downlink frequency usable by device. |
 
 #### Field Rules
 
@@ -2200,7 +2196,6 @@ This is used internally by the Network Server.
 | `beacon_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `rx1_data_rate_offset` | <p>`uint32.lte`: `7`</p> |
 | `rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
-| `factory_preset_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
 | `desired_rx2_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `desired_ping_slot_frequency` | <p>`uint64.gte`: `100000`</p> |
 | `desired_beacon_frequency` | <p>`uint64.gte`: `100000`</p> |
@@ -2231,8 +2226,7 @@ This is used internally by the Network Server and is read only.
 | `last_network_initiated_downlink_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the last network-initiated downlink message was scheduled. |
 | `rejected_adr_data_rate_indexes` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) | repeated | ADR Data rate index values rejected by the device. Reset each time `current_parameters.channels` change. Elements are sorted in ascending order. |
 | `rejected_adr_tx_power_indexes` | [`uint32`](#uint32) | repeated | ADR TX output power index values rejected by the device. Elements are sorted in ascending order. |
-| `rejected_uplink_channel_frequencies` | [`uint64`](#uint64) | repeated |  |
-| `rejected_downlink_channel_frequencies` | [`uint64`](#uint64) | repeated |  |
+| `rejected_frequencies` | [`uint64`](#uint64) | repeated | Frequencies rejected by the device. |
 
 #### Field Rules
 
@@ -2244,8 +2238,7 @@ This is used internally by the Network Server and is read only.
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
 | `rejected_adr_data_rate_indexes` | <p>`repeated.items.enum.defined_only`: `true`</p> |
 | `rejected_adr_tx_power_indexes` | <p>`repeated.items.uint32.lte`: `15`</p> |
-| `rejected_uplink_channel_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
-| `rejected_downlink_channel_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
+| `rejected_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.JoinAccept">Message `MACState.JoinAccept`</a>
 
