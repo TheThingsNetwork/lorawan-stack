@@ -45,8 +45,7 @@ type TemplateStore interface {
 	ListTemplates(ctx context.Context, req *ttnpb.ListApplicationWebhookTemplatesRequest) (*ttnpb.ApplicationWebhookTemplates, error)
 }
 
-// NewTemplateStore returns a new *web.templateStore based on the configuration.
-// If no stores are provided, this method returns a *web.noopTemplateStore.
+// NewTemplateStore returns a TemplateStore based on the configuration.
 func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
 	var fetcher fetch.Interface
 	switch {
