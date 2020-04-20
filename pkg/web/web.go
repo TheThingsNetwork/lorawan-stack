@@ -182,6 +182,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	if staticPath != "" {
 		staticDir := http.Dir(staticPath)
 		logger := logger.WithFields(log.Fields("path", staticDir, "mount", options.staticMount))
+		s.Static(options.staticMount, staticDir)
 
 		// register hashed filenames
 		manifest, err := ioutil.ReadFile(filepath.Join(staticPath, "manifest.yaml"))
