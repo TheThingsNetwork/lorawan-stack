@@ -154,7 +154,6 @@ The folder structure of the frontend looks as follows:
 ├── styles            global stylus (~css) styles and mixins
 ├── console.js        entry point of the console app
 ├── oauth.js          entry point of the oauth app
-├── manifest.go       generated manifest of the frontend, containing file hashes
 ├── template.go       go template module used to render the frontend HTML
 ```
 
@@ -637,7 +636,7 @@ If you switch between production and development builds of the Console, you migh
 ##### Possible solution
 
   1. Double check whether you have set the correct environment: `echo $NODE_ENV`, it should be either `production` or `development`
-  2. Double check whether [your The Things Stack config](#development-configuration) is set correctly (especially `TTN_LW_CONSOLE_UI_JS_FILE`, `TTN_LW_CONSOLE_UI_CANONICAL_URL` and similar settings) 
+  2. Double check whether [your The Things Stack config](#development-configuration) is set correctly (especially `TTN_LW_CONSOLE_UI_JS_FILE`, `TTN_LW_CONSOLE_UI_CANONICAL_URL` and similar settings)
   3. Make sure to rebuild the Console `./mage js:clean js:build`
   4. Restart The Things Stack
 
