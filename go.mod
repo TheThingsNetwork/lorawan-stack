@@ -55,7 +55,7 @@ require (
 	github.com/gohugoio/hugo v0.67.1
 	github.com/golang/gddo v0.0.0-20200310004957-95ce5a452273
 	github.com/golang/protobuf v1.3.5
-	github.com/goreleaser/goreleaser v0.129.0
+	github.com/goreleaser/goreleaser v0.132.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.1
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
