@@ -136,9 +136,8 @@ class Devices {
       ),
     )
 
-    // Check for errors and filter out 404 errors, since we cannot consistently return
-    // not found errors.
-    // TODO: Check for 404 errors, see https://github.com/TheThingsNetwork/lorawan-stack/issues/2323
+    // Check for errors and filter out 404 errors. We do not regard 404 responses
+    // from ns,as and js as failed requests.
     const errors = responses.filter(
       ({ status, reason }) => status === 'rejected' && reason.code !== 5,
     )
