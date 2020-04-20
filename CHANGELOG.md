@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI now shows all supported enum values for LoraWAN fields.
 - Application Server does not crash when retrieving a webhook template that does not exist if no template repository has been configured.
 - Application Server does not crash when listing webhook templates if no template repository has been configured.
+- Error display on failed end device fetching in the Console.
 
 ### Security
 
