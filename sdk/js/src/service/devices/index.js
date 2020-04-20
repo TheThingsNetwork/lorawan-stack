@@ -64,7 +64,7 @@ class Devices {
     return device
   }
 
-  async _getDevice(applicationId, deviceId, paths, ignoreNotFound) {
+  async _getDevice(applicationId, deviceId, paths, ignoreNotFound, mergeResult = true) {
     if (!applicationId) {
       throw new Error('Missing application_id for device.')
     }
@@ -91,9 +91,8 @@ class Devices {
       undefined,
       ignoreNotFound,
     )
-    const result = mergeDevice(deviceParts)
 
-    return result
+    return mergeResult ? mergeDevice(deviceParts) : deviceParts
   }
 
   async _deleteDevice(applicationId, deviceId, components = ['is', 'ns', 'as', 'js']) {
@@ -185,17 +184,46 @@ class Devices {
     return Marshaler.payloadListResponse('end_devices', response)
   }
 
-  async getById(applicationId, deviceId, selector = [['ids']], { ignoreNotFound = false } = {}) {
-    const response = await this._getDevice(
+  /**
+   * Gets the `deviceId` end device under the `applicationId` application.
+   * This method will assemble the end device from all available stack
+   * components (i.e. NS, AS, IS, JS) based on the provided `selector`
+   * and the end device existence in the respective components.
+   * Note, this method throws an error if the requested end device does not
+   * exist in the IS.
+   *
+   * @param {string} applicationId - Application ID
+   * @param {string} deviceId - Device ID
+   * @param {Array} selector - The list of end device fields to fetch
+   * @returns {Object} - End device on successful requests, an error otherwise
+   */
+  async getById(applicationId, deviceId, selector = [['ids']]) {
+    const deviceParts = await this._getDevice(
       applicationId,
       deviceId,
       Marshaler.selectorToPaths(selector),
-      ignoreNotFound,
+      false,
+      false,
     )
+
+    const errors = deviceParts.filter(part => {
+      // Consider all errors from IS and ignore 404 for JS, AS and NS
+      if (part.hasErrored && (part.component === 'is' || part.error.code !== 5)) {
+        return true
+      }
+
+      return false
+    })
+
+    if (errors.length > 0) {
+      throw errors[0].error
+    }
+
+    const mergedDevice = mergeDevice(deviceParts)
 
     const { field_mask } = Marshaler.selectorToFieldMask(selector)
 
-    return this._emitDefaults(field_mask.paths, Marshaler.unwrapDevice(response))
+    return this._emitDefaults(field_mask.paths, Marshaler.unwrapDevice(mergedDevice))
   }
 
   /**
