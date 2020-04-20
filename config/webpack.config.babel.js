@@ -201,9 +201,9 @@ export default {
       }),
       new HtmlWebpackPlugin({
         inject: false,
-        filename: `${src}/manifest.go`,
+        filename: `manifest.yaml`,
         showErrors: false,
-        template: path.resolve('config', 'manifest-template.txt'),
+        template: path.resolve('config', 'manifest-template.yaml'),
       }),
       new MiniCssExtractPlugin({
         filename: env({
