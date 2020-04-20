@@ -57,14 +57,14 @@ func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
 		var err error
 		fetcher, err = fetch.FromHTTP(c.URL, true)
 		if err != nil {
-			return &noopTemplateStore{}, err
+			return nil, err
 		}
 	default:
 		return &noopTemplateStore{}, nil
 	}
 	baseURL, err := url.Parse(c.LogoBaseURL)
 	if err != nil {
-		return &noopTemplateStore{}, err
+		return nil, err
 	}
 	return &templateStore{
 		fetcher:   fetcher,
