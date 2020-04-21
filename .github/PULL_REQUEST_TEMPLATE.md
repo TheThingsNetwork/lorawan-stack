@@ -33,7 +33,7 @@ implementation proposal in the referenced issues.
 <!-- Make sure that this pull request is complete. -->
 
 - [ ] Scope: The referenced issue is addressed, there are no unrelated changes.
-- [ ] Compatibility: The changes are backwards compatible with existing API, database and configuration, according to the stability commitments in `README.md`.
+- [ ] Compatibility: The changes are backwards compatible with existing API, storage, configuration and CLI, according to the compatibility commitments in `README.md`. The target branch is set to `master` if the changes are fully compatible with existing API, database, configuration and CLI.
 - [ ] Testing: The changes are covered with unit tests. The changes are tested manually as well.
 - [ ] Documentation: Relevant documentation is added or updated.
 - [ ] Changelog: Significant features, behavior changes, deprecations and fixes are added to `CHANGELOG.md`.
