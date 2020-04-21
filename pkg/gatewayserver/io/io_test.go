@@ -94,6 +94,7 @@ func TestFlow(t *testing.T) {
 		case <-time.After(timeout):
 			t.Fatalf("Expected uplink message time-out")
 		}
+		time.Sleep(timeout / 2)
 		total, t, ok := conn.UpStats()
 		a.So(ok, should.BeTrue)
 		a.So(total, should.Equal, 1)
@@ -107,6 +108,7 @@ func TestFlow(t *testing.T) {
 		case <-time.After(timeout):
 			t.Fatalf("Expected status message time-out")
 		}
+		time.Sleep(timeout / 2)
 		last, t, ok := conn.StatusStats()
 		a.So(ok, should.BeTrue)
 		a.So(last, should.NotBeNil)

@@ -42,6 +42,7 @@
 /pkg/interop @johanstokking @rvolosatovs
 /pkg/joinserver @johanstokking @rvolosatovs
 /pkg/networkserver @johanstokking @rvolosatovs
+/pkg/packetbrokeragent @johanstokking @adriansmares
 
 # SDKs
 /sdk/js @bafonins @kschiffer @pgalic96

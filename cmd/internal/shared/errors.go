@@ -28,4 +28,5 @@ var (
 	ErrInitializeGatewayConfigurationServer = errors.Define("initialize_gateway_configuration_server", "could not initialize Gateway Configuration Server")
 	ErrInitializeDeviceTemplateConverter    = errors.Define("initialize_device_template_converter", "could not initialize Device Template Converter")
 	ErrInitializeQRCodeGenerator            = errors.Define("initialize_qr_code_generator", "could not initialize QR Code Generator")
+	ErrInitializePacketBrokerAgent          = errors.Define("initialize_packet_broker_agent", "could not initialize Packet Broker Agent")
 )

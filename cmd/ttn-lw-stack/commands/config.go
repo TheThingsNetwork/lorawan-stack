@@ -19,11 +19,14 @@ import (
 	"go.thethings.network/lorawan-stack/cmd/internal/shared"
 	shared_applicationserver "go.thethings.network/lorawan-stack/cmd/internal/shared/applicationserver"
 	shared_console "go.thethings.network/lorawan-stack/cmd/internal/shared/console"
+	shared_devicetemplateconverter "go.thethings.network/lorawan-stack/cmd/internal/shared/devicetemplateconverter"
 	shared_gatewayconfigurationserver "go.thethings.network/lorawan-stack/cmd/internal/shared/gatewayconfigurationserver"
 	shared_gatewayserver "go.thethings.network/lorawan-stack/cmd/internal/shared/gatewayserver"
 	shared_identityserver "go.thethings.network/lorawan-stack/cmd/internal/shared/identityserver"
 	shared_joinserver "go.thethings.network/lorawan-stack/cmd/internal/shared/joinserver"
 	shared_networkserver "go.thethings.network/lorawan-stack/cmd/internal/shared/networkserver"
+	shared_packetbrokeragent "go.thethings.network/lorawan-stack/cmd/internal/shared/packetbrokeragent"
+	shared_qrcodegenerator "go.thethings.network/lorawan-stack/cmd/internal/shared/qrcodegenerator"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver"
 	conf "go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/console"
@@ -33,6 +36,7 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/pkg/networkserver"
+	"go.thethings.network/lorawan-stack/pkg/packetbrokeragent"
 	"go.thethings.network/lorawan-stack/pkg/qrcodegenerator"
 )
 
@@ -48,6 +52,7 @@ type Config struct {
 	GCS              gatewayconfigurationserver.Config `name:"gcs"`
 	DTC              devicetemplateconverter.Config    `name:"dtc"`
 	QRG              qrcodegenerator.Config            `name:"qrg"`
+	PBA              packetbrokeragent.Config          `name:"pba"`
 }
 
 // DefaultConfig contains the default config for the ttn-lw-stack binary.
@@ -60,6 +65,9 @@ var DefaultConfig = Config{
 	JS:          shared_joinserver.DefaultJoinServerConfig,
 	Console:     shared_console.DefaultConsoleConfig,
 	GCS:         shared_gatewayconfigurationserver.DefaultGatewayConfigurationServerConfig,
+	DTC:         shared_devicetemplateconverter.DefaultDeviceTemplateConverterConfig,
+	QRG:         shared_qrcodegenerator.DefaultQRCodeGeneratorConfig,
+	PBA:         shared_packetbrokeragent.DefaultPacketBrokerAgentConfig,
 }
 
 func init() {

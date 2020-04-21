@@ -1,0 +1,41 @@
+<div class="field">
+  <label class="label">NetID (hex)</label>
+  <div class="control">
+    <input class="input" type="text" data-content="net-id" placeholder="net-id" maxlength="6" minlength="6">
+  </div>
+</div>
+
+<script>
+  window.addEventListener('load', function (e) {
+    var $netIDInput = document.querySelector('input[data-content="net-id"]');
+    var query = new URLSearchParams(window.location.search);
+    $netIDInput.value = query.has('net-id') ? query.get('net-id') : '000013';
+    var $devAddrPrefixSpans = document.querySelectorAll('span[data-content="dev-addr-prefix"]')
+    function update() {
+      var netID = parseInt($netIDInput.value ? $netIDInput.value : '000013', 16);
+      if (netID == NaN) {
+        netID = 0;
+      }
+      var type = netID >> 21;
+      var nwkIDMask;
+      switch (type) {
+        case 0b000, 0b001:
+          nwkIDMask = 0x3f;
+        case 0b010:
+          nwkIDMask = 0x1ff;
+        default:
+          nwkIDMask = 0x1fffff;
+      }
+      var nwkID = netID & nwkIDMask;
+      var nwkIDBits = [6, 6, 9, 11, 12, 13, 15, 17][type];
+      var nwkAddrBits = [25, 24, 20, 17, 15, 13, 10, 7][type];
+      var typePrefix = type > 0 ? ((1 << type) - 1 << 32 - type) >>> 0 : 0;
+      var devAddrBase = typePrefix + ((nwkID & (1 << nwkIDBits) - 1) << nwkAddrBits);
+      $devAddrPrefixSpans.forEach(function($span) {
+        $span.innerText = ('00000000' + devAddrBase.toString(16).toUpperCase()).slice(-8) + '/' + (32 - nwkAddrBits).toString();
+      });
+    }
+    update();
+    $netIDInput.addEventListener('keyup', update);
+  });
+</script>

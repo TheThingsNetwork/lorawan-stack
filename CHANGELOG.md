@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Console logout is now propagated to the OAuth provider.
   - This requires a database migration (`ttn-lw-stack is-db migrate`) because of the added columns.
   - To set the `logout-redirect-uris` for existing clients, the CLI client can be used, e.g.: `ttn-lw-cli clients update console --logout-redirect-uris "https://localhost:1885/console" --redirect-uris "http://localhost:1885/console"`.
+- Packet Broker Agent to act as Forwarder and Home Network. See `pba` configuration section.
 
 ### Changed
 

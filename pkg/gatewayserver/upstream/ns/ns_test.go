@@ -39,7 +39,7 @@ func TestNSHandler(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	gtwIds := ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
+	gtwIDs := ttnpb.GatewayIdentifiers{GatewayID: "test-gateway"}
 	ns, nsAddr := mock.StartNS(ctx)
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -77,7 +77,7 @@ func TestNSHandler(t *testing.T) {
 						}},
 					},
 					RxMetadata: []*ttnpb.RxMetadata{{
-						GatewayIdentifiers: gtwIds,
+						GatewayIdentifiers: gtwIDs,
 						RSSI:               89,
 						ChannelRSSI:        89,
 						SNR:                9.25,

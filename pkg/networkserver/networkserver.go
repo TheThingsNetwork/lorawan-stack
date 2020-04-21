@@ -45,6 +45,13 @@ const (
 	// infrastructureDelay represents a time interval Network Server uses as a buffer to account for infrastructure delay.
 	infrastructureDelay = time.Second
 
+	// peeringScheduleDelay is the schedule delay used for scheduling downlink via peering.
+	// The schedule delay is used to estimate the transmission time, which is used as the minimum time for a subsequent transmission.
+	//
+	// When scheduling downlink to a cluster Gateway Server, the schedule delay is reported by the Gateway Server and is accurate.
+	// When scheduling downlink via peering, the schedule delay is unknown, and should be sufficiently high to avoid conflicts.
+	peeringScheduleDelay = infrastructureDelay + 4*time.Second
+
 	// networkInitiatedDownlinkInterval is the minimum time.Duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink.
 	networkInitiatedDownlinkInterval = time.Second
 )

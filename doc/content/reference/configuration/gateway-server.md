@@ -7,7 +7,16 @@ description: ""
 
 The Gateway Server forwards traffic to upstream hosts based on the `gs.forward` parameter.
 
-- `gs.forward`: Forward the DevAddr prefixes to the specified hosts. This parameter accepts a string in the format `name=devaddrprefixes`
+- `gs.forward`: Forward the DevAddr prefixes to the specified hosts. This parameter accepts a list of strings in the format `target=dev-addr-prefix1,dev-addr-prefix2`
+
+Enter your NetID to view recommended forwarding settings:
+
+{{< dev-addr-prefix >}}
+
+- <code>"cluster=00000000/0"</code>: Forward all traffic to the Network Server in the cluster (default)
+- <code>"cluster=<span data-content="dev-addr-prefix"></span>"</code>: Forward only traffic for your NetID to the Network Server
+- <code>"cluster=00000000/6,<span data-content="dev-addr-prefix"></span>"</code>: Forward only traffic for the experimental NetIDs `000000` and `000001`, and your NetID to the Network Server in the cluster
+- <code>"cluster=00000000/6,<span data-content="dev-addr-prefix"></span> packetbroker=00000000/0"</code>: Forward only traffic for the experimental NetIDs `000000` and `000001`, and your NetID to the Network Server in the cluster, and all traffic to Packet Broker (see [configuration]({{< relref "packet-broker-agent.md" >}}))
 
 ## Location Update Options
 

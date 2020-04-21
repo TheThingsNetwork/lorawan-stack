@@ -19,7 +19,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
 )
 
 var (
@@ -43,18 +42,10 @@ func handleLinkCheckReq(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.Up
 		return evs, nil
 	}
 
-	gtws := make(map[string]struct{}, len(msg.RxMetadata))
-	maxSNR := msg.RxMetadata[0].SNR
-	for _, md := range msg.RxMetadata {
-		gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
-		if md.SNR > maxSNR {
-			maxSNR = md.SNR
-		}
-	}
-
+	gtwCount, maxSNR := rxMetadataStats(ctx, msg.RxMetadata)
 	ans := &ttnpb.MACCommand_LinkCheckAns{
 		Margin:       uint32(uint8(maxSNR - floor)),
-		GatewayCount: uint32(len(gtws)),
+		GatewayCount: uint32(gtwCount),
 	}
 	dev.MACState.QueuedResponses = append(dev.MACState.QueuedResponses, ans.MACCommand())
 	return append(evs,
