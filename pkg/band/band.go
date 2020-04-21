@@ -112,7 +112,7 @@ func channelIndexModulo(n uint8) func(uint8) (uint8, error) {
 
 // Beacon parameters of a specific band.
 type Beacon struct {
-	DataRateIndex    int
+	DataRateIndex    ttnpb.DataRateIndex
 	CodingRate       string
 	InvertedPolarity bool
 	// Channel returns in Hz on which beaconing is performed.
@@ -174,7 +174,7 @@ type Band struct {
 	// TxOffset in dB: Tx power is computed by taking the MaxEIRP (default: +16dBm) and subtracting the offset.
 	TxOffset []float32
 	// MaxADRDataRateIndex represents the maximum non-RFU DataRateIndex suitable for ADR, which can be used according to the band's spec.
-	MaxADRDataRateIndex uint8
+	MaxADRDataRateIndex ttnpb.DataRateIndex
 
 	TxParamSetupReqSupport bool
 
