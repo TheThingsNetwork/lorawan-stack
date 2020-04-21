@@ -659,7 +659,7 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 		// Default to mbed-os and LoRaMac-node behavior.
 		// https://github.com/ARMmbed/mbed-os/blob/131ea2bb243eef898a501576e611ebbf504b079a/features/lorawan/lorastack/phy/LoRaPHY.cpp#L1625-L1630
 		// https://github.com/Lora-net/LoRaMac-node/blob/87f19e84ae2fc4af72af9567fe722386de6ce9f4/src/mac/region/RegionCN779.h#L235.
-		macState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex(phy.Beacon.DataRateIndex)}
+		macState.CurrentParameters.PingSlotDataRateIndexValue = &ttnpb.DataRateIndexValue{Value: phy.Beacon.DataRateIndex}
 	}
 	if dev.GetMACSettings().GetDesiredPingSlotDataRateIndex() != nil {
 		macState.DesiredParameters.PingSlotDataRateIndexValue = dev.MACSettings.DesiredPingSlotDataRateIndex
