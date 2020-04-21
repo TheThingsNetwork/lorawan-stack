@@ -81,7 +81,7 @@ The CLI can be used to subscribe to uplink traffic. See the [Getting Started gui
 
 ## Downlink Queue
 
-The CLI can manage the downlink queue of end devices. See the [Downlink Queue Operations guide]({{< ref "/getting-started/downlink-queue-ops" >}}) for more details.
+The CLI can manage the downlink queue of end devices. See the [Downlink Queue Operations guide]({{< ref "/devices/downlink-queue-ops" >}}) for more details.
 
 ## Events
 

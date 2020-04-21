@@ -7,4 +7,4 @@ The QR Code Generator generates QR codes for devices in various formats. These Q
 
 <!--more-->
 
-The QR Code Generator is a service that provides the supported QR code formats and the required fields, and returns the QR code as image and text value. Clients do not need to render QR codes; the images can be stored, rendered or printed directly. See the [Generate QR Code guide]({{< ref "/getting-started/generate-qr-code" >}}) for more information.
+The QR Code Generator is a service that provides the supported QR code formats and the required fields, and returns the QR code as image and text value. Clients do not need to render QR codes; the images can be stored, rendered or printed directly. See the [Generate QR Code guide]({{< ref "/devices/generate-qr-code" >}}) for more information.
