@@ -63,4 +63,17 @@ func TestErrorHandler(t *testing.T) {
 		a.So(resp.StatusCode, should.Equal, http.StatusNotImplemented)
 		a.So(string(body), should.ContainSubstring, "Not Implemented")
 	}
+
+	{
+		req := httptest.NewRequest(echo.GET, "/not_found", nil)
+		rec := httptest.NewRecorder()
+
+		e.ServeHTTP(rec, req)
+
+		resp := rec.Result()
+
+		body, _ := ioutil.ReadAll(resp.Body)
+		a.So(resp.StatusCode, should.Equal, http.StatusNotFound)
+		a.So(string(body), should.ContainSubstring, "route `/not_found` not found")
+	}
 }

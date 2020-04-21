@@ -49,21 +49,13 @@ func TestGroup(t *testing.T) {
 	a.So(s.echo, should.NotHaveRoute, "GET", "/bar")
 	a.So(s.echo, should.HaveRoute, "POST", "/bar")
 
-	{
-		grp := s.Group("/")
-		grp.GET("/baz", handler)
-		a.So(s.echo, should.HaveRoute, "GET", "/baz")
-	}
+	grp := s.Group("/group")
+	grp.GET("/g", handler)
+	a.So(s.echo, should.HaveRoute, "GET", "/group/g")
 
-	{
-		grp := s.Group("/group")
-		grp.GET("/g", handler)
-		a.So(s.echo, should.HaveRoute, "GET", "/group/g")
-
-		ggrp := grp.Group("/quu")
-		ggrp.GET("/q", handler)
-		a.So(s.echo, should.HaveRoute, "GET", "/group/quu/q")
-	}
+	ggrp := grp.Group("/quu")
+	ggrp.GET("/q", handler)
+	a.So(s.echo, should.HaveRoute, "GET", "/group/quu/q")
 }
 
 func TestIsZeros(t *testing.T) {
