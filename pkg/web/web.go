@@ -355,35 +355,3 @@ func (s *Server) Static(prefix string, fs http.FileSystem) {
 func (s *Server) Prefix(prefix string) *mux.Route {
 	return s.getRouter(prefix).PathPrefix(prefix)
 }
-
-// Route is a registered route.
-type Route struct {
-	Method string
-	Path   string
-}
-
-// Routes returns the defined routes.
-func (s *Server) Routes() []*Route {
-	var routes []*Route
-	err := s.root.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-		pathTemplate, err := route.GetPathTemplate()
-		if err != nil {
-			return nil
-		}
-		methods, err := route.GetMethods()
-		if err != nil {
-			methods = []string{"*"}
-		}
-		for _, method := range methods {
-			routes = append(routes, &Route{Method: method, Path: pathTemplate})
-		}
-		return nil
-	})
-	if err != nil {
-		panic(err)
-	}
-	for _, route := range s.echo.Routes() {
-		routes = append(routes, &Route{Method: route.Method, Path: route.Path})
-	}
-	return routes
-}
