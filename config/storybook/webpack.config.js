@@ -36,6 +36,12 @@ module.exports = async function({ config, mode }) {
   // Compose storybook config, making use of stack webpack config
   const cfg = {
     ...config,
+    resolve: {
+      alias: {
+        ...config.resolve.alias,
+        ...bundleConfig.resolve.alias,
+      },
+    },
     output: {
       ...config.output,
       publicPath: '',
