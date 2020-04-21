@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.7.1] (2020-04-21)
+
+### Added
+
 - CLI can now dump JSON encoded `grpc_payload` field for unary requests (see `--dump-requests` flag).
 - Template ID column in the webhook table in the Console.
 - Select all field mask paths in CLI get, list and search commands (see `--all` option).
@@ -39,8 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed `Cache-Control` header for static files.
 - Sort events by `time` in the Console.
 
-### Deprecated
-
 ### Removed
 
 - `ns.up.merge_metadata` event.
@@ -66,8 +78,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Application Server does not crash when listing webhook templates if no template repository has been configured.
 - Error display on failed end device fetching in the Console.
 - Various inconsistencies with Regional Parameters specifications.
-
-### Security
 
 ## [3.7.0] (2020-04-02)
 
@@ -767,7 +777,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.0...HEAD
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.1...HEAD
+[3.7.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.0...v3.7.0
 [3.6.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.2...v3.6.3
 [3.6.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.6.1...v3.6.2
