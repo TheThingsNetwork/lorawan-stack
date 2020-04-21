@@ -25,6 +25,32 @@ import {
 
 import { getCombinedDeviceId } from '../../../lib/selectors/id'
 
+const addEvent = (state, event) => {
+  const currentEvents = state.events
+  const eventTime = new Date(event.time).getTime()
+
+  let insertIndex = 0
+  while (insertIndex < currentEvents.length) {
+    const currentEventTime = new Date(currentEvents[insertIndex].time).getTime()
+
+    if (eventTime > currentEventTime) {
+      insertIndex += 1
+    } else {
+      break
+    }
+  }
+
+  const events = [
+    ...currentEvents.slice(0, insertIndex),
+    event,
+    ...currentEvents.slice(insertIndex),
+  ]
+
+  return {
+    ...state,
+    events,
+  }
+}
 const defaultState = {
   events: [],
   error: undefined,
@@ -54,10 +80,7 @@ const createNamedEventReducer = function(reducerName = '') {
           status: CONNECTION_STATUS.CONNECTED,
         }
       case GET_EVENT_SUCCESS:
-        return {
-          ...state,
-          events: [action.event, ...state.events],
-        }
+        return addEvent(state, action.event)
       case START_EVENTS_FAILURE:
       case GET_EVENT_FAILURE:
         return {
