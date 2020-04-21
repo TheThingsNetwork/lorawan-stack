@@ -433,20 +433,44 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 	}
 
 	req := msg.GetRequest()
-	logger = logger.WithFields(log.Fields(
+	pairs := []interface{}{
 		"gateway_uid", unique.ID(ctx, ids),
 		"attempt_rx1", req.Rx1Frequency != 0,
 		"attempt_rx2", req.Rx2Frequency != 0,
-		"class", req.Class,
-		"priority", req.Priority,
-	))
+		"downlink_class", req.Class,
+		"downlink_priority", req.Priority,
+		"frequency_plan", req.FrequencyPlanID,
+	}
+	if req.Rx1Frequency != 0 {
+		pairs = append(pairs,
+			"rx1_delay", req.Rx1Delay,
+			"rx1_data_rate", req.Rx1DataRateIndex,
+			"rx1_frequency", req.Rx1Frequency,
+		)
+	}
+	if req.Rx2Frequency != 0 {
+		pairs = append(pairs,
+			"rx2_data_rate", req.Rx2DataRateIndex,
+			"rx2_frequency", req.Rx2Frequency,
+		)
+	}
+	logger = logger.WithFields(log.Fields(pairs...))
 
 	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, ids)
 	if err != nil {
 		return err
 	}
-	_, err = ttnpb.NewNsGsClient(conn).ScheduleDownlink(ctx, msg, a.WithClusterAuth())
-	return err
+	res, err := ttnpb.NewNsGsClient(conn).ScheduleDownlink(ctx, msg, a.WithClusterAuth())
+	if err != nil {
+		logger.WithError(err).Warn("Failed to schedule downlink")
+		return err
+	}
+	transmitAt := time.Now().Add(res.Delay)
+	logger.WithFields(log.Fields(
+		"transmission_delay", res.Delay,
+		"transmit_at", transmitAt,
+	)).Debug("Scheduled downlink")
+	return nil
 }
 
 func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
