@@ -16,13 +16,17 @@ package web
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 
+	"github.com/gorilla/mux"
 	echo "github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/pkg/errors"
@@ -30,7 +34,8 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/random"
 	"go.thethings.network/lorawan-stack/pkg/web/cookie"
-	"go.thethings.network/lorawan-stack/pkg/web/middleware"
+	"go.thethings.network/lorawan-stack/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/pkg/webui"
 	"gopkg.in/yaml.v2"
 )
@@ -42,12 +47,17 @@ type Registerer interface {
 
 // Server is the server.
 type Server struct {
-	*rootGroup
-	server *echo.Echo
-}
+	// The root HTTP router.
+	root *mux.Router
 
-type rootGroup struct {
-	*echo.Group
+	// The main HTTP router.
+	router *mux.Router
+
+	// The HTTP router for API.
+	apiRouter *mux.Router
+
+	// The legacy HTTP framework.
+	echo *echo.Echo
 }
 
 type options struct {
@@ -56,6 +66,8 @@ type options struct {
 
 	staticMount       string
 	staticSearchPaths []string
+
+	trustedProxies []string
 
 	contextFillers []fillcontext.Filler
 
@@ -70,6 +82,13 @@ type Option func(*options)
 func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
 	return func(o *options) {
 		o.contextFillers = append(o.contextFillers, contextFillers...)
+	}
+}
+
+// WithTrustedProxies adds trusted proxies from which proxy headers are trusted.
+func WithTrustedProxies(cidrs ...string) Option {
+	return func(o *options) {
+		o.trustedProxies = append(o.trustedProxies, cidrs...)
 	}
 }
 
@@ -133,43 +152,76 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		return nil, errors.New("Expected cookie block key to be 32 bytes long")
 	}
 
+	var proxyConfiguration webmiddleware.ProxyConfiguration
+	proxyConfiguration.ParseAndAddTrusted(options.trustedProxies...)
+
+	root := mux.NewRouter()
+	root.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
+	root.Use(
+		mux.MiddlewareFunc(webmiddleware.Recover()),
+		mux.MiddlewareFunc(webmiddleware.FillContext(options.contextFillers...)),
+		mux.MiddlewareFunc(webmiddleware.RequestURL()),
+		mux.MiddlewareFunc(webmiddleware.RequestID()),
+		mux.MiddlewareFunc(webmiddleware.ProxyHeaders(proxyConfiguration)),
+		mux.MiddlewareFunc(webmiddleware.MaxBody(1<<24)), // 16 MB.
+		mux.MiddlewareFunc(webmiddleware.SecurityHeaders()),
+		mux.MiddlewareFunc(webmiddleware.Log(logger)),
+	)
+
+	var redirectConfig webmiddleware.RedirectConfiguration
+	if options.redirectToHost != "" {
+		if host, portStr, err := net.SplitHostPort(options.redirectToHost); err == nil {
+			redirectConfig.HostName = func(string) string { return host }
+			port, err := strconv.ParseUint(portStr, 10, 0)
+			if err != nil {
+				return nil, err
+			}
+			redirectConfig.Port = func(uint) uint { return uint(port) }
+		} else {
+			redirectConfig.HostName = func(string) string { return options.redirectToHost }
+		}
+	}
+	if options.redirectToHTTPS != nil {
+		redirectConfig.Scheme = func(string) string { return "https" }
+		redirectConfig.Port = func(current uint) uint {
+			return uint(options.redirectToHTTPS[int(current)])
+		}
+	}
+
+	router := root.NewRoute().Subrouter()
+	router.Use(
+		mux.MiddlewareFunc(webmiddleware.Redirect(redirectConfig)),
+	)
+
+	apiRouter := mux.NewRouter()
+	apiRouter.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
+	apiRouter.Use(
+		mux.MiddlewareFunc(webmiddleware.CORS(webmiddleware.CORSConfig{
+			AllowedHeaders:   []string{"Authorization", "Content-Type", "X-CSRF-Token"},
+			AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete},
+			AllowedOrigins:   []string{"*"},
+			ExposedHeaders:   []string{"Date", "Content-Length", "X-Request-Id", "X-Total-Count", "X-Warning"},
+			MaxAge:           600,
+			AllowCredentials: true,
+		})),
+	)
+	root.PathPrefix("/api/").Handler(apiRouter)
+
 	server := echo.New()
 
 	server.Logger = &noopLogger{}
-	server.HTTPErrorHandler = ErrorHandler
+	server.HTTPErrorHandler = errorHandler
 
 	server.Use(
-		middleware.ID(""),
-		echomiddleware.BodyLimit("16M"),
-		echomiddleware.Secure(),
 		echomiddleware.Gzip(),
-		middleware.Recover(),
 		cookie.Cookies(blockKey, hashKey),
-		middleware.FillContext(options.contextFillers...),
 	)
 
-	var rootGroupMiddleware []echo.MiddlewareFunc
-
-	if options.redirectToHost != "" {
-		rootGroupMiddleware = append(rootGroupMiddleware, middleware.RedirectToHost(options.redirectToHost))
-	}
-
-	if options.redirectToHTTPS != nil {
-		rootGroupMiddleware = append(rootGroupMiddleware, middleware.RedirectToHTTPS(options.redirectToHTTPS))
-	}
-
-	rootGroupMiddleware = append(rootGroupMiddleware, middleware.Log(logger))
-
-	rootGroupMiddleware = append(rootGroupMiddleware, middleware.Normalize(middleware.RedirectPermanent))
-
 	s := &Server{
-		rootGroup: &rootGroup{
-			Group: server.Group(
-				"",
-				rootGroupMiddleware...,
-			),
-		},
-		server: server,
+		root:      root,
+		router:    router,
+		apiRouter: apiRouter,
+		echo:      server,
 	}
 
 	var staticPath string
@@ -219,31 +271,119 @@ func isZeros(buf []byte) bool {
 
 // ServeHTTP implements http.Handler.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.server.ServeHTTP(w, r)
+	s.root.ServeHTTP(w, r)
+}
+
+// RootRouter returns the root router.
+// In most cases the Router() should be used instead of the root router.
+func (s *Server) RootRouter() *mux.Router {
+	return s.root
+}
+
+// Router returns the main router.
+func (s *Server) Router() *mux.Router {
+	return s.router
+}
+
+// APIRouter returns the API router.
+func (s *Server) APIRouter() *mux.Router {
+	return s.apiRouter
+}
+
+func (s *Server) getRouter(path string) *mux.Router {
+	if strings.HasPrefix(path, "/api/") {
+		return s.apiRouter
+	}
+	return s.router
+}
+
+var echoVar = regexp.MustCompile(":[^/]+")
+
+// replaceEchoVars replaces Echo path variables with Mux path variables.
+// "/users/:user_id" will become "/users/{user_id}"
+func replaceEchoVars(path string) string {
+	return echoVar.ReplaceAllStringFunc(path, func(s string) string {
+		return fmt.Sprintf("{%s}", strings.TrimPrefix(s, ":"))
+	})
 }
 
 // Group creates a sub group.
 func (s *Server) Group(prefix string, middleware ...echo.MiddlewareFunc) *echo.Group {
-	t := strings.TrimSuffix(prefix, "/")
-	return s.rootGroup.Group.Group(t, middleware...)
+	path := "/" + strings.Trim(prefix, "/")
+	pathWithSlash := path + "/"
+	router := s.getRouter(pathWithSlash)
+	router.PathPrefix(replaceEchoVars(pathWithSlash)).Handler(s.echo)
+	router.Handle(replaceEchoVars(path), http.RedirectHandler(pathWithSlash, http.StatusPermanentRedirect))
+	return s.echo.Group(path, middleware...)
 }
 
-// RootGroup creates a new Echo router group with prefix and optional group-level middleware on the root Server.
-func (s *Server) RootGroup(prefix string, middleware ...echo.MiddlewareFunc) *echo.Group {
-	t := strings.TrimSuffix(prefix, "/")
-	return s.server.Group(t, middleware...)
+// GET registers a GET handler at path.
+func (s *Server) GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route {
+	router := s.getRouter(path)
+	router.Path(path).Methods(http.MethodGet).Handler(s.echo)
+	return s.echo.GET(replaceEchoVars(path), h, m...)
+}
+
+// HEAD registers a HEAD handler at path.
+func (s *Server) HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route {
+	router := s.getRouter(path)
+	router.Path(path).Methods(http.MethodHead).Handler(s.echo)
+	return s.echo.HEAD(replaceEchoVars(path), h, m...)
+}
+
+// POST registers a POST handler at path.
+func (s *Server) POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route {
+	router := s.getRouter(path)
+	router.Path(path).Methods(http.MethodPost).Handler(s.echo)
+	return s.echo.POST(replaceEchoVars(path), h, m...)
+}
+
+// DELETE registers a DELETE handler at path.
+func (s *Server) DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route {
+	router := s.getRouter(path)
+	router.Path(path).Methods(http.MethodDelete).Handler(s.echo)
+	return s.echo.DELETE(replaceEchoVars(path), h, m...)
 }
 
 // Static adds the http.FileSystem under the defined prefix.
-func (s *Server) Static(prefix string, fs http.FileSystem, middleware ...echo.MiddlewareFunc) {
-	t := strings.TrimSuffix(prefix, "/")
-	path := path.Join(t, "*")
-	handler := echo.WrapHandler(http.StripPrefix(t, http.FileServer(fs)))
-	s.server.GET(path, handler, middleware...)
-	s.server.HEAD(path, handler, middleware...)
+func (s *Server) Static(prefix string, fs http.FileSystem) {
+	prefix = "/" + strings.Trim(prefix, "/") + "/"
+	s.router.PathPrefix(prefix).Handler(http.StripPrefix(prefix, http.FileServer(fs)))
+}
+
+// Prefix returns a route for the given path prefix.
+func (s *Server) Prefix(prefix string) *mux.Route {
+	return s.getRouter(prefix).PathPrefix(prefix)
+}
+
+// Route is a registered route.
+type Route struct {
+	Method string
+	Path   string
 }
 
 // Routes returns the defined routes.
-func (s *Server) Routes() []*echo.Route {
-	return s.server.Routes()
+func (s *Server) Routes() []*Route {
+	var routes []*Route
+	err := s.root.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		pathTemplate, err := route.GetPathTemplate()
+		if err != nil {
+			return nil
+		}
+		methods, err := route.GetMethods()
+		if err != nil {
+			methods = []string{"*"}
+		}
+		for _, method := range methods {
+			routes = append(routes, &Route{Method: method, Path: pathTemplate})
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	for _, route := range s.echo.Routes() {
+		routes = append(routes, &Route{Method: route.Method, Path: route.Path})
+	}
+	return routes
 }

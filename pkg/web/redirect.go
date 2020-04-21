@@ -25,7 +25,7 @@ type redirector struct {
 }
 
 func (r redirector) RegisterRoutes(s *Server) {
-	s.Group("").Any(r.Path, func(c echo.Context) error {
+	s.GET(r.Path, func(c echo.Context) error {
 		return c.Redirect(r.Code, r.Location)
 	})
 }

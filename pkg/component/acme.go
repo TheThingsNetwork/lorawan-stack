@@ -45,6 +45,7 @@ func (c *Component) initACME() error {
 		},
 		Email: c.config.TLS.ACME.Email,
 	}
-	c.web.Any(".well-known/acme-challenge/*", echo.WrapHandler(c.acme.HTTPHandler(nil)))
+	c.web.GET(".well-known/acme-challenge/*", echo.WrapHandler(c.acme.HTTPHandler(nil)))
+	c.web.HEAD(".well-known/acme-challenge/*", echo.WrapHandler(c.acme.HTTPHandler(nil)))
 	return nil
 }
