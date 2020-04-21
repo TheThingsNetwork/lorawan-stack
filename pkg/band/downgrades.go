@@ -16,22 +16,23 @@ package band
 
 import "go.thethings.network/lorawan-stack/pkg/ttnpb"
 
-// LoRaWAN 1.0.3rA -> 1.0.2rB downgrades
-
-func disableCFList1_0_2(b Band) Band {
+func disableCFList(b Band) Band {
 	b.ImplementsCFList = false
 	return b
 }
 
-// LoRaWAN 1.0.3rA -> 1.0.2rB downgrades
-
-func disableChMaskCntl51_0_2(b Band) Band {
+func disableChMaskCntl5(b Band) Band {
 	b.GenerateChMasks = makeGenerateChMask72(false)
 	return b
 }
 
 func disableTxParamSetupReq(b Band) Band {
 	b.TxParamSetupReqSupport = false
+	return b
+}
+
+func enableTxParamSetupReq(b Band) Band {
+	b.TxParamSetupReqSupport = true
 	return b
 }
 
@@ -42,25 +43,16 @@ func makeSetMaxTxPowerIndexFunc(idx uint8) func(Band) Band {
 	}
 }
 
+func makeSetBeaconDataRateIndex(idx ttnpb.DataRateIndex) func(Band) Band {
+	return func(b Band) Band {
+		b.Beacon.DataRateIndex = idx
+		return b
+	}
+}
+
 func makeAddTxPowerFunc(offset float32) func(Band) Band {
 	return func(b Band) Band {
 		b.TxOffset = append(b.TxOffset, offset)
 		return b
 	}
-}
-
-// LoRaWAN 1.0.2rB -> 1.0.2rA downgrades
-
-func auDataRates1_0_2(b Band) Band {
-	for i := ttnpb.DataRateIndex(0); i < 4; i++ {
-		b.DataRates[i] = b.DataRates[i+2]
-	}
-	b.DataRates[5] = DataRate{}
-	b.DataRates[6] = DataRate{}
-	return b
-}
-
-func usBeacon1_0_2(b Band) Band {
-	b.Beacon.DataRateIndex = 3
-	return b
 }

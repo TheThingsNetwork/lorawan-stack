@@ -65,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Application Server does not crash when retrieving a webhook template that does not exist if no template repository has been configured.
 - Application Server does not crash when listing webhook templates if no template repository has been configured.
 - Error display on failed end device fetching in the Console.
+- Various inconsistencies with Regional Parameters specifications.
 
 ### Security
 
