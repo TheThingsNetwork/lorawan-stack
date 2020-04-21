@@ -484,7 +484,7 @@ matchLoop:
 						match.Device.MACState.CurrentParameters.Channels = append(match.Device.MACState.CurrentParameters.Channels, &ttnpb.MACParameters_Channel{
 							UplinkFrequency:   uint64(freq * 100),
 							DownlinkFrequency: uint64(freq * 100),
-							MaxDataRateIndex:  ttnpb.DataRateIndex(match.phy.MaxADRDataRateIndex),
+							MaxDataRateIndex:  match.phy.MaxADRDataRateIndex,
 							EnableUplink:      true,
 						})
 					}
