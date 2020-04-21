@@ -848,10 +848,13 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 			"transmission_delay", delay,
 			"transmit_at", transmitAt,
 		)).Debug("Scheduled downlink")
+		queuedEvents = append(queuedEvents, req.SuccessEvent(ctx, req.EndDeviceIdentifiers, &ttnpb.ScheduleDownlinkResponse{
+			Delay: delay,
+		}))
 		return &scheduledDownlink{
 			Message:    down,
 			TransmitAt: transmitAt,
-		}, append(queuedEvents, req.SuccessEvent(ctx, req.EndDeviceIdentifiers, nil)), nil
+		}, queuedEvents, nil
 	}
 	return nil, queuedEvents, downlinkSchedulingError(errs)
 }
