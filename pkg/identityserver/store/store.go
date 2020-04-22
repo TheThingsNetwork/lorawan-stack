@@ -243,6 +243,8 @@ var (
 	errAccessTokenNotFound       = errors.DefineNotFound("access_token_not_found", "access token not found")
 
 	errAPIKeyNotFound = errors.DefineNotFound("api_key_not_found", "API key not found")
+
+	errMigrationNotFound = errors.DefineNotFound("migration_not_found", "migration not found")
 )
 
 func errNotFoundForID(id ttnpb.Identifiers) error {
