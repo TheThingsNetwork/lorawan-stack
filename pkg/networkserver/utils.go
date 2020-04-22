@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"sort"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -122,6 +123,15 @@ func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
 		}
 	}
 	return 0, errUplinkChannelNotFound.WithAttributes("frequency", freq)
+}
+
+func searchUint64(v uint64, vs ...uint64) int {
+	return sort.Search(len(vs), func(i int) bool { return vs[i] >= v })
+}
+
+func deviceRejectedFrequency(dev *ttnpb.EndDevice, freq uint64) bool {
+	i := searchUint64(freq, dev.MACState.RejectedFrequencies...)
+	return i < len(dev.MACState.RejectedFrequencies) && dev.MACState.RejectedFrequencies[i] == freq
 }
 
 func partitionDownlinks(p func(down *ttnpb.ApplicationDownlink) bool, downs ...*ttnpb.ApplicationDownlink) (t, f []*ttnpb.ApplicationDownlink) {

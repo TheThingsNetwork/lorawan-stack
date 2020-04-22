@@ -589,6 +589,61 @@ func TestHandleNewChannelAns(t *testing.T) {
 			Error: errMACRequestNotFound,
 		},
 		{
+			Name: "frequency nack/data rate ack/no rejections",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex:     4,
+							Frequency:        42,
+							MinDataRateIndex: 2,
+							MaxDataRateIndex: 3,
+						}).MACCommand(),
+					},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests:     []*ttnpb.MACCommand{},
+					RejectedFrequencies: []uint64{42},
+				},
+			},
+			Payload: &ttnpb.MACCommand_NewChannelAns{
+				DataRateAck: true,
+			},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveNewChannelReject.BindData(&ttnpb.MACCommand_NewChannelAns{
+					DataRateAck: true,
+				}),
+			},
+		},
+		{
+			Name: "frequency nack/data rate nack/rejected frequencies:(1,2,100)",
+			Device: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_NewChannelReq{
+							ChannelIndex:     4,
+							Frequency:        42,
+							MinDataRateIndex: 2,
+							MaxDataRateIndex: 3,
+						}).MACCommand(),
+					},
+					RejectedFrequencies: []uint64{1, 2, 100},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests:     []*ttnpb.MACCommand{},
+					RejectedFrequencies: []uint64{1, 2, 42, 100},
+				},
+			},
+			Payload: &ttnpb.MACCommand_NewChannelAns{},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveNewChannelReject.BindData(&ttnpb.MACCommand_NewChannelAns{}),
+			},
+		},
+		{
 			Name: "both ack",
 			Device: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
