@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for repeated `RekeyInd`. (happens when e.g. `RekeyConf` is lost)
+- Validate the `DevAddr` when switching session as a result of receiving `RekeyInd`.
+
 ### Changed
 
 ### Deprecated
