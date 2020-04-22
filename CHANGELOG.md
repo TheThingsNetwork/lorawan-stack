@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- JavaScript style guide to our `DEVELOPMENT.md` documentation.
+
 ### Changed
+
+- Conformed JavaScript to new code style guide.
 
 ### Deprecated
 
