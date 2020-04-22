@@ -36,7 +36,8 @@ $ ttn-lw-cli end-device template extend \
 
 The mapping file `profile.json` contains the following entries (omitting empty fields).
 
-<details><summary>Show `profile.json`</summary>
+<details><summary>Show profile.json</summary>
+
 ```json
 {
   "end_device": {
@@ -87,6 +88,7 @@ $ cat provisioningdata.json \
 This returns the device templates with provisioning data and device profile combined.
 
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {
@@ -205,6 +207,7 @@ $ cat templates.json \
 ```
 
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {

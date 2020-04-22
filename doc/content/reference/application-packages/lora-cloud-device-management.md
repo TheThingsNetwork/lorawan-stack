@@ -32,7 +32,6 @@ $ ttn-lw-cli applications packages associations set app1 dev1 200 --package-name
 
 This will enable the package on FPort `200` of the device `dev1` of application `app1`. You can now use the Semtech LoRa Cloud Device Management in order to manage your device !
 
-<details><summary>Show output</summary>
 ```json
 {
   "ids": {
@@ -52,4 +51,3 @@ This will enable the package on FPort `200` of the device `dev1` of application 
     }
 }
 ```
-</details>

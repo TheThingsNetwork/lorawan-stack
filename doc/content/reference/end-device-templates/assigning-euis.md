@@ -39,6 +39,7 @@ $ cat profile.json \
 ```
 
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {

@@ -12,8 +12,7 @@ To show supported QR code formats for end devices:
 $ ttn-lw-cli end-devices list-qr-formats
 ```
 
-<details>
-<summary>Show output</summary>
+Output:
 
 ```json
 {
@@ -34,8 +33,6 @@ $ ttn-lw-cli end-devices list-qr-formats
 ```
 
 The formats show the fields of the end device that are used in the QR code.
-
-</details>
 
 ## Generate QR Code for Identification
 
