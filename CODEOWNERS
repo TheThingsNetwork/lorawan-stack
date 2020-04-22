@@ -17,12 +17,14 @@
 /.make @htdvisser @rvolosatovs @johanstokking
 /.mage @htdvisser @rvolosatovs @johanstokking
 
-# API, configuration and CLI compatibility
+# API, configuration, CLI and storage compatibility
 /api @johanstokking @htdvisser @rvolosatovs
 /cmd @johanstokking @htdvisser @rvolosatovs
 /pkg/ttnpb @johanstokking @htdvisser @rvolosatovs
 /pkg/**/config.go @johanstokking @htdvisser @rvolosatovs
 /pkg/config/shared.go @johanstokking @htdvisser @rvolosatovs
+/pkg/identityserver/store @johanstokking @htdvisser @rvolosatovs
+/pkg/**/registry.go @johanstokking @htdvisser @rvolosatovs
 
 # Security
 /pkg/auth @johanstokking @htdvisser
