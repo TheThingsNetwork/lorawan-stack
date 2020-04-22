@@ -125,8 +125,26 @@ func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
 	return 0, errUplinkChannelNotFound.WithAttributes("frequency", freq)
 }
 
+func searchDataRateIndex(v ttnpb.DataRateIndex, vs ...ttnpb.DataRateIndex) int {
+	return sort.Search(len(vs), func(i int) bool { return vs[i] >= v })
+}
+
+func searchUint32(v uint32, vs ...uint32) int {
+	return sort.Search(len(vs), func(i int) bool { return vs[i] >= v })
+}
+
 func searchUint64(v uint64, vs ...uint64) int {
 	return sort.Search(len(vs), func(i int) bool { return vs[i] >= v })
+}
+
+func deviceRejectedADRDataRateIndex(dev *ttnpb.EndDevice, idx ttnpb.DataRateIndex) bool {
+	i := searchDataRateIndex(idx, dev.MACState.RejectedADRDataRateIndexes...)
+	return i < len(dev.MACState.RejectedADRDataRateIndexes) && dev.MACState.RejectedADRDataRateIndexes[i] == idx
+}
+
+func deviceRejectedADRTXPowerIndex(dev *ttnpb.EndDevice, idx uint32) bool {
+	i := searchUint32(idx, dev.MACState.RejectedADRTxPowerIndexes...)
+	return i < len(dev.MACState.RejectedADRTxPowerIndexes) && dev.MACState.RejectedADRTxPowerIndexes[i] == idx
 }
 
 func deviceRejectedFrequency(dev *ttnpb.EndDevice, freq uint64) bool {
@@ -162,7 +180,7 @@ func deviceNeedsMACRequestsAt(ctx context.Context, dev *ttnpb.EndDevice, t time.
 		deviceNeedsDevStatusReq(dev, defaults, t),
 		deviceNeedsDLChannelReq(dev),
 		deviceNeedsDutyCycleReq(dev),
-		deviceNeedsLinkADRReq(dev),
+		deviceNeedsLinkADRReq(dev, defaults),
 		deviceNeedsNewChannelReq(dev),
 		deviceNeedsPingSlotChannelReq(dev),
 		deviceNeedsRejoinParamSetupReq(dev),
