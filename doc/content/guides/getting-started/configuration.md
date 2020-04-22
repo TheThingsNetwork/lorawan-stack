@@ -247,6 +247,7 @@ console:
 
   oauth:
     authorize-url: 'https://thethings.example.com/oauth/authorize'
+    logout-url: 'https://thethings.example.com/oauth/logout'
     token-url: 'https://thethings.example.com/oauth/token'
     client-id: 'console'
     client-secret: 'console'          # choose or generate a secret (*)
