@@ -28,14 +28,19 @@ var (
 	evtReceiveDLChannelReject  = defineReceiveMACRejectEvent("dl_channel", "downlink Rx1 channel frequency modification")()
 )
 
-func channelNeedsDLChannelReq(desiredCh, currentCh *ttnpb.MACParameters_Channel) bool {
-	// NOTE: If channelNeedsNewChannelReq(desiredCh, currentCh), then
-	// NS will schedule NewChannelReq, which will, in turn, modify the downlink frequency, hence
-	// DLChannelReq should only be scheduled after a successful NewChannelAns is received.
-	return desiredCh != nil &&
-		currentCh != nil &&
-		desiredCh.DownlinkFrequency != currentCh.DownlinkFrequency &&
-		!channelNeedsNewChannelReq(desiredCh, currentCh)
+func deviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
+	if i >= len(dev.MACState.CurrentParameters.Channels) || i >= len(dev.MACState.DesiredParameters.Channels) {
+		return false
+	}
+	desiredCh, currentCh := dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]
+	if desiredCh == nil || currentCh == nil {
+		return false
+	}
+	if deviceNeedsNewChannelReqAtIndex(dev, i) {
+		// Cannot define a downlink frequency for disabled channel.
+		return desiredCh.UplinkFrequency != 0 && desiredCh.DownlinkFrequency != desiredCh.UplinkFrequency
+	}
+	return desiredCh.DownlinkFrequency != currentCh.DownlinkFrequency
 }
 
 func deviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
@@ -43,7 +48,7 @@ func deviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
 		return false
 	}
 	for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
-		if channelNeedsDLChannelReq(dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]) {
+		if deviceNeedsDLChannelReqAtIndex(dev, i) {
 			return true
 		}
 	}
@@ -64,8 +69,7 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 		var cmds []*ttnpb.MACCommand
 		var evs []events.DefinitionDataClosure
 		for i := 0; i < len(dev.MACState.DesiredParameters.Channels) && i < len(dev.MACState.CurrentParameters.Channels); i++ {
-			desiredCh, currentCh := dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]
-			if !channelNeedsDLChannelReq(desiredCh, currentCh) {
+			if !deviceNeedsDLChannelReqAtIndex(dev, i) {
 				continue
 			}
 			if nDown < 1 || nUp < 1 {
@@ -76,7 +80,7 @@ func enqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 
 			req := &ttnpb.MACCommand_DLChannelReq{
 				ChannelIndex: uint32(i),
-				Frequency:    desiredCh.DownlinkFrequency,
+				Frequency:    dev.MACState.DesiredParameters.Channels[i].DownlinkFrequency,
 			}
 			cmds = append(cmds, req.MACCommand())
 			evs = append(evs, evtEnqueueDLChannelRequest.BindData(req))
@@ -94,13 +98,24 @@ func handleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
+	if !pld.ChannelIndexAck {
+		// See "Table 10: DlChannelAns status bits signification" of LoRaWAN 1.1 specification
+		log.FromContext(ctx).Warn("Network Server attempted to configure downlink frequency for a channel, for which uplink frequency is not defined or device is malfunctioning.")
+	}
 
 	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {
-		if !pld.ChannelIndexAck || !pld.FrequencyAck {
+		req := cmd.GetDLChannelReq()
+		if !pld.FrequencyAck {
+			if i := searchUint64(req.Frequency, dev.MACState.RejectedFrequencies...); i == len(dev.MACState.RejectedFrequencies) || dev.MACState.RejectedFrequencies[i] != req.Frequency {
+				dev.MACState.RejectedFrequencies = append(dev.MACState.RejectedFrequencies, 0)
+				copy(dev.MACState.RejectedFrequencies[i+1:], dev.MACState.RejectedFrequencies[i:])
+				dev.MACState.RejectedFrequencies[i] = req.Frequency
+			}
+		}
+		if !pld.FrequencyAck || !pld.ChannelIndexAck {
 			return nil
 		}
-		req := cmd.GetDLChannelReq()
 
 		if uint(req.ChannelIndex) >= uint(len(dev.MACState.CurrentParameters.Channels)) || dev.MACState.CurrentParameters.Channels[req.ChannelIndex] == nil {
 			return errCorruptedMACState.WithCause(errUnknownChannel)
