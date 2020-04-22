@@ -31,7 +31,7 @@ Given input data, you can use the `end-device template from-data` command to get
 
 ## Example
 
->This example uses a **Microchip ATECC608A-MAHTN-T Manifest File**. This file contains provisioning data for The Things Industries Join Server. You can [download the example file](microchip-atecc608a-mahtn-t-example.json).
+>This example uses a **Microchip ATECC608A-MAHTN-T Manifest File**. This file contains provisioning data for The Things Industries Join Server. You can [download the example file](../microchip-atecc608a-mahtn-t-example.json).
 
 ```bash
 $ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-file example.json
