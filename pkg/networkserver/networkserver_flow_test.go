@@ -656,7 +656,7 @@ func (env FlowTestEnvironment) AssertSetDevice(ctx context.Context, create bool,
 	return dev, a.So(err, should.BeNil)
 }
 
-func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string) func(context.Context, FlowTestEnvironment) {
+func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string, linkADRReqs ...*ttnpb.MACCommand_LinkADRReq) func(context.Context, FlowTestEnvironment) {
 	return func(ctx context.Context, env FlowTestEnvironment) {
 		t := test.MustTFromContext(ctx)
 		a := assertions.New(t)
@@ -764,7 +764,9 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 			)
 		}
 		makeUplink := func(matched bool, rxMetadata ...*ttnpb.RxMetadata) *ttnpb.UplinkMessage {
-			msg := MakeDataUplink(macVersion, matched, true, joinReq.DevAddr, ttnpb.FCtrl{}, 0x00, 0x00, 0x42, []byte("test"), MakeUplinkMACBuffer(phy, upCmders...), phy.DataRates[upDRIdx].Rate, upDRIdx, upChs[upChIdx].UplinkFrequency, upChIdx, rxMetadata...)
+			msg := MakeDataUplink(macVersion, matched, true, joinReq.DevAddr, ttnpb.FCtrl{
+				ADR: true,
+			}, 0x00, 0x00, 0x42, []byte("test"), MakeUplinkMACBuffer(phy, upCmders...), phy.DataRates[upDRIdx].Rate, upDRIdx, upChs[upChIdx].UplinkFrequency, upChIdx, rxMetadata...)
 			if matched {
 				return WithMatchedUplinkSettings(msg, upChIdx, upDRIdx)
 			}
@@ -809,6 +811,14 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 			return
 		}
 
+		downCmders = append(downCmders, ttnpb.CID_DEV_STATUS)
+		expectedEvs = append(expectedEvs, EvtEnqueueDevStatusRequest(ctx, ids, nil))
+		for _, cmd := range linkADRReqs {
+			cmd := cmd
+			downCmders = append(downCmders, cmd)
+			expectedEvs = append(expectedEvs, EvtEnqueueLinkADRRequest(ctx, ids, cmd))
+		}
+
 		paths := DownlinkPathsFromMetadata(RxMetadata[:]...)
 		txReq := &ttnpb.TxRequest{
 			Class:            ttnpb.CLASS_A,
@@ -828,18 +838,16 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				a.So(down, should.Resemble, MakeDataDownlink(macVersion, false, joinReq.DevAddr, ttnpb.FCtrl{
 					ADR: true,
 					Ack: true,
-				}, 0x00, 0x00, 0x00, MakeDownlinkMACBuffer(phy, append(downCmders,
-					ttnpb.CID_DEV_STATUS,
-				)...), nil, txReq, down.CorrelationIDs...)),
+				}, 0x00, 0x00, 0x00, MakeDownlinkMACBuffer(phy, downCmders...), nil, txReq, down.CorrelationIDs...)),
 			)
 		}, paths,
 		), should.BeTrue) {
 			t.Error("Failed to schedule downlink on Gateway Server")
 			return
 		}
-		a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 3+len(expectedEvs), func(evs ...events.Event) bool {
-			return a.So(evs, should.HaveSameElementsFunc, flowTestEventEqual, append(expectedEvs,
-				EvtEnqueueDevStatusRequest(ctx, ids, nil),
+		a.So(test.AssertEventPubSubPublishRequests(ctx, env.Events, 2+len(expectedEvs), func(evs ...events.Event) bool {
+			return a.So(evs, should.HaveSameElementsFunc, flowTestEventEqual, append(
+				expectedEvs,
 				EvtScheduleDataDownlinkAttempt(ctx, ids, txReq),
 				EvtScheduleDataDownlinkSuccess(ctx, ids, &ttnpb.ScheduleDownlinkResponse{}),
 			))
@@ -868,10 +876,18 @@ func TestFlow(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
+			eu868LinkADRReqs := []*ttnpb.MACCommand_LinkADRReq{
+				{
+					ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
+					DataRateIndex: ttnpb.DATA_RATE_4,
+					TxPowerIndex:  1,
+					NbTrans:       1,
+				},
+			}
 			for flow, handleFlowTest := range map[string]func(context.Context, FlowTestEnvironment){
-				"Class C/OTAA/MAC:1.0.3/PHY:1.0.3-a/FP:EU868": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A, test.EUFrequencyPlanID),
+				"Class C/OTAA/MAC:1.0.3/PHY:1.0.3-a/FP:EU868": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_3, ttnpb.PHY_V1_0_3_REV_A, test.EUFrequencyPlanID, eu868LinkADRReqs...),
 				"Class C/OTAA/MAC:1.0.4/PHY:1.0.3-a/FP:US915": makeClassCOTAAFlowTest(ttnpb.MAC_V1_0_4, ttnpb.PHY_V1_0_3_REV_A, test.USFrequencyPlanID),
-				"Class C/OTAA/MAC:1.1/PHY:1.1-b/FP:EU868":     makeClassCOTAAFlowTest(ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B, test.EUFrequencyPlanID),
+				"Class C/OTAA/MAC:1.1/PHY:1.1-b/FP:EU868":     makeClassCOTAAFlowTest(ttnpb.MAC_V1_1, ttnpb.PHY_V1_1_REV_B, test.EUFrequencyPlanID, eu868LinkADRReqs...),
 			} {
 				t.Run(flow, func(t *testing.T) {
 					uq, uqClose := tc.NewApplicationUplinkQueue(t)
