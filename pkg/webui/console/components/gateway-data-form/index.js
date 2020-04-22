@@ -74,7 +74,7 @@ const validationSchema = Yup.object().shape({
       .min(2, Yup.passValues(sharedMessages.validateTooShort))
       .max(36, Yup.passValues(sharedMessages.validateTooLong))
       .required(sharedMessages.validateRequired),
-    eui: Yup.nullableString().length(8 * 2, Yup.passValues(sharedMessages.validateTooShort)),
+    eui: Yup.nullableString().length(8 * 2, Yup.passValues(sharedMessages.validateLength)),
   }),
   name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))

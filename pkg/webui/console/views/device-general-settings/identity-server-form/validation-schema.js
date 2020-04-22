@@ -14,8 +14,6 @@
 
 import * as Yup from 'yup'
 
-import m from '@console/components/device-data-form/messages'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
@@ -92,7 +90,7 @@ const validationSchema = Yup.object()
           return !externalJs
             ? Yup.object().shape({
                 key: Yup.string()
-                  .emptyOrLength(16 * 2, m.validate32) // A 16 Byte hex.
+                  .emptyOrLength(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                   .transform(toUndefined)
                   .default(random16BytesString),
               })

@@ -240,6 +240,7 @@ export default defineMessages({
   validateIdFormat: '{field} must contain only lowercase letters, numbers and dashes (-)',
   validateInt32: '{field} must be a whole number, negative or positive',
   validateLatitude: 'Latitude must be a whole or decimal number between -90 and 90',
+  validateLength: '{field} must be exactly {length} characters long',
   validateLongitude: 'Longitude must be a whole or decimal number between -180 and 180',
   validateMqttPassword: '{field} must be empty or have at least 2 characters',
   validateMqttUrl:

@@ -37,7 +37,7 @@ const validationSchema = Yup.object().shape({
   session: Yup.object().shape({
     keys: Yup.object().shape({
       app_s_key: Yup.object().shape({
-        key: Yup.string().emptyOrLength(16 * 2, m.validate32), // A 16 Byte hex.
+        key: Yup.string().emptyOrLength(16 * 2, Yup.passValues(sharedMessages.validateLength)), // A 16 Byte hex.
       }),
     }),
   }),
