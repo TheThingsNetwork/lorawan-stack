@@ -28,60 +28,12 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/web"
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
-
-// ServerConfig is the configuration of the CUPS server.
-type ServerConfig struct {
-	ExplicitEnable  bool `name:"require-explicit-enable" description:"Require gateways to explicitly enable CUPS"`
-	RegisterUnknown struct {
-		Type   string `name:"account-type" description:"Type of account to register unknown gateways to (user|organization)"`
-		ID     string `name:"id" description:"ID of the account to register unknown gateways to"`
-		APIKey string `name:"api-key" description:"API Key to use for unknown gateway registration"`
-	} `name:"owner-for-unknown"`
-	Default struct {
-		LNSURI string `name:"lns-uri" description:"The default LNS URI that the gateways should use"`
-	} `name:"default" description:"Default gateway settings"`
-	AllowCUPSURIUpdate bool `name:"allow-cups-uri-update" description:"Allow CUPS URI updates"`
-}
-
-// NewServer returns a new CUPS server from this config on top of the component.
-func (conf ServerConfig) NewServer(c *component.Component, customOpts ...Option) *Server {
-	opts := []Option{
-		WithExplicitEnable(conf.ExplicitEnable),
-		WithAllowCUPSURIUpdate(conf.AllowCUPSURIUpdate),
-		WithDefaultLNSURI(conf.Default.LNSURI),
-	}
-	var registerUnknownTo *ttnpb.OrganizationOrUserIdentifiers
-	switch conf.RegisterUnknown.Type {
-	case "user":
-		registerUnknownTo = ttnpb.UserIdentifiers{UserID: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
-	case "organization":
-		registerUnknownTo = ttnpb.OrganizationIdentifiers{OrganizationID: conf.RegisterUnknown.ID}.OrganizationOrUserIdentifiers()
-	}
-	if registerUnknownTo != nil && conf.RegisterUnknown.APIKey != "" {
-		opts = append(opts,
-			WithRegisterUnknown(registerUnknownTo, func(ctx context.Context) grpc.CallOption {
-				return grpc.PerRPCCredentials(rpcmetadata.MD{
-					AuthType:      "bearer",
-					AuthValue:     conf.RegisterUnknown.APIKey,
-					AllowInsecure: c.AllowInsecureForCredentials(),
-				})
-			}),
-		)
-	}
-	if tlsConfig, err := c.GetTLSServerConfig(c.Context()); err == nil {
-		opts = append(opts, WithTLSConfig(tlsConfig))
-	}
-	s := NewServer(c, append(opts, customOpts...)...)
-	c.RegisterWeb(s)
-	return s
-}
 
 // Server implements the Basic Station Configuration and Update Server.
 type Server struct {

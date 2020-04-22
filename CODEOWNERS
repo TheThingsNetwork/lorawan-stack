@@ -5,23 +5,26 @@
 
 # Clear common folders
 /doc
-/config
 /pkg
 
 # Dependencies
-/go.mod @johanstokking @htdvisser
-/go.sum @johanstokking @htdvisser
+/go.mod @johanstokking @htdvisser @rvolosatovs
+/go.sum @johanstokking @htdvisser @rvolosatovs
 
 # Build pipeline
-/Makefile @htdvisser @rvolosatovs
-/magefile.go @htdvisser @rvolosatovs
-/.make @htdvisser @rvolosatovs
-/.mage @htdvisser @rvolosatovs
+/Makefile @htdvisser @rvolosatovs @johanstokking
+/magefile.go @htdvisser @rvolosatovs @johanstokking
+/.make @htdvisser @rvolosatovs @johanstokking
+/.mage @htdvisser @rvolosatovs @johanstokking
 
-# API and CLI compatibility
+# API, configuration, CLI and storage compatibility
 /api @johanstokking @htdvisser @rvolosatovs
-/cmd @johanstokking @htdvisser
+/cmd @johanstokking @htdvisser @rvolosatovs
 /pkg/ttnpb @johanstokking @htdvisser @rvolosatovs
+/pkg/**/config.go @johanstokking @htdvisser @rvolosatovs
+/pkg/config/shared.go @johanstokking @htdvisser @rvolosatovs
+/pkg/identityserver/store @johanstokking @htdvisser @rvolosatovs
+/pkg/**/registry.go @johanstokking @htdvisser @rvolosatovs
 
 # Security
 /pkg/auth @johanstokking @htdvisser
@@ -32,16 +35,17 @@
 /pkg/pfconfig @rvolosatovs @KrishnaIyer
 /pkg/types @johanstokking @htdvisser @rvolosatovs
 /pkg/webui @bafonins @kschiffer @pgalic96
+/pkg/oauth @htdvisser @bafonins @kschiffer
 
 # Subsystems
-/pkg/applicationserver @johanstokking @adriansmares
-/pkg/console @bafonins @kschiffer
-/pkg/gatewayconfigurationserver @rvolosatovs @KrishnaIyer
-/pkg/gatewayserver @johanstokking @KrishnaIyer
-/pkg/identityserver @htdvisser @bafonins
-/pkg/interop @johanstokking @rvolosatovs
-/pkg/joinserver @johanstokking @rvolosatovs
-/pkg/networkserver @johanstokking @rvolosatovs
+/pkg/applicationserver @johanstokking @adriansmares @KrishnaIyer
+/pkg/console @bafonins @kschiffer @pgalic96
+/pkg/gatewayconfigurationserver @rvolosatovs @KrishnaIyer @htdvisser
+/pkg/gatewayserver @johanstokking @KrishnaIyer @adriansmares
+/pkg/identityserver @htdvisser @bafonins @kschiffer
+/pkg/interop @johanstokking @rvolosatovs @adriansmares
+/pkg/joinserver @johanstokking @rvolosatovs @adriansmares
+/pkg/networkserver @johanstokking @rvolosatovs @adriansmares
 
 # SDKs
 /sdk/js @bafonins @kschiffer @pgalic96

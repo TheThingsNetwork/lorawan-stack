@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package email provides an interface to send messages over email.
-package email
+// Package devicetemplateconverter provides device template services.
+package devicetemplateconverter
 
-// Sender is the interface for sending messages over email.
-type Sender interface {
-	Send(message *Message) error
+// Config represents the DeviceTemplateConverter configuration.
+type Config struct {
+	Enabled []string `name:"enabled" description:"Enabled converters"`
 }

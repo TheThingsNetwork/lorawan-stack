@@ -19,7 +19,6 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -353,54 +352,6 @@ type Client struct {
 var errUnknownProtocol = errors.DefineInvalidArgument("unknown_protocol", "unknown protocol")
 
 var errUnknownConfig = errors.DefineNotFound("unknown_config", "configuration is unknown")
-
-type tlsConfig struct {
-	RootCA      string `yaml:"root-ca"`
-	Certificate string `yaml:"certificate"`
-	Key         string `yaml:"key"`
-}
-
-func (conf tlsConfig) IsZero() bool {
-	return conf == (tlsConfig{})
-}
-
-func (conf tlsConfig) TLSConfig(fetcher fetch.Interface) (*tls.Config, error) {
-	var rootCAs *x509.CertPool
-	if conf.RootCA != "" {
-		caPEM, err := fetcher.File(conf.RootCA)
-		if err != nil {
-			return nil, err
-		}
-		rootCAs = x509.NewCertPool()
-		rootCAs.AppendCertsFromPEM(caPEM)
-	}
-
-	var getCert func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
-	if conf.Certificate != "" || conf.Key != "" {
-		getCert = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			certPEM, err := fetcher.File(conf.Certificate)
-			if err != nil {
-				return nil, err
-			}
-			keyPEM, err := fetcher.File(conf.Key)
-			if err != nil {
-				return nil, err
-			}
-			cert, err := tls.X509KeyPair(certPEM, keyPEM)
-			if err != nil {
-				return nil, err
-			}
-			return &cert, nil
-		}
-	}
-	return &tls.Config{
-		RootCAs:              rootCAs,
-		GetClientCertificate: getCert,
-	}, nil
-}
-
-// InteropClientConfigurationName represents the filename of interop client configuration.
-const InteropClientConfigurationName = "config.yml"
 
 // NewClient return new interop client.
 // fallbackTLS is optional.

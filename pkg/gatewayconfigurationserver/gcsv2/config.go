@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package email provides an interface to send messages over email.
-package email
+package gcsv2
 
-// Sender is the interface for sending messages over email.
-type Sender interface {
-	Send(message *Message) error
+// TheThingsGatewayConfig is the configuration for The Things Gateway.
+type TheThingsGatewayConfig struct {
+	Default struct {
+		UpdateChannel string `name:"update-channel" description:"The default update channel that the gateways should use"`
+		MQTTServer    string `name:"mqtt-server" description:"The default MQTT server that the gateways should use"`
+		FirmwareURL   string `name:"firmware-url" description:"The default URL to the firmware storage"`
+	} `name:"default" description:"Default gateway settings"`
 }

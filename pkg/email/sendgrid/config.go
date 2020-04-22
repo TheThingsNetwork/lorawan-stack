@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package email provides an interface to send messages over email.
-package email
+package sendgrid
 
-// Sender is the interface for sending messages over email.
-type Sender interface {
-	Send(message *Message) error
+// Config for the SendGrid email provider.
+type Config struct {
+	APIKey      string `name:"api-key" description:"The SendGrid API key to use"`
+	SandboxMode bool   `name:"sandbox" description:"Use SendGrid sandbox mode for testing"`
 }

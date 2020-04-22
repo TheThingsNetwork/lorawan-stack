@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package email provides an interface to send messages over email.
-package email
+package joinserver
 
-// Sender is the interface for sending messages over email.
-type Sender interface {
-	Send(message *Message) error
+import "go.thethings.network/lorawan-stack/pkg/types"
+
+// Config represents the JoinServer configuration.
+type Config struct {
+	Devices         DeviceRegistry      `name:"-"`
+	Keys            KeyRegistry         `name:"-"`
+	JoinEUIPrefixes []types.EUI64Prefix `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
+	DeviceKEKLabel  string              `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }

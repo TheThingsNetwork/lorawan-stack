@@ -22,7 +22,6 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	echo "github.com/labstack/echo/v4"
-	bscups "go.thethings.network/lorawan-stack/pkg/basicstation/cups"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/gatewayconfigurationserver/gcsv2"
 	"go.thethings.network/lorawan-stack/pkg/pfconfig/cpf"
@@ -32,16 +31,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
-
-// Config contains the Gateway Configuration Server configuration.
-type Config struct {
-	// BasicStation defines the configuration for the BasicStation CUPS.
-	BasicStation bscups.ServerConfig `name:"basic-station" description:"BasicStation CUPS configuration."`
-	// TheThingsGateway defines the configuration for The Things Gateway CUPS.
-	TheThingsGateway gcsv2.TheThingsGatewayConfig `name:"the-things-gateway" description:"The Things Gateway CUPS configuration."`
-	// RequreAuth defines if the HTTP endpoints should require authentication or not.
-	RequireAuth bool `name:"require-auth" description:"Require authentication for the HTTP endpoints."`
-}
 
 // GatewayConfigurationServer implements the Gateway Configuration Server component.
 type GatewayConfigurationServer struct {

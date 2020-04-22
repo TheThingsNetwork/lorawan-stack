@@ -16,7 +16,6 @@ package identityserver
 
 import (
 	"context"
-	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jinzhu/gorm"
@@ -25,8 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/cluster"
 	"go.thethings.network/lorawan-stack/pkg/component"
 	"go.thethings.network/lorawan-stack/pkg/email"
-	"go.thethings.network/lorawan-stack/pkg/email/sendgrid"
-	"go.thethings.network/lorawan-stack/pkg/email/smtp"
 	"go.thethings.network/lorawan-stack/pkg/errors"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
@@ -37,49 +34,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
-
-// Config for the Identity Server
-type Config struct {
-	DatabaseURI      string `name:"database-uri" description:"Database connection URI"`
-	UserRegistration struct {
-		Invitation struct {
-			Required bool          `name:"required" description:"Require invitations for new users"`
-			TokenTTL time.Duration `name:"token-ttl" description:"TTL of user invitation tokens"`
-		} `name:"invitation"`
-		ContactInfoValidation struct {
-			Required bool `name:"required" description:"Require contact info validation for new users"`
-		} `name:"contact-info-validation"`
-		AdminApproval struct {
-			Required bool `name:"required" description:"Require admin approval for new users"`
-		} `name:"admin-approval"`
-		PasswordRequirements struct {
-			MinLength    int `name:"min-length" description:"Minimum password length"`
-			MaxLength    int `name:"max-length" description:"Maximum password length"`
-			MinUppercase int `name:"min-uppercase" description:"Minimum number of uppercase letters"`
-			MinDigits    int `name:"min-digits" description:"Minimum number of digits"`
-			MinSpecial   int `name:"min-special" description:"Minimum number of special characters"`
-		} `name:"password-requirements"`
-	} `name:"user-registration"`
-	AuthCache struct {
-		MembershipTTL time.Duration `name:"membership-ttl" description:"TTL of membership caches"`
-	} `name:"auth-cache"`
-	OAuth          oauth.Config `name:"oauth"`
-	ProfilePicture struct {
-		UseGravatar bool   `name:"use-gravatar" description:"Use Gravatar fallback for users without profile picture"`
-		Bucket      string `name:"bucket" description:"Bucket used for storing profile pictures"`
-		BucketURL   string `name:"bucket-url" description:"Base URL for public bucket access"`
-	} `name:"profile-picture"`
-	EndDevicePicture struct {
-		Bucket    string `name:"bucket" description:"Bucket used for storing end device pictures"`
-		BucketURL string `name:"bucket-url" description:"Base URL for public bucket access"`
-	} `name:"end-device-picture"`
-	Email struct {
-		email.Config `name:",squash"`
-		SendGrid     sendgrid.Config      `name:"sendgrid"`
-		SMTP         smtp.Config          `name:"smtp"`
-		Templates    emailTemplatesConfig `name:"templates"`
-	} `name:"email"`
-}
 
 // IdentityServer implements the Identity Server component.
 //

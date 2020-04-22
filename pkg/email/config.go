@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package email provides an interface to send messages over email.
 package email
 
-// Sender is the interface for sending messages over email.
-type Sender interface {
-	Send(message *Message) error
+// Config for sending emails
+type Config struct {
+	SenderName    string `name:"sender-name" description:"The name of the sender"`
+	SenderAddress string `name:"sender-address" description:"The address of the sender"`
+	Provider      string `name:"provider" description:"Email provider to use"`
+	Network       struct {
+		Name              string `name:"name" description:"The name of the network"`
+		IdentityServerURL string `name:"identity-server-url" description:"The URL of the Identity Server"`
+		ConsoleURL        string `name:"console-url" description:"The URL of the Console"`
+	} `name:"network" description:"The network of the sender"`
 }

@@ -18,12 +18,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	stdio "io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
+
+	stdio "io"
 
 	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/pkg/applicationserver/io"
@@ -139,13 +140,6 @@ type Webhooks interface {
 	Registry() WebhookRegistry
 	// NewSubscription returns a new webhooks integration subscription.
 	NewSubscription() *io.Subscription
-}
-
-// DownlinksConfig defines the configuration for the webhook downlink queue operations.
-// For public addresses, the TLS version is preferred when present.
-type DownlinksConfig struct {
-	PublicAddress    string `name:"public-address" description:"Public address of the HTTP webhooks frontend"`
-	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the HTTPS webhooks frontend"`
 }
 
 type webhooks struct {

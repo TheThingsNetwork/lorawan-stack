@@ -10,7 +10,15 @@ Thank you for your interest in building this thing together with us. We're reall
 
 If you'd like to contribute by writing code, you'll find [here](DEVELOPMENT.md) how to set up your development environment.
 
-## <a name="branching"></a>Branching
+## Compatibility Commitment
+
+The [compatibility commitment](README.md#commitments-and-releases) ensures that users can update confidently and with little hassle to patch releases.
+
+If, according to the compatibility commitment, we need to bump the minor version, a pull request should target the `develop` branch. Only if the changes in a pull request are fully compatible in terms of API, storage, command-line and configuration, the target can be set to `master`.
+
+We use [`CODEOWNERS`](CODEOWNERS) to enforce the compatibility commitment. This requires configuration structure to be defined in `config.go` files, i.e. `/pkg/<subsystem>/config.go`.
+
+## Branching
 
 When contributing code or documentation to this repository, we follow a number of guidelines.
 
