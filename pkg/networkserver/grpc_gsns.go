@@ -660,7 +660,7 @@ matchLoop:
 			case ttnpb.CID_DL_CHANNEL:
 				evs, err = handleDLChannelAns(ctx, match.Device, cmd.GetDLChannelAns())
 			case ttnpb.CID_REKEY:
-				evs, err = handleRekeyInd(ctx, match.Device, cmd.GetRekeyInd())
+				evs, err = handleRekeyInd(ctx, match.Device, cmd.GetRekeyInd(), pld.DevAddr)
 			case ttnpb.CID_ADR_PARAM_SETUP:
 				evs, err = handleADRParamSetupAns(ctx, match.Device)
 			case ttnpb.CID_DEVICE_TIME:

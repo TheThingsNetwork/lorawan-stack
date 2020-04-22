@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/pkg/events"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/pkg/types"
 )
 
 var (
@@ -26,7 +27,7 @@ var (
 	evtEnqueueRekeyConfirmation = defineEnqueueMACConfirmationEvent("rekey", "device rekey")()
 )
 
-func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd) ([]events.DefinitionDataClosure, error) {
+func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_RekeyInd, devAddr types.DevAddr) ([]events.DefinitionDataClosure, error) {
 	if pld == nil {
 		return nil, errNoPayload.New()
 	}
@@ -37,7 +38,7 @@ func handleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	if !dev.SupportsJoin {
 		return evs, nil
 	}
-	if dev.PendingSession != nil {
+	if dev.PendingSession != nil && dev.MACState.PendingJoinRequest != nil && dev.PendingSession.DevAddr == devAddr {
 		dev.EndDeviceIdentifiers.DevAddr = &dev.PendingSession.DevAddr
 		dev.Session = dev.PendingSession
 	}
