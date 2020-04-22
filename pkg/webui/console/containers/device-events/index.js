@@ -16,17 +16,18 @@ import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../../lib/prop-types'
-import { getApplicationId, getDeviceId, combineDeviceIds } from '../../../lib/selectors/id'
-import EventsSubscription from '../../containers/events-subscription'
+import EventsSubscription from '@console/containers/events-subscription'
 
-import { clearDeviceEventsStream, startDeviceEventsStream } from '../../store/actions/devices'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { getApplicationId, getDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
+
+import { clearDeviceEventsStream, startDeviceEventsStream } from '@console/store/actions/devices'
 
 import {
   selectDeviceEvents,
   selectDeviceEventsStatus,
   selectDeviceEventsError,
-} from '../../store/selectors/devices'
+} from '@console/store/selectors/devices'
 
 @connect(
   null,

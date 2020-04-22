@@ -17,7 +17,7 @@ import { storiesOf } from '@storybook/react'
 import 'focus-visible/dist/focus-visible'
 import { withInfo } from '@storybook/addon-info'
 
-import NavigationBar from '../bar'
+import NavigationBar from '.'
 
 storiesOf('Navigation', module)
   .addDecorator((story, context) =>

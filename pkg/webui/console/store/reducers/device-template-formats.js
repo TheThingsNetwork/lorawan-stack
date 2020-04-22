@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_DEVICE_TEMPLATE_FORMATS_SUCCESS } from '../actions/device-template-formats'
+import { GET_DEVICE_TEMPLATE_FORMATS_SUCCESS } from '@console/store/actions/device-template-formats'
 
 const defaultState = {
   formats: undefined,

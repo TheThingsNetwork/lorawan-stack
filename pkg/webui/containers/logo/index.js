@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import LogoComponent from '../../components/logo'
+import LogoComponent from '@ttn-lw/components/logo'
 
 import {
   selectAssetsRootPath,

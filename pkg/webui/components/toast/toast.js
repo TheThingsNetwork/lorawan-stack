@@ -15,9 +15,9 @@
 import React from 'react'
 import { toast as t } from 'react-toastify'
 
-import Notification from '../notification'
+import Notification from '@ttn-lw/components/notification'
 
-import diff from '../../lib/diff'
+import diff from '@ttn-lw/lib/diff'
 
 import style from './toast.styl'
 
@@ -63,7 +63,7 @@ const createToast = function() {
   }
 
   const toast = function(options) {
-    // Prevent flooding of identical messages (if wished)
+    // Prevent flooding of identical messages (if wished).
     if (
       options.preventConsecutive &&
       lastMessage &&

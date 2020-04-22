@@ -15,7 +15,7 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const { Provider, Consumer } = React.createContext()
 
@@ -36,7 +36,7 @@ class BreadcrumbsProvider extends React.Component {
         return { breadcrumbs: [...prev.breadcrumbs, { id, breadcrumb }] }
       }
 
-      // replace breadcrumb with existing id
+      // Replace breadcrumb with existing id.
       return {
         breadcrumbs: [
           ...prev.breadcrumbs.slice(0, index),

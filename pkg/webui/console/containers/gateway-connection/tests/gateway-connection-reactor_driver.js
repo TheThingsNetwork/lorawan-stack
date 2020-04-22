@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+
 import withConnectionReactor from '../gateway-connection-reactor'
 
 const TestComponent = () => <div>test</div>

@@ -15,7 +15,7 @@
 import React from 'react'
 import DOM from 'react-dom'
 
-import Modal from '../'
+import Modal from '..'
 
 /**
  * PortalledModal is a wrapper around the modal component that renders it into
@@ -24,7 +24,7 @@ import Modal from '../'
  * top of the DOM hierarchy, regardless of its position in the component
  * hierarchy.
  *
- * @returns {Object} - The modal rendered into a portal.
+ * @returns {object} - The modal rendered into a portal.
  */
 const PortalledModal = function({ dispatch, modal, visible, ...rest }) {
   if (!modal) {

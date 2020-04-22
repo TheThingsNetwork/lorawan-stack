@@ -39,7 +39,8 @@ class StackConfiguration {
 
   /**
    * Selects the url of a stack component.
-   * @param {*} componentName - The abbreviation of the component, e.g. is for the Identity Server.
+   *
+   * @param {*} componentName - The abbreviation of the component, e.g. Is for the Identity Server.
    * @returns {?string} - The url of the component or `undefined` if the component is not available.
    */
   getComponentUrlByName(componentName) {
@@ -48,7 +49,8 @@ class StackConfiguration {
 
   /**
    * Selects the hostname of a stack component.
-   * @param {*} componentName - The abbreviation of the component, e.g. is for the Identity Server.
+   *
+   * @param {*} componentName - The abbreviation of the component, e.g. Is for the Identity Server.
    * @returns {?string} - The hostname of the component address or `undefined` if the component is not available.
    */
   getComponentHostByName(componentName) {
@@ -57,14 +59,17 @@ class StackConfiguration {
 
       return new URL(url).hostname
     } catch (error) {
-      // do not propagate the error, simply return `undefined`
+      // Do not propagate the error, simply return `undefined`.
     }
   }
 
   /**
    * Checks whether a stack component is available in the configuration.
-   * @param {*} componentName - The abbreviation of the component, e.g. is for the Identity Server.
-   * @returns {boolean} - `true` if the component is available in the configuration, `false` otherwise.
+   *
+   * @param {*} componentName - The abbreviation of the component, e.g. Is for
+   * the Identity Server.
+   * @returns {boolean} - `true` if the component is available in the
+   * configuration, `false` otherwise.
    */
   isComponentAvailable(componentName) {
     const componentUrl = this.getComponentUrlByName(componentName)
@@ -74,7 +79,9 @@ class StackConfiguration {
 
   /**
    * Identity Server hostname getter.
-   * @returns {?string} - The hostname of the Identity Server of the stack configuration.
+   *
+   * @returns {?string} - The hostname of the Identity Server of the stack
+   * onfiguration.
    */
   get isHost() {
     return this.isComponentAvailable('is') && this.getComponentHostByName('is')
@@ -82,7 +89,9 @@ class StackConfiguration {
 
   /**
    * Network Server hostname getter.
-   * @returns {?string} - The hostname of the Network Server of the stack configuration.
+   *
+   * @returns {?string} - The hostname of the Network Server of the stack
+   * configuration.
    */
   get nsHost() {
     return this.isComponentAvailable('ns') && this.getComponentHostByName('ns')
@@ -90,7 +99,9 @@ class StackConfiguration {
 
   /**
    * Application Server hostname getter.
-   * @returns {?string} - The hostname of the Application Server of the stack configuration.
+   *
+   * @returns {?string} - The hostname of the Application Server of the stack
+   * configuration.
    */
   get asHost() {
     return this.isComponentAvailable('as') && this.getComponentHostByName('as')
@@ -98,7 +109,9 @@ class StackConfiguration {
 
   /**
    * Join Server hostname getter.
-   * @returns {?string} - The hostname of the Join Server of the stack configuration.
+   *
+   * @returns {?string} - The hostname of the Join Server of the stack
+   * configuration.
    */
   get jsHost() {
     return this.isComponentAvailable('js') && this.getComponentHostByName('js')
@@ -106,17 +119,23 @@ class StackConfiguration {
 
   /**
    * Avaible stack components getter.
-   * @returns {Array<string>} - A list of available component abbreviations, e.g. [is, as, ns, js].
+   *
+   * @returns {Array<string>} - A list of available component abbreviations,
+   * e.g. [is, as, ns, js].
    */
   get availableComponents() {
     return Object.keys(this._stackConfig)
   }
 
-  /** Takes a list of allowed components and only returns components that have
+  /**
+   * Takes a list of allowed components and only returns components that have
    * distinct base urls. Used to subscribe to event streaming sources when the
    * stack uses multiple hosts.
-   * @param {Array<string>} components - A list of abbreviations of stack components to return distinct ones from.
-   * @returns {Array<string>} - An array of components that have distinct base urls.
+   *
+   * @param {Array<string>} components - A list of abbreviations of stack
+   * components to return distinct ones from.
+   * @returns {Array<string>} - An array of components that have distinct base
+   * urls.
    */
   getComponentsWithDistinctBaseUrls(components = STACK_COMPONENTS) {
     const distinctComponents = components.reduce((collection, component) => {

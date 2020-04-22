@@ -19,22 +19,28 @@ import { defineMessages } from 'react-intl'
 import { Switch, Route } from 'react-router'
 import bind from 'autobind-decorator'
 
-import sharedMessages from '../../../lib/shared-messages'
-import PageTitle from '../../../components/page-title'
-import Message from '../../../lib/components/message'
-import Link from '../../../components/link'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { listWebhookTemplates } from '../../store/actions/webhook-templates'
-import ApplicationWebhookAddForm from '../application-integrations-webhook-add-form'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import BlankWebhookImg from '@assets/misc/blank-webhook.svg'
+
+import PageTitle from '@ttn-lw/components/page-title'
+import Link from '@ttn-lw/components/link'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import ApplicationWebhookAddForm from '@console/views/application-integrations-webhook-add-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { listWebhookTemplates } from '@console/store/actions/webhook-templates'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
   selectWebhookTemplates,
   selectWebhookTemplatesFetching,
-} from '../../store/selectors/webhook-templates'
-import PropTypes from '../../../lib/prop-types'
+} from '@console/store/selectors/webhook-templates'
 
-import BlankWebhookImg from '../../../assets/misc/blank-webhook.svg'
 import style from './application-integrations-webhook-add-choose.styl'
 
 const m = defineMessages({

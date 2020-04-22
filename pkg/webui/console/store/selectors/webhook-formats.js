@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_WEBHOOK_FORMATS_BASE } from '../actions/webhook-formats'
+import { GET_WEBHOOK_FORMATS_BASE } from '@console/store/actions/webhook-formats'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 

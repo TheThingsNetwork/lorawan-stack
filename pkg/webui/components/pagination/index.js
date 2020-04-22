@@ -16,9 +16,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
-
 import Paginate from 'react-paginate'
-import Icon from '../icon'
+
+import Icon from '@ttn-lw/components/icon'
 
 import style from './pagination.styl'
 
@@ -26,7 +26,7 @@ import style from './pagination.styl'
 class Pagination extends React.PureComponent {
   static propTypes = {
     className: PropTypes.string,
-    /** Page to be displayed immediately */
+    /** Page to be displayed immediately. */
     forcePage: PropTypes.number,
     /** A flag indicating whether the pagination should be hidden when there is
      * only one page.
@@ -40,13 +40,13 @@ class Pagination extends React.PureComponent {
      * The number of pages to be displayed in the beginning/end of
      * the component. For example, marginPagesDisplayed = 2, then the
      * component will display at most two pages as margins:
-     * [<][1][2]...[10]...[19][20][>]
+     * [<][1][2]...[10]...[19][20][>].
      *
      */
     marginPagesDisplayed: PropTypes.number,
-    /** An onClick handler that gets called with the new page number */
+    /** An onClick handler that gets called with the new page number. */
     onPageChange: PropTypes.func,
-    /** The total number of pages */
+    /** The total number of pages. */
     pageCount: PropTypes.number.isRequired,
     /**
      * The number of pages to be displayed. If is bigger than
@@ -82,7 +82,7 @@ class Pagination extends React.PureComponent {
       ...rest
     } = this.props
 
-    // Don't show pagination if there is only one page
+    // Don't show pagination if there is only one page.
     if (hideIfOnlyOnePage && pageCount === 1) {
       return null
     }

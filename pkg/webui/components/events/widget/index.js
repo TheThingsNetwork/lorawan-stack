@@ -16,14 +16,15 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import Link from '../../link'
-import List from '../../list'
-import ErrorNotification from '../../error-notification'
-import getEventComponentByName from '../../event/types'
+import Link from '@ttn-lw/components/link'
+import List from '@ttn-lw/components/list'
+import ErrorNotification from '@ttn-lw/components/error-notification'
+import getEventComponentByName from '@ttn-lw/components/event/types'
 
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './widget.styl'
 

@@ -15,7 +15,8 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 
-import Button from '../button'
+import Button from '@ttn-lw/components/button'
+
 import SubmitBar from '.'
 
 storiesOf('SubmitBar', module)

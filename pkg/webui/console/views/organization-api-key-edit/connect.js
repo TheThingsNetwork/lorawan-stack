@@ -15,22 +15,24 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import withRequest from '../../../lib/components/with-request'
+import api from '@console/api'
 
-import { getApiKey } from '../../store/actions/api-keys'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import { getApiKey } from '@console/store/actions/api-keys'
+
 import {
   selectSelectedOrganizationId,
   selectOrganizationRights,
   selectOrganizationPseudoRights,
   selectOrganizationRightsError,
   selectOrganizationRightsFetching,
-} from '../../store/selectors/organizations'
+} from '@console/store/selectors/organizations'
 import {
   selectSelectedApiKey,
   selectApiKeyError,
   selectApiKeyFetching,
-} from '../../store/selectors/api-keys'
-import api from '../../api'
+} from '@console/store/selectors/api-keys'
 
 export default OrganizationApiKeyEdit =>
   connect(

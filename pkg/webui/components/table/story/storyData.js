@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import React from 'react'
-import Button from '../../button'
+
+import Button from '@ttn-lw/components/button'
 
 const headers = [
   {

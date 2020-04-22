@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getGatewayId } from '../../../lib/selectors/id'
+import { getGatewayId } from '@ttn-lw/lib/selectors/id'
+
 import {
   GET_GTW,
   GET_GTW_SUCCESS,
@@ -24,7 +25,7 @@ import {
   UPDATE_GTW_STATS_FAILURE,
   START_GTW_STATS_SUCCESS,
   START_GTW_STATS_FAILURE,
-} from '../actions/gateways'
+} from '@console/store/actions/gateways'
 
 const defaultStatisticsState = {
   error: undefined,

@@ -14,9 +14,10 @@
 
 import { connect } from 'react-redux'
 
-import { updateGateway } from '../../store/actions/gateways'
-import { attachPromise } from '../../store/actions/lib'
-import { selectSelectedGateway, selectSelectedGatewayId } from '../../store/selectors/gateways'
+import { updateGateway } from '@console/store/actions/gateways'
+import { attachPromise } from '@console/store/actions/lib'
+
+import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 const mapStateToProps = state => ({
   gateway: selectSelectedGateway(state),

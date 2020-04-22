@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { INITIALIZE, INITIALIZE_SUCCESS, INITIALIZE_FAILURE } from '../actions/init'
+import { INITIALIZE, INITIALIZE_SUCCESS, INITIALIZE_FAILURE } from '@oauth/store/actions/init'
 
 const defaultState = {
   initialized: false,

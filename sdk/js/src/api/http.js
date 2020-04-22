@@ -16,6 +16,7 @@ import axios from 'axios'
 
 import { URI_PREFIX_STACK_COMPONENT_MAP } from '../util/constants'
 import EventHandler from '../util/events'
+
 import stream from './stream/stream-node'
 
 /**
@@ -72,7 +73,7 @@ class Http {
     const parsedComponent = component || this._parseStackComponent(endpoint)
     if (!this._stackConfig.isComponentAvailable(parsedComponent)) {
       // If the component has not been defined in The Things Stack config, make no
-      // request and throw an error instead
+      // request and throw an error instead.
       throw new Error(
         `Cannot run "${method.toUpperCase()} ${endpoint}" API call on disabled component: "${parsedComponent}"`,
       )
@@ -91,17 +92,17 @@ class Http {
 
       if (method === 'get' || method === 'delete') {
         // For GETs and DELETEs, convert payload to query params (should usually
-        // be field_mask only)
+        // be field_mask only).
         config.params = this._payloadToQueryParams(payload)
       } else {
-        // Otherwise pass data as request body
+        // Otherwise pass data as request body.
         config.data = payload
       }
 
       const response = await this[parsedComponent](config)
 
       if ('X-Warning' in response.headers || 'x-warning' in response.headers) {
-        // Dispatch a warning event when the server has set a warning header
+        // Dispatch a warning event when the server has set a warning header.
         EventHandler.dispatchEvent(
           EventHandler.EVENTS.WARNING,
           response.headers['X-Warning'] || response.headers['x-warning'],
@@ -121,8 +122,9 @@ class Http {
   /**
    * Converts a payload object to a query parameter object, making sure that the
    * field mask parameter is converted correctly.
-   * @param {Object} payload - The payload object.
-   * @returns {Object} The params object, to be passed to axios config.
+   *
+   * @param {object} payload - The payload object.
+   * @returns {object} The params object, to be passed to axios config.
    */
   _payloadToQueryParams(payload) {
     const res = { ...payload }
@@ -137,6 +139,7 @@ class Http {
 
   /**
    * Extracts The Things Stack component abbreviation from the endpoint.
+   *
    * @param {string} endpoint - The endpoint got for a request method.
    * @returns {string} One of {is|as|gs|js|ns}.
    */

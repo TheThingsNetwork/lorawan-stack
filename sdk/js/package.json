@@ -31,6 +31,12 @@
   },
   "eslintConfig": {
     "extends": "../../config/eslintrc.yaml",
+    "settings": {
+      "import/ignore": ["node_modules"],
+      "import/resolver": {
+        "webpack": "../../config/webpack.config.babel.js"
+      }
+    },
     "rules": {
       "import/named": "off",
       "no-use-before-define": [

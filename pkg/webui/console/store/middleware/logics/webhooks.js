@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as webhooks from '../../actions/webhooks'
-import * as webhookFormats from '../../actions/webhook-formats'
-import * as webhookTemplates from '../../actions/webhook-templates'
+import api from '@console/api'
 
-import api from '../../../api'
+import * as webhooks from '@console/store/actions/webhooks'
+import * as webhookFormats from '@console/store/actions/webhook-formats'
+import * as webhookTemplates from '@console/store/actions/webhook-templates'
+
 import createRequestLogic from './lib'
 
 const getWebhookLogic = createRequestLogic({

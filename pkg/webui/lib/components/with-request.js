@@ -14,20 +14,27 @@
 
 import React from 'react'
 
-import Spinner from '../../components/spinner'
-import Message from '../../lib/components/message'
+import Spinner from '@ttn-lw/components/spinner'
 
-import sharedMessages from '../../lib/shared-messages'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import Message from './message'
 
 /**
  * `withRequest` is a HOC that handles:
  *   * Requesting data on initial mount using the `loadData` prop.
- *   * Showing the loading spinner while the request in is progress using the `isFetchingTest` predicate.
+ *   * Showing the loading spinner while the request in is progress using the
+ *     `isFetchingTest` predicate.
  *   * Throwing an error received as the `error` prop.
- * @param {Function} mapPropsToRequest - Selects the `request` given the wrapped component props.
- * @param {Function} mapPropsToFetching - Selects the `fetching` value given the wrapped component props.
- * If evaluates to `true`, then the loading spinner is rendered, otherwise renders the wrapped component.
- * @param {Function} mapPropsToError - Selects the `error` value given the wrapped component props.
+ *
+ * @param {Function} mapPropsToRequest - Selects the `request` given the wrapped
+ * component props.
+ * @param {Function} mapPropsToFetching - Selects the `fetching` value given the
+ * wrapped component props.
+ * If evaluates to `true`, then the loading spinner is rendered, otherwise
+ * renders the wrapped component.
+ * @param {Function} mapPropsToError - Selects the `error` value given the
+ * wrapped component props.
  * @returns {Function} - An instance of the `withRequest` HOC.
  */
 const withRequest = (

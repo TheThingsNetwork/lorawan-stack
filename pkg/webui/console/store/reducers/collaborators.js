@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
+
 import {
   GET_COLLABORATORS_LIST_SUCCESS,
   GET_COLLABORATOR_SUCCESS,
   GET_COLLABORATOR,
-} from '../actions/collaborators'
-import { getCollaboratorId } from '../../../lib/selectors/id'
+} from '@console/store/actions/collaborators'
 
 const defaultState = {
   entities: {},

@@ -15,9 +15,11 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Link from '../../link'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
+import Link from '@ttn-lw/components/link'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './breadcrumb.styl'
 
@@ -42,11 +44,11 @@ const Breadcrumb = function({ className, path, content, isLast }) {
 
 Breadcrumb.propTypes = {
   className: PropTypes.string,
-  /** The content of the breadcrumb */
+  /** The content of the breadcrumb. */
   content: PropTypes.message.isRequired,
-  /** The flag for rendering last breadcrumb as plain text */
+  /** The flag for rendering last breadcrumb as plain text. */
   isLast: PropTypes.bool,
-  /** The path for a breadcrumb */
+  /** The path for a breadcrumb. */
   path: PropTypes.string.isRequired,
 }
 

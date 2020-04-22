@@ -16,30 +16,36 @@ import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import FetchTable from '../fetch-table'
-import DateTime from '../../../lib/components/date-time'
-import Button from '../../../components/button'
-import withRequest from '../../../lib/components/with-request'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Button from '@ttn-lw/components/button'
 
-import { getDevicesList } from '../../../console/store/actions/devices'
-import { getDeviceTemplateFormats } from '../../store/actions/device-template-formats'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectDeviceTemplateFormats } from '../../store/selectors/device-template-formats'
+import Message from '@ttn-lw/lib/components/message'
+import DateTime from '@ttn-lw/lib/components/date-time'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import FetchTable from '@console/containers/fetch-table'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import {
+  checkFromState,
+  mayCreateOrEditApplicationDevices,
+  mayViewApplicationDevices,
+} from '@console/lib/feature-checks'
+
+import { getDeviceTemplateFormats } from '@console/store/actions/device-template-formats'
+import { getDevicesList } from '@console/store/actions/devices'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectDeviceTemplateFormats } from '@console/store/selectors/device-template-formats'
 import {
   selectDevices,
   selectDevicesTotalCount,
   selectDevicesFetching,
   selectDevicesError,
-} from '../../store/selectors/devices'
-import {
-  checkFromState,
-  mayCreateOrEditApplicationDevices,
-  mayViewApplicationDevices,
-} from '../../lib/feature-checks'
+} from '@console/store/selectors/devices'
 
 const headers = [
   {

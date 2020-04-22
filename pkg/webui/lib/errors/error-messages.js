@@ -15,7 +15,7 @@
 import { defineMessages } from 'react-intl'
 
 export default defineMessages({
-  // Keep these sorted alphabetically
+  // Keep these sorted alphabetically.
   additionalInformation: 'Additional Information (please attach to error inquiries)',
   contactAdministrator: 'If the error persists after refreshing, please contact an administrator.',
   error: 'Error',

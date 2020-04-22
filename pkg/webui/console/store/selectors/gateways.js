@@ -18,7 +18,7 @@ import {
   UPDATE_GTW_STATS_BASE,
   GET_GTWS_RIGHTS_LIST_BASE,
   START_GTW_STATS_BASE,
-} from '../actions/gateways'
+} from '@console/store/actions/gateways'
 
 import {
   createEventsSelector,
@@ -36,7 +36,7 @@ import { createErrorSelector } from './error'
 
 const ENTITY = 'gateways'
 
-// Gateway Entity
+// Gateway.
 export const selectGatewayStore = state => state.gateways
 export const selectGatewayEntitiesStore = state => selectGatewayStore(state).entities
 export const selectGatewayStatisticsStore = state => selectGatewayStore(state).statistics
@@ -48,7 +48,7 @@ export const selectSelectedGateway = state =>
 export const selectGatewayFetching = createFetchingSelector(GET_GTW_BASE)
 export const selectGatewayError = createErrorSelector(GET_GTW_BASE)
 
-// Gateways
+// Gateways.
 const selectGtwsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectGtwsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 const selectGtwsFetching = createFetchingSelector(GET_GTWS_LIST_BASE)
@@ -59,19 +59,19 @@ export const selectGatewaysTotalCount = state => selectGtwsTotalCount(state)
 export const selectGatewaysFetching = state => selectGtwsFetching(state)
 export const selectGatewaysError = state => selectGtwsError(state)
 
-// Events
+// Events.
 export const selectGatewayEvents = createEventsSelector(ENTITY)
 export const selectGatewayEventsError = createEventsErrorSelector(ENTITY)
 export const selectGatewayEventsStatus = createEventsStatusSelector(ENTITY)
 export const selectLatestGatewayEvent = createLatestEventSelector(ENTITY)
 
-// Rights
+// Rights.
 export const selectGatewayRights = createRightsSelector(ENTITY)
 export const selectGatewayPseudoRights = createPseudoRightsSelector(ENTITY)
 export const selectGatewayRightsError = createErrorSelector(ENTITY)
 export const selectGatewayRightsFetching = createFetchingSelector(GET_GTWS_RIGHTS_LIST_BASE)
 
-// Statistics
+// Statistics.
 export const selectGatewayStatisticsConnectError = createErrorSelector(START_GTW_STATS_BASE)
 export const selectGatewayStatisticsUpdateError = function(state) {
   const statistics = selectGatewayStatisticsStore(state) || {}

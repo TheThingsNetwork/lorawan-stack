@@ -18,30 +18,35 @@ import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import { replace } from 'connected-react-router'
 
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import PageTitle from '../../../components/page-title'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import sharedMessages from '../../../lib/shared-messages'
-import CollaboratorForm from '../../components/collaborator-form'
-import toast from '../../../components/toast'
-import withRequest from '../../../lib/components/with-request'
+import api from '@console/api'
 
-import { getCollaborator } from '../../store/actions/collaborators'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import toast from '@ttn-lw/components/toast'
+
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import CollaboratorForm from '@console/components/collaborator-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { getCollaborator } from '@console/store/actions/collaborators'
+
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationPseudoRights,
   selectApplicationRightsFetching,
   selectApplicationRightsError,
-} from '../../store/selectors/applications'
+} from '@console/store/selectors/applications'
 import {
   selectUserCollaborator,
   selectOrganizationCollaborator,
   selectCollaboratorFetching,
   selectCollaboratorError,
-} from '../../store/selectors/collaborators'
-import api from '../../api'
-import PropTypes from '../../../lib/prop-types'
+} from '@console/store/selectors/collaborators'
 
 const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
 

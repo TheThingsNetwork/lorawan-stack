@@ -16,7 +16,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import displayName from 'react-display-name'
 
-import { warn } from '../log'
+import { warn } from '@ttn-lw/lib/log'
 
 export const withEnv = function(Component) {
   const Base =

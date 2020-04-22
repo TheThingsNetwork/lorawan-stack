@@ -17,24 +17,30 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Checkbox from '../../../components/checkbox'
-import SubmitBar from '../../../components/submit-bar'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import { GsFrequencyPlansSelect } from '../../containers/freq-plans-select'
-import delay from '../../constants/delays'
-import sharedMessages from '../../../lib/shared-messages'
+import delay from '@console/constants/delays'
+
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import Checkbox from '@ttn-lw/components/checkbox'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import UnitInput from '@ttn-lw/components/unit-input'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import { GsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
+import OwnersSelect from '@console/containers/owners-select'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   id as gatewayIdRegexp,
   address as addressRegexp,
   unit as unitRegexp,
   emptyDuration as emptyDurationRegexp,
   delay as delayRegexp,
-} from '../../lib/regexp'
-import OwnersSelect from '../../containers/owners-select'
-import UnitInput from '../../../components/unit-input'
+} from '@console/lib/regexp'
+
 const m = defineMessages({
   enforced: 'Enforced',
   dutyCycle: 'Duty Cycle',
@@ -90,10 +96,10 @@ const validationSchema = Yup.object().shape({
 
 class GatewayDataForm extends React.Component {
   static propTypes = {
-    /** SubmitBar contents */
+    /** The SubmitBar content. */
     children: PropTypes.node.isRequired,
     error: PropTypes.error,
-    /** React reference to be passed to the form */
+    /** React reference to be passed to the form. */
     formRef: PropTypes.shape({}),
     initialValues: PropTypes.gateway,
     onSubmit: PropTypes.func.isRequired,

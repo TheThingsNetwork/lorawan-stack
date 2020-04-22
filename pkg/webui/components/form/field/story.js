@@ -17,14 +17,16 @@ import * as Yup from 'yup'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
-import { unit as unitRegexp } from '../../../console/lib/regexp'
 
-import Input from '../../input'
-import Checkbox from '../../checkbox'
-import Radio from '../../radio-button'
-import Select from '../../select'
-import FileInput from '../../file-input'
-import UnitInput from '../../unit-input'
+import Input from '@ttn-lw/components/input'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Radio from '@ttn-lw/components/radio-button'
+import Select from '@ttn-lw/components/select'
+import FileInput from '@ttn-lw/components/file-input'
+import UnitInput from '@ttn-lw/components/unit-input'
+
+import { unit as unitRegexp } from '@console/lib/regexp'
+
 import Form from '..'
 
 const handleSubmit = function(data, { resetForm }) {

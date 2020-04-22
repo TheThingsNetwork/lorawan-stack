@@ -18,13 +18,14 @@ import { action } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
 import * as Yup from 'yup'
 
-import Button from '../button'
-import SubmitBar from '../submit-bar'
-import SubmitButton from '../submit-button'
-import Input from '../input'
-import Form from '../form'
-import Checkbox from '../checkbox'
-import Radio from '../radio-button'
+import Button from '@ttn-lw/components/button'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Input from '@ttn-lw/components/input'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Radio from '@ttn-lw/components/radio-button'
+
+import Form from '.'
 
 const handleSubmit = function(data, { resetForm }) {
   action('Submit')(data)

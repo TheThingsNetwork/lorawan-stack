@@ -16,7 +16,8 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
-import Dropdown from '../dropdown'
+import Dropdown from '@ttn-lw/components/dropdown'
+
 import ProfileDropdown from '.'
 
 const handleLogout = function() {

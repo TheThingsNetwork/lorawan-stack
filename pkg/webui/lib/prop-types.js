@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import originalPropTypes from 'prop-types'
-import { components } from '../constants/components'
+
+import { components } from '@ttn-lw/constants/components'
 
 const PropTypes = { ...originalPropTypes }
 
@@ -64,7 +65,7 @@ PropTypes.link = PropTypes.shape({
   hidden: PropTypes.bool,
 })
 
-// Entities and entity-related prop-types
+// Entities and entity-related prop-types.
 
 PropTypes.event = PropTypes.shape({
   name: PropTypes.string.isRequired,

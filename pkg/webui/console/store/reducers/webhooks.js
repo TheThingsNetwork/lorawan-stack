@@ -14,13 +14,14 @@
 
 import { merge } from 'lodash'
 
+import { getWebhookId } from '@ttn-lw/lib/selectors/id'
+
 import {
   GET_WEBHOOK,
   GET_WEBHOOK_SUCCESS,
   GET_WEBHOOKS_LIST_SUCCESS,
   UPDATE_WEBHOOK_SUCCESS,
-} from '../actions/webhooks'
-import { getWebhookId } from '../../../lib/selectors/id'
+} from '@console/store/actions/webhooks'
 
 const defaultState = {
   selectedWebhook: null,

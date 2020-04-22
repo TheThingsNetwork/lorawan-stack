@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_COLLABORATOR_BASE, GET_COLLABORATORS_LIST_BASE } from '../actions/collaborators'
+import {
+  GET_COLLABORATOR_BASE,
+  GET_COLLABORATORS_LIST_BASE,
+} from '@console/store/actions/collaborators'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 import {
@@ -22,7 +26,7 @@ import {
 
 const ENTITY = 'collaborators'
 
-// Collaborator
+// Collaborator.
 export const selectCollaboratorsStore = state => state.collaborators || {}
 export const selectCollaboratorsEntitiesStore = state => selectCollaboratorsStore(state).entities
 export const selectCollaboratorById = (state, id) => selectCollaboratorsEntitiesStore(state)[id]
@@ -47,7 +51,7 @@ export const selectOrganizationCollaborator = function(state) {
   }
 }
 
-// Collaborators
+// Collaborators.
 const createSelectCollaboratorsIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
 const createSelectCollaboratorsTotalCountSelector = createPaginationTotalCountSelectorByEntity(
   ENTITY,

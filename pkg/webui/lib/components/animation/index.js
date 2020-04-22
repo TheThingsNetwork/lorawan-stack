@@ -16,7 +16,7 @@ import React, { Component } from 'react'
 import lottie from 'lottie-web'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 @bind
 export default class Animation extends Component {

@@ -17,16 +17,20 @@ import * as Yup from 'yup'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 
-import Form from '../../../components/form'
-import DeviceTemplateFormatSelect from '../../containers/device-template-format-select'
-import FileInput from '../../../components/file-input'
-import Checkbox from '../../../components/checkbox'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import { dict as componentDict } from '../../../constants/components'
+import { dict as componentDict } from '@ttn-lw/constants/components'
+
+import Form from '@ttn-lw/components/form'
+import FileInput from '@ttn-lw/components/file-input'
+import Checkbox from '@ttn-lw/components/checkbox'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import DeviceTemplateFormatSelect from '@console/containers/device-template-format-select'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './device-import-form.styl'
 
@@ -107,8 +111,8 @@ export default class DeviceBulkCreateForm extends Component {
         if (state.values.set_claim_auth_code) {
           const { setFieldValue } = this.formRef.current
 
-          // `claim_authentication_code` is stored in JS, so if JS option is not selected
-          // we dont want to include it in the paylaod
+          // `claim_authentication_code` is stored in JS, so if the JS option is
+          // not selected we dont want to include it in the payload.
           setFieldValue('set_claim_auth_code', false)
         }
       })

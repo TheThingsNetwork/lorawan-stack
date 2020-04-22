@@ -17,14 +17,17 @@ import bind from 'autobind-decorator'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
-import Button from '../button'
-import ErrorNotification from '../error-notification'
-import Message from '../../lib/components/message'
-import List from '../list'
-import Icon from '../icon'
-import getEventComponentByName from '../event/types'
-import sharedMessages from '../../lib/shared-messages'
-import PropTypes from '../../lib/prop-types'
+import Button from '@ttn-lw/components/button'
+import ErrorNotification from '@ttn-lw/components/error-notification'
+import List from '@ttn-lw/components/list'
+import Icon from '@ttn-lw/components/icon'
+import getEventComponentByName from '@ttn-lw/components/event/types'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import EventsWidget from './widget'
 
 import style from './events.styl'
@@ -74,12 +77,12 @@ class Events extends React.Component {
     const newEvents = events !== nextProps.events
     const clearedEvents = newEvents && nextProps.events.length === 0
 
-    // rerender component if cleared events when in the `paused` state
+    // Rerender component if cleared events when in the `paused` state.
     if (clearedEvents && paused) {
       return true
     }
 
-    // do not rerender component on new events when in the `paused` state
+    // Do not rerender component on new events when in the `paused` state.
     if (newEvents && paused) {
       return false
     }

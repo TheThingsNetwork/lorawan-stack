@@ -15,17 +15,19 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
-import ApplicationAdd from '../application-add'
-import ApplicationsList from '../applications-list'
-import Application from '../application'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-import { mayViewApplications } from '../../lib/feature-checks'
-import PropTypes from '../../../lib/prop-types'
+import Application from '@console/views/application'
+import ApplicationsList from '@console/views/applications-list'
+import ApplicationAdd from '@console/views/application-add'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewApplications } from '@console/lib/feature-checks'
 
 @withFeatureRequirement(mayViewApplications, { redirect: '/' })
 @withBreadcrumb('apps', function(props) {

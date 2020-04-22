@@ -17,15 +17,17 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import bind from 'autobind-decorator'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import DeviceEvents from '../../containers/device-events'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import PropTypes from '../../../lib/prop-types'
+import DeviceEvents from '@console/containers/device-events'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 @connect(function(state, props) {
   const device = selectSelectedDevice(state)

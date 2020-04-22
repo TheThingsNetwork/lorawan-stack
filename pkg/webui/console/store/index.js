@@ -16,7 +16,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createLogicMiddleware } from 'redux-logic'
 import { routerMiddleware } from 'connected-react-router'
 
-import dev from '../../lib/dev'
+import dev from '@ttn-lw/lib/dev'
 
 import createRootReducer from './reducers'
 import requestPromiseMiddleware from './middleware/request-promise-middleware'

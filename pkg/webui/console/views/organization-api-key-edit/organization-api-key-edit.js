@@ -15,13 +15,14 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 
-import { ApiKeyEditForm } from '../../components/api-key-form'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import PageTitle from '@ttn-lw/components/page-title'
 
-import PageTitle from '../../../components/page-title'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import { ApiKeyEditForm } from '@console/components/api-key-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 @withBreadcrumb('orgs.single.api-keys.edit', function(props) {
   const { orgId, keyId } = props

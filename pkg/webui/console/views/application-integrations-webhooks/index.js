@@ -16,26 +16,33 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import ErrorView from '../../../lib/components/error-view'
-import SubViewError from '../error/sub-view'
-import ApplicationWebhooksList from '../application-integrations-webhooks-list'
-import ApplicationWebhookAdd from '../application-integrations-webhook-add'
-import ApplicationWebhookEdit from '../application-integrations-webhook-edit'
-import ApplicationWebhookChoose from '../application-integrations-webhook-add-choose'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-import withRequest from '../../../lib/components/with-request'
-import { mayViewApplicationEvents } from '../../lib/feature-checks'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { listWebhookTemplates } from '../../store/actions/webhook-templates'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+
+import ErrorView from '@ttn-lw/lib/components/error-view'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import ApplicationWebhookChoose from '@console/views/application-integrations-webhook-add-choose'
+import ApplicationWebhookEdit from '@console/views/application-integrations-webhook-edit'
+import ApplicationWebhookAdd from '@console/views/application-integrations-webhook-add'
+import ApplicationWebhooksList from '@console/views/application-integrations-webhooks-list'
+import SubViewError from '@console/views/error/sub-view'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayViewApplicationEvents } from '@console/lib/feature-checks'
+
+import { listWebhookTemplates } from '@console/store/actions/webhook-templates'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
   selectWebhookTemplates,
   selectWebhookTemplatesFetching,
   selectWebhookTemplatesError,
-} from '../../store/selectors/webhook-templates'
+} from '@console/store/selectors/webhook-templates'
 
 const selector = [
   'description',

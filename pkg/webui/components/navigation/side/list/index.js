@@ -15,7 +15,8 @@
 import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
-import PropTypes from '../../../../lib/prop-types'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './list.styl'
 
@@ -24,7 +25,7 @@ class SideNavigationList extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
-    /** The depth of the current list starting at 0 for the root list */
+    /** The depth of the current list starting at 0 for the root list. */
     depth: PropTypes.number,
     /**
      * A flag specifying whether the side navigation list is expanded or not.

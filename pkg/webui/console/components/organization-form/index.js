@@ -17,12 +17,13 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
 
-import { id as organizationIdRegexp } from '../../lib/regexp'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { id as organizationIdRegexp } from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({

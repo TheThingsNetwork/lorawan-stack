@@ -15,17 +15,22 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router'
 
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '../../../components/breadcrumbs'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import NotFoundRoute from '../../../lib/components/not-found-route'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
-import { mayManageUsers } from '../../lib/feature-checks'
-import UserEdit from '../admin-user-management-edit'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import UserEdit from '@console/views/admin-user-management-edit'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayManageUsers } from '@console/lib/feature-checks'
+
 import UserManagement from './admin-user-management'
 
 @withFeatureRequirement(mayManageUsers, { redirect: '/' })

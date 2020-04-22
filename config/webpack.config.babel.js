@@ -16,7 +16,6 @@
 
 import path from 'path'
 import webpack from 'webpack'
-
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
@@ -24,7 +23,6 @@ import CleanWebpackPlugin from 'clean-webpack-plugin'
 import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HashOutput from 'webpack-plugin-hash-output'
-
 import nib from 'nib'
 
 import pjson from '../package.json'
@@ -58,7 +56,7 @@ const modules = [path.resolve(context, 'node_modules')]
 
 const r = SUPPORT_LOCALES.split(',').map(l => new RegExp(l.trim()))
 
-// Export the style config for usage in the storybook config
+// Export the style config for usage in the storybook config.
 export const styleConfig = {
   test: /\.(styl|css)$/,
   include,
@@ -104,6 +102,12 @@ export default {
   },
   resolve: {
     alias: env({
+      all: {
+        '@ttn-lw': path.resolve(context, 'pkg/webui'),
+        '@console': path.resolve(context, 'pkg/webui/console'),
+        '@oauth': path.resolve(context, 'pkg/webui/oauth'),
+        '@assets': path.resolve(context, 'pkg/webui/assets'),
+      },
       development: {
         'react-dom': '@hot-loader/react-dom',
         'ttn-lw': path.resolve(context, 'sdk/js/src'),
@@ -257,8 +261,8 @@ function filterLocales(context, request, callback) {
   callback()
 }
 
-// env selects and merges the environments for the passed object based on NODE_ENV, which
-// can have the all, development and production keys.
+// Env selects and merges the environments for the passed object based on
+// `NODE_ENV`, which can have the all, development and production keys.
 function env(obj = {}) {
   if (!obj) {
     return obj

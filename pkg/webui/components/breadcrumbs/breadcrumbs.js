@@ -17,7 +17,7 @@ import ReactDom from 'react-dom'
 import classnames from 'classnames'
 import { Container } from 'react-grid-system'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './breadcrumbs.styl'
 
@@ -33,7 +33,7 @@ const Breadcrumbs = ({ className, breadcrumbs }) => (
 )
 
 Breadcrumbs.propTypes = {
-  /** A list of breadcrumb elements */
+  /** A list of breadcrumb elements. */
   breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.element])),
   className: PropTypes.string,
 }
@@ -44,7 +44,7 @@ Breadcrumbs.defaultProps = {
 }
 
 const PortalledBreadcrumbs = ({ className, ...rest }) => {
-  // Breadcrumbs can be rendered into multiple containers
+  // Breadcrumbs can be rendered into multiple containers.
   const containers = document.querySelectorAll('.breadcrumbs, #breadcrumbs')
   if (containers.length) {
     const nodes = []

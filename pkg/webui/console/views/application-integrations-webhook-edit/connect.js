@@ -15,18 +15,20 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import withRequest from '../../../lib/components/with-request'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import { getWebhookTemplateId } from '@ttn-lw/lib/selectors/id'
+
+import { getWebhook, updateWebhook } from '@console/store/actions/webhooks'
+import { attachPromise } from '@console/store/actions/lib'
 
 import {
   selectSelectedWebhook,
   selectWebhookFetching,
   selectWebhookError,
-} from '../../store/selectors/webhooks'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectWebhookTemplateById } from '../../store/selectors/webhook-templates'
-import { getWebhook, updateWebhook } from '../../store/actions/webhooks'
-import { attachPromise } from '../../store/actions/lib'
-import { getWebhookTemplateId } from '../../../lib/selectors/id'
+} from '@console/store/selectors/webhooks'
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectWebhookTemplateById } from '@console/store/selectors/webhook-templates'
 
 const webhookEntitySelector = [
   'base_url',

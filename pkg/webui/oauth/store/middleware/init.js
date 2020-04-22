@@ -14,9 +14,10 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '../../api'
-import * as init from '../actions/init'
-import * as user from '../actions/user'
+import api from '@oauth/api'
+
+import * as init from '@oauth/store/actions/init'
+import * as user from '@oauth/store/actions/user'
 
 const oauthInitLogic = createLogic({
   type: init.INITIALIZE,

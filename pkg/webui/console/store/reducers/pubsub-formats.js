@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_PUBSUB_FORMATS_SUCCESS } from '../actions/pubsub-formats'
+import { GET_PUBSUB_FORMATS_SUCCESS } from '@console/store/actions/pubsub-formats'
 
 const defaultState = {
   formats: undefined,

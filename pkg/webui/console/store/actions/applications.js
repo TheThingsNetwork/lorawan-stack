@@ -20,7 +20,6 @@ import {
   createPaginationDeleteActions,
 } from './pagination'
 import { createRequestActions } from './lib'
-
 import {
   startEventsStream,
   createStartEventsStreamActionType,

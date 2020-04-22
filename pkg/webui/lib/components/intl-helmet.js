@@ -16,8 +16,8 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import { injectIntl } from 'react-intl'
 
-import PropTypes from '../prop-types'
-import { warn } from '../log'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { warn } from '@ttn-lw/lib/log'
 
 /**
  * IntlHelmet is a HOC that enables usage of i18n message objects inside the

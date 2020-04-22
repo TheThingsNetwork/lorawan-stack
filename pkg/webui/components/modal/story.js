@@ -15,9 +15,11 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
-import Icon from '../icon'
+
+import Icon from '@ttn-lw/components/icon'
 
 import style from './story.styl'
+
 import Modal from '.'
 
 const bottomLine = (

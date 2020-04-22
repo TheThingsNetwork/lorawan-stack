@@ -13,12 +13,13 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from '../../../lib/prop-types'
-import MapWidget from '../../../components/map/widget/'
+
+import MapWidget from '@ttn-lw/components/map/widget'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 export default class DeviceMap extends React.Component {
   static propTypes = {
-    // Device is an object.
     device: PropTypes.device.isRequired,
   }
 

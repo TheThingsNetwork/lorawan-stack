@@ -17,8 +17,10 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
-import PropTypes from '../../lib/prop-types'
-import Button from '../button'
+import Button from '@ttn-lw/components/button'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import Entry from './entry'
 
 import style from './key-value-map.styl'

@@ -14,8 +14,9 @@
 
 import React from 'react'
 
-import Events from '../../../components/events'
-import PropTypes from '../../../lib/prop-types'
+import Events from '@ttn-lw/components/events'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const { Widget } = Events
 

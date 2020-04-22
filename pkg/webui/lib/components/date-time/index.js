@@ -16,7 +16,8 @@ import React from 'react'
 import { FormattedDate, FormattedTime } from 'react-intl'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import RelativeTime from './relative'
 
 @bind
@@ -67,21 +68,21 @@ class DateTime extends React.PureComponent {
 DateTime.Relative = RelativeTime
 
 DateTime.propTypes = {
-  /** The time to be displayed */
+  /** The time to be displayed. */
+  date: PropTypes.bool,
+  // See https://github.com/yahoo/react-intl/wiki/Components#date-formatting-components
+  dateFormat: PropTypes.string,
+  dateFormatOptions: PropTypes.object,
+  time: PropTypes.bool,
+  timeFormat: PropTypes.string,
+  /** Whether to show the date. */
+  timeFormatOptions: PropTypes.object,
+  /** Whether to show the time. */
   value: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.number, // support timestamps
+    PropTypes.number, // Support timestamps.
     PropTypes.instanceOf(Date),
   ]).isRequired,
-  // see https://github.com/yahoo/react-intl/wiki/Components#date-formatting-components
-  dateFormatOptions: PropTypes.object,
-  timeFormatOptions: PropTypes.object,
-  dateFormat: PropTypes.string,
-  timeFormat: PropTypes.string,
-  /** Whether to show the date */
-  date: PropTypes.bool,
-  /** Whether to show the time */
-  time: PropTypes.bool,
 }
 
 DateTime.defaultProps = {

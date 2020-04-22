@@ -14,9 +14,10 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import PropTypes from '../../lib/prop-types'
 
-import Message from '../../lib/components/message'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './submit-bar.styl'
 

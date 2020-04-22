@@ -17,16 +17,16 @@ import bind from 'autobind-decorator'
 import { defineMessages, injectIntl } from 'react-intl'
 import * as Yup from 'yup'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Select from '../../../components/select'
-import Checkbox from '../../../components/checkbox'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import ModalButton from '../../../components/button/modal-button'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import Select from '@ttn-lw/components/select'
+import Checkbox from '@ttn-lw/components/checkbox'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 

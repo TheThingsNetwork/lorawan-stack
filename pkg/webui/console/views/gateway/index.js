@@ -16,36 +16,26 @@ import React from 'react'
 import { Switch, Route } from 'react-router'
 import { connect } from 'react-redux'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import sharedMessages from '../../../lib/shared-messages'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '../../../components/breadcrumbs'
-import SideNavigation from '../../../components/navigation/side'
-import withRequest from '../../../lib/components/with-request'
-import withEnv from '../../../lib/components/env'
-import NotFoundRoute from '../../../lib/components/not-found-route'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
+import SideNavigation from '@ttn-lw/components/navigation/side'
 
-import GatewayOverview from '../gateway-overview'
-import GatewayApiKeys from '../gateway-api-keys'
-import GatewayCollaborators from '../gateway-collaborators'
-import GatewayLocation from '../gateway-location'
-import GatewayData from '../gateway-data'
-import GatewayGeneralSettings from '../gateway-general-settings'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import withRequest from '@ttn-lw/lib/components/with-request'
+import withEnv from '@ttn-lw/lib/components/env'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
-import {
-  getGateway,
-  stopGatewayEventsStream,
-  getGatewaysRightsList,
-} from '../../store/actions/gateways'
-import {
-  selectGatewayFetching,
-  selectGatewayError,
-  selectSelectedGateway,
-  selectGatewayRights,
-  selectGatewayRightsFetching,
-  selectGatewayRightsError,
-} from '../../store/selectors/gateways'
+import GatewayCollaborators from '@console/views/gateway-collaborators'
+import GatewayLocation from '@console/views/gateway-location'
+import GatewayData from '@console/views/gateway-data'
+import GatewayGeneralSettings from '@console/views/gateway-general-settings'
+import GatewayApiKeys from '@console/views/gateway-api-keys'
+import GatewayOverview from '@console/views/gateway-overview'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   mayViewGatewayInfo,
   mayViewGatewayEvents,
@@ -53,8 +43,22 @@ import {
   mayViewOrEditGatewayCollaborators,
   mayViewOrEditGatewayApiKeys,
   mayEditBasicGatewayInformation,
-} from '../../lib/feature-checks'
-import PropTypes from '../../../lib/prop-types'
+} from '@console/lib/feature-checks'
+
+import {
+  getGateway,
+  stopGatewayEventsStream,
+  getGatewaysRightsList,
+} from '@console/store/actions/gateways'
+
+import {
+  selectGatewayFetching,
+  selectGatewayError,
+  selectSelectedGateway,
+  selectGatewayRights,
+  selectGatewayRightsFetching,
+  selectGatewayRightsError,
+} from '@console/store/selectors/gateways'
 
 @connect(
   function(state, props) {

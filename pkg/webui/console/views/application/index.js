@@ -16,40 +16,31 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
-import sharedMessages from '../../../lib/shared-messages'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import SideNavigation from '../../../components/navigation/side'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import withRequest from '../../../lib/components/with-request'
-import { withEnv } from '../../../lib/components/env'
-import Breadcrumbs from '../../../components/breadcrumbs'
-import NotFoundRoute from '../../../lib/components/not-found-route'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import SideNavigation from '@ttn-lw/components/navigation/side'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
-import ApplicationOverview from '../application-overview'
-import ApplicationGeneralSettings from '../application-general-settings'
-import ApplicationApiKeys from '../application-api-keys'
-import ApplicationLink from '../application-link'
-import ApplicationCollaborators from '../application-collaborators'
-import ApplicationData from '../application-data'
-import ApplicationPayloadFormatters from '../application-payload-formatters'
-import ApplicationIntegrationsWebhooks from '../application-integrations-webhooks'
-import ApplicationIntegrationsPubsubs from '../application-integrations-pubsubs'
-import ApplicationIntegrationsMqtt from '../application-integrations-mqtt'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import withRequest from '@ttn-lw/lib/components/with-request'
+import { withEnv } from '@ttn-lw/lib/components/env'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
-import {
-  getApplication,
-  stopApplicationEventsStream,
-  getApplicationsRightsList,
-} from '../../store/actions/applications'
-import {
-  selectSelectedApplication,
-  selectApplicationFetching,
-  selectApplicationError,
-  selectApplicationRights,
-  selectApplicationRightsFetching,
-  selectApplicationRightsError,
-} from '../../store/selectors/applications'
+import ApplicationOverview from '@console/views/application-overview'
+import ApplicationGeneralSettings from '@console/views/application-general-settings'
+import ApplicationApiKeys from '@console/views/application-api-keys'
+import ApplicationLink from '@console/views/application-link'
+import ApplicationCollaborators from '@console/views/application-collaborators'
+import ApplicationData from '@console/views/application-data'
+import ApplicationPayloadFormatters from '@console/views/application-payload-formatters'
+import ApplicationIntegrationsWebhooks from '@console/views/application-integrations-webhooks'
+import ApplicationIntegrationsPubsubs from '@console/views/application-integrations-pubsubs'
+import ApplicationIntegrationsMqtt from '@console/views/application-integrations-mqtt'
+import Devices from '@console/views/devices'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   mayViewApplicationInfo,
   mayViewApplicationEvents,
@@ -59,10 +50,22 @@ import {
   mayEditBasicApplicationInfo,
   mayViewOrEditApplicationApiKeys,
   mayViewOrEditApplicationCollaborators,
-} from '../../lib/feature-checks'
+} from '@console/lib/feature-checks'
 
-import Devices from '../devices'
-import PropTypes from '../../../lib/prop-types'
+import {
+  getApplication,
+  stopApplicationEventsStream,
+  getApplicationsRightsList,
+} from '@console/store/actions/applications'
+
+import {
+  selectSelectedApplication,
+  selectApplicationFetching,
+  selectApplicationError,
+  selectApplicationRights,
+  selectApplicationRightsFetching,
+  selectApplicationRightsError,
+} from '@console/store/selectors/applications'
 
 @connect(
   function(state, props) {

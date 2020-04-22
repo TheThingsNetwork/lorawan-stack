@@ -33,10 +33,10 @@ const appData = {
   description: 'Some description',
 }
 
-// Via Applications object
+// Via Applications object.
 const firstApp = await ttn.Applications.create('testuser', appData)
 
-// Via Application class
+// Via Application class.
 const secondApp = new ttn.Application(appData)
 await secondApp.save()
 ```

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_DEVICE_TEMPLATE_FORMATS_BASE } from '../actions/device-template-formats'
+import { GET_DEVICE_TEMPLATE_FORMATS_BASE } from '@console/store/actions/device-template-formats'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 

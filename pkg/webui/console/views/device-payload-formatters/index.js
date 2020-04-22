@@ -18,24 +18,27 @@ import { Container, Col, Row } from 'react-grid-system'
 import { Switch, Route, Redirect } from 'react-router'
 import { defineMessages } from 'react-intl'
 
-import sharedMessages from '../../../lib/shared-messages'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Tab from '../../../components/tabs'
-import NotFoundRoute from '../../../lib/components/not-found-route'
-import Notification from '../../../components/notification'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Tab from '@ttn-lw/components/tabs'
+import Notification from '@ttn-lw/components/notification'
 
-import DeviceUplinkPayloadFormatters from '../../containers/device-payload-formatters/uplink'
-import DeviceDownlinkPayloadFormatters from '../../containers/device-payload-formatters/downlink'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
+import DeviceUplinkPayloadFormatters from '@console/containers/device-payload-formatters/uplink'
+import DeviceDownlinkPayloadFormatters from '@console/containers/device-payload-formatters/downlink'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import {
   selectApplicationIsLinked,
   selectApplicationLink,
   selectApplicationLinkFetching,
   selectSelectedApplicationId,
-} from '../../store/selectors/applications'
-import { selectSelectedDeviceId } from '../../store/selectors/devices'
+} from '@console/store/selectors/applications'
+import { selectSelectedDeviceId } from '@console/store/selectors/devices'
 
-import PropTypes from '../../../lib/prop-types'
 import style from './device-payload-formatters.styl'
 
 const m = defineMessages({

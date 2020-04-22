@@ -19,15 +19,18 @@ import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import classnames from 'classnames'
 
-import Notification from '../notification'
-import ErrorNotification from '../error-notification'
-import PropTypes from '../../lib/prop-types'
+import Notification from '@ttn-lw/components/notification'
+import ErrorNotification from '@ttn-lw/components/error-notification'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import FormContext from './context'
 import FormField from './field'
 import FormInfoField from './field/info'
 import FormSubmit from './submit'
 
 import style from './form.styl'
+
 class InnerForm extends React.PureComponent {
   static propTypes = {
     children: PropTypes.node.isRequired,
@@ -56,13 +59,13 @@ class InnerForm extends React.PureComponent {
     const { formError, isSubmitting, isValid } = this.props
     const { isSubmitting: prevIsSubmitting, formError: prevFormError } = prevProps
 
-    // Scroll form notification into view if needed
+    // Scroll form notification into view if needed.
     if (formError && !prevFormError) {
       scrollIntoView(this.notificationRef.current, { behavior: 'smooth' })
       this.notificationRef.current.focus({ preventScroll: true })
     }
 
-    // Scroll invalid fields into view if needed and focus them
+    // Scroll invalid fields into view if needed and focus them.
     if (prevIsSubmitting && !isSubmitting && !isValid) {
       const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
       if (firstErrorNode) {

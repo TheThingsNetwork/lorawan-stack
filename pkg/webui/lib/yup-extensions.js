@@ -17,8 +17,9 @@ import * as Yup from 'yup'
 const StringSchema = Yup.string
 
 /**
- * `NullableStringSchemaType` is an extension for the default `yup.string` schema type.
- * It transforms the value to `null` if it is empty and skips validation.
+ * `NullableStringSchemaType` is an extension for the default `yup.string`
+ * schema type. It transforms the value to `null` if it is empty and skips
+ * validation.
  */
 class NullableStringSchemaType extends StringSchema {
   constructor() {

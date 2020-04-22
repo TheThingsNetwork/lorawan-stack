@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getOrganizationId } from '../../../lib/selectors/id'
+import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
+
 import {
   GET_ORGS_LIST_SUCCESS,
   CREATE_ORG_SUCCESS,
@@ -20,7 +21,7 @@ import {
   GET_ORG_SUCCESS,
   UPDATE_ORG_SUCCESS,
   DELETE_ORG_SUCCESS,
-} from '../actions/organizations'
+} from '@console/store/actions/organizations'
 
 const organization = function(state = {}, organization) {
   return {

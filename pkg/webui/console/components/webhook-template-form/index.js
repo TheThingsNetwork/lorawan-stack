@@ -18,16 +18,21 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import urlTemplate from 'url-template'
 
-import api from '../../api'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import { id as webhookIdRegexp } from '../../lib/regexp'
-import WebhookTemplateInfo from '../webhook-template-info'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import Message from '../../../lib/components/message'
+import api from '@console/api'
+
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import WebhookTemplateInfo from '@console/components/webhook-template-info'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { id as webhookIdRegexp } from '@console/lib/regexp'
 
 const m = defineMessages({
   createTemplate: 'Create {template} webhook',

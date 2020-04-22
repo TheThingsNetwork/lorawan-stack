@@ -14,7 +14,7 @@
 
 import { handleActions } from 'redux-actions'
 
-import { GET_JOIN_EUI_PREFIXES_SUCCESS } from '../actions/join-server'
+import { GET_JOIN_EUI_PREFIXES_SUCCESS } from '@console/store/actions/join-server'
 
 const defaultState = {
   prefixes: [],

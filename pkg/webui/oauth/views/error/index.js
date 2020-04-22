@@ -15,21 +15,21 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import Button from '../../../components/button'
-import Message from '../../../lib/components/message'
-import ErrorMessage from '../../../lib/components/error-message'
-import { withEnv } from '../../../lib/components/env'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import sharedMessages from '../../../lib/shared-messages'
-import errorMessages from '../../../lib/errors/error-messages'
+import Button from '@ttn-lw/components/button'
 
+import Message from '@ttn-lw/lib/components/message'
+import ErrorMessage from '@ttn-lw/lib/components/error-message'
+import { withEnv } from '@ttn-lw/lib/components/env'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import {
   httpStatusCode,
   isUnknown as isUnknownError,
   isNotFoundError,
-} from '../../../lib/errors/utils'
-
-import statusCodeMessages from '../../../lib/errors/status-code-messages'
+} from '@ttn-lw/lib/errors/utils'
+import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 
 import style from './full-view.styl'
 

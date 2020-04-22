@@ -18,19 +18,22 @@ import { ConnectedRouter } from 'connected-react-router'
 import { Route, Switch } from 'react-router-dom'
 import classnames from 'classnames'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import { withEnv } from '../../../lib/components/env'
-import ErrorView from '../../../lib/components/error-view'
-import ScrollToTop from '../../../lib/components/scroll-to-top'
-import dev from '../../../lib/dev'
-import PropTypes from '../../../lib/prop-types'
-import { ToastContainer } from '../../../components/toast'
+import { ToastContainer } from '@ttn-lw/components/toast'
+import Footer from '@ttn-lw/components/footer'
 
-import Header from '../../containers/header'
-import Footer from '../../../components/footer'
-import Landing from '../landing'
-import Login from '../login'
-import FullViewError from '../error'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import { withEnv } from '@ttn-lw/lib/components/env'
+import ErrorView from '@ttn-lw/lib/components/error-view'
+import ScrollToTop from '@ttn-lw/lib/components/scroll-to-top'
+
+import Header from '@console/containers/header'
+
+import Landing from '@console/views/landing'
+import Login from '@console/views/login'
+import FullViewError from '@console/views/error'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import dev from '@ttn-lw/lib/dev'
 
 import style from './app.styl'
 
@@ -83,7 +86,7 @@ class ConsoleApp extends React.Component {
                 <div className={style.content}>
                   <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                   <Switch>
-                    {/* routes for registration, privacy policy, other public pages */}
+                    {/* Routes for registration, privacy policy, other public pages */}
                     <Route path="/login" component={Login} />
                     <Route path="/" component={Landing} />
                   </Switch>

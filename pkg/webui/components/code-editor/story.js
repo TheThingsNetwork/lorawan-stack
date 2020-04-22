@@ -45,7 +45,7 @@ class Example extends React.Component {
 }
 
 const code = `
-// Decode raw data
+// Decode raw data.
 function Decoder(bytes, port) {
   var colors = ["red", "green", "blue", "yellow", "cyan", "magenta", "white", "black"];
   var decoded = {

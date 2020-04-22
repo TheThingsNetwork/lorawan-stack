@@ -16,12 +16,14 @@ import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import sharedMessages from '../../lib/shared-messages'
-import PropTypes from '../../lib/prop-types'
+import Checkbox from '@ttn-lw/components/checkbox'
 
-import Checkbox from '../checkbox'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import style from './toggled.styl'
-import Input from './'
+
+import Input from '.'
 
 @bind
 class Toggled extends Component {

@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { selectStackConfig } from '../../lib/selectors/env'
-import { selectApplicationRights } from '../store/selectors/applications'
-import { selectGatewayRights } from '../store/selectors/gateways'
-import { selectOrganizationRights } from '../store/selectors/organizations'
-import { selectUserRights, selectUserIsAdmin } from '../store/selectors/user'
+import { selectStackConfig } from '@ttn-lw/lib/selectors/env'
+
+import { selectApplicationRights } from '@console/store/selectors/applications'
+import { selectGatewayRights } from '@console/store/selectors/gateways'
+import { selectOrganizationRights } from '@console/store/selectors/organizations'
+import { selectUserRights, selectUserIsAdmin } from '@console/store/selectors/user'
 
 const stackConfig = selectStackConfig()
 const asEnabled = stackConfig.as.enabled
@@ -25,7 +26,7 @@ const gsEnabled = stackConfig.gs.enabled
 export const checkFromState = (featureCheck, state) =>
   featureCheck.check(featureCheck.rightsSelector(state))
 
-// User
+// User related feature checks.
 export const mayViewApplicationsOfUser = {
   rightsSelector: selectUserRights,
   check: rights => rights.includes('RIGHT_USER_APPLICATIONS_LIST'),
@@ -51,7 +52,7 @@ export const mayCreateOrganizations = {
   check: rights => rights.includes('RIGHT_USER_ORGANIZATIONS_CREATE'),
 }
 
-// Applications
+// Application related feature checks.
 export const mayViewApplicationInfo = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_INFO'),
@@ -109,7 +110,7 @@ export const mayEditApplicationDeviceKeys = {
   check: rights => rights.includes('RIGHT_APPLICATION_DEVICES_WRITE_KEYS'),
 }
 
-// Gateways
+// Gateway related feature checks.
 export const mayViewGatewayInfo = {
   rightsSelector: selectGatewayRights,
   check: rights => rights.includes('RIGHT_GATEWAY_INFO'),
@@ -147,7 +148,7 @@ export const mayViewOrEditGatewayLocation = {
   check: rights => rights.includes('RIGHT_GATEWAY_LOCATION_READ'),
 }
 
-// Organizations
+// Organization related feature checks.
 export const mayViewOrganizationInformation = {
   rightsSelector: selectOrganizationRights,
   check: rights => rights.includes('RIGHT_ORGANIZATION_INFO'),
@@ -189,8 +190,7 @@ export const mayAddOrganizationAsCollaborator = {
   check: rights => rights.includes('RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR'),
 }
 
-// Admin features
-
+// Admin feature checks.
 export const mayPerformAdminActions = {
   rightsSelector: selectUserIsAdmin,
   check: isAdmin => isAdmin,
@@ -201,7 +201,7 @@ export const mayManageUsers = {
   check: mayPerformAdminActions.check,
 }
 
-// Composite
+// Composite feature checks.
 export const mayViewApplications = {
   rightsSelector: state => [...selectUserRights(state), ...selectOrganizationRights(state)],
   check: rights =>

@@ -14,13 +14,15 @@
 
 import { defineMessages } from 'react-intl'
 
-import CreateFetchSelect from '../fetch-select'
+import CreateFetchSelect from '@console/containers/fetch-select'
+
+import { getWebhookFormats } from '@console/store/actions/webhook-formats'
+
 import {
   selectWebhookFormats,
   selectWebhookFormatsError,
   selectWebhookFormatsFetching,
-} from '../../store/selectors/webhook-formats'
-import { getWebhookFormats } from '../../store/actions/webhook-formats'
+} from '@console/store/selectors/webhook-formats'
 
 const m = defineMessages({
   title: 'Webhook Format',

@@ -15,27 +15,30 @@
 import React from 'react'
 import { Switch, Route } from 'react-router'
 
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '../../../components/breadcrumbs'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import { withEnv } from '../../../lib/components/env'
-import SideNavigation from '../../../components/navigation/side'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import NotFoundRoute from '../../../lib/components/not-found-route'
-import OrganizationOverview from '../organization-overview'
-import OrganizationData from '../organization-data'
-import OrganizationGeneralSettings from '../organization-general-settings'
-import OrganizationApiKeys from '../organization-api-keys'
-import OrganizationCollaborators from '../organization-collaborators'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
+import SideNavigation from '@ttn-lw/components/navigation/side'
+
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import { withEnv } from '@ttn-lw/lib/components/env'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
+import OrganizationOverview from '@console/views/organization-overview'
+import OrganizationData from '@console/views/organization-data'
+import OrganizationGeneralSettings from '@console/views/organization-general-settings'
+import OrganizationApiKeys from '@console/views/organization-api-keys'
+import OrganizationCollaborators from '@console/views/organization-collaborators'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import {
   mayViewOrganizationInformation,
   mayViewOrEditOrganizationApiKeys,
   mayViewOrEditOrganizationCollaborators,
   mayEditBasicOrganizationInformation,
-} from '../../lib/feature-checks'
+} from '@console/lib/feature-checks'
 
 @withEnv
 @withBreadcrumb('orgs.single', function(props) {

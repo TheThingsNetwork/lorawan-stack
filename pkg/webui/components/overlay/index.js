@@ -14,11 +14,13 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import PropTypes from '../../lib/prop-types'
-import sharedMessages from '../../lib/shared-messages'
 
-import Spinner from '../spinner'
-import Message from '../../lib/components/message'
+import Spinner from '@ttn-lw/components/spinner'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './overlay.styl'
 
@@ -42,10 +44,10 @@ Overlay.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   /**
-   * A flag specifying whether the overlay should display the loading spinner
+   * A flag specifying whether the overlay should display the loading spinner.
    */
   loading: PropTypes.bool,
-  /** A flag specifying whether the overlay is visible or not */
+  /** A flag specifying whether the overlay is visible or not. */
   visible: PropTypes.bool.isRequired,
 }
 

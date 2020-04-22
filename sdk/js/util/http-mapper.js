@@ -16,6 +16,7 @@
 /* eslint-disable import/no-commonjs */
 
 const fs = require('fs')
+
 const api = require('../generated/api.json')
 const allowedFieldMaskPaths = require('../generated/allowed-field-mask-paths.json')
 

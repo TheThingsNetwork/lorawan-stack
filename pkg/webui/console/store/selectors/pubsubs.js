@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_PUBSUB_BASE, GET_PUBSUBS_LIST_BASE } from '../actions/pubsubs'
+import { GET_PUBSUB_BASE, GET_PUBSUBS_LIST_BASE } from '@console/store/actions/pubsubs'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 
 const selectPubsubStore = state => state.pubsubs
 
-// Pubsub
+// Pubsub.
 export const selectPubsubEntityStore = state => selectPubsubStore(state).entities
 export const selectSelectedPubsubId = state => selectPubsubStore(state).selectedPubsub
 export const selectSelectedPubsub = state =>
@@ -26,7 +27,7 @@ export const selectSelectedPubsub = state =>
 export const selectPubsubError = createErrorSelector(GET_PUBSUB_BASE)
 export const selectPubsubFetching = createFetchingSelector(GET_PUBSUB_BASE)
 
-// Pubsubs
+// Pubsubs.
 export const selectPubsubs = state => Object.values(selectPubsubEntityStore(state))
 export const selectPubsubsTotalCount = state => selectPubsubStore(state).totalCount
 export const selectPubsubsFetching = createFetchingSelector(GET_PUBSUBS_LIST_BASE)

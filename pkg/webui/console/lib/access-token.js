@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '../api'
 import * as cache from './cache'
 
-export default async function() {
+export default retrieveToken => async () => {
   const storedToken = cache.get('accessToken')
   let token
 
   if (!storedToken || Date.parse(storedToken.expiry) < Date.now()) {
-    // If we don't have a token stored or it's expired, we want to retrieve it
+    // If we don't have a token stored or it's expired, we want to retrieve it.
 
-    // Remove stored, invalid token
+    // Remove stored, invalid token.
     clear()
 
-    // Retrieve new token and store it
-    const response = await api.console.token()
+    // Retrieve new token and store it.
+    const response = await retrieveToken()
     token = response.data
     cache.set('accessToken', token)
     return token
   }
 
-  // If we have a stored token and its valid, we want to use it
+  // If we have a stored token and its valid, we want to use it.
   return storedToken
 }
 

@@ -20,16 +20,18 @@ import { defineMessages } from 'react-intl'
 import { Redirect } from 'react-router-dom'
 import { Container, Row, Col } from 'react-grid-system'
 
-import PropTypes from '../../../lib/prop-types'
-import { selectApplicationSiteName, selectApplicationRootPath } from '../../../lib/selectors/env'
-import { getBackendErrorName } from '../../../lib/errors/utils'
-import Button from '../../../components/button'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
+import Button from '@ttn-lw/components/button'
+import Notification from '@ttn-lw/components/notification'
+import ErrorNotification from '@ttn-lw/components/error-notification'
 
-import Notification from '../../../components/notification'
-import ErrorNotification from '../../../components/error-notification'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectApplicationSiteName, selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
+import { getBackendErrorName } from '@ttn-lw/lib/errors/utils'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import style from './login.styl'
 
 const m = defineMessages({
@@ -73,7 +75,7 @@ export default class Login extends React.PureComponent {
       )
     ) : null
 
-    // dont show the login page if the user is already logged in
+    // Dont show the login page if the user is already logged in.
     if (Boolean(user)) {
       return <Redirect to="/" />
     }

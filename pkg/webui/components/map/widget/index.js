@@ -14,11 +14,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import sharedMessages from '../../../lib/shared-messages'
 
-import Message from '../../../lib/components/message'
-import Link from '../../../components/link'
-import Map from '../../map'
+import Link from '@ttn-lw/components/link'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import Map from '..'
 
 import style from './widget.styl'
 
@@ -26,9 +29,10 @@ export default class MapWidget extends React.Component {
   static propTypes = {
     // Id is a string used to give the map a unique ID.
     id: PropTypes.string.isRequired,
-    // Markers is an array of objects containing a specific properties
+    // Markers is an array of objects containing a specific properties.
     markers: PropTypes.arrayOf(
-      // Position is a object containing two properties latitude and longitude which are both numbers.
+      // Position is a object containing two properties latitude and longitude
+      // which are both numbers.
       PropTypes.shape({
         position: PropTypes.objectOf(PropTypes.number),
       }),

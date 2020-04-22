@@ -41,5 +41,5 @@ export default function getHttpErrorFromRpcError(rpcError) {
     return undefined
   }
 
-  return errorMap[rpcError] || '520' // Fallback to 520 Unknown
+  return errorMap[rpcError] || '520' // Fallback to 520 Unknown.
 }
