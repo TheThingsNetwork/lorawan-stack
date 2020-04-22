@@ -120,7 +120,7 @@ export const isUnauthenticatedError = error =>
  * @param {Object} error - The error to be tested.
  * @returns {boolean} `true` if `error` has translation ids, `false` otherwise.
  */
-export const isTranslated = error => isBackend() || (typeof error === 'object' && error.id)
+export const isTranslated = error => isBackend(error) || (typeof error === 'object' && error.id)
 
 /**
  * Returns the id of the error, used as message id.
