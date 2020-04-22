@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package email provides an interface to send messages over email.
-package email
+package qrcodegenerator
 
-// Sender is the interface for sending messages over email.
-type Sender interface {
-	Send(message *Message) error
+// Config represents the QRCodeGenerator configuration.
+type Config struct {
 }

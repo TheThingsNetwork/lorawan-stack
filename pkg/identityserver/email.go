@@ -19,60 +19,14 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
-	"go.thethings.network/lorawan-stack/pkg/config"
 	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/pkg/email/smtp"
-	"go.thethings.network/lorawan-stack/pkg/fetch"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 )
-
-type emailTemplatesConfig struct {
-	Source    string                `name:"source" description:"Source of the email template files (static, directory, url, blob)"`
-	Static    map[string][]byte     `name:"-"`
-	Directory string                `name:"directory" description:"Retrieve the email templates from the filesystem"`
-	URL       string                `name:"url" description:"Retrieve the email templates from a web server"`
-	Blob      config.BlobPathConfig `name:"blob"`
-
-	Includes []string `name:"includes" description:"The email templates that will be preloaded on startup"`
-}
-
-// Fetcher returns a fetch.Interface based on the configuration.
-// If no configuration source is set, this method returns nil, nil.
-func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobConfig) (fetch.Interface, error) {
-	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
-	if c.Source == "" {
-		switch {
-		case c.Static != nil:
-			c.Source = "static"
-		case c.Directory != "":
-			c.Source = "directory"
-		case c.URL != "":
-			c.Source = "url"
-		case !c.Blob.IsZero():
-			c.Source = "blob"
-		}
-	}
-	switch c.Source {
-	case "static":
-		return fetch.NewMemFetcher(c.Static), nil
-	case "directory":
-		return fetch.FromFilesystem(c.Directory), nil
-	case "url":
-		return fetch.FromHTTP(c.URL, true)
-	case "blob":
-		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
-		if err != nil {
-			return nil, err
-		}
-		return fetch.FromBucket(ctx, b, c.Blob.Path), nil
-	default:
-		return nil, nil
-	}
-}
 
 func (is *IdentityServer) initEmailTemplates(ctx context.Context) (*email.TemplateRegistry, error) {
 	config := is.configFromContext(ctx).Email.Templates

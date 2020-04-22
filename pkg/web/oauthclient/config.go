@@ -12,10 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package email provides an interface to send messages over email.
-package email
+package oauthclient
 
-// Sender is the interface for sending messages over email.
-type Sender interface {
-	Send(message *Message) error
+// Config is the configuration for the OAuth client.
+type Config struct {
+	AuthorizeURL string `name:"authorize-url" description:"The OAuth Authorize URL"`
+	LogoutURL    string `name:"logout-url" description:"The OAuth Logout URL"`
+	TokenURL     string `name:"token-url" description:"The OAuth Token Exchange URL"`
+	RootURL      string `name:"-"`
+
+	ClientID     string `name:"client-id" description:"The OAuth client ID"`
+	ClientSecret string `name:"client-secret" description:"The OAuth client secret" json:"-"`
+
+	StateCookieName string `name:"-"`
+	AuthCookieName  string `name:"-"`
 }

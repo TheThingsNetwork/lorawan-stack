@@ -27,11 +27,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Config represents the DeviceTemplateConverter configuration.
-type Config struct {
-	Enabled []string `name:"enabled" description:"Enabled converters"`
-}
-
 // DeviceTemplateConverter implements the Device Template Converter component.
 //
 // The Device Template Converter exposes the EndDeviceTemplateConverter service.

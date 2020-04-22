@@ -26,10 +26,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Config represents the QRCodeGenerator configuration.
-type Config struct {
-}
-
 // QRCodeGenerator implements the QR Code Generator component.
 //
 // The QR Code Generator exposes the EndDeviceQRCodeGenerator service.
