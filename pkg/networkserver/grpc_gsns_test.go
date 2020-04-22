@@ -1394,7 +1394,7 @@ func TestHandleUplink(t *testing.T) {
 					"recent_uplinks",
 					"session",
 				}
-				makeDataSetDevice := func(getDevice *ttnpb.EndDevice, decodedMsg *ttnpb.UplinkMessage) (*ttnpb.EndDevice, []events.DefinitionDataClosure) {
+				makeDataSetDevice := func(ctx context.Context, getDevice *ttnpb.EndDevice, decodedMsg *ttnpb.UplinkMessage) (*ttnpb.EndDevice, []events.DefinitionDataClosure) {
 					setDevice := CopyEndDevice(getDevice)
 					setDevice.MACState.QueuedResponses = nil
 					evs := test.Must(HandleLinkCheckReq(test.Context(), setDevice, decodedMsg)).([]events.DefinitionDataClosure)
@@ -1402,9 +1402,16 @@ func TestHandleUplink(t *testing.T) {
 					setDevice.MACState.RxWindowsAvailable = true
 					setDevice.RecentUplinks = AppendRecentUplink(setDevice.RecentUplinks, WithMatchedUplinkSettings(decodedMsg, chIdx, drIdx), RecentUplinkCount)
 					setDevice.Session.LastFCntUp = FCnt
+					if !decodedMsg.Payload.GetMACPayload().ADR {
+						setDevice.MACState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
+						setDevice.MACState.CurrentParameters.ADRTxPowerIndex = 0
+					}
+					setDevice.MACState.DesiredParameters.ADRDataRateIndex = setDevice.MACState.CurrentParameters.ADRDataRateIndex
+					setDevice.MACState.DesiredParameters.ADRTxPowerIndex = setDevice.MACState.CurrentParameters.ADRTxPowerIndex
+					setDevice.MACState.DesiredParameters.ADRNbTrans = setDevice.MACState.CurrentParameters.ADRNbTrans
 					if decodedMsg.Payload.GetMACPayload().ADR {
 						setDevice.RecentADRUplinks = AppendRecentUplink(setDevice.RecentADRUplinks, WithMatchedUplinkSettings(decodedMsg, chIdx, drIdx), OptimalADRUplinkCount)
-						test.Must(nil, AdaptDataRate(setDevice, phy, ttnpb.MACSettings{}))
+						test.Must(nil, AdaptDataRate(ctx, setDevice, phy, ttnpb.MACSettings{}))
 					}
 					return setDevice, evs
 				}
@@ -1663,7 +1670,7 @@ func TestHandleUplink(t *testing.T) {
 										return false
 									}
 									getDevice := CopyEndDevice(rangeDevices[matchIdx])
-									setDevice, macEvs := makeDataSetDevice(getDevice, decodedMsg)
+									setDevice, macEvs := makeDataSetDevice(ctx, getDevice, decodedMsg)
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
@@ -1699,7 +1706,7 @@ func TestHandleUplink(t *testing.T) {
 									decodedMsg.RxMetadata = RxMetadata[:]
 									getDevice := CopyEndDevice(rangeDevices[matchIdx])
 									getDevice.UpdatedAt = clock.Now()
-									setDevice, macEvs := makeDataSetDevice(getDevice, decodedMsg)
+									setDevice, macEvs := makeDataSetDevice(ctx, getDevice, decodedMsg)
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
@@ -1723,7 +1730,7 @@ func TestHandleUplink(t *testing.T) {
 								rangeDevices := makeDataRangeDevices(clock, true, true)
 								prevMsg := CopyUplinkMessage(decodedMsg)
 								prevMsg.ReceivedAt = clock.Now()
-								rangeDevice, _ := makeDataSetDevice(rangeDevices[matchIdx], prevMsg)
+								rangeDevice, _ := makeDataSetDevice(ctx, rangeDevices[matchIdx], prevMsg)
 								rangeDevices[matchIdx] = rangeDevice
 								return a.So(assertHandleUplink(ctx, handle, msg, func() bool {
 									rangeCtx, ok := assertDataDeduplicateSequence(ctx, env, clock, decodedMsg, chIdx, drIdx, rangeDevices, matchIdx, true, nil)
@@ -1737,7 +1744,7 @@ func TestHandleUplink(t *testing.T) {
 										return false
 									}
 									decodedMsg.RxMetadata = RxMetadata[:]
-									setDevice, macEvs := makeDataSetDevice(rangeDevice, decodedMsg)
+									setDevice, macEvs := makeDataSetDevice(ctx, rangeDevice, decodedMsg)
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, rangeDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,

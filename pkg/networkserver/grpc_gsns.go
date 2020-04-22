@@ -972,26 +972,34 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			queuedEvents = append(queuedEvents, events.ApplyDefinitionDataClosures(ctx, matched.Device.EndDeviceIdentifiers, matched.QueuedEventClosures...)...)
 
 			stored = matched.Device
-			paths := matched.SetPaths
-
+			paths := ttnpb.AddFields(matched.SetPaths,
+				"mac_state.desired_parameters.adr_data_rate_index",
+				"mac_state.desired_parameters.adr_nb_trans",
+				"mac_state.desired_parameters.adr_tx_power_index",
+				"mac_state.recent_uplinks",
+				"recent_adr_uplinks",
+				"recent_uplinks",
+			)
 			stored.MACState.RecentUplinks = appendRecentUplink(stored.MACState.RecentUplinks, up, recentUplinkCount)
-			paths = ttnpb.AddFields(paths, "mac_state.recent_uplinks")
-
 			stored.RecentUplinks = appendRecentUplink(stored.RecentUplinks, up, recentUplinkCount)
-			paths = ttnpb.AddFields(paths, "recent_uplinks")
-
-			paths = ttnpb.AddFields(paths, "recent_adr_uplinks")
 			if !pld.FHDR.ADR {
+				paths = ttnpb.AddFields(paths,
+					"mac_state.current_parameters.adr_data_rate_index",
+					"mac_state.current_parameters.adr_tx_power_index",
+				)
+				stored.MACState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
+				stored.MACState.CurrentParameters.ADRTxPowerIndex = 0
+			}
+			stored.MACState.DesiredParameters.ADRDataRateIndex = stored.MACState.CurrentParameters.ADRDataRateIndex
+			stored.MACState.DesiredParameters.ADRTxPowerIndex = stored.MACState.CurrentParameters.ADRTxPowerIndex
+			stored.MACState.DesiredParameters.ADRNbTrans = stored.MACState.CurrentParameters.ADRNbTrans
+			if !pld.FHDR.ADR || !deviceUseADR(stored, ns.defaultMACSettings) {
 				stored.RecentADRUplinks = nil
 				return stored, paths, nil
 			}
 			stored.RecentADRUplinks = appendRecentUplink(stored.RecentADRUplinks, up, optimalADRUplinkCount)
-
-			if !deviceUseADR(stored, ns.defaultMACSettings) {
-				return stored, paths, nil
-			}
-			if err := adaptDataRate(stored, matched.phy, ns.defaultMACSettings); err != nil {
-				return nil, nil, err
+			if err := adaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {
+				logger.WithError(err).Info("Failed to adapt data rate, avoid ADR")
 			}
 			return stored, paths, nil
 		})
