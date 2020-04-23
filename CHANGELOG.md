@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Conformed JavaScript to new code style guide.
+- Removed login page of the Console (now redirects straight to the OAuth login).
 
 ### Deprecated
 

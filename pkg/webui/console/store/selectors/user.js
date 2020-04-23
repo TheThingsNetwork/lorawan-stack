@@ -25,14 +25,18 @@ export const selectUserFetching = createFetchingSelector(GET_USER_ME_BASE)
 
 export const selectUserId = function(state) {
   const user = selectUser(state)
-  const { ids = {} } = user
 
-  return ids.user_id
+  if (!Boolean(user)) {
+    return undefined
+  }
+
+  return user.ids.user_id
 }
 
 export const selectUserIsAdmin = function(state) {
   const user = selectUser(state)
-  return user.isAdmin
+
+  return user ? user.isAdmin : false
 }
 
 export const selectUserRights = state => selectUserStore(state).rights

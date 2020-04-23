@@ -19,40 +19,48 @@ import { push } from 'connected-react-router'
 
 import Button from '@ttn-lw/components/button'
 
-import WithAuth from '@ttn-lw/lib/components/with-auth'
-
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { logout } from '@oauth/store/actions/user'
 
-@connect(state => ({
-  user: state.user.user,
-}))
+@connect(
+  state => ({
+    user: state.user.user,
+  }),
+  {
+    redirectToLogin: () => push('/login'),
+    logout,
+  },
+)
 @bind
 export default class OAuth extends React.PureComponent {
-  async handleLogout() {
-    const { dispatch } = this.props
-
-    dispatch(logout())
+  static propTypes = {
+    logout: PropTypes.func.isRequired,
+    redirectToLogin: PropTypes.func.isRequired,
+    user: PropTypes.user.isRequired,
   }
 
-  async handleUpdatePassword() {
-    const { dispatch } = this.props
+  async handleLogout() {
+    const { logout } = this.props
 
-    dispatch(push('/update-password'))
+    logout()
   }
 
   render() {
-    const { user = { ids: {} } } = this.props
+    const { user, redirectToLogin } = this.props
+
+    if (!Boolean(user)) {
+      redirectToLogin()
+      return null
+    }
 
     return (
-      <WithAuth>
-        <div>
-          You are logged in as {user.ids.user_id}.{' '}
-          <Button message={sharedMessages.logout} onClick={this.handleLogout} />
-          <Button message={sharedMessages.changePassword} onClick={this.handleUpdatePassword} />
-        </div>
-      </WithAuth>
+      <div>
+        You are logged in as {user.ids.user_id}.{' '}
+        <Button message={sharedMessages.logout} onClick={this.handleLogout} />
+        <Button.Link message={sharedMessages.changePassword} to="/update-password" />
+      </div>
     )
   }
 }
