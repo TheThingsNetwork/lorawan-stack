@@ -30,11 +30,12 @@ const addEvent = (state, event) => {
   const currentEvents = state.events
   const eventTime = new Date(event.time).getTime()
 
+  // Keep events sorted in descending order by `time`.
   let insertIndex = 0
   while (insertIndex < currentEvents.length) {
     const currentEventTime = new Date(currentEvents[insertIndex].time).getTime()
 
-    if (eventTime > currentEventTime) {
+    if (eventTime < currentEventTime) {
       insertIndex += 1
     } else {
       break
