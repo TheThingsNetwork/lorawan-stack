@@ -181,3 +181,11 @@ type ContactInfoStore interface {
 	// Confirm a validation. Only the ID and Token need to be set.
 	Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 }
+
+// MigrationStore interface for migration history.
+type MigrationStore interface {
+	CreateMigration(ctx context.Context, migration *Migration) error
+	FindMigrations(ctx context.Context) ([]*Migration, error)
+	GetMigration(ctx context.Context, id string) (*Migration, error)
+	DeleteMigration(ctx context.Context, id string) error
+}
