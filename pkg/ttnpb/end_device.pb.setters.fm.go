@@ -1366,6 +1366,33 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 			} else {
 				dst.LastNetworkInitiatedDownlinkAt = nil
 			}
+		case "rejected_adr_data_rate_indexes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejected_adr_data_rate_indexes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejectedADRDataRateIndexes = src.RejectedADRDataRateIndexes
+			} else {
+				dst.RejectedADRDataRateIndexes = nil
+			}
+		case "rejected_adr_tx_power_indexes":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejected_adr_tx_power_indexes' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejectedADRTxPowerIndexes = src.RejectedADRTxPowerIndexes
+			} else {
+				dst.RejectedADRTxPowerIndexes = nil
+			}
+		case "rejected_frequencies":
+			if len(subs) > 0 {
+				return fmt.Errorf("'rejected_frequencies' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.RejectedFrequencies = src.RejectedFrequencies
+			} else {
+				dst.RejectedFrequencies = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

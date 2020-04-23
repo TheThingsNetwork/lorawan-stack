@@ -8657,6 +8657,60 @@
               "fullType": "google.protobuf.Timestamp",
               "ismap": false,
               "defaultValue": ""
+            },
+            {
+              "name": "rejected_adr_data_rate_indexes",
+              "description": "ADR Data rate index values rejected by the device.\nReset each time `current_parameters.channels` change.\nElements are sorted in ascending order.",
+              "label": "repeated",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "rejected_adr_tx_power_indexes",
+              "description": "ADR TX output power index values rejected by the device.\nElements are sorted in ascending order.",
+              "label": "repeated",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "rejected_frequencies",
+              "description": "Frequencies rejected by the device.",
+              "label": "repeated",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.items.uint64.gte",
+                    "value": 100000
+                  }
+                ]
+              }
             }
           ]
         },

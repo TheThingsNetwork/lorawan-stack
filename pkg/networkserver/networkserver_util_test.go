@@ -84,6 +84,7 @@ var (
 	EvtEndApplicationLink            = evtEndApplicationLink
 	EvtEnqueueDeviceModeConfirmation = evtEnqueueDeviceModeConfirmation
 	EvtEnqueueDevStatusRequest       = evtEnqueueDevStatusRequest
+	EvtEnqueueLinkADRRequest         = evtEnqueueLinkADRRequest
 	EvtEnqueueRekeyConfirmation      = evtEnqueueRekeyConfirmation
 	EvtForwardDataUplink             = evtForwardDataUplink
 	EvtForwardJoinAccept             = evtForwardJoinAccept

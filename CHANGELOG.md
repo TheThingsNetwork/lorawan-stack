@@ -13,7 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - To set the `logout-redirect-uris` for existing clients, the CLI client can be used, e.g.: `ttn-lw-cli clients update console --logout-redirect-uris "https://localhost:1885/console" --redirect-uris "http://localhost:1885/console"`.
 - JavaScript style guide to our `DEVELOPMENT.md` documentation.
 - Schedule end device downlinks in the Console.
-
 - Support for repeated `RekeyInd`. (happens when e.g. `RekeyConf` is lost)
 - Validate the `DevAddr` when switching session as a result of receiving `RekeyInd`.
 
@@ -21,12 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Conformed JavaScript to new code style guide.
 - Removed login page of the Console (now redirects straight to the OAuth login).
+- Network Server now records `LinkADRReq` rejections and will not retry rejected values.
+- Improved `NewChannelReq`, `DLChannelReq` and `LinkADRReq` efficiency.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Handling of device unsetting the ADR bit in uplink, after ADR has been started.
 
 ### Security
 
