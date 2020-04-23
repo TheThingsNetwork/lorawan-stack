@@ -31,7 +31,10 @@ var (
 )
 
 func deviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy band.Band) bool {
-	if !phy.TxParamSetupReqSupport || dev.MACState == nil || dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+	if !phy.TxParamSetupReqSupport ||
+		dev.GetMulticast() ||
+		dev.GetMACState() == nil ||
+		dev.MACState.LoRaWANVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
 		return false
 	}
 	if dev.MACState.DesiredParameters.MaxEIRP != dev.MACState.CurrentParameters.MaxEIRP {

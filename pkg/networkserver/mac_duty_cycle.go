@@ -28,7 +28,8 @@ var (
 )
 
 func deviceNeedsDutyCycleReq(dev *ttnpb.EndDevice) bool {
-	return dev.MACState != nil &&
+	return !dev.GetMulticast() &&
+		dev.GetMACState() != nil &&
 		dev.MACState.DesiredParameters.MaxDutyCycle != dev.MACState.CurrentParameters.MaxDutyCycle
 }
 

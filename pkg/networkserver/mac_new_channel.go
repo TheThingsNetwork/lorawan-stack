@@ -49,7 +49,7 @@ func deviceNeedsNewChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 }
 
 func deviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
-	if dev.MACState == nil {
+	if dev.GetMulticast() || dev.GetMACState() == nil {
 		return false
 	}
 	if len(dev.MACState.DesiredParameters.Channels) != len(dev.MACState.CurrentParameters.Channels) {

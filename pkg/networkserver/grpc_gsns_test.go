@@ -1674,7 +1674,13 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
+										func() bool {
+											if len(uplinkMDs) == 0 {
+												// No downlink task should be added if no downlink paths are available.
+												return true
+											}
+											return assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, ErrTestInternal)
+										}(),
 										assertDataApplicationUp(ctx, env, setCtx, setDevice, decodedMsg, ErrTestInternal),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
@@ -1710,7 +1716,7 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, getDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, nil),
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, nil),
 										assertDataApplicationUp(ctx, env, setCtx, setDevice, WithMatchedUplinkSettings(decodedMsg, chIdx, drIdx), nil),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
@@ -1748,7 +1754,7 @@ func TestHandleUplink(t *testing.T) {
 									setCtx, ok := assertDataSetByID(ctx, env, rangeCtx, rangeDevice, setDevice, dataSetByIDSetPaths[:], nil, nil)
 									return a.So(AllTrue(
 										ok,
-										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, decodedMsg.ReceivedAt.Add(-InfrastructureDelay/2+Rx1Delay.Duration()/2-NSScheduleWindow()), true, ErrTestInternal),
+										assertDownlinkTaskAdd(ctx, env, setCtx, setDevice.EndDeviceIdentifiers, clock.Now().Add(NSScheduleWindow()), true, ErrTestInternal),
 										a.So(env.Events, should.ReceiveEventsResembling,
 											events.ApplyDefinitionDataClosures(setCtx, setDevice.EndDeviceIdentifiers, macEvs...),
 											EvtProcessDataUplink(setCtx, setDevice.EndDeviceIdentifiers, decodedMsg),
