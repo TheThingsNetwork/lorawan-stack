@@ -15,11 +15,13 @@
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import GatewaysTable from '../../containers/gateways-table'
-import sharedMessages from '../../../lib/shared-messages'
-import IntlHelmet from '../../../lib/components/intl-helmet'
+import PAGE_SIZES from '@console/constants/page-sizes'
 
-import PAGE_SIZES from '../../constants/page-sizes'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import GatewaysTable from '@console/containers/gateways-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 export default class GatewaysList extends React.Component {
   render() {

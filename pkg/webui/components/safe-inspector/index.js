@@ -18,9 +18,11 @@ import classnames from 'classnames'
 import clipboard from 'clipboard'
 import { defineMessages, injectIntl } from 'react-intl'
 
-import Icon from '../icon'
-import Message from '../../lib/components/message'
-import PropTypes from '../../lib/prop-types'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './safe-inspector.styl'
 
@@ -56,29 +58,32 @@ const m = defineMessages({
 @bind
 export class SafeInspector extends Component {
   static propTypes = {
-    /** The classname to be applied **/
+    /** The classname to be applied. */
     className: PropTypes.string,
-    /** The data to be displayed */
+    /** The data to be displayed. */
     data: PropTypes.string.isRequired,
-    /** Whether the component should resize when its data is truncated */
+    /** Whether the component should resize when its data is truncated. */
     disableResize: PropTypes.bool,
-    /** Whether the data can be hidden (like passwords) */
+    /** Whether the data can be hidden (like passwords). */
     hideable: PropTypes.bool,
-    /** Whether the data is initially visible */
+    /** Whether the data is initially visible. */
     initiallyVisible: PropTypes.bool,
-    /** Utility functions passed via react-intl hoc **/
+    /** Utility functions passed via react-intl HOC. */
     intl: PropTypes.shape({
       formatMessage: PropTypes.func,
     }).isRequired,
-    /** Whether the data is in byte format */
+    /** Whether the data is in byte format. */
     isBytes: PropTypes.bool,
-    /** Whether to hide the copy action */
+    /** Whether to hide the copy action. */
     noCopy: PropTypes.bool,
-    /** Whether to hide the copy popup click and just display checkmark */
+    /** Whether to hide the copy popup click and just display checkmark. */
     noCopyPopup: PropTypes.bool,
-    /** Whether to hide the data transform action */
+    /** Whether to hide the data transform action. */
     noTransform: PropTypes.bool,
-    /** Whether a smaller style should be rendered (useful for display in tables) */
+    /**
+     * Whether a smaller style should be rendered (useful for display in
+     * tables).
+     */
     small: PropTypes.bool,
   }
 

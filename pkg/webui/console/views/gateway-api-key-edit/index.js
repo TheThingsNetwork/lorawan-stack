@@ -18,29 +18,33 @@ import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import { replace } from 'connected-react-router'
 
-import PageTitle from '../../../components/page-title'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import sharedMessages from '../../../lib/shared-messages'
-import { ApiKeyEditForm } from '../../components/api-key-form'
-import withRequest from '../../../lib/components/with-request'
+import api from '@console/api'
 
-import { getApiKey } from '../../store/actions/api-keys'
+import PageTitle from '@ttn-lw/components/page-title'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import { ApiKeyEditForm } from '@console/components/api-key-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { getApiKey } from '@console/store/actions/api-keys'
+
 import {
   selectSelectedGatewayId,
   selectGatewayRights,
   selectGatewayPseudoRights,
   selectGatewayRightsError,
   selectGatewayRightsFetching,
-} from '../../store/selectors/gateways'
+} from '@console/store/selectors/gateways'
 import {
   selectSelectedApiKey,
   selectApiKeyError,
   selectApiKeyFetching,
-} from '../../store/selectors/api-keys'
-
-import api from '../../api'
-import PropTypes from '../../../lib/prop-types'
+} from '@console/store/selectors/api-keys'
 
 @connect(
   function(state, props) {

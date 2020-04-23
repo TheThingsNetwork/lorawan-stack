@@ -17,20 +17,22 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import PropTypes from '../../../lib/prop-types'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import PageTitle from '../../../components/page-title'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import PubsubForm from '../../components/pubsub-form'
-import toast from '../../../components/toast'
-import sharedMessages from '../../../lib/shared-messages'
+import api from '@console/api'
 
-import api from '../../api'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import PageTitle from '@ttn-lw/components/page-title'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import toast from '@ttn-lw/components/toast'
+
+import PubsubForm from '@console/components/pubsub-form'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
-  editPubsub: 'Edit PubSub',
-  updateSuccess: 'Successfully updated PubSub',
-  deleteSuccess: 'Successfully deleted PubSub',
+  editPubsub: 'Edit pub-sub',
+  updateSuccess: 'Pub-sub updated',
+  deleteSuccess: 'Pub-sub deleted',
 })
 
 @withBreadcrumb('apps.single.integrations.edit', function(props) {

@@ -15,16 +15,19 @@
 import React, { useState, useCallback } from 'react'
 import classnames from 'classnames'
 
-import Logo from '../../containers/logo'
-import NavigationBar from '../navigation/bar'
-import ProfileDropdown from '../profile-dropdown'
-import MobileMenu from '../mobile-menu'
-import Input from '../input'
-import PropTypes from '../../lib/prop-types'
-import Icon from '../../components/icon'
+import hamburgerMenuNormal from '@assets/misc/hamburger-menu-normal.svg'
+import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
-import hamburgerMenuNormal from '../../assets/misc/hamburger-menu-normal.svg'
-import hamburgerMenuClose from '../../assets/misc/hamburger-menu-close.svg'
+import Icon from '@ttn-lw/components/icon'
+import NavigationBar from '@ttn-lw/components/navigation/bar'
+import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
+import MobileMenu from '@ttn-lw/components/mobile-menu'
+import Input from '@ttn-lw/components/input'
+
+import Logo from '@ttn-lw/containers/logo'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import style from './header.styl'
 
 const Header = function({
@@ -88,24 +91,24 @@ const Header = function({
 }
 
 Header.propTypes = {
-  /** The classname applied to the component */
+  /** The classname applied to the component. */
   className: PropTypes.string,
-  /** The child node of the dropdown component */
+  /** The child node of the dropdown component. */
   dropdownItems: ProfileDropdown.propTypes.children,
   logo: PropTypes.node,
-  /** The child node of the mobile dropdown */
+  /** The child node of the mobile dropdown. */
   mobileDropdownItems: PropTypes.node.isRequired,
-  /** The Child node of the navigation bar */
+  /** The Child node of the navigation bar. */
   navigationEntries: NavigationBar.propTypes.children,
-  /** A handler for when the user used the search input */
+  /** A handler for when the user used the search input. */
   onLogout: PropTypes.func.isRequired,
-  /** Handler of the search function */
+  /** Handler of the search function. */
   onSearchRequest: PropTypes.func,
-  /* A flag indicating whether the header has a search input */
+  /* A flag indicating whether the header has a search input. */
   searchable: PropTypes.bool,
   /**
    * The User object, retrieved from the API. If it is `undefined`, then the
-   * guest header is rendered
+   * guest header is rendered.
    */
   user: PropTypes.user,
 }

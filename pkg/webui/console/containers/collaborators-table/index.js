@@ -15,11 +15,14 @@
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 
-import FetchTable from '../fetch-table'
-import Message from '../../../lib/components/message'
-import { getCollaboratorId } from '../../../lib/selectors/id'
-import sharedMessages from '../../../lib/shared-messages'
-import Icon from '../../../components/icon'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import FetchTable from '@console/containers/fetch-table'
+
+import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './collaborators-table.styl'
 

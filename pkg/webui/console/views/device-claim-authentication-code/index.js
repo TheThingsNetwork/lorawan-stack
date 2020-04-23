@@ -18,32 +18,34 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import ModalButton from '../../../components/button/modal-button'
-import Notification from '../../../components/notification'
-import toast from '../../../components/toast'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import ModalButton from '@ttn-lw/components/button/modal-button'
+import Notification from '@ttn-lw/components/notification'
+import toast from '@ttn-lw/components/toast'
 
-import { updateDevice } from '../../store/actions/devices'
-import { attachPromise } from '../../store/actions/lib'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { updateDevice } from '@console/store/actions/devices'
+import { attachPromise } from '@console/store/actions/lib'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 const m = defineMessages({
   deleteCode: 'Delete claim authentication code',
   deleteWarning: 'Are you sure you want to delete this claim authentication code?',
   noCodeSet: 'There is currently no claim authentication code set',
-  validateToDate: 'Invalid code expiration date',
-  deleteFailure: 'There was a problem deleting the claim authentication code',
-  deleteSuccess: 'The claim authentication code has been deleted successfully',
-  updateSuccess: 'The claim authentication code has been updated successfully',
-  validateCode: 'Only uppercase letters and numbers are allowed',
+  validateToDate: 'Expiration date must be after the validity date',
+  deleteFailure: 'There was an error and the claim authentication code could not be deleted',
+  deleteSuccess: 'Claim authentication deleted',
+  updateSuccess: 'Claim authentication updated',
+  validateCode: 'Claim authentication code must consist only of numbers and letters',
 })
 
 const validationSchema = Yup.object({
@@ -100,7 +102,7 @@ const DeviceClaimAuthenticationCode = props => {
     async (values, { resetForm, setSubmitting }) => {
       setError('')
 
-      // Convert any false value to undefined
+      // Convert any false value to undefined.
       for (const [key, value] of Object.entries(values.claim_authentication_code)) {
         values.claim_authentication_code[key] = value ? value : undefined
       }

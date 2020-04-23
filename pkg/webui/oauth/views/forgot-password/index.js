@@ -20,35 +20,37 @@ import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
 
-import api from '../../api'
-import sharedMessages from '../../../lib/shared-messages'
+import api from '@oauth/api'
 
-import Button from '../../../components/button'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitButton from '../../../components/submit-button'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import { id as userRegexp } from '../../../lib/regexp'
+import Button from '@ttn-lw/components/button'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitButton from '@ttn-lw/components/submit-button'
+
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { id as userRegexp } from '@ttn-lw/lib/regexp'
 
 import style from './forgot-password.styl'
 
 const m = defineMessages({
-  loginPage: 'Login Page',
-  forgotPassword: 'Forgot Password',
-  passwordRequested: 'You will receive an email with reset instructions shortly.',
-  goToLogin: 'Go to Login',
+  loginPage: 'Login page',
+  forgotPassword: 'Forgot password',
+  passwordRequested: 'You will receive an email with reset instructions shortly',
+  goToLogin: 'Go to login',
   send: 'Send',
   resetPasswordDescription:
     'Please enter your username to receive an email with reset instructions',
-  requestTempPassword: 'Reset Password',
+  requestTempPassword: 'Reset password',
 })
 
 const validationSchema = Yup.object().shape({
   user_id: Yup.string()
-    .min(3, sharedMessages.validateTooShort)
-    .max(36, sharedMessages.validateTooLong)
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(36, Yup.passValues(sharedMessages.validateTooLong))
     .matches(userRegexp, sharedMessages.validateIdFormat)
     .required(sharedMessages.validateRequired),
 })

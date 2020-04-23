@@ -17,16 +17,16 @@ import bind from 'autobind-decorator'
 import { defineMessages, injectIntl } from 'react-intl'
 import * as Yup from 'yup'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Select from '../../../components/select'
-import Checkbox from '../../../components/checkbox'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import ModalButton from '../../../components/button/modal-button'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import Select from '@ttn-lw/components/select'
+import Checkbox from '@ttn-lw/components/checkbox'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -40,11 +40,11 @@ const approvalStates = [
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   primary_email_address: Yup.string().email(sharedMessages.validateEmail),
   state: Yup.string().oneOf(approvalStates),
-  description: Yup.string().max(2000, sharedMessages.validateTooLong),
+  description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
 })
 
 const m = defineMessages({
@@ -57,7 +57,7 @@ const m = defineMessages({
   emailAddressDescription:
     'Primary email address used for logging in; this address is not publicly visible',
   modalWarning:
-    'Are you sure you want to delete the user "{userId}". This action cannot be undone and it will not be possible to reuse the user ID!',
+    'Are you sure you want to delete the user "{userId}". This action cannot be undone and it will not be possible to reuse the user ID.',
 })
 
 @injectIntl

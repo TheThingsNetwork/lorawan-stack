@@ -29,11 +29,20 @@ const KR_920_923 = "KR_920_923"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 922100000, MinDataRate: 0, MaxDataRate: 5},
-		{Frequency: 922300000, MinDataRate: 0, MaxDataRate: 5},
-		{Frequency: 922500000, MinDataRate: 0, MaxDataRate: 5},
+		{
+			Frequency:   922100000,
+			MaxDataRate: ttnpb.DATA_RATE_5,
+		},
+		{
+			Frequency:   922300000,
+			MaxDataRate: ttnpb.DATA_RATE_5,
+		},
+		{
+			Frequency:   922500000,
+			MaxDataRate: ttnpb.DATA_RATE_5,
+		},
 	}
-	const krBeaconFrequency = 923100000
+	const beaconFrequency = 923100000
 
 	downlinkDRTable := [6][6]ttnpb.DataRateIndex{
 		{0, 0, 0, 0, 0, 0},
@@ -63,14 +72,14 @@ func init() {
 		},
 
 		DataRates: map[ttnpb.DataRateIndex]DataRate{
-			0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-			1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-			2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-			3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
-			4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
-			5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			ttnpb.DATA_RATE_1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			ttnpb.DATA_RATE_2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			ttnpb.DATA_RATE_3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
+			ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
 		},
-		MaxADRDataRateIndex: 5,
+		MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -96,7 +105,7 @@ func init() {
 
 		Rx1Channel: channelIndexIdentity,
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
-			if idx > 5 {
+			if idx > ttnpb.DATA_RATE_5 {
 				return 0, errDataRateIndexTooHigh.WithAttributes("max", 5)
 			}
 			if offset > 5 {
@@ -114,18 +123,30 @@ func init() {
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,
 
-		DefaultRx2Parameters: Rx2Parameters{0, 921900000},
+		DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_0, 921900000},
 
 		Beacon: Beacon{
-			DataRateIndex:    3,
+			DataRateIndex:    ttnpb.DATA_RATE_3,
 			CodingRate:       "4/5",
-			ComputeFrequency: func(_ float64) uint64 { return krBeaconFrequency },
+			ComputeFrequency: func(_ float64) uint64 { return beaconFrequency },
 		},
-		PingSlotFrequency: uint64Ptr(krBeaconFrequency),
+		PingSlotFrequency: uint64Ptr(beaconFrequency),
 
 		// No LoRaWAN 1.0
 		// No LoRaWAN 1.0.1
-		regionalParameters1_0_2RevA: makeSetMaxTxPowerIndexFunc(6),
+		regionalParameters1_0_2RevA: func(b Band) Band {
+			b.DefaultMaxEIRP = 20
+			b.TxOffset = []float32{
+				0,
+				-6,
+				-10,
+				-12,
+				-15,
+				-18,
+				-20,
+			}
+			return b
+		},
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_0_3RevA: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,

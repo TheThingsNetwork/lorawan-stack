@@ -4193,6 +4193,15 @@
       "file": "membership_store.go"
     }
   },
+  "error:pkg/identityserver/store:migration_not_found": {
+    "translations": {
+      "en": "migration not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "store.go"
+    }
+  },
   "error:pkg/identityserver/store:multiple_application_ids": {
     "translations": {
       "en": "can not list devices for multiple application IDs"

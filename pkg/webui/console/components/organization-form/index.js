@@ -17,25 +17,26 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
 
-import { id as organizationIdRegexp } from '../../lib/regexp'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { id as organizationIdRegexp } from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({
     organization_id: Yup.string()
       .matches(organizationIdRegexp, sharedMessages.validateIdFormat)
-      .min(2, sharedMessages.validateTooShort)
-      .max(25, sharedMessages.validateTooLong)
+      .min(2, Yup.passValues(sharedMessages.validateTooShort))
+      .max(25, Yup.passValues(sharedMessages.validateTooLong))
       .required(sharedMessages.validateRequired),
   }),
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  description: Yup.string().max(2000, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
+  description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
 })
 
 const m = defineMessages({
@@ -43,7 +44,7 @@ const m = defineMessages({
   orgDescDescription:
     'Optional organization description; can also be used to save notes about the organization',
   orgIdPlaceholder: 'my-new-organization',
-  orgNamePlaceholder: 'My New Organization',
+  orgNamePlaceholder: 'My new organization',
 })
 
 class OrganizationForm extends React.Component {

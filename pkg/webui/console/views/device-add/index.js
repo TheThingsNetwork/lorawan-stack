@@ -18,17 +18,21 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import PageTitle from '../../../components/page-title'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import DeviceDataForm from '../../components/device-data-form'
-import sharedMessages from '../../../lib/shared-messages'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { getDeviceId } from '../../../lib/selectors/id'
-import PropTypes from '../../../lib/prop-types'
-import { mayEditApplicationDeviceKeys, checkFromState } from '../../lib/feature-checks'
+import api from '@console/api'
 
-import api from '../../api'
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+
+import DeviceDataForm from '@console/components/device-data-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { getDeviceId } from '@ttn-lw/lib/selectors/id'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayEditApplicationDeviceKeys, checkFromState } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 @connect(
   state => ({

@@ -16,7 +16,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { defineMessages } from 'react-intl'
 
-import ErrorNotification from '../error-notification'
+import ErrorNotification from '.'
 
 const m = defineMessages({
   problem: 'We got a problem here!',

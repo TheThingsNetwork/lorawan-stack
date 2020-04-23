@@ -17,21 +17,25 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 
-import PageTitle from '../../../components/page-title'
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import ApplicationEvents from '../../containers/application-events'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import { mayViewApplicationEvents } from '../../lib/feature-checks'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
+import ApplicationEvents from '@console/containers/application-events'
 
-import PropTypes from '../../../lib/prop-types'
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayViewApplicationEvents } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+
 import style from './application-data.styl'
 
 const m = defineMessages({
-  appData: 'Application Data',
+  appData: 'Application data',
 })
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))

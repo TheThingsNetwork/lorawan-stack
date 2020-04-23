@@ -14,6 +14,7 @@
 
 /**
  * Extracts hostname from the `url`.
+ *
  * @param {string} url - The URL string.
  * @returns {string?} - The hostname of the `url` or undefined.
  */

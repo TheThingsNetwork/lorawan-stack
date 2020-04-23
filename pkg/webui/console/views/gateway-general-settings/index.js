@@ -20,30 +20,35 @@ import { Col, Row, Container } from 'react-grid-system'
 import { bindActionCreators } from 'redux'
 import { replace } from 'connected-react-router'
 
-import toast from '../../../components/toast'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import GatewayDataForm from '../../components/gateway-data-form'
-import ModalButton from '../../../components/button/modal-button'
-import FormSubmit from '../../../components/form/submit'
-import SubmitButton from '../../../components/submit-button'
-import PageTitle from '../../../components/page-title'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-import Require from '../../lib/components/require'
-import diff from '../../../lib/diff'
+import toast from '@ttn-lw/components/toast'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import ModalButton from '@ttn-lw/components/button/modal-button'
+import FormSubmit from '@ttn-lw/components/form/submit'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import PageTitle from '@ttn-lw/components/page-title'
 
-import { updateGateway, deleteGateway } from '../../store/actions/gateways'
-import { attachPromise } from '../../store/actions/lib'
-import { selectSelectedGateway, selectSelectedGatewayId } from '../../store/selectors/gateways'
-import { mayEditBasicGatewayInformation, mayDeleteGateway } from '../../lib/feature-checks'
+import GatewayDataForm from '@console/components/gateway-data-form'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+import Require from '@console/lib/components/require'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import diff from '@ttn-lw/lib/diff'
+
+import { mayEditBasicGatewayInformation, mayDeleteGateway } from '@console/lib/feature-checks'
+
+import { attachPromise } from '@console/store/actions/lib'
+import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
+
+import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 const m = defineMessages({
-  updateSuccess: 'Successfully updated gateway',
-  deleteGateway: 'Delete Gateway',
+  updateSuccess: 'Gateway updated',
+  deleteGateway: 'Delete gateway',
   modalWarning:
-    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID!',
+    'Are you sure you want to delete "{gtwName}"? This action cannot be undone and it will not be possible to reuse the gateway ID.',
 })
 
 @connect(

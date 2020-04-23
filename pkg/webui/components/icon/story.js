@@ -17,6 +17,7 @@ import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import style from './story.styl'
+
 import Icon from '.'
 
 const icons = [

@@ -16,10 +16,12 @@ import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import classnames from 'classnames'
 
-import DateTime from '../../../lib/components/date-time'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
+import DateTime from '@ttn-lw/lib/components/date-time'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import style from './entity-title-section.styl'
 
 const EntityTitleSection = ({ entityName, entityId, description, creationDate, children }) => {

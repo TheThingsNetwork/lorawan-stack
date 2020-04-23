@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '../../../api'
-import * as organizations from '../../actions/organizations'
-import { selectUserId } from '../../selectors/user'
+import api from '@console/api'
+
+import * as organizations from '@console/store/actions/organizations'
+
+import { selectUserId } from '@console/store/selectors/user'
+
 import createRequestLogic from './lib'
 import createEventsConnectLogics from './events'
 

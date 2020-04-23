@@ -12,10 +12,9 @@ To list users with the CLI, use the `users list` command. Make sure to specify t
 $ ttn-lw-cli users list --name --state --admin
 ```
 
-> **TIP:** Use the pagination flags `--limit` and `--page` when there are many users.
+Output:
 
-<details><summary>Show output</summary>
-```
+```json
 [{
   "ids": {
     "user_id": "new-user"
@@ -33,7 +32,9 @@ $ ttn-lw-cli users list --name --state --admin
   "admin": true
 }]
 ```
-</details>
+
+> **TIP:** Use the pagination flags `--limit` and `--page` when there are many users.
+
 
 ## Searching for Users
 
@@ -43,10 +44,9 @@ To search for users with the CLI, use the `users search` command. Make sure to s
 $ ttn-lw-cli users search --id-contains new --name
 ```
 
-> **TIP:** Use the pagination flags `--limit` and `--page` when there are many users.
+Output:
 
-<details><summary>Show output</summary>
-```
+```json
 [{
   "ids": {
     "user_id": "new-user"
@@ -56,7 +56,9 @@ $ ttn-lw-cli users search --id-contains new --name
   "name": "New User"
 }]
 ```
-</details>
+
+> **TIP:** Use the pagination flags `--limit` and `--page` when there are many users.
+
 
 ## Creating Users
 
@@ -68,10 +70,13 @@ $ ttn-lw-cli users create colleague \
   --primary-email-address colleague@thethings.network
 ```
 
-<details><summary>Show output</summary>
-```
+Output:
+
+```bash
 Please enter password:***************
 Please confirm password:***************
+```
+```json
 {
   "ids": {
     "user_id": "colleague"
@@ -90,7 +95,6 @@ Please confirm password:***************
   "state": "STATE_APPROVED"
 }
 ```
-</details>
 
 ## Inviting Users
 
@@ -106,8 +110,9 @@ After you do this, you'll be able to list the invitations you've sent:
 % ttn-lw-cli users invitations list
 ```
 
-<details><summary>Show output</summary>
-```
+Output:
+
+```json
 [{
   "email": "colleague@thethings.network",
   "token": "MW7INQWYOE46GLP3AEFQEHR5XIKRYPSRAXFF3CUCLIQPPQ3BNBLQ",
@@ -116,7 +121,6 @@ After you do this, you'll be able to list the invitations you've sent:
   "updated_at": "2019-12-19T11:41:29.486Z"
 }]
 ```
-</details>
 
 And delete an invitation if you want to revoke it:
 
@@ -132,8 +136,9 @@ To update users with the CLI, use the `users update` command. The following comm
 $ ttn-lw-cli users update new-user --state APPROVED --admin true
 ```
 
-<details><summary>Show output</summary>
-```
+Output:
+
+```json
 {
   "ids": {
     "user_id": "new-user"
@@ -144,7 +149,6 @@ $ ttn-lw-cli users update new-user --state APPROVED --admin true
   "admin": true
 }
 ```
-</details>
 
 ## Deleting Users
 

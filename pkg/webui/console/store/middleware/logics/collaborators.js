@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as collaborators from '../../actions/collaborators'
+import api from '@console/api'
 
-import api from '../../../api'
+import * as collaborators from '@console/store/actions/collaborators'
+
 import createRequestLogic from './lib'
 
 const validParentTypes = ['application', 'gateway', 'organization']
@@ -22,7 +23,7 @@ const validParentTypes = ['application', 'gateway', 'organization']
 const parentTypeValidator = function({ action }, allow) {
   if (!validParentTypes.includes(action.payload.parentType)) {
     // Do not reject the action but throw an error, as this is an implementation
-    // error
+    // error.
     throw new Error(`Invalid parent entity type ${action.payload.parentType}`)
   }
   allow(action)

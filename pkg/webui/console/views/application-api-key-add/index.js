@@ -18,23 +18,26 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import PageTitle from '../../../components/page-title'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import sharedMessages from '../../../lib/shared-messages'
-import { ApiKeyCreateForm } from '../../components/api-key-form'
+import api from '@console/api'
 
-import { getApplicationsRightsList } from '../../store/actions/applications'
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+
+import { ApiKeyCreateForm } from '@console/components/api-key-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { getApplicationsRightsList } from '@console/store/actions/applications'
+
 import {
   selectSelectedApplicationId,
   selectApplicationRights,
   selectApplicationPseudoRights,
   selectApplicationRightsError,
   selectApplicationRightsFetching,
-} from '../../store/selectors/applications'
-
-import api from '../../api'
-import PropTypes from '../../../lib/prop-types'
+} from '@console/store/selectors/applications'
 
 @connect(
   state => ({

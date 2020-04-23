@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { selectApplicationRootPath } from '../../lib/selectors/env'
-import stringToHash from '../../lib/string-to-hash'
+import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
+import stringToHash from '@ttn-lw/lib/string-to-hash'
 
 const hash = stringToHash(selectApplicationRootPath())
 const hashKey = key => `${key}-${hash}`

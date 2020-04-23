@@ -15,10 +15,13 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import NavigationLink from '../link'
-import Message from '../../../lib/components/message'
-import Icon from '../../icon'
-import PropTypes from '../../../lib/prop-types'
 
 import style from './bar.styl'
 

@@ -19,25 +19,29 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { replace } from 'connected-react-router'
 
-import PropTypes from '../../../lib/prop-types'
-import toast from '../../../components/toast'
-import sharedMessages from '../../../lib/shared-messages'
-import withRequest from '../../../lib/components/with-request'
-import PageTitle from '../../../components/page-title'
-import UserDataForm from '../../components/user-data-form'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
+import toast from '@ttn-lw/components/toast'
+import PageTitle from '@ttn-lw/components/page-title'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
-import diff from '../../../lib/diff'
-import { selectSelectedUser } from '../../store/selectors/users'
-import { getUser, updateUser, deleteUser } from '../../store/actions/users'
-import { attachPromise } from '../../store/actions/lib'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import UserDataForm from '@console/components/user-data-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import diff from '@ttn-lw/lib/diff'
+
+import { getUser, updateUser, deleteUser } from '@console/store/actions/users'
+import { attachPromise } from '@console/store/actions/lib'
+
+import { selectSelectedUser } from '@console/store/selectors/users'
 
 const m = defineMessages({
-  updateSuccess: 'User updated successfully',
-  updateFailure: 'There was a problem updating the user',
-  deleteFailure: 'There was a problem deleting the user',
-  deleteSuccess: 'User deleted successfully',
+  updateSuccess: 'User updated',
+  updateFailure: 'There was an error and the user could not be updated',
+  deleteFailure: 'There was an error and the user could not be deleted',
+  deleteSuccess: 'User deleted',
 })
 
 @connect(

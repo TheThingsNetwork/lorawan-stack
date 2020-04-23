@@ -17,17 +17,20 @@ import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import PageTitle from '../../../components/page-title'
-import OrganizationForm from '../../components/organization-form'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import Form from '../../../components/form'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import { getOrganizationId } from '../../../lib/selectors/id'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import PageTitle from '@ttn-lw/components/page-title'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Form from '@ttn-lw/components/form'
 
-import { mayCreateOrganizations } from '../../lib/feature-checks'
+import OrganizationForm from '@console/components/organization-form'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
+
+import { mayCreateOrganizations } from '@console/lib/feature-checks'
 
 const initialValues = {
   ids: {
@@ -38,7 +41,7 @@ const initialValues = {
 }
 
 const m = defineMessages({
-  createOrganization: 'Create Organization',
+  createOrganization: 'Create organization',
 })
 
 @withFeatureRequirement(mayCreateOrganizations, { redirect: '/organizations' })

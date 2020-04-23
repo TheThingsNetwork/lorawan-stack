@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import reducer, { defaultState } from '../gateway-status'
-
 import {
   getGateway,
   updateGatewayStatisticsSuccess,

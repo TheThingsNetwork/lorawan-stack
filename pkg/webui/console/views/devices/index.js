@@ -16,18 +16,22 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import DeviceList from '../device-list'
-import DeviceAdd from '../device-add'
-import DeviceImport from '../device-import'
-import Device from '../device'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-import { mayViewApplicationDevices } from '../../lib/feature-checks'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import PropTypes from '../../../lib/prop-types'
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import Device from '@console/views/device'
+import DeviceImport from '@console/views/device-import'
+import DeviceAdd from '@console/views/device-add'
+import DeviceList from '@console/views/device-list'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewApplicationDevices } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))
 @withFeatureRequirement(mayViewApplicationDevices, {

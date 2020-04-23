@@ -15,16 +15,17 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import withRequest from '../../../lib/components/with-request'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import { getPubsub, updatePubsub } from '@console/store/actions/pubsubs'
+import { attachPromise } from '@console/store/actions/lib'
 
 import {
   selectSelectedPubsub,
   selectPubsubFetching,
   selectPubsubError,
-} from '../../store/selectors/pubsubs'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { getPubsub, updatePubsub } from '../../store/actions/pubsubs'
-import { attachPromise } from '../../store/actions/lib'
+} from '@console/store/selectors/pubsubs'
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 const pubsubEntitySelector = [
   'base_topic',

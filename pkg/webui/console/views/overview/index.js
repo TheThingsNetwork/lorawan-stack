@@ -18,35 +18,39 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 
-import sharedMessages from '../../../lib/shared-messages'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import { withEnv } from '../../../lib/components/env'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
-import Status from '../../../components/status'
-import Spinner from '../../../components/spinner'
-import Link from '../../../components/link'
-import Animation from '../../../lib/components/animation'
-import { selectApplicationsTotalCount } from '../../store/selectors/applications'
-import { getApplicationsList, GET_APPS_LIST_BASE } from '../../store/actions/applications'
-import { selectGatewaysTotalCount } from '../../store/selectors/gateways'
-import { getGatewaysList, GET_GTWS_LIST_BASE } from '../../store/actions/gateways'
-import { createFetchingSelector } from '../../store/selectors/fetching'
-import { selectUserId, selectUserRights } from '../../store/selectors/user'
+import ServerIcon from '@assets/auxiliary-icons/server.svg'
+import AppAnimation from '@assets/animations/illustrations/app.json'
+import GatewayAnimation from '@assets/animations/illustrations/gateway.json'
+
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Status from '@ttn-lw/components/status'
+import Spinner from '@ttn-lw/components/spinner'
+import Link from '@ttn-lw/components/link'
+
+import Message from '@ttn-lw/lib/components/message'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import { withEnv } from '@ttn-lw/lib/components/env'
+import Animation from '@ttn-lw/lib/components/animation'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import {
   mayViewApplications,
   mayViewGateways,
   mayCreateApplications,
   mayCreateGateways,
-} from '../../lib/feature-checks'
+} from '@console/lib/feature-checks'
 
-import ServerIcon from '../../../assets/auxiliary-icons/server.svg'
-import AppAnimation from '../../../assets/animations/illustrations/app.json'
-import GatewayAnimation from '../../../assets/animations/illustrations/gateway.json'
+import { getApplicationsList, GET_APPS_LIST_BASE } from '@console/store/actions/applications'
+import { getGatewaysList, GET_GTWS_LIST_BASE } from '@console/store/actions/gateways'
 
-import PropTypes from '../../../lib/prop-types'
+import { selectApplicationsTotalCount } from '@console/store/selectors/applications'
+import { selectGatewaysTotalCount } from '@console/store/selectors/gateways'
+import { createFetchingSelector } from '@console/store/selectors/fetching'
+import { selectUserId, selectUserRights } from '@console/store/selectors/user'
+
 import style from './overview.styl'
 
 const m = defineMessages({
@@ -56,10 +60,10 @@ const m = defineMessages({
   gotoGateways: 'Go to gateways',
   welcome: 'Welcome to the Console!',
   welcomeBack: 'Welcome back, {userId}! 👋',
-  getStarted: 'Get started right away by creating an application or registering a gateway.',
-  continueWorking: 'Walk right through to your applications and/or gateways.',
-  componentStatus: 'Component Status',
-  versionInfo: 'Version Info',
+  getStarted: 'Get started right away by creating an application or registering a gateway',
+  continueWorking: 'Walk right through to your applications and/or gateways',
+  componentStatus: 'Component status',
+  versionInfo: 'Version info',
 })
 
 const componentMap = {

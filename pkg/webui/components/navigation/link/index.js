@@ -14,12 +14,12 @@
 
 import React from 'react'
 import classnames from 'classnames'
-
 import { NavLink } from 'react-router-dom'
 
-import Link from '../../link'
+import Link from '@ttn-lw/components/link'
 
-import PropTypes from '../../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import style from './link.styl'
 
 const NavigationLink = function({
@@ -59,15 +59,12 @@ NavigationLink.propTypes = {
   activeClassName: PropTypes.string,
   children: PropTypes.node,
   className: PropTypes.string,
-  /**
-   * Boolean flag identifying whether the path should
-   * be matched exactly
-   */
+  /** Boolean flag identifying whether the path shoul be matched exactly. */
   exact: PropTypes.bool,
   onClick: PropTypes.func,
-  /** The path for a link */
+  /** The path for a link. */
   path: PropTypes.string.isRequired,
-  /** The name of a css class to be applied on the active tab */
+  /** The name of a css class to be applied on the active tab. */
 }
 
 NavigationLink.defaultProps = {

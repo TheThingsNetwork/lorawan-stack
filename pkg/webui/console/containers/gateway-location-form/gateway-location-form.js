@@ -16,13 +16,15 @@ import React, { useCallback, useState } from 'react'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
-import LocationForm from '../../components/location-form'
-import Checkbox from '../../../components/checkbox'
-import Form from '../../../components/form'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Form from '@ttn-lw/components/form'
 
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '../../lib/regexp'
+import LocationForm from '@console/components/location-form'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '@console/lib/regexp'
 
 const m = defineMessages({
   locationDescription: 'The location of this gateway may be publicly displayed',
@@ -30,7 +32,7 @@ const m = defineMessages({
   updateLocationFromStatusDescription:
     'Update the location of this gateway based on incoming status messages',
   setGatewayLocation: 'Gateway antenna location settings',
-  locationSource: 'Location Source',
+  locationSource: 'Location source',
   privacy: 'Privacy',
   publishLocation: 'Publish location',
 })
@@ -39,7 +41,7 @@ const validationSchema = Yup.object().shape({
   latitude: Yup.number().when('update_location_from_status', {
     is: false,
     then: schema =>
-      schema.test('is-valid-latitude', sharedMessages.validateLatLong, value =>
+      schema.test('is-valid-latitude', sharedMessages.validateLat, value =>
         latitudeRegexp.test(String(value)),
       ),
     otherwise: schema => schema.strip(),
@@ -47,7 +49,7 @@ const validationSchema = Yup.object().shape({
   longitude: Yup.number().when('update_location_from_status', {
     is: false,
     then: schema =>
-      schema.test('is-valid-longitude', sharedMessages.validateLatLong, value =>
+      schema.test('is-valid-longitude', sharedMessages.validateLong, value =>
         longitudeRegexp.test(String(value)),
       ),
     otherwise: schema => schema.strip(),
@@ -97,14 +99,14 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
       if (!values.update_location_from_status) {
         const registryLocation = getRegistryLocation(gateway.antennas)
         if (registryLocation) {
-          // Update old location value
+          // Update old location value.
           patch.antennas = [...gateway.antennas]
           patch.antennas[registryLocation.key].location = {
             ...registryLocation.antenna.location,
             ...values,
           }
         } else {
-          // Create new location value
+          // Create new location value.
           patch.antennas = [
             {
               gain: 0,

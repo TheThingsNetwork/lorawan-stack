@@ -23,10 +23,12 @@ import Require from './require'
  * necessary authorization to view the wrapped component. It can be set up to
  * either redirect to another route, to render something different or to not
  * render anything if the requirement is not met.
- * @param {Object} featureCheck - The feature check object containing the right
+ *
+ * @param {object} featureCheck - The feature check object containing the right
  * selector as well as the check itself.
- * @param {Object} otherwise - A configuration object determining what should be
- * rendered if the requirement was not met. If not set, nothing will be rendered.
+ * @param {object} otherwise - A configuration object determining what should be
+ * rendered if the requirement was not met. If not set, nothing will be
+ * rendered.
  * @returns {Function} - An instance of the `withFeatureRequirement` HOC.
  */
 const withFeatureRequirement = (featureCheck, otherwise) => Component =>

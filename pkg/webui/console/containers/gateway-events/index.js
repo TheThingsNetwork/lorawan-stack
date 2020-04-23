@@ -16,16 +16,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../../lib/prop-types'
-import EventsSubscription from '../../containers/events-subscription'
+import EventsSubscription from '@console/containers/events-subscription'
 
-import { clearGatewayEventsStream, startGatewayEventsStream } from '../../store/actions/gateways'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { clearGatewayEventsStream, startGatewayEventsStream } from '@console/store/actions/gateways'
 
 import {
   selectGatewayEvents,
   selectGatewayEventsStatus,
   selectGatewayEventsError,
-} from '../../store/selectors/gateways'
+} from '@console/store/selectors/gateways'
 
 @connect(
   null,

@@ -16,9 +16,11 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import PropTypes from '../../lib/prop-types'
-import Message from '../../lib/components/message'
-import sharedMessages from '../../lib/shared-messages'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import { CheckboxGroupContext } from './group'
 
 import style from './checkbox.styl'

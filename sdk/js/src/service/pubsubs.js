@@ -22,7 +22,7 @@ class PubSub {
   }
 
   _fillZeroValues(pubsub, paths) {
-    // Add zero values that would otherwise be swallowed by the http bridge
+    // Add zero values that would otherwise be swallowed by the http bridge.
     if (
       (paths.includes('provider.mqtt') || paths.includes('provider.mqtt.publish_qos')) &&
       'mqtt' in pubsub &&

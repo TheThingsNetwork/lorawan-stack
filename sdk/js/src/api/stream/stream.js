@@ -13,15 +13,17 @@
 // limitations under the License.
 
 import ArrayBufferToString from 'arraybuffer-to-string'
+
 import Token from '../../util/token'
+
 import { notify, EVENTS } from './shared'
-import 'web-streams-polyfill/dist/polyfill.js'
+import 'web-streams-polyfill/dist/polyfill'
 
 /**
  * Opens a new stream.
  *
  * @async
- * @param {Object} payload  - The body of the initial request.
+ * @param {object} payload -  - The body of the initial request.
  * @param {string} url - The stream endpoint.
  *
  * @example
@@ -31,18 +33,18 @@ import 'web-streams-polyfill/dist/polyfill.js'
  *      '/api/v3/events',
  *    )
  *
- *    // add listeners to the stream
+ *    // Add listeners to the stream.
  *    stream
  *      .on('start', () => console.log('conn opened'));
  *      .on('chunk', chunk => console.log('received chunk', chunk));
  *      .on('error', error => console.log(error));
  *      .on('close', () => console.log('conn closed'))
  *
- *    // close the stream after 20 s
+ *    // Close the stream after 20 s.
  *    setTimeout(() => stream.close(), 20000)
  * })()
  *
- * @returns {Object} The stream subscription object with the `on` function for
+ * @returns {object} The stream subscription object with the `on` function for
  * attaching listeners and the `close` function to close the stream.
  */
 export default async function(payload, url) {

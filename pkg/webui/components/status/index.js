@@ -15,8 +15,10 @@
 import React from 'react'
 import classnames from 'classnames'
 import { defineMessages, injectIntl } from 'react-intl'
-import Message from '../../lib/components/message'
-import PropTypes from '../../lib/prop-types'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './status.styl'
 

@@ -18,15 +18,16 @@ import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import debounce from '../../../lib/debounce'
+import PAGE_SIZES from '@console/constants/page-sizes'
 
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import Tabular from '../../../components/table'
-import Input from '../../../components/input'
-import Button from '../../../components/button'
-import Tabs from '../../../components/tabs'
-import PAGE_SIZES from '../../constants/page-sizes'
+import Tabular from '@ttn-lw/components/table'
+import Input from '@ttn-lw/components/input'
+import Button from '@ttn-lw/components/button'
+import Tabs from '@ttn-lw/components/tabs'
+
+import debounce from '@ttn-lw/lib/debounce'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './fetch-table.styl'
 
@@ -227,7 +228,7 @@ class FetchTable extends Component {
 
     let itemIndex = index
     if (handlesPagination) {
-      const pageNr = page - 1 // switch to 0-based pagination
+      const pageNr = page - 1 // Switch to 0-based pagination.
       itemIndex += pageSize * pageNr
     }
 
@@ -264,7 +265,7 @@ class FetchTable extends Component {
     const { page, query, tab, order } = this.state
     let orderDirection, orderBy
 
-    // Parse order string
+    // Parse order string.
     if (typeof order === 'string') {
       orderDirection = typeof order === 'string' && order[0] === '-' ? 'desc' : 'asc'
       orderBy = typeof order === 'string' && order[0] === '-' ? order.substr(1) : order

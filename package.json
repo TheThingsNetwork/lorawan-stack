@@ -1,6 +1,6 @@
 {
   "name": "ttn-stack",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "description": "The Things Stack",
   "main": "index.js",
   "repository": "https://github.com/TheThingsNetwork/lorawan-stack.git",
@@ -41,10 +41,11 @@
     "eslint": "^6.2.2",
     "eslint-config-prettier": "^6.0.0",
     "eslint-config-ttn": "git+https://github.com/TheThingsNetwork/eslint-config-ttn.git#v1.4.0",
+    "eslint-import-resolver-webpack": "^0.12.1",
     "eslint-plugin-babel": "^4.1.2",
-    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jest": "^21.17.0",
-    "eslint-plugin-jsdoc": "^3.7.1",
+    "eslint-plugin-jsdoc": "^24.0.0",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.4.0",
     "file-loader": "^1.1.11",
@@ -133,7 +134,11 @@
       "\\.(jpg|jpeg|svg|png|woff|woff2|ttf|eot|gif|webp)$": "<rootDir>/config/jest/files.transform.js"
     },
     "moduleNameMapper": {
-      "\\.(css|styl|less|sass)$": "identity-obj-proxy"
+      "\\.(css|styl|less|sass)$": "identity-obj-proxy",
+      "^\\@ttn-lw(.*)": "<rootDir>/pkg/webui$1",
+      "^\\@console(.*)": "<rootDir>/pkg/webui/console$1",
+      "^\\@oauth(.*)": "<rootDir>/pkg/webui/oauth$1",
+      "^\\@assets(.*)": "<rootDir>/pkg/webuiassets$1"
     }
   },
   "eslintConfig": {

@@ -18,22 +18,24 @@ import { Col, Row, Container } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import sharedMessages from '../../../lib/shared-messages'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import LocationForm from '../../components/location-form'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import IntlHelmet from '../../../lib/components/intl-helmet'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import { updateDevice } from '../../store/actions/devices'
-import { attachPromise } from '../../store/actions/lib'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
+import LocationForm from '@console/components/location-form'
 
-import PropTypes from '../../../lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { updateDevice } from '@console/store/actions/devices'
+import { attachPromise } from '@console/store/actions/lib'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 const m = defineMessages({
-  setDeviceLocation: 'Set Device Location',
+  setDeviceLocation: 'Set end device location',
 })
 
 const getRegistryLocation = function(locations) {
@@ -86,13 +88,13 @@ export default class DeviceGeneralSettings extends React.Component {
 
     const registryLocation = getRegistryLocation(device.locations)
     if (registryLocation) {
-      // Update old location value
+      // Update old location value.
       patch.locations[registryLocation.key] = {
         ...registryLocation.location,
         ...values,
       }
     } else {
-      // Create new location value
+      // Create new location value.
       patch.locations.user = {
         ...values,
         accuracy: 0,

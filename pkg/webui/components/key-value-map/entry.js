@@ -16,14 +16,15 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import PropTypes from '../../lib/prop-types'
-import Input from '../input'
-import Button from '../button'
+import Input from '@ttn-lw/components/input'
+import Button from '@ttn-lw/components/button'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './key-value-map.styl'
 
 const m = defineMessages({
-  deleteEntry: 'Delete Entry',
+  deleteEntry: 'Delete entry',
 })
 
 @bind

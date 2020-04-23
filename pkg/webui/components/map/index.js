@@ -17,11 +17,11 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Leaflet from 'leaflet'
 
-import MarkerIcon from '../../assets/auxiliary-icons/location_pin.svg'
+import MarkerIcon from '@assets/auxiliary-icons/location_pin.svg'
 
 import style from './map.styl'
 
-// Reset default marker icon
+// Reset default marker icon.
 delete Leaflet.Icon.Default.prototype._getIconUrl
 Leaflet.Icon.Default.mergeOptions({
   iconRetinaUrl: MarkerIcon,
@@ -31,6 +31,7 @@ Leaflet.Icon.Default.mergeOptions({
   iconAnchor: [13, 36],
   shadowAnchor: [8, 37],
   popupAnchor: [0, -40],
+  // eslint-disable-next-line import/no-commonjs
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 })
 
@@ -38,16 +39,20 @@ export default class Map extends React.Component {
   static propTypes = {
     // Id is a string used to give the map a unique ID.
     id: PropTypes.string.isRequired,
-    // LeafletConfig is an object which can contain any number of properties defined by the leaflet plugin and is used to overwrite the default configuration of leaflet.
+    // LeafletConfig is an object which can contain any number of properties
+    // defined by the leaflet plugin and is used to overwrite the default
+    // configuration of leaflet.
     leafletConfig: PropTypes.shape({}),
-    // Markers is an array of objects containing a specific properties
+    // Markers is an array of objects containing a specific properties.
     markers: PropTypes.arrayOf(
-      // Position is a object containing two properties latitude and longitude which are both numbers.
+      // Position is a object containing two properties latitude and longitude
+      // which are both numbers.
       PropTypes.shape({
         position: PropTypes.objectOf(PropTypes.number),
       }),
     ).isRequired,
-    // Widget is a boolean used to add a class name to the map container div for styling.
+    // Widget is a boolean used to add a class name to the map container div for
+    // styling.
     widget: PropTypes.bool,
   }
 
@@ -57,9 +62,10 @@ export default class Map extends React.Component {
   }
 
   getMapCenter(markers) {
-    // This will calculate zoom and map center long/lang based on all markers provided.
-    // Currently it just returns the first marker.
-    // TODO: action (https://github.com/TheThingsNetwork/lorawan-stack/issues/1241)
+    // This will calculate zoom and map center long/lang based on all markers
+    // provided. Currently it just returns the first marker.
+    // TODO: Add multiple markers
+    // https://github.com/TheThingsNetwork/lorawan-stack/issues/1241
     return markers[0]
   }
 

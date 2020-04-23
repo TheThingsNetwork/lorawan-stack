@@ -17,12 +17,14 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import { withRouter } from 'react-router-dom'
 
-import PropTypes from '../../../../lib/prop-types'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import SideNavigationList from '../list'
 import NavigationLink from '../../link'
-import Message from '../../../../lib/components/message'
-import Icon from '../../../icon'
 import SideNavigationContext from '../context'
 
 import style from './item.styl'
@@ -34,16 +36,16 @@ export class SideNavigationItem extends React.PureComponent {
     children: PropTypes.node,
     className: PropTypes.string,
     depth: PropTypes.number,
-    /** A flag specifying whether the path of the linkable item should be matched exactly or not */
+    /** A flag specifying whether the path of the linkable item should be matched exactly or not. */
     exact: PropTypes.bool,
-    /** The name of the icon for the side navigation item */
+    /** The name of the icon for the side navigation item. */
     icon: PropTypes.string,
-    /** A flag specifying whether the side navigation item is active or not */
+    /** A flag specifying whether the side navigation item is active or not. */
     isActive: PropTypes.bool,
     location: PropTypes.location.isRequired,
-    /** The path of the linkable side navigation item */
+    /** The path of the linkable side navigation item. */
     path: PropTypes.string,
-    /** The title of the side navigation item */
+    /** The title of the side navigation item. */
     title: PropTypes.message.isRequired,
   }
 

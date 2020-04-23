@@ -15,7 +15,8 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 
-import Button from '../button'
+import Button from '@ttn-lw/components/button'
+
 import SubmitBar from '.'
 
 storiesOf('SubmitBar', module)
@@ -33,6 +34,6 @@ storiesOf('SubmitBar', module)
   .add('Submit and Text', () => (
     <SubmitBar align="start">
       <Button message="Save Changes" icon="done" />
-      <SubmitBar.Message content="Note: Device level message payload formats take precedence over application level message payload formats." />
+      <SubmitBar.Message content="Note: End device level message payload formats take precedence over application level message payload formats" />
     </SubmitBar>
   ))

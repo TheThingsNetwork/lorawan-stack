@@ -18,18 +18,22 @@ import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 import queryString from 'query-string'
 import { connect } from 'react-redux'
-import PropTypes from '../../../lib/prop-types'
-import Spinner from '../../../components/spinner'
-import Message from '../../../lib/components/message'
-import ErrorNotification from '../../../components/error-notification'
-import Notification from '../../../components/notification'
-import api from '../../api'
-import sharedMessages from '../../../lib/shared-messages'
+
+import api from '@oauth/api'
+
+import Spinner from '@ttn-lw/components/spinner'
+import ErrorNotification from '@ttn-lw/components/error-notification'
+import Notification from '@ttn-lw/components/notification'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
-  validateSuccess: 'Contact info validated successfully',
-  validateFail: 'Contact info validation failed',
-  goToLogin: 'Go to Login',
+  validateSuccess: 'Contact info validated',
+  validateFail: 'There was an error and the contact info could not be validated',
+  goToLogin: 'Go to login',
 })
 
 @connect(

@@ -14,24 +14,27 @@
 
 import React from 'react'
 
-import SubmitButton from '../../../../components/submit-button'
-import SubmitBar from '../../../../components/submit-bar'
-import Checkbox from '../../../../components/checkbox'
-import Input from '../../../../components/input'
-import Radio from '../../../../components/radio-button'
-import Select from '../../../../components/select'
-import Form from '../../../../components/form'
-import { NsFrequencyPlansSelect } from '../../../containers/freq-plans-select'
-import DevAddrInput from '../../../containers/dev-addr-input'
-import Notification from '../../../../components/notification'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Input from '@ttn-lw/components/input'
+import Radio from '@ttn-lw/components/radio-button'
+import Select from '@ttn-lw/components/select'
+import Form from '@ttn-lw/components/form'
+import Notification from '@ttn-lw/components/notification'
 
-import diff from '../../../../lib/diff'
-import m from '../../../components/device-data-form/messages'
+import m from '@console/components/device-data-form/messages'
+
+import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
+import DevAddrInput from '@console/containers/dev-addr-input'
+
+import diff from '@ttn-lw/lib/diff'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import randomByteString from '@console/lib/random-bytes'
+
 import messages from '../messages'
-import sharedMessages from '../../../../lib/shared-messages'
-import randomByteString from '../../../lib/random-bytes'
-import PropTypes from '../../../../lib/prop-types'
-
 import {
   parseLorawanMacVersion,
   isDeviceABP,
@@ -41,6 +44,7 @@ import {
   isDeviceJoined,
   isDeviceOTAA,
 } from '../utils'
+
 import validationSchema from './validation-schema'
 
 const random16BytesString = () => randomByteString(32)
@@ -177,8 +181,8 @@ const NetworkServerForm = React.memo(props => {
     [initialValues],
   )
 
-  // Notify the user that the session keys might be there, but since there are no rights
-  // to read the keys we cannot display them.
+  // Notify the user that the session keys might be there, but since there are
+  // no rights to read the keys we cannot display them.
   const showResetNotification = !mayReadKeys && mayEditKeys && !Boolean(device.session)
 
   return (

@@ -1,6 +1,8 @@
 extends:
   - ttn
   - plugin:jest/recommended
+  - plugin:jsdoc/recommended
+  - plugin:import/recommended
   - prettier
   - prettier/react
 
@@ -9,6 +11,15 @@ parser: babel-eslint
 plugins:
   - jsdoc
   - prettier
+  - import
+
+settings:
+  import/ignore:
+    - node_modules
+    - sdk
+  import/resolver:
+    webpack:
+      config: './config/webpack.config.babel.js'
 
 env:
   node: true
@@ -22,11 +33,84 @@ globals:
 
 parserOptions:
   ecmaFeatures:
-    # Remove after migration
+    # Remove after migration.
     legacyDecorators: true
 
 rules:
   prettier/prettier: error
+
+  # Enforce import order.
+  import/order:
+    - warn
+    - groups:
+      - builtin
+      - external
+      - internal
+      - parent
+      - sibling
+      - index
+      pathGroups:
+      - pattern: "\\@{ttn-lw,console,oauth}/constants"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/api"
+        group: internal
+        position: after
+      - pattern: "\\@ttn-lw/components/**"
+        group: internal
+        position: after
+      - pattern: "\\@ttn-lw/containers/**"
+        group: internal
+        position: after
+      - pattern: "\\@ttn-lw/lib/components/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/components/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/containers/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/lib/components/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/views/**"
+        group: internal
+        position: after
+      - pattern: "\\@ttn-lw/lib/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/lib/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/store/actions/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/store/reducers/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/store/selectors/**"
+        group: internal
+        position: after
+      - pattern: "\\@{console,oauth}/store/middleware/**"
+        group: internal
+        position: after
+      - pattern: "(\\@assets/**|\\@ttn-lw/styles/**)"
+        group: sibling
+        position: after
+      - pattern: "./*.styl"
+        group: sibling
+        position: after
+
+  # Prevent superfluous path traversions in import statements.
+  import/no-useless-path-segments:
+    - error
+    - noUselessIndex: true
+
+  # Enforce newlines after import statements.
+  import/newline-after-import: warn
+
+  import/no-named-as-default: off
 
   jest/no-large-snapshots:
     - warn
@@ -35,19 +119,19 @@ rules:
   # Change to `error` after https://github.com/TheThingsNetwork/lorawan-stack/issues/1086
   # is resolved.
 
-  # Prevent extraneous defaultProps on components
+  # Prevent extraneous defaultProps on components.
   react/default-props-match-prop-types: warn
-  # Enforce a defaultProps definition for every prop that is not a required prop
+  # Enforce a defaultProps definition for every prop that is not a required prop.
   react/require-default-props: warn
-  # Prevent definitions of unused prop types
+  # Prevent definitions of unused prop types.
   react/no-unused-prop-types: warn
-  # Prevent missing props validation in a React component definition
+  # Prevent missing props validation in a React component definition.
   react/prop-types: warn
-  # Enforce propTypes declarations alphabetical sorting
+  # Enforce propTypes declarations alphabetical sorting.
   react/sort-prop-types: warn
-  # Prevent undefined components
-  react/jsx-no-undef: error
-  # Prevent vague prop types
+  # Prevent undefined components.
+  react/jsx-no-undef: warn
+  # Prevent vague prop types.
   react/forbid-prop-types:
     - warn
     - forbid:
@@ -57,24 +141,17 @@ rules:
       checkContextTypes: true
       checkChildContextTypes: true
 
-  jsdoc/no-undefined-types: error
-  jsdoc/check-param-names: error
-  jsdoc/check-types: error
-  jsdoc/require-param-name: error
-  jsdoc/require-param-type: error
-  jsdoc/require-hyphen-before-param-description: error
-
   # Warn on console occurrences
   no-console:
     - warn
 
-  # Warn on missing JsDoc definitions
-  valid-jsdoc:
+  # Enforce capitalized comments.
+  capitalized-comments:
     - warn
-    - prefer:
-        return: returns
-        arg: param
-        argument: param
-        class: constructor
-        virtual: abstract
-      requireReturn: false
+    - always
+    - ignoreConsecutiveComments: true
+
+  jsdoc/require-jsdoc: off
+  jsdoc/require-hyphen-before-param-description: warn
+  jsdoc/check-indentation: warn
+  jsdoc/require-description-complete-sentence: warn

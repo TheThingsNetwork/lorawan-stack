@@ -14,7 +14,7 @@
 
 /* eslint-disable no-console */
 
-import TTN from '../.'
+import TTN from '..'
 
 const token = 'access-token-or-api-key'
 const ttn = new TTN(token, {
@@ -34,11 +34,11 @@ const appData = {
 }
 
 async function createApplication() {
-  // Via Applications object
+  // Via Applications object.
   const firstApp = await ttn.Applications.create('testuser', appData)
   console.log(firstApp)
 
-  // Via Application class
+  // Via Application class.
   appData.ids.application_id = `second-app-${hash}`
   const secondApp = new ttn.Application(appData)
   await secondApp.save()
@@ -56,12 +56,12 @@ async function listApplications() {
 }
 
 async function updateApplication() {
-  // Via Applications object
+  // Via Applications object.
   const patch = { description: 'New description' }
   const res = await ttn.Applications.updateById(appName, patch)
   console.log(res)
 
-  // Via Application instance
+  // Via Application instance.
   const app = await ttn.Applications.getById(appName)
   app.description = 'Another description'
   await app.save()

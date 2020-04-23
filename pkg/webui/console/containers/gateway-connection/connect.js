@@ -15,17 +15,18 @@
 import { connect } from 'react-redux'
 
 import {
+  startGatewayStatistics,
+  stopGatewayStatistics,
+  updateGatewayStatistics,
+} from '@console/store/actions/gateways'
+
+import {
   selectGatewayStatistics,
   selectGatewayStatisticsError,
   selectGatewayStatisticsIsFetching,
   selectLatestGatewayEvent,
-} from '../../store/selectors/gateways'
-import {
-  startGatewayStatistics,
-  stopGatewayStatistics,
-  updateGatewayStatistics,
-} from '../../store/actions/gateways'
-import { selectGatewayLastSeen } from '../../store/selectors/gateway-status'
+} from '@console/store/selectors/gateways'
+import { selectGatewayLastSeen } from '@console/store/selectors/gateway-status'
 
 import withConnectionReactor from './gateway-connection-reactor'
 

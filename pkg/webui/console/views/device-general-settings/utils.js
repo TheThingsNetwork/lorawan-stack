@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { selectJsConfig } from '../../../lib/selectors/env'
-import getHostnameFromUrl from '../../../lib/host-from-url'
+import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 const lwRegexp = /^[1-9].[0-9].[0-9]$/
 const lwCache = {}
 
 /**
  * Parses string representation of the lorawan mac version to number.
- * @param {string} strMacVersion - Formatted string representation fot the lorawan mac version, e.g. 1.1.0.
- * @returns {number} - Number representation of the lorawan mac version. Returns 0 if provided
+ *
+ * @param {string} strMacVersion - Formatted string representation fot the
+ * lorawan mac version, e.g. 1.1.0.
+ * @returns {number} - Number representation of the lorawan mac version. Returns
+ * 0 if provided
  * argument is not a valid string representation of the lorawan mac version.
  * @example
  *  const parsedVersion = parseLorawanMacVersion('1.0.0'); // returns 100
@@ -51,34 +54,40 @@ export const parseLorawanMacVersion = strMacVersion => {
 
 /**
  * Returns whether the device is OTAA.
- * Note: device type is mainly derived based on the `supports_join` and `multicast` fields.
- * However, in cases when NS is not available, `root_keys` can be used to determine whether
- * the device is OTAA.
- * @param {Object} device - The device object.
- * @returns {boolean} `true` if the device is OTAA, `false` otherwise
+ * Note: device type is mainly derived based on the `supports_join` and
+ * `multicast` fields.
+ * However, in cases when NS is not available, `root_keys` can be used to
+ * determine whether the device is OTAA.
+ *
+ * @param {object} device - The device object.
+ * @returns {boolean} `true` if the device is OTAA, `false` otherwise.
  */
 export const isDeviceOTAA = device =>
   Boolean(device) && (Boolean(device.supports_join) || Boolean(device.root_keys))
 
 /**
  * Returns whether the device is ABP.
- * @param {Object} device - The device object.
- * @returns {boolean} `true` if the device is ABP, `false` otherwise
+ *
+ * @param {object} device - The device object.
+ * @returns {boolean} `true` if the device is ABP, `false` otherwise.
  */
 export const isDeviceABP = device =>
   Boolean(device) && !Boolean(device.supports_join) && !Boolean(device.multicast)
 
 /**
  * Returns whether the device is multicast.
- * @param {Object} device - The device object.
- * @returns {boolean} `true` if the device is multicast, `false` otherwise
+ *
+ * @param {object} device - The device object.
+ * @returns {boolean} `true` if the device is multicast, `false` otherwise.
  */
 export const isDeviceMulticast = device => Boolean(device) && Boolean(device.multicast)
 
 /**
  * Returns whether an end device is provisioned on an external join server.
- * @param {Object} device - The device object.
- * @returns {boolean} `true` if the end device is provisioned on an external join server, `false` otherwise.
+ *
+ * @param {object} device - The device object.
+ * @returns {boolean} `true` if the end device is provisioned on an external
+ * join server, `false` otherwise.
  */
 export const hasExternalJs = device => {
   const { enabled, base_url } = selectJsConfig()

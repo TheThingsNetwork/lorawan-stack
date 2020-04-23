@@ -14,13 +14,14 @@
 
 import { mergeWith } from 'lodash'
 
-import { getCombinedDeviceId, combineDeviceIds } from '../../../lib/selectors/id'
+import { getCombinedDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
+
 import {
   GET_DEV,
   GET_DEVICES_LIST_SUCCESS,
   GET_DEV_SUCCESS,
   UPDATE_DEV_SUCCESS,
-} from '../actions/devices'
+} from '@console/store/actions/devices'
 
 const defaultState = {
   entities: {},
@@ -38,7 +39,7 @@ const devices = function(state = defaultState, { type, payload }) {
     case GET_DEV_SUCCESS:
       const id = getCombinedDeviceId(payload)
       const mergedDevice = mergeWith({}, state.entities[id], payload, (_, __, key, ___, source) => {
-        // always set location from the payload
+        // Always set location from the payload.
         if (source === payload && key === 'locations') {
           return source.locations
         }

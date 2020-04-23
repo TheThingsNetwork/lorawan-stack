@@ -22,37 +22,40 @@ import { connect } from 'react-redux'
 import * as Yup from 'yup'
 import queryString from 'query-string'
 
-import api from '../../api'
-import sharedMessages from '../../../lib/shared-messages'
+import api from '@oauth/api'
 
-import Button from '../../../components/button'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitButton from '../../../components/submit-button'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
-import style from '../create-account/create-account.styl'
-import Checkbox from '../../../components/checkbox'
-import Spinner from '../../../components/spinner'
-import PropTypes from '../../../lib/prop-types'
+import Button from '@ttn-lw/components/button'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Spinner from '@ttn-lw/components/spinner'
+
+import Message from '@ttn-lw/lib/components/message'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import style from '@oauth/views/create-account/create-account.styl'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   newPassword: 'New Password',
   oldPassword: 'Old Password',
-  passwordChanged: 'Password changed successfully',
+  passwordChanged: 'Password changed',
   revokeAccess: 'Revoke Access',
-  logoutAllDevices: 'Log out from all devices',
+  logoutAllDevices: 'Log out from all end devices',
   revokeWarning: 'This will revoke access from all logged in devices',
-  sessionRevoked: 'Your session is revoked',
+  sessionRevoked: 'Session revoked',
 })
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
-    .min(8)
+    .min(8, Yup.passValues(sharedMessages.validateTooShort))
     .required(sharedMessages.validateRequired),
   confirm: Yup.string()
     .oneOf([Yup.ref('password'), null], sharedMessages.validatePasswordMatch)
-    .min(8)
+    .min(8, Yup.passValues(sharedMessages.validateTooShort))
     .required(sharedMessages.validateRequired),
 })
 

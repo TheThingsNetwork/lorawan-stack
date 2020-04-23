@@ -15,15 +15,16 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 
-import Button from '../'
-import PortalledModal from '../../../components/modal/portalled'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
 
-import PropTypes from '../../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import Button from '..'
 
 /**
  * ModalButton is a button which needs a modal confirmation to complete the
  * action. It can be used as an easy way to get the users explicit confirmation
- * before doing an action, e.g. deleting a resource.
+ * before doing an action, e.g. Deleting a resource.
  */
 @bind
 class ModalButton extends React.Component {
@@ -84,9 +85,9 @@ ModalButton.defaultProps = {
 }
 
 ModalButton.propTypes = {
+  modalData: PropTypes.object.isRequired,
   onApprove: PropTypes.func,
   onCancel: PropTypes.func,
-  modalData: PropTypes.object.isRequired,
 }
 
 export default ModalButton

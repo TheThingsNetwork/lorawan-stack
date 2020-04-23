@@ -15,24 +15,29 @@
 import React from 'react'
 import { Col, Row, Container } from 'react-grid-system'
 
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import PAGE_SIZES from '../../constants/page-sizes'
+import PAGE_SIZES from '@console/constants/page-sizes'
 
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import DateTime from '../../../lib/components/date-time'
-import DevicesTable from '../../containers/devices-table'
-import DataSheet from '../../../components/data-sheet'
-import ApplicationEvents from '../../containers/application-events'
-import EntityTitleSection from '../../components/entity-title-section'
-import KeyValueTag from '../../components/key-value-tag'
-import Status from '../../../components/status'
-import Spinner from '../../../components/spinner'
-import Message from '../../../lib/components/message'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-import withRequest from '../../../lib/components/with-request'
+import DataSheet from '@ttn-lw/components/data-sheet'
+import Status from '@ttn-lw/components/status'
+import Spinner from '@ttn-lw/components/spinner'
 
-import { mayViewApplicationInfo } from '../../lib/feature-checks'
+import DateTime from '@ttn-lw/lib/components/date-time'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import Message from '@ttn-lw/lib/components/message'
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import KeyValueTag from '@console/components/key-value-tag'
+import EntityTitleSection from '@console/components/entity-title-section'
+
+import DevicesTable from '@console/containers/devices-table'
+import ApplicationEvents from '@console/containers/application-events'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewApplicationInfo } from '@console/lib/feature-checks'
 
 import style from './application-overview.styl'
 

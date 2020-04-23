@@ -16,32 +16,13 @@ package smtp
 
 import (
 	"context"
-	"crypto/tls"
 	"net"
-	"net/smtp"
 	"strconv"
 
 	"go.thethings.network/lorawan-stack/pkg/email"
 	"go.thethings.network/lorawan-stack/pkg/log"
 	gomail "gopkg.in/mail.v2"
 )
-
-// Config for the SMTP email provider.
-type Config struct {
-	Address     string `name:"address" description:"SMTP server address"`
-	Username    string `name:"username" description:"Username to authenticate with"`
-	Password    string `name:"password" description:"Password to authenticate with"`
-	Connections int    `name:"connections" description:"Maximum number of connections to the SMTP server"`
-	TLSConfig   *tls.Config
-}
-
-func (c Config) auth() smtp.Auth {
-	if c.Username == "" && c.Password == "" {
-		return nil
-	}
-	host, _, _ := net.SplitHostPort(c.Address)
-	return smtp.PlainAuth("", c.Username, c.Password, host)
-}
 
 type sendTask struct {
 	message *gomail.Message

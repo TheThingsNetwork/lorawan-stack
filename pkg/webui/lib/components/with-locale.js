@@ -20,21 +20,21 @@ import { connect } from 'react-redux'
 import { IntlProvider } from 'react-intl'
 import CancelablePromise from 'cancelable-promise'
 
-import Spinner from '../../components/spinner'
+import Spinner from '@ttn-lw/components/spinner'
 
-import log, { error } from '../log'
+import log, { error } from '@ttn-lw/lib/log'
+
 import { withEnv } from './env'
 
-const defaultLocale = process.predefined.DEFAULT_MESSAGES_LOCALE // Note: defined by webpack define plugin
+const defaultLocale = process.predefined.DEFAULT_MESSAGES_LOCALE // Note: defined by webpack define plugin.
 const defaultLanguage = defaultLocale.split('-')[0] || 'en'
 const xx = 'xx'
 const dev = '../../dev'
 
 /**
  * WithLocale is a component that fetches the user's preferred language and
- * sets the language in th react-intl provider context. It will asynchronously fetch
- * translated messages and polyfills window.Intl.
- *
+ * sets the language in th react-intl provider context. It will asynchronously
+ * fetch translated messages and polyfills `window.Intl`.
  * The default language will be fetched from the env.
  */
 @connect(state => ({
@@ -48,7 +48,7 @@ export default class UserLocale extends React.PureComponent {
   promise = null
 
   state = {
-    messages: process.predefined.DEFAULT_MESSAGES, // Note: defined by webpack define plugin
+    messages: process.predefined.DEFAULT_MESSAGES, // Note: defined by webpack define plugin.
     xx: false,
     loaded: false,
   }
@@ -105,13 +105,13 @@ export default class UserLocale extends React.PureComponent {
   async load(language) {
     let locale = navigator.language || navigator.browserLanguage || defaultLocale
 
-    // if the browser locale does not match the lang on the html tag, prefer the lang
-    // otherwise we get mixed languages.
+    // If the browser locale does not match the lang on the html tag, prefer the
+    // lang otherwise we get mixed languages.
     if (locale.split('-')[0] !== language && language !== xx) {
       locale = language
     }
 
-    // load the language files if needed
+    // Load the language files if needed.
     await this.setState({ loaded: false })
 
     let promises = []
@@ -119,8 +119,8 @@ export default class UserLocale extends React.PureComponent {
     if (language !== defaultLanguage) {
       withLocale = true
       promises = [
-        import(/* webpackChunkName: "lang.[request]" */ `../../locales/${language}.json`), // Frontend messages
-        import(/* webpackChunkName: "lang.[request]" */ `../../locales/.backend/${language}.json`), // Backend messages
+        import(/* WebpackChunkName: "lang.[request]" */ `../../locales/${language}.json`), // Frontend messages
+        import(/* WebpackChunkName: "lang.[request]" */ `../../locales/.backend/${language}.json`), // Backend messages
       ]
     }
 
@@ -128,7 +128,7 @@ export default class UserLocale extends React.PureComponent {
       log(`Polyfilling locale ${locale} for language ${language}`)
       promises.push(import('intl'))
       promises.push(
-        import(/* webpackChunkName: "locale.[request]" */ `intl/locale-data/jsonp/${locale}`),
+        import(/* WebpackChunkName: "locale.[request]" */ `intl/locale-data/jsonp/${locale}`),
       )
     }
 
@@ -166,7 +166,7 @@ export default class UserLocale extends React.PureComponent {
     const { messages, loaded, xx } = this.state
 
     if (!loaded) {
-      // Not using <Message />, since we're initializing locales
+      // Not using <Message />, since we're initializing locales.
       return <Spinner center>Loading locale…</Spinner>
     }
 

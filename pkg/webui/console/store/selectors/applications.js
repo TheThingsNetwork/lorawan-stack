@@ -16,8 +16,9 @@ import {
   GET_APPS_LIST_BASE,
   GET_APPS_RIGHTS_LIST_BASE,
   GET_APP_BASE,
-} from '../actions/applications'
-import { GET_APP_LINK_BASE } from '../actions/link'
+} from '@console/store/actions/applications'
+import { GET_APP_LINK_BASE } from '@console/store/actions/link'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -33,7 +34,7 @@ import { createErrorSelector } from './error'
 
 const ENTITY = 'applications'
 
-// Application
+// Application.
 export const selectApplicationStore = state => state.applications
 export const selectApplicationEntitiesStore = state => selectApplicationStore(state).entities
 export const selectApplicationById = (state, id) => selectApplicationEntitiesStore(state)[id]
@@ -46,7 +47,7 @@ export const selectApplicationError = createErrorSelector(GET_APP_BASE)
 export const selectApplicationDeviceCount = state =>
   selectApplicationStore(state).applicationDeviceCount
 
-// Applications
+// Applications.
 const selectAppsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectAppsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 const selectAppsFetching = createFetchingSelector(GET_APPS_LIST_BASE)
@@ -58,18 +59,18 @@ export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
 export const selectApplicationsFetching = state => selectAppsFetching(state)
 export const selectApplicationsError = state => selectAppsError(state)
 
-// Events
+// Events.
 export const selectApplicationEvents = createEventsSelector(ENTITY)
 export const selectApplicationEventsError = createEventsErrorSelector(ENTITY)
 export const selectApplicationEventsStatus = createEventsStatusSelector(ENTITY)
 
-// Rights
+// Rights.
 export const selectApplicationRights = createRightsSelector(ENTITY)
 export const selectApplicationPseudoRights = createPseudoRightsSelector(ENTITY)
 export const selectApplicationRightsError = createErrorSelector(GET_APPS_RIGHTS_LIST_BASE)
 export const selectApplicationRightsFetching = createFetchingSelector(GET_APPS_RIGHTS_LIST_BASE)
 
-// Link
+// Link.
 const selectLinkStore = state => state.link
 export const selectApplicationLink = state => selectLinkStore(state).link
 export const selectApplicationLinkIndicator = state => selectLinkStore(state).linked

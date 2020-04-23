@@ -17,25 +17,29 @@ import { Container, Col, Row } from 'react-grid-system'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import PropTypes from '../../../lib/prop-types'
-import DeviceImporter from '../../containers/device-importer'
-import Notification from '../../../components/notification'
-import sharedMessages from '../../../lib/shared-messages'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Notification from '@ttn-lw/components/notification'
+
+import Message from '@ttn-lw/lib/components/message'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import DeviceImporter from '@console/containers/device-importer'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   selectDeviceTemplateFormats,
   selectDeviceTemplateFormatsFetching,
-} from '../../store/selectors/device-template-formats'
+} from '@console/store/selectors/device-template-formats'
 
 import style from './device-import.styl'
 
 const m = defineMessages({
-  noTemplatesTitle: 'No device templates found',
+  noTemplatesTitle: 'No end device templates found',
   noTemplates:
-    'There are currently no device templates set up. Please set up a device template to make use of the bulk device import feature. For more information please refer to the documentation.',
+    'There are currently no end device templates set up. Please set up an end device template to make use of the bulk device import feature. For more information please refer to the documentation.',
 })
 
 @connect(state => ({

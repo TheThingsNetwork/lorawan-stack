@@ -34,11 +34,12 @@ export const createRequestActions = function(baseType, requestPayloadCreator, re
 }
 
 /**
- * attachPromise is a function which extends an action creator to include a flag
+ * The attachPromise function extends an action creator to include a flag
  * which results in a promise being attached to the action by the promise
  * middleware.
- * @param {Function} actionCreator - The original action creator
- * @returns {Function} - The modified action creator
+ *
+ * @param {Function} actionCreator - The original action creator.
+ * @returns {Function} - The modified action creator.
  */
 export const attachPromise = actionCreator =>
   function(...args) {

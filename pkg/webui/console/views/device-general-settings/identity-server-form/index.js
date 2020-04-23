@@ -15,25 +15,28 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import SubmitButton from '../../../../components/submit-button'
-import SubmitBar from '../../../../components/submit-bar'
-import Input from '../../../../components/input'
-import Form from '../../../../components/form'
-import Checkbox from '../../../../components/checkbox'
-import ModalButton from '../../../../components/button/modal-button'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import Input from '@ttn-lw/components/input'
+import Form from '@ttn-lw/components/form'
+import Checkbox from '@ttn-lw/components/checkbox'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 
-import diff from '../../../../lib/diff'
-import m from '../../../components/device-data-form/messages'
-import PropTypes from '../../../../lib/prop-types'
-import sharedMessages from '../../../../lib/shared-messages'
-import { selectAsConfig, selectJsConfig, selectNsConfig } from '../../../../lib/selectors/env'
+import m from '@console/components/device-data-form/messages'
+
+import diff from '@ttn-lw/lib/diff'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
+
 import { parseLorawanMacVersion, hasExternalJs, isDeviceOTAA } from '../utils'
+
 import validationSchema from './validation-schema'
 
 const messages = defineMessages({
-  deleteDevice: 'Delete End Device',
+  deleteDevice: 'Delete end device',
   deleteWarning:
-    'Are you sure you want to delete "{deviceId}"? This action cannot be undone and it will not be possible to reuse the end device ID!',
+    'Are you sure you want to delete "{deviceId}"? This action cannot be undone and it will not be possible to reuse the end device ID.',
 })
 
 const IdentityServerForm = React.memo(props => {
@@ -117,7 +120,8 @@ const IdentityServerForm = React.memo(props => {
   const hasJoinEUI = Boolean(device.ids.join_eui)
   const hasDevEUI = Boolean(device.ids.dev_eui)
 
-  // We do not want to show the external JS option if the user is on JS only deployment.
+  // We do not want to show the external JS option if the user is on JS only
+  // deployment.
   // See https://github.com/TheThingsNetwork/lorawan-stack/issues/2119#issuecomment-597736420
   const hideExternalJs = !isOTAA || (jsEnabled && !asEnabled && !nsEnabled)
 

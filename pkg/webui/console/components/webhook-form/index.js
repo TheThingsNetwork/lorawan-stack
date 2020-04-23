@@ -17,20 +17,25 @@ import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 import bind from 'autobind-decorator'
 
-import WebhookTemplateInfo from '../../components/webhook-template-info'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import Notification from '../../../components/notification'
-import Message from '../../../lib/components/message'
-import KeyValueMap from '../../../components/key-value-map'
-import ModalButton from '../../../components/button/modal-button'
-import WebhookFormatSelector from '../../containers/webhook-formats-select'
-import sharedMessages from '../../../lib/shared-messages'
-import { id as webhookIdRegexp, apiKey as webhookAPIKeyRegexp } from '../../lib/regexp'
-import { url as urlRegexp } from '../../../lib/regexp'
-import PropTypes from '../../../lib/prop-types'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Notification from '@ttn-lw/components/notification'
+import KeyValueMap from '@ttn-lw/components/key-value-map'
+import ModalButton from '@ttn-lw/components/button/modal-button'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import WebhookTemplateInfo from '@console/components/webhook-template-info'
+
+import WebhookFormatSelector from '@console/containers/webhook-formats-select'
+
+import { url as urlRegexp } from '@ttn-lw/lib/regexp'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { id as webhookIdRegexp, apiKey as webhookAPIKeyRegexp } from '@console/lib/regexp'
 
 import { mapWebhookToFormValues, mapFormValuesToWebhook, blankValues } from './mapping'
 
@@ -39,18 +44,18 @@ const pathPlaceholder = '/path/to/webhook'
 const m = defineMessages({
   idPlaceholder: 'my-new-webhook',
   messageInfo:
-    'For each enabled message type, you can set an optional path that will be appended to the base URL.',
+    'For each enabled message type, an optional path can be defined which will be appended to the base URL',
   deleteWebhook: 'Delete Webhook',
   modalWarning:
-    'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone!',
+    'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone.',
   headers: 'Headers',
   headersKeyPlaceholder: 'Authorization',
   headersValuePlaceholder: 'Bearer my-auth-token',
   headersAdd: 'Add header entry',
   headersValidateRequired: 'All header entry values are required. Please remove empty entries.',
-  downlinkAPIKey: 'Downlink API Key',
+  downlinkAPIKey: 'Downlink API key',
   downlinkAPIKeyDesc:
-    'The API Key will be provided to the endpoint using the X-Downlink-Apikey header',
+    'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
   templateInformation: 'Template information',
 })
 
@@ -62,15 +67,15 @@ const headerCheck = headers =>
 const validationSchema = Yup.object().shape({
   webhook_id: Yup.string()
     .matches(webhookIdRegexp, sharedMessages.validateIdFormat)
-    .min(2, sharedMessages.validateTooShort)
-    .max(25, sharedMessages.validateTooLong)
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
   headers: Yup.array().test('has no empty string values', m.headersValidateRequired, headerCheck),
   base_url: Yup.string()
     .matches(urlRegexp, sharedMessages.validateUrl)
     .required(sharedMessages.validateRequired),
-  downlink_api_key: Yup.string().matches(webhookAPIKeyRegexp, sharedMessages.validateFormat),
+  downlink_api_key: Yup.string().matches(webhookAPIKeyRegexp, sharedMessages.validateApiKey),
 })
 
 export default class WebhookForm extends Component {

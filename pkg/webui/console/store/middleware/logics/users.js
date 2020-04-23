@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as users from '../../actions/users'
+import api from '@console/api'
 
-import api from '../../../api'
+import * as users from '@console/store/actions/users'
+
 import createRequestLogic from './lib'
 
 const getUserLogic = createRequestLogic({

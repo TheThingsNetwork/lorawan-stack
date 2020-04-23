@@ -17,11 +17,14 @@ import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
-import PropTypes from '../../../lib/prop-types'
 
-import Button from '../../button'
-import Icon from '../../icon'
-import Message from '../../../lib/components/message'
+import Button from '@ttn-lw/components/button'
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import SideNavigationList from './list'
 import SideNavigationItem from './item'
 import SideNavigationContext from './context'
@@ -29,7 +32,7 @@ import SideNavigationContext from './context'
 import style from './side.styl'
 
 const m = defineMessages({
-  hideSidebar: 'Hide Sidebar',
+  hideSidebar: 'Hide sidebar',
 })
 export class SideNavigation extends Component {
   static defaultProps = {
@@ -39,7 +42,7 @@ export class SideNavigation extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
-    /** The header for the side navigation */
+    /** The header for the side navigation. */
     header: PropTypes.shape({
       title: PropTypes.string,
       icon: PropTypes.string,
@@ -47,9 +50,11 @@ export class SideNavigation extends Component {
   }
 
   state = {
-    /** A flag specifying whether the side navigation is minimized or not */
+    /** A flag specifying whether the side navigation is minimized or not. */
     isMinimized: false,
-    /** A flag specifying whether the drawer is currently open (in mobile screensizes) */
+    /** A flag specifying whether the drawer is currently open (in mobile
+     * screensizes).
+     */
     isDrawerOpen: false,
   }
 
@@ -83,14 +88,14 @@ export class SideNavigation extends Component {
   closeDrawer() {
     this.setState({ isDrawerOpen: false })
 
-    // Enable body scrolling
+    // Enable body scrolling.
     document.body.classList.remove(style.scrollLock)
     document.removeEventListener('mousedown', this.onClickOutside)
   }
 
   @bind
   openDrawer() {
-    // Disable body scrolling
+    // Disable body scrolling.
     document.body.classList.add(style.scrollLock)
 
     document.addEventListener('mousedown', this.onClickOutside)

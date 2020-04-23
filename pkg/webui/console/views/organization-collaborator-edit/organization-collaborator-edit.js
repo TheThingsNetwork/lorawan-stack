@@ -15,14 +15,15 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 
-import PageTitle from '../../../components/page-title'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import CollaboratorForm from '../../components/collaborator-form'
-import toast from '../../../components/toast'
+import PageTitle from '@ttn-lw/components/page-title'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import toast from '@ttn-lw/components/toast'
 
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import CollaboratorForm from '@console/components/collaborator-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 @withBreadcrumb('orgs.single.collaborators.edit', function(props) {
   const { orgId, collaboratorId, collaboratorType } = props

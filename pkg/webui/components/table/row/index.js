@@ -15,7 +15,8 @@
 import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
-import PropTypes from '../../../lib/prop-types'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './row.styl'
 
@@ -72,17 +73,17 @@ class Row extends React.Component {
 }
 
 Row.propTypes = {
-  /** A flag indicating whether the row is wrapping the body of a table */
+  /** A flag indicating whether the row is wrapping the body of a table. */
   body: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
-  /** A flag indicating whether the row is clickable */
+  /** A flag indicating whether the row is clickable. */
   clickable: PropTypes.bool,
-  /** A flag indicating whether the row is wrapping the footer of a table */
+  /** A flag indicating whether the row is wrapping the footer of a table. */
   footer: PropTypes.bool,
-  /** A flag indicating whether the row is wrapping the head of a table */
+  /** A flag indicating whether the row is wrapping the head of a table. */
   head: PropTypes.bool,
-  /** The identifier of the row */
+  /** The identifier of the row. */
   id: PropTypes.number,
   /**
    * Function to be called when the row gets clicked. The identifier of the row

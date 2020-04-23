@@ -19,32 +19,39 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
-import PageTitle from '../../../components/page-title'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Button from '../../../components/button'
-import SubmitButton from '../../../components/submit-button'
-import Message from '../../../lib/components/message'
-import DataSheet from '../../../components/data-sheet'
-import toast from '../../../components/toast'
-import DateTime from '../../../lib/components/date-time'
-import Icon from '../../../components/icon'
-import SubmitBar from '../../../components/submit-bar'
-import withRequest from '../../../lib/components/with-request'
-import Checkbox from '../../../components/checkbox'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import api from '@console/api'
 
-import { apiKey, address } from '../../lib/regexp'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import PageTitle from '@ttn-lw/components/page-title'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import Button from '@ttn-lw/components/button'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import DataSheet from '@ttn-lw/components/data-sheet'
+import toast from '@ttn-lw/components/toast'
+import Icon from '@ttn-lw/components/icon'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import Checkbox from '@ttn-lw/components/checkbox'
+
+import withRequest from '@ttn-lw/lib/components/with-request'
+import DateTime from '@ttn-lw/lib/components/date-time'
+import Message from '@ttn-lw/lib/components/message'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { apiKey, address } from '@console/lib/regexp'
+import { mayLinkApplication } from '@console/lib/feature-checks'
 
 import {
   getApplicationLink,
   updateApplicationLinkSuccess,
   deleteApplicationLinkSuccess,
-} from '../../store/actions/link'
+} from '@console/store/actions/link'
+
 import {
   selectApplicationIsLinked,
   selectApplicationLink,
@@ -52,10 +59,7 @@ import {
   selectApplicationLinkFetching,
   selectApplicationLinkError,
   selectSelectedApplicationId,
-} from '../../store/selectors/applications'
-import { mayLinkApplication } from '../../lib/feature-checks'
-
-import api from '../../api'
+} from '@console/store/selectors/applications'
 
 import style from './application-link.styl'
 
@@ -64,23 +68,23 @@ const m = defineMessages({
   linkSettings: 'Link settings',
   linkStatistics: 'Statistics',
   linkStatus: 'Link status',
-  linkStatusLinked: 'The application is linked successfully',
+  linkStatusLinked: 'The application is linked',
   linkStatusUnLinked: 'The application is currently not linked to a Network Server',
-  linkSuccess: 'Successfully linked',
-  linkedSince: 'Linked Since',
-  nsAddress: 'Network Server Address',
+  linkSuccess: 'Application linked',
+  linkedSince: 'Linked since',
+  nsAddress: 'Network Server address',
   nsCluster: 'Network Server is within a cluster',
   statistics: 'Statistics',
   unlink: 'Unlink',
-  unlinkSuccess: 'Successfully unlinked',
+  unlinkSuccess: 'Application unlinked',
   tls: 'TLS',
 })
 
 const validationSchema = Yup.object().shape({
   api_key: Yup.string()
-    .matches(apiKey, sharedMessages.validateFormat)
+    .matches(apiKey, sharedMessages.validateApiKey)
     .required(sharedMessages.validateRequired),
-  network_server_address: Yup.string().matches(address, sharedMessages.validateFormat),
+  network_server_address: Yup.string().matches(address, sharedMessages.validateAddressFormat),
   tls: Yup.bool(),
 })
 

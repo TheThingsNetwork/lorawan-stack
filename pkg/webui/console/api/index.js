@@ -13,12 +13,15 @@
 // limitations under the License.
 
 import axios from 'axios'
+
 import TTN from 'ttn-lw'
 
-import token from '../lib/access-token'
-import getCookieValue from '../../lib/cookie'
-import { selectStackConfig, selectApplicationRootPath } from '../../lib/selectors/env'
-import toast from '../../components/toast'
+import toast from '@ttn-lw/components/toast'
+
+import getCookieValue from '@ttn-lw/lib/cookie'
+import { selectStackConfig, selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
+
+import tokenCreator from '@console/lib/access-token'
 
 const stackConfig = selectStackConfig()
 const appRoot = selectApplicationRootPath()
@@ -35,23 +38,10 @@ const stack = {
 
 const isBaseUrl = stackConfig.is.base_url
 
-const ttnClient = new TTN(token, {
-  stackConfig: stack,
-  connectionType: 'http',
-  proxy: false,
+const csrf = getCookieValue('_csrf')
+const instance = axios.create({
+  headers: { 'X-CSRF-Token': csrf },
 })
-
-// Forward header warnings to the toast message queue
-ttnClient.subscribe('warning', payload => {
-  toast({
-    title: 'Warning',
-    type: toast.types.WARNING,
-    message: payload,
-    preventConsecutive: true,
-  })
-})
-
-const instance = axios.create()
 
 instance.interceptors.response.use(
   response => {
@@ -64,6 +54,24 @@ instance.interceptors.response.use(
     throw error
   },
 )
+
+const token = tokenCreator(() => instance.get(`${appRoot}/api/auth/token`))
+
+const ttnClient = new TTN(token, {
+  stackConfig: stack,
+  connectionType: 'http',
+  proxy: false,
+})
+
+// Forward header warnings to the toast message queue.
+ttnClient.subscribe('warning', payload => {
+  toast({
+    title: 'Warning',
+    type: toast.types.WARNING,
+    message: payload,
+    preventConsecutive: true,
+  })
+})
 
 export default {
   console: {

@@ -16,12 +16,14 @@ import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 import classnames from 'classnames'
 
-import Icon from '../icon'
-import Button from '../button'
-import Message from '../../lib/components/message'
-import Dropdown from '../dropdown'
-import sharedMessages from '../../lib/shared-messages'
-import PropTypes from '../../lib/prop-types'
+import Icon from '@ttn-lw/components/icon'
+import Button from '@ttn-lw/components/button'
+import Dropdown from '@ttn-lw/components/dropdown'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './mobile-menu.styl'
 

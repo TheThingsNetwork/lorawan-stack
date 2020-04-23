@@ -17,11 +17,13 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { push } from 'connected-react-router'
 
-import Button from '../../../components/button'
-import WithAuth from '../../../lib/components/with-auth'
+import Button from '@ttn-lw/components/button'
 
-import { logout } from '../../store/actions/user'
-import sharedMessages from '../../../lib/shared-messages'
+import WithAuth from '@ttn-lw/lib/components/with-auth'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { logout } from '@oauth/store/actions/user'
 
 @connect(state => ({
   user: state.user.user,

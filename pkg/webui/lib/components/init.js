@@ -18,18 +18,18 @@ import 'focus-visible/dist/focus-visible'
 import { setConfiguration } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import Spinner from '../../components/spinner'
+import Spinner from '@ttn-lw/components/spinner'
+
 import ErrorMessage from './error-message'
 import Message from './message'
 
-import '../../styles/main.styl'
+import '@ttn-lw/styles/main.styl'
 
 const m = defineMessages({
   initializing: 'Initializing…',
 })
 
-// React grid configuration
-// Keep these in line with styles/variables.less
+// React grid configuration. Keep these in line with `styles/variables.less`.
 setConfiguration({
   breakpoints: [480, 768, 1080, 1280],
   containerWidths: [768, 1000, 1140, 1140],

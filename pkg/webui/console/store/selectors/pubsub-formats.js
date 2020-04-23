@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_PUBSUB_FORMATS_BASE } from '../actions/pubsub-formats'
+import { GET_PUBSUB_FORMATS_BASE } from '@console/store/actions/pubsub-formats'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 

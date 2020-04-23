@@ -21,7 +21,6 @@ $ ttn-lw-cli applications packages list app1 dev1
 
 This gives the result in the JSON format:
 
-<details><summary>Show output</summary>
 ```json
 {
   "packages": [
@@ -32,7 +31,6 @@ This gives the result in the JSON format:
   ]
 }
 ```
-</details>
 
 ## Creating and Updating an Association
 
@@ -42,9 +40,8 @@ In order to associate a given application package to a FPort of a device, you ca
 $ ttn-lw-cli applications packages associations set app1 dev1 25 --package-name test-package
 ```
 
-This will associate FPort `25` of device `dev1` of application `app1` with the application package `test-package`:
+This will associate FPort `25` of device `dev1` of application `app1` with the application package `test-package`, as shown by the command output:
 
-<details><summary>Show output</summary>
 ```json
 {
   "ids": {
@@ -61,7 +58,6 @@ This will associate FPort `25` of device `dev1` of application `app1` with the a
   "package_name": "test-package"
 }
 ```
-</details>
 
 Some application packages are stateful, and as such their state can be updated using the `data-*` parameters:
 
@@ -74,7 +70,6 @@ $ ttn-lw-cli applications packages associations set app1 dev1 25 --data-local-fi
 
 This will update the association to use the given `api_key`:
 
-<details><summary>Show output</summary>
 ```json
 {
   "ids": {
@@ -94,7 +89,6 @@ This will update the association to use the given `api_key`:
     }
 }
 ```
-</details>
 
 ## Listing the Associations
 
@@ -104,7 +98,8 @@ The package associations of a given device can be listed using the `association 
 $ ttn-lw-cli applications packages associations list app1 dev1
 ```
 
-<details><summary>Show output</summary>
+Output:
+
 ```json
 {
   "associations": [
@@ -125,7 +120,6 @@ $ ttn-lw-cli applications packages associations list app1 dev1
   ]
 }
 ```
-</details>
 
 ## Retrieving an Association
 
@@ -135,7 +129,8 @@ The associations can be retrieved using the `association get` command:
 $ ttn-lw-cli applications packages associations get app1 dev1 25 --data
 ```
 
-<details><summary>Show output</summary>
+Output:
+
 ```json
 {
   "ids": {
@@ -151,11 +146,10 @@ $ ttn-lw-cli applications packages associations get app1 dev1 25 --data
   "updated_at": "2019-12-18T21:37:16.470742803Z",
   "package_name": "test-package",
   "data": {
-      "api_key": "AQEA8+q0v..."
-    }
+    "api_key": "AQEA8+q0v..."
+  }
 }
 ```
-</details>
 
 ## Deleting an Association
 
@@ -164,4 +158,3 @@ The associations can be deleted using the `association delete` command:
 ```bash
 $ ttn-lw-cli applications packages associations delete app1 dev1 25
 ```
-

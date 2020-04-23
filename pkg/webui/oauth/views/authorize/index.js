@@ -19,21 +19,23 @@ import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 import bind from 'autobind-decorator'
 
-import api from '../../api'
-import sharedMessages from '../../../lib/shared-messages'
+import api from '@oauth/api'
 
-import ErrorMessage from '../../../lib/components/error-message'
-import Modal from '../../../components/modal'
-import Icon from '../../../components/icon'
-import Message from '../../../lib/components/message'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import { withEnv } from '../../../lib/components/env'
-import getCookieValue from '../../../lib/cookie'
+import Modal from '@ttn-lw/components/modal'
+import Icon from '@ttn-lw/components/icon'
+
+import ErrorMessage from '@ttn-lw/lib/components/error-message'
+import Message from '@ttn-lw/lib/components/message'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import { withEnv } from '@ttn-lw/lib/components/env'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import getCookieValue from '@ttn-lw/lib/cookie'
 
 import style from './authorize.styl'
 
 const m = defineMessages({
-  modalTitle: 'Request for Permission',
+  modalTitle: 'Request for permission',
   modalSubtitle: '{clientName} is requesting permissions to do the following:',
   loginInfo: 'You are logged in as {userId}.',
   redirectInfo: 'You will be redirected to {redirectUri}',

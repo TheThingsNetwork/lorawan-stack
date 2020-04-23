@@ -17,10 +17,11 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import Select from '../../../components/select'
-import Input from '../../../components/input'
+import Select from '@ttn-lw/components/select'
+import Input from '@ttn-lw/components/input'
 
-import PropTypes from '../../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import computePrefix from './compute-prefix'
 
 import style from './join-eui-prefixes-input.styl'

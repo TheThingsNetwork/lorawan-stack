@@ -14,12 +14,13 @@
 
 import { connect } from 'react-redux'
 
+import { getJoinEUIPrefixes } from '@console/store/actions/join-server'
+
 import {
   selectJoinEUIPrefixes,
   selectJoinEUIPrefixesError,
   selectJoinEUIPrefixesFetching,
-} from '../../store/selectors/join-server'
-import { getJoinEUIPrefixes } from '../../store/actions/join-server'
+} from '@console/store/selectors/join-server'
 
 const mapStateToProps = state => ({
   fetching: selectJoinEUIPrefixesFetching(state),

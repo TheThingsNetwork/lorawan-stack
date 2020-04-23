@@ -16,8 +16,9 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
-import { SideNavigation } from '../side'
-import SideNavigationItem from '../side/item'
+import SideNavigationItem from './item'
+
+import { SideNavigation } from '.'
 
 storiesOf('Navigation', module)
   .addDecorator((story, context) =>
@@ -55,7 +56,7 @@ storiesOf('Navigation', module)
             <SideNavigationItem title="Pubsubs" path="/integrations/pubsubs" icon="extension" />
           </SideNavigationItem>
           <SideNavigationItem title="Collaborators" path="/collaborators" icon="organization" />
-          <SideNavigationItem title="API Keys" path="/api-keys" icon="api_keys" />
+          <SideNavigationItem title="API keys" path="/api-keys" icon="api_keys" />
           <SideNavigationItem
             title="General Settings"
             path="/general-settings"

@@ -14,21 +14,24 @@
 
 import React, { Component } from 'react'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import Status from '../../../components/status'
-import Icon from '../../../components/icon'
+import Status from '@ttn-lw/components/status'
+import Icon from '@ttn-lw/components/icon'
 
-import FetchTable from '../fetch-table'
+import Message from '@ttn-lw/lib/components/message'
 
-import { getUsersList } from '../../../console/store/actions/users'
+import FetchTable from '@console/containers/fetch-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { getUsersList } from '@console/store/actions/users'
+
 import {
   selectUsers,
   selectUsersTotalCount,
   selectUsersFetching,
   selectUsersError,
-} from '../../store/selectors/users'
+} from '@console/store/selectors/users'
 
 import style from './users-table.styl'
 

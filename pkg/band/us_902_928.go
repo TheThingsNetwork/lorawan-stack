@@ -32,15 +32,14 @@ func init() {
 	for i := 0; i < 64; i++ {
 		uplinkChannels = append(uplinkChannels, Channel{
 			Frequency:   uint64(902300000 + 200000*i),
-			MinDataRate: 0,
-			MaxDataRate: 3,
+			MaxDataRate: ttnpb.DATA_RATE_3,
 		})
 	}
 	for i := 0; i < 8; i++ {
 		uplinkChannels = append(uplinkChannels, Channel{
 			Frequency:   uint64(903000000 + 1600000*i),
-			MinDataRate: 4,
-			MaxDataRate: 4,
+			MinDataRate: ttnpb.DATA_RATE_4,
+			MaxDataRate: ttnpb.DATA_RATE_4,
 		})
 	}
 
@@ -48,8 +47,8 @@ func init() {
 	for i := 0; i < 8; i++ {
 		downlinkChannels = append(downlinkChannels, Channel{
 			Frequency:   uint64(923300000 + 600000*i),
-			MinDataRate: 8,
-			MaxDataRate: 13,
+			MinDataRate: ttnpb.DATA_RATE_8,
+			MaxDataRate: ttnpb.DATA_RATE_13,
 		})
 	}
 
@@ -87,20 +86,20 @@ func init() {
 		},
 
 		DataRates: map[ttnpb.DataRateIndex]DataRate{
-			0: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(19)),
-			1: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(61)),
-			2: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(133)),
-			3: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(250)),
-			4: makeLoRaDataRate(8, 500000, makeConstMaxMACPayloadSizeFunc(250)),
+			ttnpb.DATA_RATE_0: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(19)),
+			ttnpb.DATA_RATE_1: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(61)),
+			ttnpb.DATA_RATE_2: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(133)),
+			ttnpb.DATA_RATE_3: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(250)),
+			ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 500000, makeConstMaxMACPayloadSizeFunc(250)),
 
-			8:  makeLoRaDataRate(12, 500000, makeConstMaxMACPayloadSizeFunc(41)),
-			9:  makeLoRaDataRate(11, 500000, makeConstMaxMACPayloadSizeFunc(117)),
-			10: makeLoRaDataRate(10, 500000, makeConstMaxMACPayloadSizeFunc(230)),
-			11: makeLoRaDataRate(9, 500000, makeConstMaxMACPayloadSizeFunc(230)),
-			12: makeLoRaDataRate(8, 500000, makeConstMaxMACPayloadSizeFunc(230)),
-			13: makeLoRaDataRate(7, 500000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_8:  makeLoRaDataRate(12, 500000, makeConstMaxMACPayloadSizeFunc(41)),
+			ttnpb.DATA_RATE_9:  makeLoRaDataRate(11, 500000, makeConstMaxMACPayloadSizeFunc(117)),
+			ttnpb.DATA_RATE_10: makeLoRaDataRate(10, 500000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_11: makeLoRaDataRate(9, 500000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_12: makeLoRaDataRate(8, 500000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_13: makeLoRaDataRate(7, 500000, makeConstMaxMACPayloadSizeFunc(230)),
 		},
-		MaxADRDataRateIndex: 3,
+		MaxADRDataRateIndex: ttnpb.DATA_RATE_3,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -133,7 +132,7 @@ func init() {
 
 		Rx1Channel: channelIndexModulo(8),
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
-			if idx > 4 {
+			if idx > ttnpb.DATA_RATE_4 {
 				return 0, errDataRateIndexTooHigh.WithAttributes("max", 4)
 			}
 			if offset > 3 {
@@ -151,20 +150,23 @@ func init() {
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_CHANNEL_MASKS,
 
-		DefaultRx2Parameters: Rx2Parameters{8, 923300000},
+		DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_8, 923300000},
 
 		Beacon: Beacon{
-			DataRateIndex:    8,
+			DataRateIndex:    ttnpb.DATA_RATE_8,
 			CodingRate:       "4/5",
 			ComputeFrequency: makeBeaconFrequencyFunc(usAuBeaconFrequencies),
 		},
 
-		regionalParameters1_0:       bandIdentity,
-		regionalParameters1_0_1:     bandIdentity,
-		regionalParameters1_0_2RevA: usBeacon1_0_2,
+		regionalParameters1_0:   bandIdentity,
+		regionalParameters1_0_1: bandIdentity,
+		regionalParameters1_0_2RevA: func(b Band) Band {
+			b.Beacon.DataRateIndex = ttnpb.DATA_RATE_3
+			return b
+		},
 		regionalParameters1_0_2RevB: composeSwaps(
-			disableCFList1_0_2,
-			disableChMaskCntl51_0_2,
+			disableCFList,
+			disableChMaskCntl5,
 			makeSetMaxTxPowerIndexFunc(10),
 		),
 		regionalParameters1_0_3RevA: composeSwaps(

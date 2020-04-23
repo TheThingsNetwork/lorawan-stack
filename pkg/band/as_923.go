@@ -29,10 +29,16 @@ const AS_923 = "AS_923"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 923200000, MinDataRate: 0, MaxDataRate: 5},
-		{Frequency: 923400000, MinDataRate: 0, MaxDataRate: 5},
+		{
+			Frequency:   923200000,
+			MaxDataRate: ttnpb.DATA_RATE_5,
+		},
+		{
+			Frequency:   923400000,
+			MaxDataRate: ttnpb.DATA_RATE_5,
+		},
 	}
-	const asBeaconFrequency = 923400000
+	const beaconFrequency = 923400000
 
 	as_923 = Band{
 		ID: AS_923,
@@ -53,16 +59,16 @@ func init() {
 		},
 
 		DataRates: map[ttnpb.DataRateIndex]DataRate{
-			0: makeLoRaDataRate(12, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
-			1: makeLoRaDataRate(11, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
-			2: makeLoRaDataRate(10, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 19)),
-			3: makeLoRaDataRate(9, 125000, makeDwellTimeMaxMACPayloadSizeFunc(123, 61)),
-			4: makeLoRaDataRate(8, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 133)),
-			5: makeLoRaDataRate(7, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
-			6: makeLoRaDataRate(7, 250000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
-			7: makeFSKDataRate(50000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
+			ttnpb.DATA_RATE_0: makeLoRaDataRate(12, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
+			ttnpb.DATA_RATE_1: makeLoRaDataRate(11, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
+			ttnpb.DATA_RATE_2: makeLoRaDataRate(10, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 19)),
+			ttnpb.DATA_RATE_3: makeLoRaDataRate(9, 125000, makeDwellTimeMaxMACPayloadSizeFunc(123, 61)),
+			ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 133)),
+			ttnpb.DATA_RATE_5: makeLoRaDataRate(7, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
+			ttnpb.DATA_RATE_6: makeLoRaDataRate(7, 250000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
+			ttnpb.DATA_RATE_7: makeFSKDataRate(50000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
 		},
-		MaxADRDataRateIndex: 5,
+		MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -104,16 +110,15 @@ func init() {
 			}
 			si := int8(idx) - so
 
-			minDR := uint32(0)
+			minDR := ttnpb.DATA_RATE_0
 			if dwellTime {
-				minDR = 2
+				minDR = ttnpb.DATA_RATE_2
 			}
-
 			switch {
 			case si <= int8(minDR):
-				return ttnpb.DataRateIndex(minDR), nil
+				return minDR, nil
 			case si >= 5:
-				return 5, nil
+				return ttnpb.DATA_RATE_5, nil
 			}
 			return ttnpb.DataRateIndex(si), nil
 		},
@@ -121,20 +126,26 @@ func init() {
 		GenerateChMasks: generateChMask16,
 		ParseChMask:     parseChMask16,
 
-		DefaultRx2Parameters: Rx2Parameters{2, 923200000},
+		DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_2, 923200000},
 
 		Beacon: Beacon{
-			DataRateIndex:    3,
+			DataRateIndex:    ttnpb.DATA_RATE_3,
 			CodingRate:       "4/5",
-			ComputeFrequency: func(_ float64) uint64 { return asBeaconFrequency },
+			ComputeFrequency: func(_ float64) uint64 { return beaconFrequency },
 		},
-		PingSlotFrequency: uint64Ptr(asBeaconFrequency),
+		PingSlotFrequency: uint64Ptr(beaconFrequency),
 
 		TxParamSetupReqSupport: true,
 
 		// No LoRaWAN Regional Parameters 1.0
 		// No LoRaWAN Regional Parameters 1.0.1
-		regionalParameters1_0_2RevA: bandIdentity,
+		regionalParameters1_0_2RevA: composeSwaps(
+			func(b Band) Band {
+				b.DefaultMaxEIRP = 14
+				return b
+			},
+			makeSetMaxTxPowerIndexFunc(5),
+		),
 		regionalParameters1_0_2RevB: bandIdentity,
 		regionalParameters1_0_3RevA: bandIdentity,
 		regionalParameters1_1RevA:   bandIdentity,

@@ -15,18 +15,22 @@
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Message from '../../../lib/components/message'
-import FetchTable from '../fetch-table'
+import Message from '@ttn-lw/lib/components/message'
 
-import { getApplicationsList } from '../../../console/store/actions/applications'
+import FetchTable from '@console/containers/fetch-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { checkFromState, mayCreateApplications } from '@console/lib/feature-checks'
+
+import { getApplicationsList } from '@console/store/actions/applications'
+
 import {
   selectApplications,
   selectApplicationsTotalCount,
   selectApplicationsFetching,
   selectApplicationsError,
-} from '../../store/selectors/applications'
-import { checkFromState, mayCreateApplications } from '../../lib/feature-checks'
+} from '@console/store/selectors/applications'
 
 const headers = [
   {

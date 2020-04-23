@@ -29,50 +29,6 @@ import (
 
 const yamlFetchErrorCache = 1 * time.Minute
 
-// TemplatesConfig defines the configuration for the webhook templates registry.
-type TemplatesConfig struct {
-	Static      map[string][]byte `name:"-"`
-	Directory   string            `name:"directory" description:"Retrieve the webhook templates from the filesystem"`
-	URL         string            `name:"url" description:"Retrieve the webhook templates from a web server"`
-	LogoBaseURL string            `name:"logo-base-url" description:"The base URL for the logo storage"`
-}
-
-// TemplateStore contains the webhook templates.
-type TemplateStore interface {
-	// GetTemplate returns the template with the given identifiers.
-	GetTemplate(ctx context.Context, req *ttnpb.GetApplicationWebhookTemplateRequest) (*ttnpb.ApplicationWebhookTemplate, error)
-	// ListTemplates returns the available templates.
-	ListTemplates(ctx context.Context, req *ttnpb.ListApplicationWebhookTemplatesRequest) (*ttnpb.ApplicationWebhookTemplates, error)
-}
-
-// NewTemplateStore returns a TemplateStore based on the configuration.
-func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
-	var fetcher fetch.Interface
-	switch {
-	case c.Static != nil:
-		fetcher = fetch.NewMemFetcher(c.Static)
-	case c.Directory != "":
-		fetcher = fetch.FromFilesystem(c.Directory)
-	case c.URL != "":
-		var err error
-		fetcher, err = fetch.FromHTTP(c.URL, true)
-		if err != nil {
-			return nil, err
-		}
-	default:
-		return &noopTemplateStore{}, nil
-	}
-	baseURL, err := url.Parse(c.LogoBaseURL)
-	if err != nil {
-		return nil, err
-	}
-	return &templateStore{
-		fetcher:   fetcher,
-		baseURL:   baseURL,
-		templates: make(map[string]queryResult),
-	}, nil
-}
-
 type noopTemplateStore struct {
 }
 

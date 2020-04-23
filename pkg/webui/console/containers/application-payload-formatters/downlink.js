@@ -17,28 +17,34 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
-import Notification from '../../../components/notification'
-import PageTitle from '../../../components/page-title'
-import toast from '../../../components/toast'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import PayloadFormattersForm from '../../components/payload-formatters-form'
-import PAYLOAD_FORMATTER_TYPES from '../../constants/formatter-types'
-import { updateApplicationLinkSuccess } from '../../store/actions/link'
+import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
+
+import api from '@console/api'
+
+import Notification from '@ttn-lw/components/notification'
+import PageTitle from '@ttn-lw/components/page-title'
+import toast from '@ttn-lw/components/toast'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+
+import PayloadFormattersForm from '@console/components/payload-formatters-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { updateApplicationLinkSuccess } from '@console/store/actions/link'
+
 import {
   selectApplicationIsLinked,
   selectApplicationLinkFormatters,
   selectSelectedApplicationId,
-} from '../../store/selectors/applications'
+} from '@console/store/selectors/applications'
 
-import api from '../../api'
 import style from './application-payload-formatters.styl'
 
 const m = defineMessages({
   infoText:
-    'These payload formatters are executed on downlink messages to all devices in this application. If payload formatters are also set for a specific device, only those will be executed for downlinks to that device.',
+    'These payload formatters are executed on downlink messages to all end devices in this application. Note: end device level payload formatters have precedence.',
 })
 @connect(
   function(state) {

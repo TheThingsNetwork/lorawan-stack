@@ -16,16 +16,18 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import Message from '../../../lib/components/message'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import Section from '../section'
 import SortButton from '../sort-button'
 import Row from '../row'
 import { HeadCell, DataCell } from '../cell'
 
-import PropTypes from '../../../lib/prop-types'
 import style from './table.styl'
 
-/* Empty message to render when no entries provided */
+/* Empty message to render when no entries provided. */
 const Empty = ({ className, colSpan, message }) => (
   <Row className={classnames(className, style.emptyMessageRow)} clickable={false}>
     <DataCell colSpan={colSpan}>

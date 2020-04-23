@@ -17,7 +17,7 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import MaskedInput from 'react-text-mask'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './input.styl'
 
@@ -36,7 +36,7 @@ const mask = function(min, max, showPerChar = false) {
 
   let length = 3 * Math.floor(max / wordSize) - 1
   if (showPerChar && max % wordSize !== 0) {
-    // account for the space and the extra character
+    // Account for the space and the extra character.
     length += wordSize
   }
 
@@ -176,7 +176,7 @@ export default class ByteInput extends React.Component {
     evt.clipboardData.setData('text/plain', clean(value))
     evt.preventDefault()
 
-    // emit the cut value
+    // Emit the cut value.
     const cut = input.value.substr(0, input.selectionStart) + input.value.substr(input.selectionEnd)
     evt.target.value = cut
     this.onChange({

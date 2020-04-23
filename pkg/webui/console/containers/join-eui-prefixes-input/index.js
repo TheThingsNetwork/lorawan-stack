@@ -15,14 +15,15 @@
 import React, { useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 
-import PropTypes from '../../../lib/prop-types'
+import Field from '@ttn-lw/components/form/field'
 
-import Field from '../../../components/form/field'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import connect from './connect'
 import JoinEUIPrefixesInput from './join-eui-prefixes-input'
 
 const m = defineMessages({
-  prefixesFetchingFailure: 'Could not retrieve the list of available prefixes',
+  prefixesFetchingFailure: 'Prefixes unavailable',
 })
 
 const JoinEUIPrefixesField = function({

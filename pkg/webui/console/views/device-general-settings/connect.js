@@ -16,22 +16,25 @@ import { replace } from 'connected-react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { updateDevice } from '../../store/actions/devices'
-import { attachPromise } from '../../store/actions/lib'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectSelectedDevice, selectSelectedDeviceId } from '../../store/selectors/devices'
+import api from '@console/api'
+
 import {
   selectIsConfig,
   selectAsConfig,
   selectJsConfig,
   selectNsConfig,
-} from '../../../lib/selectors/env'
+} from '@ttn-lw/lib/selectors/env'
+
 import {
   mayEditApplicationDeviceKeys,
   mayReadApplicationDeviceKeys,
-} from '../../lib/feature-checks'
+} from '@console/lib/feature-checks'
 
-import api from '../../api'
+import { updateDevice } from '@console/store/actions/devices'
+import { attachPromise } from '@console/store/actions/lib'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
 
 const mapStateToProps = state => ({
   device: selectSelectedDevice(state),

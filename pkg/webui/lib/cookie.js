@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * Extracts the value of a cookie if it exists
- * @param {string} key - The key of the entry to extract
- * @returns {string} The extracted value
+ * Extracts the value of a cookie if it exists.
+ *
+ * @param {string} key - The key of the entry to extract.
+ * @returns {string} The extracted value.
  */
 export default function(key) {
   const matches = document.cookie.match(

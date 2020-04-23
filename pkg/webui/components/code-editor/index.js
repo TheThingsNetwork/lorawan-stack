@@ -17,7 +17,7 @@ import ReactAce from 'react-ace'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import 'brace/mode/javascript'
 import 'brace/mode/json'
@@ -29,33 +29,33 @@ import style from './code-editor.styl'
 class CodeEditor extends React.Component {
   static propTypes = {
     className: PropTypes.string,
-    /** New commands to add to the editor, see official docs */
+    /** New commands to add to the editor, see official docs. */
     commands: PropTypes.arrayOf(PropTypes.shape({})),
-    /** see https://github.com/ajaxorg/ace/wiki/Configuring-Ace */
+    /** See `https://github.com/ajaxorg/ace/wiki/Configuring-Ace`. */
     editorOptions: PropTypes.shape({}),
-    /** The height of the editor */
+    /** The height of the editor. */
     height: PropTypes.string,
-    /** The language to highlight */
+    /** The language to highlight. */
     language: PropTypes.oneOf(['javascript', 'json']),
-    /** Maximum lines of code allowed */
+    /** Maximum lines of code allowed. */
     maxLines: PropTypes.number,
-    /** Minimum lines of code allowed */
+    /** Minimum lines of code allowed. */
     minLines: PropTypes.number,
-    /** The name of the editor (should be unique) */
+    /** The name of the editor (should be unique). */
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
-    /** The default value of the editor */
+    /** The default value of the editor. */
     placeholder: PropTypes.string,
-    /** A flag identifying whether the editor is editable */
+    /** A flag identifying whether the editor is editable. */
     readOnly: PropTypes.bool,
-    /** A flag indicating whether the editor should scroll to the bottom when the
-     * value has been updated, useful for logging use cases.
+    /** A flag indicating whether the editor should scroll to the bottom when
+     * the value has been updated, useful for logging use cases.
      */
     scrollToBottom: PropTypes.bool,
     showGutter: PropTypes.bool,
-    /** The current value of the editor */
+    /** The current value of the editor. */
     value: PropTypes.string,
   }
 
@@ -155,17 +155,17 @@ class CodeEditor extends React.Component {
     return (
       <div className={editorCls}>
         <ReactAce
-          // rendered options
+          // Rendered options.
           theme="ttn"
           minLines={minLines}
           maxLines={maxLines}
-          // session options
+          // Session options.
           mode={language}
-          // editor options
+          // Editor options.
           readOnly={readOnly}
           highlightActiveLine
           showGutter={showGutter}
-          // other
+          // Other props.
           name={name}
           onChange={onChange}
           value={currentValue}

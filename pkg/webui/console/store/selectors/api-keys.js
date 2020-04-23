@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_API_KEY_BASE, GET_API_KEYS_LIST_BASE } from '../actions/api-keys'
+import { GET_API_KEY_BASE, GET_API_KEYS_LIST_BASE } from '@console/store/actions/api-keys'
+
 import { createFetchingSelector } from './fetching'
 import { createErrorSelector } from './error'
 import {
@@ -22,7 +23,7 @@ import {
 
 const ENTITY = 'apiKeys'
 
-// Api Key
+// Api key.
 export const selectApiKeysStore = state => state.apiKeys || {}
 export const selectApiKeysEntitiesStore = state => selectApiKeysStore(state).entities
 export const selectApiKeyById = (state, id) => selectApiKeysEntitiesStore(state)[id]
@@ -31,7 +32,7 @@ export const selectSelectedApiKey = state => selectApiKeyById(state, selectSelec
 export const selectApiKeyFetching = createFetchingSelector(GET_API_KEY_BASE)
 export const selectApiKeyError = createErrorSelector(GET_API_KEY_BASE)
 
-// Api Keys
+// Api keys.
 const createSelectApiKeysIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
 const createSelectApiKeysTotalCountSelector = createPaginationTotalCountSelectorByEntity(ENTITY)
 const createSelectApiKeysFetchingSelector = createFetchingSelector(GET_API_KEYS_LIST_BASE)

@@ -36,7 +36,8 @@ $ ttn-lw-cli end-device template extend \
 
 The mapping file `profile.json` contains the following entries (omitting empty fields).
 
-<details><summary>Show `profile.json`</summary>
+<details><summary>Show profile.json</summary>
+
 ```json
 {
   "end_device": {
@@ -71,7 +72,7 @@ The mapping file `profile.json` contains the following entries (omitting empty f
 
 Second, convert the provisioning data to a device templates file to `provisioningdata.json`.
 
->This example uses a **Microchip ATECC608A-MAHTN-T Manifest File**. This file contains provisioning data for The Things Industries Join Server. You can [download the example file](microchip-atecc608a-mahtn-t-example.json).
+>This example uses a **Microchip ATECC608A-MAHTN-T Manifest File**. This file contains provisioning data for The Things Industries Join Server. You can [download the example file](../microchip-atecc608a-mahtn-t-example.json).
 
 ```bash
 $ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-file example.json > provisioningdata.json
@@ -87,6 +88,7 @@ $ cat provisioningdata.json \
 This returns the device templates with provisioning data and device profile combined.
 
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {
@@ -205,6 +207,7 @@ $ cat templates.json \
 ```
 
 <details><summary>Show output</summary>
+
 ```json
 {
   "end_device": {

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import CONNECTION_STATUS from '../../constants/connection-status'
+import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
+
 import {
   createGetEventMessageSuccessActionType,
   createGetEventMessageFailureActionType,
@@ -21,9 +22,9 @@ import {
   createStartEventsStreamFailureActionType,
   createStopEventsStreamActionType,
   createClearEventsActionType,
-} from '../actions/events'
+} from '@console/store/actions/events'
 
-import { getCombinedDeviceId } from '../../../lib/selectors/id'
+import CONNECTION_STATUS from '../../constants/connection-status'
 
 const addEvent = (state, event) => {
   const currentEvents = state.events

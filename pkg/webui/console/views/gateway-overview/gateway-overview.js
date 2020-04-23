@@ -16,24 +16,28 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 
-import DataSheet from '../../../components/data-sheet'
-import GatewayConnection from '../../containers/gateway-connection'
-import GatewayEvents from '../../containers/gateway-events'
-import Tag from '../../../components/tag'
+import DataSheet from '@ttn-lw/components/data-sheet'
+import Tag from '@ttn-lw/components/tag'
+import Spinner from '@ttn-lw/components/spinner'
 
-import sharedMessages from '../../../lib/shared-messages'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import DateTime from '../../../lib/components/date-time'
-import Message from '../../../lib/components/message'
-import PropTypes from '../../../lib/prop-types'
-import GatewayMap from '../../components/gateway-map'
-import EntityTitleSection from '../../components/entity-title-section'
-import KeyValueTag from '../../components/key-value-tag'
-import Spinner from '../../../components/spinner'
-import withRequest from '../../../lib/components/with-request'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Message from '@ttn-lw/lib/components/message'
+import DateTime from '@ttn-lw/lib/components/date-time'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { mayEditBasicGatewayInformation } from '../../lib/feature-checks'
+import GatewayMap from '@console/components/gateway-map'
+import EntityTitleSection from '@console/components/entity-title-section'
+import KeyValueTag from '@console/components/key-value-tag'
+
+import GatewayEvents from '@console/containers/gateway-events'
+import GatewayConnection from '@console/containers/gateway-connection'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayEditBasicGatewayInformation } from '@console/lib/feature-checks'
 
 @withRequest(({ gtwId, loadData }) => loadData(gtwId), () => false)
 @withFeatureRequirement(mayEditBasicGatewayInformation, {

@@ -14,28 +14,32 @@
 
 import React from 'react'
 
-import SubmitButton from '../../../../components/submit-button'
-import SubmitBar from '../../../../components/submit-bar'
-import Input from '../../../../components/input'
-import Checkbox from '../../../../components/checkbox'
-import Form from '../../../../components/form'
-import Notification from '../../../../components/notification'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import Input from '@ttn-lw/components/input'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Form from '@ttn-lw/components/form'
+import Notification from '@ttn-lw/components/notification'
 
-import diff from '../../../../lib/diff'
-import m from '../../../components/device-data-form/messages'
+import m from '@console/components/device-data-form/messages'
+
+import diff from '@ttn-lw/lib/diff'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import randomByteString from '@console/lib/random-bytes'
+
 import messages from '../messages'
-import PropTypes from '../../../../lib/prop-types'
-import sharedMessages from '../../../../lib/shared-messages'
-import randomByteString from '../../../lib/random-bytes'
-
 import { parseLorawanMacVersion, hasExternalJs } from '../utils'
+
 import validationSchema from './validation-schema'
 
 const random16BytesString = () => randomByteString(32)
 
-// The Join Server can store end device fields while not exposing the root keys. This means
-// that the `root_keys` object is present, same for `root_keys.nwk_key` and `root_keys.app_key`,
-// while `root_keys.nwk_key.key` == nil or `root_keys.app_key.key == nil` must hold.
+// The Join Server can store end device fields while not exposing the root keys.
+// This means that the `root_keys` object is present, same for
+// `root_keys.nwk_key` and `root_keys.app_key`, while
+// `root_keys.nwk_key.key` == nil or `root_keys.app_key.key == nil` must  hold.
 // See https://github.com/TheThingsNetwork/lorawan-stack/issues/1473
 const isNwkKeyHidden = ({ root_keys }) =>
   Boolean(root_keys) && Boolean(root_keys.nwk_key) && !Boolean(root_keys.nwk_key.key)
@@ -45,7 +49,8 @@ const isAppKeyHidden = ({ root_keys }) =>
 const JoinServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayReadKeys, mayEditKeys } = props
 
-  // Fallback to 1.1.0 in case NS is not available and lorawan version is not set present.
+  // Fallback to 1.1.0 in case NS is not available and lorawan version is not
+  // set present.
   const isNewLorawanVersion = parseLorawanMacVersion(device.lorawan_version || '1.1.0') >= 110
   const externalJs = hasExternalJs(device) && mayReadKeys
 
@@ -66,7 +71,8 @@ const JoinServerForm = React.memo(props => {
     return validationSchema.cast(values)
   }, [device, mayEditKeys, mayReadKeys])
 
-  // Setup and memoize callbacks for changes to `resets_join_nonces` for displaying the field warning.
+  // Setup and memoize callbacks for changes to `resets_join_nonces` for
+  // displaying the field warning.
   const handleResetsJoinNoncesChange = React.useCallback(
     evt => {
       setResetsJoinNonces(evt.target.checked)
@@ -114,8 +120,8 @@ const JoinServerForm = React.memo(props => {
     nwkKeyPlaceholder = m.unexposed
   }
 
-  // Notify the user that the root keys might be there, but since there are no rights
-  // to read the keys we cannot display them.
+  // Notify the user that the root keys might be there, but since there are no
+  // rights to read the keys we cannot display them.
   const showResetNotification = !mayReadKeys && mayEditKeys && !Boolean(device.root_keys)
 
   return (

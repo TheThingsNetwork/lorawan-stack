@@ -18,7 +18,7 @@ import { injectIntl } from 'react-intl'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './select.styl'
 
@@ -99,7 +99,7 @@ class Select extends React.PureComponent {
     const { onBlur, name } = this.props
 
     // https://github.com/JedWatson/react-select/issues/3523
-    // make sure the input name is always present in the event object
+    // Make sure the input name is always present in the event object.
     event.target.name = name
 
     if (typeof value !== 'undefined') {

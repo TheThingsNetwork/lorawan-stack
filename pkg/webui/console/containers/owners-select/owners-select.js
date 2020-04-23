@@ -15,15 +15,15 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import Select from '../../../components/select'
-import Field from '../../../components/form/field'
+import Select from '@ttn-lw/components/select'
+import Field from '@ttn-lw/components/form/field'
 
-import { getOrganizationId, getUserId } from '../../../lib/selectors/id'
-import PropTypes from '../../../lib/prop-types'
+import { getOrganizationId, getUserId } from '@ttn-lw/lib/selectors/id'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   title: 'Owner',
-  warning: 'Cannot load user oganizations',
+  warning: 'User oganizations unavailable',
 })
 
 const OwnersSelect = props => {

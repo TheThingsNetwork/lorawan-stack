@@ -14,6 +14,14 @@
 
 import { connect } from 'react-redux'
 
+import withRequest from '@ttn-lw/lib/components/with-request'
+
+import {
+  getOrganization,
+  stopOrganizationEventsStream,
+  getOrganizationsRightsList,
+} from '@console/store/actions/organizations'
+
 import {
   selectSelectedOrganization,
   selectOrganizationFetching,
@@ -21,14 +29,7 @@ import {
   selectOrganizationRights,
   selectOrganizationRightsFetching,
   selectOrganizationRightsError,
-} from '../../store/selectors/organizations'
-import {
-  getOrganization,
-  stopOrganizationEventsStream,
-  getOrganizationsRightsList,
-} from '../../store/actions/organizations'
-
-import withRequest from '../../../lib/components/with-request'
+} from '@console/store/selectors/organizations'
 
 const mapStateToProps = (state, props) => ({
   orgId: props.match.params.orgId,

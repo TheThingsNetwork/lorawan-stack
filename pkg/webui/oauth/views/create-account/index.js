@@ -22,23 +22,26 @@ import { replace, push } from 'connected-react-router'
 import * as Yup from 'yup'
 import queryString from 'query-string'
 
-import api from '../../api'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import { id as userRegexp } from '../../../lib/regexp'
-import Button from '../../../components/button'
-import Input from '../../../components/input'
-import Form from '../../../components/form'
-import SubmitButton from '../../../components/submit-button'
-import Message from '../../../lib/components/message'
-import { selectApplicationSiteName } from '../../../lib/selectors/env'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Spinner from '../../../components/spinner'
+import api from '@oauth/api'
+
+import Button from '@ttn-lw/components/button'
+import Input from '@ttn-lw/components/input'
+import Form from '@ttn-lw/components/form'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Spinner from '@ttn-lw/components/spinner'
+
+import Message from '@ttn-lw/lib/components/message'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+
+import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import { id as userRegexp } from '@ttn-lw/lib/regexp'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './create-account.styl'
 
 const m = defineMessages({
-  createAccount: 'Create a new {siteName} Account',
+  createAccount: 'Create a new {siteName} account',
   register: 'Register',
   registrationApproved: 'You have successfully registered and can login now',
   registrationPending:
@@ -47,15 +50,15 @@ const m = defineMessages({
 
 const validationSchema = Yup.object().shape({
   user_id: Yup.string()
-    .min(3, sharedMessages.validateTooShort)
-    .max(36, sharedMessages.validateTooLong)
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(36, Yup.passValues(sharedMessages.validateTooLong))
     .matches(userRegexp, sharedMessages.validateIdFormat)
     .required(sharedMessages.validateRequired),
   name: Yup.string()
-    .min(3, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   password: Yup.string()
-    .min(8, sharedMessages.validateTooShort)
+    .min(8, Yup.passValues(sharedMessages.validateTooShort))
     .required(sharedMessages.validateRequired),
   primary_email_address: Yup.string()
     .email(sharedMessages.validateEmail)

@@ -14,21 +14,23 @@
 
 import * as Yup from 'yup'
 
-import sharedMessages from '../../../lib/shared-messages'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 import {
   id as idRegexp,
   address as addressRegexp,
   mqttUrl as mqttUrlRegexp,
   mqttPassword as mqttPasswordRegexp,
   noSpaces as noSpacesRegexp,
-} from '../../lib/regexp'
+} from '@console/lib/regexp'
+
 import { qosLevels } from './qos-options'
 
 export default Yup.object().shape({
   pub_sub_id: Yup.string()
     .matches(idRegexp, sharedMessages.validateIdFormat)
-    .min(2, sharedMessages.validateTooShort)
-    .max(25, sharedMessages.validateTooLong)
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
   base_topic: Yup.string().required(sharedMessages.validateRequired),
@@ -40,21 +42,21 @@ export default Yup.object().shape({
         is: true,
         then: Yup.string()
           .matches(idRegexp, sharedMessages.validateIdFormat)
-          .min(2, sharedMessages.validateTooShort)
-          .max(100, sharedMessages.validateTooLong)
+          .min(2, Yup.passValues(sharedMessages.validateTooShort))
+          .max(100, Yup.passValues(sharedMessages.validateTooLong))
           .required(sharedMessages.validateRequired),
         otherwise: Yup.string().strip(),
       }),
       password: Yup.string().when('use_credentials', {
         is: true,
         then: Yup.string()
-          .min(2, sharedMessages.validateTooShort)
-          .max(100, sharedMessages.validateTooLong)
+          .min(2, Yup.passValues(sharedMessages.validateTooShort))
+          .max(100, Yup.passValues(sharedMessages.validateTooLong))
           .required(sharedMessages.validateRequired),
         otherwise: Yup.string().strip(),
       }),
       address: Yup.string()
-        .matches(addressRegexp, sharedMessages.validateAddress)
+        .matches(addressRegexp, sharedMessages.validateAddressFormat)
         .required(sharedMessages.validateRequired),
       port: Yup.number()
         .integer(sharedMessages.validateInt32)
@@ -73,15 +75,15 @@ export default Yup.object().shape({
         .required(sharedMessages.validateRequired),
       client_id: Yup.string()
         .matches(noSpacesRegexp, sharedMessages.validateNoSpaces)
-        .min(2, sharedMessages.validateTooShort)
-        .max(23, sharedMessages.validateTooLong)
+        .min(2, Yup.passValues(sharedMessages.validateTooShort))
+        .max(23, Yup.passValues(sharedMessages.validateTooLong))
         .required(sharedMessages.validateRequired),
       username: Yup.string().when('use_credentials', {
         is: true,
         then: Yup.string()
           .matches(noSpacesRegexp, sharedMessages.validateNoSpaces)
-          .min(2, sharedMessages.validateTooShort)
-          .max(100, sharedMessages.validateTooLong)
+          .min(2, Yup.passValues(sharedMessages.validateTooShort))
+          .max(100, Yup.passValues(sharedMessages.validateTooLong))
           .required(sharedMessages.validateRequired),
         otherwise: Yup.string().strip(),
       }),
@@ -90,12 +92,8 @@ export default Yup.object().shape({
         then: Yup.string().matches(mqttPasswordRegexp, sharedMessages.validateMqttPassword),
         otherwise: Yup.string().strip(),
       }),
-      subscribe_qos: Yup.string()
-        .oneOf(qosLevels, sharedMessages.validateFormat)
-        .required(sharedMessages.validateRequired),
-      publish_qos: Yup.string()
-        .oneOf(qosLevels, sharedMessages.validateFormat)
-        .required(sharedMessages.validateRequired),
+      subscribe_qos: Yup.string().oneOf(qosLevels, sharedMessages.validateRequired),
+      publish_qos: Yup.string().oneOf(qosLevels, sharedMessages.validateRequired),
       use_tls: Yup.boolean(),
       tls_ca: Yup.string().when('use_tls', {
         is: true,

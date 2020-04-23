@@ -16,7 +16,7 @@ class EventHandler {
   constructor() {
     this.EVENTS = Object.freeze({
       WARNING: 'warning',
-      // Add more here as we go
+      // Add more here as we go.
     })
 
     this.eventHandlers = {}

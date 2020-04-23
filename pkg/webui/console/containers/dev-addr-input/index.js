@@ -15,14 +15,15 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
-import PropTypes from '../../../lib/prop-types'
+import Field from '@ttn-lw/components/form/field'
 
-import Field from '../../../components/form/field'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import DevAddrInput from './dev-addr-input'
 import connect from './connect'
 
 const m = defineMessages({
-  devAddrFetchingFailure: 'Could not generate device address',
+  devAddrFetchingFailure: 'There was an error and the end device address could not be generated',
 })
 
 const DevAddrField = function(props) {

@@ -13,26 +13,30 @@
 // limitations under the License.
 
 import traverse from 'traverse'
+
 import Marshaler from '../../util/marshaler'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 
-/** Takes the requested paths of the device and returns a request tree. The
+/**
+ * Takes the requested paths of the device and returns a request tree. The
  * splitting is achieved by looking up path responsibilities as defined in the
  * generated device entity map json.
- * @param {Object} paths - The requested paths (from the field mask) of the device
- * @param {string} direction - The direction, either 'set' or 'get'
- * @param {Object} base - An optional base value for the returned request tree
- * @param {Object} components - A component whitelist, unincluded components
- * will be excluded from the request tree
- * @returns {Object} A request tree object, consisting of resulting paths for each
- * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
+ *
+ * @param {object} paths - The requested paths (from the field mask) of the
+ * device.
+ * @param {string} direction - The direction, either 'set' or 'get'.
+ * @param {object} base - An optional base value for the returned request tree.
+ * @param {object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree.
+ * @returns {object} A request tree object, consisting of resulting paths for
+ * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
 function splitPaths(paths = [], direction, base = {}, components = ['is', 'ns', 'as', 'js']) {
   const result = base
   const retrieveIndex = direction === 'get' ? 0 : 1
 
   for (const path of paths) {
-    // Look up the current path in the device entity map
+    // Look up the current path in the device entity map.
     const subtree = traverse(deviceEntityMap).get(path) || traverse(deviceEntityMap).get([path[0]])
 
     if (!subtree) {
@@ -60,44 +64,52 @@ function splitPaths(paths = [], direction, base = {}, components = ['is', 'ns', 
   return result
 }
 
-/** A wrapper function to obtain a request tree for writing values to a device
- * @param {Object} paths - The requested paths (from the field mask) of the device
- * @param {Object} base - An optional base value for the returned request tree
- * @param {Object} components - A component whitelist, unincluded components
- * will be excluded from the request tree
- * @returns {Object} A request tree object, consisting of resulting paths for each
- * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
+/**
+ * A wrapper function to obtain a request tree for writing values to a device.
+ *
+ * @param {object} paths - The requested paths (from the field mask) of the
+ * device.
+ * @param {object} base - An optional base value for the returned request tree.
+ * @param {object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree.
+ * @returns {object} A request tree object, consisting of resulting paths for
+ * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
 export function splitSetPaths(paths, base, components) {
   return splitPaths(paths, 'set', base, components)
 }
 
-/** A wrapper function to obtain a request tree for reading values to a device
- * @param {Object} paths - The requested paths (from the field mask) of the device
- * @param {Object} base - An optional base value for the returned request tree
- * @param {Object} components - A component whitelist, unincluded components
- * will be excluded from the request tree
- * @returns {Object} A request tree object, consisting of resulting paths for each
- * component eg: { is: ['ids'], as: ['session'], js: ['root_keys'] }
+/**
+ * A wrapper function to obtain a request tree for reading values to a device.
+ *
+ * @param {object} paths - The requested paths (from the field mask) of the
+ * device.
+ * @param {object} base - An optional base value for the returned request tree.
+ * @param {object} components - A component whitelist, unincluded components
+ * will be excluded from the request tree.
+ * @returns {object} A request tree object, consisting of resulting paths for
+ * each component eg: `{ is: ['ids'], as: ['session'], js: ['root_keys'] }`.
  */
 export function splitGetPaths(paths, base, components) {
   return splitPaths(paths, 'get', base, components)
 }
 
-/** makeRequests will make the necessary api calls based on the request tree and
- * other options
- * @param {Object} api - The Api object as passed to the service
- * @param {Object} stackConfig - The Things Stack config object
+/**
+ * `makeRequests` will make the necessary api calls based on the request tree
+ * and other options.
+ *
+ * @param {object} api - The Api object as passed to the service.
+ * @param {object} stackConfig - The Things Stack config object.
  * @param {string} operation - The operation, an enum of 'create', 'set', 'get'
- * and 'delete'
- * @param {string} requestTree - The request tree, as returned by the splitPaths
- * function
- * @param {Object} params - The parameters object to be passed to the requests
- * @param {Object} payload - The payload to be passed to the requests
- * @param {boolean} ignoreNotFound - A flag indicating whether not found errors
- * should be translated to an empty device instead of throwing
- * @returns {Object} An array of device registry responses together with the paths
- * (field_mask) that they were requested with
+ * and 'delete'.
+ * @param {string} requestTree - The request tree, as returned by the
+ * `splitPaths` function.
+ * @param {object} params - The parameters object to be passed to the requests.
+ * @param {object} payload - The payload to be passed to the requests.
+ * @param {boolean} ignoreNotFound - Flag indicating whether not found errors
+ * should be translated to an empty device instead of throwing.
+ * @returns {object} An array of device registry responses together with the
+ * paths (field_mask) that they were requested with.
  */
 export async function makeRequests(
   api,
@@ -114,7 +126,7 @@ export async function makeRequests(
   const rpcFunction = isSet || isCreate ? 'Set' : isDelete ? 'Delete' : 'Get'
 
   // Use a wrapper for the api calls to control the result object and allow
-  // ignoring not found errors per component, if wished
+  // ignoring not found errors per component, if wished.
   const requestWrapper = async function(
     call,
     params,
@@ -174,7 +186,7 @@ export async function makeRequests(
 
   const { end_device = {} } = payload
 
-  // Do a possible IS request first
+  // Do a possible IS request first.
   if (stackConfig.isComponentAvailable('is') && 'is' in requestTree) {
     let func
     if (isSet) {
@@ -199,16 +211,17 @@ export async function makeRequests(
     )
 
     if (isCreate) {
-      // Abort and return the result object when the IS create request has failed
+      // Abort and return the result object when the IS create request has
+      // failed.
       if (result[3].hasErrored) {
         return result
       }
-      // Set the device id param based on the id of the newly created device
+      // Set the device id param based on the id of the newly created device.
       params.routeParams['end_device.ids.device_id'] = result[3].device.ids.device_id
     }
   }
 
-  // Compose an array of possible api calls to NS, AS, JS
+  // Compose an array of possible api calls to NS, AS, JS.
   if (stackConfig.isComponentAvailable('ns') && 'ns' in requestTree) {
     requests[0] = requestWrapper(api.NsEndDeviceRegistry[rpcFunction], params, 'ns', {
       ...splitPayload(payload, requestTree.ns),
@@ -228,10 +241,10 @@ export async function makeRequests(
     })
   }
 
-  // Run the requests in parallel
+  // Run the requests in parallel.
   const responses = await Promise.all(requests)
 
-  // Attach the results to the result array
+  // Attach the results to the result array.
   for (const [i, response] of responses.entries()) {
     if (response) {
       result[i] = response

@@ -21,19 +21,22 @@ import { replace } from 'connected-react-router'
 import { connect } from 'react-redux'
 import * as Yup from 'yup'
 
-import api from '../../api'
-import sharedMessages from '../../../lib/shared-messages'
-import { selectApplicationRootPath, selectApplicationSiteName } from '../../../lib/selectors/env'
-import PropTypes from '../../../lib/prop-types'
+import api from '@oauth/api'
 
-import Button from '../../../components/button'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import SubmitButton from '../../../components/submit-button'
-import Logo from '../../../containers/logo'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import Message from '../../../lib/components/message'
-import { id as userRegexp } from '../../../lib/regexp'
+import Button from '@ttn-lw/components/button'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitButton from '@ttn-lw/components/submit-button'
+
+import Logo from '@ttn-lw/containers/logo'
+
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectApplicationRootPath, selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { id as userRegexp } from '@ttn-lw/lib/regexp'
 
 import style from './login.styl'
 
@@ -45,8 +48,8 @@ const m = defineMessages({
 
 const validationSchema = Yup.object().shape({
   user_id: Yup.string()
-    .min(3, sharedMessages.validateTooShort)
-    .max(36, sharedMessages.validateTooLong)
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(36, Yup.passValues(sharedMessages.validateTooLong))
     .matches(userRegexp, sharedMessages.validateIdFormat)
     .required(sharedMessages.validateRequired),
   password: Yup.string().required(sharedMessages.validateRequired),

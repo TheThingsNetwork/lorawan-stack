@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createGetRightsListActionType } from '../actions/rights'
-import { createRequestActions } from '../actions/lib'
+import { createGetRightsListActionType } from '@console/store/actions/rights'
+import { createRequestActions } from '@console/store/actions/lib'
 
 const defaultState = {
   rights: [],

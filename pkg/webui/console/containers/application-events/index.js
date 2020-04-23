@@ -16,21 +16,24 @@ import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 
-import PropTypes from '../../../lib/prop-types'
-import EventsSubscription from '../../containers/events-subscription'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
-import { mayViewApplicationEvents } from '../../lib/feature-checks'
+import EventsSubscription from '@console/containers/events-subscription'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 
 import {
   clearApplicationEventsStream,
   startApplicationEventsStream,
-} from '../../store/actions/applications'
+} from '@console/store/actions/applications'
 
 import {
   selectApplicationEvents,
   selectApplicationEventsStatus,
   selectApplicationEventsError,
-} from '../../store/selectors/applications'
+} from '@console/store/selectors/applications'
 
 @withFeatureRequirement(mayViewApplicationEvents)
 @connect(

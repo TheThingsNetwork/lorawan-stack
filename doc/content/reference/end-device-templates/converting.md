@@ -31,17 +31,18 @@ Given input data, you can use the `end-device template from-data` command to get
 
 ## Example
 
->This example uses a **Microchip ATECC608A-MAHTN-T Manifest File**. This file contains provisioning data for The Things Industries Join Server. You can [download the example file](microchip-atecc608a-mahtn-t-example.json).
+>This example uses a **Microchip ATECC608A-MAHTN-T Manifest File**. This file contains provisioning data for The Things Industries Join Server. You can [download the example file](../microchip-atecc608a-mahtn-t-example.json).
 
 ```bash
 $ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-file example.json
 ```
 
-<details><summary>Show output</summary>
-```json
+Output:
+
+```javascript
 {
   "end_device": {
-    ...
+    // ...
     "provisioner_id": "microchip",
     "provisioning_data": {
         "distributor": {
@@ -54,7 +55,7 @@ $ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-f
               "organizationalUnitName": "Secure Products Group"
             },
         "model": "ATECC608A",
-        ...
+        // ...
       }
   },
   "field_mask": {
@@ -66,6 +67,5 @@ $ ttn-lw-cli end-device template from-data microchip-atecc608a-mahtn-t --local-f
   "mapping_key": "0123d34fb176c66f27"
 }
 ```
-</details>
 
 In this example, only the `provisioner_id` and `provisioning_data` fields are set with the `mapping_key` set to the serial number. Device makers can use the template to assign the `JoinEUI` and `DevEUI`s (see [Assigning EUIs]({{< relref "assigning-euis.md" >}})) as well as other device fields (see [Creating]({{< relref "creating.md" >}}) and [Mapping Templates]({{< relref "mapping.md" >}})).

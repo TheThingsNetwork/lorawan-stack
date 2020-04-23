@@ -14,7 +14,13 @@
 
 import { createLogic } from 'redux-logic'
 
-import CONNECTION_STATUS from '../../../constants/connection-status'
+import CONNECTION_STATUS from '@console/constants/connection-status'
+
+import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
+import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
+
+import { createEventsStatusSelector } from '@console/store/selectors/events'
+
 import {
   createStartEventsStreamActionType,
   createStopEventsStreamActionType,
@@ -26,17 +32,15 @@ import {
   startEventsStreamSuccess,
   stopEventsStream,
 } from '../../actions/events'
-import { createEventsStatusSelector } from '../../selectors/events'
-import { isUnauthenticatedError } from '../../../../lib/errors/utils'
-import { getCombinedDeviceId } from '../../../../lib/selectors/id'
 
 /**
  * Creates `redux-logic` logic from processing entity events.
+ *
  * @param {string} reducerName - The name of an entity used to create the events reducer.
  * @param {string} entityName - The name of an entity.
  * @param {Function} onEventsStart - A function to be called to start the events stream.
  * Should accept a list of entity ids.
- * @returns {Object} - The `redux-logic` (decorated) logic.
+ * @returns {object} - The `redux-logic` (decorated) logic.
  */
 const createEventsConnectLogics = function(reducerName, entityName, onEventsStart) {
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
@@ -68,7 +72,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
 
         const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
 
-        // only proceed if not already connected
+        // Only proceed if not already connected.
         const status = selectEntityEventsStatus(getState(), id)
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING
@@ -110,7 +114,7 @@ const createEventsConnectLogics = function(reducerName, entityName, onEventsStar
 
         const id = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
 
-        // only proceed if connected
+        // Only proceed if connected.
         const status = selectEntityEventsStatus(getState(), id)
         const connected = status === CONNECTION_STATUS.CONNECTED
         const connecting = status === CONNECTION_STATUS.CONNECTING

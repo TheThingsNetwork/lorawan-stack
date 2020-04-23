@@ -15,13 +15,15 @@
 import React from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
-import PropTypes from '../../lib/prop-types'
 
-import sharedMessages from '../../lib/shared-messages'
+import Button from '@ttn-lw/components/button'
 
-import Message from '../../lib/components/message'
-import Button from '../button'
-import Logo from '../../containers/logo'
+import Logo from '@ttn-lw/containers/logo'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './modal.styl'
 

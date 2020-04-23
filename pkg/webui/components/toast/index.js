@@ -16,7 +16,8 @@ import React from 'react'
 import { ToastContainer as Container, Slide } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-import PropTypes from '../../lib/prop-types'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import createToast from './toast'
 
 import style from './toast.styl'

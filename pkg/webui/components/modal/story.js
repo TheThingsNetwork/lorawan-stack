@@ -15,9 +15,11 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
-import Icon from '../icon'
+
+import Icon from '@ttn-lw/components/icon'
 
 import style from './story.styl'
+
 import Modal from '.'
 
 const bottomLine = (
@@ -80,7 +82,7 @@ storiesOf('Modal', module)
           </li>
           <li>
             <Icon icon="check" className={style.icon} />
-            Create and edit devices of your applications
+            Create and edit end devices of your applications
           </li>
         </ul>
       </div>

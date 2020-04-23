@@ -18,6 +18,7 @@ import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import CheckboxGroup from './group'
+
 import Checkbox from '.'
 
 const info = {

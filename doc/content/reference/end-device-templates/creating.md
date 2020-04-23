@@ -25,7 +25,8 @@ $ ttn-lw-cli device get test-app test-dev \
   | ttn-lw-cli end-device template create > template.json
 ```
 
-<details><summary>Show output</summary>
+Output:
+
 ```json
 {
   "end_device": {
@@ -47,7 +48,6 @@ $ ttn-lw-cli device get test-app test-dev \
   }
 }
 ```
-</details>
 
 ## Extend existing template
 
@@ -59,7 +59,8 @@ $ cat template.json \
   --frequency-plan-id EU_863_870
 ```
 
-<details><summary>Show output</summary>
+Output:
+
 ```json
 {
   "end_device": {
@@ -85,7 +86,6 @@ $ cat template.json \
   }
 }
 ```
-</details>
 
 See `$ ttn-lw-cli end-device template extend --help` for all the fields that can be set.
 
@@ -102,7 +102,8 @@ $ ttn-lw-cli end-device template extend \
   --frequency-plan-id EU_863_870
 ```
 
-<details><summary>Show output</summary>
+Output:
+
 ```json
 {
   "end_device": {
@@ -128,4 +129,3 @@ $ ttn-lw-cli end-device template extend \
   }
 }
 ```
-</details>

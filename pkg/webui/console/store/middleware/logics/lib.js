@@ -15,12 +15,8 @@
 import { createLogic } from 'redux-logic'
 import * as Sentry from '@sentry/browser'
 
-import { error } from '../../../../lib/log'
-import {
-  isUnauthenticatedError,
-  isInvalidArgumentError,
-  isUnknown,
-} from '../../../../lib/errors/utils'
+import { error } from '@ttn-lw/lib/log'
+import { isUnauthenticatedError, isInvalidArgumentError, isUnknown } from '@ttn-lw/lib/errors/utils'
 
 const getResultActionFromType = function(typeString, status) {
   if (typeString instanceof Array) {
@@ -35,11 +31,12 @@ const getResultActionFromType = function(typeString, status) {
 
 /**
  * Logic creator for request logics, it will handle promise resolution, as well
- * as result action dispatch automatically
- * @param {Object} options - The logic options (to be passed to `createLogic()`)
- * @param {(string\|function)} successType - The success action type or action creator
- * @param {(string\|function)} failType - The fail action type or action creator
- * @returns {Object} The `redux-logic` (decorated) logic
+ * as result action dispatch automatically.
+ *
+ * @param {object} options - The logic options (to be passed to `createLogic()`).
+ * @param {(string|Function)} successType - The success action type or action creator.
+ * @param {(string|Function)} failType - The fail action type or action creator.
+ * @returns {object} The `redux-logic` (decorated) logic.
  */
 const createRequestLogic = function(
   options,
@@ -68,10 +65,10 @@ const createRequestLogic = function(
       try {
         const res = await options.process(deps, dispatch)
 
-        // After successful request, dispatch success action
+        // After successful request, dispatch success action.
         dispatch(successAction(res))
 
-        // If we have a promise attached, resolve it
+        // If we have a promise attached, resolve it.
         if (promiseAttached) {
           const {
             meta: { _resolve },
@@ -79,21 +76,21 @@ const createRequestLogic = function(
           _resolve(res)
         }
       } catch (e) {
-        error(e) // Log the error if in development mode
+        error(e) // Log the error if in development mode.
 
         if (isUnauthenticatedError(e)) {
           // If there was an unauthenticated error, the access token is not
           // valid. Reloading will then initiate the auth flow.
           window.location.reload()
         } else {
-          // Otherwise, dispatch the fail action and report it to Sentry
+          // Otherwise, dispatch the fail action and report it to Sentry.
           if (isUnknown(e) || isInvalidArgumentError(e)) {
             Sentry.captureException(failAction(e))
           }
           dispatch(failAction(e))
         }
 
-        // If we have a promise attached, reject it
+        // If we have a promise attached, reject it.
         if (promiseAttached) {
           const {
             meta: { _reject },

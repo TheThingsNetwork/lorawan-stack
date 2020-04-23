@@ -18,14 +18,15 @@ import {
   isGsStatusReceiveEvent,
   isGsDownlinkSendEvent,
   isGsUplinkReceiveEvent,
-} from '../../../lib/selectors/event'
-import PropTypes from '../../../lib/prop-types'
+} from '@ttn-lw/lib/selectors/event'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 /**
- * `withConnectionReactor` is a HOC that handles gateway connection statistics updates based on
- * gateway uplink, downlink and connection events.
- * @param {Object} Component - React component to be wrapped by the reactor.
- * @returns {Object} - A wrapped react component.
+ * `withConnectionReactor` is a HOC that handles gateway connection statistics
+ * updates based on gateway uplink, downlink and connection events.
+ *
+ * @param {object} Component - React component to be wrapped by the reactor.
+ * @returns {object} - A wrapped react component.
  */
 const withConnectionReactor = Component => {
   class ConnectionReactor extends React.PureComponent {

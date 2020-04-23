@@ -15,9 +15,11 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import PropTypes from '../../../lib/prop-types'
-import Message from '../../../lib/components/message'
-import from from '../../../lib/from'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import from from '@ttn-lw/lib/from'
+
 import FormContext from '../context'
 
 import style from './field.styl'

@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as configuration from '../../actions/configuration'
-import api from '../../../api'
+import api from '@console/api'
 
-import { selectNsFrequencyPlans, selectGsFrequencyPlans } from '../../selectors/configuration'
+import * as configuration from '@console/store/actions/configuration'
+
+import {
+  selectNsFrequencyPlans,
+  selectGsFrequencyPlans,
+} from '@console/store/selectors/configuration'
 
 import createRequestLogic from './lib'
 

@@ -15,6 +15,7 @@
 import React from 'react'
 
 import getSideNavigationDriver from './index_driver'
+
 import SideNavigation from '.'
 
 describe('SideNavigation', function() {

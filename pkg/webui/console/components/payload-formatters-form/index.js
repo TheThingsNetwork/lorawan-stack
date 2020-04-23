@@ -17,23 +17,27 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import * as Yup from 'yup'
 
-import Form from '../../../components/form'
-import Radio from '../../../components/radio-button'
-import SubmitButton from '../../../components/submit-button'
-import SubmitBar from '../../../components/submit-bar'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import { address as addressRegexp } from '../../lib/regexp'
-import Input from '../../../components/input'
-import CodeEditor from '../../../components/code-editor'
-import TYPES from '../../constants/formatter-types'
+import TYPES from '@console/constants/formatter-types'
+
+import Form from '@ttn-lw/components/form'
+import Radio from '@ttn-lw/components/radio-button'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import Input from '@ttn-lw/components/input'
+import CodeEditor from '@ttn-lw/components/code-editor'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { address as addressRegexp } from '@console/lib/regexp'
+
 import { getDefaultGrpcServiceFormatter, getDefaultJavascriptFormatter } from './formatter-values'
 
 const m = defineMessages({
-  grpc: 'GRPC Service',
+  grpc: 'GRPC service',
   repository: 'Repository',
-  formatterType: 'Formatter Type',
-  formatterParameter: 'Formatter Parameter',
+  formatterType: 'Formatter type',
+  formatterParameter: 'Formatter parameter',
   grpcDescription: 'The address of the service to connect to',
 })
 

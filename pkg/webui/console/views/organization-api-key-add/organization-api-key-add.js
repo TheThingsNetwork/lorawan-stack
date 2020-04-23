@@ -16,13 +16,14 @@ import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 
-import { ApiKeyCreateForm } from '../../components/api-key-form'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import PageTitle from '@ttn-lw/components/page-title'
 
-import PageTitle from '../../../components/page-title'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import { ApiKeyCreateForm } from '@console/components/api-key-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 @withBreadcrumb('orgs.single.api-keys.add', function(props) {
   const orgId = props.orgId

@@ -17,21 +17,23 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import PageTitle from '../../../components/page-title'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import WebhookForm from '../../components/webhook-form'
-import toast from '../../../components/toast'
-import diff from '../../../lib/diff'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import api from '@console/api'
 
-import api from '../../api'
+import PageTitle from '@ttn-lw/components/page-title'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import toast from '@ttn-lw/components/toast'
+
+import WebhookForm from '@console/components/webhook-form'
+
+import diff from '@ttn-lw/lib/diff'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
-  editWebhook: 'Edit Webhook',
-  updateSuccess: 'Successfully updated webhook',
-  deleteSuccess: 'Successfully deleted webhook',
+  editWebhook: 'Edit webhook',
+  updateSuccess: 'Webhook updated',
+  deleteSuccess: 'Webhook deleted',
 })
 
 @withBreadcrumb('apps.single.integrations.webhooks.edit', function(props) {

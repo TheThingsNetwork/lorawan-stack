@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import React from 'react'
-import PropTypes from '../../../lib/prop-types'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const ListItem = function(props) {
   const { className, component: Component, children, ...rest } = props

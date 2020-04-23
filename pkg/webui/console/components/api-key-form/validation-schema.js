@@ -13,12 +13,13 @@
 // limitations under the License.
 
 import * as Yup from 'yup'
-import sharedMessages from '../../../lib/shared-messages'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 

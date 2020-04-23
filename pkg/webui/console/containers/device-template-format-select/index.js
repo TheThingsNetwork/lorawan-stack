@@ -14,17 +14,19 @@
 
 import { defineMessages } from 'react-intl'
 
-import CreateFetchSelect from '../fetch-select'
+import CreateFetchSelect from '@console/containers/fetch-select'
+
+import { getDeviceTemplateFormats } from '@console/store/actions/device-template-formats'
+
 import {
   selectDeviceTemplateFormats,
   selectDeviceTemplateFormatsError,
   selectDeviceTemplateFormatsFetching,
-} from '../../store/selectors/device-template-formats'
-import { getDeviceTemplateFormats } from '../../store/actions/device-template-formats'
+} from '@console/store/selectors/device-template-formats'
 
 const m = defineMessages({
   title: 'Format',
-  warning: 'Could not retrieve the list of available device template formats',
+  warning: 'End device template formats unavailable',
 })
 
 const formatOptions = formats =>

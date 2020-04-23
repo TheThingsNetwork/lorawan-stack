@@ -19,21 +19,27 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { push } from 'connected-react-router'
 
-import PageTitle from '../../../components/page-title'
-import FormSubmit from '../../../components/form/submit'
-import SubmitButton from '../../../components/submit-button'
-import GatewayDataForm from '../../components/gateway-data-form'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
-import { withEnv } from '../../../lib/components/env'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import api from '@console/api'
 
-import api from '../../api'
-import { selectUserId } from '../../store/selectors/user'
-import { mayCreateGateways } from '../../lib/feature-checks'
+import PageTitle from '@ttn-lw/components/page-title'
+import FormSubmit from '@ttn-lw/components/form/submit'
+import SubmitButton from '@ttn-lw/components/submit-button'
+
+import { withEnv } from '@ttn-lw/lib/components/env'
+
+import GatewayDataForm from '@console/components/gateway-data-form'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayCreateGateways } from '@console/lib/feature-checks'
+
+import { selectUserId } from '@console/store/selectors/user'
 
 const m = defineMessages({
-  createGateway: 'Create Gateway',
+  createGateway: 'Create gateway',
 })
 
 @withEnv

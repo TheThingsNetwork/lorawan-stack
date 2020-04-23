@@ -15,29 +15,30 @@
 import { connect } from 'react-redux'
 
 import {
-  selectSelectedApplication,
-  selectSelectedApplicationId,
-  selectApplicationLinkIndicator,
-  selectApplicationLinkFetching,
-  selectApplicationDeviceCount,
-} from '../../store/selectors/applications'
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-} from '../../store/selectors/collaborators'
-import { selectApiKeysTotalCount, selectApiKeysFetching } from '../../store/selectors/api-keys'
-import { getCollaboratorsList } from '../../store/actions/collaborators'
-import { getApiKeysList } from '../../store/actions/api-keys'
-import { getApplicationLink } from '../../store/actions/link'
-import { getApplicationDeviceCount } from '../../store/actions/applications'
-
-import {
   checkFromState,
   mayViewOrEditApplicationApiKeys,
   mayViewOrEditApplicationCollaborators,
   mayViewApplicationDevices,
   mayLinkApplication,
-} from '../../lib/feature-checks'
+} from '@console/lib/feature-checks'
+
+import { getCollaboratorsList } from '@console/store/actions/collaborators'
+import { getApiKeysList } from '@console/store/actions/api-keys'
+import { getApplicationLink } from '@console/store/actions/link'
+import { getApplicationDeviceCount } from '@console/store/actions/applications'
+
+import { selectApiKeysTotalCount, selectApiKeysFetching } from '@console/store/selectors/api-keys'
+import {
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+} from '@console/store/selectors/collaborators'
+import {
+  selectSelectedApplication,
+  selectSelectedApplicationId,
+  selectApplicationLinkIndicator,
+  selectApplicationLinkFetching,
+  selectApplicationDeviceCount,
+} from '@console/store/selectors/applications'
 
 const mapStateToProps = (state, props) => {
   const appId = selectSelectedApplicationId(state)

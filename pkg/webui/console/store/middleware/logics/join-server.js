@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as js from '../../actions/join-server'
-import api from '../../../api'
+import api from '@console/api'
+
+import * as js from '@console/store/actions/join-server'
 
 import createRequestLogic from './lib'
 

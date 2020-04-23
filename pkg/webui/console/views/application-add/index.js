@@ -20,36 +20,40 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
-import PageTitle from '../../../components/page-title'
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Checkbox from '../../../components/checkbox'
-import SubmitButton from '../../../components/submit-button'
-import toast from '../../../components/toast'
-import SubmitBar from '../../../components/submit-bar'
-import PropTypes from '../../../lib/prop-types'
-import sharedMessages from '../../../lib/shared-messages'
-import { id as applicationIdRegexp, address } from '../../lib/regexp'
-import { getApplicationId } from '../../../lib/selectors/id'
-import OwnersSelect from '../../containers/owners-select'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import api from '@console/api'
 
-import { selectUserId, selectUserRights } from '../../store/selectors/user'
-import { mayCreateApplications, mayLinkApplication } from '../../lib/feature-checks'
+import PageTitle from '@ttn-lw/components/page-title'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import Checkbox from '@ttn-lw/components/checkbox'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import toast from '@ttn-lw/components/toast'
+import SubmitBar from '@ttn-lw/components/submit-bar'
 
-import api from '../../api'
+import OwnersSelect from '@console/containers/owners-select'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { getApplicationId } from '@ttn-lw/lib/selectors/id'
+
+import { id as applicationIdRegexp, address } from '@console/lib/regexp'
+import { mayCreateApplications, mayLinkApplication } from '@console/lib/feature-checks'
+
+import { selectUserId, selectUserRights } from '@console/store/selectors/user'
 
 const m = defineMessages({
-  applicationName: 'Application Name',
+  applicationName: 'Application name',
   appIdPlaceholder: 'my-new-application',
-  appNamePlaceholder: 'My New Application',
+  appNamePlaceholder: 'My new application',
   appDescPlaceholder: 'Description for my new application',
   appDescDescription:
     'Optional application description; can also be used to save notes about the application',
-  createApplication: 'Create Application',
+  createApplication: 'Create application',
   linking: 'Linking',
   linkAutomatically: 'Link new application to Network Server automatically',
-  linkFailure: 'There was a problem while linking the application',
+  linkFailure: 'There was an error and the application could not be linked',
   linkFailureTitle: 'Application link failed',
 })
 
@@ -57,16 +61,16 @@ const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),
   application_id: Yup.string()
     .matches(applicationIdRegexp, sharedMessages.validateIdFormat)
-    .min(2, sharedMessages.validateTooShort)
-    .max(25, sharedMessages.validateTooLong)
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string(),
   network_server_address: Yup.string().when('link', {
     is: true,
-    then: Yup.string().matches(address, sharedMessages.validateFormat),
+    then: Yup.string().matches(address, sharedMessages.validateAddressFormat),
   }),
 })
 

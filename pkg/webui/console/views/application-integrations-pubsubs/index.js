@@ -16,19 +16,24 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import ErrorView from '../../../lib/components/error-view'
-import SubViewError from '../error/sub-view'
-import ApplicationPubsubsList from '../application-integrations-pubsubs-list'
-import ApplicationPubsubAdd from '../application-integrations-pubsub-add'
-import ApplicationPubsubEdit from '../application-integrations-pubsub-edit'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import { mayViewApplicationEvents } from '../../lib/feature-checks'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import PropTypes from '../../../lib/prop-types'
+import ErrorView from '@ttn-lw/lib/components/error-view'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import ApplicationPubsubEdit from '@console/views/application-integrations-pubsub-edit'
+import ApplicationPubsubAdd from '@console/views/application-integrations-pubsub-add'
+import ApplicationPubsubsList from '@console/views/application-integrations-pubsubs-list'
+import SubViewError from '@console/views/error/sub-view'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewApplicationEvents } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))
 @withFeatureRequirement(mayViewApplicationEvents, {

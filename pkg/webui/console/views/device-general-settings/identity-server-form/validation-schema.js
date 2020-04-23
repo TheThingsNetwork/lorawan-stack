@@ -14,11 +14,11 @@
 
 import * as Yup from 'yup'
 
-import randomByteString from '../../../lib/random-bytes'
-import sharedMessages from '../../../../lib/shared-messages'
-import { id as deviceIdRegexp, address as addressRegexp } from '../../../lib/regexp'
-import m from '../../../components/device-data-form/messages'
-import { selectJsConfig } from '../../../../lib/selectors/env'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectJsConfig } from '@ttn-lw/lib/selectors/env'
+
+import randomByteString from '@console/lib/random-bytes'
+import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
 
 import { parseLorawanMacVersion } from '../utils'
 
@@ -32,14 +32,14 @@ const validationSchema = Yup.object()
     ids: Yup.object().shape({
       device_id: Yup.string()
         .matches(deviceIdRegexp, sharedMessages.validateAlphanum)
-        .min(2, sharedMessages.validateTooShort)
-        .max(36, sharedMessages.validateTooLong)
+        .min(2, Yup.passValues(sharedMessages.validateTooShort))
+        .max(36, Yup.passValues(sharedMessages.validateTooLong))
         .required(sharedMessages.validateRequired),
     }),
     name: Yup.string()
-      .min(2, sharedMessages.validateTooShort)
-      .max(50, sharedMessages.validateTooLong),
-    description: Yup.string().max(2000, sharedMessages.validateTooLong),
+      .min(2, Yup.passValues(sharedMessages.validateTooShort))
+      .max(50, Yup.passValues(sharedMessages.validateTooLong)),
+    description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
     network_server_address: Yup.string().matches(
       addressRegexp,
       sharedMessages.validateAddressFormat,
@@ -90,7 +90,7 @@ const validationSchema = Yup.object()
           return !externalJs
             ? Yup.object().shape({
                 key: Yup.string()
-                  .emptyOrLength(16 * 2, m.validate32) // 16 Byte hex
+                  .emptyOrLength(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                   .transform(toUndefined)
                   .default(random16BytesString),
               })

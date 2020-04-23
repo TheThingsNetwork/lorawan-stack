@@ -15,28 +15,31 @@
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import FileInput from '../../../components/file-input'
-import Radio from '../../../components/radio-button'
-import Checkbox from '../../../components/checkbox'
-import Select from '../../../components/select'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import Notification from '../../../components/notification'
-import Message from '../../../lib/components/message'
-import ModalButton from '../../../components/button/modal-button'
-import PubsubFormatSelector from '../../containers/pubsub-formats-select'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import FileInput from '@ttn-lw/components/file-input'
+import Radio from '@ttn-lw/components/radio-button'
+import Checkbox from '@ttn-lw/components/checkbox'
+import Select from '@ttn-lw/components/select'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Notification from '@ttn-lw/components/notification'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 
+import Message from '@ttn-lw/lib/components/message'
+
+import PubsubFormatSelector from '@console/containers/pubsub-formats-select'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import m from './messages'
 import {
   mapPubsubToFormValues,
   mapFormValuesToPubsub,
   blankValues,
   mapNatsServerUrlToFormValue,
 } from './mapping'
-import m from './messages'
 import { qosOptions } from './qos-options'
 import validationSchema from './validation-schema'
 

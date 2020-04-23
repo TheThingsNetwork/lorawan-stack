@@ -15,14 +15,17 @@
 import React from 'react'
 import { Switch, Route } from 'react-router'
 
-import PropTypes from '../../../lib/prop-types'
-import { selectApplicationSiteName } from '../../../lib/selectors/env'
-import IntlHelmet from '../../../lib/components/intl-helmet'
-import NotFoundRoute from '../../../lib/components/not-found-route'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
-import UserManagement from '../admin-user-management'
-import { mayPerformAdminActions } from '../../lib/feature-checks'
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import UserManagement from '@console/views/admin-user-management'
+
+import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { mayPerformAdminActions } from '@console/lib/feature-checks'
 
 const AdminView = ({ match }) => (
   <React.Fragment>

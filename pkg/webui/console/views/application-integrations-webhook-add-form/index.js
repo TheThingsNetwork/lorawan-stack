@@ -19,18 +19,24 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
-import PropTypes from '../../../lib/prop-types'
-import PageTitle from '../../../components/page-title'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import WebhookForm from '../../components/webhook-form'
-import WebhookTemplateForm from '../../components/webhook-template-form'
-import sharedMessages from '../../../lib/shared-messages'
-import NotFoundRoute from '../../../lib/components/not-found-route'
-import { getWebhookTemplate } from '../../store/actions/webhook-templates'
-import { selectSelectedApplicationId } from '../../store/selectors/applications'
-import { selectWebhookTemplateById } from '../../store/selectors/webhook-templates'
-import api from '../../api'
+import api from '@console/api'
+
+import PageTitle from '@ttn-lw/components/page-title'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
+import WebhookForm from '@console/components/webhook-form'
+import WebhookTemplateForm from '@console/components/webhook-template-form'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { getWebhookTemplate } from '@console/store/actions/webhook-templates'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectWebhookTemplateById } from '@console/store/selectors/webhook-templates'
 
 const m = defineMessages({
   addCustomWebhook: 'Add custom webhook',
@@ -114,7 +120,7 @@ export default class ApplicationWebhookAddForm extends Component {
       }
     }
 
-    // Render Not Found error, when the template was not found
+    // Render Not Found error when the template was not found.
     if (!isCustom && templateId && !webhookTemplate) {
       return <NotFoundRoute />
     }

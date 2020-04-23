@@ -17,11 +17,14 @@ import classnames from 'classnames'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import Icon from '../icon'
-import Message from '../../lib/components/message'
-import DateTime from '../../lib/components/date-time'
-import PropTypes from '../../lib/prop-types'
-import CodeEditor from '../code-editor'
+import Icon from '@ttn-lw/components/icon'
+import CodeEditor from '@ttn-lw/components/code-editor'
+
+import Message from '@ttn-lw/lib/components/message'
+import DateTime from '@ttn-lw/lib/components/date-time'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
 import CRUDEvent from './types/crud'
 import DefaultEvent from './types/default'
 import MessageEvent from './types/message'
@@ -30,7 +33,7 @@ import ErrorEvent from './types/error'
 import style from './event.styl'
 
 const m = defineMessages({
-  eventData: 'Event Data',
+  eventData: 'Event data',
 })
 
 @bind
@@ -46,11 +49,11 @@ class Event extends React.PureComponent {
     data: PropTypes.shape({}),
     /** The entity identifier of the event. */
     emitter: PropTypes.string.isRequired,
-    /** Additional styling for the event expanded view */
+    /** Additional styling for the event expanded view. */
     expandedClassName: PropTypes.string,
     /** The icon of the event. */
     icon: PropTypes.node,
-    /** Additional styling for the event overview */
+    /** Additional styling for the event overview. */
     overviewClassName: PropTypes.string,
     /** The time of the event. */
     time: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)])

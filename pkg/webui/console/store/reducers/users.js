@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getUserId } from '../../../lib/selectors/id'
+import { getUserId } from '@ttn-lw/lib/selectors/id'
+
 import {
   GET_USERS_LIST_SUCCESS,
   GET_USER_SUCCESS,
   UPDATE_USER_SUCCESS,
   GET_USER,
   DELETE_USER_SUCCESS,
-} from '../actions/users'
+} from '@console/store/actions/users'
 
 const initialState = {
   entities: {},

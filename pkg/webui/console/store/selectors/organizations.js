@@ -16,7 +16,8 @@ import {
   GET_ORGS_LIST_BASE,
   GET_ORG_BASE,
   GET_ORGS_RIGHTS_LIST_BASE,
-} from '../actions/organizations'
+} from '@console/store/actions/organizations'
+
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
@@ -32,7 +33,7 @@ import { createRightsSelector, createPseudoRightsSelector } from './rights'
 
 const ENTITY = 'organizations'
 
-// Organization
+// Organization.
 export const selectOrganizationStore = state => state.organizations
 export const selectOrganizationEntitiesStore = state => selectOrganizationStore(state).entities
 export const selectOrganizationById = (state, id) => selectOrganizationEntitiesStore(state)[id]
@@ -43,7 +44,7 @@ export const selectSelectedOrganization = state =>
 export const selectOrganizationFetching = createFetchingSelector(GET_ORG_BASE)
 export const selectOrganizationError = createErrorSelector(GET_ORG_BASE)
 
-// Organizations
+// Organizations.
 const selectOrgsIds = createPaginationIdsSelectorByEntity(ENTITY)
 const selectOrgsTotalCount = createPaginationTotalCountSelectorByEntity(ENTITY)
 const selectOrgsFetching = createFetchingSelector(GET_ORGS_LIST_BASE)
@@ -55,13 +56,13 @@ export const selectOrganizationsTotalCount = state => selectOrgsTotalCount(state
 export const selectOrganizationsFetching = state => selectOrgsFetching(state)
 export const selectOrganizationsError = state => selectOrgsError(state)
 
-// Rights
+// Rights.
 export const selectOrganizationRights = createRightsSelector(ENTITY)
 export const selectOrganizationPseudoRights = createPseudoRightsSelector(ENTITY)
 export const selectOrganizationRightsError = createErrorSelector(GET_ORGS_RIGHTS_LIST_BASE)
 export const selectOrganizationRightsFetching = createFetchingSelector(GET_ORGS_RIGHTS_LIST_BASE)
 
-// Events
+// Events.
 export const selectOrganizationEvents = createEventsSelector(ENTITY)
 export const selectOrganizationEventsError = createEventsErrorSelector(ENTITY)
 export const selectOrganizationEventsStatus = createEventsStatusSelector(ENTITY)

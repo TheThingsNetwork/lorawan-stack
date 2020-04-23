@@ -15,9 +15,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import PropTypes from '../../../lib/prop-types'
-import EventsSubscription from '../../containers/events-subscription'
-import { startOrganizationEventsStream } from '../../store/actions/organizations'
+import EventsSubscription from '@console/containers/events-subscription'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { startOrganizationEventsStream } from '@console/store/actions/organizations'
+
 @connect(
   null,
   (dispatch, ownProps) => ({

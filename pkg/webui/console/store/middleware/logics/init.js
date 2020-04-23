@@ -14,23 +14,25 @@
 
 import { defineMessages } from 'react-intl'
 
-import * as user from '../../actions/user'
-import * as init from '../../actions/init'
-import api from '../../../api'
+import api from '@console/api'
+
+import * as user from '@console/store/actions/user'
+import * as init from '@console/store/actions/init'
+
 import createRequestLogic from './lib'
 
 const m = defineMessages({
-  errTooFewRights: 'Your account does not possess sufficient rights to use the console.',
+  errTooFewRights: 'Your account does not possess sufficient rights to use the console',
   errStateRequested:
     'Your account still needs to be approved by an administrator. You will receive a confirmation email once your account is approved.',
-  errStateRejected: 'Your account has been rejected by an administrator.',
+  errStateRejected: 'Your account has been rejected by an administrator',
   errStateSuspended:
     'Your account has been suspended by an administrator. Please contact support for further information about your account status.',
-  errEmailValidation: 'Your account is restricted until your email address has been validated.',
+  errEmailValidation: 'Your account is restricted until your email address has been validated',
 })
 
 // Define a minimum set of rights, without which it makes no sense to use the
-// console
+// console.
 const minimumRights = ['RIGHT_APPLICATION', 'RIGHT_GATEWAY', 'RIGHT_ORGANIZATION']
 
 const consoleAppLogic = createRequestLogic({
@@ -41,9 +43,9 @@ const consoleAppLogic = createRequestLogic({
     let info, rights
 
     try {
-      // there is no way to retrieve the current user directly
-      // within the console app, so first get the authentication info
-      // and only afterwards fetch the user
+      // There is no way to retrieve the current user directly within the
+      // console app, so first get the authentication info and only afterwards
+      // fetch the user.
       info = await api.users.authInfo()
       rights = info.oauth_access_token.rights
       dispatch(user.getUserRightsSuccess(rights))
@@ -65,9 +67,9 @@ const consoleAppLogic = createRequestLogic({
         dispatch(user.getUserMeSuccess(userResult))
 
         // Check whether the user account has sufficient rights to use the
-        // console
+        // console.
         if (!info.is_admin && !rights.some(r => minimumRights.some(mr => r.startsWith(mr)))) {
-          // Provide relevant error messages if possible
+          // Provide relevant error messages if possible.
           if (userResult.state === 'STATE_REQUESTED') {
             throw m.errStateRequested
           } else if (userResult.state === 'STATE_REJECTED') {

@@ -15,26 +15,27 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 
-import PropTypes from '../../lib/prop-types'
-import RelativeDateTime from '../../lib/components/date-time/relative'
+import RelativeDateTime from '@ttn-lw/lib/components/date-time/relative'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './progress-bar.styl'
 
 export default class ProgressBar extends PureComponent {
   static propTypes = {
-    /* The class to be attached to the outer container */
+    /* The class to be attached to the outer container. */
     className: PropTypes.string,
-    /* The current progress value, used in conjunction with the `target` value */
+    /* The current progress value, used in conjunction with the `target` value. */
     current: PropTypes.number,
-    /* Current percentage */
+    /* Current percentage. */
     percentage: PropTypes.number,
-    /* Decimals to be shown for the percentage value */
+    /* Decimals to be shown for the percentage value. */
     percentageDecimals: PropTypes.number,
-    /* Flag indicating whether an ETA estimation is shown */
+    /* Flag indicating whether an ETA estimation is shown. */
     showEstimation: PropTypes.bool,
-    /* Flag indicating whether a status text is shown (percentage value) */
+    /* Flag indicating whether a status text is shown (percentage value). */
     showStatus: PropTypes.bool,
-    /* The target value, used in conjunction with the `current` value */
+    /* The target value, used in conjunction with the `current` value. */
     target: PropTypes.number,
   }
 
@@ -94,12 +95,12 @@ export default class ProgressBar extends PureComponent {
       const now = new Date(Date.now() + 1000)
       let eta = new Date(startTime + estimatedDuration)
       if (eta < now) {
-        // Avoid estimations in the past
+        // Avoid estimations in the past.
         eta = new Date(now + 1000)
       }
       displayEstimation =
         !showEstimation ||
-        estimations < 3 || // Avoid inaccurate early estimations
+        estimations < 3 || // Avoid inaccurate early estimations.
         estimatedDuration === Infinity ||
         !startTime ? null : (
           <div>

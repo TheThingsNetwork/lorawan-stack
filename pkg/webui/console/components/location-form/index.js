@@ -17,36 +17,38 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import * as Yup from 'yup'
 
-import Form from '../../../components/form'
-import Input from '../../../components/input'
-import Message from '../../../lib/components/message'
-import SubmitBar from '../../../components/submit-bar'
-import SubmitButton from '../../../components/submit-button'
-import Notification from '../../../components/notification'
-import ModalButton from '../../../components/button/modal-button'
-import toast from '../../../components/toast'
+import Form from '@ttn-lw/components/form'
+import Input from '@ttn-lw/components/input'
+import SubmitBar from '@ttn-lw/components/submit-bar'
+import SubmitButton from '@ttn-lw/components/submit-button'
+import Notification from '@ttn-lw/components/notification'
+import ModalButton from '@ttn-lw/components/button/modal-button'
+import toast from '@ttn-lw/components/toast'
 
-import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '../../lib/regexp'
-import sharedMessages from '../../../lib/shared-messages'
-import PropTypes from '../../../lib/prop-types'
+import Message from '@ttn-lw/lib/components/message'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { latitude as latitudeRegexp, longitude as longitudeRegexp } from '@console/lib/regexp'
 
 const m = defineMessages({
   deleteWarning: 'Are you sure you want to delete this location entry?',
   deleteLocation: 'Remove location entry',
   noLocationSet: 'There is currently no location information set',
-  updateSuccess: 'The location has been updated successfully',
-  deleteFailure: 'There was a problem removing the location',
-  deleteSuccess: 'The location has been removed successfully',
+  updateSuccess: 'Location updated',
+  deleteFailure: 'An error occurred and the location could not be deleted',
+  deleteSuccess: 'Location deleted',
 })
 
 const validationSchema = Yup.object().shape({
   latitude: Yup.number()
-    .test('is-valid-latitude', sharedMessages.validateLatLong, value =>
+    .test('is-valid-latitude', sharedMessages.validateLat, value =>
       latitudeRegexp.test(String(value)),
     )
     .required(sharedMessages.validateRequired),
   longitude: Yup.number()
-    .test('is-valid-longitude', sharedMessages.validateLatLong, value =>
+    .test('is-valid-longitude', sharedMessages.validateLong, value =>
       longitudeRegexp.test(String(value)),
     )
     .required(sharedMessages.validateRequired),
@@ -64,23 +66,23 @@ const hasLocationSet = location =>
 
 class LocationForm extends Component {
   static propTypes = {
-    /** Flag specifying whether the delete location button can be enabled */
+    /** Flag specifying whether the delete location button can be enabled. */
     allowDelete: PropTypes.bool,
-    /** Additional fields to be passed as children */
+    /** Additional fields to be passed as children. */
     children: PropTypes.node,
     entityId: PropTypes.string.isRequired,
-    /** The title message shown at the top of the form */
+    /** The title message shown at the top of the form. */
     formTitle: PropTypes.message.isRequired,
-    /** The initial values of the form */
+    /** The initial values of the form. */
     initialValues: PropTypes.shape({
       latitude: PropTypes.number,
       longitude: PropTypes.number,
       altitude: PropTypes.number,
     }),
     locationFieldsDisabled: PropTypes.bool,
-    /** The handler for the delete function of the form */
+    /** The handler for the delete function of the form. */
     onDelete: PropTypes.func.isRequired,
-    /** The handler for the submit function of the form */
+    /** The handler for the submit function of the form. */
     onSubmit: PropTypes.func.isRequired,
     validationSchema: PropTypes.shape({
       cast: PropTypes.func.isRequired,

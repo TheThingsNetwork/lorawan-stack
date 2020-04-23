@@ -14,15 +14,14 @@
 
 import * as Yup from 'yup'
 
-import m from '../../../components/device-data-form/messages'
-import sharedMessages from '../../../../lib/shared-messages'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { parseLorawanMacVersion } from '../utils'
 
 const validationSchema = Yup.object()
   .shape({
     net_id: Yup.nullableString()
-      .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
+      .emptyOrLength(3 * 2, Yup.passValues(sharedMessages.validateLength)) // 3 Byte hex.
       .default(''),
     root_keys: Yup.object().when(
       ['_external_js', '_lorawan_version', '_may_edit_keys', '_may_read_keys'],
@@ -31,7 +30,10 @@ const validationSchema = Yup.object()
         const keySchema = Yup.lazy(value => {
           return !externalJs && Boolean(value) && Boolean(value.key)
             ? Yup.object().shape({
-                key: Yup.string().emptyOrLength(16 * 2, m.validate32), // 16 Byte hex
+                key: Yup.string().emptyOrLength(
+                  16 * 2,
+                  Yup.passValues(sharedMessages.validateLength),
+                ), // 16 Byte hex.
               })
             : Yup.object().strip()
         })
@@ -67,13 +69,13 @@ const validationSchema = Yup.object()
       otherwise: schema => schema.strip(),
     }),
     application_server_id: Yup.string()
-      .max(100, sharedMessages.validateTooLong)
+      .max(100, Yup.passValues(sharedMessages.validateTooLong))
       .default(''),
     application_server_kek_label: Yup.string()
-      .max(2048, sharedMessages.validateTooLong)
+      .max(2048, Yup.passValues(sharedMessages.validateTooLong))
       .default(''),
     network_server_kek_label: Yup.string()
-      .max(2048, sharedMessages.validateTooLong)
+      .max(2048, Yup.passValues(sharedMessages.validateTooLong))
       .default(''),
     _external_js: Yup.boolean().default(false),
     _lorawan_version: Yup.string().default('1.1.0'),

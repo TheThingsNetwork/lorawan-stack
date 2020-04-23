@@ -15,11 +15,10 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Message from '../message'
+import Message from '@ttn-lw/lib/components/message'
 
-import PropTypes from '../../prop-types'
-
-import { toMessageProps } from '../../errors/utils'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { toMessageProps } from '@ttn-lw/lib/errors/utils'
 
 import style from './error-message.styl'
 

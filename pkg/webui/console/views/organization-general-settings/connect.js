@@ -16,12 +16,13 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { replace } from 'connected-react-router'
 
-import { attachPromise } from '../../store/actions/lib'
+import { attachPromise } from '@console/store/actions/lib'
+import { updateOrganization, deleteOrganization } from '@console/store/actions/organizations'
+
 import {
   selectSelectedOrganization,
   selectSelectedOrganizationId,
-} from '../../store/selectors/organizations'
-import { updateOrganization, deleteOrganization } from '../../store/actions/organizations'
+} from '@console/store/selectors/organizations'
 
 const mapStateToProps = state => ({
   orgId: selectSelectedOrganizationId(state),

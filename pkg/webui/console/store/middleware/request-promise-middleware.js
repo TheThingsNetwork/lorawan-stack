@@ -15,8 +15,9 @@
 /**
  * This middleware will check for request actions and attach a promise to the
  * action.
- * @param {Object} store - The store to apply the middleware to
- * @returns {Object} The middleware
+ *
+ * @param {object} store - The store to apply the middleware to.
+ * @returns {object} The middleware.
  */
 const requestPromiseMiddleware = store => next =>
   function(action) {

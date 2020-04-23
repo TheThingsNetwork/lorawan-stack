@@ -16,19 +16,24 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router'
 
-import sharedMessages from '../../../lib/shared-messages'
-import Breadcrumb from '../../../components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '../../../components/breadcrumbs/context'
-import ErrorView from '../../../lib/components/error-view'
-import SubViewError from '../error/sub-view'
-import GatewayApiKeysList from '../gateway-api-keys-list'
-import GatewayApiKeyAdd from '../gateway-api-key-add'
-import GatewayApiKeyEdit from '../gateway-api-key-edit'
-import withFeatureRequirement from '../../lib/components/with-feature-requirement'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
-import { mayViewOrEditGatewayApiKeys } from '../../lib/feature-checks'
-import { selectSelectedGatewayId } from '../../store/selectors/gateways'
-import PropTypes from '../../../lib/prop-types'
+import ErrorView from '@ttn-lw/lib/components/error-view'
+
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import GatewayApiKeyEdit from '@console/views/gateway-api-key-edit'
+import GatewayApiKeyAdd from '@console/views/gateway-api-key-add'
+import GatewayApiKeysList from '@console/views/gateway-api-keys-list'
+import SubViewError from '@console/views/error/sub-view'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayViewOrEditGatewayApiKeys } from '@console/lib/feature-checks'
+
+import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 @connect(state => ({ gtwId: selectSelectedGatewayId(state) }))
 @withFeatureRequirement(mayViewOrEditGatewayApiKeys, {

@@ -27,37 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/pkg/webui"
 )
 
-// UIConfig is the combined configuration for the Console UI.
-type UIConfig struct {
-	webui.TemplateData `name:",squash"`
-	FrontendConfig     `name:",squash"`
-}
-
-// StackConfig is the configuration of the stack components.
-type StackConfig struct {
-	IS   webui.APIConfig `json:"is" name:"is"`
-	GS   webui.APIConfig `json:"gs" name:"gs"`
-	NS   webui.APIConfig `json:"ns" name:"ns"`
-	AS   webui.APIConfig `json:"as" name:"as"`
-	JS   webui.APIConfig `json:"js" name:"js"`
-	EDTC webui.APIConfig `json:"edtc" name:"edtc"`
-	QRG  webui.APIConfig `json:"qrg" name:"qrg"`
-}
-
-// FrontendConfig is the configuration for the Console frontend.
-type FrontendConfig struct {
-	Language    string `json:"language" name:"-"`
-	SupportLink string `json:"support_link" name:"support-link" description:"The URI that the support button will point to"`
-	StackConfig `json:"stack_config" name:",squash"`
-}
-
-// Config is the configuration for the Console.
-type Config struct {
-	OAuth oauthclient.Config `name:"oauth"`
-	Mount string             `name:"mount" description:"Path on the server where the Console will be served"`
-	UI    UIConfig           `name:"ui"`
-}
-
 // Console is the Console component.
 type Console struct {
 	*component.Component

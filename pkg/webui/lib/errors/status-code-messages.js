@@ -17,18 +17,17 @@
 import { defineMessages } from 'react-intl'
 
 export default defineMessages({
-  '4××': 'Client Error',
-  '400': 'Bad Request',
+  '4××': 'Client error',
+  '400': 'Bad request',
   '401': 'Unauthorized',
   '403': 'Forbidden',
-  '404': 'Not Found',
+  '404': 'Not found',
   '409': 'Conflict',
-  '429': 'Too Many Requests',
-  '499': 'Client Closed Request',
-  '5××': 'Server Error',
-  '500': 'Internal Server Error',
-  '501': 'Not Implemented',
-  '503': 'Service Unavailable',
-  '504': 'Gateway Timeout',
-  '520': 'Unknown Error',
+  '429': 'Too many requests',
+  '499': 'Client closed request',
+  '500': 'Internal server error',
+  '501': 'Not implemented',
+  '503': 'Service unavailable',
+  '504': 'Gateway timeout',
+  '520': 'Unknown error',
 })

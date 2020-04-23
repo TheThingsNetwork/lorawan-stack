@@ -14,14 +14,18 @@
 
 import React from 'react'
 
+import Icon from '@ttn-lw/components/icon'
+
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { getEntityId } from '@ttn-lw/lib/selectors/id'
+import { warn } from '@ttn-lw/lib/log'
+
 import Event from '../..'
-import Message from '../../../../lib/components/message'
-import Icon from '../../../icon'
-import PropTypes from '../../../../lib/prop-types'
-import { getEntityId } from '../../../../lib/selectors/id'
-import { warn } from '../../../../lib/log'
-import style from './crud.styl'
 import { getEventActionByName } from '..'
+
+import style from './crud.styl'
 
 class CRUDEvent extends React.PureComponent {
   static propTypes = {

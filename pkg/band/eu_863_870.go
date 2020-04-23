@@ -29,11 +29,20 @@ const EU_863_870 = "EU_863_870"
 
 func init() {
 	defaultChannels := []Channel{
-		{Frequency: 868100000, MinDataRate: 0, MaxDataRate: 5},
-		{Frequency: 868300000, MinDataRate: 0, MaxDataRate: 5},
-		{Frequency: 868500000, MinDataRate: 0, MaxDataRate: 5},
+		{
+			Frequency:   868100000,
+			MaxDataRate: ttnpb.DATA_RATE_5,
+		},
+		{
+			Frequency:   868300000,
+			MaxDataRate: ttnpb.DATA_RATE_5,
+		},
+		{
+			Frequency:   868500000,
+			MaxDataRate: ttnpb.DATA_RATE_5,
+		},
 	}
-	const euBeaconFrequency = 869525000
+	const beaconFrequency = 869525000
 
 	downlinkDRTable := [8][6]ttnpb.DataRateIndex{
 		{0, 0, 0, 0, 0, 0},
@@ -103,16 +112,16 @@ func init() {
 		},
 
 		DataRates: map[ttnpb.DataRateIndex]DataRate{
-			0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-			1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-			2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-			3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
-			4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
-			5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
-			6: makeLoRaDataRate(7, 250000, makeConstMaxMACPayloadSizeFunc(230)),
-			7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			ttnpb.DATA_RATE_1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			ttnpb.DATA_RATE_2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+			ttnpb.DATA_RATE_3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
+			ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_6: makeLoRaDataRate(7, 250000, makeConstMaxMACPayloadSizeFunc(230)),
+			ttnpb.DATA_RATE_7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(230)),
 		},
-		MaxADRDataRateIndex: 5,
+		MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
@@ -138,7 +147,7 @@ func init() {
 
 		Rx1Channel: channelIndexIdentity,
 		Rx1DataRate: func(idx ttnpb.DataRateIndex, offset uint32, _ bool) (ttnpb.DataRateIndex, error) {
-			if idx > 7 {
+			if idx > ttnpb.DATA_RATE_7 {
 				return 0, errDataRateIndexTooHigh.WithAttributes("max", 7)
 			}
 			if offset > 5 {
@@ -156,14 +165,14 @@ func init() {
 		ImplementsCFList: true,
 		CFListType:       ttnpb.CFListType_FREQUENCIES,
 
-		DefaultRx2Parameters: Rx2Parameters{0, 869525000},
+		DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_0, 869525000},
 
 		Beacon: Beacon{
-			DataRateIndex:    3,
+			DataRateIndex:    ttnpb.DATA_RATE_3,
 			CodingRate:       "4/5",
-			ComputeFrequency: func(_ float64) uint64 { return euBeaconFrequency },
+			ComputeFrequency: func(_ float64) uint64 { return beaconFrequency },
 		},
-		PingSlotFrequency: uint64Ptr(euBeaconFrequency),
+		PingSlotFrequency: uint64Ptr(beaconFrequency),
 
 		regionalParameters1_0:   bandIdentity,
 		regionalParameters1_0_1: bandIdentity,

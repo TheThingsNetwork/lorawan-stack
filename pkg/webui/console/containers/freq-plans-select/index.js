@@ -14,20 +14,20 @@
 
 import { defineMessages } from 'react-intl'
 
-import CreateFetchSelect from '../fetch-select'
+import CreateFetchSelect from '@console/containers/fetch-select'
+
+import { getGsFrequencyPlans, getNsFrequencyPlans } from '@console/store/actions/configuration'
 
 import {
   selectGsFrequencyPlans,
   selectNsFrequencyPlans,
   selectFrequencyPlansError,
   selectFrequencyPlansFetching,
-} from '../../store/selectors/configuration'
-
-import { getGsFrequencyPlans, getNsFrequencyPlans } from '../../store/actions/configuration'
+} from '@console/store/selectors/configuration'
 
 const m = defineMessages({
-  title: 'Frequency Plan',
-  warning: 'Could not retrieve the list of available frequency plans',
+  title: 'Frequency plan',
+  warning: 'Frequency plans unavailable',
   description: 'The frequency plan used by the end device',
 })
 

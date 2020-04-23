@@ -17,9 +17,10 @@ import { Link as RouterLink } from 'react-router-dom'
 import classnames from 'classnames'
 import { injectIntl } from 'react-intl'
 
-import PropTypes from '../../lib/prop-types'
-import { withEnv } from '../../lib/components/env'
-import { url as urlPattern } from '../../lib/regexp'
+import { withEnv } from '@ttn-lw/lib/components/env'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import { url as urlPattern } from '@ttn-lw/lib/regexp'
 
 import style from './link.styl'
 
@@ -177,7 +178,7 @@ Link.Anchor = injectIntl(AnchorLink)
 const BaseAnchorLink = function({ env, href, ...rest }) {
   const { appRoot } = env
 
-  // Prevent prefixing proper URLs
+  // Prevent prefixing proper URLs.
   const path = href.match(urlPattern) ? href : appRoot + href
 
   return <Link.Anchor href={path} {...rest} />

@@ -15,19 +15,20 @@
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
-import toast from '../../components/toast'
-import PropTypes from '../../lib/prop-types'
 
-import Status from '../../components/status'
-import Message from '../../lib/components/message'
+import toast from '@ttn-lw/components/toast'
+import Status from '@ttn-lw/components/status'
 
-import sharedMessages from '../../lib/shared-messages'
+import Message from '@ttn-lw/lib/components/message'
+
+import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './offline.styl'
 
 const m = defineMessages({
-  offline: 'The Application is now offline',
-  online: 'The Application is back online',
+  offline: 'The application went offline',
+  online: 'The application is back online',
 })
 
 @bind
