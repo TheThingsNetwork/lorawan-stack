@@ -67,5 +67,5 @@ func (s *migrationStore) DeleteMigration(ctx context.Context, name string) error
 		}
 		return err
 	}
-	return s.query(ctx, Invitation{}).Delete(&model).Error
+	return s.query(ctx, Migration{}).Delete(&model).Error
 }
