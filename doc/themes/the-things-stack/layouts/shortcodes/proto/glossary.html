@@ -1,0 +1,12 @@
+<dl>
+  {{- range $key, $elem := .Site.Data.glossary.glossary -}}
+    <dt><code>{{$key }}</code></dt>
+    <dd>{{.description}}</dd>
+    {{ with .ref }}
+      <dd><a href={{ . }} >{{ . }}</a></dd> 
+    {{ end }}
+    {{ with .link }}
+      <dd><a href={{ . }}>{{ . }}</a></dd>
+    {{ end }}
+  {{ end }}
+</dl>
