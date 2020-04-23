@@ -32,7 +32,7 @@ import SideNavigationContext from './context'
 import style from './side.styl'
 
 const m = defineMessages({
-  hideSidebar: 'Hide Sidebar',
+  hideSidebar: 'Hide sidebar',
 })
 export class SideNavigation extends Component {
   static defaultProps = {

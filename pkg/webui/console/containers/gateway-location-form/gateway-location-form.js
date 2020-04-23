@@ -32,7 +32,7 @@ const m = defineMessages({
   updateLocationFromStatusDescription:
     'Update the location of this gateway based on incoming status messages',
   setGatewayLocation: 'Gateway antenna location settings',
-  locationSource: 'Location Source',
+  locationSource: 'Location source',
   privacy: 'Privacy',
   publishLocation: 'Publish location',
 })
@@ -41,7 +41,7 @@ const validationSchema = Yup.object().shape({
   latitude: Yup.number().when('update_location_from_status', {
     is: false,
     then: schema =>
-      schema.test('is-valid-latitude', sharedMessages.validateLatLong, value =>
+      schema.test('is-valid-latitude', sharedMessages.validateLat, value =>
         latitudeRegexp.test(String(value)),
       ),
     otherwise: schema => schema.strip(),
@@ -49,7 +49,7 @@ const validationSchema = Yup.object().shape({
   longitude: Yup.number().when('update_location_from_status', {
     is: false,
     then: schema =>
-      schema.test('is-valid-longitude', sharedMessages.validateLatLong, value =>
+      schema.test('is-valid-longitude', sharedMessages.validateLong, value =>
         longitudeRegexp.test(String(value)),
       ),
     otherwise: schema => schema.strip(),

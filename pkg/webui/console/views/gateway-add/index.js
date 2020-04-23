@@ -39,7 +39,7 @@ import { mayCreateGateways } from '@console/lib/feature-checks'
 import { selectUserId } from '@console/store/selectors/user'
 
 const m = defineMessages({
-  createGateway: 'Create Gateway',
+  createGateway: 'Create gateway',
 })
 
 @withEnv

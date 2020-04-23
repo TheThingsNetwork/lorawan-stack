@@ -82,7 +82,7 @@ storiesOf('Modal', module)
           </li>
           <li>
             <Icon icon="check" className={style.icon} />
-            Create and edit devices of your applications
+            Create and edit end devices of your applications
           </li>
         </ul>
       </div>

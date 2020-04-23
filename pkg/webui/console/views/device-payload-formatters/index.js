@@ -43,9 +43,9 @@ import style from './device-payload-formatters.styl'
 
 const m = defineMessages({
   infoUplinkText:
-    'These payload formatters are executed on uplink messages from this device. If payload formatters are also set for the application, those are not executed for uplinks from this device.',
+    'These payload formatters are executed on uplink messages from this end device and take precedence over application level payload formatters.',
   infoDownlinkText:
-    'These payload formatters are executed on downlink messages to this device. If payload formatters are also set for the application, those are not executed for downlinks to this device.',
+    'These payload formatters are executed on downlink messages to this end device and take precedence over application level payload formatters.',
 })
 @connect(function(state) {
   const link = selectApplicationLink(state)

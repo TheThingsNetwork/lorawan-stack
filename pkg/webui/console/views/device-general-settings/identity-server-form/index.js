@@ -34,9 +34,9 @@ import { parseLorawanMacVersion, hasExternalJs, isDeviceOTAA } from '../utils'
 import validationSchema from './validation-schema'
 
 const messages = defineMessages({
-  deleteDevice: 'Delete End Device',
+  deleteDevice: 'Delete end device',
   deleteWarning:
-    'Are you sure you want to delete "{deviceId}"? This action cannot be undone and it will not be possible to reuse the end device ID!',
+    'Are you sure you want to delete "{deviceId}"? This action cannot be undone and it will not be possible to reuse the end device ID.',
 })
 
 const IdentityServerForm = React.memo(props => {

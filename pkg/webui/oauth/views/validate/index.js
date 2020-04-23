@@ -31,9 +31,9 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
-  validateSuccess: 'Contact info validated successfully',
-  validateFail: 'Contact info validation failed',
-  goToLogin: 'Go to Login',
+  validateSuccess: 'Contact info validated',
+  validateFail: 'There was an error and the contact info could not be validated',
+  goToLogin: 'Go to login',
 })
 
 @connect(

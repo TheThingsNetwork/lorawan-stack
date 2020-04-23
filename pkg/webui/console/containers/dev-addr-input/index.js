@@ -23,7 +23,7 @@ import DevAddrInput from './dev-addr-input'
 import connect from './connect'
 
 const m = defineMessages({
-  devAddrFetchingFailure: 'Could not generate device address',
+  devAddrFetchingFailure: 'There was an error and the end device address could not be generated',
 })
 
 const DevAddrField = function(props) {

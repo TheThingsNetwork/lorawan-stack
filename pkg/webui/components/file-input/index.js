@@ -30,7 +30,7 @@ const m = defineMessages({
   changeFile: 'Change file…',
   noFileSelected: 'No file selected',
   fileProvided: 'A file has been provided',
-  tooBig: 'The selected file is too large.',
+  tooBig: 'The selected file is too large',
   remove: 'Remove',
 })
 

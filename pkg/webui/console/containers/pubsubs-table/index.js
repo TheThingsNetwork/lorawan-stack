@@ -35,7 +35,7 @@ import {
 
 const m = defineMessages({
   format: 'Format',
-  host: 'Server Host',
+  host: 'Server host',
 })
 
 const headers = [

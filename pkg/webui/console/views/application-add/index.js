@@ -44,16 +44,16 @@ import { mayCreateApplications, mayLinkApplication } from '@console/lib/feature-
 import { selectUserId, selectUserRights } from '@console/store/selectors/user'
 
 const m = defineMessages({
-  applicationName: 'Application Name',
+  applicationName: 'Application name',
   appIdPlaceholder: 'my-new-application',
-  appNamePlaceholder: 'My New Application',
+  appNamePlaceholder: 'My new application',
   appDescPlaceholder: 'Description for my new application',
   appDescDescription:
     'Optional application description; can also be used to save notes about the application',
-  createApplication: 'Create Application',
+  createApplication: 'Create application',
   linking: 'Linking',
   linkAutomatically: 'Link new application to Network Server automatically',
-  linkFailure: 'There was a problem while linking the application',
+  linkFailure: 'There was an error and the application could not be linked',
   linkFailureTitle: 'Application link failed',
 })
 
@@ -61,16 +61,16 @@ const validationSchema = Yup.object().shape({
   owner_id: Yup.string().required(sharedMessages.validateRequired),
   application_id: Yup.string()
     .matches(applicationIdRegexp, sharedMessages.validateIdFormat)
-    .min(2, sharedMessages.validateTooShort)
-    .max(25, sharedMessages.validateTooLong)
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(25, Yup.passValues(sharedMessages.validateTooLong))
     .required(sharedMessages.validateRequired),
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string(),
   network_server_address: Yup.string().when('link', {
     is: true,
-    then: Yup.string().matches(address, sharedMessages.validateFormat),
+    then: Yup.string().matches(address, sharedMessages.validateAddressFormat),
   }),
 })
 

@@ -36,11 +36,11 @@ import { selectSelectedDevice } from '@console/store/selectors/devices'
 import style from './device-overview.styl'
 
 const m = defineMessages({
-  activationInfo: 'Activation Information',
-  rootKeyId: 'Root Key ID',
-  sessionInfo: 'Session Information',
-  latestData: 'Latest Data',
-  rootKeys: 'Root Keys',
+  activationInfo: 'Activation information',
+  rootKeyId: 'Root key ID',
+  sessionInfo: 'Session information',
+  latestData: 'Latest data',
+  rootKeys: 'Root keys',
   keysNotExposed: 'Keys are not exposed',
 })
 

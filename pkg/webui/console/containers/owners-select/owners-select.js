@@ -23,7 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   title: 'Owner',
-  warning: 'Cannot load user oganizations',
+  warning: 'User oganizations unavailable',
 })
 
 const OwnersSelect = props => {

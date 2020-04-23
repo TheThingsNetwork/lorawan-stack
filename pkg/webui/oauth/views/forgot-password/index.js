@@ -37,20 +37,20 @@ import { id as userRegexp } from '@ttn-lw/lib/regexp'
 import style from './forgot-password.styl'
 
 const m = defineMessages({
-  loginPage: 'Login Page',
-  forgotPassword: 'Forgot Password',
-  passwordRequested: 'You will receive an email with reset instructions shortly.',
-  goToLogin: 'Go to Login',
+  loginPage: 'Login page',
+  forgotPassword: 'Forgot password',
+  passwordRequested: 'You will receive an email with reset instructions shortly',
+  goToLogin: 'Go to login',
   send: 'Send',
   resetPasswordDescription:
     'Please enter your username to receive an email with reset instructions',
-  requestTempPassword: 'Reset Password',
+  requestTempPassword: 'Reset password',
 })
 
 const validationSchema = Yup.object().shape({
   user_id: Yup.string()
-    .min(3, sharedMessages.validateTooShort)
-    .max(36, sharedMessages.validateTooLong)
+    .min(3, Yup.passValues(sharedMessages.validateTooShort))
+    .max(36, Yup.passValues(sharedMessages.validateTooLong))
     .matches(userRegexp, sharedMessages.validateIdFormat)
     .required(sharedMessages.validateRequired),
 })

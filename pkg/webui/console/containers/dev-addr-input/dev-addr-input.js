@@ -20,7 +20,7 @@ import Input from '@ttn-lw/components/input'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
-  generate: 'Generate Device Address',
+  generate: 'Generate end device address',
 })
 
 const DevAddrInput = function(props) {

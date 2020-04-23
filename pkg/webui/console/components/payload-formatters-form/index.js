@@ -34,10 +34,10 @@ import { address as addressRegexp } from '@console/lib/regexp'
 import { getDefaultGrpcServiceFormatter, getDefaultJavascriptFormatter } from './formatter-values'
 
 const m = defineMessages({
-  grpc: 'GRPC Service',
+  grpc: 'GRPC service',
   repository: 'Repository',
-  formatterType: 'Formatter Type',
-  formatterParameter: 'Formatter Parameter',
+  formatterType: 'Formatter type',
+  formatterParameter: 'Formatter parameter',
   grpcDescription: 'The address of the service to connect to',
 })
 

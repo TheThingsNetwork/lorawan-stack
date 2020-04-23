@@ -26,7 +26,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
-  orgData: 'Organization Data',
+  orgData: 'Organization data',
 })
 
 @withBreadcrumb('orgs.single.data', function(props) {

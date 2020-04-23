@@ -25,8 +25,8 @@ import {
 } from '@console/store/selectors/pubsub-formats'
 
 const m = defineMessages({
-  title: 'PubSub Format',
-  warning: 'Could not fetch the list of available PubSub formats',
+  title: 'Pub-sub format',
+  warning: 'Pub-sub formats unavailable',
 })
 
 export default CreateFetchSelect({

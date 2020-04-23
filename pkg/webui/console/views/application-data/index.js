@@ -35,7 +35,7 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 import style from './application-data.styl'
 
 const m = defineMessages({
-  appData: 'Application Data',
+  appData: 'Application data',
 })
 
 @connect(state => ({ appId: selectSelectedApplicationId(state) }))

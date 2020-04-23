@@ -22,13 +22,13 @@ import * as init from '@console/store/actions/init'
 import createRequestLogic from './lib'
 
 const m = defineMessages({
-  errTooFewRights: 'Your account does not possess sufficient rights to use the console.',
+  errTooFewRights: 'Your account does not possess sufficient rights to use the console',
   errStateRequested:
     'Your account still needs to be approved by an administrator. You will receive a confirmation email once your account is approved.',
-  errStateRejected: 'Your account has been rejected by an administrator.',
+  errStateRejected: 'Your account has been rejected by an administrator',
   errStateSuspended:
     'Your account has been suspended by an administrator. Please contact support for further information about your account status.',
-  errEmailValidation: 'Your account is restricted until your email address has been validated.',
+  errEmailValidation: 'Your account is restricted until your email address has been validated',
 })
 
 // Define a minimum set of rights, without which it makes no sense to use the

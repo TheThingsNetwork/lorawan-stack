@@ -18,16 +18,14 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
 
-import m from './messages'
-
 const isABP = mode => mode === 'abp'
 const isOTAA = mode => mode === 'otaa'
 
 const validationSchema = Yup.object({
   name: Yup.string()
-    .min(2, sharedMessages.validateTooShort)
-    .max(50, sharedMessages.validateTooLong),
-  description: Yup.string().max(2000, sharedMessages.validateTooLong),
+    .min(2, Yup.passValues(sharedMessages.validateTooShort))
+    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
+  description: Yup.string().max(2000, Yup.passValues(sharedMessages.validateTooLong)),
   lorawan_version: Yup.string().required(sharedMessages.validateRequired),
   lorawan_phy_version: Yup.string().required(sharedMessages.validateRequired),
   frequency_plan_id: Yup.string().required(sharedMessages.validateRequired),
@@ -48,8 +46,8 @@ const validationSchema = Yup.object({
     .shape({
       device_id: Yup.string()
         .matches(deviceIdRegexp, sharedMessages.validateIdFormat)
-        .min(2, sharedMessages.validateTooShort)
-        .max(36, sharedMessages.validateTooLong)
+        .min(2, Yup.passValues(sharedMessages.validateTooShort))
+        .max(36, Yup.passValues(sharedMessages.validateTooLong))
         .required(sharedMessages.validateRequired),
     })
     .when(['_activation_mode', 'lorawan_version'], (mode, version, schema) => {
@@ -60,7 +58,7 @@ const validationSchema = Yup.object({
         join_eui: Yup.lazy(() =>
           isModeOTAA
             ? Yup.string()
-                .length(8 * 2, m.validate16) // An 8 Byte hex.
+                .length(8 * 2, Yup.passValues(sharedMessages.validateLength)) // 8 Byte hex.
                 .required(sharedMessages.validateRequired)
             : Yup.string().strip(),
         ),
@@ -68,9 +66,12 @@ const validationSchema = Yup.object({
           () =>
             isModeOTAA || isLw104
               ? Yup.string()
-                  .length(8 * 2, m.validate16) // An 8 Byte hex.
+                  .length(8 * 2, Yup.passValues(sharedMessages.validateLength)) // 8 Byte hex.
                   .required(sharedMessages.validateRequired)
-              : Yup.nullableString().emptyOrLength(8 * 2, m.validate16), // An 8 Byte hex.
+              : Yup.nullableString().emptyOrLength(
+                  8 * 2,
+                  Yup.passValues(sharedMessages.validateLength),
+                ), // 8 Byte hex.
         ),
       })
     }),
@@ -99,14 +100,20 @@ const validationSchema = Yup.object({
             nwk_key: Yup.lazy(value =>
               Boolean(value) && Boolean(value.key)
                 ? Yup.object().shape({
-                    key: Yup.string().emptyOrLength(16 * 2, m.validate32), // A 16 Byte hex.
+                    key: Yup.string().emptyOrLength(
+                      16 * 2,
+                      Yup.passValues(sharedMessages.validateLength),
+                    ), // 16 Byte hex.
                   })
                 : Yup.object().strip(),
             ),
             app_key: Yup.lazy(value =>
               Boolean(value) && Boolean(value.key)
                 ? Yup.object().shape({
-                    key: Yup.string().emptyOrLength(16 * 2, m.validate32), // A 16 Byte hex.
+                    key: Yup.string().emptyOrLength(
+                      16 * 2,
+                      Yup.passValues(sharedMessages.validateLength),
+                    ), // 16 Byte hex.
                   })
                 : Yup.object().strip(),
             ),
@@ -120,23 +127,23 @@ const validationSchema = Yup.object({
       is: false,
       then: schema =>
         schema
-          .emptyOrLength(3 * 2, m.validate6) // 3 Byte hex
+          .emptyOrLength(3 * 2, Yup.passValues(sharedMessages.validateLength)) // 3 Byte hex.
           .default(''),
       otherwise: schema => schema.strip(),
     }),
     application_server_id: Yup.string().when('_external_js', {
       is: false,
-      then: schema => schema.max(100, sharedMessages.validateTooLong).default(''),
+      then: schema => schema.max(100, Yup.passValues(sharedMessages.validateTooLong)).default(''),
       otherwise: schema => schema.strip(),
     }),
     application_server_kek_label: Yup.string().when('_external_js', {
       is: false,
-      then: schema => schema.max(2048, sharedMessages.validateTooLong).default(''),
+      then: schema => schema.max(2048, Yup.passValues(sharedMessages.validateTooLong)).default(''),
       otherwise: schema => schema.strip(),
     }),
     network_server_kek_label: Yup.string().when('_external_js', {
       is: false,
-      then: schema => schema.max(2048, sharedMessages.validateTooLong).default(''),
+      then: schema => schema.max(2048, Yup.passValues(sharedMessages.validateTooLong)).default(''),
       otherwise: schema => schema.strip(),
     }),
   }) // ABP related entries.
@@ -154,24 +161,24 @@ const validationSchema = Yup.object({
 
         return schema.shape({
           dev_addr: Yup.string()
-            .length(4 * 2, m.validate8) // A 4 Byte hex.
+            .length(4 * 2, Yup.passValues(sharedMessages.validateLength)) // 4 Byte hex.
             .required(sharedMessages.validateRequired),
           keys: Yup.object().shape({
             f_nwk_s_int_key: Yup.object().shape({
               key: Yup.string()
-                .length(16 * 2, m.validate32) // A 16 Byte hex.
+                .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                 .required(sharedMessages.validateRequired),
             }),
             app_s_key: Yup.object().shape({
               key: Yup.string()
-                .length(16 * 2, m.validate32) // A 16 Byte hex.
+                .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                 .required(sharedMessages.validateRequired),
             }),
             s_nwk_s_int_key: Yup.lazy(() =>
               isNewVersion
                 ? Yup.object().shape({
                     key: Yup.string()
-                      .length(16 * 2, m.validate32) // A 16 Byte hex.
+                      .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                       .required(sharedMessages.validateRequired),
                   })
                 : Yup.object().strip(),
@@ -180,7 +187,7 @@ const validationSchema = Yup.object({
               isNewVersion
                 ? Yup.object().shape({
                     key: Yup.string()
-                      .length(16 * 2, m.validate32) // A 16 Byte hex.
+                      .length(16 * 2, Yup.passValues(sharedMessages.validateLength)) // 16 Byte hex.
                       .required(sharedMessages.validateRequired),
                   })
                 : Yup.object().strip(),
