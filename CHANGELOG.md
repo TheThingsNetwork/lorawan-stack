@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - JavaScript style guide to our `DEVELOPMENT.md` documentation.
 
+- Support for repeated `RekeyInd`. (happens when e.g. `RekeyConf` is lost)
+- Validate the `DevAddr` when switching session as a result of receiving `RekeyInd`.
+
 ### Changed
 
 - Conformed JavaScript to new code style guide.

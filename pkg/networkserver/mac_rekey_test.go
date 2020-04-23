@@ -45,11 +45,11 @@ func TestHandleRekeyInd(t *testing.T) {
 			Error: errNoPayload,
 		},
 		{
-			Name: "empty queue",
+			Name: "empty queue/original",
 			Device: &ttnpb.EndDevice{
 				SupportsJoin: true,
 				PendingSession: &ttnpb.Session{
-					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					DevAddr:       DevAddr,
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -60,12 +60,111 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
 				SupportsJoin: true,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &DevAddr,
+				},
 				Session: &ttnpb.Session{
-					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					DevAddr:       DevAddr,
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+					QueuedResponses: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_RekeyConf{
+							MinorVersion: 1,
+						}).MACCommand(),
+					},
+				},
+			},
+			Payload: &ttnpb.MACCommand_RekeyInd{
+				MinorVersion: 1,
+			},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRekeyIndication.BindData(&ttnpb.MACCommand_RekeyInd{
+					MinorVersion: 1,
+				}),
+				evtEnqueueRekeyConfirmation.BindData(&ttnpb.MACCommand_RekeyConf{
+					MinorVersion: 1,
+				}),
+			},
+		},
+		{
+			Name: "empty queue/retransmission/non-matching pending session",
+			Device: &ttnpb.EndDevice{
+				SupportsJoin: true,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &DevAddr,
+				},
+				Session: &ttnpb.Session{
+					DevAddr:       DevAddr,
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
+				PendingSession: &ttnpb.Session{
+					DevAddr:       types.DevAddr{0x23, 0x23, 0x11, 0x42},
+					LastFCntUp:    101,
+					LastNFCntDown: 2,
+				},
+				PendingMACState: &ttnpb.MACState{},
+				MACState: &ttnpb.MACState{
+					PendingJoinRequest: &ttnpb.JoinRequest{},
+					QueuedResponses:    []*ttnpb.MACCommand{},
+				},
+			},
+			Expected: &ttnpb.EndDevice{
+				SupportsJoin: true,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &DevAddr,
+				},
+				Session: &ttnpb.Session{
+					DevAddr:       DevAddr,
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
+				MACState: &ttnpb.MACState{
+					LoRaWANVersion: ttnpb.MAC_V1_1,
+					QueuedResponses: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_RekeyConf{
+							MinorVersion: 1,
+						}).MACCommand(),
+					},
+				},
+			},
+			Payload: &ttnpb.MACCommand_RekeyInd{
+				MinorVersion: 1,
+			},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveRekeyIndication.BindData(&ttnpb.MACCommand_RekeyInd{
+					MinorVersion: 1,
+				}),
+				evtEnqueueRekeyConfirmation.BindData(&ttnpb.MACCommand_RekeyConf{
+					MinorVersion: 1,
+				}),
+			},
+		},
+		{
+			Name: "empty queue/retransmission/no pending session",
+			Device: &ttnpb.EndDevice{
+				SupportsJoin: true,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &DevAddr,
+				},
+				Session: &ttnpb.Session{
+					DevAddr:       DevAddr,
+					LastFCntUp:    42,
+					LastNFCntDown: 43,
+				},
+				MACState: &ttnpb.MACState{},
+			},
+			Expected: &ttnpb.EndDevice{
+				SupportsJoin: true,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &DevAddr,
+				},
+				Session: &ttnpb.Session{
+					DevAddr:       DevAddr,
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -95,7 +194,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				SupportsJoin: true,
 				PendingSession: &ttnpb.Session{
-					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					DevAddr:       DevAddr,
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -110,12 +209,12 @@ func TestHandleRekeyInd(t *testing.T) {
 				},
 			},
 			Expected: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DevAddr: &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-				},
 				SupportsJoin: true,
+				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					DevAddr: &DevAddr,
+				},
 				Session: &ttnpb.Session{
-					DevAddr:       types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					DevAddr:       DevAddr,
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -149,7 +248,7 @@ func TestHandleRekeyInd(t *testing.T) {
 
 			dev := deepcopy.Copy(tc.Device).(*ttnpb.EndDevice)
 
-			evs, err := handleRekeyInd(test.Context(), dev, tc.Payload)
+			evs, err := handleRekeyInd(test.Context(), dev, tc.Payload, DevAddr)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()
