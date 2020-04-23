@@ -514,13 +514,11 @@ func newMACState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb
 	} else {
 		macState.DesiredParameters.MaxEIRP = macState.CurrentParameters.MaxEIRP
 	}
-
-	if phy.TxParamSetupReqSupport {
-		macState.DesiredParameters.UplinkDwellTime = &pbtypes.BoolValue{Value: fp.DwellTime.GetUplinks()}
+	if fp.DwellTime.Uplinks != nil {
+		macState.DesiredParameters.UplinkDwellTime = &pbtypes.BoolValue{Value: *fp.DwellTime.Uplinks}
 	}
-
-	if phy.TxParamSetupReqSupport {
-		macState.DesiredParameters.DownlinkDwellTime = &pbtypes.BoolValue{Value: fp.DwellTime.GetDownlinks()}
+	if fp.DwellTime.Downlinks != nil {
+		macState.DesiredParameters.DownlinkDwellTime = &pbtypes.BoolValue{Value: *fp.DwellTime.Downlinks}
 	}
 
 	macState.CurrentParameters.ADRDataRateIndex = ttnpb.DATA_RATE_0
