@@ -33,7 +33,7 @@ class MessageEvent extends React.PureComponent {
     event: PropTypes.event.isRequired,
     expandedClassName: PropTypes.string,
     overviewClassName: PropTypes.string,
-    type: PropTypes.oneOf(['downlink', 'uplink']).isRequired,
+    type: PropTypes.oneOf(['downlink', 'uplink', 'join']).isRequired,
     widget: PropTypes.bool,
   }
 
@@ -48,10 +48,8 @@ class MessageEvent extends React.PureComponent {
     const { className, event, type, widget, overviewClassName, expandedClassName } = this.props
 
     const entityId = getEntityId(event.identifiers[0])
-    const icon = type === 'downlink' ? 'downlink' : 'uplink'
-
+    const eventIcon = <Icon icon={type} className={style.messageIcon} />
     const eventContent = <Message content={{ id: `event:${event.name}` }} />
-    const eventIcon = <Icon icon={icon} className={style.messageIcon} />
 
     return (
       <Event
