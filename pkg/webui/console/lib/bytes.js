@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,27 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.group
-  display: flex
-  flex-direction: column
-  margin-bottom: $cs.s * -1
-  flex-wrap: wrap
-  position: relative
-  top: 'calc(%s / 2)' % $cs.s
+/* eslint-disable import/prefer-default-export */
 
-  +media-query($bp.m)
-    top: 0
-    margin-top: $cs.xs
-
-  .group-radio
-    margin-bottom: $cs.s
-
-    &:not(:last-child)
-      margin-right: $cs.m
-
-  &.horizontal
-    flex-direction: row
-    align-items: center
-
-  &:not(:last-child)
-    margin-bottom: 0
+export const hexToBase64 = str => {
+  return btoa(
+    String.fromCharCode.apply(
+      null,
+      str
+        .replace(/\r|\n/g, '')
+        .replace(/([\da-fA-F]{2}) ?/g, '0x$1 ')
+        .replace(/ +$/, '')
+        .split(' '),
+    ),
+  )
+}
