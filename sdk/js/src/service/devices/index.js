@@ -21,6 +21,8 @@ import Marshaler from '../../util/marshaler'
 import combineStreams from '../../util/combine-streams'
 import deviceEntityMap from '../../../generated/device-entity-map.json'
 
+import DownlinkQueue from '../downlink-queue'
+
 import { splitSetPaths, splitGetPaths, makeRequests } from './split'
 import mergeDevice from './merge'
 
@@ -36,6 +38,8 @@ class Devices {
     }
     this._api = api
     this._stackConfig = stackConfig
+
+    this.DownlinkQueue = new DownlinkQueue(api.AppAs, { stackConfig })
   }
 
   _emitDefaults(paths, device) {

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - To set the `logout-redirect-uris` for existing clients, the CLI client can be used, e.g.: `ttn-lw-cli clients update console --logout-redirect-uris "https://localhost:1885/console" --redirect-uris "http://localhost:1885/console"`.
 - Packet Broker Agent to act as Forwarder and Home Network. See `pba` configuration section.
 - JavaScript style guide to our `DEVELOPMENT.md` documentation.
+- Schedule end device downlinks in the Console.
 - Support for repeated `RekeyInd`. (happens when e.g. `RekeyConf` is lost)
 - Validate the `DevAddr` when switching session as a result of receiving `RekeyInd`.
 

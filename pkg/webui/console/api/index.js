@@ -199,6 +199,17 @@ export default {
     list: ttnClient.Gateways.getAll.bind(ttnClient.Gateways),
     search: ttnClient.Gateways.search.bind(ttnClient.Gateways),
   },
+  downlinkQueue: {
+    list: ttnClient.Applications.Devices.DownlinkQueue.list.bind(
+      ttnClient.Applications.Devices.DownlinkQueue,
+    ),
+    replace: ttnClient.Applications.Devices.DownlinkQueue.replace.bind(
+      ttnClient.Applications.Devices.DownlinkQueue,
+    ),
+    push: ttnClient.Applications.Devices.DownlinkQueue.push.bind(
+      ttnClient.Applications.Devices.DownlinkQueue,
+    ),
+  },
   gateway: {
     get: ttnClient.Gateways.getById.bind(ttnClient.Gateways),
     delete: ttnClient.Gateways.deleteById.bind(ttnClient.Gateways),

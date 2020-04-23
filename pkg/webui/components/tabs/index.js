@@ -28,21 +28,23 @@ import style from './tabs.styl'
 const Tabs = function({ className, active, tabs, onTabChange, divider, narrow }) {
   return (
     <ul className={classnames(className, style.tabs, { [style.divider]: divider })}>
-      {tabs.map(function(tab, index) {
+      {tabs.map(function({ name, disabled, narrow: nrw, link, exact, icon, title, hidden }, index) {
         return (
-          <Tab
-            key={index}
-            active={tab.name === active}
-            name={tab.name}
-            disabled={tab.disabled}
-            onClick={onTabChange}
-            narrow={tab.narrow || narrow}
-            link={tab.link}
-            exact={tab.exact}
-          >
-            {tab.icon && <Icon icon={tab.icon} className={style.icon} />}
-            <Message content={tab.title} />
-          </Tab>
+          !Boolean(hidden) && (
+            <Tab
+              key={index}
+              active={name === active}
+              name={name}
+              disabled={disabled}
+              onClick={onTabChange}
+              narrow={nrw || narrow}
+              link={link}
+              exact={exact}
+            >
+              {icon && <Icon icon={icon} className={style.icon} />}
+              <Message content={title} />
+            </Tab>
+          )
         )
       })}
     </ul>
@@ -68,6 +70,7 @@ Tabs.propTypes = {
       name: PropTypes.string.isRequired,
       icon: PropTypes.string,
       disabled: PropTypes.bool,
+      hidden: PropTypes.bool,
     }),
   ).isRequired,
 }
