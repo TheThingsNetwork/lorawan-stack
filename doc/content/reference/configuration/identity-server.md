@@ -38,7 +38,7 @@ Most emails contain the name of the network and links to the Identity Server or 
 - `is.email.network.identity-server-url`: The URL of the Identity Server
 - `is.email.network.console-url`: The URL of the Console
 
-Although {{% tts %}} comes with a number of builtin email templates, it is possible to override those with custom templates. You can specify the source where to load templates from, and options for that source. For more information on email templates, see the [email templates reference]({{< relref "../email-templates" >}}).
+Although {{% tts %}} comes with a number of builtin email templates, it is possible to override those with custom templates. You can specify the source where to load templates from, and options for that source. For more information on email templates, see the [email templates reference]({{< ref "/reference/email-templates" >}}).
 
 - `is.email.templates.source`: Source of the email template files (directory, url, blob)
 - `is.email.templates.directory`: Directory on the filesystem where email templates are located
@@ -61,7 +61,7 @@ If you do not want to serve the OAuth user interface on `/oauth`, you may custom
 
 - `is.oauth.mount`: Path on the server where the OAuth server will be served
 
-If page assets for the OAuth UI are served from a CDN or on a different path on the server, the base URL needs to be customized as well. If you want to [customize the branding]({{< ref "/guides/branding" >}}) of the OAuth UI, you can set the base URL for where your branding assets are located.
+If page assets for the OAuth UI are served from a CDN or on a different path on the server, the base URL needs to be customized as well. If you want to [customize the branding]({{< ref "/reference/branding" >}}) of the OAuth UI, you can set the base URL for where your branding assets are located.
 
 - `is.oauth.ui.assets-base-url`: The base URL to the page assets
 - `is.oauth.ui.branding-base-url`: The base URL to the branding assets
