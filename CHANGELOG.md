@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved `NewChannelReq`, `DLChannelReq` and `LinkADRReq` efficiency.
 - Submit buttons are now always enabled in the Console, regardless of the form's validation state.
 - Disabled ADR for `ISM2400` band.
+- Network Server will attempt RX1 for devices with `Rx1Delay` of 1 second, if possible.
+- Network Server will not attempt to schedule MAC-only frames in ping slots or RXC windows.
+- Network Server will only attempt to schedule in a ping slot or RXC window after RX2 has passed.
+- Network Server will schedule all time-bound network-initiated downlinks at most RX1 delay ahead of time.
 
 ### Deprecated
 
