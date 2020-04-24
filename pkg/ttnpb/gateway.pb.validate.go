@@ -716,6 +716,13 @@ func (m *Gateway) ValidateFields(paths ...string) error {
 
 		case "frequency_plan_ids":
 
+			if len(m.GetFrequencyPlanIDs()) > 8 {
+				return GatewayValidationError{
+					field:  "frequency_plan_ids",
+					reason: "value must contain no more than 8 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetFrequencyPlanIDs() {
 				_, _ = idx, item
 
