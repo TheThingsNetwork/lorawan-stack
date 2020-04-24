@@ -41,14 +41,17 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
-var timeout = (1 << 4) * test.Delay
+var (
+	timeout     = (1 << 4) * test.Delay
+	testOptions []Option
+)
 
 func TestComponent(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	c := componenttest.NewComponent(t, &component.Config{})
 
-	test.Must(New(c, &Config{}))
+	test.Must(New(c, &Config{}, testOptions...))
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
@@ -93,7 +96,7 @@ func TestForwarder(t *testing.T) {
 			TokenKey:       tokenKey,
 			TokenEncrypter: tokenEncrypter,
 		},
-	}))
+	}, testOptions...))
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_GATEWAY_SERVER)
@@ -410,7 +413,7 @@ func TestHomeNetwork(t *testing.T) {
 				Limit: 1,
 			},
 		},
-	}))
+	}, testOptions...))
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
