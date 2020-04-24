@@ -17,6 +17,7 @@ The Console app uses the [OAuth 2.0 authorization flow](https://en.wikipedia.org
 - `console.oauth.client-id`: The OAuth client ID
 - `console.oauth.client-secret`: The OAuth client secret
 - `console.oauth.token-url`: The OAuth Token Exchange URL
+- `console.oauth.logout-url`: The logout URL of the OAuth server used to perform client initiated logouts
 
 ## Frontend Setup
 
