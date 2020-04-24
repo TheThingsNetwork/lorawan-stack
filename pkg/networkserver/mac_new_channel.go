@@ -28,13 +28,24 @@ var (
 	evtReceiveNewChannelReject  = defineReceiveMACRejectEvent("new_channel", "new channel")()
 )
 
-func channelNeedsNewChannelReq(desiredCh, currentCh *ttnpb.MACParameters_Channel) bool {
-	return (desiredCh != nil || currentCh != nil) &&
-		(desiredCh == nil ||
-			currentCh == nil ||
-			desiredCh.UplinkFrequency != currentCh.UplinkFrequency ||
-			desiredCh.MaxDataRateIndex != currentCh.MaxDataRateIndex ||
-			desiredCh.MinDataRateIndex != currentCh.MinDataRateIndex)
+func deviceNeedsNewChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
+	if i >= len(dev.MACState.CurrentParameters.Channels) {
+		// A channel is desired to be created.
+		return i < len(dev.MACState.DesiredParameters.Channels)
+	}
+	if i >= len(dev.MACState.DesiredParameters.Channels) {
+		// A channel is desired to be deleted.
+		return !deviceRejectedFrequency(dev, 0)
+	}
+	// NOTE: i < len(dev.MACState.CurrentParameters.Channels) && i < len(dev.MACState.DesiredParameters.Channels) at this point
+	desiredCh, currentCh := dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]
+	if desiredCh == nil || currentCh == nil {
+		return desiredCh != currentCh
+	}
+	if desiredCh.UplinkFrequency != currentCh.UplinkFrequency || desiredCh.MaxDataRateIndex != currentCh.MaxDataRateIndex || desiredCh.MinDataRateIndex != currentCh.MinDataRateIndex {
+		return !deviceRejectedFrequency(dev, desiredCh.UplinkFrequency)
+	}
+	return false
 }
 
 func deviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
@@ -45,7 +56,7 @@ func deviceNeedsNewChannelReq(dev *ttnpb.EndDevice) bool {
 		return true
 	}
 	for i := range dev.MACState.DesiredParameters.Channels {
-		if channelNeedsNewChannelReq(dev.MACState.DesiredParameters.Channels[i], dev.MACState.CurrentParameters.Channels[i]) {
+		if deviceNeedsNewChannelReqAtIndex(dev, i) {
 			return true
 		}
 	}
@@ -74,9 +85,8 @@ func enqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 				break
 			}
 
-			desiredCh := dev.MACState.DesiredParameters.Channels[i]
-			if i >= len(dev.MACState.CurrentParameters.Channels) ||
-				channelNeedsNewChannelReq(desiredCh, dev.MACState.CurrentParameters.Channels[i]) {
+			if i >= len(dev.MACState.CurrentParameters.Channels) || deviceNeedsNewChannelReqAtIndex(dev, i) {
+				desiredCh := dev.MACState.DesiredParameters.Channels[i]
 				reqs = append(reqs, &ttnpb.MACCommand_NewChannelReq{
 					ChannelIndex:     uint32(i),
 					Frequency:        desiredCh.GetUplinkFrequency(),
@@ -115,15 +125,22 @@ func handleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 
 	var err error
 	dev.MACState.PendingRequests, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {
+		req := cmd.GetNewChannelReq()
+		// TODO: Handle DataRate nack. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2192)
+		if !pld.FrequencyAck {
+			if i := searchUint64(req.Frequency, dev.MACState.RejectedFrequencies...); i == len(dev.MACState.RejectedFrequencies) || dev.MACState.RejectedFrequencies[i] != req.Frequency {
+				dev.MACState.RejectedFrequencies = append(dev.MACState.RejectedFrequencies, 0)
+				copy(dev.MACState.RejectedFrequencies[i+1:], dev.MACState.RejectedFrequencies[i:])
+				dev.MACState.RejectedFrequencies[i] = req.Frequency
+			}
+		}
 		if !pld.DataRateAck || !pld.FrequencyAck {
 			return nil
 		}
-		req := cmd.GetNewChannelReq()
 
 		if uint(req.ChannelIndex) >= uint(len(dev.MACState.CurrentParameters.Channels)) {
 			dev.MACState.CurrentParameters.Channels = append(dev.MACState.CurrentParameters.Channels, make([]*ttnpb.MACParameters_Channel, 1+int(req.ChannelIndex-uint32(len(dev.MACState.CurrentParameters.Channels))))...)
 		}
-
 		ch := dev.MACState.CurrentParameters.Channels[req.ChannelIndex]
 		if ch == nil {
 			ch = &ttnpb.MACParameters_Channel{

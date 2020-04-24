@@ -21,12 +21,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Conformed JavaScript to new code style guide.
+- Removed login page of the Console (now redirects straight to the OAuth login).
+- Network Server now records `LinkADRReq` rejections and will not retry rejected values.
+- Improved `NewChannelReq`, `DLChannelReq` and `LinkADRReq` efficiency.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Handling of device unsetting the ADR bit in uplink, after ADR has been started.
 
 ### Security
 

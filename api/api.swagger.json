@@ -11302,6 +11302,29 @@
           "type": "string",
           "format": "date-time",
           "description": "Time when the last network-initiated downlink message was scheduled."
+        },
+        "rejected_adr_data_rate_indexes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3DataRateIndex"
+          },
+          "description": "ADR Data rate index values rejected by the device.\nReset each time `current_parameters.channels` change.\nElements are sorted in ascending order."
+        },
+        "rejected_adr_tx_power_indexes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "ADR TX output power index values rejected by the device.\nElements are sorted in ascending order."
+        },
+        "rejected_frequencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          },
+          "description": "Frequencies rejected by the device."
         }
       },
       "description": "MACState represents the state of MAC layer of the device.\nMACState is reset on each join for OTAA or ResetInd for ABP devices.\nThis is used internally by the Network Server and is read only."

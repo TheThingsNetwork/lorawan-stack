@@ -2227,6 +2227,9 @@ This is used internally by the Network Server and is read only.
 | `recent_uplinks` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) | repeated | Recent data uplink messages sorted by time. The number of messages stored may depend on configuration. |
 | `recent_downlinks` | [`DownlinkMessage`](#ttn.lorawan.v3.DownlinkMessage) | repeated | Recent data downlink messages sorted by time. The number of messages stored may depend on configuration. |
 | `last_network_initiated_downlink_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the last network-initiated downlink message was scheduled. |
+| `rejected_adr_data_rate_indexes` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) | repeated | ADR Data rate index values rejected by the device. Reset each time `current_parameters.channels` change. Elements are sorted in ascending order. |
+| `rejected_adr_tx_power_indexes` | [`uint32`](#uint32) | repeated | ADR TX output power index values rejected by the device. Elements are sorted in ascending order. |
+| `rejected_frequencies` | [`uint64`](#uint64) | repeated | Frequencies rejected by the device. |
 
 #### Field Rules
 
@@ -2236,6 +2239,9 @@ This is used internally by the Network Server and is read only.
 | `desired_parameters` | <p>`message.required`: `true`</p> |
 | `device_class` | <p>`enum.defined_only`: `true`</p> |
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
+| `rejected_adr_data_rate_indexes` | <p>`repeated.items.enum.defined_only`: `true`</p> |
+| `rejected_adr_tx_power_indexes` | <p>`repeated.items.uint32.lte`: `15`</p> |
+| `rejected_frequencies` | <p>`repeated.items.uint64.gte`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.MACState.JoinAccept">Message `MACState.JoinAccept`</a>
 

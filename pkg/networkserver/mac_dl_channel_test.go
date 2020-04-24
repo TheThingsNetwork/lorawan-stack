@@ -22,6 +22,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/pkg/events"
+	"go.thethings.network/lorawan-stack/pkg/log"
 	"go.thethings.network/lorawan-stack/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/pkg/util/test"
 	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
@@ -187,7 +188,7 @@ func TestEnqueueDLChannelReq(t *testing.T) {
 					},
 					{
 						UplinkFrequency:   130,
-						DownlinkFrequency: 131,
+						DownlinkFrequency: 130,
 						MinDataRateIndex:  ttnpb.DATA_RATE_2,
 						MaxDataRateIndex:  ttnpb.DATA_RATE_5,
 					},
@@ -341,7 +342,7 @@ func TestEnqueueDLChannelReq(t *testing.T) {
 							expectedEvs = append(expectedEvs, evtEnqueueDLChannelRequest.BindData(req))
 						}
 
-						st := enqueueDLChannelReq(test.Context(), dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
+						st := enqueueDLChannelReq(test.ContextWithT(log.NewContext(test.Context(), test.GetLogger(t)), t), dev, conf.MaxDownlinkLength, conf.MaxUplinkLength)
 						a.So(dev, should.Resemble, expectedDev)
 						a.So(st.QueuedEvents, should.ResembleEventDefinitionDataClosures, expectedEvs)
 						a.So(st, should.Resemble, macCommandEnqueueState{
@@ -414,7 +415,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 			Error: errMACRequestNotFound,
 		},
 		{
-			Name: "frequency nack/channel index ack/valid request",
+			Name: "frequency nack/channel index nack/valid request/no rejections",
 			InputDevice: &ttnpb.EndDevice{
 				MACState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
@@ -452,6 +453,55 @@ func TestHandleDLChannelAns(t *testing.T) {
 							},
 						},
 					},
+					RejectedFrequencies: []uint64{42},
+				},
+			},
+			Payload: &ttnpb.MACCommand_DLChannelAns{},
+			Events: []events.DefinitionDataClosure{
+				evtReceiveDLChannelReject.BindData(&ttnpb.MACCommand_DLChannelAns{}),
+			},
+		},
+		{
+			Name: "frequency nack/channel index ack/valid request/rejected frequencies:(1,2,100)",
+			InputDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{
+						(&ttnpb.MACCommand_DLChannelReq{
+							ChannelIndex: 2,
+							Frequency:    42,
+						}).MACCommand(),
+					},
+					CurrentParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								EnableUplink: true,
+							},
+							nil,
+							{
+								UplinkFrequency:   41,
+								DownlinkFrequency: 41,
+							},
+						},
+					},
+					RejectedFrequencies: []uint64{1, 2, 100},
+				},
+			},
+			ExpectedDevice: &ttnpb.EndDevice{
+				MACState: &ttnpb.MACState{
+					PendingRequests: []*ttnpb.MACCommand{},
+					CurrentParameters: ttnpb.MACParameters{
+						Channels: []*ttnpb.MACParameters_Channel{
+							{
+								EnableUplink: true,
+							},
+							nil,
+							{
+								UplinkFrequency:   41,
+								DownlinkFrequency: 41,
+							},
+						},
+					},
+					RejectedFrequencies: []uint64{1, 2, 42, 100},
 				},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
@@ -555,7 +605,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 
 			dev := CopyEndDevice(tc.InputDevice)
 
-			evs, err := handleDLChannelAns(test.Context(), dev, tc.Payload)
+			evs, err := handleDLChannelAns(test.ContextWithT(log.NewContext(test.Context(), test.GetLogger(t)), t), dev, tc.Payload)
 			if tc.Error != nil && !a.So(err, should.EqualErrorOrDefinition, tc.Error) ||
 				tc.Error == nil && !a.So(err, should.BeNil) {
 				t.FailNow()

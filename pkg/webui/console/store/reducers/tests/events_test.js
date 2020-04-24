@@ -38,35 +38,35 @@ describe('events reducer', () => {
       newState = reducer(newState, successActionCreator(testId, event2))
 
       expect(newState[testId].events).toHaveLength(2)
-      expect(newState[testId].events[0]).toEqual(event1)
-      expect(newState[testId].events[1]).toEqual(event2)
+      expect(newState[testId].events[0]).toEqual(event2)
+      expect(newState[testId].events[1]).toEqual(event1)
 
       const event3 = { time: new Date(testDate.getTime() - 1000).toISOString() }
       newState = reducer(newState, successActionCreator(testId, event3))
 
       expect(newState[testId].events).toHaveLength(3)
-      expect(newState[testId].events[0]).toEqual(event3)
+      expect(newState[testId].events[0]).toEqual(event2)
       expect(newState[testId].events[1]).toEqual(event1)
-      expect(newState[testId].events[2]).toEqual(event2)
+      expect(newState[testId].events[2]).toEqual(event3)
 
       const event4 = { time: new Date(testDate.getTime() + 2000).toISOString() }
       newState = reducer(newState, successActionCreator(testId, event4))
 
       expect(newState[testId].events).toHaveLength(4)
-      expect(newState[testId].events[0]).toEqual(event3)
-      expect(newState[testId].events[1]).toEqual(event1)
-      expect(newState[testId].events[2]).toEqual(event2)
-      expect(newState[testId].events[3]).toEqual(event4)
+      expect(newState[testId].events[0]).toEqual(event4)
+      expect(newState[testId].events[1]).toEqual(event2)
+      expect(newState[testId].events[2]).toEqual(event1)
+      expect(newState[testId].events[3]).toEqual(event3)
 
       const event5 = { time: new Date(testDate.getTime()).toISOString() }
       newState = reducer(newState, successActionCreator(testId, event5))
 
       expect(newState[testId].events).toHaveLength(5)
-      expect(newState[testId].events[0]).toEqual(event3)
-      expect(newState[testId].events[1]).toEqual(event5)
-      expect(newState[testId].events[2]).toEqual(event1)
-      expect(newState[testId].events[3]).toEqual(event2)
-      expect(newState[testId].events[4]).toEqual(event4)
+      expect(newState[testId].events[0]).toEqual(event4)
+      expect(newState[testId].events[1]).toEqual(event2)
+      expect(newState[testId].events[2]).toEqual(event5)
+      expect(newState[testId].events[3]).toEqual(event1)
+      expect(newState[testId].events[4]).toEqual(event3)
     })
   })
 })

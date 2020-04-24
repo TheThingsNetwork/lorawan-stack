@@ -14,6 +14,7 @@
 
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
+import { connect } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 import { Route, Switch } from 'react-router-dom'
 import classnames from 'classnames'
@@ -26,37 +27,75 @@ import { withEnv } from '@ttn-lw/lib/components/env'
 import ErrorView from '@ttn-lw/lib/components/error-view'
 import ScrollToTop from '@ttn-lw/lib/components/scroll-to-top'
 
+import WithAuth from '@ttn-lw/lib/components/with-auth'
+
 import Header from '@console/containers/header'
 
-import Landing from '@console/views/landing'
-import Login from '@console/views/login'
-import FullViewError from '@console/views/error'
+import Overview from '@console/views/overview'
+import Applications from '@console/views/applications'
+import Gateways from '@console/views/gateways'
+import Organizations from '@console/views/organizations'
+import Admin from '@console/views/admin'
+
+import FullViewError, { FullViewErrorInner } from '@console/views/error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
+import {
+  selectUser,
+  selectUserFetching,
+  selectUserError,
+  selectUserRights,
+  selectUserIsAdmin,
+} from '@console/store/selectors/user'
 
 import style from './app.styl'
 
+const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
+
 @withEnv
+@connect(state => ({
+  user: selectUser(state),
+  fetching: selectUserFetching(state),
+  error: selectUserError(state),
+  rights: selectUserRights(state),
+  isAdmin: selectUserIsAdmin(state),
+}))
 @(Component => (dev ? hot(Component) : Component))
-class ConsoleApp extends React.Component {
+class ConsoleApp extends React.PureComponent {
   static propTypes = {
     env: PropTypes.env.isRequired,
+    error: PropTypes.error,
+    fetching: PropTypes.bool.isRequired,
     history: PropTypes.shape({
       push: PropTypes.func,
       replace: PropTypes.func,
     }).isRequired,
+    isAdmin: PropTypes.bool,
+    rights: PropTypes.rights,
+    user: PropTypes.user,
+  }
+  static defaultProps = {
+    user: undefined,
+    error: undefined,
+    isAdmin: undefined,
+    rights: undefined,
   }
 
   render() {
     const {
+      user,
+      fetching,
+      error,
+      rights,
+      isAdmin,
+      history,
       env: {
         siteTitle,
         pageData,
         siteName,
         config: { supportLink },
       },
-      history,
     } = this.props
 
     if (pageData && pageData.error) {
@@ -81,16 +120,30 @@ class ConsoleApp extends React.Component {
               <div id="modal-container" />
               <Header className={style.header} />
               <main className={style.main}>
-                <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
-                <div className={style.sidebar} id="sidebar" />
-                <div className={style.content}>
-                  <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
-                  <Switch>
-                    {/* Routes for registration, privacy policy, other public pages */}
-                    <Route path="/login" component={Login} />
-                    <Route path="/" component={Landing} />
-                  </Switch>
-                </div>
+                <WithAuth
+                  user={user}
+                  fetching={fetching}
+                  error={error}
+                  errorComponent={FullViewErrorInner}
+                  rights={rights}
+                  isAdmin={isAdmin}
+                >
+                  <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
+                  <div className={style.sidebar} id="sidebar" />
+                  <div className={style.content}>
+                    <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
+                    <div className={style.stage}>
+                      <Switch>
+                        <Route exact path="/" component={Overview} />
+                        <Route path="/applications" component={Applications} />
+                        <Route path="/gateways" component={Gateways} />
+                        <Route path="/organizations" component={Organizations} />
+                        <Route path="/admin" component={Admin} />
+                        <Route component={GenericNotFound} />
+                      </Switch>
+                    </div>
+                  </div>
+                </WithAuth>
               </main>
               <Footer className={style.footer} supportLink={supportLink} />
             </div>

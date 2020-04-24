@@ -1539,6 +1539,48 @@ func (m *MACState) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "rejected_adr_data_rate_indexes":
+
+			for idx, item := range m.GetRejectedADRDataRateIndexes() {
+				_, _ = idx, item
+
+				if _, ok := DataRateIndex_name[int32(item)]; !ok {
+					return MACStateValidationError{
+						field:  fmt.Sprintf("rejected_adr_data_rate_indexes[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
+
+		case "rejected_adr_tx_power_indexes":
+
+			for idx, item := range m.GetRejectedADRTxPowerIndexes() {
+				_, _ = idx, item
+
+				if item > 15 {
+					return MACStateValidationError{
+						field:  fmt.Sprintf("rejected_adr_tx_power_indexes[%v]", idx),
+						reason: "value must be less than or equal to 15",
+					}
+				}
+
+			}
+
+		case "rejected_frequencies":
+
+			for idx, item := range m.GetRejectedFrequencies() {
+				_, _ = idx, item
+
+				if item < 100000 {
+					return MACStateValidationError{
+						field:  fmt.Sprintf("rejected_frequencies[%v]", idx),
+						reason: "value must be greater than or equal to 100000",
+					}
+				}
+
+			}
+
 		default:
 			return MACStateValidationError{
 				field:  name,

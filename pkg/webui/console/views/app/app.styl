@@ -20,12 +20,17 @@
 .main
   display: flex
   flex: 1 1 auto
+  position: relative
   +media-query($bp.s)
     flex-direction: column
 
 .content
   overflow: auto
   flex: 1
+  position: relative
+
+.stage
+  padding-bottom: $ls.xxs
 
 .mobile-breadcrumbs
   display: none
