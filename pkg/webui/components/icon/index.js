@@ -46,6 +46,7 @@ const hardcoded = {
   event_update: 'edit',
   uplink: 'arrow_drop_up',
   downlink: 'arrow_drop_down',
+  join: 'link',
   import_devices: 'playlist_add',
   collaborators: 'people',
   logout: 'power_settings_new',
