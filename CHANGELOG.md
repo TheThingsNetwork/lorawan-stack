@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Schedule end device downlinks in the Console.
 - Support for repeated `RekeyInd`. (happens when e.g. `RekeyConf` is lost)
 - Validate the `DevAddr` when switching session as a result of receiving `RekeyInd`.
+- Error details for failed events in the Console.
 
 ### Changed
 
