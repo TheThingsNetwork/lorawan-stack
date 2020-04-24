@@ -24,16 +24,24 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './overlay.styl'
 
-const Overlay = ({ className, visible, loading, children }) => (
+const Overlay = ({
+  className,
+  overlayClassName,
+  spinnerClassName,
+  spinnerMessage,
+  visible,
+  loading,
+  children,
+}) => (
   <div className={classnames(className, style.overlayWrapper)}>
     <div
-      className={classnames(style.overlay, {
+      className={classnames(overlayClassName, style.overlay, {
         [style.overlayVisible]: visible,
       })}
     />
     {visible && loading && (
-      <Spinner center>
-        <Message content={sharedMessages.fetching} />
+      <Spinner center className={spinnerClassName}>
+        <Message content={spinnerMessage} />
       </Spinner>
     )}
     {children}
@@ -47,12 +55,18 @@ Overlay.propTypes = {
    * A flag specifying whether the overlay should display the loading spinner.
    */
   loading: PropTypes.bool,
-  /** A flag specifying whether the overlay is visible or not. */
+  overlayClassName: PropTypes.string,
+  spinnerClassName: PropTypes.string,
+  spinnerMessage: PropTypes.message,
+  /** A flag specifying whether the overlay is visible or not */
   visible: PropTypes.bool.isRequired,
 }
 
 Overlay.defaultProps = {
   className: undefined,
+  overlayClassName: undefined,
+  spinnerClassName: undefined,
+  spinnerMessage: sharedMessages.fetching,
   loading: false,
 }
 
