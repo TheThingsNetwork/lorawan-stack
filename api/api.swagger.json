@@ -14,7 +14,7 @@
     "/applications": {
       "get": {
         "summary": "List applications. See request message for details.",
-        "operationId": "List",
+        "operationId": "ApplicationRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -93,7 +93,7 @@
     },
     "/applications/{application.ids.application_id}": {
       "put": {
-        "operationId": "Update",
+        "operationId": "ApplicationRegistry_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -132,7 +132,7 @@
     "/applications/{application_ids.application_id}": {
       "get": {
         "summary": "Get the application with the given identifiers, selecting the fields given\nby the field mask. The method may return more or less fields, depending on\nthe rights of the caller.",
-        "operationId": "Get",
+        "operationId": "ApplicationRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -173,7 +173,7 @@
     },
     "/applications/{application_ids.application_id}/api-keys": {
       "get": {
-        "operationId": "ListAPIKeys",
+        "operationId": "ApplicationAccess_ListAPIKeys",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -217,7 +217,7 @@
         ]
       },
       "post": {
-        "operationId": "CreateAPIKey",
+        "operationId": "ApplicationAccess_CreateAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -256,7 +256,7 @@
     "/applications/{application_ids.application_id}/api-keys/{api_key.id}": {
       "put": {
         "summary": "Update the rights of an existing application API key. To generate an API key,\nthe CreateAPIKey should be used. To delete an API key, update it\nwith zero rights. It is required for the caller to have all assigned or/and removed rights.",
-        "operationId": "UpdateAPIKey",
+        "operationId": "ApplicationAccess_UpdateAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -301,7 +301,7 @@
     },
     "/applications/{application_ids.application_id}/api-keys/{key_id}": {
       "get": {
-        "operationId": "GetAPIKey",
+        "operationId": "ApplicationAccess_GetAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -339,7 +339,7 @@
     "/applications/{application_ids.application_id}/collaborator": {
       "get": {
         "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
-        "operationId": "GetCollaborator",
+        "operationId": "ApplicationAccess_GetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -391,7 +391,7 @@
     "/applications/{application_ids.application_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
       "get": {
         "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
-        "operationId": "GetCollaborator3",
+        "operationId": "ApplicationAccess_GetCollaborator3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -443,7 +443,7 @@
     "/applications/{application_ids.application_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
         "summary": "Get the rights of a collaborator (member) of the application.\nPseudo-rights in the response (such as the \"_ALL\" right) are not expanded.",
-        "operationId": "GetCollaborator2",
+        "operationId": "ApplicationAccess_GetCollaborator2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -494,7 +494,7 @@
     },
     "/applications/{application_ids.application_id}/collaborators": {
       "get": {
-        "operationId": "ListCollaborators",
+        "operationId": "ApplicationAccess_ListCollaborators",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -539,7 +539,7 @@
       },
       "put": {
         "summary": "Set the rights of a collaborator (member) on the application. It is required for the caller to\nhave all assigned or/and removed rights.\nSetting a collaborator without rights, removes them.",
-        "operationId": "SetCollaborator",
+        "operationId": "ApplicationAccess_SetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -577,7 +577,7 @@
     },
     "/applications/{application_ids.application_id}/devices": {
       "get": {
-        "operationId": "List",
+        "operationId": "EndDeviceRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -641,7 +641,7 @@
     },
     "/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "EndDeviceRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -701,7 +701,7 @@
     },
     "/applications/{application_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "ApplicationRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -731,7 +731,7 @@
     },
     "/applications/{application_id}/rights": {
       "get": {
-        "operationId": "ListRights",
+        "operationId": "ApplicationAccess_ListRights",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -761,7 +761,7 @@
     },
     "/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
-        "operationId": "Create",
+        "operationId": "EndDeviceRegistry_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -799,7 +799,7 @@
     },
     "/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
-        "operationId": "Update",
+        "operationId": "EndDeviceRegistry_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -843,7 +843,7 @@
     },
     "/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "EndDeviceRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -914,7 +914,7 @@
     },
     "/as/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "AsEndDeviceRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -974,7 +974,7 @@
     },
     "/as/applications/{application_ids.application_id}/devices/{device_id}/down": {
       "get": {
-        "operationId": "DownlinkQueueList",
+        "operationId": "AppAs_DownlinkQueueList",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1034,7 +1034,7 @@
     },
     "/as/applications/{application_ids.application_id}/devices/{device_id}/packages": {
       "get": {
-        "operationId": "List",
+        "operationId": "ApplicationPackageRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1095,7 +1095,7 @@
     "/as/applications/{application_ids.application_id}/link": {
       "get": {
         "summary": "Get returns the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
-        "operationId": "GetLink",
+        "operationId": "As_GetLink",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1135,7 +1135,7 @@
       },
       "put": {
         "summary": "Set creates or updates the device.",
-        "operationId": "SetLink",
+        "operationId": "As_SetLink",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1174,7 +1174,7 @@
     "/as/applications/{application_id}/link": {
       "delete": {
         "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
-        "operationId": "DeleteLink",
+        "operationId": "As_DeleteLink",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1204,7 +1204,7 @@
     },
     "/as/applications/{application_id}/link/stats": {
       "get": {
-        "operationId": "GetLinkStats",
+        "operationId": "As_GetLinkStats",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1234,7 +1234,7 @@
     },
     "/as/applications/{application_id}/mqtt-connection-info": {
       "get": {
-        "operationId": "GetMQTTConnectionInfo",
+        "operationId": "AppAs_GetMQTTConnectionInfo",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1264,7 +1264,7 @@
     },
     "/as/applications/{association.ids.end_device_ids.application_ids.application_id}/devices/{association.ids.end_device_ids.device_id}/packages/associations/{association.ids.f_port}": {
       "put": {
-        "operationId": "SetAssociation",
+        "operationId": "ApplicationPackageRegistry_SetAssociation",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1315,7 +1315,7 @@
     },
     "/as/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
-        "operationId": "Set2",
+        "operationId": "AsEndDeviceRegistry_Set2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1353,7 +1353,7 @@
     },
     "/as/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
-        "operationId": "Set",
+        "operationId": "AsEndDeviceRegistry_Set",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1397,7 +1397,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "AsEndDeviceRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1468,7 +1468,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/push": {
       "post": {
-        "operationId": "DownlinkQueuePush",
+        "operationId": "AppAs_DownlinkQueuePush",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1512,7 +1512,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/down/replace": {
       "post": {
-        "operationId": "DownlinkQueueReplace",
+        "operationId": "AppAs_DownlinkQueueReplace",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1556,7 +1556,7 @@
     },
     "/as/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}/packages/associations/{f_port}": {
       "delete": {
-        "operationId": "DeleteAssociation",
+        "operationId": "ApplicationPackageRegistry_DeleteAssociation",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1623,7 +1623,7 @@
     },
     "/as/applications/{ids.application_ids.application_id}/devices/{ids.device_id}/packages/associations": {
       "get": {
-        "operationId": "ListAssociations",
+        "operationId": "ApplicationPackageRegistry_ListAssociations",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1710,7 +1710,7 @@
     },
     "/as/applications/{ids.end_device_ids.application_ids.application_id}/devices/{ids.end_device_ids.device_id}/packages/associations/{ids.f_port}": {
       "get": {
-        "operationId": "GetAssociation",
+        "operationId": "ApplicationPackageRegistry_GetAssociation",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1788,7 +1788,7 @@
     },
     "/as/pubsub-formats": {
       "get": {
-        "operationId": "GetFormats",
+        "operationId": "ApplicationPubSubRegistry_GetFormats",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1810,7 +1810,7 @@
     },
     "/as/pubsub/{application_ids.application_id}": {
       "get": {
-        "operationId": "List",
+        "operationId": "ApplicationPubSubRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1851,7 +1851,7 @@
     },
     "/as/pubsub/{application_ids.application_id}/{pub_sub_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "ApplicationPubSubRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1887,7 +1887,7 @@
     },
     "/as/pubsub/{ids.application_ids.application_id}/{ids.pub_sub_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "ApplicationPubSubRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1934,7 +1934,7 @@
     },
     "/as/pubsub/{pubsub.ids.application_ids.application_id}": {
       "post": {
-        "operationId": "Set2",
+        "operationId": "ApplicationPubSubRegistry_Set2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1972,7 +1972,7 @@
     },
     "/as/pubsub/{pubsub.ids.application_ids.application_id}/{pubsub.ids.pub_sub_id}": {
       "put": {
-        "operationId": "Set",
+        "operationId": "ApplicationPubSubRegistry_Set",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2016,7 +2016,7 @@
     },
     "/as/webhook-formats": {
       "get": {
-        "operationId": "GetFormats",
+        "operationId": "ApplicationWebhookRegistry_GetFormats",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2038,7 +2038,7 @@
     },
     "/as/webhook-templates": {
       "get": {
-        "operationId": "ListTemplates",
+        "operationId": "ApplicationWebhookRegistry_ListTemplates",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2073,7 +2073,7 @@
     },
     "/as/webhook-templates/{ids.template_id}": {
       "get": {
-        "operationId": "GetTemplate",
+        "operationId": "ApplicationWebhookRegistry_GetTemplate",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2114,7 +2114,7 @@
     },
     "/as/webhooks/{application_ids.application_id}": {
       "get": {
-        "operationId": "List",
+        "operationId": "ApplicationWebhookRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2155,7 +2155,7 @@
     },
     "/as/webhooks/{application_ids.application_id}/{webhook_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "ApplicationWebhookRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2191,7 +2191,7 @@
     },
     "/as/webhooks/{ids.application_ids.application_id}/{ids.webhook_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "ApplicationWebhookRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2238,7 +2238,7 @@
     },
     "/as/webhooks/{webhook.ids.application_ids.application_id}": {
       "post": {
-        "operationId": "Set2",
+        "operationId": "ApplicationWebhookRegistry_Set2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2276,7 +2276,7 @@
     },
     "/as/webhooks/{webhook.ids.application_ids.application_id}/{webhook.ids.webhook_id}": {
       "put": {
-        "operationId": "Set",
+        "operationId": "ApplicationWebhookRegistry_Set",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2320,7 +2320,7 @@
     },
     "/auth_info": {
       "get": {
-        "operationId": "AuthInfo",
+        "operationId": "EntityAccess_AuthInfo",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2342,7 +2342,7 @@
     },
     "/clients": {
       "get": {
-        "operationId": "List",
+        "operationId": "ClientRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2421,7 +2421,7 @@
     },
     "/clients/{client.ids.client_id}": {
       "put": {
-        "operationId": "Update",
+        "operationId": "ClientRegistry_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2459,7 +2459,7 @@
     },
     "/clients/{client_ids.client_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "ClientRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2500,7 +2500,7 @@
     },
     "/clients/{client_ids.client_id}/collaborator": {
       "get": {
-        "operationId": "GetCollaborator",
+        "operationId": "ClientAccess_GetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2551,7 +2551,7 @@
     },
     "/clients/{client_ids.client_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
       "get": {
-        "operationId": "GetCollaborator3",
+        "operationId": "ClientAccess_GetCollaborator3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2602,7 +2602,7 @@
     },
     "/clients/{client_ids.client_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
-        "operationId": "GetCollaborator2",
+        "operationId": "ClientAccess_GetCollaborator2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2653,7 +2653,7 @@
     },
     "/clients/{client_ids.client_id}/collaborators": {
       "get": {
-        "operationId": "ListCollaborators",
+        "operationId": "ClientAccess_ListCollaborators",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2697,7 +2697,7 @@
         ]
       },
       "put": {
-        "operationId": "SetCollaborator",
+        "operationId": "ClientAccess_SetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2735,7 +2735,7 @@
     },
     "/clients/{client_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "ClientRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2765,7 +2765,7 @@
     },
     "/clients/{client_id}/rights": {
       "get": {
-        "operationId": "ListRights",
+        "operationId": "ClientAccess_ListRights",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2795,7 +2795,7 @@
     },
     "/configuration/frequency-plans": {
       "get": {
-        "operationId": "ListFrequencyPlans",
+        "operationId": "Configuration_ListFrequencyPlans",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2827,7 +2827,7 @@
     },
     "/contact_info/validation": {
       "post": {
-        "operationId": "RequestValidation",
+        "operationId": "ContactInfoRegistry_RequestValidation",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2847,7 +2847,7 @@
         ]
       },
       "patch": {
-        "operationId": "Validate",
+        "operationId": "ContactInfoRegistry_Validate",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2869,7 +2869,7 @@
     },
     "/edcs/applications/{application_ids.application_id}/authorize": {
       "post": {
-        "operationId": "AuthorizeApplication",
+        "operationId": "EndDeviceClaimingServer_AuthorizeApplication",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2907,7 +2907,7 @@
     },
     "/edcs/applications/{application_id}/authorize": {
       "delete": {
-        "operationId": "UnauthorizeApplication",
+        "operationId": "EndDeviceClaimingServer_UnauthorizeApplication",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2937,7 +2937,7 @@
     },
     "/edcs/claim": {
       "post": {
-        "operationId": "Claim",
+        "operationId": "EndDeviceClaimingServer_Claim",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2969,7 +2969,7 @@
     },
     "/edtc/convert": {
       "post": {
-        "operationId": "Convert",
+        "operationId": "EndDeviceTemplateConverter_Convert",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -3010,7 +3010,7 @@
     },
     "/edtc/formats": {
       "get": {
-        "operationId": "ListFormats",
+        "operationId": "EndDeviceTemplateConverter_ListFormats",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3032,7 +3032,7 @@
     },
     "/events": {
       "post": {
-        "operationId": "Stream",
+        "operationId": "Events_Stream",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -3073,7 +3073,7 @@
     },
     "/gateways": {
       "get": {
-        "operationId": "List",
+        "operationId": "GatewayRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3152,7 +3152,7 @@
     },
     "/gateways/{gateway.ids.gateway_id}": {
       "put": {
-        "operationId": "Update",
+        "operationId": "GatewayRegistry_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3190,7 +3190,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "GatewayRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3239,7 +3239,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/api-keys": {
       "get": {
-        "operationId": "ListAPIKeys",
+        "operationId": "GatewayAccess_ListAPIKeys",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3291,7 +3291,7 @@
         ]
       },
       "post": {
-        "operationId": "CreateAPIKey",
+        "operationId": "GatewayAccess_CreateAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3329,7 +3329,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/api-keys/{api_key.id}": {
       "put": {
-        "operationId": "UpdateAPIKey",
+        "operationId": "GatewayAccess_UpdateAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3374,7 +3374,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/api-keys/{key_id}": {
       "get": {
-        "operationId": "GetAPIKey",
+        "operationId": "GatewayAccess_GetAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3419,7 +3419,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/collaborator": {
       "get": {
-        "operationId": "GetCollaborator",
+        "operationId": "GatewayAccess_GetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3478,7 +3478,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}": {
       "get": {
-        "operationId": "GetCollaborator3",
+        "operationId": "GatewayAccess_GetCollaborator3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3537,7 +3537,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
-        "operationId": "GetCollaborator2",
+        "operationId": "GatewayAccess_GetCollaborator2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3596,7 +3596,7 @@
     },
     "/gateways/{gateway_ids.gateway_id}/collaborators": {
       "get": {
-        "operationId": "ListCollaborators",
+        "operationId": "GatewayAccess_ListCollaborators",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3648,7 +3648,7 @@
         ]
       },
       "put": {
-        "operationId": "SetCollaborator",
+        "operationId": "GatewayAccess_SetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3686,7 +3686,7 @@
     },
     "/gateways/{gateway_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "GatewayRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3724,7 +3724,7 @@
     },
     "/gateways/{gateway_id}/rights": {
       "get": {
-        "operationId": "ListRights",
+        "operationId": "GatewayAccess_ListRights",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3762,7 +3762,7 @@
     },
     "/gs/gateways/{gateway_id}/connection/stats": {
       "get": {
-        "operationId": "GetGatewayConnectionStats",
+        "operationId": "Gs_GetGatewayConnectionStats",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3800,7 +3800,7 @@
     },
     "/gs/gateways/{gateway_id}/mqtt-connection-info": {
       "get": {
-        "operationId": "GetMQTTConnectionInfo",
+        "operationId": "GtwGs_GetMQTTConnectionInfo",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3838,7 +3838,7 @@
     },
     "/gs/gateways/{gateway_id}/mqttv2-connection-info": {
       "get": {
-        "operationId": "GetMQTTV2ConnectionInfo",
+        "operationId": "GtwGs_GetMQTTV2ConnectionInfo",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3876,7 +3876,7 @@
     },
     "/invitations": {
       "get": {
-        "operationId": "List",
+        "operationId": "UserInvitationRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3914,7 +3914,7 @@
         ]
       },
       "delete": {
-        "operationId": "Delete",
+        "operationId": "UserInvitationRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3942,7 +3942,7 @@
         ]
       },
       "post": {
-        "operationId": "Send",
+        "operationId": "UserInvitationRegistry_Send",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3974,7 +3974,7 @@
     },
     "/js/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "JsEndDeviceRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4034,7 +4034,7 @@
     },
     "/js/applications/{application_ids.application_id}/provision-devices": {
       "put": {
-        "operationId": "Provision",
+        "operationId": "JsEndDeviceRegistry_Provision",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -4081,7 +4081,7 @@
     },
     "/js/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
-        "operationId": "Set2",
+        "operationId": "JsEndDeviceRegistry_Set2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4119,7 +4119,7 @@
     },
     "/js/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
-        "operationId": "Set",
+        "operationId": "JsEndDeviceRegistry_Set",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4163,7 +4163,7 @@
     },
     "/js/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "JsEndDeviceRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4234,7 +4234,7 @@
     },
     "/js/join_eui_prefixes": {
       "get": {
-        "operationId": "GetJoinEUIPrefixes",
+        "operationId": "Js_GetJoinEUIPrefixes",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4256,7 +4256,7 @@
     },
     "/ns/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "NsEndDeviceRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4316,7 +4316,7 @@
     },
     "/ns/applications/{end_device.ids.application_ids.application_id}/devices": {
       "post": {
-        "operationId": "Set2",
+        "operationId": "NsEndDeviceRegistry_Set2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4354,7 +4354,7 @@
     },
     "/ns/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}": {
       "put": {
-        "operationId": "Set",
+        "operationId": "NsEndDeviceRegistry_Set",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4398,7 +4398,7 @@
     },
     "/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "NsEndDeviceRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4469,7 +4469,7 @@
     },
     "/ns/dev_addr": {
       "get": {
-        "operationId": "GenerateDevAddr",
+        "operationId": "Ns_GenerateDevAddr",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4491,7 +4491,7 @@
     },
     "/organizations": {
       "get": {
-        "operationId": "List",
+        "operationId": "OrganizationRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4571,7 +4571,7 @@
     "/organizations/{collaborator.organization_ids.organization_id}/applications": {
       "get": {
         "summary": "List applications. See request message for details.",
-        "operationId": "List3",
+        "operationId": "ApplicationRegistry_List3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4649,7 +4649,7 @@
       },
       "post": {
         "summary": "Create a new application. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
-        "operationId": "Create2",
+        "operationId": "ApplicationRegistry_Create2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4688,7 +4688,7 @@
     },
     "/organizations/{collaborator.organization_ids.organization_id}/clients": {
       "get": {
-        "operationId": "List3",
+        "operationId": "ClientRegistry_List3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4765,7 +4765,7 @@
         ]
       },
       "post": {
-        "operationId": "Create2",
+        "operationId": "ClientRegistry_Create2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4804,7 +4804,7 @@
     },
     "/organizations/{collaborator.organization_ids.organization_id}/gateways": {
       "get": {
-        "operationId": "List3",
+        "operationId": "GatewayRegistry_List3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4881,7 +4881,7 @@
         ]
       },
       "post": {
-        "operationId": "Create2",
+        "operationId": "GatewayRegistry_Create2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4920,7 +4920,7 @@
     },
     "/organizations/{organization.ids.organization_id}": {
       "put": {
-        "operationId": "Update",
+        "operationId": "OrganizationRegistry_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4959,7 +4959,7 @@
     },
     "/organizations/{organization_ids.organization_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "OrganizationRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5001,7 +5001,7 @@
     },
     "/organizations/{organization_ids.organization_id}/api-keys": {
       "get": {
-        "operationId": "ListAPIKeys",
+        "operationId": "OrganizationAccess_ListAPIKeys",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5046,7 +5046,7 @@
         ]
       },
       "post": {
-        "operationId": "CreateAPIKey",
+        "operationId": "OrganizationAccess_CreateAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5085,7 +5085,7 @@
     },
     "/organizations/{organization_ids.organization_id}/api-keys/{api_key.id}": {
       "put": {
-        "operationId": "UpdateAPIKey",
+        "operationId": "OrganizationAccess_UpdateAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5131,7 +5131,7 @@
     },
     "/organizations/{organization_ids.organization_id}/api-keys/{key_id}": {
       "get": {
-        "operationId": "GetAPIKey",
+        "operationId": "OrganizationAccess_GetAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5169,7 +5169,7 @@
     },
     "/organizations/{organization_ids.organization_id}/collaborator": {
       "get": {
-        "operationId": "GetCollaborator",
+        "operationId": "OrganizationAccess_GetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5214,7 +5214,7 @@
     },
     "/organizations/{organization_ids.organization_id}/collaborator/user/{collaborator.user_ids.user_id}": {
       "get": {
-        "operationId": "GetCollaborator2",
+        "operationId": "OrganizationAccess_GetCollaborator2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5259,7 +5259,7 @@
     },
     "/organizations/{organization_ids.organization_id}/collaborators": {
       "get": {
-        "operationId": "ListCollaborators",
+        "operationId": "OrganizationAccess_ListCollaborators",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5304,7 +5304,7 @@
         ]
       },
       "put": {
-        "operationId": "SetCollaborator",
+        "operationId": "OrganizationAccess_SetCollaborator",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5343,7 +5343,7 @@
     },
     "/organizations/{organization_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "OrganizationRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5374,7 +5374,7 @@
     },
     "/organizations/{organization_id}/rights": {
       "get": {
-        "operationId": "ListRights",
+        "operationId": "OrganizationAccess_ListRights",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5405,7 +5405,7 @@
     },
     "/qr-codes/end-devices": {
       "post": {
-        "operationId": "Generate",
+        "operationId": "EndDeviceQRCodeGenerator_Generate",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5437,7 +5437,7 @@
     },
     "/qr-codes/end-devices/formats": {
       "get": {
-        "operationId": "ListFormats",
+        "operationId": "EndDeviceQRCodeGenerator_ListFormats",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5459,7 +5459,7 @@
     },
     "/qr-codes/end-devices/formats/{format_id}": {
       "get": {
-        "operationId": "GetFormat",
+        "operationId": "EndDeviceQRCodeGenerator_GetFormat",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5489,7 +5489,7 @@
     },
     "/search/applications": {
       "get": {
-        "operationId": "SearchApplications",
+        "operationId": "EntityRegistrySearch_SearchApplications",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5568,7 +5568,7 @@
     },
     "/search/applications/{application_ids.application_id}/devices": {
       "get": {
-        "operationId": "SearchEndDevices",
+        "operationId": "EndDeviceRegistrySearch_SearchEndDevices",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5674,7 +5674,7 @@
     },
     "/search/clients": {
       "get": {
-        "operationId": "SearchClients",
+        "operationId": "EntityRegistrySearch_SearchClients",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5753,7 +5753,7 @@
     },
     "/search/gateways": {
       "get": {
-        "operationId": "SearchGateways",
+        "operationId": "EntityRegistrySearch_SearchGateways",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5832,7 +5832,7 @@
     },
     "/search/organizations": {
       "get": {
-        "operationId": "SearchOrganizations",
+        "operationId": "EntityRegistrySearch_SearchOrganizations",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5911,7 +5911,7 @@
     },
     "/search/users": {
       "get": {
-        "operationId": "SearchUsers",
+        "operationId": "EntityRegistrySearch_SearchUsers",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -5990,7 +5990,7 @@
     },
     "/users": {
       "get": {
-        "operationId": "List",
+        "operationId": "UserRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6046,7 +6046,7 @@
         ]
       },
       "post": {
-        "operationId": "Create",
+        "operationId": "UserRegistry_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6079,7 +6079,7 @@
     "/users/{collaborator.user_ids.user_id}/applications": {
       "get": {
         "summary": "List applications. See request message for details.",
-        "operationId": "List2",
+        "operationId": "ApplicationRegistry_List2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6157,7 +6157,7 @@
       },
       "post": {
         "summary": "Create a new application. This also sets the given organization or user as\nfirst collaborator with all possible rights.",
-        "operationId": "Create",
+        "operationId": "ApplicationRegistry_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6196,7 +6196,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/clients": {
       "get": {
-        "operationId": "List2",
+        "operationId": "ClientRegistry_List2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6273,7 +6273,7 @@
         ]
       },
       "post": {
-        "operationId": "Create",
+        "operationId": "ClientRegistry_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6312,7 +6312,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/gateways": {
       "get": {
-        "operationId": "List2",
+        "operationId": "GatewayRegistry_List2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6389,7 +6389,7 @@
         ]
       },
       "post": {
-        "operationId": "Create",
+        "operationId": "GatewayRegistry_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6428,7 +6428,7 @@
     },
     "/users/{collaborator.user_ids.user_id}/organizations": {
       "get": {
-        "operationId": "List2",
+        "operationId": "OrganizationRegistry_List2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6505,7 +6505,7 @@
         ]
       },
       "post": {
-        "operationId": "Create",
+        "operationId": "OrganizationRegistry_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6544,7 +6544,7 @@
     },
     "/users/{user.ids.user_id}": {
       "put": {
-        "operationId": "Update",
+        "operationId": "UserRegistry_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6583,7 +6583,7 @@
     },
     "/users/{user_ids.user_id}": {
       "get": {
-        "operationId": "Get",
+        "operationId": "UserRegistry_Get",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6632,7 +6632,7 @@
     },
     "/users/{user_ids.user_id}/api-keys": {
       "get": {
-        "operationId": "ListAPIKeys",
+        "operationId": "UserAccess_ListAPIKeys",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6684,7 +6684,7 @@
         ]
       },
       "post": {
-        "operationId": "CreateAPIKey",
+        "operationId": "UserAccess_CreateAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6723,7 +6723,7 @@
     },
     "/users/{user_ids.user_id}/api-keys/{api_key.id}": {
       "put": {
-        "operationId": "UpdateAPIKey",
+        "operationId": "UserAccess_UpdateAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6769,7 +6769,7 @@
     },
     "/users/{user_ids.user_id}/api-keys/{key_id}": {
       "get": {
-        "operationId": "GetAPIKey",
+        "operationId": "UserAccess_GetAPIKey",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6814,7 +6814,7 @@
     },
     "/users/{user_ids.user_id}/authorizations": {
       "get": {
-        "operationId": "List",
+        "operationId": "OAuthAuthorizationRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6875,7 +6875,7 @@
     },
     "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "OAuthAuthorizationRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6919,7 +6919,7 @@
     },
     "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens": {
       "get": {
-        "operationId": "ListTokens",
+        "operationId": "OAuthAuthorizationRegistry_ListTokens",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -6986,7 +6986,7 @@
     },
     "/users/{user_ids.user_id}/authorizations/{client_ids.client_id}/tokens/{id}": {
       "delete": {
-        "operationId": "DeleteToken",
+        "operationId": "OAuthAuthorizationRegistry_DeleteToken",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -7036,7 +7036,7 @@
     },
     "/users/{user_ids.user_id}/password": {
       "put": {
-        "operationId": "UpdatePassword",
+        "operationId": "UserRegistry_UpdatePassword",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -7075,7 +7075,7 @@
     },
     "/users/{user_ids.user_id}/sessions": {
       "get": {
-        "operationId": "List",
+        "operationId": "UserSessionRegistry_List",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -7136,7 +7136,7 @@
     },
     "/users/{user_ids.user_id}/sessions/{session_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "UserSessionRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -7180,7 +7180,7 @@
     },
     "/users/{user_ids.user_id}/temporary_password": {
       "post": {
-        "operationId": "CreateTemporaryPassword",
+        "operationId": "UserRegistry_CreateTemporaryPassword",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -7211,7 +7211,7 @@
     },
     "/users/{user_id}": {
       "delete": {
-        "operationId": "Delete",
+        "operationId": "UserRegistry_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -7249,7 +7249,7 @@
     },
     "/users/{user_id}/rights": {
       "get": {
-        "operationId": "ListRights",
+        "operationId": "UserAccess_ListRights",
         "responses": {
           "200": {
             "description": "A successful response.",

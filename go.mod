@@ -3,7 +3,7 @@ module go.thethings.network/lorawan-stack
 go 1.14
 
 // Use our fork of grpc-gateway.
-replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.14.3-gogo
+replace github.com/grpc-ecosystem/grpc-gateway => github.com/TheThingsIndustries/grpc-gateway v1.14.4-gogo
 
 // Use our fork of otto.
 replace github.com/robertkrimen/otto => github.com/TheThingsIndustries/otto v0.0.0-20181129100957-6ddbbb60554a
@@ -117,7 +117,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 	google.golang.org/api v0.20.0
 	google.golang.org/genproto v0.0.0-20200318110522-7735f76e9fa5
-	google.golang.org/grpc v1.28.0
+	google.golang.org/grpc v1.28.1
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1

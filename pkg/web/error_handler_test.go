@@ -65,6 +65,6 @@ func TestErrorHandler(t *testing.T) {
 
 		body, _ := ioutil.ReadAll(resp.Body)
 		a.So(resp.StatusCode, should.Equal, http.StatusNotImplemented)
-		a.So(string(body), should.ContainSubstring, "Not implemented")
+		a.So(string(body), should.ContainSubstring, "Not Implemented")
 	}
 }

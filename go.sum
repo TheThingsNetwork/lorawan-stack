@@ -101,8 +101,8 @@ github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdko
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqRtAwp2Xwc6WNPJEufxJ7fx3npB4UV/JOLmbu5I0=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/TheThingsIndustries/grpc-gateway v1.14.3-gogo h1:2YS0W3NE5Rv/rUmqo/R0nU6sfwXd4GDwxpBjKiNq53c=
-github.com/TheThingsIndustries/grpc-gateway v1.14.3-gogo/go.mod h1:Tb2dgNB7YopcrZBhmbG3fBNUM4DArslDpERdzL7gRuI=
+github.com/TheThingsIndustries/grpc-gateway v1.14.4-gogo h1:KVwXf7CY5/mRRXiD1/99mQLSPlxMHT1HFQBYoj2AsXU=
+github.com/TheThingsIndustries/grpc-gateway v1.14.4-gogo/go.mod h1:Tb2dgNB7YopcrZBhmbG3fBNUM4DArslDpERdzL7gRuI=
 github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed h1:rsGbnyV9cP0ocol1W17uTbZ1iWcEeg+gp3ivzW6NQ6Q=
 github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed/go.mod h1:InVSk9cxzZR1y4QaHF4CbDQ/uFeoTnbJfnwiKM04UNo=
 github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7 h1:Vb+sqm8nZUi+3N10QB8g2Gio2luOgfQnLlO6eLTuYDY=
@@ -1047,8 +1047,8 @@ google.golang.org/grpc v1.25.1/go.mod h1:c3i+UQWmh7LiEpx4sFZnkU36qjEYZ0imhYfXVyQ
 google.golang.org/grpc v1.27.0/go.mod h1:qbnxyOmOxrQa7FizSgH+ReBfzJrCY1pSN7KXBS8abTk=
 google.golang.org/grpc v1.27.1 h1:zvIju4sqAGvwKspUQOhwnpcqSbzi7/H6QomNNjTL4sk=
 google.golang.org/grpc v1.27.1/go.mod h1:qbnxyOmOxrQa7FizSgH+ReBfzJrCY1pSN7KXBS8abTk=
-google.golang.org/grpc v1.28.0 h1:bO/TA4OxCOummhSf10siHuG7vJOiwh7SpRpFZDkOgl4=
-google.golang.org/grpc v1.28.0/go.mod h1:rpkK4SK4GF4Ach/+MFLZUBavHOvF2JJB5uozKKal+60=
+google.golang.org/grpc v1.28.1 h1:C1QC6KzgSiLyBabDi87BbjaGreoRgGUF5nOyvfrAZ1k=
+google.golang.org/grpc v1.28.1/go.mod h1:rpkK4SK4GF4Ach/+MFLZUBavHOvF2JJB5uozKKal+60=
 gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 h1:FVCohIoYO7IJoDDVpV2pdq7SgrMH6wHnuTyrdrxJNoY=
 gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0/go.mod h1:OdE7CF6DbADk7lN8LIKRzRJTTZXIjtWgA5THM5lhBAw=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6 h1:jMFz6MfLP0/4fUyZle81rXUoxOBFi19VUFKVDOQfozc=
