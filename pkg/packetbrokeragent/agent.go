@@ -232,7 +232,7 @@ const (
 
 func (a *Agent) publishUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "packetbroker/agent",
+		"namespace", "packetbrokeragent",
 		"forwarder_net_id", a.netID,
 		"forwarder_id", a.clusterID,
 		"forwarder_tenant_id", a.tenantID,
@@ -323,7 +323,7 @@ func (a *Agent) runForwarderPublisher(ctx context.Context, conn *grpc.ClientConn
 
 func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "packetbroker/agent",
+		"namespace", "packetbrokeragent",
 		"forwarder_net_id", a.netID,
 		"forwarder_id", a.clusterID,
 		"forwarder_tenant_id", a.tenantID,
@@ -519,7 +519,7 @@ func (a *Agent) getSubscriptionFilters() []*packetbroker.RoutingFilter {
 
 func (a *Agent) subscribeUplink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "packetbroker/agent",
+		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
 		"home_network_tenant_id", a.tenantID,
 	))
@@ -660,7 +660,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 
 func (a *Agent) publishDownlink(ctx context.Context) error {
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"namespace", "packetbroker/agent",
+		"namespace", "packetbrokeragent",
 		"home_network_net_id", a.netID,
 		"home_network_tenant_id", a.tenantID,
 	))
