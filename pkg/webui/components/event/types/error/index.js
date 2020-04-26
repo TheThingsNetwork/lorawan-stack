@@ -17,9 +17,11 @@ import React from 'react'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
+import ErrorMessage from '@ttn-lw/lib/components/error-message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { getEntityId } from '@ttn-lw/lib/selectors/id'
+import { getBackendErrorRootCause } from '@ttn-lw/lib/errors/utils'
 
 import Event from '../..'
 
@@ -27,9 +29,16 @@ import style from './error.styl'
 
 const ErrorEvent = function({ className, event, expandedClassName, overviewClassName, widget }) {
   const entityId = getEntityId(event.identifiers[0])
-
   const icon = <Icon icon="error" className={style.icon} />
-  const content = <Message className={style.text} content={{ id: `event:${event.name}` }} />
+  // Transform error details to error-like structure.
+  const rootCause = getBackendErrorRootCause({ details: [event.data] })
+
+  const content = (
+    <span className={style.content}>
+      <Message content={{ id: `event:${event.name}` }} />
+      {!widget && <ErrorMessage className={style.errorDescription} content={rootCause} />}
+    </span>
+  )
 
   return (
     <Event
