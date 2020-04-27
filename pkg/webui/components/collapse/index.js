@@ -43,7 +43,7 @@ const Collapse = props => {
   return (
     <section className={cls}>
       <div className={style.header}>
-        <div className={style.content}>
+        <div className={style.headerContent}>
           <Message className={style.title} component="h3" content={title} />
           <Message className={style.description} component="p" content={description} />
         </div>

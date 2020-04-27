@@ -1,4 +1,6 @@
 {
+  "components.collapse.index.collapse": "Collapse",
+  "components.collapse.index.expand": "Expand",
   "components.data-sheet.index.noData": "No data available",
   "components.error-notification.story.problem": "We got a problem here!",
   "components.error-notification.story.lengthyProblem": "We got a problem here! And the description is quite lengthy as well, which can sometimes be a problem.",
@@ -268,8 +270,6 @@
   "console.views.device-claim-authentication-code.index.deleteSuccess": "Claim authentication deleted",
   "console.views.device-claim-authentication-code.index.updateSuccess": "Claim authentication updated",
   "console.views.device-claim-authentication-code.index.validateCode": "Claim authentication code must consist only of numbers and letters",
-  "console.views.device-general-settings.collapse.index.collapse": "Collapse",
-  "console.views.device-general-settings.collapse.index.expand": "Expand",
   "console.views.device-general-settings.identity-server-form.index.deleteDevice": "Delete end device",
   "console.views.device-general-settings.identity-server-form.index.deleteWarning": "Are you sure you want to delete \"{deviceId}\"? This action cannot be undone and it will not be possible to reuse the end device ID.",
   "console.views.device-general-settings.messages.isTitle": "Basic",
