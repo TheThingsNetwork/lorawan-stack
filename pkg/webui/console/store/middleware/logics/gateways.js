@@ -20,6 +20,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import { getGatewayId } from '@ttn-lw/lib/selectors/id'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as gateways from '@console/store/actions/gateways'
 
@@ -29,7 +30,6 @@ import {
 } from '@console/store/selectors/gateways'
 
 import createEventsConnectLogics from './events'
-import createRequestLogic from './lib'
 
 const getGatewayLogic = createRequestLogic({
   type: gateways.GET_GTW,
