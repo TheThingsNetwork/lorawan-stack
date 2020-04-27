@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createFetchingSelector } from '../fetching'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 
 describe('fetching selectors', function() {
   const BASE_ACTION_TYPE = 'BASE_ACTION'

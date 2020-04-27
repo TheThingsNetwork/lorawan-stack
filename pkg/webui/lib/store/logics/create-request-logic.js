@@ -17,8 +17,7 @@ import * as Sentry from '@sentry/browser'
 
 import { error } from '@ttn-lw/lib/log'
 import { isUnauthenticatedError, isInvalidArgumentError, isUnknown } from '@ttn-lw/lib/errors/utils'
-
-import { clear as clearAccessToken } from '@console/lib/access-token'
+import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 
 const getResultActionFromType = function(typeString, status) {
   if (typeString instanceof Array) {
@@ -78,7 +77,8 @@ const createRequestLogic = function(
           _resolve(res)
         }
       } catch (e) {
-        error(e) // Log the error if in development mode.
+        // Log the error when in development mode
+        error(e)
 
         if (isUnauthenticatedError(e)) {
           // If there was an unauthenticated error, the access token is not

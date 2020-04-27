@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_DEVICE_TEMPLATE_FORMATS_BASE } from '@console/store/actions/device-template-formats'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
-import { createFetchingSelector } from './fetching'
-import { createErrorSelector } from './error'
+import { GET_DEVICE_TEMPLATE_FORMATS_BASE } from '@console/store/actions/device-template-formats'
 
 const selectDeviceTemplateFormatsStore = state => state.deviceTemplateFormats
 
