@@ -14,11 +14,12 @@
 
 import api from '@console/api'
 
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
 import * as devices from '@console/store/actions/devices'
 import * as deviceTemplateFormats from '@console/store/actions/device-template-formats'
 
 import createEventsConnectLogics from './events'
-import createRequestLogic from './lib'
 
 const getDeviceLogic = createRequestLogic({
   type: devices.GET_DEV,

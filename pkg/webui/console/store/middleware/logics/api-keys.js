@@ -14,9 +14,9 @@
 
 import api from '@console/api'
 
-import * as apiKeys from '@console/store/actions/api-keys'
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
-import createRequestLogic from './lib'
+import * as apiKeys from '@console/store/actions/api-keys'
 
 const validParentTypes = ['application', 'gateway', 'organization']
 
