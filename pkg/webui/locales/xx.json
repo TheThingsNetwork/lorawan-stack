@@ -1,4 +1,6 @@
 {
+  "components.collapse.index.collapse": "Xxxxxxxx",
+  "components.collapse.index.expand": "Xxxxxx",
   "components.data-sheet.index.noData": "Xx xxxx xxxxxxxxx",
   "components.error-notification.story.problem": "Xx xxx x xxxxxxx xxxx!",
   "components.error-notification.story.lengthyProblem": "Xx xxx x xxxxxxx xxxx! Xxx xxx xxxxxxxxxxx xx xxxxx xxxxxxx xx xxxx, xxxxx xxx xxxxxxxxx xx x xxxxxxx.",
@@ -291,8 +293,6 @@
   "console.views.device-claim-authentication-code.index.deleteSuccess": "Xxxxx xxxxxxxxxxxxxx xxxxxxx",
   "console.views.device-claim-authentication-code.index.updateSuccess": "Xxxxx xxxxxxxxxxxxxx xxxxxxx",
   "console.views.device-claim-authentication-code.index.validateCode": "Xxxxx xxxxxxxxxxxxxx xxxx xxxx xxxxxxx xxxx xx xxxxxxx xxx xxxxxxx",
-  "console.views.device-general-settings.collapse.index.collapse": "Xxxxxxxx",
-  "console.views.device-general-settings.collapse.index.expand": "Xxxxxx",
   "console.views.device-general-settings.identity-server-form.index.deleteDevice": "Xxxxxx xxx xxxxxx",
   "console.views.device-general-settings.identity-server-form.index.deleteWarning": "Xxx xxx xxxx xxx xxxx xx xxxxxx \"{deviceId}\"? Xxxx xxxxxx xxxxxx xx xxxxxx xxx xx xxxx xxx xx xxxxxxxx xx xxxxx xxx xxx xxxxxx XX.",
   "console.views.device-general-settings.messages.isTitle": "Xxxxx",
