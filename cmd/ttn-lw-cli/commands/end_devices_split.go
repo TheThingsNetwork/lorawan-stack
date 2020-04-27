@@ -177,7 +177,7 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 	return &res, nil
 }
 
-func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []string, isCreate, touch bool) (*ttnpb.EndDevice, error) {
+func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, unsetPaths []string, isCreate, touch bool) (*ttnpb.EndDevice, error) {
 	var res ttnpb.EndDevice
 	res.SetFields(device, "ids", "created_at", "updated_at")
 
@@ -188,7 +188,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		}
 		var isDevice ttnpb.EndDevice
 		logger.WithField("paths", isPaths).Debug("Set end device on Identity Server")
-		isDevice.SetFields(device, append(isPaths, "ids")...)
+		isDevice.SetFields(device, append(ttnpb.ExcludeFields(isPaths, unsetPaths...), "ids")...)
 		isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			EndDevice: isDevice,
 			FieldMask: types.FieldMask{Paths: isPaths},
@@ -214,7 +214,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		}
 		var jsDevice ttnpb.EndDevice
 		logger.WithField("paths", jsPaths).Debug("Set end device on Join Server")
-		jsDevice.SetFields(device, append(jsPaths, "ids")...)
+		jsDevice.SetFields(device, append(ttnpb.ExcludeFields(jsPaths, unsetPaths...), "ids")...)
 		jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: jsDevice,
 			FieldMask: types.FieldMask{Paths: jsPaths},
@@ -240,7 +240,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		}
 		var nsDevice ttnpb.EndDevice
 		logger.WithField("paths", nsPaths).Debug("Set end device on Network Server")
-		nsDevice.SetFields(device, append(nsPaths, "ids")...)
+		nsDevice.SetFields(device, append(ttnpb.ExcludeFields(nsPaths, unsetPaths...), "ids")...)
 		nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: nsDevice,
 			FieldMask: types.FieldMask{Paths: nsPaths},
@@ -266,7 +266,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths []
 		}
 		var asDevice ttnpb.EndDevice
 		logger.WithField("paths", asPaths).Debug("Set end device on Application Server")
-		asDevice.SetFields(device, append(asPaths, "ids")...)
+		asDevice.SetFields(device, append(ttnpb.ExcludeFields(asPaths, unsetPaths...), "ids")...)
 		asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: asDevice,
 			FieldMask: types.FieldMask{Paths: asPaths},

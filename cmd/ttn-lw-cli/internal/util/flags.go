@@ -56,6 +56,15 @@ var (
 	toUnderscore = strings.NewReplacer("-", "_")
 )
 
+// NormalizePaths converts arguments to field mask paths, replacing '-' with '_'
+func NormalizePaths(paths []string) []string {
+	normalized := make([]string, len(paths))
+	for i, path := range paths {
+		normalized[i] = toUnderscore.Replace(path)
+	}
+	return normalized
+}
+
 func NormalizeFlags(f *pflag.FlagSet, name string) pflag.NormalizedName {
 	return pflag.NormalizedName(toDash.Replace(name))
 }
@@ -472,7 +481,9 @@ func SetFields(dst interface{}, flags *pflag.FlagSet, prefix ...string) error {
 	return nil
 }
 
-var textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
+var (
+	textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
+)
 
 func setField(rv reflect.Value, path []string, v reflect.Value) error {
 	rt := rv.Type()
@@ -684,5 +695,12 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 func SelectAllFlagSet(what string) *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	flagSet.Bool("all", false, fmt.Sprintf("select all %s fields", what))
+	return flagSet
+}
+
+// UnsetFlagSet returns a flagset with the --unset flag
+func UnsetFlagSet() *pflag.FlagSet {
+	flagSet := &pflag.FlagSet{}
+	flagSet.StringSlice("unset", []string{}, "list of fields to unset")
 	return flagSet
 }
