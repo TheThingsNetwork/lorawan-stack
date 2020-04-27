@@ -32,9 +32,9 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
 import { getUserId } from '@ttn-lw/lib/selectors/id'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { getUser, updateUser, deleteUser } from '@console/store/actions/users'
-import { attachPromise } from '@console/store/actions/lib'
 
 import { selectSelectedUser } from '@console/store/selectors/users'
 
