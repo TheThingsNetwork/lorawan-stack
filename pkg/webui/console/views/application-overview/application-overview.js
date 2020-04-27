@@ -15,7 +15,7 @@
 import React from 'react'
 import { Col, Row, Container } from 'react-grid-system'
 
-import PAGE_SIZES from '@console/constants/page-sizes'
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 
