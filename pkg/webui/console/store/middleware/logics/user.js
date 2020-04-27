@@ -14,13 +14,13 @@
 
 import api from '@console/api'
 
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
 import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 
 import * as accessToken from '@console/lib/access-token'
 
 import * as user from '@console/store/actions/user'
-
-import createRequestLogic from './lib'
 
 export default [
   createRequestLogic({

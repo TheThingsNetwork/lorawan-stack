@@ -14,10 +14,10 @@
 
 import api from '@console/api'
 
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
 import * as user from '@console/store/actions/user'
 import * as init from '@console/store/actions/init'
-
-import createRequestLogic from './lib'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
