@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_DEV_BASE, GET_DEVICES_LIST_BASE } from '@console/store/actions/devices'
+import { combineDeviceIds, extractDeviceIdFromCombinedId } from '@ttn-lw/lib/selectors/id'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
+import {
+  createPaginationIdsSelectorByEntity,
+  createPaginationTotalCountSelectorByEntity,
+} from '@ttn-lw/lib/store/selectors/pagination'
 
-import { combineDeviceIds, extractDeviceIdFromCombinedId } from '../../../lib/selectors/id'
+import { GET_DEV_BASE, GET_DEVICES_LIST_BASE } from '@console/store/actions/devices'
 
 import {
   createEventsSelector,
   createEventsErrorSelector,
   createEventsStatusSelector,
 } from './events'
-import {
-  createPaginationIdsSelectorByEntity,
-  createPaginationTotalCountSelectorByEntity,
-} from './pagination'
-import { createFetchingSelector } from './fetching'
-import { createErrorSelector } from './error'
 
 const ENTITY = 'devices'
 

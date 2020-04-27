@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_API_KEY_BASE, GET_API_KEYS_LIST_BASE } from '@console/store/actions/api-keys'
-
-import { createFetchingSelector } from './fetching'
-import { createErrorSelector } from './error'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
-} from './pagination'
+} from '@ttn-lw/lib/store/selectors/pagination'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
+
+import { GET_API_KEY_BASE, GET_API_KEYS_LIST_BASE } from '@console/store/actions/api-keys'
 
 const ENTITY = 'apiKeys'
 

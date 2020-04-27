@@ -24,6 +24,9 @@ import {
   getApiKeyId,
   getCollaboratorId,
 } from '@ttn-lw/lib/selectors/id'
+import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
+import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
+import error from '@ttn-lw/lib/store/reducers/ui/error'
 
 import { SHARED_NAME as APPLICATION_SHARED_NAME } from '@console/store/actions/applications'
 import { SHARED_NAME as GATEWAY_SHARED_NAME } from '@console/store/actions/gateways'
@@ -45,8 +48,6 @@ import createNamedRightsReducer from './rights'
 import collaborators from './collaborators'
 import createNamedEventsReducer from './events'
 import link from './link'
-import fetching from './ui/fetching'
-import error from './ui/error'
 import webhooks from './webhooks'
 import webhookFormats from './webhook-formats'
 import webhookTemplates from './webhook-templates'
@@ -54,7 +55,6 @@ import pubsubs from './pubsubs'
 import pubsubFormats from './pubsub-formats'
 import deviceTemplateFormats from './device-template-formats'
 import organizations from './organizations'
-import { createNamedPaginationReducer } from './pagination'
 import js from './join-server'
 import gatewayStatus from './gateway-status'
 

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_USERS_LIST_BASE, GET_USER_BASE } from '@console/store/actions/users'
-
-import { createFetchingSelector } from './fetching'
-import { createErrorSelector } from './error'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
-} from './pagination'
+} from '@ttn-lw/lib/store/selectors/pagination'
+
+import { GET_USERS_LIST_BASE, GET_USER_BASE } from '@console/store/actions/users'
 
 const ENTITY = 'users'
 
