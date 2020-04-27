@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_APP_PKG_DEFAULT_ASSOC } from '@console/store/actions/application-packages'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
-import { createFetchingSelector } from './fetching'
-import { createErrorSelector } from './error'
+import { GET_APP_PKG_DEFAULT_ASSOC } from '@console/store/actions/application-packages'
 
 const selectApplicationPackagesStore = state => state.applicationPackages
 

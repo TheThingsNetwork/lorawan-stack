@@ -13,19 +13,22 @@
 // limitations under the License.
 
 import {
+  createPaginationIdsSelectorByEntity,
+  createPaginationTotalCountSelectorByEntity,
+} from '@ttn-lw/lib/store/selectors/pagination'
+import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
+import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
+
+import { GET_APP_LINK_BASE } from '@console/store/actions/link'
+import {
   GET_APPS_LIST_BASE,
   GET_APPS_RIGHTS_LIST_BASE,
   GET_APP_BASE,
   GET_APP_DEV_COUNT_BASE,
 } from '@console/store/actions/applications'
-import { GET_APP_LINK_BASE } from '@console/store/actions/link'
 
 import { selectDeviceDerivedStore } from '@console/store/selectors/devices'
 
-import {
-  createPaginationIdsSelectorByEntity,
-  createPaginationTotalCountSelectorByEntity,
-} from './pagination'
 import {
   createEventsSelector,
   createEventsErrorSelector,
@@ -33,8 +36,6 @@ import {
   createEventsInterruptedSelector,
 } from './events'
 import { createRightsSelector, createPseudoRightsSelector } from './rights'
-import { createFetchingSelector } from './fetching'
-import { createErrorSelector } from './error'
 
 const ENTITY = 'applications'
 

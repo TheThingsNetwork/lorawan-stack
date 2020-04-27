@@ -15,7 +15,7 @@
 import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { attachPromise } from '@console/store/actions/lib'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 const useRequest = requestAction => {
   const dispatch = useDispatch()

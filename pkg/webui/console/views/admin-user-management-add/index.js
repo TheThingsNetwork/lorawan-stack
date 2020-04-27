@@ -25,10 +25,10 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import UserDataForm from '@console/components/user-data-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { createUser } from '@console/store/actions/users'
-import { attachPromise } from '@console/store/actions/lib'
 
 @connect(
   undefined,

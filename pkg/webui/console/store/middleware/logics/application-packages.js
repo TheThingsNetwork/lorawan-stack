@@ -14,12 +14,12 @@
 
 import api from '@console/api'
 
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
 import {
   GET_APP_PKG_DEFAULT_ASSOC,
   SET_APP_PKG_DEFAULT_ASSOC,
 } from '@console/store/actions/application-packages'
-
-import createRequestLogic from './lib'
 
 const getApplicationPackagesDefaultAssociationLogic = createRequestLogic({
   type: GET_APP_PKG_DEFAULT_ASSOC,
