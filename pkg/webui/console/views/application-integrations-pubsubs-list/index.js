@@ -15,7 +15,7 @@
 import React, { Component } from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 
-import PAGE_SIZES from '@console/constants/page-sizes'
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
