@@ -18,10 +18,9 @@ import TTN from 'ttn-lw'
 
 import toast from '@ttn-lw/components/toast'
 
-import getCookieValue from '@ttn-lw/lib/cookie'
 import { selectStackConfig, selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
-
-import tokenCreator from '@console/lib/access-token'
+import getCookieValue from '@ttn-lw/lib/cookie'
+import tokenCreator from '@ttn-lw/lib/access-token'
 
 const stackConfig = selectStackConfig()
 const appRoot = selectApplicationRootPath()
