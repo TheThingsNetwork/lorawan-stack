@@ -23,8 +23,6 @@ import ErrorMessage from '@ttn-lw/lib/components/error-message'
 import { withEnv } from '@ttn-lw/lib/components/env'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
-import Header from '@console/containers/header'
-
 import errorMessages from '@ttn-lw/lib/errors/error-messages'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import {
@@ -92,7 +90,7 @@ const FullViewErrorInner = function({ error, env }) {
 
 const FullViewErrorInnerWithEnv = withEnv(FullViewErrorInner)
 
-const FullViewError = function({ error }) {
+const FullViewError = function({ error, header: Header }) {
   return (
     <div className={style.wrapper}>
       <Header className={style.header} anchored />
@@ -111,6 +109,7 @@ FullViewErrorInner.propTypes = {
 
 FullViewError.propTypes = {
   error: PropTypes.error.isRequired,
+  header: PropTypes.node.isRequired,
 }
 
 FullViewErrorInner.defaultProps = {
