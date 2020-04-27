@@ -33,6 +33,7 @@ import GatewayDataForm from '@console/components/gateway-data-form'
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 import Require from '@console/lib/components/require'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import diff from '@ttn-lw/lib/diff'
@@ -40,7 +41,6 @@ import diff from '@ttn-lw/lib/diff'
 import { mayEditBasicGatewayInformation, mayDeleteGateway } from '@console/lib/feature-checks'
 import { mapFormValueToAttributes, mapAttributesToFormValue } from '@console/lib/attributes'
 
-import { attachPromise } from '@console/store/actions/lib'
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
 
 import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'

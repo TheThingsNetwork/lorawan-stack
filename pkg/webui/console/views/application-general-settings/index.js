@@ -40,11 +40,11 @@ import Yup from '@ttn-lw/lib/yup'
 import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { mayEditBasicApplicationInfo, mayDeleteApplication } from '@console/lib/feature-checks'
 import { attributeValidCheck, attributeTooShortCheck } from '@console/lib/attributes'
 
-import { attachPromise } from '@console/store/actions/lib'
 import { updateApplication, deleteApplication } from '@console/store/actions/applications'
 
 import {

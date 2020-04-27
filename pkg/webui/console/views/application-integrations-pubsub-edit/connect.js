@@ -17,8 +17,9 @@ import { replace } from 'connected-react-router'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
 import { getPubsub, updatePubsub } from '@console/store/actions/pubsubs'
-import { attachPromise } from '@console/store/actions/lib'
 
 import {
   selectSelectedPubsub,
