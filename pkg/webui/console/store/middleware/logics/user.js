@@ -17,7 +17,6 @@ import axios from 'axios'
 import api from '@console/api'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
-
 import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 import { selectApplicationRootPath } from '@ttn-lw/lib/selectors/env'
 
