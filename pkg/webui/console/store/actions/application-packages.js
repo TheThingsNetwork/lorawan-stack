@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createRequestActions } from './lib'
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
 export const GET_APP_PKG_DEFAULT_ASSOC_BASE = 'GET_APPLICATION_PACKAGE_DEFAULT_ASSOCIATION'
 export const [
