@@ -20,7 +20,7 @@ import {
   selectAssetsRootPath,
   selectBrandingRootPath,
   selectApplicationSiteName,
-} from '../../lib/selectors/env'
+} from '@ttn-lw/lib/selectors/env'
 
 const logo = {
   src: `${selectAssetsRootPath()}/logo.svg`,
