@@ -31,7 +31,7 @@ import {
   startEventsStreamFailure,
   startEventsStreamSuccess,
   stopEventsStream,
-} from '../../actions/events'
+} from '@console/store/actions/events'
 
 /**
  * Creates `redux-logic` logic from processing entity events.

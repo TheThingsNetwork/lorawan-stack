@@ -14,11 +14,12 @@
 
 import api from '@console/api'
 
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
 import * as organizations from '@console/store/actions/organizations'
 
 import { selectUserId } from '@console/store/selectors/user'
 
-import createRequestLogic from './lib'
 import createEventsConnectLogics from './events'
 
 const getOrganizationLogic = createRequestLogic({

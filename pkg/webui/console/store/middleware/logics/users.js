@@ -14,9 +14,9 @@
 
 import api from '@console/api'
 
-import * as users from '@console/store/actions/users'
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
-import createRequestLogic from './lib'
+import * as users from '@console/store/actions/users'
 
 const getUserLogic = createRequestLogic({
   type: users.GET_USER,

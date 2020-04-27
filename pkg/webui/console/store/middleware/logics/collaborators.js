@@ -14,9 +14,9 @@
 
 import api from '@console/api'
 
-import * as collaborators from '@console/store/actions/collaborators'
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
-import createRequestLogic from './lib'
+import * as collaborators from '@console/store/actions/collaborators'
 
 const validParentTypes = ['application', 'gateway', 'organization']
 

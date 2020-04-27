@@ -14,11 +14,11 @@
 
 import api from '@console/api'
 
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
 import * as webhooks from '@console/store/actions/webhooks'
 import * as webhookFormats from '@console/store/actions/webhook-formats'
 import * as webhookTemplates from '@console/store/actions/webhook-templates'
-
-import createRequestLogic from './lib'
 
 const getWebhookLogic = createRequestLogic({
   type: webhooks.GET_WEBHOOK,
