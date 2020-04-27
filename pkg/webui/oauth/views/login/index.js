@@ -28,10 +28,10 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitButton from '@ttn-lw/components/submit-button'
 
-import Logo from '@ttn-lw/containers/logo'
-
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
+
+import Logo from '@console/containers/logo'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { selectApplicationRootPath, selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
