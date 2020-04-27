@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import { createAction } from 'redux-actions'
 
-export const GET_IS_CONFIGURATION_BASE = 'GET_IS_CONFIGURATION'
-export const [
-  {
-    request: GET_IS_CONFIGURATION,
-    success: GET_IS_CONFIGURATION_SUCCESS,
-    failure: GET_IS_CONFIGURATION_FAILURE,
-  },
-  {
-    request: getIsConfiguration,
-    success: getIsConfigurationSuccess,
-    failure: getIsConfigurationFailure,
-  },
-] = createRequestActions(GET_IS_CONFIGURATION_BASE)
+export default function(baseType, requestPayloadCreator, requestMetaCreator) {
+  const requestType = `${baseType}_REQUEST`
+  const successType = `${baseType}_SUCCESS`
+  const failureType = `${baseType}_FAILURE`
+
+  return [
+    {
+      request: requestType,
+      success: successType,
+      failure: failureType,
+    },
+    {
+      request: createAction(requestType, requestPayloadCreator, requestMetaCreator),
+      success: createAction(successType),
+      failure: createAction(failureType),
+    },
+  ]
+}

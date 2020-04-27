@@ -16,7 +16,7 @@ import { createAction } from 'redux-actions'
 
 import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 
-import { createRequestActions } from './lib'
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
 export const SET_CONNECTION_STATUS = 'SET_CONNECTION_STATUS'
 
