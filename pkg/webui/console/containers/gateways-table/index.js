@@ -18,9 +18,9 @@ import { connect } from 'react-redux'
 
 import Status from '@ttn-lw/components/status'
 
-import Message from '@ttn-lw/lib/components/message'
+import FetchTable from '@ttn-lw/containers/fetch-table'
 
-import FetchTable from '@console/containers/fetch-table'
+import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
