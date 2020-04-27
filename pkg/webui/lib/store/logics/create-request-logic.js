@@ -22,8 +22,7 @@ import {
   getBackendErrorId,
   isUnknown,
 } from '@ttn-lw/lib/errors/utils'
-
-import { clear as clearAccessToken } from '@console/lib/access-token'
+import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 
 const getResultActionFromType = function(typeString, status) {
   if (typeString instanceof Array) {
