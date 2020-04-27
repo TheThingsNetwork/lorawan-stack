@@ -23,8 +23,7 @@ import {
   selectApplicationRootPath,
   selectCSRFToken,
 } from '@ttn-lw/lib/selectors/env'
-
-import tokenCreator from '@console/lib/access-token'
+import tokenCreator from '@ttn-lw/lib/access-token'
 
 const stackConfig = selectStackConfig()
 const appRoot = selectApplicationRootPath()
