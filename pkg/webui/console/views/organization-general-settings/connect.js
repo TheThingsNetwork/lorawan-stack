@@ -16,7 +16,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { replace } from 'connected-react-router'
 
-import { attachPromise } from '@console/store/actions/lib'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
 import { updateOrganization, deleteOrganization } from '@console/store/actions/organizations'
 
 import {

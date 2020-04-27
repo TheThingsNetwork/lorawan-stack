@@ -30,9 +30,9 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { updateDevice } from '@console/store/actions/devices'
-import { attachPromise } from '@console/store/actions/lib'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
