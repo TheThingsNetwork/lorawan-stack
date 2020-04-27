@@ -17,9 +17,9 @@ import { defineMessages } from 'react-intl'
 
 import Icon from '@ttn-lw/components/icon'
 
-import Message from '@ttn-lw/lib/components/message'
+import FetchTable from '@ttn-lw/containers/fetch-table'
 
-import FetchTable from '@console/containers/fetch-table'
+import Message from '@ttn-lw/lib/components/message'
 
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
