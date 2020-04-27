@@ -26,15 +26,14 @@ import {
   isTimeoutError,
   createFrontendError,
 } from '@ttn-lw/lib/errors/utils'
-
-import { clear as clearAccessToken } from '@console/lib/access-token'
+import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 
 import {
   setStatusChecking,
   ATTEMPT_RECONNECT,
   attemptReconnect,
 } from '@console/store/actions/status'
-import { getResultActionFromType } from '@console/store/actions/lib'
+import { getResultActionFromType } from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { selectIsCheckingStatus, selectIsOnlineStatus } from '@console/store/selectors/status'
 
