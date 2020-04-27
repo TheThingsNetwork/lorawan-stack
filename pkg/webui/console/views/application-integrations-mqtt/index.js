@@ -32,7 +32,7 @@ import ErrorView from '@ttn-lw/lib/components/error-view'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'

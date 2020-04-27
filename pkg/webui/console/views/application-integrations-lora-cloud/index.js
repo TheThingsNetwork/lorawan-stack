@@ -31,7 +31,7 @@ import LoRaCloudForm from '@console/containers/lora-cloud-form'
 
 import Require from '@console/lib/components/require'
 
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 

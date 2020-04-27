@@ -25,7 +25,7 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 
 import ApplicationApiKeysList from '@console/views/application-api-keys-list'
 import ApplicationApiKeyAdd from '@console/views/application-api-key-add'
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 import ApplicationApiKeyEdit from '@console/views/application-api-key-edit'
 
 import PropTypes from '@ttn-lw/lib/prop-types'

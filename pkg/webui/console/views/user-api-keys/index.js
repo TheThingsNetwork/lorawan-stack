@@ -22,7 +22,7 @@ import ErrorView from '@ttn-lw/lib/components/error-view'
 
 import UserApiKeyEdit from '@console/views/user-api-key-edit'
 import UserApiKeyAdd from '@console/views/user-api-key-add'
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 import UserApiKeysList from '@console/views/user-api-keys-list'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
