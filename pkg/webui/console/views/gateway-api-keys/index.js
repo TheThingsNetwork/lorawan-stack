@@ -26,7 +26,7 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 import GatewayApiKeyEdit from '@console/views/gateway-api-key-edit'
 import GatewayApiKeyAdd from '@console/views/gateway-api-key-add'
 import GatewayApiKeysList from '@console/views/gateway-api-keys-list'
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'

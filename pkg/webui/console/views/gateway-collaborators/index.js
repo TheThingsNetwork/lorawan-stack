@@ -27,7 +27,7 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 import GatewayCollaboratorEdit from '@console/views/gateway-collaborator-edit'
 import GatewayCollaboratorAdd from '@console/views/gateway-collaborator-add'
 import GatewayCollaboratorsList from '@console/views/gateway-collaborators-list'
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'

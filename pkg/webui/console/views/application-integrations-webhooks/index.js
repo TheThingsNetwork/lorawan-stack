@@ -28,7 +28,7 @@ import ApplicationWebhookChoose from '@console/views/application-integrations-we
 import ApplicationWebhookEdit from '@console/views/application-integrations-webhook-edit'
 import ApplicationWebhookAdd from '@console/views/application-integrations-webhook-add'
 import ApplicationWebhooksList from '@console/views/application-integrations-webhooks-list'
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
