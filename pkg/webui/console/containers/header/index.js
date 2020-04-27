@@ -35,6 +35,8 @@ import { logout } from '@console/store/actions/user'
 
 import { selectUser } from '@console/store/selectors/user'
 
+import Logo from '../logo'
+
 @withRouter
 @connect(
   state => {
@@ -179,6 +181,7 @@ class Header extends Component {
         searchable={searchable}
         onSearchRequest={handleSearchRequest}
         onLogout={handleLogout}
+        logo={<Logo />}
       />
     )
   }
