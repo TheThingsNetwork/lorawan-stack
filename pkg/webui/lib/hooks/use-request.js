@@ -15,7 +15,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { attachPromise } from '@console/store/actions/lib'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { selectIsOnlineStatus } from '@console/store/selectors/status'
 

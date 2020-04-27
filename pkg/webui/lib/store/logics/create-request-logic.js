@@ -116,7 +116,9 @@ const createRequestLogic = (
           _resolve(res)
         }
       } catch (e) {
-        error(e) // Log the error if in development mode.
+        // Log the error when in development mode
+        error(e)
+
         if (isUnauthenticatedError(e)) {
           // If there was an unauthenticated error, the access token is not
           // valid and we can delete it. Reloading will then initiate the auth

@@ -13,14 +13,14 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
-
-import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 import {
   createPaginationRequestActions,
   createPaginationBaseActionType,
   createPaginationDeleteBaseActionType,
   createPaginationDeleteActions,
-} from './pagination'
+} from '@ttn-lw/lib/store/actions/pagination'
+
+import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 import {
   startEventsStream,
   createStartEventsStreamActionType,

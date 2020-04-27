@@ -13,8 +13,11 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import {
+  createPaginationRequestActions,
+  createPaginationBaseActionType,
+} from '@ttn-lw/lib/store/actions/pagination'
 
-import { createPaginationRequestActions, createPaginationBaseActionType } from './pagination'
 import createGetRightsListRequestActions, { createGetRightsListActionType } from './rights'
 
 export const SHARED_NAME = 'USER'

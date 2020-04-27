@@ -42,7 +42,7 @@ export const createRequestActions = (baseType, requestPayloadCreator, requestMet
  * action creator.
  * @returns {object|Function} - The modified action or action creator.
  */
-export const attachPromise = actionOrActionCreator => {
+export default actionOrActionCreator => {
   const decorateAction = action => ({
     ...action,
     meta: {

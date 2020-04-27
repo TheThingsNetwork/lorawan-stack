@@ -31,8 +31,8 @@ import RequireRequest from '@ttn-lw/lib/components/require-request'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { attachPromise } from '@console/store/actions/lib'
 import {
   setAppPkgDefaultAssoc,
   getAppPkgDefaultAssoc,

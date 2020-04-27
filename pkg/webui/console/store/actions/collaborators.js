@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
-
-import { createPaginationByParentRequestActions } from './pagination'
+import { createPaginationByParentRequestActions } from '@ttn-lw/lib/store/actions/pagination'
 
 export const SHARED_NAME = 'COLLABORATORS'
 
