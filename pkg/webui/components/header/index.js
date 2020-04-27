@@ -24,8 +24,6 @@ import ProfileDropdown from '@ttn-lw/components/profile-dropdown'
 import MobileMenu from '@ttn-lw/components/mobile-menu'
 import Input from '@ttn-lw/components/input'
 
-import Logo from '@ttn-lw/containers/logo'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './header.styl'
@@ -99,7 +97,8 @@ Header.propTypes = {
   className: PropTypes.string,
   /** The child node of the dropdown component. */
   dropdownItems: ProfileDropdown.propTypes.children,
-  logo: PropTypes.node,
+  /** The logo component. */
+  logo: PropTypes.node.isRequired,
   /** The child node of the mobile dropdown. */
   mobileDropdownItems: PropTypes.node.isRequired,
   /** The Child node of the navigation bar. */
@@ -122,7 +121,6 @@ Header.defaultProps = {
   dropdownItems: undefined,
   navigationEntries: undefined,
   onSearchRequest: () => null,
-  logo: <Logo />,
   searchable: false,
   user: undefined,
 }
