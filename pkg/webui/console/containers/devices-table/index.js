@@ -19,11 +19,11 @@ import bind from 'autobind-decorator'
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 
+import FetchTable from '@ttn-lw/containers/fetch-table'
+
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 import withRequest from '@ttn-lw/lib/components/with-request'
-
-import FetchTable from '@console/containers/fetch-table'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 

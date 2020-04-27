@@ -18,9 +18,9 @@ import { defineMessages } from 'react-intl'
 import Tag from '@ttn-lw/components/tag'
 import TagGroup from '@ttn-lw/components/tag/group'
 
-import Message from '@ttn-lw/lib/components/message'
+import FetchTable from '@ttn-lw/containers/fetch-table'
 
-import FetchTable from '@console/containers/fetch-table'
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'

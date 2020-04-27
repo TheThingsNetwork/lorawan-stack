@@ -19,7 +19,7 @@ import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
-import PAGE_SIZES from '@console/constants/page-sizes'
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
 import Tabular from '@ttn-lw/components/table'
 import Input from '@ttn-lw/components/input'
