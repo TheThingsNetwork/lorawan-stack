@@ -14,14 +14,14 @@
 
 import api from '@console/api'
 
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+
 import * as configuration from '@console/store/actions/configuration'
 
 import {
   selectNsFrequencyPlans,
   selectGsFrequencyPlans,
 } from '@console/store/selectors/configuration'
-
-import createRequestLogic from './lib'
 
 const getNsFrequencyPlansLogic = createRequestLogic({
   type: configuration.GET_NS_FREQUENCY_PLANS,
