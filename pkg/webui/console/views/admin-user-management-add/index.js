@@ -27,10 +27,10 @@ import withRequest from '@ttn-lw/lib/components/with-request'
 import UserDataForm from '@console/components/user-data-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { createUser } from '@console/store/actions/users'
-import { attachPromise } from '@console/store/actions/lib'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
 
 import {
