@@ -24,6 +24,7 @@ import {
   selectJsConfig,
   selectNsConfig,
 } from '@ttn-lw/lib/selectors/env'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import {
   mayEditApplicationDeviceKeys,
@@ -31,7 +32,6 @@ import {
 } from '@console/lib/feature-checks'
 
 import { updateDevice } from '@console/store/actions/devices'
-import { attachPromise } from '@console/store/actions/lib'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'

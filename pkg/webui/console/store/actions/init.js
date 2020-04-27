@@ -14,7 +14,7 @@
 
 /* eslint-disable import/prefer-default-export */
 
-import { createRequestActions } from './lib'
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
 export const [
   { request: INITIALIZE, success: INITIALIZE_SUCCESS, failure: INITIALIZE_FAILURE },

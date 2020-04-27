@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,21 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const GET_USER_ME = 'GET_OAUTH_USER_ME'
-export const GET_USER_ME_SUCCESS = 'GET_OAUTH_USER_SUCCESS_ME'
-export const GET_USER_ME_FAILURE = 'GET_OAUTH_USER_FAILURE_ME'
-export const LOGOUT = 'LOGOUT'
-export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
-export const LOGOUT_FAILURE = 'LOGOUT_FAILURE'
+import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
-export const getUserMe = () => ({ type: GET_USER_ME })
+export const GET_USER_ME_BASE = 'GET_USER_ME'
+export const [
+  { request: GET_USER_ME, success: GET_USER_ME_SUCCESS, failure: GET_USER_ME_FAILURE },
+  { request: getUserMe, success: getUserMeSuccess, failure: getUserMeFailure },
+] = createRequestActions(GET_USER_ME_BASE)
 
-export const getUserMeSuccess = user => ({ type: GET_USER_ME_SUCCESS, user })
-
-export const getUserMeFailure = error => ({ type: GET_USER_ME_FAILURE, error })
-
-export const logout = () => ({ type: LOGOUT })
-
-export const logoutSuccess = () => ({ type: LOGOUT_SUCCESS })
-
-export const logoutFailure = error => ({ type: LOGOUT_FAILURE, error })
+export const LOGOUT_BASE = 'LOGOUT'
+export const [
+  { request: LOGOUT, success: LOGOUT_SUCCESS, failure: LOGOUT_FAILURE },
+  { request: logout, success: logoutSuccess, failure: logoutFailure },
+] = createRequestActions(LOGOUT_BASE)

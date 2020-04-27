@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
-
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-
-import { updateGateway } from '@console/store/actions/gateways'
-
-import { selectSelectedGateway, selectSelectedGatewayId } from '@console/store/selectors/gateways'
-
-const mapStateToProps = state => ({
-  gateway: selectSelectedGateway(state),
-  gatewayId: selectSelectedGatewayId(state),
-})
-
-const mapDispatchToProps = {
-  updateGateway: attachPromise(updateGateway),
-}
-
-export default Component => connect(mapStateToProps, mapDispatchToProps)(Component)
+/**
+ * The attachPromise function extends an action creator to include a flag
+ * which results in a promise being attached to the action by the promise
+ * middleware.
+ *
+ * @param {Function} actionCreator - The original action creator.
+ * @returns {Function} - The modified action creator.
+ */
+export default actionCreator =>
+  function(...args) {
+    const action = actionCreator(...args)
+    return {
+      ...action,
+      meta: {
+        ...action.meta,
+        _attachPromise: true,
+      },
+    }
+  }
