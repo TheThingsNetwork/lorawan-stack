@@ -147,6 +147,7 @@ var (
 func init() {
 	useCommand.Flags().Bool("insecure", defaultInsecure, "Connect without TLS")
 	useCommand.Flags().String("host", defaultClusterHost, "Server host name")
+	useCommand.Flags().String("oauth-server-address", "", "OAuth Server address")
 	useCommand.Flags().Bool("fetch-ca", false, "Connect to server and retrieve CA")
 	useCommand.Flags().Bool("user", false, "Write config file in user config directory")
 	useCommand.Flags().Bool("overwrite", false, "Overwrite existing config files")
