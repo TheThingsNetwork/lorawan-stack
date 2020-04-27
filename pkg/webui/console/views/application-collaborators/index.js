@@ -26,7 +26,7 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 
 import ApplicationCollaboratorsList from '@console/views/application-collaborators-list'
 import ApplicationCollaboratorEdit from '@console/views/application-collaborator-edit'
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 import ApplicationCollaboratorAdd from '@console/views/application-collaborator-add'
 
 import PropTypes from '@ttn-lw/lib/prop-types'

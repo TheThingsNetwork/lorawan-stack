@@ -24,7 +24,7 @@ import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-import SubViewError from '@console/views/error/sub-view'
+import SubViewError from '@console/views/sub-view-error'
 import OrganizationCollaboratorsList from '@console/views/organization-collaborators-list'
 import OrganizationCollaboratorAdd from '@console/views/organization-collaborator-add'
 import OrganizationCollaboratorEdit from '@console/views/organization-collaborator-edit'
