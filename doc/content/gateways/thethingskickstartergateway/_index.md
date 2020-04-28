@@ -8,7 +8,7 @@ The Things Kickstarter Gateway is a LoRaWAN gateway, whose technical specificati
 ## Prerequisites
 
 1. User account on {{% tts %}} with rights to create Gateways and API Keys.
-2. The Things Gateway running the latest firmware (a minimum of `v1.0.7` is necessary).
+2. The Things Gateway running the latest firmware (a minimum of `v1.0.8` is necessary).
 
 ## Registration
 
@@ -43,4 +43,6 @@ This will apply the setting and reboot the gateway. If all the steps have been f
 
 ## Troubleshooting
 
-If the gateway does not connect to the {{% tts %}} after a few minutes, disconnect and reconnect the power supply to power-cycle the gateway.
+Please allow about 5 mins for the gateway to attempt connection before trouble shooting. During this period only 2 or 3 LEDs will be ON with the 3rd LED slowly blinking.
+
+If there only 3 LEDs active for an extended period of time, unplug the gateway, wait for 10s and reconnect. Also try using an Ethernet connection as that improves the network connectivity.
