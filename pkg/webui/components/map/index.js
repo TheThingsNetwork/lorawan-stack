@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,19 @@
 // limitations under the License.
 
 import React from 'react'
+
 import PropTypes from 'prop-types'
+import { Map, Marker, TileLayer } from 'react-leaflet'
 import classnames from 'classnames'
 import Leaflet from 'leaflet'
+import bind from 'autobind-decorator'
 
 import MarkerIcon from '@assets/auxiliary-icons/location_pin.svg'
 
 import style from './map.styl'
 
 // Reset default marker icon.
+
 delete Leaflet.Icon.Default.prototype._getIconUrl
 Leaflet.Icon.Default.mergeOptions({
   iconRetinaUrl: MarkerIcon,
@@ -35,79 +39,112 @@ Leaflet.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 })
 
-export default class Map extends React.Component {
+const tileLayer = (
+  <TileLayer
+    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+  />
+)
+const defaultMinZoom = 7
+
+export default class LocationMap extends React.Component {
   static propTypes = {
-    // Id is a string used to give the map a unique ID.
-    id: PropTypes.string.isRequired,
-    // LeafletConfig is an object which can contain any number of properties
+    className: PropTypes.string,
+    clickable: PropTypes.bool,
+    // `LeafletConfig` is an object which can contain any number of properties
     // defined by the leaflet plugin and is used to overwrite the default
     // configuration of leaflet.
-    leafletConfig: PropTypes.shape({}),
-    // Markers is an array of objects containing a specific properties.
+    leafletConfig: PropTypes.shape({
+      zoom: PropTypes.number,
+    }),
+    mapCenter: PropTypes.arrayOf(PropTypes.number),
+    mapRef: PropTypes.string,
+    // `markers` is an array of objects containing a specific properties.
     markers: PropTypes.arrayOf(
-      // Position is a object containing two properties latitude and longitude
-      // which are both numbers.
+      // `position` is a object containing two properties latitude and longitude which are both numbers.
       PropTypes.shape({
-        position: PropTypes.objectOf(PropTypes.number),
+        position: PropTypes.shape({
+          longitude: PropTypes.number,
+          latitude: PropTypes.number,
+        }),
       }),
-    ).isRequired,
-    // Widget is a boolean used to add a class name to the map container div for
-    // styling.
+    ),
+    onClick: PropTypes.func,
+    // `widget` is a boolean used to add a class name to the map container div for styling.
     widget: PropTypes.bool,
   }
 
   static defaultProps = {
     leafletConfig: {},
+    className: undefined,
     widget: false,
+    markers: [],
+    onClick: () => null,
+    mapCenter: undefined,
+    clickable: false,
+    mapRef: 'map',
   }
 
-  getMapCenter(markers) {
-    // This will calculate zoom and map center long/lang based on all markers
-    // provided. Currently it just returns the first marker.
-    // TODO: Add multiple markers
-    // https://github.com/TheThingsNetwork/lorawan-stack/issues/1241
-    return markers[0]
-  }
+  constructor(props) {
+    super(props)
 
-  createMap(config, id) {
-    this.map = Leaflet.map(id, {
-      ...config,
-    })
-  }
-
-  createMarkers(markers) {
-    markers.map(marker =>
-      Leaflet.marker([marker.position.latitude, marker.position.longitude]).addTo(this.map),
-    )
-  }
-
-  componentDidMount() {
-    const { id, markers } = this.props
-
-    const { position } = markers.length >= 1 ? this.getMapCenter(markers) : markers[0]
-
-    const config = {
-      layers: [
-        Leaflet.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        }),
-      ],
-      center: [position.latitude, position.longitude],
-      zoom: 11,
-      minZoom: 1,
-      ...this.props.leafletConfig,
+    this.state = {
+      zoomLevel: props.leafletConfig.zoom,
     }
+  }
 
-    this.createMap(config, id)
-    this.createMarkers(markers, id)
+  // Fix the issue where tiles sometimes partially load.
+  @bind
+  componentDidMount() {
+    const map = this.refs.map.leafletElement
+    setTimeout(() => {
+      map.invalidateSize()
+    }, 250)
+  }
+
+  @bind
+  onZoomEvent(event) {
+    this.setState({ zoomLevel: event.target._zoom })
   }
 
   render() {
-    const { id, widget } = this.props
-
+    const {
+      className,
+      mapCenter,
+      clickable,
+      widget,
+      markers,
+      leafletConfig,
+      mapRef,
+      onClick,
+    } = this.props
+    const { zoomLevel } = this.state
     return (
-      <div className={style.container}>
-        <div className={classnames(style.map, { [style.widget]: widget })} id={id} />
+      <div className={classnames(style.container, className)}>
+        <Map
+          ref={mapRef}
+          className={classnames(style.map, {
+            [style.widget]: widget,
+            [style.click]: clickable,
+          })}
+          minZoom={defaultMinZoom}
+          onZoomend={this.onZoomEvent}
+          onClick={onClick}
+          {...leafletConfig}
+          zoom={zoomLevel}
+          center={mapCenter}
+        >
+          {tileLayer}
+          {markers.map(
+            marker =>
+              marker && (
+                <Marker
+                  key={`marker-${marker.position.latitude}-${marker.position.altitude}`}
+                  position={[marker.position.latitude, marker.position.longitude]}
+                />
+              ),
+          )}
+        </Map>
       </div>
     )
   }

@@ -129,6 +129,7 @@
   "console.components.location-form.index.updateSuccess": "Xxxxxxxx xxxxxxx",
   "console.components.location-form.index.deleteFailure": "Xx xxxxx xxxxxxxx xxx xxx xxxxxxxx xxxxx xxx xx xxxxxxx",
   "console.components.location-form.index.deleteSuccess": "Xxxxxxxx xxxxxxx",
+  "console.components.location-form.index.loadingLocation": "Xxxxxxx xxxxxxxx...",
   "console.components.organization-form.index.orgDescPlaceholder": "Xxxxxxxxxxx xxx xx xxx xxxxxxxxxxxx",
   "console.components.organization-form.index.orgDescDescription": "Xxxxxxxx xxxxxxxxxxxx xxxxxxxxxxx; xxx xxxx xx xxxx xx xxxx xxxxx xxxxx xxx xxxxxxxxxxxx",
   "console.components.organization-form.index.orgIdPlaceholder": "xx-xxx-xxxxxxxxxxxx",
