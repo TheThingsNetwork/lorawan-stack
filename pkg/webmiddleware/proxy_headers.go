@@ -30,12 +30,22 @@ const (
 	headerXForwardedProto = "X-Forwarded-Proto" // We don't support non-standard headers such as Front-End-Https, X-Forwarded-Ssl, X-Url-Scheme.
 	headerXRealIP         = "X-Real-IP"
 
+	headerXForwardedClientCert        = "X-Forwarded-Client-Cert"          // Envoy mTLS.
+	headerXForwardedTLSClientCert     = "X-Forwarded-Tls-Client-Cert"      // Traefik mTLS.
+	headerXForwardedTLSClientCertInfo = "X-Forwarded-Tls-Client-Cert-Info" // Traefik mTLS.
+
 	schemeHTTP  = "http"
 	schemeHTTPS = "https"
 )
 
 var (
-	proxyHeaders        = []string{headerForwarded, headerXForwardedFor, headerXForwardedHost, headerXForwardedProto, headerXRealIP}
+	proxyHeaders = []string{
+		headerForwarded,
+		headerXForwardedFor, headerXForwardedHost, headerXForwardedProto,
+		headerXForwardedClientCert,
+		headerXForwardedTLSClientCert, headerXForwardedTLSClientCertInfo,
+		headerXRealIP,
+	}
 	forwardedForRegex   = regexp.MustCompile(`(?i)(?:for=)([^(;|,| )]+)`)
 	forwardedHostRegex  = regexp.MustCompile(`(?i)(?:host=)([^(;|,| )]+)`)
 	forwardedProtoRegex = regexp.MustCompile(`(?i)(?:proto=)(https|http)`)
