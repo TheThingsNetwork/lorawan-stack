@@ -161,7 +161,7 @@ func init() {
 		// No LoRaWAN Regional Parameters 1.0
 		regionalParameters1_0_1: bandIdentity,
 		regionalParameters1_0_2RevA: func(b Band) Band {
-			for drIdx := ttnpb.DATA_RATE_0; drIdx < ttnpb.DATA_RATE_4; drIdx++ {
+			for drIdx := ttnpb.DATA_RATE_0; drIdx <= ttnpb.DATA_RATE_4; drIdx++ {
 				b.DataRates[drIdx] = b.DataRates[drIdx+2]
 			}
 			delete(b.DataRates, ttnpb.DATA_RATE_5)
