@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Converts hex encoded string to base64.
+ *
+ * @param {string} str - Hex encoded string.
+ * @returns {string} - `str` base64 encoded.
+ */
 export const hexToBase64 = str => {
   return btoa(
     String.fromCharCode.apply(
