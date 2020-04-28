@@ -19,6 +19,7 @@ import api from '@console/api'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import { getGatewayId } from '@ttn-lw/lib/selectors/id'
+import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 import * as gateways from '@console/store/actions/gateways'
 
@@ -88,8 +89,21 @@ const getGatewaysLogic = createRequestLogic({
 
     let entities = data.gateways
     if (options.withStatus) {
+      const gsConfig = selectGsConfig()
+      const consoleGsAddress = getHostFromUrl(gsConfig.base_url)
+
       entities = await Promise.all(
         data.gateways.map(gateway => {
+          const gatewayServerAddress = gateway.gateway_server_address
+
+          if (!Boolean(gateway.gateway_server_address)) {
+            return Promise.resolve({ ...gateway, status: 'unknown' })
+          }
+
+          if (gatewayServerAddress !== consoleGsAddress) {
+            return Promise.resolve({ ...gateway, status: 'other-cluster' })
+          }
+
           const id = getGatewayId(gateway)
           return api.gateway
             .stats(id)
