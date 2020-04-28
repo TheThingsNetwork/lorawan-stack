@@ -225,4 +225,22 @@ details + blockquote {
   margin-top: 1em;
 }
 
+.glossary dl {
+}
+.glossary dt {
+  margin-top: 1rem;
+  font-weight: bold;
+  .term {
+    background-color: #ececec;
+    padding: 0.25rem;
+  }
+  .term-abbr, .term-alt {
+    background-color: #ececec;
+    padding: 0.25rem;
+  }
+}
+.glossary dd {
+  margin: 0.5em 0 0.5em 0;
+}
+
 @import "highlight.scss";

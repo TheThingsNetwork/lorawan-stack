@@ -1,14 +1,12 @@
 {{ $term := .Get "term" }}
+<div class = "glossary">
 {{ if $term }}
   {{- with index .Site.Data.glossary.glossary $term -}}
-    <dl>
       {{ "partial proto/glossary-term.html" (dict "context" . "term" $term) }}
-    </dl>
   {{ end}}
 {{ else }}
-  <dl>
     {{- range $key, $elem := .Site.Data.glossary.glossary -}}
       {{ partial "proto/glossary-term.html" (dict "context" . "term" $key) }}
     {{ end }}
-  </dl>
 {{ end }}
+</div>

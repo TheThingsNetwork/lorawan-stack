@@ -5,7 +5,7 @@ description: "Common terms and definitions"
 
 Common terms and definitions.
 
-<!-- more -->
+<!--more-->
 
 <!-- Terms come from /data/glossary. -->
 

@@ -1,16 +1,18 @@
-<dt id="{{.term | urlize}}">
-	<span class="term">{{- .term -}}</span>
-	{{- with .context.abbr }}
-  		<span id="{{ . | urlize}}" class="term-abbr">( {{- . -}} )</span>
+<dl class='glossary'>
+	<dt id="{{.term | urlize}}">
+		<span class="term">{{- .term -}}</span>
+		{{- with .context.abbr }}
+	  		<span id="{{ . | urlize}}" class="term-abbr">( {{- . -}} )</span>
+		{{ end }}
+		{{ range .context.alt }}
+			<span id="{{ . | urlize}}" class="term-alt">( {{- . -}} )</span>
+		{{ end }}
+	</dt>
+	<dd>{{.context.description}}</dd>
+	{{ with .context.ref }}
+		<dd><a href={{ . | relURL }} >{{ . }}</a></dd> 
 	{{ end }}
-	{{ range .context.alt }}
-		<span id="{{ . | urlize}}" class="term-alt">( {{- . -}} )</span>
+	{{ with .context.link }}
+		<dd><a href={{ . }}>{{ . }}</a></dd>
 	{{ end }}
-</dt>
-<dd>{{.context.description}}</dd>
-{{ with .context.ref }}
-	<dd><a href={{ . | relURL }} >{{ . }}</a></dd> 
-{{ end }}
-{{ with .context.link }}
-	<dd><a href={{ . }}>{{ . }}</a></dd>
-{{ end }}
+</dl>

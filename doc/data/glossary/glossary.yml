@@ -19,7 +19,7 @@ Gateway ID:
   description: A unique, human-readable identifier for your gateway.
 
 Gateway EUI:
-  description: A 64 bit extended unique identifier for your gateway. This is programmed by the manufactuerer and should not be changed. In cases where it is not programmed by the manufacturer, it must be programmed with a unique EUI that you own.
+  description: A 64 bit extended unique identifier for your gateway. This is programmed by the manufacturer and should not be changed. In cases where it is not programmed by the manufacturer, it must be programmed with a unique EUI that you own.
   link: https://www.thethingsnetwork.org/docs/lorawan/addressing.html
 
 Network:
@@ -50,7 +50,7 @@ End Device:
     - Mote
 
 Media Access Control:
-  description: LoRaWAN media access protocols, downloadable from the LoRa Alliance. The MAC version for your device should be specified in the product documentation as Protocol version.
+  description: LoRaWAN media access protocols, downloadable from the LoRa Alliance. The MAC version for your device should be specified in the product documentation as LoRaWAN specification or protocol version.
   link: https://lora-alliance.org/lorawan-for-developers
   abbr: MAC
 
@@ -155,7 +155,7 @@ Join EUI:
   abbr: JoinEUI
 
 Application EUI:
-  description: In LoRaWAN specifications prior to 1.1, Join EUI was called Application EUI. See Join EUI
+  description: In LoRaWAN specifications prior to 1.1, Join EUI was called Application EUI. See Join EUI.
   link: https://www.thethingsnetwork.org/docs/lorawan/addressing.html
   abbr: AppEUI
 
