@@ -86,6 +86,7 @@ func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
 }
 
 var (
+	errConflictingPaths             = errors.DefineInvalidArgument("conflicting_paths", "conflicting set and unset field mask paths")
 	errEndDeviceEUIUpdate           = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
 	errEndDeviceKeysWithProvisioner = errors.DefineInvalidArgument("end_device_keys_provisioner", "end device ABP or OTAA keys cannot be set when there is a provisioner")
 	errInconsistentEndDeviceEUI     = errors.DefineInvalidArgument("inconsistent_end_device_eui", "given end device EUIs do not match registered EUIs")
@@ -511,7 +512,7 @@ var (
 
 			device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...)
 
-			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, []string{}, true, false)
+			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, nil, true, false)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
 				if err := deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers); err != nil {
@@ -549,6 +550,10 @@ var (
 			if len(paths)+len(unsetPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
+			}
+			if remainingPaths := ttnpb.ExcludeFields(paths, unsetPaths...); len(remainingPaths) != len(paths) {
+				overlapPaths := ttnpb.ExcludeFields(paths, remainingPaths...)
+				return errConflictingPaths.WithAttributes("field_mask_paths", overlapPaths)
 			}
 			var device ttnpb.EndDevice
 			if ttnpb.HasAnyField(paths, setEndDeviceToJS...) {
