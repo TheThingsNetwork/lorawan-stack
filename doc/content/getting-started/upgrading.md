@@ -1,9 +1,12 @@
 ---
 title: "Upgrading"
 description: ""
+weight: -1
 ---
 
 Follow these instructions to upgrade an existing {{% tts %}} instance.
+
+<!--more-->
 
 Replace the tag in your **docker-compose.yml** file with the newer version of {{% tts %}}:
 

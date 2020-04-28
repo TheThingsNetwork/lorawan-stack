@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error details for failed events in the Console.
 - `Unknown` and `Other cluster` connection statuses to the gateways table in the Console.
 - LoRaWAN 2.4 GHz band `ISM2400`.
+- Upgrading guide in docs
 
 ### Changed
 
