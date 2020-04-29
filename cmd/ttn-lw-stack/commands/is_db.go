@@ -81,6 +81,9 @@ var (
 				}
 				return nil
 			})
+			if err != nil {
+				return err
+			}
 
 			logger.Info("Successfully migrated")
 			return nil
