@@ -20,7 +20,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 class SubmitButton extends React.PureComponent {
   static propTypes = {
-    dirty: PropTypes.bool.isRequired,
     disabled: PropTypes.bool,
     icon: PropTypes.string,
     isSubmitting: PropTypes.bool.isRequired,
@@ -33,9 +32,8 @@ class SubmitButton extends React.PureComponent {
     icon: undefined,
   }
   render() {
-    const { message, icon, isSubmitting, isValidating, disabled, dirty } = this.props
+    const { message, icon, disabled, isSubmitting, isValidating } = this.props
 
-    const buttonDisabled = disabled || isSubmitting || !dirty
     const buttonLoading = isSubmitting || isValidating
 
     return (
@@ -43,7 +41,7 @@ class SubmitButton extends React.PureComponent {
         type="submit"
         icon={icon}
         message={message}
-        disabled={buttonDisabled}
+        disabled={disabled}
         busy={buttonLoading}
       />
     )
