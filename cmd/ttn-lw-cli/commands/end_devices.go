@@ -86,6 +86,7 @@ func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
 }
 
 var (
+	errConflictingPaths             = errors.DefineInvalidArgument("conflicting_paths", "conflicting set and unset field mask paths")
 	errEndDeviceEUIUpdate           = errors.DefineInvalidArgument("end_device_eui_update", "end device EUIs can not be updated")
 	errEndDeviceKeysWithProvisioner = errors.DefineInvalidArgument("end_device_keys_provisioner", "end device ABP or OTAA keys cannot be set when there is a provisioner")
 	errInconsistentEndDeviceEUI     = errors.DefineInvalidArgument("inconsistent_end_device_eui", "given end device EUIs do not match registered EUIs")
@@ -511,7 +512,7 @@ var (
 
 			device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...)
 
-			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, true, false)
+			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, nil, true, false)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
 				if err := deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers); err != nil {
@@ -543,9 +544,16 @@ var (
 				return err
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags(), endDevicePictureFlags)
-			if len(paths) == 0 {
+			rawUnsetPaths, _ := cmd.Flags().GetStringSlice("unset")
+			unsetPaths := util.NormalizePaths(rawUnsetPaths)
+
+			if len(paths)+len(unsetPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
+			}
+			if remainingPaths := ttnpb.ExcludeFields(paths, unsetPaths...); len(remainingPaths) != len(paths) {
+				overlapPaths := ttnpb.ExcludeFields(paths, remainingPaths...)
+				return errConflictingPaths.WithAttributes("field_mask_paths", overlapPaths)
 			}
 			var device ttnpb.EndDevice
 			if ttnpb.HasAnyField(paths, setEndDeviceToJS...) {
@@ -557,8 +565,8 @@ var (
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			device.EndDeviceIdentifiers = *devID
 
+			paths = append(paths, unsetPaths...)
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
-
 			if len(nsPaths) > 0 && config.NetworkServerEnabled {
 				if device.NetworkServerAddress == "" {
 					device.NetworkServerAddress = getHost(config.NetworkServerGRPCAddress)
@@ -593,7 +601,7 @@ var (
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: *devID,
-				FieldMask:            pbtypes.FieldMask{Paths: isPaths},
+				FieldMask:            pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(isPaths, unsetPaths...)},
 			})
 			if err != nil {
 				return err
@@ -625,7 +633,7 @@ var (
 			}
 
 			touch, _ := cmd.Flags().GetBool("touch")
-			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths, false, touch)
+			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths, unsetPaths, false, touch)
 			if err != nil {
 				return err
 			}
@@ -1138,6 +1146,7 @@ func init() {
 	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesUpdateCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDevicePictureFlags)
+	endDevicesUpdateCommand.Flags().AddFlagSet(util.UnsetFlagSet())
 	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
 	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())
 	endDevicesProvisionCommand.Flags().AddFlagSet(dataFlags("", ""))
