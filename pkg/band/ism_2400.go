@@ -95,7 +95,7 @@ func init() {
 		MinAckTimeout:    defaultAckTimeout - defaultAckTimeoutMargin,
 		MaxAckTimeout:    defaultAckTimeout + defaultAckTimeoutMargin,
 
-		DefaultMaxEIRP: 16,
+		DefaultMaxEIRP: 10,
 		TxOffset: []float32{
 			0,
 			-2,
