@@ -3,10 +3,10 @@ title: "Glossary"
 description: "Common terms and definitions"
 ---
 
-Common terms and definitions.
+This reference contains common terms and definitions to help you find your way around {{% tts %}}.
 
 <!--more-->
 
-<!-- Terms come from /data/glossary. -->
+<!-- terms come from /data/glossary. -->
 
-{{< proto/glossary >}}
+{{< glossary package="glossary">}}

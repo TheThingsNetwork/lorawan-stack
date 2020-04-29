@@ -225,11 +225,19 @@ details + blockquote {
   margin-top: 1em;
 }
 
-.glossary dl {
+.glossary {
+  .term, .term-abbr, .term-alt{
+    background-color: #ececec;
+    padding: 0.25rem;
+    font-weight: bold;
+  }
+
+  dd {
+    margin: 0.5em 0 0.5em 0;
+  }
 }
 .glossary dt {
-  margin-top: 1rem;
-  font-weight: bold;
+
   .term {
     background-color: #ececec;
     padding: 0.25rem;
@@ -238,9 +246,6 @@ details + blockquote {
     background-color: #ececec;
     padding: 0.25rem;
   }
-}
-.glossary dd {
-  margin: 0.5em 0 0.5em 0;
 }
 
 @import "highlight.scss";
