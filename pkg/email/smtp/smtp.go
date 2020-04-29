@@ -19,8 +19,8 @@ import (
 	"net"
 	"strconv"
 
-	"go.thethings.network/lorawan-stack/pkg/email"
-	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	gomail "gopkg.in/mail.v2"
 )
 

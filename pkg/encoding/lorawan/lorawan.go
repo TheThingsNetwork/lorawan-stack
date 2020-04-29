@@ -18,7 +18,7 @@ package lorawan
 import (
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 const maxUint24 = 1<<24 - 1

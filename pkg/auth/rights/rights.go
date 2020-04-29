@@ -18,7 +18,7 @@ package rights
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Rights for the request.

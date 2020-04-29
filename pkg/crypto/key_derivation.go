@@ -17,7 +17,7 @@ package crypto
 import (
 	"crypto/aes"
 
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // deriveSKey derives a session key

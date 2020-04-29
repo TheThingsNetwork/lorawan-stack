@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"go.thethings.network/lorawan-stack/pkg/errorcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 )
 
 const (

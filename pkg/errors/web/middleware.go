@@ -23,9 +23,9 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/golang/gddo/httputil"
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	sentryerrors "go.thethings.network/lorawan-stack/pkg/errors/sentry"
-	_ "go.thethings.network/lorawan-stack/pkg/ttnpb" // imported for side-effect of correct TTN error rendering.
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/ttnpb" // imported for side-effect of correct TTN error rendering.
 )
 
 var globalRenderers = map[string]ErrorRenderer{}

@@ -17,7 +17,7 @@ package udp
 import (
 	"encoding/json"
 
-	"go.thethings.network/lorawan-stack/pkg/util/datarate"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/datarate"
 )
 
 // Data contains a LoRaWAN packet

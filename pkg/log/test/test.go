@@ -18,7 +18,7 @@ package test
 import (
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 // Entry is a simple log.Entry that can be used for testing.

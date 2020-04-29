@@ -25,10 +25,10 @@ import (
 	"time"
 
 	ulid "github.com/oklog/ulid/v2"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/picture"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
-	"go.thethings.network/lorawan-stack/pkg/util/randutil"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/picture"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/randutil"
 )
 
 const maxProfilePictureStoredDimensions = 1024

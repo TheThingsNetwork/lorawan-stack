@@ -19,7 +19,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 
-	"go.thethings.network/lorawan-stack/pkg/crypto"
+	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 )
 
 type emptyKeyVault struct {

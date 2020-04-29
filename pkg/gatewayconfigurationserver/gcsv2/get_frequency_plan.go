@@ -18,7 +18,7 @@ import (
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
-	"go.thethings.network/lorawan-stack/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
 )
 
 func (s *Server) handleGetFrequencyPlan(c echo.Context) error {

@@ -15,9 +15,9 @@
 package mqtt
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt/topics"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Format formats topics, downlink, uplink and status messages.

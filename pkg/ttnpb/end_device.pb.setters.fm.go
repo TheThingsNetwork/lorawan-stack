@@ -7,7 +7,7 @@ import (
 	time "time"
 
 	types "github.com/gogo/protobuf/types"
-	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
+	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func (dst *Session) SetFields(src *Session, paths ...string) error {
@@ -20,7 +20,7 @@ func (dst *Session) SetFields(src *Session, paths ...string) error {
 			if src != nil {
 				dst.DevAddr = src.DevAddr
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.DevAddr
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
 				dst.DevAddr = zero
 			}
 		case "keys":
@@ -2254,7 +2254,7 @@ func (dst *GetEndDeviceIdentifiersForEUIsRequest) SetFields(src *GetEndDeviceIde
 			if src != nil {
 				dst.JoinEUI = src.JoinEUI
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
 				dst.JoinEUI = zero
 			}
 		case "dev_eui":
@@ -2264,7 +2264,7 @@ func (dst *GetEndDeviceIdentifiersForEUIsRequest) SetFields(src *GetEndDeviceIde
 			if src != nil {
 				dst.DevEUI = src.DevEUI
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
 				dst.DevEUI = zero
 			}
 

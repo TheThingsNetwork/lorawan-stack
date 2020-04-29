@@ -14,7 +14,7 @@
 
 package emails
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 // Data for emails.
 // Update doc/content/reference/email-templates/available.md when changing fields or adding new emails.

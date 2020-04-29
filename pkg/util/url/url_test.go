@@ -19,8 +19,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
-	urlutil "go.thethings.network/lorawan-stack/pkg/util/url"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
 )
 
 func TestURLClone(t *testing.T) {

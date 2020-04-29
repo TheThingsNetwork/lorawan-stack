@@ -18,10 +18,10 @@ import (
 	"path"
 	"time"
 
-	"go.thethings.network/lorawan-stack/cmd/internal/shared"
-	"go.thethings.network/lorawan-stack/pkg/identityserver"
-	"go.thethings.network/lorawan-stack/pkg/oauth"
-	"go.thethings.network/lorawan-stack/pkg/webui"
+	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
+	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
 // DefaultIdentityServerConfig is the default configuration for the Identity Server.

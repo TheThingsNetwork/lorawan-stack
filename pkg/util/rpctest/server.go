@@ -21,7 +21,7 @@ import (
 	"io"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/errorcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 )
 
 // The FooBarExampleServer is an example/test server

@@ -14,7 +14,7 @@
 
 package formatters
 
-import "go.thethings.network/lorawan-stack/pkg/ttnpb"
+import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
 type protobuf struct{}
 

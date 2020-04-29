@@ -23,12 +23,12 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/openshift/osin"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	web_errors "go.thethings.network/lorawan-stack/pkg/errors/web"
-	"go.thethings.network/lorawan-stack/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/web"
-	"go.thethings.network/lorawan-stack/pkg/webui"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
 // Server is the interface for the OAuth server.

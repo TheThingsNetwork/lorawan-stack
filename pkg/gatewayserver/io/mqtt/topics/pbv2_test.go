@@ -19,11 +19,11 @@ import (
 
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/pkg/gatewayserver/io/mqtt/topics"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
-	"go.thethings.network/lorawan-stack/pkg/util/test"
-	"go.thethings.network/lorawan-stack/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt/topics"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 const gatewayIDV2 = "test"

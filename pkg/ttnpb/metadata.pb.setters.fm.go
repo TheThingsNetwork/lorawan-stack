@@ -6,7 +6,7 @@ import (
 	fmt "fmt"
 	time "time"
 
-	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
+	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
@@ -324,7 +324,7 @@ func (dst *PacketBrokerMetadata) SetFields(src *PacketBrokerMetadata, paths ...s
 			if src != nil {
 				dst.ForwarderNetID = src.ForwarderNetID
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.NetID
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
 				dst.ForwarderNetID = zero
 			}
 		case "forwarder_tenant_id":
@@ -354,7 +354,7 @@ func (dst *PacketBrokerMetadata) SetFields(src *PacketBrokerMetadata, paths ...s
 			if src != nil {
 				dst.HomeNetworkNetID = src.HomeNetworkNetID
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.NetID
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
 				dst.HomeNetworkNetID = zero
 			}
 		case "home_network_tenant_id":

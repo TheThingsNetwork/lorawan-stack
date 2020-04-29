@@ -22,10 +22,10 @@ import (
 
 	"github.com/go-redis/redis"
 	"github.com/gogo/protobuf/proto"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	ttnredis "go.thethings.network/lorawan-stack/pkg/redis"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 var (

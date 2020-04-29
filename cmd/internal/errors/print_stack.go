@@ -19,7 +19,7 @@ import (
 	"io"
 	"os"
 
-	"go.thethings.network/lorawan-stack/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
 // PrintStack prints the error stack to w.

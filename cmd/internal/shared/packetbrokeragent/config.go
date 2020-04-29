@@ -15,7 +15,7 @@
 package shared
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/packetbrokeragent"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbrokeragent"
 )
 
 // DefaultPacketBrokerAgentConfig is the default configuration for the Packet Broker Agent.

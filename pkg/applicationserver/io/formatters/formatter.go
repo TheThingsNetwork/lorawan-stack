@@ -15,7 +15,7 @@
 package formatters
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Formatter formats upstream and downstream messages.

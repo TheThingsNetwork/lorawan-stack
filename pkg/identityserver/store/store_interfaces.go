@@ -18,7 +18,7 @@ import (
 	"context"
 
 	"github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // ApplicationStore interface for storing Applications.

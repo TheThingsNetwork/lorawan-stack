@@ -15,8 +15,8 @@
 package console
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/web/oauthclient"
-	"go.thethings.network/lorawan-stack/pkg/webui"
+	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
+	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
 // UIConfig is the combined configuration for the Console UI.

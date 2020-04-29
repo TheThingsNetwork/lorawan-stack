@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/rpcmiddleware/discover"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/discover"
 	"gopkg.in/yaml.v2"
 )
 

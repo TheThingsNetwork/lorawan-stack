@@ -14,7 +14,7 @@
 
 package web
 
-import "go.thethings.network/lorawan-stack/pkg/applicationserver/io/formatters"
+import "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 
 func init() {
 	formats["protobuf"] = Format{

@@ -28,7 +28,7 @@ import "lorawan-stack/api/regional.proto";
 
 package ttn.lorawan.v3;
 
-option go_package = "go.thethings.network/lorawan-stack/pkg/ttnpb";
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 // GatewayUp may contain zero or more uplink messages and/or a status message for the gateway.
 message GatewayUp {

@@ -16,7 +16,7 @@ package test_test
 
 import (
 	"github.com/gogo/protobuf/proto"
-	. "go.thethings.network/lorawan-stack/pkg/util/test"
+	. "go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 var (

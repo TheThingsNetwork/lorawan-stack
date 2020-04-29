@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"time"
 
-	"go.thethings.network/lorawan-stack/pkg/interop"
+	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 )
 
 // RegisterInterop registers an interop subsystem to the component.

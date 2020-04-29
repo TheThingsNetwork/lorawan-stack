@@ -14,7 +14,7 @@
 
 package fetch
 
-import "go.thethings.network/lorawan-stack/pkg/errors"
+import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
 var (
 	errCouldNotFetchFile    = errors.Define("fetch_file", "could not fetch file `{filename}`")

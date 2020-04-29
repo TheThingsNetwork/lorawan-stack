@@ -26,8 +26,8 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/gogo/protobuf/types"
 	"github.com/spf13/pflag"
-	"go.thethings.network/lorawan-stack/pkg/errors"
-	"go.thethings.network/lorawan-stack/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // DeprecateFlag deprecates a CLI flag.
@@ -147,7 +147,7 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 			"UInt64Value":
 			return true
 		}
-	case "go.thethings.network/lorawan-stack/pkg/ttnpb":
+	case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
 		switch t.Name() {
 		case
 			"ADRAckDelayExponentValue",
@@ -182,7 +182,7 @@ func isSettableField(name string) bool {
 }
 
 func enumValues(t reflect.Type) []string {
-	if t.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb" {
+	if t.PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/ttnpb" {
 		valueMap := make(map[string]int32)
 		implementsStringer := t.Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem())
 		for s, v := range proto.EnumValueMap(fmt.Sprintf("ttn.lorawan.v3.%s", t.Name())) {
@@ -263,7 +263,7 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			return
 		}
 
-	case "go.thethings.network/lorawan-stack/pkg/ttnpb":
+	case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
 		switch typeName := t.Name(); typeName {
 		case
 			"ADRAckDelayExponentValue",
@@ -321,14 +321,14 @@ func addField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 	case reflect.Slice:
 		el := t.Elem()
 		switch el.PkgPath() {
-		case "go.thethings.network/lorawan-stack/pkg/ttnpb":
+		case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
 			switch el.Name() {
 			case "GatewayAntennaIdentifiers":
 				fs.StringSlice(name, nil, "")
 				return
 			}
 
-		case "go.thethings.network/lorawan-stack/pkg/types":
+		case "go.thethings.network/lorawan-stack/v3/pkg/types":
 			switch el.Name() {
 			case "DevAddrPrefix":
 				fs.StringSlice(name, nil, "")
@@ -557,7 +557,7 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						}
 						field.Set(reflect.ValueOf(types.BytesValue{Value: buf}))
 					}
-				case ft.PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb":
+				case ft.PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
 					switch typeName := ft.Name(); typeName {
 					case "DataRateIndexValue":
 						if enumValue, ok := proto.EnumValueMap(unwrapLoRaWANEnumType(typeName))[v.String()]; ok {
@@ -656,7 +656,7 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						for i := 0; i < v.Len(); i++ {
 							slice.Index(i).Set(v.Index(i).Convert(ft.Elem()))
 						}
-					case ft.Elem().PkgPath() == "go.thethings.network/lorawan-stack/pkg/ttnpb" &&
+					case ft.Elem().PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/ttnpb" &&
 						ft.Elem().Name() == "GatewayAntennaIdentifiers" && vt.Elem().Kind() == reflect.String:
 						for i := 0; i < v.Len(); i++ {
 							slice.Index(i).Set(reflect.ValueOf(ttnpb.GatewayAntennaIdentifiers{

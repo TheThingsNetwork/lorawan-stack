@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"math"
 
-	"go.thethings.network/lorawan-stack/pkg/log"
-	"go.thethings.network/lorawan-stack/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // NewPopulatedUplinkMessage is used for compatibility with gogoproto, and in cases, where the

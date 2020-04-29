@@ -21,8 +21,8 @@ import (
 	"sync"
 
 	"github.com/fsnotify/fsnotify"
-	"go.thethings.network/lorawan-stack/pkg/events"
-	"go.thethings.network/lorawan-stack/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 // Watcher interface for watching the filesystem for changes.

@@ -7,7 +7,7 @@ import (
 	time "time"
 
 	types "github.com/gogo/protobuf/types"
-	go_thethings_network_lorawan_stack_pkg_types "go.thethings.network/lorawan-stack/pkg/types"
+	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func (dst *GatewayBrand) SetFields(src *GatewayBrand, paths ...string) error {
@@ -586,7 +586,7 @@ func (dst *GetGatewayIdentifiersForEUIRequest) SetFields(src *GetGatewayIdentifi
 			if src != nil {
 				dst.EUI = src.EUI
 			} else {
-				var zero go_thethings_network_lorawan_stack_pkg_types.EUI64
+				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
 				dst.EUI = zero
 			}
 

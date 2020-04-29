@@ -15,7 +15,7 @@
 package errors
 
 import (
-	"go.thethings.network/lorawan-stack/pkg/jsonpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	spb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/status"
 )
