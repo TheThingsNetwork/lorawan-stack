@@ -83,7 +83,6 @@ func init() {
 			ttnpb.DATA_RATE_6: makeLoRaDataRate(6, 812000, makeConstMaxMACPayloadSizeFunc(230)),
 			ttnpb.DATA_RATE_7: makeLoRaDataRate(5, 812000, makeConstMaxMACPayloadSizeFunc(230)),
 		},
-		MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
 
 		ReceiveDelay1:    defaultReceiveDelay1,
 		ReceiveDelay2:    defaultReceiveDelay2,
