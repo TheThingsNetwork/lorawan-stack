@@ -72,14 +72,14 @@ var (
 
 			err = store.Transact(ctx, db, func(db *gorm.DB) error {
 				logger.Info("Migrating table structure...")
-				if err = store.AutoMigrate(db).Error; err != nil {
-					return err
-				}
+				return store.AutoMigrate(db).Error
+			})
+			if err != nil {
+				return err
+			}
+			err = store.Transact(ctx, db, func(db *gorm.DB) error {
 				logger.Info("Migrating table contents...")
-				if err = migrations.Apply(ctx, db, migrations.All...); err != nil {
-					return err
-				}
-				return nil
+				return migrations.Apply(ctx, db, migrations.All...)
 			})
 			if err != nil {
 				return err
